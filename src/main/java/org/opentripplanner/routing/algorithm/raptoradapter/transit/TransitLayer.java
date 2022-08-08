@@ -121,21 +121,17 @@ public class TransitLayer {
     return stopIndex.size();
   }
 
-  @Nullable
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {
     List<TripPatternForDate> tripPatternForDate = tripPatternsRunningOnDate.get(runningPeriodDate);
-    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : null;
+    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : new ArrayList<>();
   }
 
-  @Nullable
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
     List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
-    return tripPatternsRunningOnDate != null
-      ? tripPatternsRunningOnDate
-        .stream()
-        .filter(t -> t.getLocalDate().equals(date))
-        .collect(Collectors.toList())
-      : null;
+    return tripPatternsRunningOnDate
+      .stream()
+      .filter(t -> t.getLocalDate().equals(date))
+      .collect(Collectors.toList());
   }
 
   public TransferService getTransferService() {
