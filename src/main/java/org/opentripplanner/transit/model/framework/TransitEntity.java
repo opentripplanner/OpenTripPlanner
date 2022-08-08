@@ -40,7 +40,7 @@ public abstract class TransitEntity<
 
   @Override
   public final int hashCode() {
-    return getId().hashCode();
+    return id.hashCode();
   }
 
   /**
