@@ -37,8 +37,8 @@ public class ItineraryFiltersMapper {
       ),
       c.asBoolean("accessibilityScore", dft.accessibilityScore),
       c.asBoolean(
-        "removeTimeshiftedItinerariesWithSameRoutesAndStops",
-        dft.removeTimeshiftedItinerariesWithSameRoutesAndStops
+        "removeItinerariesWithSameRoutesAndStops",
+        dft.removeItinerariesWithSameRoutesAndStops
       )
     );
   }

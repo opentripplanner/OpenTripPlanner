@@ -196,7 +196,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void removeTimeshiftedItinerariesWithSameRoutesAndStops() {
+  public void removeItinerariesWithSameRoutesAndStops() {
     var i1 = newItinerary(A).bus(21, T11_06, T11_28, E).bus(41, T11_30, T11_32, D).build();
     var i2 = newItinerary(A).bus(22, T11_09, T11_30, E).bus(42, T11_32, T11_33, D).build();
     var i3 = newItinerary(A).bus(23, T11_10, T11_32, E).bus(43, T11_33, T11_50, D).build();

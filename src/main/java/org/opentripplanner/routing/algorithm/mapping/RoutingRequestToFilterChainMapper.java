@@ -71,7 +71,7 @@ public class RoutingRequestToFilterChainMapper {
       .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible, wheelchairMaxSlope)
       .withFares(fareService)
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
-        params.removeTimeshiftedItinerariesWithSameRoutesAndStops
+        params.removeItinerariesWithSameRoutesAndStops
       )
       .withTransitAlerts(transitAlertService, getMultiModalStation)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)

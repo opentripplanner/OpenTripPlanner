@@ -106,7 +106,7 @@ public class ItineraryFilterParameters {
    * Whether to remove timeshifted "duplicate" itineraries from the search results so that you get a
    * greater variety of results rather than the same ones at different times.
    */
-  public boolean removeTimeshiftedItinerariesWithSameRoutesAndStops;
+  public boolean removeItinerariesWithSameRoutesAndStops;
 
   private ItineraryFilterParameters() {
     this.debug = false;
@@ -120,7 +120,7 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
-    this.removeTimeshiftedItinerariesWithSameRoutesAndStops = false;
+    this.removeItinerariesWithSameRoutesAndStops = false;
   }
 
   public ItineraryFilterParameters(ItineraryFilterParameters i) {
@@ -135,7 +135,7 @@ public class ItineraryFilterParameters {
       i.parkAndRideDurationRatio,
       i.filterItinerariesWithSameFirstOrLastTrip,
       i.accessibilityScore,
-      i.removeTimeshiftedItinerariesWithSameRoutesAndStops
+      i.removeItinerariesWithSameRoutesAndStops
     );
   }
 
@@ -150,7 +150,7 @@ public class ItineraryFilterParameters {
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,
     boolean accessibilityScore,
-    boolean removeTimeshiftedItinerariesWithSameRoutesAndStops
+    boolean removeItinerariesWithSameRoutesAndStops
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -162,8 +162,7 @@ public class ItineraryFilterParameters {
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = accessibilityScore;
-    this.removeTimeshiftedItinerariesWithSameRoutesAndStops =
-      removeTimeshiftedItinerariesWithSameRoutesAndStops;
+    this.removeItinerariesWithSameRoutesAndStops = removeItinerariesWithSameRoutesAndStops;
   }
 
   public static ItineraryFilterParameters createDefault() {
