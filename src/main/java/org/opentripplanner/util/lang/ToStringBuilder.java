@@ -4,6 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -238,6 +239,14 @@ public class ToStringBuilder {
           .mapToObj(TimeUtils::timeToStrCompact)
           .collect(Collectors.joining(" ", "[", "]"))
     );
+  }
+
+  /**
+   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
+   * DATE is not printed. {@code null} value is ignored.
+   */
+  public ToStringBuilder addDate(String name, LocalDate time) {
+    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_DATE::format);
   }
 
   /**

@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**

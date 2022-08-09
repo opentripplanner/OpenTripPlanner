@@ -1,39 +1,46 @@
 package org.opentripplanner.standalone.configure;
 
-import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-
 import dagger.BindsInstance;
 import dagger.Component;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
-import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.configure.GraphModule;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.ConfigModule;
 import org.opentripplanner.standalone.config.OtpBaseDirectory;
-import org.opentripplanner.standalone.config.OtpConfig;
-import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.configure.TransitModule;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This abstract class provide the top level service created and wired together using the Dagger 2
  * Dependency Injection framework. Dagger picks up this class and implement it.
  */
 @Singleton
-@Component(modules = { ConfigModule.class, DataStoreModule.class, GsDataSourceModule.class })
+@Component(
+  modules = {
+    AppModule.class,
+    ConfigModule.class,
+    DataStoreModule.class,
+    GraphModule.class,
+    GsDataSourceModule.class,
+    TransitModule.class,
+  }
+)
 public interface OTPApplicationFactory {
-  OtpConfig otpConfig();
-  BuildConfig buildConfig();
-  RouterConfig routerConfig();
+  RaptorConfig<TripSchedule> raptorConfig();
   OtpDataStore datastore();
   ConfigModel configModel();
-
-  default void setOtpConfigVersionsOnServerInfo() {
-    projectInfo().otpConfigVersion = otpConfig().configVersion;
-    projectInfo().buildConfigVersion = buildConfig().configVersion;
-    projectInfo().routerConfigVersion = routerConfig().getConfigVersion();
-  }
+  Deduplicator deduplicator();
+  AtomicReference<Graph> graph();
+  AtomicReference<TransitModel> transitModel();
 
   @Component.Builder
   interface Builder {

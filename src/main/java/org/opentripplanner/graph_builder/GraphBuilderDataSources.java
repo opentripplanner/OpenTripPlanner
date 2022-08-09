@@ -85,19 +85,19 @@ public class GraphBuilderDataSources {
    * @return {@code true} if and only if the data source exist, proper command line parameters is
    * set and not disabled by the loaded configuration files.
    */
-  boolean has(FileType type) {
+  public boolean has(FileType type) {
     return inputData.containsKey(type);
   }
 
-  Iterable<DataSource> get(FileType type) {
+  public Iterable<DataSource> get(FileType type) {
     return inputData.get(type);
   }
 
-  CompositeDataSource getBuildReportDir() {
+  public CompositeDataSource getBuildReportDir() {
     return store.getBuildReportDir();
   }
 
-  File getCacheDirectory() {
+  public File getCacheDirectory() {
     return cacheDirectory;
   }
 

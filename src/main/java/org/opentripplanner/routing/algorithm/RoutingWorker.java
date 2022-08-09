@@ -132,12 +132,8 @@ public class RoutingWorker {
       request.wheelchairAccessibility.enabled(),
       request.wheelchairAccessibility.maxSlope(),
       serverContext.graph().getService(FareService.class),
-      serverContext.transitModel().getTransitAlertService(),
-      serverContext
-        .transitModel()
-        .getStopModel()
-        .getStopModelIndex()
-        .getMultiModalStationForStations()::get
+      serverContext.transitService().getTransitAlertService(),
+      serverContext.transitService()::getMultiModalStationForStation
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);

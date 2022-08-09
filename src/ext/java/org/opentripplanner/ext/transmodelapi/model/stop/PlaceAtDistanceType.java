@@ -15,8 +15,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitService;
@@ -116,9 +116,7 @@ public class PlaceAtDistanceType {
 
     List<PlaceAtDistance> res = new ArrayList<>();
 
-    MultiModalStation multiModalStation = transitService
-      .getMultiModalStationForStations()
-      .get(stopPlace);
+    MultiModalStation multiModalStation = transitService.getMultiModalStationForStation(stopPlace);
 
     if (
       "child".equals(multiModalMode) || "all".equals(multiModalMode) || multiModalStation == null

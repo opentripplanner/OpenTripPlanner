@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,8 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -35,7 +35,7 @@ public class UnconnectedAreasTest {
    */
   @Test
   public void testUnconnectedCarParkAndRide() {
-    DataImportIssueStore issueStore = new DataImportIssueStore(true);
+    DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
     assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
@@ -52,7 +52,7 @@ public class UnconnectedAreasTest {
 
   @Test
   public void testUnconnectedBikeParkAndRide() {
-    DataImportIssueStore issueStore = new DataImportIssueStore(true);
+    DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
 
     assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
@@ -144,7 +144,7 @@ public class UnconnectedAreasTest {
   }
 
   private Graph buildOSMGraph(String osmFileName) {
-    return buildOSMGraph(osmFileName, new DataImportIssueStore(false));
+    return buildOSMGraph(osmFileName, DataImportIssueStore.noopIssueStore());
   }
 
   private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
@@ -157,15 +157,20 @@ public class UnconnectedAreasTest {
     File file = new File(fileUrl.getFile());
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      graph,
+      transitModel.getTimeZone(),
+      issueStore
+    );
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     loader.staticParkAndRide = true;
     loader.staticBikeParkAndRide = true;
 
-    loader.buildGraph(graph, transitModel, new HashMap<>(), issueStore);
+    loader.buildGraph();
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, transitModel, new HashMap<>(), issueStore);
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     return graph;
   }

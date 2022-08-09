@@ -11,12 +11,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
@@ -36,12 +34,13 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -62,7 +61,7 @@ public class GeometryProcessorTest {
     var stopModel = new StopModel();
     graph = new Graph(stopModel, deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
-    this.issueStore = new DataImportIssueStore(true);
+    this.issueStore = new DataImportIssueStore();
 
     context =
       contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
@@ -127,10 +126,9 @@ public class GeometryProcessorTest {
       );
     }
 
-    StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
   }
 
   @Test

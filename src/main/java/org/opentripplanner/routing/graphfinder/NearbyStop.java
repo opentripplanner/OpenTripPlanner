@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -21,25 +19,13 @@ public class NearbyStop implements Comparable<NearbyStop> {
   public final double distance;
 
   public final List<Edge> edges;
-  public final LineString geometry;
   public final State state;
 
-  public NearbyStop(
-    StopLocation stop,
-    double distance,
-    List<Edge> edges,
-    LineString geometry,
-    State state
-  ) {
+  public NearbyStop(StopLocation stop, double distance, List<Edge> edges, State state) {
     this.stop = stop;
     this.distance = distance;
     this.edges = edges;
-    this.geometry = geometry;
     this.state = state;
-  }
-
-  public NearbyStop(TransitStopVertex stopVertex, double distance, List<Edge> edges, State state) {
-    this(stopVertex.getStop(), distance, edges, null, state);
   }
 
   /**
@@ -54,7 +40,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
       effectiveWalkDistance += edge.getEffectiveWalkDistance();
       edges.add(edge);
     }
-    return new NearbyStop(stop, effectiveWalkDistance, edges, null, state);
+    return new NearbyStop(stop, effectiveWalkDistance, edges, state);
   }
 
   @Override
@@ -73,7 +59,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
 
   @Override
   public int hashCode() {
-    return Objects.hash(stop, distance, edges, geometry, state);
+    return Objects.hash(stop, distance, edges, state);
   }
 
   @Override
@@ -89,7 +75,6 @@ public class NearbyStop implements Comparable<NearbyStop> {
       Double.compare(that.distance, distance) == 0 &&
       stop.equals(that.stop) &&
       Objects.equals(edges, that.edges) &&
-      Objects.equals(geometry, that.geometry) &&
       Objects.equals(state, that.state)
     );
   }
@@ -101,7 +86,6 @@ public class NearbyStop implements Comparable<NearbyStop> {
       stop,
       distance,
       edges != null ? " (" + edges.size() + " edges)" : "",
-      geometry != null ? " w/geometry" : "",
       state != null ? " w/state" : ""
     );
   }

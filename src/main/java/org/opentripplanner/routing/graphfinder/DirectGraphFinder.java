@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.graphfinder;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -18,10 +18,10 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class DirectGraphFinder implements GraphFinder {
 
-  private final StreetVertexIndex streetIndex;
+  private final StopModelIndex stopModelIndex;
 
   public DirectGraphFinder(Graph graph) {
-    this.streetIndex = graph.getStreetIndex();
+    this.stopModelIndex = graph.getStopModel().getStopModelIndex();
   }
 
   /**
@@ -30,11 +30,16 @@ public class DirectGraphFinder implements GraphFinder {
    */
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-    List<NearbyStop> stopsFound = Lists.newArrayList();
+    List<NearbyStop> stopsFound = new ArrayList<>();
     Coordinate coordinate = new Coordinate(lon, lat);
-    for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
+    Envelope envelope = new Envelope(coordinate);
+    envelope.expandBy(
+      SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),
+      SphericalDistanceLibrary.metersToDegrees(radiusMeters)
+    );
+    for (Stop it : stopModelIndex.queryStopSpatialIndex(envelope)) {
       double distance = Math.round(
-        SphericalDistanceLibrary.distance(coordinate, it.getCoordinate())
+        SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );
       if (distance < radiusMeters) {
         NearbyStop sd = new NearbyStop(it, distance, null, null);
@@ -58,7 +63,6 @@ public class DirectGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService,
     TransitService transitService
   ) {
     throw new UnsupportedOperationException("Not implemented");

@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitModelIndex;
 import org.opentripplanner.util.OTPFeature;
@@ -28,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the
+ * {@link GraphBuilderModule} module that links up the
  * stops of a transit network among themselves. This is necessary for routing in long-distance
  * mode.
  * <p>
@@ -42,27 +43,26 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Duration radiusByDuration;
 
   private final List<RoutingRequest> transferRequests;
+  private final Graph graph;
+  private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
 
-  public DirectTransferGenerator(Duration radiusByDuration, List<RoutingRequest> transferRequests) {
+  public DirectTransferGenerator(
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
+    Duration radiusByDuration,
+    List<RoutingRequest> transferRequests
+  ) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
   }
 
-  public List<String> provides() {
-    return List.of("linking");
-  }
-
-  public List<String> getPrerequisites() {
-    return List.of("street to transit");
-  }
-
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     /* Initialize transit model index which is needed by the nearby stop finder. */
     if (transitModel.getTransitModelIndex() == null) {
       transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
@@ -70,7 +70,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
-    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(graph, transitModel, radiusByDuration);
+    NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
+      graph,
+      new DefaultTransitService(transitModel),
+      radiusByDuration
+    );
     if (nearbyStopFinder.useStreets) {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
     } else {
@@ -173,7 +177,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
-    transitModel.setHasDirectTransfers(true);
   }
 
   @Override

@@ -3,12 +3,11 @@ package org.opentripplanner.model.plan.legreference;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
@@ -25,23 +24,18 @@ public record ScheduledTransitLegReference(
   implements LegReference {
   @Override
   public ScheduledTransitLeg getLeg(TransitService transitService) {
-    Trip trip = transitService.getTripForId().get(tripId);
+    Trip trip = transitService.getTripForId(tripId);
 
     if (trip == null) {
       return null;
     }
 
-    TripPattern tripPattern = null;
-    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-
     // Check if pattern is changed by real-time updater
-    if (timetableSnapshot != null) {
-      tripPattern = timetableSnapshot.getLastAddedTripPattern(tripId, serviceDate);
-    }
+    TripPattern tripPattern = transitService.getRealtimeAddedTripPattern(tripId, serviceDate);
 
     // Otherwise use scheduled pattern
     if (tripPattern == null) {
-      tripPattern = transitService.getPatternForTrip().get(trip);
+      tripPattern = transitService.getPatternForTrip(trip);
     }
 
     // no matching pattern found anywhere

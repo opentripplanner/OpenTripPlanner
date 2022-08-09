@@ -47,9 +47,7 @@ public class UnscheduledTripTest extends FlexTest {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, params)
-      .collect(Collectors.toList());
+    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
 
     assertEquals(1, accesses.size());
 
@@ -62,9 +60,7 @@ public class UnscheduledTripTest extends FlexTest {
   public void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, params)
-      .collect(Collectors.toList());
+    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
 
     assertEquals(1, egresses.size());
 
@@ -79,13 +75,13 @@ public class UnscheduledTripTest extends FlexTest {
     transitModel = model.transitModel();
   }
 
-  private static NearbyStop getNearbyStop(FlexTrip trip) {
+  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip) {
     assertEquals(1, trip.getStops().size());
     var stopLocation = trip.getStops().iterator().next();
-    return new NearbyStop(stopLocation, 0, List.of(), null, null);
+    return new NearbyStop(stopLocation, 0, List.of(), null);
   }
 
-  private static FlexTrip getFlexTrip() {
+  private static FlexTrip<?, ?> getFlexTrip() {
     var flexTrips = transitModel.getAllFlexTrips();
     return flexTrips.iterator().next();
   }

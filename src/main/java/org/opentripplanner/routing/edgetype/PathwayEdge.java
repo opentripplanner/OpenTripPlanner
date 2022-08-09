@@ -3,8 +3,6 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.PathwayMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -14,6 +12,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.PathwayMode;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A walking pathway as described in GTFS

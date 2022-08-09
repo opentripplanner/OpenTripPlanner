@@ -22,12 +22,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
@@ -36,13 +33,9 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
@@ -56,8 +49,6 @@ import org.slf4j.LoggerFactory;
 public class Graph implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-
-  private static final long serialVersionUID = 1L;
 
   public static final DrivingDirection DEFAULT_DRIVING_DIRECTION =
     DrivingDirection.RIGHT_HAND_TRAFFIC;
@@ -77,8 +68,6 @@ public class Graph implements Serializable {
 
   public final Instant buildTime = Instant.now();
   private StopModel stopModel;
-
-  private GraphBundle bundle;
 
   private OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
@@ -317,14 +306,6 @@ public class Graph implements Serializable {
     return env;
   }
 
-  public GraphBundle getBundle() {
-    return bundle;
-  }
-
-  public void setBundle(GraphBundle bundle) {
-    this.bundle = bundle;
-  }
-
   public int countVertices() {
     return vertices.size();
   }
@@ -484,37 +465,6 @@ public class Graph implements Serializable {
 
   public VehicleParkingService getVehicleParkingService() {
     return getService(VehicleParkingService.class);
-  }
-
-  /** Get all stops within a given bounding box. */
-  public Collection<StopLocation> getStopsByBoundingBox(
-    double minLat,
-    double minLon,
-    double maxLat,
-    double maxLon
-  ) {
-    Envelope envelope = new Envelope(
-      new Coordinate(minLon, minLat),
-      new Coordinate(maxLon, maxLat)
-    );
-    return streetIndex
-      .getTransitStopForEnvelope(envelope)
-      .stream()
-      .map(TransitStopVertex::getStop)
-      .collect(Collectors.toList());
-  }
-
-  /** Get all stops within a given radius. Unit: meters. */
-  public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
-    Coordinate coord = new Coordinate(center.longitude(), center.latitude());
-    return streetIndex
-      .getNearbyTransitStops(coord, radius)
-      .stream()
-      .map(v ->
-        new T2<>(v.getStop(), SphericalDistanceLibrary.fastDistance(v.getCoordinate(), coord))
-      )
-      .filter(t -> t.second < radius)
-      .collect(Collectors.toList());
   }
 
   public DrivingDirection getDrivingDirection() {

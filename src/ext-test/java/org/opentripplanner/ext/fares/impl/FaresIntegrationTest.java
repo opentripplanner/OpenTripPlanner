@@ -14,7 +14,6 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -271,12 +270,7 @@ public class FaresIntegrationTest {
     request.to = to;
     request.itineraryFilters.debug = true;
 
-    var routingWorker = new RoutingWorker(
-      serverContext,
-      request,
-      serverContext.transitModel().getTimeZone()
-    );
-    var result = routingWorker.route();
+    var result = serverContext.routingService().route(request);
 
     return result
       .getTripPlan()

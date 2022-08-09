@@ -25,8 +25,6 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
@@ -35,6 +33,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
+import org.opentripplanner.transit.service.StopIndexMock;
+import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.util.OTPFeature;
 
 public class ConstrainedBoardingSearchTest {
@@ -75,7 +75,7 @@ public class ConstrainedBoardingSearchTest {
   private TestRouteData route2;
   private TripPatternWithRaptorStopIndexes pattern1;
   private TripPatternWithRaptorStopIndexes pattern2;
-  private StopIndexForRaptor stopIndex;
+  private StopModelIndex stopIndex;
 
   /**
    * Create transit data with 2 routes with a trip each.
@@ -136,8 +136,8 @@ public class ConstrainedBoardingSearchTest {
 
     this.pattern1 = route1.getRaptorTripPattern();
     this.pattern2 = route2.getRaptorTripPattern();
-    this.stopIndex =
-      new StopIndexForRaptor(List.of(RAPTOR_STOP_INDEX), TransitTuningParameters.FOR_TEST);
+
+    this.stopIndex = new StopIndexMock(List.of(RAPTOR_STOP_INDEX));
   }
 
   @Test

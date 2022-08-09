@@ -1,0 +1,6 @@
+{
+  "osmWayPropertySet": "germany",
+  "staticBikeParkAndRide": true,
+  "discardMinTransferTimes": true,
+  "timeZone": "Europe/Berlin"
+}

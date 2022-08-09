@@ -4,14 +4,13 @@ import static graphql.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -25,9 +24,14 @@ class GtfsModuleTest {
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));
-    var module = new GtfsModule(List.of(bundle), ServiceDateInterval.unbounded());
+    var module = new GtfsModule(
+      List.of(bundle),
+      transitModel,
+      graph,
+      ServiceDateInterval.unbounded()
+    );
 
-    module.buildGraph(graph, transitModel, new HashMap<>());
+    module.buildGraph();
 
     var frequencyTripPattern = transitModel
       .getAllTripPatterns()

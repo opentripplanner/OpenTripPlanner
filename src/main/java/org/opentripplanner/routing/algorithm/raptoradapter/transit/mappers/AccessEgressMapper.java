@@ -7,15 +7,15 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.service.StopModelIndex;
 
 public class AccessEgressMapper {
 
-  private final StopIndexForRaptor stopIndex;
+  private final StopModelIndex stopIndex;
 
-  public AccessEgressMapper(StopIndexForRaptor stopIndex) {
+  public AccessEgressMapper(StopModelIndex stopIndex) {
     this.stopIndex = stopIndex;
   }
 

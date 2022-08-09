@@ -5,12 +5,19 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.FlexLocationGroup;
+import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
@@ -30,10 +37,6 @@ public interface OtpTransitService {
    * imported data.
    */
   Collection<Operator> getAllOperators();
-
-  Collection<FareAttribute> getAllFareAttributes();
-
-  Collection<FareRule> getAllFareRules();
 
   Collection<FeedInfo> getAllFeedInfos();
 
@@ -86,7 +89,7 @@ public interface OtpTransitService {
 
   Collection<Trip> getAllTrips();
 
-  Collection<FlexTrip> getAllFlexTrips();
+  Collection<FlexTrip<?, ?>> getAllFlexTrips();
 
   /**
    * @return if transit service has any active services. The graph build might filter out all

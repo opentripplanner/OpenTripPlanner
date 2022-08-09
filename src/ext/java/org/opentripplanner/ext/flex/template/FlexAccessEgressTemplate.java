@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.template;
 
-import com.google.common.base.MoreObjects;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 public abstract class FlexAccessEgressTemplate {
 
@@ -84,20 +84,17 @@ public abstract class FlexAccessEgressTemplate {
    */
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(
     Graph graph,
-    TransitModel transitModel
+    TransitService transitService
   ) {
-    if (transferStop instanceof Stop) {
-      TransitStopVertex flexVertex = transitModel
-        .getStopModel()
-        .getStopVertexForStop()
-        .get(transferStop);
+    if (transferStop instanceof Stop stop) {
+      TransitStopVertex flexVertex = transitService.getStopVertexForStop(stop);
       return Stream
         .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
         .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
     else {
-      return getTransfersFromTransferStop(transitModel)
+      return getTransfersFromTransferStop(transitService)
         .stream()
         .filter(pathTransfer -> pathTransfer.getDistanceMeters() <= flexParams.maxTransferMeters)
         .filter(transfer -> getFinalStop(transfer) != null)
@@ -111,17 +108,17 @@ public abstract class FlexAccessEgressTemplate {
 
   @Override
   public String toString() {
-    return MoreObjects
-      .toStringHelper(this)
-      .add("accessEgress", accessEgress)
-      .add("trip", trip)
-      .add("fromStopIndex", fromStopIndex)
-      .add("toStopIndex", toStopIndex)
-      .add("transferStop", transferStop)
-      .add("secondsFromStartOfTime", secondsFromStartOfTime)
-      .add("serviceDate", serviceDate)
-      .add("calculator", calculator)
-      .add("flexParams", flexParams)
+    return ToStringBuilder
+      .of(FlexAccessEgressTemplate.class)
+      .addObj("accessEgress", accessEgress)
+      .addObj("trip", trip)
+      .addNum("fromStopIndex", fromStopIndex)
+      .addNum("toStopIndex", toStopIndex)
+      .addObj("transferStop", transferStop)
+      .addServiceTime("secondsFromStartOfTime", secondsFromStartOfTime)
+      .addDate("serviceDate", serviceDate)
+      .addObj("calculator", calculator)
+      .addObj("flexParams", flexParams)
       .toString();
   }
 
@@ -141,7 +138,7 @@ public abstract class FlexAccessEgressTemplate {
    * flex ride for the access/egress.
    */
   protected abstract Collection<PathTransfer> getTransfersFromTransferStop(
-    TransitModel transitModel
+    TransitService transitService
   );
 
   /**

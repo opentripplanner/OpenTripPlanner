@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
 import org.opentripplanner.model.transfer.RouteStopTransferPoint;
@@ -20,12 +19,13 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.StopModelIndex;
 
 public class TransferIndexGenerator {
 
@@ -37,12 +37,12 @@ public class TransferIndexGenerator {
   private final Map<StopLocation, Set<TripPatternWithRaptorStopIndexes>> patternsByStop = new HashMap<>();
   private final Map<Route, Set<TripPatternWithRaptorStopIndexes>> patternsByRoute = new HashMap<>();
   private final Map<Trip, Set<TripPatternWithRaptorStopIndexes>> patternsByTrip = new HashMap<>();
-  private final StopIndexForRaptor stopIndex;
+  private final StopModelIndex stopIndex;
 
   public TransferIndexGenerator(
     Collection<ConstrainedTransfer> constrainedTransfers,
     Collection<TripPatternWithRaptorStopIndexes> tripPatterns,
-    StopIndexForRaptor stopIndex
+    StopModelIndex stopIndex
   ) {
     this.constrainedTransfers = constrainedTransfers;
     this.stopIndex = stopIndex;

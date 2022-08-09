@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.model.ApiPatternDetail;
 import org.opentripplanner.api.model.ApiPatternShort;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 public class TripPatternMapper {
 

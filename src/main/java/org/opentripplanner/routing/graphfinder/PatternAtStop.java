@@ -1,13 +1,15 @@
 package org.opentripplanner.routing.graphfinder;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -53,18 +55,18 @@ public class PatternAtStop {
   /**
    * Returns a list of stop times for the specific pattern at the stop.
    *
-   * @param routingService     An instance of the RoutingService to be used for the timetable
+   * @param transitService     An instance of the TransitService to be used for the timetable
    *                           search
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
-   * @param timeRange          Searches forward for timeRange seconds from startTime
+   * @param startTime          Start time for the search.
+   * @param timeRange          Searches forward for timeRange from startTime
    * @param numberOfDepartures Number of departures to fetch
    * @param arrivalDeparture   Filter by arrivals, departures, or both
    * @return A list of stop times
    */
   public List<TripTimeOnDate> getStoptimes(
     TransitService transitService,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {

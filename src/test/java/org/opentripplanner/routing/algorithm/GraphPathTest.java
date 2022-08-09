@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -22,8 +22,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
@@ -73,7 +73,7 @@ public class GraphPathTest {
     assertNotNull(path);
 
     // Check that the resulting path visits the stops in the right order.
-    List<Vertex> stopvs = Lists.newArrayList();
+    List<Vertex> stopvs = new ArrayList<>();
     for (State state : path.states) {
       if (state.getVertex() instanceof TransitStopVertex) {
         stopvs.add(state.getVertex());

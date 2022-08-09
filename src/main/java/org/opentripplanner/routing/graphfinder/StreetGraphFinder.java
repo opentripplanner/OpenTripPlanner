@@ -5,7 +5,6 @@ import static java.lang.Integer.min;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
@@ -49,7 +48,6 @@ public class StreetGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService,
     TransitService transitService
   ) {
     PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(

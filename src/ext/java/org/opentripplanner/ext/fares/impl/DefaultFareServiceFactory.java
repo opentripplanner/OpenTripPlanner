@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
+import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareRule;
+import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -35,12 +36,8 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
   }
 
   @Override
-  public void processGtfs(OtpTransitService transitService) {
-    fillFareRules(
-      transitService.getAllFareAttributes(),
-      transitService.getAllFareRules(),
-      regularFareRules
-    );
+  public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
+    fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), regularFareRules);
   }
 
   public void configure(JsonNode config) {

@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.stoptime;
 
-import com.google.common.base.Preconditions;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -32,8 +32,8 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     final String feedId
   ) {
     // Preconditions
-    Preconditions.checkNotNull(updates);
-    Preconditions.checkNotNull(feedId);
+    Objects.requireNonNull(updates);
+    Objects.requireNonNull(feedId);
 
     // Set fields
     this.fullDataset = fullDataset;

@@ -1,7 +1,9 @@
 package org.opentripplanner.graph_builder.module;
 
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
+
 import java.io.File;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +17,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -75,7 +77,13 @@ public class PruneNoThruIslandsTest {
       // Add street data from OSM
       File osmFile = new File(osmPath);
       OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProvider);
+      OpenStreetMapModule osmModule = new OpenStreetMapModule(
+        List.of(osmProvider),
+        Set.of(),
+        graph,
+        transitModel.getTimeZone(),
+        noopIssueStore()
+      );
       osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
       osmModule.customNamer =
         new CustomNamer() {
@@ -94,12 +102,17 @@ public class PruneNoThruIslandsTest {
           public void configure() {}
         };
       osmModule.skipVisibility = true;
-      osmModule.buildGraph(graph, transitModel, new HashMap<>());
+      osmModule.buildGraph();
       // Prune floating islands and set noThru where necessary
-      PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(null);
+      PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(
+        graph,
+        transitModel,
+        noopIssueStore(),
+        null
+      );
       pruneNoThruIslands.setPruningThresholdIslandWithoutStops(40);
       pruneNoThruIslands.setPruningThresholdIslandWithStops(5);
-      pruneNoThruIslands.buildGraph(graph, transitModel, new HashMap<>());
+      pruneNoThruIslands.buildGraph();
 
       return graph;
     } catch (Exception e) {

@@ -5,20 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.TestServerContext;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -34,21 +33,14 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class OpenStreetMapModuleTest {
-
-  private HashMap<Class<?>, Object> extra;
-
-  @BeforeEach
-  public void setUp() {
-    extra = new HashMap<>();
-  }
 
   @Test
   public void testGraphBuilder() {
@@ -63,10 +55,16 @@ public class OpenStreetMapModuleTest {
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
 
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    osmModule.buildGraph(gg, transitModel, extra);
+    osmModule.buildGraph();
 
     // Kamiennogorska at south end of segment
     Vertex v1 = gg.getVertex("osm:node:280592578");
@@ -127,10 +125,16 @@ public class OpenStreetMapModuleTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    osmModule.buildGraph(gg, transitModel, extra);
+    osmModule.buildGraph();
 
     // These vertices are labeled in the OSM file as having traffic lights.
     IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm:node:1919595918");
@@ -302,13 +306,17 @@ public class OpenStreetMapModuleTest {
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      graph,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     loader.skipVisibility = skipVisibility;
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(graph, transitModel, extra);
-
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    loader.buildGraph();
 
     RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
 
@@ -317,14 +325,9 @@ public class OpenStreetMapModuleTest {
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(
-      request,
-      serverContext.graph(),
-      bottomV,
-      topV
-    );
+    RoutingContext routingContext = new RoutingContext(request, graph, bottomV, topV);
 
-    GraphPathFinder graphPathFinder = new GraphPathFinder(serverContext);
+    GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
     List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
     assertNotNull(pathList);

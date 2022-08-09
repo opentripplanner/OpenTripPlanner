@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.transit.service.StopModelIndex;
 
 /**
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg AccessEgress.
@@ -12,7 +13,7 @@ public class FlexAccessEgressAdapter extends AccessEgress {
   public FlexAccessEgressAdapter(
     FlexAccessEgress flexAccessEgress,
     boolean isEgress,
-    StopIndexForRaptor stopIndex
+    StopModelIndex stopIndex
   ) {
     super(
       stopIndex.indexOf(flexAccessEgress.stop),

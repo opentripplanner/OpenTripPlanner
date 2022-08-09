@@ -11,9 +11,9 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
@@ -32,8 +32,10 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
 /**
@@ -52,7 +54,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
-  private DoubleFunction<Double> transitGeneralizedCostLimit;
+  private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
@@ -63,6 +65,7 @@ public class ItineraryListFilterChainBuilder {
   private FareService faresService;
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
+  private boolean removeItinerariesWithSameRoutesAndStops;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -108,23 +111,32 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * This function is used to compute a max-limit for generalized-cost. The limit is applied to
-   * itineraries with at least one transit leg. Street-only itineraries are not considered.
+   * The given parameters is used to compare all itineraries with each other, dropping itineraries
+   * with a high relative cost. The limit is applied to itineraries with at least one transit
+   * leg. Street-only itineraries are not considered.
    * <p>
-   * The smallest transit leg generalized-cost value is used as input to the function. For example
-   * if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, then all
-   * transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+   * For all pairs {code (i1, i2)} in the set of returned itineraries, a generalized cost limit is
+   * computed. If the generalized-cost of i1 is less then the generalized-cost of i2, i2 is dropped if:
+   * <pre>
+   * t0 := is the time between i1 and i2.
+   *
+   * limit = i1.generalized-cost * costFactor + minimumCostDifference + t0 * itineraryIntervalRelaxFactor
+   *
+   * i2 is dropped if i2.generalized-cost is greater than the limit.
+   * </pre>
+   * @param transitGeneralizedCostFilterParams container for costFactor, minimumCostDifference and
+   *                                           itineraryIntervalRelaxFactor
    */
   public ItineraryListFilterChainBuilder withTransitGeneralizedCostLimit(
-    DoubleFunction<Double> value
+    TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams
   ) {
-    this.transitGeneralizedCostLimit = value;
+    this.transitGeneralizedCostFilterParams = transitGeneralizedCostFilterParams;
     return this;
   }
 
   /**
-   * This is a a bit similar to {@link #withTransitGeneralizedCostLimit(DoubleFunction)}, with a few
-   * important differences.
+   * This is a bit similar to {@link #withTransitGeneralizedCostLimit(TransitGeneralizedCostFilterParams)},
+   * with a few important differences.
    * <p>
    * This function is used to compute a max-limit for generalized-cost. The limit is applied to
    * itineraries with no transit legs, however ALL itineraries (including those with transit legs)
@@ -248,11 +260,20 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
+    boolean remove
+  ) {
+    this.removeItinerariesWithSameRoutesAndStops = remove;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
+
+    filters.addAll(buildGroupBySameRoutesAndStopsFilter());
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
@@ -272,9 +293,11 @@ public class ItineraryListFilterChainBuilder {
     }
 
     // Filter transit itineraries on generalized-cost
-    if (transitGeneralizedCostLimit != null) {
+    if (transitGeneralizedCostFilterParams != null) {
       filters.add(
-        new DeletionFlaggingFilter(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit))
+        new DeletionFlaggingFilter(
+          new TransitGeneralizedCostFilter(transitGeneralizedCostFilterParams)
+        )
       );
     }
 
@@ -347,6 +370,27 @@ public class ItineraryListFilterChainBuilder {
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
     return new ItineraryListFilterChain(filters, debug);
+  }
+
+  /**
+   * If enabled, this adds the filter to remove itineraries which have the same stops and routes.
+   * These are sometimes called "time-shifted duplicates" but since those terms have so many meanings
+   * we chose to use a long, but descriptive name instead.
+   */
+  private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
+    if (removeItinerariesWithSameRoutesAndStops) {
+      return List.of(
+        new GroupByFilter<>(
+          GroupBySameRoutesAndStops::new,
+          List.of(
+            new SortingFilter(SortOrderComparator.comparator(sortOrder)),
+            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+          )
+        )
+      );
+    } else {
+      return List.of();
+    }
   }
 
   public ItineraryListFilterChainBuilder withTransitAlerts(

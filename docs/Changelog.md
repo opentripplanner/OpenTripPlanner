@@ -79,6 +79,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Take street legs into account when applying the similar legs filter [#4280](https://github.com/opentripplanner/OpenTripPlanner/pull/4280)
 - Make graph time zone configurable [#4281](https://github.com/opentripplanner/OpenTripPlanner/pull/4281)
 - Support real-time updated wheelchair accessibility for trips [#4255](https://github.com/opentripplanner/OpenTripPlanner/pull/4255)
+- Include waiting time at beginning and end in TransitGeneralizedCostFilter [#4188](https://github.com/opentripplanner/OpenTripPlanner/pull/4188)
+- Convert TripOnServiceDate to TransitEntity2  [#4331](https://github.com/opentripplanner/OpenTripPlanner/pull/4331)
+- Allow filtering out of timeshifted itineraries with same routes and stops [#4298](https://github.com/opentripplanner/OpenTripPlanner/pull/4298)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

@@ -11,6 +11,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
@@ -115,10 +117,7 @@ public class QuayType {
             if (station != null) {
               return new MonoOrMultiModalStation(
                 station,
-                GqlUtil
-                  .getTransitService(environment)
-                  .getMultiModalStationForStations()
-                  .get(station)
+                GqlUtil.getTransitService(environment).getMultiModalStationForStation(station)
               );
             } else {
               return null;
@@ -291,21 +290,20 @@ public class QuayType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            int timeRange = environment.getArgument("timeRange");
+            Duration timeRange = Duration.ofSeconds(environment.getArgument("timeRange"));
             Stop stop = environment.getSource();
 
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            Long startTimeMs = environment.getArgument("startTime") == null
-              ? 0L
-              : environment.getArgument("startTime");
-            Long startTimeSeconds = startTimeMs / 1000;
+            Instant startTime = environment.containsArgument("startTime")
+              ? Instant.ofEpochMilli(environment.getArgument("startTime"))
+              : Instant.now();
 
             return StopPlaceType
               .getTripTimesForStop(
                 stop,
-                startTimeSeconds,
+                startTime,
                 timeRange,
                 arrivalDeparture,
                 includeCancelledTrips,

@@ -6,14 +6,12 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * This creates a group identifier based on all origin and destination stations, or stops if there
  * is no parent station, of all legs in the itinerary.
  * <p>
- * This is used to group itineraries that are almost the same, but where one might have e slight
+ * This is used to group itineraries that are almost the same, but where one might have a slight
  * time advantage and the other a slight cost advantage eg. due to shorter walking distance inside
  * the station.
  */
@@ -28,7 +26,7 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
         .stream()
         .filter(Leg::isTransitLeg)
         .map(leg ->
-          new P2<>(getStopOrStationId(leg.getFrom().stop), getStopOrStationId(leg.getTo().stop))
+          new P2<>(leg.getFrom().stop.getStationOrStopId(), leg.getTo().stop.getStationOrStopId())
         )
         .collect(Collectors.toList());
   }
@@ -50,15 +48,5 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
   @Override
   public GroupByAllSameStations merge(GroupByAllSameStations other) {
     return this;
-  }
-
-  /**
-   * Get the parent station id if such exists. Otherwise, return the stop id.
-   */
-  private static FeedScopedId getStopOrStationId(StopLocation stopPlace) {
-    if (stopPlace instanceof StationElement && ((StationElement) stopPlace).isPartOfStation()) {
-      return ((StationElement) stopPlace).getParentStation().getId();
-    }
-    return stopPlace.getId();
   }
 }

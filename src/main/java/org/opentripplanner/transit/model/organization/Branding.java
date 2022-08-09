@@ -18,7 +18,7 @@ public class Branding extends TransitEntity2<Branding, BrandingBuilder> implemen
   private final String description;
   private final String image;
 
-  public Branding(BrandingBuilder builder) {
+  Branding(BrandingBuilder builder) {
     super(builder.getId());
     // Required fields - id only
 

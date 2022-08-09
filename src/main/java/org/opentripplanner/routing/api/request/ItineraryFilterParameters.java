@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 
 /**
  * Group by Similarity filter parameters
@@ -39,19 +39,20 @@ public class ItineraryFilterParameters {
 
   /**
    * A relative maximum limit for the generalized cost for transit itineraries. The limit is a
-   * linear function of the minimum generalized-cost. The minimum cost is lowest cost from the set
-   * of all returned transit itineraries. The function is used to calculate a max-limit. The
-   * max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher
-   * than the max-limit is dropped from the result set. None transit itineraries is excluded from
-   * the filter.
+   * linear function of the generalized-cost of an itinerary.
+   * <p>
+   * Transit itineraries with a cost higher than the value produced by this function plus wait cost
+   * at the beginning or end multiplied by {@link RoutingRequest#waitAtBeginningFactor} for any
+   * other itinerary are dropped from the result set. Non-transit itineraries is excluded from the
+   * filter.
    * <ul>
    * <li>To set a filter to be 1 hours plus 2 times the lowest cost use:
    * {@code 3600 + 2.0 x}
    * <li>To set an absolute value(3000) use: {@code 3000 + 0x}
    * </ul>
-   * The default is {@code 3600 + 2x} - 1 hours plus 2 times the lowest cost.
+   * The default is {@code 900 + 1.5x} - 15 minutes plus 1.5 times the lowest cost.
    */
-  public DoubleFunction<Double> transitGeneralizedCostLimit;
+  public TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
 
   /**
    * This is used to filter out bike rental itineraries that contain mostly walking. The value
@@ -101,6 +102,12 @@ public class ItineraryFilterParameters {
    */
   public boolean accessibilityScore;
 
+  /**
+   * Whether to remove timeshifted "duplicate" itineraries from the search results so that you get a
+   * greater variety of results rather than the same ones at different times.
+   */
+  public boolean removeItinerariesWithSameRoutesAndStops;
+
   private ItineraryFilterParameters() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
@@ -108,10 +115,12 @@ public class ItineraryFilterParameters {
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
     this.bikeRentalDistanceRatio = 0.0;
     this.parkAndRideDurationRatio = 0.0;
-    this.transitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
+    this.transitGeneralizedCostLimit =
+      new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(900, 1.5), 0.4);
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
+    this.removeItinerariesWithSameRoutesAndStops = false;
   }
 
   public ItineraryFilterParameters(ItineraryFilterParameters i) {
@@ -125,7 +134,8 @@ public class ItineraryFilterParameters {
       i.bikeRentalDistanceRatio,
       i.parkAndRideDurationRatio,
       i.filterItinerariesWithSameFirstOrLastTrip,
-      i.accessibilityScore
+      i.accessibilityScore,
+      i.removeItinerariesWithSameRoutesAndStops
     );
   }
 
@@ -134,12 +144,13 @@ public class ItineraryFilterParameters {
     double groupSimilarityKeepOne,
     double groupSimilarityKeepThree,
     double groupedOtherThanSameLegsMaxCostMultiplier,
-    DoubleFunction<Double> transitGeneralizedCostLimit,
+    TransitGeneralizedCostFilterParams transitGeneralizedCostLimit,
     DoubleFunction<Double> nonTransitGeneralizedCostLimit,
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,
-    boolean accessibilityScore
+    boolean accessibilityScore,
+    boolean removeItinerariesWithSameRoutesAndStops
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -151,6 +162,7 @@ public class ItineraryFilterParameters {
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = accessibilityScore;
+    this.removeItinerariesWithSameRoutesAndStops = removeItinerariesWithSameRoutesAndStops;
   }
 
   public static ItineraryFilterParameters createDefault() {

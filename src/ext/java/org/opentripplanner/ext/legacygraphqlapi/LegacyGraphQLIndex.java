@@ -194,8 +194,8 @@ class LegacyGraphQLIndex {
 
     LegacyGraphQLRequestContext requestContext = new LegacyGraphQLRequestContext(
       serverContext,
-      new RoutingService(serverContext.graph(), serverContext.transitModel()),
-      new DefaultTransitService(serverContext.transitModel())
+      serverContext.routingService(),
+      serverContext.transitService()
     );
 
     ExecutionInput executionInput = ExecutionInput
@@ -216,7 +216,7 @@ class LegacyGraphQLIndex {
 
   static Response getGraphQLResponse(
     String query,
-    OtpServerContext router,
+    OtpServerContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -225,7 +225,7 @@ class LegacyGraphQLIndex {
   ) {
     ExecutionResult executionResult = getGraphQLExecutionResult(
       query,
-      router,
+      serverContext,
       variables,
       operationName,
       maxResolves,

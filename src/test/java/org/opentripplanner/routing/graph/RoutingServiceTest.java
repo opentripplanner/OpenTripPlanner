@@ -4,16 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
+import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -37,7 +37,7 @@ public class RoutingServiceTest extends GtfsTest {
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex) {
         Stop stop = ((TransitStopVertex) vertex).getStop();
-        Vertex index_vertex = transitModel.getStopModel().getStopVertexForStop().get(stop);
+        Vertex index_vertex = transitModel.getStopModel().getStopVertexForStop(stop);
         assertEquals(index_vertex, vertex);
       }
     }
@@ -105,32 +105,28 @@ public class RoutingServiceTest extends GtfsTest {
     TransitStopVertex stopvJ = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopVertexForStop()
-      .get(stopJ);
+      .getStopVertexForStop((Stop) stopJ);
     TransitStopVertex stopvL = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopVertexForStop()
-      .get(stopL);
+      .getStopVertexForStop((Stop) stopL);
     TransitStopVertex stopvM = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopVertexForStop()
-      .get(stopM);
+      .getStopVertexForStop((Stop) stopM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    List<TransitStopVertex> stops = transitModel
+    Collection<Stop> stops = transitModel
       .getStopModel()
       .getStopModelIndex()
-      .getStopSpatialIndex()
-      .query(env);
-    assertTrue(stops.contains(stopvJ));
-    assertTrue(stops.contains(stopvL));
-    assertTrue(stops.contains(stopvM));
+      .queryStopSpatialIndex(env);
+    assertTrue(stops.contains(stopJ));
+    assertTrue(stops.contains(stopL));
+    assertTrue(stops.contains(stopM));
     assertTrue(stops.size() >= 3); // Query can overselect
   }
 

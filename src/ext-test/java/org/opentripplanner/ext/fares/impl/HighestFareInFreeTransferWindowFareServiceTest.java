@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.Fare;
@@ -58,11 +58,11 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // $1 fares
     float oneDollar = 1.0f;
-    FareAttribute oneDollarFareAttribute = new FareAttribute(
-      new FeedScopedId(FEED_ID, "oneDollarAttribute")
-    );
-    oneDollarFareAttribute.setCurrencyType("USD");
-    oneDollarFareAttribute.setPrice(oneDollar);
+    FareAttribute oneDollarFareAttribute = FareAttribute
+      .of(new FeedScopedId(FEED_ID, "oneDollarAttribute"))
+      .setCurrencyType("USD")
+      .setPrice(oneDollar)
+      .build();
     FareRuleSet oneDollarRouteBasedFares = new FareRuleSet(oneDollarFareAttribute);
     oneDollarRouteBasedFares.addRoute(routeA.getId());
     oneDollarRouteBasedFares.addRoute(routeB.getId());
@@ -70,11 +70,11 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // $2 fares
     float twoDollars = 2.0f;
-    FareAttribute twoDollarFareAttribute = new FareAttribute(
-      new FeedScopedId(FEED_ID, "twoDollarAttribute")
-    );
-    twoDollarFareAttribute.setCurrencyType("USD");
-    twoDollarFareAttribute.setPrice(twoDollars);
+    FareAttribute twoDollarFareAttribute = FareAttribute
+      .of(new FeedScopedId(FEED_ID, "twoDollarAttribute"))
+      .setCurrencyType("USD")
+      .setPrice(twoDollars)
+      .build();
 
     FareRuleSet twoDollarRouteBasedFares = new FareRuleSet(twoDollarFareAttribute);
     twoDollarRouteBasedFares.addRoute(routeC.getId());

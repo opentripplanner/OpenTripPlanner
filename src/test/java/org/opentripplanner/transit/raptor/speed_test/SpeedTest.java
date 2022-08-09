@@ -24,6 +24,7 @@ import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerContext;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
@@ -68,17 +69,19 @@ public class SpeedTest {
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());
 
+    var routerConfig = RouterConfig.DEFAULT;
     this.serverContext =
-      new DefaultServerContext(
+      DefaultServerContext.create(
+        routerConfig,
+        new RaptorConfig<>(routerConfig.raptorTuningParameters()),
         graph,
         transitModel,
-        RouterConfig.DEFAULT,
         timer.getRegistry(),
-        false
+        null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now
     // we do it manually here
-    creatTransitLayerForRaptor(serverContext.transitModel(), serverContext.routerConfig());
+    creatTransitLayerForRaptor(transitModel, routerConfig);
 
     timer.setUp(opts.groupResultsByCategory());
   }
@@ -216,9 +219,7 @@ public class SpeedTest {
         getTimeZoneId()
       );
       var routingRequest = speedTestRequest.toRoutingRequest();
-
-      var worker = new RoutingWorker(this.serverContext, routingRequest, getTimeZoneId());
-      RoutingResponse routingResponse = worker.route();
+      RoutingResponse routingResponse = serverContext.routingService().route(routingRequest);
 
       var times = routingResponse.getDebugTimingAggregator().finishedRendering();
 

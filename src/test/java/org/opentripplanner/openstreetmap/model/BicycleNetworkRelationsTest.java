@@ -18,7 +18,7 @@ public class BicycleNetworkRelationsTest {
    */
   @Test
   public void testBicycleRouteRelations() {
-    var issueStore = new DataImportIssueStore(false);
+    var issueStore = DataImportIssueStore.noopIssueStore();
     var osmdb = new OSMDatabase(issueStore, Set.of());
     var provider = new OpenStreetMapProvider(
       new File("src/test/resources/germany/ehningen-minimal.osm.pbf"),

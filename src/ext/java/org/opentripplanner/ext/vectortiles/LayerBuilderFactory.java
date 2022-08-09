@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.vectortiles;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 @FunctionalInterface
 public interface LayerBuilderFactory {
-  LayerBuilder create(
+  LayerBuilder<?> create(
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     VectorTilesResource.LayerParameters layerParameters
   );
 }

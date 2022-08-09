@@ -14,6 +14,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -22,20 +24,21 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -325,16 +328,15 @@ public class StopPlaceType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            int timeRage = environment.getArgument("timeRange");
+            Duration timeRage = Duration.ofSeconds(environment.getArgument("timeRange"));
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            Long startTimeMs = environment.getArgument("startTime") == null
-              ? 0L
-              : environment.getArgument("startTime");
-            Long startTimeSeconds = startTimeMs / 1000;
+            Instant startTime = environment.containsArgument("startTime")
+              ? Instant.ofEpochMilli(environment.getArgument("startTime"))
+              : Instant.now();
 
             return monoOrMultiModalStation
               .getChildStops()
@@ -342,7 +344,7 @@ public class StopPlaceType {
               .flatMap(singleStop ->
                 getTripTimesForStop(
                   singleStop,
-                  startTimeSeconds,
+                  startTime,
                   timeRage,
                   arrivalDeparture,
                   includeCancelledTrips,
@@ -366,8 +368,8 @@ public class StopPlaceType {
 
   public static Stream<TripTimeOnDate> getTripTimesForStop(
     StopLocation stop,
-    Long startTimeSeconds,
-    int timeRage,
+    Instant startTimeSeconds,
+    Duration timeRage,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
     int numberOfDepartures,
@@ -435,7 +437,7 @@ public class StopPlaceType {
     if (station != null) {
       return new MonoOrMultiModalStation(
         station,
-        transitService.getMultiModalStationForStations().get(station)
+        transitService.getMultiModalStationForStation(station)
       );
     }
 
@@ -457,12 +459,17 @@ public class StopPlaceType {
     String multiModalMode,
     DataFetchingEnvironment environment
   ) {
-    final RoutingService routingService = GqlUtil.getRoutingService(environment);
     final TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Stream<Station> stations = routingService
-      .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
+    Envelope envelope = new Envelope(
+      new Coordinate(minLon, minLat),
+      new Coordinate(maxLon, maxLat)
+    );
+
+    Stream<Station> stations = transitService
+      .queryStopSpatialIndex(envelope)
       .stream()
+      .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
       .map(StopLocation::getParentStation)
       .filter(Objects::nonNull)
       .distinct();
@@ -479,7 +486,7 @@ public class StopPlaceType {
     if ("child".equals(multiModalMode)) {
       return stations
         .map(s -> {
-          MultiModalStation parent = transitService.getMultiModalStationForStations().get(s);
+          MultiModalStation parent = transitService.getMultiModalStationForStation(s);
           return new MonoOrMultiModalStation(s, parent);
         })
         .collect(Collectors.toList());
@@ -488,7 +495,7 @@ public class StopPlaceType {
     else if ("all".equals(multiModalMode)) {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
-        MultiModalStation p = transitService.getMultiModalStationForStations().get(it);
+        MultiModalStation p = transitService.getMultiModalStationForStation(it);
         result.add(new MonoOrMultiModalStation(it, p));
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
@@ -501,7 +508,7 @@ public class StopPlaceType {
     else if ("parent".equals(multiModalMode)) {
       Set<MonoOrMultiModalStation> result = new HashSet<>();
       stations.forEach(it -> {
-        MultiModalStation p = transitService.getMultiModalStationForStations().get(it);
+        MultiModalStation p = transitService.getMultiModalStationForStation(it);
         if (p != null) {
           result.add(new MonoOrMultiModalStation(p));
         } else {

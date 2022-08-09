@@ -22,15 +22,14 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -98,12 +97,7 @@ public abstract class GtfsTest {
     routingRequest.setWalkBoardCost(30);
     routingRequest.transferSlack = 0;
 
-    RoutingResponse res = new RoutingWorker(
-      serverContext,
-      routingRequest,
-      transitModel.getTimeZone()
-    )
-      .route();
+    RoutingResponse res = serverContext.routingService().route(routingRequest);
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
     // Stored in instance field for use in individual tests
     Itinerary itinerary = itineraries.get(0);
@@ -148,10 +142,6 @@ public abstract class GtfsTest {
     feedId = new GtfsFeedId.Builder().id("FEED").build();
     gtfsBundle.setFeedId(feedId);
     List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
-      gtfsBundleList,
-      ServiceDateInterval.unbounded()
-    );
 
     alertsUpdateHandler = new AlertsUpdateHandler();
     var deduplicator = new Deduplicator();
@@ -159,7 +149,14 @@ public abstract class GtfsTest {
     graph = new Graph(stopModel, deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
 
-    gtfsGraphBuilderImpl.buildGraph(graph, transitModel, null);
+    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+      gtfsBundleList,
+      transitModel,
+      graph,
+      ServiceDateInterval.unbounded()
+    );
+
+    gtfsGraphBuilderImpl.buildGraph();
     transitModel.index();
     graph.index();
     serverContext = TestServerContext.createServerContext(graph, transitModel);

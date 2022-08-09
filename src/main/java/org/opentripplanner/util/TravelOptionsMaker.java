@@ -3,10 +3,11 @@ package org.opentripplanner.util;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Class which creates "Travel by" options list from supported transit modes and which extra modes
@@ -25,9 +26,9 @@ public final class TravelOptionsMaker {
     staticTravelOptions.add(new TravelOption(TraverseMode.CAR.toString()));
   }
 
-  public static List<TravelOption> makeOptions(Graph graph, TransitModel transitModel) {
+  public static List<TravelOption> makeOptions(Graph graph, TransitService transitService) {
     return makeOptions(
-      transitModel.getTransitModes(),
+      transitService.getTransitModes(),
       graph.hasBikeSharing,
       graph.hasBikeRide,
       graph.hasParkRide
@@ -35,7 +36,7 @@ public final class TravelOptionsMaker {
   }
 
   public static List<TravelOption> makeOptions(
-    HashSet<TransitMode> transitModes,
+    Set<TransitMode> transitModes,
     boolean hasBikeSharing,
     boolean hasBikeRide,
     boolean hasParkRide

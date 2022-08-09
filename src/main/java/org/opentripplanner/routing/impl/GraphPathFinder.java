@@ -5,13 +5,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.api.OtpServerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +42,14 @@ public class GraphPathFinder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
 
-  OtpServerContext serverContext;
+  @Nullable
+  private final TraverseVisitor traverseVisitor;
 
-  public GraphPathFinder(OtpServerContext serverContext) {
-    this.serverContext = serverContext;
+  private final Duration streetRoutingTimeout;
+
+  public GraphPathFinder(@Nullable TraverseVisitor traverseVisitor, Duration streetRoutingTimeout) {
+    this.traverseVisitor = traverseVisitor;
+    this.streetRoutingTimeout = streetRoutingTimeout;
   }
 
   /**
@@ -68,11 +73,12 @@ public class GraphPathFinder {
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
-      .setTimeout(Duration.ofMillis((long) (serverContext.streetRoutingTimeoutSeconds() * 1000)));
+      .setTimeout(streetRoutingTimeout);
 
-    // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
-    if (serverContext.graphVisualizer() != null) {
-      aStar.setTraverseVisitor(serverContext.graphVisualizer().traverseVisitor);
+    // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
+    // for the AStar search
+    if (traverseVisitor != null) {
+      aStar.setTraverseVisitor(traverseVisitor);
     }
 
     LOG.debug("rreq={}", options);

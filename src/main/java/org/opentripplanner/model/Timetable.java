@@ -1,6 +1,5 @@
 package org.opentripplanner.model;
 
-import com.google.common.collect.Lists;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -13,11 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -40,9 +40,9 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private final List<TripTimes> tripTimes = Lists.newArrayList();
+  private final List<TripTimes> tripTimes = new ArrayList<>();
 
-  private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+  private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
 
   private final LocalDate serviceDate;
 

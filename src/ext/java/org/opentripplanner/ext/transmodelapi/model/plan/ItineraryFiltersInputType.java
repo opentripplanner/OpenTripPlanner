@@ -4,10 +4,13 @@ import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
+import graphql.schema.GraphQLNonNull;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 
@@ -47,19 +50,42 @@ public class ItineraryFiltersInputType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name(TRANSIT_GENERALIZED_COST_LIMIT)
-          .type(gqlUtil.doubleFunctionScalar)
+          .type(
+            GraphQLInputObjectType
+              .newInputObject()
+              .name("TransitGeneralizedCostFilterParams")
+              .field(
+                GraphQLInputObjectField
+                  .newInputObjectField()
+                  .name("costLimitFunction")
+                  .type(new GraphQLNonNull(gqlUtil.doubleFunctionScalar))
+                  .build()
+              )
+              .field(
+                GraphQLInputObjectField
+                  .newInputObjectField()
+                  .name("intervalRelaxFactor")
+                  .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+                  .build()
+              )
+              .build()
+          )
           // There is a bug in the GraphQL lib. The default value is shown as a `boolean`
           // with value `false`, not the actual value. Hence; The default is added to the
           // description instead.
           .description(
-            "Set a relative limit for all transit itineraries. The limit is " +
-            "calculated based on the best transit itinerary generalized-cost. " +
+            "Set a relative limit for all transit itineraries. The limit is calculated based on " +
+            "the transit itinerary generalized-cost and the time between itineraries " +
             "Itineraries without transit legs are excluded from this filter. Example: " +
-            "f(x) = 3600 + 2.0 x. If the lowest cost returned is 10 000, then the limit " +
-            "is set to: 3 600 + 2 * 10 000 = 26 600. Then all itineraries with at least " +
-            "one transit leg and a cost above 26 600 is removed from the result. " +
-            "Default: " +
-            RequestFunctions.serialize(dft.transitGeneralizedCostLimit)
+            "costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. " +
+            "If the lowest cost returned is 10 000, then the limit " +
+            "is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure" +
+            " or arrival times of the itinerary. " +
+            "Default: {\"costLimitFunction\": " +
+            RequestFunctions.serialize(dft.transitGeneralizedCostLimit.costLimitFunction()) +
+            ", \"intervalRelaxFactor\": " +
+            dft.transitGeneralizedCostLimit.intervalRelaxFactor() +
+            "}"
           )
           .build()
       )
@@ -145,7 +171,12 @@ public class ItineraryFiltersInputType {
     setField(
       callWith,
       TRANSIT_GENERALIZED_COST_LIMIT,
-      (DoubleFunction<Double> v) -> target.transitGeneralizedCostLimit = v
+      (Map<String, ?> v) ->
+        target.transitGeneralizedCostLimit =
+          new TransitGeneralizedCostFilterParams(
+            (DoubleFunction<Double>) v.get("costLimitFunction"),
+            (double) v.get("intervalRelaxFactor")
+          )
     );
   }
 
