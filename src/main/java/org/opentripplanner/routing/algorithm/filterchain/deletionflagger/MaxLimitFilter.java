@@ -51,7 +51,7 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
 
     if (cropSection == ListSection.HEAD) {
       int limit = itineraries.size() - maxLimit;
-      changedSubscriber.accept(itineraries.get(limit-1));
+      changedSubscriber.accept(itineraries.get(limit - 1));
       return itineraries.subList(0, limit);
     }
 
