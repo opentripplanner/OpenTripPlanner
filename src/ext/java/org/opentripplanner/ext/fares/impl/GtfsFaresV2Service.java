@@ -13,6 +13,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -24,13 +25,19 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public final class GtfsFaresV2Service implements Serializable {
 
   private final List<FareLegRule> legRules;
+  private List<FareTransferRule> transferRules;
   private final Multimap<FeedScopedId, String> stopAreas;
   private final Set<String> networksWithRules;
   private final Set<String> fromAreasWithRules;
   private final Set<String> toAreasWithRules;
 
-  public GtfsFaresV2Service(List<FareLegRule> legRules, Multimap<FeedScopedId, String> stopAreas) {
+  public GtfsFaresV2Service(
+    List<FareLegRule> legRules,
+    List<FareTransferRule> fareTransferRules,
+    Multimap<FeedScopedId, String> stopAreas
+  ) {
     this.legRules = legRules;
+    this.transferRules = fareTransferRules;
     this.networksWithRules = findNetworksWithRules(legRules);
     this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
     this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreadId);

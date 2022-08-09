@@ -113,6 +113,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       new FareLegRule(FEED_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
       new FareLegRule("another-feed", null, null, null, monthlyPass)
     ),
+    List.of(),
     Multimaps.forMap(
       Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
     )
