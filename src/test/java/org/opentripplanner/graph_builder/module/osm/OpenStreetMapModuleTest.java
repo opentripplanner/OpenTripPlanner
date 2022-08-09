@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
@@ -27,7 +28,6 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -193,7 +193,7 @@ public class OpenStreetMapModuleTest {
     // add two equal matches: lane only...
     OSMSpecifier lane_only = new OSMSpecifier("cycleway=lane");
 
-    WayProperties lane_is_safer = new WayPropertiesBuilder(ALL).bicycleSafety(1.5).build();
+    WayProperties lane_is_safer = withModes(ALL).bicycleSafety(1.5).build();
 
     wayPropertySet.addProperties(lane_only, lane_is_safer);
 

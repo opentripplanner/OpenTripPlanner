@@ -1,5 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,7 +16,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.slf4j.Logger;
@@ -50,11 +52,7 @@ public class WayPropertySet {
 
   public WayPropertySet() {
     /* sensible defaults */
-    defaultProperties =
-      new WayPropertiesBuilder(StreetTraversalPermission.ALL)
-        .bicycleSafety(1)
-        .walkSafety(1)
-        .build();
+    defaultProperties = withModes(ALL).build();
     defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
     wayProperties = new ArrayList<>();
     creativeNamers = new ArrayList<>();

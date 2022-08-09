@@ -82,14 +82,14 @@ public class StreetEdge
 
   /**
    * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
+   * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
   protected float bicycleSafetyFactor;
 
   /**
    * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in term of safety cost as the same as a 150m street with a
+   * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
   protected float walkSafetyFactor;
