@@ -43,11 +43,12 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
-  private final WayProperties allWayProperties = withModes(ALL).build();
-  private final WayProperties noneWayProperties = withModes(NONE).build();
-  private final WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
-  private final WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE)
-    .build();
+  private final WayPropertiesBuilder allWayProperties = withModes(ALL);
+  private final WayPropertiesBuilder noneWayProperties = withModes(NONE);
+  private final WayPropertiesBuilder pedestrianWayProperties = withModes(PEDESTRIAN);
+  private final WayPropertiesBuilder pedestrianAndBicycleWayProperties = withModes(
+    PEDESTRIAN_AND_BICYCLE
+  );
   private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
   /* Populate properties on existing WayPropertySet */
