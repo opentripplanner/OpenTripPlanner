@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
@@ -85,6 +86,7 @@ public final class GtfsFaresV2Service implements Serializable {
       return distinctProductSets
         .stream()
         .flatMap(p -> p.stream().filter(ps -> ps.coversItinerary(itinerary)))
+        .map(LegProducts.ProductWithTransfer::product)
         .collect(Collectors.toSet());
     } else {
       return Set.of();
@@ -92,18 +94,34 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   private LegProducts getLegProduct(ScheduledTransitLeg leg) {
+    var legRules =
+      this.legRules.stream()
+        // make sure that you only get rules for the correct feed
+        .filter(legRule -> leg.getAgency().getId().getFeedId().equals(legRule.feedId()))
+        .filter(rule -> filterByNetworkId(leg, rule))
+        // apply only those fare leg rules which have the correct area ids
+        // if area id is null, the rule applies to all legs UNLESS there is another rule that
+        // covers this area
+        .filter(rule -> filterByArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules))
+        .filter(rule -> filterByArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules))
+        .collect(Collectors.toSet());
+
+    var transferRulesForLeg = transferRules
+      .stream()
+      .filter(t -> t.feedId().equals(leg.getAgency().getId().getFeedId()))
+      .toList();
+
     var products = legRules
       .stream()
-      // make sure that you only get rules for the correct feed
-      .filter(legRule -> leg.getAgency().getId().getFeedId().equals(legRule.feedId()))
-      .filter(rule -> filterByNetworkId(leg, rule))
-      // apply only those fare leg rules which have the correct area ids
-      // if area id is null, the rule applies to all legs UNLESS there is another rule that
-      // covers this area
-      .filter(rule -> filterByArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules))
-      .filter(rule -> filterByArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules))
-      .map(FareLegRule::fareProduct)
+      .map(p -> {
+        var transferRules = transferRulesForLeg
+          .stream()
+          .filter(t -> t.fromLegGroup().equals(p.legGroupId()))
+          .toList();
+        return new LegProducts.ProductWithTransfer(p.fareProduct(), transferRules);
+      })
       .collect(Collectors.toSet());
+
     return new LegProducts(leg, products);
   }
 
@@ -147,7 +165,13 @@ record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legPro
       .stream()
       .filter(lp -> lp.leg().equals(leg))
       .findFirst()
-      .map(LegProducts::products)
+      .map(l ->
+        l
+          .products()
+          .stream()
+          .map(LegProducts.ProductWithTransfer::product)
+          .collect(Collectors.toSet())
+      )
       .orElse(Set.of());
   }
 }

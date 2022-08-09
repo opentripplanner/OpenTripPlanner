@@ -45,8 +45,8 @@ public class FareTransferRuleMapper {
           duration = Duration.ofSeconds(rhs.getDurationLimit());
         }
         return new FareTransferRule(
-          mapAgencyAndId(rhs.getFromLegGroupId()),
-          mapAgencyAndId(rhs.getToLegGroupId()),
+          rhs.getFromLegGroupId().getId(),
+          rhs.getToLegGroupId().getId(),
           rhs.getTransferCount(),
           duration,
           p

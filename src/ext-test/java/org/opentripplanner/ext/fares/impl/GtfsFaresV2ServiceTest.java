@@ -9,9 +9,11 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -21,7 +23,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
-  String LEG_GROUP_ID = "legroup1";
+  String LEG_GROUP1 = "legroup1";
+  String LEG_GROUP2 = "legroup2";
   int ID = 100;
   String expressNetwork = "express";
   String localNetwork = "local";
@@ -94,6 +97,16 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     null,
     null
   );
+
+  FareProduct freeTransfer = new FareProduct(
+    new FeedScopedId(FEED_ID, "free_transfer"),
+    "Free transfer",
+    Money.euros(0),
+    null,
+    null,
+    null
+  );
+
   Place INNER_ZONE_STOP = Place.forStop(
     TransitModelForTest.stop("inner city stop").withCoordinate(1, 1).build()
   );
@@ -105,13 +118,13 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      new FareLegRule(LEG_GROUP_ID, null, null, null, single),
-      new FareLegRule(LEG_GROUP_ID, null, null, OUTER_ZONE, singleToOuter),
-      new FareLegRule(LEG_GROUP_ID, null, OUTER_ZONE, null, singleFromOuter),
-      new FareLegRule(LEG_GROUP_ID, null, null, null, dayPass),
-      new FareLegRule(LEG_GROUP_ID, expressNetwork, null, null, expressPass),
-      new FareLegRule(LEG_GROUP_ID, localNetwork, null, null, localPass),
-      new FareLegRule(LEG_GROUP_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
+      new FareLegRule(LEG_GROUP1, null, null, null, single),
+      new FareLegRule(LEG_GROUP1, null, null, OUTER_ZONE, singleToOuter),
+      new FareLegRule(LEG_GROUP1, null, OUTER_ZONE, null, singleFromOuter),
+      new FareLegRule(LEG_GROUP1, null, null, null, dayPass),
+      new FareLegRule(LEG_GROUP1, expressNetwork, null, null, expressPass),
+      new FareLegRule(LEG_GROUP1, localNetwork, null, null, localPass),
+      new FareLegRule(LEG_GROUP1, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
       new FareLegRule("another-leg-group", null, null, null, monthlyPass)
     ),
     List.of(),
@@ -144,37 +157,41 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     assertEquals(Set.of(expressPass), result.itineraryProducts());
   }
 
-  @Test
-  void twoAreaIds() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, INNER_ZONE_STOP)
-      .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
-      .build();
+  @Nested
+  public class AreaId {
 
-    var result = service.getProducts(i1);
-    assertEquals(Set.of(innerToOuterZoneSingle), result.itineraryProducts());
-  }
+    @Test
+    void twoAreaIds() {
+      Itinerary i1 = newItinerary(A, 0)
+        .walk(20, INNER_ZONE_STOP)
+        .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
+        .build();
 
-  @Test
-  void onlyToAreaId() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, B)
-      .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
-      .build();
+      var result = service.getProducts(i1);
+      assertEquals(Set.of(innerToOuterZoneSingle), result.itineraryProducts());
+    }
 
-    var result = service.getProducts(i1);
-    assertEquals(Set.of(singleToOuter), result.itineraryProducts());
-  }
+    @Test
+    void onlyToAreaId() {
+      Itinerary i1 = newItinerary(A, 0)
+        .walk(20, B)
+        .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
+        .build();
 
-  @Test
-  void onlyFromAreaId() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, OUTER_ZONE_STOP)
-      .faresV2Rail(ID, 0, 50, B, null)
-      .build();
+      var result = service.getProducts(i1);
+      assertEquals(Set.of(singleToOuter), result.itineraryProducts());
+    }
 
-    var result = service.getProducts(i1);
-    assertEquals(Set.of(singleFromOuter), result.itineraryProducts());
+    @Test
+    void onlyFromAreaId() {
+      Itinerary i1 = newItinerary(A, 0)
+        .walk(20, OUTER_ZONE_STOP)
+        .faresV2Rail(ID, 0, 50, B, null)
+        .build();
+
+      var result = service.getProducts(i1);
+      assertEquals(Set.of(singleFromOuter), result.itineraryProducts());
+    }
   }
 
   /**
@@ -198,5 +215,22 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     var expressLeg = i1.getLegs().get(2);
     var expressProducts = result.getProducts(expressLeg);
     assertEquals(Set.of(expressPass), expressProducts);
+  }
+
+  @Nested
+  class FareLegGroups {
+
+    GtfsFaresV2Service service = new GtfsFaresV2Service(
+      List.of(new FareLegRule(LEG_GROUP1, null, null, null, single)),
+      List.of(new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer)),
+      Multimaps.forMap(Map.of())
+    );
+
+    @Test
+    void addFreeTransferInSameGroup() {
+      Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
+      var result = service.getProducts(i1);
+      assertEquals(Set.of(single), result.itineraryProducts());
+    }
   }
 }
