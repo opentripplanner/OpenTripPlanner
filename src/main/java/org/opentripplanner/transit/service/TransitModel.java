@@ -291,11 +291,11 @@ public class TransitModel implements Serializable {
    * Initialize the time zone, if it has not been set previously.
    */
   public void initTimeZone(ZoneId timeZone) {
+    if (timeZone == null || timeZone.equals(this.timeZone)) {
+      return;
+    }
     if (this.timeZone != null) {
       throw new IllegalStateException("Timezone can't be re-set");
-    }
-    if (timeZone == null) {
-      return;
     }
     this.timeZone = timeZone;
     this.timeZoneExplicitlySet = true;
