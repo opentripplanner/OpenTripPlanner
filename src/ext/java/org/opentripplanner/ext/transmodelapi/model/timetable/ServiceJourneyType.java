@@ -3,7 +3,6 @@ package org.opentripplanner.ext.transmodelapi.model.timetable;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
 
-import com.google.common.collect.Lists;
 import graphql.AssertException;
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -210,16 +209,14 @@ public class ServiceJourneyType {
             if (first != null && last != null) {
               throw new AssertException("Both first and last can't be defined simultaneously.");
             } else if (first != null) {
-              stops = stops.stream().limit(Long.valueOf(first)).collect(Collectors.toList());
+              if(first > stops.size()) {
+                return stops.subList(0, first);
+              }
             } else if (last != null) {
-              List<StopLocation> reversedStops = Lists
-                .reverse(stops)
-                .stream()
-                .limit(Long.valueOf(last))
-                .collect(Collectors.toList());
-              stops = Lists.reverse(reversedStops);
+              if(last > stops.size()) {
+                return stops.subList(stops.size() - last, stops.size());
+              }
             }
-
             return stops;
           })
           .build()

@@ -726,7 +726,7 @@ public class LegacyGraphQLQueryTypeImpl
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {
-        // request.allowedFares = Sets.newHashSet();
+        // request.allowedFares = new HashSet();
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 

@@ -5,7 +5,6 @@ import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
 
-import com.google.common.collect.Lists;
 import dagger.Module;
 import dagger.Provides;
 import java.io.File;
@@ -56,7 +55,7 @@ public class GraphBuilderModules {
     ZoneId zoneId,
     DataImportIssueStore issueStore
   ) {
-    List<OpenStreetMapProvider> providers = Lists.newArrayList();
+    List<OpenStreetMapProvider> providers = new ArrayList<>();
     for (DataSource osmFile : dataSources.get(OSM)) {
       providers.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
     }
@@ -80,7 +79,7 @@ public class GraphBuilderModules {
     TransitModel transitModel,
     DataImportIssueStore issueStore
   ) {
-    List<GtfsBundle> gtfsBundles = Lists.newArrayList();
+    List<GtfsBundle> gtfsBundles = new ArrayList<>();
     for (DataSource gtfsData : dataSources.get(GTFS)) {
       GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData);
 

@@ -479,7 +479,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Replaced/duplicated ServiceJourneyId
     //        VehicleJourneyRef existingServiceJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
-    //        Preconditions.checkNotNull(existingServiceJourneyRef, "VehicleJourneyRef is required");
+    //        Objects.requireNonNull(existingServiceJourneyRef, "VehicleJourneyRef is required");
 
     // LineRef of added trip
     Objects.requireNonNull(estimatedVehicleJourney.getLineRef(), "LineRef is required");
@@ -490,13 +490,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     String operatorRef = estimatedVehicleJourney.getOperatorRef().getValue();
 
     //Required in SIRI, but currently not in use by OTP
-    //        Preconditions.checkNotNull(estimatedVehicleJourney.getRouteRef(), "RouteRef is required");
+    //        Objects.requireNonNull(estimatedVehicleJourney.getRouteRef(), "RouteRef is required");
     //        String routeRef = estimatedVehicleJourney.getRouteRef().getValue();
 
-    //        Preconditions.checkNotNull(estimatedVehicleJourney.getGroupOfLinesRef(), "GroupOfLinesRef is required");
+    //        Objects.requireNonNull(estimatedVehicleJourney.getGroupOfLinesRef(), "GroupOfLinesRef is required");
     //        String groupOfLines = estimatedVehicleJourney.getGroupOfLinesRef().getValue();
 
-    //        Preconditions.checkNotNull(estimatedVehicleJourney.getExternalLineRef(), "ExternalLineRef is required");
+    //        Objects.requireNonNull(estimatedVehicleJourney.getExternalLineRef(), "ExternalLineRef is required");
     String externalLineRef;
     if (estimatedVehicleJourney.getExternalLineRef() != null) {
       externalLineRef = estimatedVehicleJourney.getExternalLineRef().getValue();
@@ -508,7 +508,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       .getTransitModelIndex()
       .getOperatorForId()
       .get(new FeedScopedId(feedId, operatorRef));
-    //        Preconditions.checkNotNull(operator, "Operator " + operatorRef + " is unknown");
+    //        Objects.requireNonNull(operator, "Operator " + operatorRef + " is unknown");
 
     FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
 
