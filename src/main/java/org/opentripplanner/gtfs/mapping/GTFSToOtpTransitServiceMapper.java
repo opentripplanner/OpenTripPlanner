@@ -91,7 +91,6 @@ public class GTFSToOtpTransitServiceMapper {
     this.data = data;
     this.discardMinTransferTimes = discardMinTransferTimes;
     translationHelper = new TranslationHelper();
-    translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(feedId);
     stationMapper = new StationMapper(translationHelper);
