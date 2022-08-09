@@ -80,7 +80,7 @@ public class WayPropertiesBuilder {
     return new WayProperties(this);
   }
 
-  public static WayPropertiesBuilder of(StreetTraversalPermission p) {
+  public static WayPropertiesBuilder withModes(StreetTraversalPermission p) {
     return new WayPropertiesBuilder(p);
   }
 }

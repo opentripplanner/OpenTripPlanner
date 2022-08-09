@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.of;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
@@ -29,49 +29,58 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    props.setProperties("highway=living_street", of(ALL).bicycleSafety(0.9).walkSafety(0.9));
-    props.setProperties("highway=unclassified", of(ALL));
-    props.setProperties("highway=road", of(ALL));
-    props.setProperties("highway=byway", of(ALL).bicycleSafety(1.3).walkSafety(1.3));
-    props.setProperties("highway=track", of(ALL).bicycleSafety(1.3).walkSafety(1.3));
-    props.setProperties("highway=service", of(ALL).bicycleSafety(1.1).walkSafety(1.1));
-    props.setProperties("highway=residential", of(ALL).bicycleSafety(0.98).walkSafety(0.98));
-    props.setProperties("highway=residential_link", of(ALL).bicycleSafety(0.98).walkSafety(0.98));
-    props.setProperties("highway=tertiary", of(ALL));
-    props.setProperties("highway=tertiary_link", of(ALL));
-    props.setProperties("highway=secondary", of(ALL).bicycleSafety(1.5).walkSafety(1.5));
-    props.setProperties("highway=secondary_link", of(ALL).bicycleSafety(1.5).walkSafety(1.5));
-    props.setProperties("highway=primary", of(ALL).bicycleSafety(2.06).walkSafety(2.06));
-    props.setProperties("highway=primary_link", of(ALL).bicycleSafety(2.06).walkSafety(2.06));
+    props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(0.9).walkSafety(0.9));
+    props.setProperties("highway=unclassified", withModes(ALL));
+    props.setProperties("highway=road", withModes(ALL));
+    props.setProperties("highway=byway", withModes(ALL).bicycleSafety(1.3).walkSafety(1.3));
+    props.setProperties("highway=track", withModes(ALL).bicycleSafety(1.3).walkSafety(1.3));
+    props.setProperties("highway=service", withModes(ALL).bicycleSafety(1.1).walkSafety(1.1));
+    props.setProperties("highway=residential", withModes(ALL).bicycleSafety(0.98).walkSafety(0.98));
+    props.setProperties(
+      "highway=residential_link",
+      withModes(ALL).bicycleSafety(0.98).walkSafety(0.98)
+    );
+    props.setProperties("highway=tertiary", withModes(ALL));
+    props.setProperties("highway=tertiary_link", withModes(ALL));
+    props.setProperties("highway=secondary", withModes(ALL).bicycleSafety(1.5).walkSafety(1.5));
+    props.setProperties(
+      "highway=secondary_link",
+      withModes(ALL).bicycleSafety(1.5).walkSafety(1.5)
+    );
+    props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06).walkSafety(2.06));
+    props.setProperties(
+      "highway=primary_link",
+      withModes(ALL).bicycleSafety(2.06).walkSafety(2.06)
+    );
     // Replace existing matching properties as the logic is that the first statement registered takes precedence over later statements
-    props.setProperties("highway=trunk_link", of(ALL).bicycleSafety(2.06).walkSafety(2.06));
-    props.setProperties("highway=trunk", of(ALL).bicycleSafety(7.47).walkSafety(7.47));
+    props.setProperties("highway=trunk_link", withModes(ALL).bicycleSafety(2.06).walkSafety(2.06));
+    props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(7.47).walkSafety(7.47));
 
     // Don't recommend walking in trunk road tunnels
-    props.setProperties("highway=trunk;tunnel=yes", of(CAR).bicycleSafety(7.47));
+    props.setProperties("highway=trunk;tunnel=yes", withModes(CAR).bicycleSafety(7.47));
 
     // Do not walk on "moottoriliikennetie"
-    props.setProperties("motorroad=yes", of(CAR).bicycleSafety(7.47));
+    props.setProperties("motorroad=yes", withModes(CAR).bicycleSafety(7.47));
 
     // Remove informal and private roads
-    props.setProperties("highway=*;informal=yes", of(NONE));
-    props.setProperties("highway=service;access=private", of(NONE));
-    props.setProperties("highway=trail", of(NONE));
+    props.setProperties("highway=*;informal=yes", withModes(NONE));
+    props.setProperties("highway=service;access=private", withModes(NONE));
+    props.setProperties("highway=trail", withModes(NONE));
 
     // No biking on designated footways/sidewalks
-    props.setProperties("highway=footway", of(PEDESTRIAN));
+    props.setProperties("highway=footway", withModes(PEDESTRIAN));
 
     // Prefer designated cycleways
     props.setProperties(
       "highway=cycleway;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6)
     );
 
     // Remove Helsinki city center service tunnel network from graph
-    props.setProperties("highway=service;tunnel=yes;access=destination", of(NONE));
+    props.setProperties("highway=service;tunnel=yes;access=destination", withModes(NONE));
     props.setProperties(
       "highway=service;access=destination",
-      of(ALL).bicycleSafety(1.1).walkSafety(1.1)
+      withModes(ALL).bicycleSafety(1.1).walkSafety(1.1)
     );
 
     /*

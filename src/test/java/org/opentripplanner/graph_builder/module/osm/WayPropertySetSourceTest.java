@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.of;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
 
@@ -66,9 +66,9 @@ public class WayPropertySetSourceTest {
     var source = new DefaultWayPropertySetSource();
     var wps = new WayPropertySet();
 
-    wps.setProperties("tag=imaginary", of(CAR).bicycleSafety(2));
+    wps.setProperties("tag=imaginary", withModes(CAR).bicycleSafety(2));
 
-    wps.setMixinProperties("foo=bar", of(NONE).bicycleSafety(0.5));
+    wps.setMixinProperties("foo=bar", withModes(NONE).bicycleSafety(0.5));
     source.populateProperties(wps);
 
     var withoutFoo = new OSMWithTags();

@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.of;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -43,10 +43,10 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
-  private final WayProperties allWayProperties = of(ALL).build();
-  private final WayProperties noneWayProperties = of(NONE).build();
-  private final WayProperties pedestrianWayProperties = of(PEDESTRIAN).build();
-  private final WayProperties pedestrianAndBicycleWayProperties = of(PEDESTRIAN_AND_BICYCLE)
+  private final WayProperties allWayProperties = withModes(ALL).build();
+  private final WayProperties noneWayProperties = withModes(NONE).build();
+  private final WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
+  private final WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE)
     .build();
   private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
@@ -73,242 +73,323 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     /* PEDESTRIAN_AND_BICYCLE */
     props.setProperties("mtb:scale=0", pedestrianAndBicycleWayProperties);
-    props.setProperties("highway=cycleway", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
-    props.setProperties("highway=path", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75));
-    props.setProperties("highway=pedestrian", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.9));
-    props.setProperties("highway=footway", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1));
-    props.setProperties("highway=bridleway", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
+    props.setProperties("highway=cycleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.6));
+    props.setProperties("highway=path", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75));
+    props.setProperties("highway=pedestrian", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.9));
+    props.setProperties("highway=footway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1));
+    props.setProperties("highway=bridleway", withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
 
     /* ALL */
-    props.setProperties("highway=living_street", of(ALL).bicycleSafety(0.9));
+    props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(0.9));
     props.setProperties("highway=unclassified", allWayProperties);
     props.setProperties("highway=road", allWayProperties);
-    props.setProperties("highway=byway", of(ALL).bicycleSafety(1.3));
-    props.setProperties("highway=track", of(ALL).bicycleSafety(1.3));
-    props.setProperties("highway=service", of(ALL).bicycleSafety(1.1));
-    props.setProperties("highway=residential", of(ALL).bicycleSafety(0.98));
-    props.setProperties("highway=residential_link", of(ALL).bicycleSafety(0.98));
+    props.setProperties("highway=byway", withModes(ALL).bicycleSafety(1.3));
+    props.setProperties("highway=track", withModes(ALL).bicycleSafety(1.3));
+    props.setProperties("highway=service", withModes(ALL).bicycleSafety(1.1));
+    props.setProperties("highway=residential", withModes(ALL).bicycleSafety(0.98));
+    props.setProperties("highway=residential_link", withModes(ALL).bicycleSafety(0.98));
     props.setProperties("highway=tertiary", allWayProperties);
     props.setProperties("highway=tertiary_link", allWayProperties);
-    props.setProperties("highway=secondary", of(ALL).bicycleSafety(1.5));
-    props.setProperties("highway=secondary_link", of(ALL).bicycleSafety(1.5));
-    props.setProperties("highway=primary", of(ALL).bicycleSafety(2.06));
-    props.setProperties("highway=primary_link", of(ALL).bicycleSafety(2.06));
+    props.setProperties("highway=secondary", withModes(ALL).bicycleSafety(1.5));
+    props.setProperties("highway=secondary_link", withModes(ALL).bicycleSafety(1.5));
+    props.setProperties("highway=primary", withModes(ALL).bicycleSafety(2.06));
+    props.setProperties("highway=primary_link", withModes(ALL).bicycleSafety(2.06));
 
     /* DRIVING ONLY */
     // trunk and motorway links are often short distances and necessary connections
-    props.setProperties("highway=trunk_link", of(CAR).bicycleSafety(2.06));
-    props.setProperties("highway=motorway_link", of(CAR).bicycleSafety(2.06));
+    props.setProperties("highway=trunk_link", withModes(CAR).bicycleSafety(2.06));
+    props.setProperties("highway=motorway_link", withModes(CAR).bicycleSafety(2.06));
 
-    props.setProperties("highway=trunk", of(CAR).bicycleSafety(7.47));
-    props.setProperties("highway=motorway", of(CAR).bicycleSafety(8));
+    props.setProperties("highway=trunk", withModes(CAR).bicycleSafety(7.47));
+    props.setProperties("highway=motorway", withModes(CAR).bicycleSafety(8));
 
     /* cycleway=lane */
-    props.setProperties("highway=*;cycleway=lane", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.87));
-    props.setProperties("highway=service;cycleway=lane", of(ALL).bicycleSafety(0.77));
-    props.setProperties("highway=residential;cycleway=lane", of(ALL).bicycleSafety(0.77));
-    props.setProperties("highway=residential_link;cycleway=lane", of(ALL).bicycleSafety(0.77));
-    props.setProperties("highway=tertiary;cycleway=lane", of(ALL).bicycleSafety(0.87));
-    props.setProperties("highway=tertiary_link;cycleway=lane", of(ALL).bicycleSafety(0.87));
-    props.setProperties("highway=secondary;cycleway=lane", of(ALL).bicycleSafety(0.96));
-    props.setProperties("highway=secondary_link;cycleway=lane", of(ALL).bicycleSafety(0.96));
-    props.setProperties("highway=primary;cycleway=lane", of(ALL).bicycleSafety(1.15));
-    props.setProperties("highway=primary_link;cycleway=lane", of(ALL).bicycleSafety(1.15));
+    props.setProperties(
+      "highway=*;cycleway=lane",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.87)
+    );
+    props.setProperties("highway=service;cycleway=lane", withModes(ALL).bicycleSafety(0.77));
+    props.setProperties("highway=residential;cycleway=lane", withModes(ALL).bicycleSafety(0.77));
+    props.setProperties(
+      "highway=residential_link;cycleway=lane",
+      withModes(ALL).bicycleSafety(0.77)
+    );
+    props.setProperties("highway=tertiary;cycleway=lane", withModes(ALL).bicycleSafety(0.87));
+    props.setProperties("highway=tertiary_link;cycleway=lane", withModes(ALL).bicycleSafety(0.87));
+    props.setProperties("highway=secondary;cycleway=lane", withModes(ALL).bicycleSafety(0.96));
+    props.setProperties("highway=secondary_link;cycleway=lane", withModes(ALL).bicycleSafety(0.96));
+    props.setProperties("highway=primary;cycleway=lane", withModes(ALL).bicycleSafety(1.15));
+    props.setProperties("highway=primary_link;cycleway=lane", withModes(ALL).bicycleSafety(1.15));
 
     /* BICYCLE_AND_CAR */
-    props.setProperties("highway=trunk;cycleway=lane", of(BICYCLE_AND_CAR).bicycleSafety(1.5));
+    props.setProperties(
+      "highway=trunk;cycleway=lane",
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.5)
+    );
     props.setProperties(
       "highway=trunk_link;cycleway=lane",
-      of(BICYCLE_AND_CAR).bicycleSafety(1.15)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.15)
     );
-    props.setProperties("highway=motorway;cycleway=lane", of(BICYCLE_AND_CAR).bicycleSafety(2));
+    props.setProperties(
+      "highway=motorway;cycleway=lane",
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2)
+    );
     props.setProperties(
       "highway=motorway_link;cycleway=lane",
-      of(BICYCLE_AND_CAR).bicycleSafety(1.15)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.15)
     );
 
     /* cycleway=share_busway */
     props.setProperties(
       "highway=*;cycleway=share_busway",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.92)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.92)
     );
-    props.setProperties("highway=service;cycleway=share_busway", of(ALL).bicycleSafety(0.85));
-    props.setProperties("highway=residential;cycleway=share_busway", of(ALL).bicycleSafety(0.85));
+    props.setProperties(
+      "highway=service;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(0.85)
+    );
+    props.setProperties(
+      "highway=residential;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(0.85)
+    );
     props.setProperties(
       "highway=residential_link;cycleway=share_busway",
-      of(ALL).bicycleSafety(0.85)
+      withModes(ALL).bicycleSafety(0.85)
     );
-    props.setProperties("highway=tertiary;cycleway=share_busway", of(ALL).bicycleSafety(0.92));
-    props.setProperties("highway=tertiary_link;cycleway=share_busway", of(ALL).bicycleSafety(0.92));
-    props.setProperties("highway=secondary;cycleway=share_busway", of(ALL).bicycleSafety(0.99));
+    props.setProperties(
+      "highway=tertiary;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(0.92)
+    );
+    props.setProperties(
+      "highway=tertiary_link;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(0.92)
+    );
+    props.setProperties(
+      "highway=secondary;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(0.99)
+    );
     props.setProperties(
       "highway=secondary_link;cycleway=share_busway",
-      of(ALL).bicycleSafety(0.99)
+      withModes(ALL).bicycleSafety(0.99)
     );
-    props.setProperties("highway=primary;cycleway=share_busway", of(ALL).bicycleSafety(1.25));
-    props.setProperties("highway=primary_link;cycleway=share_busway", of(ALL).bicycleSafety(1.25));
+    props.setProperties(
+      "highway=primary;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(1.25)
+    );
+    props.setProperties(
+      "highway=primary_link;cycleway=share_busway",
+      withModes(ALL).bicycleSafety(1.25)
+    );
     props.setProperties(
       "highway=trunk;cycleway=share_busway",
-      of(BICYCLE_AND_CAR).bicycleSafety(1.75)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.75)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=share_busway",
-      of(BICYCLE_AND_CAR).bicycleSafety(1.25)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.25)
     );
     props.setProperties(
       "highway=motorway;cycleway=share_busway",
-      of(BICYCLE_AND_CAR).bicycleSafety(2.5)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.5)
     );
     props.setProperties(
       "highway=motorway_link;cycleway=share_busway",
-      of(BICYCLE_AND_CAR).bicycleSafety(1.25)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(1.25)
     );
 
     /* cycleway=opposite_lane */
     props.setProperties(
       "highway=*;cycleway=opposite_lane",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1, 0.87)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1, 0.87)
     );
-    props.setProperties("highway=service;cycleway=opposite_lane", of(ALL).bicycleSafety(1.1, 0.77));
+    props.setProperties(
+      "highway=service;cycleway=opposite_lane",
+      withModes(ALL).bicycleSafety(1.1, 0.77)
+    );
     props.setProperties(
       "highway=residential;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(0.98, 0.77)
+      withModes(ALL).bicycleSafety(0.98, 0.77)
     );
     props.setProperties(
       "highway=residential_link;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(0.98, 0.77)
+      withModes(ALL).bicycleSafety(0.98, 0.77)
     );
-    props.setProperties("highway=tertiary;cycleway=opposite_lane", of(ALL).bicycleSafety(1, 0.87));
+    props.setProperties(
+      "highway=tertiary;cycleway=opposite_lane",
+      withModes(ALL).bicycleSafety(1, 0.87)
+    );
     props.setProperties(
       "highway=tertiary_link;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(1, 0.87)
+      withModes(ALL).bicycleSafety(1, 0.87)
     );
     props.setProperties(
       "highway=secondary;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(1.5, 0.96)
+      withModes(ALL).bicycleSafety(1.5, 0.96)
     );
     props.setProperties(
       "highway=secondary_link;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(1.5, 0.96)
+      withModes(ALL).bicycleSafety(1.5, 0.96)
     );
     props.setProperties(
       "highway=primary;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(2.06, 1.15)
+      withModes(ALL).bicycleSafety(2.06, 1.15)
     );
     props.setProperties(
       "highway=primary_link;cycleway=opposite_lane",
-      of(ALL).bicycleSafety(2.06, 1.15)
+      withModes(ALL).bicycleSafety(2.06, 1.15)
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_lane",
-      of(BICYCLE_AND_CAR).bicycleSafety(7.47, 1.5)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47, 1.5)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_lane",
-      of(BICYCLE_AND_CAR).bicycleSafety(2.06, 1.15)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06, 1.15)
     );
 
     /* cycleway=track */
-    props.setProperties("highway=*;cycleway=track", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75));
-    props.setProperties("highway=service;cycleway=track", of(ALL).bicycleSafety(0.65));
-    props.setProperties("highway=residential;cycleway=track", of(ALL).bicycleSafety(0.65));
-    props.setProperties("highway=residential_link;cycleway=track", of(ALL).bicycleSafety(0.65));
-    props.setProperties("highway=tertiary;cycleway=track", of(ALL).bicycleSafety(0.75));
-    props.setProperties("highway=tertiary_link;cycleway=track", of(ALL).bicycleSafety(0.75));
-    props.setProperties("highway=secondary;cycleway=track", of(ALL).bicycleSafety(0.8));
-    props.setProperties("highway=secondary_link;cycleway=track", of(ALL).bicycleSafety(0.8));
-    props.setProperties("highway=primary;cycleway=track", of(ALL).bicycleSafety(0.85));
-    props.setProperties("highway=primary_link;cycleway=track", of(ALL).bicycleSafety(0.85));
-    props.setProperties("highway=trunk;cycleway=track", of(BICYCLE_AND_CAR).bicycleSafety(0.95));
+    props.setProperties(
+      "highway=*;cycleway=track",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
+    );
+    props.setProperties("highway=service;cycleway=track", withModes(ALL).bicycleSafety(0.65));
+    props.setProperties("highway=residential;cycleway=track", withModes(ALL).bicycleSafety(0.65));
+    props.setProperties(
+      "highway=residential_link;cycleway=track",
+      withModes(ALL).bicycleSafety(0.65)
+    );
+    props.setProperties("highway=tertiary;cycleway=track", withModes(ALL).bicycleSafety(0.75));
+    props.setProperties("highway=tertiary_link;cycleway=track", withModes(ALL).bicycleSafety(0.75));
+    props.setProperties("highway=secondary;cycleway=track", withModes(ALL).bicycleSafety(0.8));
+    props.setProperties("highway=secondary_link;cycleway=track", withModes(ALL).bicycleSafety(0.8));
+    props.setProperties("highway=primary;cycleway=track", withModes(ALL).bicycleSafety(0.85));
+    props.setProperties("highway=primary_link;cycleway=track", withModes(ALL).bicycleSafety(0.85));
+    props.setProperties(
+      "highway=trunk;cycleway=track",
+      withModes(BICYCLE_AND_CAR).bicycleSafety(0.95)
+    );
     props.setProperties(
       "highway=trunk_link;cycleway=track",
-      of(BICYCLE_AND_CAR).bicycleSafety(0.85)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(0.85)
     );
 
     /* cycleway=opposite_track */
     props.setProperties(
       "highway=*;cycleway=opposite_track",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.0, 0.75)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.0, 0.75)
     );
     props.setProperties(
       "highway=service;cycleway=opposite_track",
-      of(ALL).bicycleSafety(1.1, 0.65)
+      withModes(ALL).bicycleSafety(1.1, 0.65)
     );
     props.setProperties(
       "highway=residential;cycleway=opposite_track",
-      of(ALL).bicycleSafety(0.98, 0.65)
+      withModes(ALL).bicycleSafety(0.98, 0.65)
     );
     props.setProperties(
       "highway=residential_link;cycleway=opposite_track",
-      of(ALL).bicycleSafety(0.98, 0.65)
+      withModes(ALL).bicycleSafety(0.98, 0.65)
     );
-    props.setProperties("highway=tertiary;cycleway=opposite_track", of(ALL).bicycleSafety(1, 0.75));
+    props.setProperties(
+      "highway=tertiary;cycleway=opposite_track",
+      withModes(ALL).bicycleSafety(1, 0.75)
+    );
     props.setProperties(
       "highway=tertiary_link;cycleway=opposite_track",
-      of(ALL).bicycleSafety(1, 0.75)
+      withModes(ALL).bicycleSafety(1, 0.75)
     );
     props.setProperties(
       "highway=secondary;cycleway=opposite_track",
-      of(ALL).bicycleSafety(1.5, 0.8)
+      withModes(ALL).bicycleSafety(1.5, 0.8)
     );
     props.setProperties(
       "highway=secondary_link;cycleway=opposite_track",
-      of(ALL).bicycleSafety(1.5, 0.8)
+      withModes(ALL).bicycleSafety(1.5, 0.8)
     );
     props.setProperties(
       "highway=primary;cycleway=opposite_track",
-      of(ALL).bicycleSafety(2.06, 0.85)
+      withModes(ALL).bicycleSafety(2.06, 0.85)
     );
     props.setProperties(
       "highway=primary_link;cycleway=opposite_track",
-      of(ALL).bicycleSafety(2.06, 0.85)
+      withModes(ALL).bicycleSafety(2.06, 0.85)
     );
     props.setProperties(
       "highway=trunk;cycleway=opposite_track",
-      of(BICYCLE_AND_CAR).bicycleSafety(7.47, 0.95)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.47, 0.95)
     );
     props.setProperties(
       "highway=trunk_link;cycleway=opposite_track",
-      of(BICYCLE_AND_CAR).bicycleSafety(2.06, 0.85)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2.06, 0.85)
     );
 
     /* cycleway=shared_lane a.k.a. bike boulevards or neighborhood greenways */
     props.setProperties(
       "highway=*;cycleway=shared_lane",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.77)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.77)
     );
-    props.setProperties("highway=service;cycleway=shared_lane", of(ALL).bicycleSafety(0.73));
-    props.setProperties("highway=residential;cycleway=shared_lane", of(ALL).bicycleSafety(0.77));
+    props.setProperties("highway=service;cycleway=shared_lane", withModes(ALL).bicycleSafety(0.73));
+    props.setProperties(
+      "highway=residential;cycleway=shared_lane",
+      withModes(ALL).bicycleSafety(0.77)
+    );
     props.setProperties(
       "highway=residential_link;cycleway=shared_lane",
-      of(ALL).bicycleSafety(0.77)
+      withModes(ALL).bicycleSafety(0.77)
     );
-    props.setProperties("highway=tertiary;cycleway=shared_lane", of(ALL).bicycleSafety(0.83));
-    props.setProperties("highway=tertiary_link;cycleway=shared_lane", of(ALL).bicycleSafety(0.83));
-    props.setProperties("highway=secondary;cycleway=shared_lane", of(ALL).bicycleSafety(1.25));
-    props.setProperties("highway=secondary_link;cycleway=shared_lane", of(ALL).bicycleSafety(1.25));
-    props.setProperties("highway=primary;cycleway=shared_lane", of(ALL).bicycleSafety(1.75));
-    props.setProperties("highway=primary_link;cycleway=shared_lane", of(ALL).bicycleSafety(1.75));
+    props.setProperties(
+      "highway=tertiary;cycleway=shared_lane",
+      withModes(ALL).bicycleSafety(0.83)
+    );
+    props.setProperties(
+      "highway=tertiary_link;cycleway=shared_lane",
+      withModes(ALL).bicycleSafety(0.83)
+    );
+    props.setProperties(
+      "highway=secondary;cycleway=shared_lane",
+      withModes(ALL).bicycleSafety(1.25)
+    );
+    props.setProperties(
+      "highway=secondary_link;cycleway=shared_lane",
+      withModes(ALL).bicycleSafety(1.25)
+    );
+    props.setProperties("highway=primary;cycleway=shared_lane", withModes(ALL).bicycleSafety(1.75));
+    props.setProperties(
+      "highway=primary_link;cycleway=shared_lane",
+      withModes(ALL).bicycleSafety(1.75)
+    );
 
     /* cycleway=opposite */
     props.setProperties(
       "highway=*;cycleway=opposite",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1, 1.4)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1, 1.4)
     );
-    props.setProperties("highway=service;cycleway=opposite", of(ALL).bicycleSafety(1.1));
-    props.setProperties("highway=residential;cycleway=opposite", of(ALL).bicycleSafety(0.98));
-    props.setProperties("highway=residential_link;cycleway=opposite", of(ALL).bicycleSafety(0.98));
+    props.setProperties("highway=service;cycleway=opposite", withModes(ALL).bicycleSafety(1.1));
+    props.setProperties(
+      "highway=residential;cycleway=opposite",
+      withModes(ALL).bicycleSafety(0.98)
+    );
+    props.setProperties(
+      "highway=residential_link;cycleway=opposite",
+      withModes(ALL).bicycleSafety(0.98)
+    );
     props.setProperties("highway=tertiary;cycleway=opposite", allWayProperties);
     props.setProperties("highway=tertiary_link;cycleway=opposite", allWayProperties);
-    props.setProperties("highway=secondary;cycleway=opposite", of(ALL).bicycleSafety(1.5, 1.71));
+    props.setProperties(
+      "highway=secondary;cycleway=opposite",
+      withModes(ALL).bicycleSafety(1.5, 1.71)
+    );
     props.setProperties(
       "highway=secondary_link;cycleway=opposite",
-      of(ALL).bicycleSafety(1.5, 1.71)
+      withModes(ALL).bicycleSafety(1.5, 1.71)
     );
-    props.setProperties("highway=primary;cycleway=opposite", of(ALL).bicycleSafety(2.06, 2.99));
+    props.setProperties(
+      "highway=primary;cycleway=opposite",
+      withModes(ALL).bicycleSafety(2.06, 2.99)
+    );
     props.setProperties(
       "highway=primary_link;cycleway=opposite",
-      of(ALL).bicycleSafety(2.06, 2.99)
+      withModes(ALL).bicycleSafety(2.06, 2.99)
     );
 
     /*
@@ -316,39 +397,39 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
      */
     props.setProperties(
       "highway=path;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.60)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.60)
     );
 
     /* special cases for footway, pedestrian and bicycles */
     props.setProperties(
       "highway=footway;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
     );
     props.setProperties(
       "highway=footway;bicycle=yes;area=yes",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.9)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.9)
     );
     props.setProperties(
       "highway=pedestrian;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.75)
     );
 
     /* sidewalk and crosswalk */
     props.setProperties(
       "footway=sidewalk;highway=footway;bicycle=yes",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.5)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.5)
     );
     props.setProperties(
       "footway=sidewalk;highway=footway;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1)
     );
     props.setProperties(
       "highway=footway;footway=crossing",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.5)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(2.5)
     );
     props.setProperties(
       "highway=footway;footway=crossing;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.1)
     );
 
     /*
@@ -357,55 +438,73 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
      */
     props.setProperties(
       "highway=track;bicycle=yes",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.18)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.18)
     );
     props.setProperties(
       "highway=track;bicycle=designated",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.99)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.99)
     );
     props.setProperties(
       "highway=track;bicycle=yes;surface=*",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.18)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.18)
     );
     props.setProperties(
       "highway=track;bicycle=designated;surface=*",
-      of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.99)
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(0.99)
     );
     /* this is to avoid double counting since tracks are almost of surface type that is penalized */
-    props.setProperties("highway=track;surface=*", of(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3));
+    props.setProperties(
+      "highway=track;surface=*",
+      withModes(PEDESTRIAN_AND_BICYCLE).bicycleSafety(1.3)
+    );
 
     /* bicycle=designated, but no bike infrastructure is present */
-    props.setProperties("highway=*;bicycle=designated", of(ALL).bicycleSafety(0.97));
-    props.setProperties("highway=service;bicycle=designated", of(ALL).bicycleSafety(0.84));
-    props.setProperties("highway=residential;bicycle=designated", of(ALL).bicycleSafety(0.95));
-    props.setProperties("highway=unclassified;bicycle=designated", of(ALL).bicycleSafety(0.95));
-    props.setProperties("highway=residential_link;bicycle=designated", of(ALL).bicycleSafety(0.95));
-    props.setProperties("highway=tertiary;bicycle=designated", of(ALL).bicycleSafety(0.97));
-    props.setProperties("highway=tertiary_link;bicycle=designated", of(ALL).bicycleSafety(0.97));
-    props.setProperties("highway=secondary;bicycle=designated", of(ALL).bicycleSafety(1.46));
-    props.setProperties("highway=secondary_link;bicycle=designated", of(ALL).bicycleSafety(1.46));
-    props.setProperties("highway=primary;bicycle=designated", of(ALL).bicycleSafety(2));
-    props.setProperties("highway=primary_link;bicycle=designated", of(ALL).bicycleSafety(2));
+    props.setProperties("highway=*;bicycle=designated", withModes(ALL).bicycleSafety(0.97));
+    props.setProperties("highway=service;bicycle=designated", withModes(ALL).bicycleSafety(0.84));
+    props.setProperties(
+      "highway=residential;bicycle=designated",
+      withModes(ALL).bicycleSafety(0.95)
+    );
+    props.setProperties(
+      "highway=unclassified;bicycle=designated",
+      withModes(ALL).bicycleSafety(0.95)
+    );
+    props.setProperties(
+      "highway=residential_link;bicycle=designated",
+      withModes(ALL).bicycleSafety(0.95)
+    );
+    props.setProperties("highway=tertiary;bicycle=designated", withModes(ALL).bicycleSafety(0.97));
+    props.setProperties(
+      "highway=tertiary_link;bicycle=designated",
+      withModes(ALL).bicycleSafety(0.97)
+    );
+    props.setProperties("highway=secondary;bicycle=designated", withModes(ALL).bicycleSafety(1.46));
+    props.setProperties(
+      "highway=secondary_link;bicycle=designated",
+      withModes(ALL).bicycleSafety(1.46)
+    );
+    props.setProperties("highway=primary;bicycle=designated", withModes(ALL).bicycleSafety(2));
+    props.setProperties("highway=primary_link;bicycle=designated", withModes(ALL).bicycleSafety(2));
     props.setProperties(
       "highway=trunk;bicycle=designated",
-      of(BICYCLE_AND_CAR).bicycleSafety(7.25)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.25)
     );
     props.setProperties(
       "highway=trunk_link;bicycle=designated",
-      of(BICYCLE_AND_CAR).bicycleSafety(2)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2)
     );
     props.setProperties(
       "highway=motorway;bicycle=designated",
-      of(BICYCLE_AND_CAR).bicycleSafety(7.76)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(7.76)
     );
     props.setProperties(
       "highway=motorway_link;bicycle=designated",
-      of(BICYCLE_AND_CAR).bicycleSafety(2)
+      withModes(BICYCLE_AND_CAR).bicycleSafety(2)
     );
 
     // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", of(ALL).bicycleSafety(0.7));
+    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.7));
 
     /*
      * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
@@ -464,27 +563,27 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
      * running tracks are usually made of)
      */
 
-    props.setMixinProperties("surface=unpaved", of(ALL).bicycleSafety(1.18));
-    props.setMixinProperties("surface=compacted", of(ALL).bicycleSafety(1.18));
-    props.setMixinProperties("surface=wood", of(ALL).bicycleSafety(1.18));
+    props.setMixinProperties("surface=unpaved", withModes(ALL).bicycleSafety(1.18));
+    props.setMixinProperties("surface=compacted", withModes(ALL).bicycleSafety(1.18));
+    props.setMixinProperties("surface=wood", withModes(ALL).bicycleSafety(1.18));
 
-    props.setMixinProperties("surface=cobblestone", of(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=cobblestone:flattened", of(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=grass_paver", of(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=pebblestone", of(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("surface=cobblestone", withModes(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("surface=cobblestone:flattened", withModes(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("surface=grass_paver", withModes(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("surface=pebblestone", withModes(ALL).bicycleSafety(1.3));
     // Can be slick if wet, but otherwise not unfavorable to bikes
-    props.setMixinProperties("surface=metal", of(ALL).bicycleSafety(1.3));
-    props.setMixinProperties("surface=ground", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=dirt", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=earth", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=grass", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=mud", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=woodchip", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=gravel", of(ALL).bicycleSafety(1.5));
-    props.setMixinProperties("surface=artifical_turf", of(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=metal", withModes(ALL).bicycleSafety(1.3));
+    props.setMixinProperties("surface=ground", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=dirt", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=earth", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=grass", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=mud", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=woodchip", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=gravel", withModes(ALL).bicycleSafety(1.5));
+    props.setMixinProperties("surface=artifical_turf", withModes(ALL).bicycleSafety(1.5));
 
     /* sand is deadly for bikes */
-    props.setMixinProperties("surface=sand", of(ALL).bicycleSafety(100));
+    props.setMixinProperties("surface=sand", withModes(ALL).bicycleSafety(100));
 
     /* Portland-local mixins */
 
@@ -497,15 +596,27 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     /*
      * props.setProperties("RLIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
      */
-    props.setMixinProperties("RLIS:bicycle=caution_area", of(ALL).bicycleSafety(1.45));
-    props.setMixinProperties("RLIS:bicycle:right=caution_area", of(ALL).bicycleSafety(1.45, 1));
-    props.setMixinProperties("RLIS:bicycle:left=caution_area", of(ALL).bicycleSafety(1, 1.45));
+    props.setMixinProperties("RLIS:bicycle=caution_area", withModes(ALL).bicycleSafety(1.45));
+    props.setMixinProperties(
+      "RLIS:bicycle:right=caution_area",
+      withModes(ALL).bicycleSafety(1.45, 1)
+    );
+    props.setMixinProperties(
+      "RLIS:bicycle:left=caution_area",
+      withModes(ALL).bicycleSafety(1, 1.45)
+    );
     /*
      * props.setProperties("CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
      */
-    props.setMixinProperties("CCGIS:bicycle=caution_area", of(ALL).bicycleSafety(1.45));
-    props.setMixinProperties("CCGIS:bicycle:right=caution_area", of(ALL).bicycleSafety(1.45, 1));
-    props.setMixinProperties("CCGIS:bicycle:left=caution_area", of(ALL).bicycleSafety(1, 1.45));
+    props.setMixinProperties("CCGIS:bicycle=caution_area", withModes(ALL).bicycleSafety(1.45));
+    props.setMixinProperties(
+      "CCGIS:bicycle:right=caution_area",
+      withModes(ALL).bicycleSafety(1.45, 1)
+    );
+    props.setMixinProperties(
+      "CCGIS:bicycle:left=caution_area",
+      withModes(ALL).bicycleSafety(1, 1.45)
+    );
 
     populateNotesAndNames(props);
 
