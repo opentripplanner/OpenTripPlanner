@@ -23,9 +23,11 @@ which are also part of the sandbox code.
 
 The classes and their maintainers are as follows:
 
-| class                                                          | maintainer                                                 |
-|----------------------------------------------------------------|------------------------------------------------------------|
-| HighestFareInFreeTransferWindowFareServiceDutchFareServiceImpl | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
+| class                                                          | maintainer                                                |
+|----------------------------------------------------------------|-----------------------------------------------------------|
+| HighestFareInFreeTransferWindowFareServiceDutchFareServiceImpl | IBI Group ([David Emory](mailto:david.emory@ibigroup.com) |
+| NycFareServiceImpl                                             | unmaintained                                              |
+| SFBayFareServiceImpl                                           | unmaintained                                              |
 
 ## Removed fare calculators
 
@@ -33,9 +35,7 @@ The following calculators used to be part of the OTP codebase but since their ma
 was unclear and no-one [offered to maintain](https://groups.google.com/g/opentripplanner-users/c/ZPzx1lhZ9HU), 
 they were [removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273) in July 2022.
 
-- NycFareServiceImpl
 - SeattleFareServiceImpl
-- SFBayFareServiceImpl
 - DutchFareServiceImpl
 
 If you were using these calculators, you're welcome to re-add them to the code base.
