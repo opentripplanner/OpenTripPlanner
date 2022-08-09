@@ -19,6 +19,8 @@ public class NamedArea implements Serializable {
 
   private double bicycleSafetyMultiplier;
 
+  private double walkSafetyMultiplier;
+
   private int streetClass;
 
   private StreetTraversalPermission permission;
@@ -45,6 +47,14 @@ public class NamedArea implements Serializable {
 
   public void setBicycleSafetyMultiplier(double bicycleSafetyMultiplier) {
     this.bicycleSafetyMultiplier = bicycleSafetyMultiplier;
+  }
+
+  public double getWalkSafetyMultiplier() {
+    return walkSafetyMultiplier;
+  }
+
+  public void setWalkSafetyMultiplier(double walkSafetyMultiplier) {
+    this.walkSafetyMultiplier = walkSafetyMultiplier;
   }
 
   public StreetTraversalPermission getPermission() {

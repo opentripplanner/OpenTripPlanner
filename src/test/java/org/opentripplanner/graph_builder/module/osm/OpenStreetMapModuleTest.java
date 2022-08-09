@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -25,7 +28,6 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -191,16 +193,14 @@ public class OpenStreetMapModuleTest {
     // add two equal matches: lane only...
     OSMSpecifier lane_only = new OSMSpecifier("cycleway=lane");
 
-    WayProperties lane_is_safer = new WayProperties();
-    lane_is_safer.setSafetyFeatures(new P2<>(1.5, 1.5));
+    WayProperties lane_is_safer = withModes(ALL).bicycleSafety(1.5).build();
 
     wayPropertySet.addProperties(lane_only, lane_is_safer);
 
     // and footway only
     OSMSpecifier footway_only = new OSMSpecifier("highway=footway");
 
-    WayProperties footways_allow_peds = new WayProperties();
-    footways_allow_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    WayProperties footways_allow_peds = new WayPropertiesBuilder(PEDESTRIAN).build();
 
     wayPropertySet.addProperties(footway_only, footways_allow_peds);
 
@@ -211,9 +211,7 @@ public class OpenStreetMapModuleTest {
     // add a better match
     OSMSpecifier lane_and_footway = new OSMSpecifier("cycleway=lane;highway=footway");
 
-    WayProperties safer_and_peds = new WayProperties();
-    safer_and_peds.setSafetyFeatures(new P2<>(0.75, 0.75));
-    safer_and_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    WayProperties safer_and_peds = new WayPropertiesBuilder(PEDESTRIAN).bicycleSafety(0.75).build();
 
     wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
     dataForWay = wayPropertySet.getDataForWay(way);
@@ -221,12 +219,11 @@ public class OpenStreetMapModuleTest {
 
     // add a mixin
     OSMSpecifier gravel = new OSMSpecifier("surface=gravel");
-    WayProperties gravel_is_dangerous = new WayProperties();
-    gravel_is_dangerous.setSafetyFeatures(new P2<>(2.0, 2.0));
+    WayProperties gravel_is_dangerous = new WayPropertiesBuilder(ALL).bicycleSafety(2).build();
     wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.getSafetyFeatures().first, 1.5);
+    assertEquals(dataForWay.getBicycleSafetyFeatures().first, 1.5);
 
     // test a left-right distinction
     way = new OSMWay();
@@ -235,14 +232,13 @@ public class OpenStreetMapModuleTest {
     way.addTag("cycleway:right", "track");
 
     OSMSpecifier track_only = new OSMSpecifier("highway=footway;cycleway=track");
-    WayProperties track_is_safest = new WayProperties();
-    track_is_safest.setSafetyFeatures(new P2<>(0.25, 0.25));
+    WayProperties track_is_safest = new WayPropertiesBuilder(ALL).bicycleSafety(0.25).build();
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(0.25, dataForWay.getSafetyFeatures().first); // right (with traffic) comes
+    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().first); // right (with traffic) comes
     // from track
-    assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
+    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().second); // left comes from lane
 
     way = new OSMWay();
     way.addTag("highway", "footway");

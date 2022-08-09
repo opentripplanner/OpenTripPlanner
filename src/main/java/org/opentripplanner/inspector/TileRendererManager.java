@@ -36,6 +36,7 @@ public class TileRendererManager {
 
     // Register layers.
     renderers.put("bike-safety", new EdgeVertexTileRenderer(new BikeSafetyEdgeRenderer()));
+    renderers.put("walk-safety", new EdgeVertexTileRenderer(new WalkSafetyEdgeRenderer()));
     renderers.put("thru-traffic", new EdgeVertexTileRenderer(new NoThruTrafficEdgeRenderer()));
     renderers.put("traversal", new EdgeVertexTileRenderer(new TraversalPermissionsEdgeRenderer()));
     renderers.put(
