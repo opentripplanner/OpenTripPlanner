@@ -339,11 +339,19 @@ public class WayPropertySet {
   }
 
   public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
-    addProperties(new OSMSpecifier(spec), properties.build(), true);
+    setMixinProperties(spec, properties.build());
+  }
+
+  public void setMixinProperties(String spec, WayProperties properties) {
+    addProperties(new OSMSpecifier(spec), properties, true);
   }
 
   public void setProperties(String spec, WayPropertiesBuilder properties) {
-    addProperties(new OSMSpecifier(spec), properties.build(), false);
+    setProperties(spec, properties.build());
+  }
+
+  public void setProperties(String spec, WayProperties properties) {
+    addProperties(new OSMSpecifier(spec), properties, false);
   }
 
   public void setCarSpeed(String spec, float speed) {
