@@ -1,10 +1,10 @@
 package org.opentripplanner.updater;
 
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -168,7 +168,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   @Override
   public Map<Integer, String> getUpdaterDescriptions() {
-    Map<Integer, String> ret = Maps.newTreeMap();
+    Map<Integer, String> ret = new TreeMap<>();
     int i = 0;
     for (GraphUpdater updater : updaterList) {
       ret.put(i++, updater.toString());

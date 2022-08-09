@@ -68,7 +68,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
-      new DataImportIssueStore(false)
+      DataImportIssueStore.noopIssueStore()
     );
 
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
@@ -146,7 +146,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       quaysById,
       null,
-      new DataImportIssueStore(false)
+      DataImportIssueStore.noopIssueStore()
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);

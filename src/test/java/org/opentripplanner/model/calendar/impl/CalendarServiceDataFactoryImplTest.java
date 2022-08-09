@@ -128,7 +128,7 @@ public class CalendarServiceDataFactoryImplTest {
       ConstantsForTests.FAKE_GTFS
     );
     OtpTransitServiceBuilder builder = ctxBuilder
-      .withDataImportIssueStore(new DataImportIssueStore(false))
+      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore())
       .getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
@@ -136,10 +136,6 @@ public class CalendarServiceDataFactoryImplTest {
     builder.getFeedInfos().add(FeedInfo.dummyForTest(TransitModelForTest.FEED_ID));
 
     return ctxBuilder.build();
-  }
-
-  private static FareAttribute createFareAttribute() {
-    return new FareAttribute(id("FA"));
   }
 
   private static ServiceCalendarDate removeMondayFromAlldays() {

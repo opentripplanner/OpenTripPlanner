@@ -48,7 +48,7 @@ public class MockGtfs {
     throws IOException {
     var mapper = new GTFSToOtpTransitServiceMapper(
       "a0",
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       false,
       reader == null ? gtfsDelegate.read() : gtfsDelegate.read(reader)
     );

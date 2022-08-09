@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -73,7 +73,7 @@ public class GraphPathTest {
     assertNotNull(path);
 
     // Check that the resulting path visits the stops in the right order.
-    List<Vertex> stopvs = Lists.newArrayList();
+    List<Vertex> stopvs = new ArrayList<>();
     for (State state : path.states) {
       if (state.getVertex() instanceof TransitStopVertex) {
         stopvs.add(state.getVertex());

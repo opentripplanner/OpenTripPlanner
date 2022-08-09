@@ -22,6 +22,7 @@ import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -50,23 +51,8 @@ public class OTPAppConstruction {
 
   private final CommandLineParameters cli;
   private final OTPApplicationFactory factory;
-
-  private RaptorConfig<TripSchedule> raptorTuningParameters;
   private GraphBuilderDataSources graphBuilderDataSources = null;
-
-  /**
-   * The graph should be chased in the factory not here, this is an intermediate step.
-   */
-  private Graph graph;
-
-  /**
-   * The transit model should be created by the factory not cashed here, this is an intermediate
-   * step.
-   */
-  private TransitModel transitModel;
-
   private DefaultServerContext context;
-
   private GraphVisualizer graphVisualizer;
 
   /**
@@ -87,17 +73,15 @@ public class OTPAppConstruction {
    * so it can be used during construction of the web server.
    */
   public void updateModel(Graph graph, TransitModel transitModel) {
-    this.graph = graph;
-    this.transitModel = transitModel;
-    this.raptorTuningParameters =
-      new RaptorConfig<>(factory.configModel().routerConfig().raptorTuningParameters());
+    getFactory().graph().set(graph);
+    getFactory().transitModel().set(transitModel);
 
     this.context =
       DefaultServerContext.create(
         factory.configModel().routerConfig(),
-        raptorTuningParameters,
-        graph,
-        transitModel,
+        factory.raptorConfig(),
+        factory.graph().get(),
+        factory.transitModel().get(),
         Metrics.globalRegistry,
         traverseVisitor()
       );
@@ -122,15 +106,14 @@ public class OTPAppConstruction {
 
   /**
    * Create the default graph builder.
-   *
-   * @param baseGraph the base graph to add more data on to of.
    */
-  public GraphBuilder createGraphBuilder(Graph baseGraph) {
+  public GraphBuilder createGraphBuilder() {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
       buildConfig(),
       graphBuilderDataSources(),
-      baseGraph,
+      graph(),
+      transitModel(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -164,7 +147,10 @@ public class OTPAppConstruction {
   public GraphVisualizer graphVisualizer() {
     if (cli.visualize && graphVisualizer == null) {
       graphVisualizer =
-        new GraphVisualizer(graph, factory.configModel().routerConfig().streetRoutingTimeout());
+        new GraphVisualizer(
+          factory.graph().get(),
+          factory.configModel().routerConfig().streetRoutingTimeout()
+        );
     }
     return graphVisualizer;
   }
@@ -175,9 +161,9 @@ public class OTPAppConstruction {
   }
 
   private void setupTransitRoutingServer() {
-    new MetricsLogging(transitModel(), raptorTuningParameters);
+    new MetricsLogging(transitModel(), raptorConfig());
 
-    creatTransitLayerForRaptor(transitModel, routerConfig());
+    creatTransitLayerForRaptor(transitModel(), routerConfig());
 
     /* Create Graph updater modules from JSON config. */
     GraphUpdaterConfigurator.setupGraph(graph(), transitModel(), routerConfig().updaterConfig());
@@ -223,23 +209,27 @@ public class OTPAppConstruction {
     );
   }
 
-  public RaptorConfig<TripSchedule> raptorTuningParameters() {
-    return raptorTuningParameters;
+  public RaptorConfig<TripSchedule> raptorConfig() {
+    return factory.raptorConfig();
   }
 
   public TransitModel transitModel() {
-    return transitModel;
+    return getFactory().transitModel().get();
   }
 
   public Graph graph() {
-    return graph;
+    return getFactory().graph().get();
+  }
+
+  public Deduplicator deduplicator() {
+    return getFactory().deduplicator();
   }
 
   private BuildConfig buildConfig() {
-    return factory.configModel().buildConfig();
+    return getFactory().configModel().buildConfig();
   }
 
   private RouterConfig routerConfig() {
-    return factory.configModel().routerConfig();
+    return getFactory().configModel().routerConfig();
   }
 }

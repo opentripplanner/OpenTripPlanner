@@ -7,8 +7,6 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -154,7 +152,7 @@ public class OSMFilter {
     OSMWay way,
     StreetTraversalPermission def
   ) {
-    return getPermissionsForWay(way, def, false, false, new DataImportIssueStore(false));
+    return getPermissionsForWay(way, def, false, false, DataImportIssueStore.noopIssueStore());
   }
 
   /**

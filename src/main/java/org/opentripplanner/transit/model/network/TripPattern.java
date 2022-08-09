@@ -2,21 +2,12 @@ package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
-import com.google.common.io.BaseEncoding;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -57,11 +48,10 @@ import org.slf4j.LoggerFactory;
  */
 public final class TripPattern
   extends TransitEntity2<TripPattern, TripPatternBuilder>
-  implements Cloneable, Serializable {
+  implements Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
-  private static final long serialVersionUID = 1;
   private final Route route;
   /**
    * The stop-pattern help us reuse the same stops in several trip-patterns; Hence saving memory.
@@ -114,159 +104,15 @@ public final class TripPattern
     return new TripPatternBuilder(id);
   }
 
-  /**
-   * Static method that creates unique human-readable names for a collection of TableTripPatterns.
-   * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resolve
-   * this question: can a frequency and table pattern have the same stoppattern? If so should they
-   * have the same "unique" name?
-   * <p>
-   * The names should be dataset unique, not just route-unique?
-   * <p>
-   * A TripPattern groups all trips visiting a particular pattern of stops on a particular route.
-   * GFTS Route names are intended for very general customer information, but sometimes there is a
-   * need to know where a particular trip actually goes. For example, the New York City N train has
-   * at least four different variants: express (over the Manhattan bridge) and local (via lower
-   * Manhattan and the tunnel), in two directions (to Astoria or to Coney Island). During
-   * construction, a fifth variant sometimes appears: trains use the D line to Coney Island after
-   * 59th St (or from Coney Island to 59th in the opposite direction).
-   * <p>
-   * TripPattern names are machine-generated on a best-effort basis. They are guaranteed to be
-   * unique (among TripPatterns for a single Route) but not stable across graph builds, especially
-   * when different versions of GTFS inputs are used. For instance, if a variant is the only variant
-   * of the N that ends at Coney Island, the name will be "N to Coney Island". But if multiple
-   * variants end at Coney Island (but have different stops elsewhere), that name would not be
-   * chosen. OTP also tries start and intermediate stations ("from Coney Island", or "via
-   * Whitehall", or even combinations ("from Coney Island via Whitehall"). But if there is no way to
-   * create a unique name from start/end/intermediate stops, then the best we can do is to create a
-   * "like [trip id]" name, which at least tells you where in the GTFS you can find a related trip.
-   */
-  // TODO: pass in a transit index that contains a Multimap<Route, TripPattern> and derive all TableTripPatterns
-  // TODO: combine from/to and via in a single name. this could be accomplished by grouping the trips by destination,
-  // then disambiguating in groups of size greater than 1.
-  /*
-   * Another possible approach: for each route, determine the necessity of each field (which
-   * combination will create unique names). from, to, via, express. Then concatenate all necessary
-   * fields. Express should really be determined from number of stops and/or run time of trips.
-   */
-  public static void generateUniqueNames(Collection<TripPattern> tableTripPatterns) {
-    LOG.info("Generating unique names for stop patterns on each route.");
-
-    /* Group TripPatterns by Route */
-    Multimap<Route, TripPattern> patternsByRoute = ArrayListMultimap.create();
-    for (TripPattern ttp : tableTripPatterns) {
-      patternsByRoute.put(ttp.route, ttp);
-    }
-
-    /* Iterate over all routes, giving the patterns within each route unique names. */
-    for (Route route : patternsByRoute.keySet()) {
-      Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
-      String routeName = route.getName();
-
-      /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
-      if (routeTripPatterns.size() == 1) {
-        routeTripPatterns.iterator().next().setName(routeName);
-        continue;
-      }
-
-      /* Do the patterns within this Route have a unique start, end, or via Stop? */
-      Multimap<String, TripPattern> signs = ArrayListMultimap.create(); // prefer headsigns
-      Multimap<StopLocation, TripPattern> starts = ArrayListMultimap.create();
-      Multimap<StopLocation, TripPattern> ends = ArrayListMultimap.create();
-      Multimap<StopLocation, TripPattern> vias = ArrayListMultimap.create();
-
-      for (TripPattern pattern : routeTripPatterns) {
-        StopLocation start = pattern.firstStop();
-        StopLocation end = pattern.lastStop();
-        String headsign = pattern.getTripHeadsign();
-        if (headsign != null) {
-          signs.put(headsign, pattern);
-        }
-        starts.put(start, pattern);
-        ends.put(end, pattern);
-        for (StopLocation stop : pattern.getStops()) {
-          vias.put(stop, pattern);
-        }
-      }
-      PATTERN:for (TripPattern pattern : routeTripPatterns) {
-        StringBuilder sb = new StringBuilder(routeName);
-        String headsign = pattern.getTripHeadsign();
-        if (headsign != null && signs.get(headsign).size() == 1) {
-          pattern.setName(sb.append(" ").append(headsign).toString());
-          continue;
-        }
-
-        /* First try to name with destination. */
-        var end = pattern.lastStop();
-        sb.append(" to ").append(stopNameAndId(end));
-        if (ends.get(end).size() == 1) {
-          pattern.setName(sb.toString());
-          continue; // only pattern with this last stop
-        }
-
-        /* Then try to name with origin. */
-        var start = pattern.firstStop();
-        sb.append(" from ").append(stopNameAndId(start));
-        if (starts.get(start).size() == 1) {
-          pattern.setName((sb.toString()));
-          continue; // only pattern with this first stop
-        }
-
-        /* Check whether (end, start) is unique. */
-        Collection<TripPattern> tripPatterns = starts.get(start);
-        Set<TripPattern> remainingPatterns = new HashSet<>(tripPatterns);
-        remainingPatterns.retainAll(ends.get(end)); // set intersection
-        if (remainingPatterns.size() == 1) {
-          pattern.setName((sb.toString()));
-          continue;
-        }
-
-        /* Still not unique; try (end, start, via) for each via. */
-        for (var via : pattern.getStops()) {
-          if (via.equals(start) || via.equals(end)) continue;
-          Set<TripPattern> intersection = new HashSet<>(remainingPatterns);
-          intersection.retainAll(vias.get(via));
-          if (intersection.size() == 1) {
-            sb.append(" via ").append(stopNameAndId(via));
-            pattern.setName((sb.toString()));
-            continue PATTERN;
-          }
-        }
-
-        /* Still not unique; check for express. */
-        if (remainingPatterns.size() == 2) {
-          // There are exactly two patterns sharing this start/end.
-          // The current one must be a subset of the other, because it has no unique via.
-          // Therefore we call it the express.
-          sb.append(" express");
-        } else {
-          // The final fallback: reference a specific trip ID.
-          Optional
-            .ofNullable(pattern.scheduledTimetable.getRepresentativeTripTimes())
-            .map(TripTimes::getTrip)
-            .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
-        }
-        pattern.setName((sb.toString()));
-      } // END foreach PATTERN
-    } // END foreach ROUTE
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Done generating unique names for stop patterns on each route.");
-      for (Route route : patternsByRoute.keySet()) {
-        Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
-        LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), route.getName());
-        for (TripPattern pattern : routeTripPatterns) {
-          LOG.debug("    {} ({} stops)", pattern.name, pattern.stopPattern.getSize());
-        }
-      }
-    }
-  }
-
   /** The human-readable, unique name for this trip pattern. */
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void initName(String name) {
+    if (this.name != null) {
+      throw new IllegalStateException("Name has already been set");
+    }
     this.name = name;
   }
 
@@ -673,37 +519,6 @@ public final class TripPattern
     return getMode().equals(mode) || route.getNetexSubmode().equals(transportSubmode);
   }
 
-  /**
-   * In most cases we want to use identity equality for Trips. However, in some cases we want a way
-   * to consistently identify trips across versions of a GTFS feed, when the feed publisher cannot
-   * ensure stable trip IDs. Therefore we define some additional hash functions. Hash collisions are
-   * theoretically possible, so these identifiers should only be used to detect when two trips are
-   * the same with a high degree of probability. An example application is avoiding double-booking
-   * of a particular bus trip for school field trips. Using Murmur hash function. see
-   * http://programmers.stackexchange.com/a/145633 for comparison.
-   *
-   * @param trip a trip object within this pattern, or null to hash the pattern itself independent
-   *             any specific trip.
-   * @return the semantic hash of a Trip in this pattern as a printable String.
-   * <p>
-   * TODO deal with frequency-based trips
-   */
-  public String semanticHashString(Trip trip) {
-    HashFunction murmur = Hashing.murmur3_32();
-    BaseEncoding encoder = BaseEncoding.base64Url().omitPadding();
-    StringBuilder sb = new StringBuilder(50);
-    sb.append(encoder.encode(stopPattern.semanticHash(murmur).asBytes()));
-    if (trip != null) {
-      TripTimes tripTimes = scheduledTimetable.getTripTimes(trip);
-      if (tripTimes == null) {
-        return null;
-      }
-      sb.append(':');
-      sb.append(encoder.encode(tripTimes.semanticHash(murmur).asBytes()));
-    }
-    return sb.toString();
-  }
-
   public TripPattern clone() {
     try {
       return (TripPattern) super.clone();
@@ -721,10 +536,6 @@ public final class TripPattern
   public String getFeedId() {
     // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
     return route.getId().getFeedId();
-  }
-
-  private static String stopNameAndId(StopLocation stop) {
-    return stop.getName() + " (" + stop.getId().toString() + ")";
   }
 
   private static Coordinate coordinate(StopLocation s) {

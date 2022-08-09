@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -28,7 +26,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
@@ -38,7 +35,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -48,6 +44,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -71,7 +68,7 @@ public class TransitModel implements Serializable {
 
   private final HashSet<TransitMode> transitModes = new HashSet<>();
 
-  private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
+  private final Map<FeedScopedId, Integer> serviceCodes = new HashMap<>();
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
@@ -97,8 +94,8 @@ public class TransitModel implements Serializable {
   private boolean hasFrequencyService = false;
   private boolean hasScheduledService = false;
 
-  private final Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
-  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = Maps.newHashMap();
+  private final Map<FeedScopedId, TripPattern> tripPatternForId = new HashMap<>();
+  private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDates = new HashMap<>();
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
@@ -294,11 +291,11 @@ public class TransitModel implements Serializable {
    * Initialize the time zone, if it has not been set previously.
    */
   public void initTimeZone(ZoneId timeZone) {
+    if (timeZone == null || timeZone.equals(this.timeZone)) {
+      return;
+    }
     if (this.timeZone != null) {
       throw new IllegalStateException("Timezone can't be re-set");
-    }
-    if (timeZone == null) {
-      return;
     }
     this.timeZone = timeZone;
     this.timeZoneExplicitlySet = true;

@@ -127,4 +127,14 @@ public interface StopLocation extends LogInfo {
   default String logName() {
     return ObjectUtils.ifNotNull(getName(), Object::toString, null);
   }
+
+  /**
+   * Get the parent station id if such exists. Otherwise, return the stop id.
+   */
+  default FeedScopedId getStationOrStopId() {
+    if (this instanceof StationElement<?, ?> stationElement && stationElement.isPartOfStation()) {
+      return stationElement.getParentStation().getId();
+    }
+    return getId();
+  }
 }

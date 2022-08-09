@@ -80,7 +80,7 @@ public abstract class GraphRoutingTest {
       .collect(Collectors.joining(" - "));
   }
 
-  protected TestOtpModel graphOf(Builder builder) {
+  protected TestOtpModel modelOf(Builder builder) {
     builder.build();
     Graph graph = builder.graph();
     TransitModel transitModel = builder.transitModel();

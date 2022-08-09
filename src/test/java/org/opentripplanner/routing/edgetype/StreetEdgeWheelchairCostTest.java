@@ -27,7 +27,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
   Graph graph;
 
   public StreetEdgeWheelchairCostTest() {
-    TestOtpModel model = graphOf(
+    TestOtpModel model = modelOf(
       new Builder() {
         @Override
         public void build() {

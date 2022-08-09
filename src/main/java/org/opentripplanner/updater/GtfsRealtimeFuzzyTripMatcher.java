@@ -29,7 +29,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
   // TODO: replace this with a runtime solution
   private final DirectionMapper directionMapper = new DirectionMapper(
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
