@@ -162,6 +162,10 @@ public class GTFSToOtpTransitServiceMapper {
 
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
     fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
+
+    // we don't want to store the list of fare products if they are not required by a fare rule
+    // or a fare transfer rule, that's why this is not added to the builder
+    fareProductMapper.map(data.getAllFareProducts());
     fareRulesBuilder.fareLegRules().addAll(fareLegRuleMapper.map(data.getAllFareLegRules()));
     fareRulesBuilder
       .fareTransferRules()

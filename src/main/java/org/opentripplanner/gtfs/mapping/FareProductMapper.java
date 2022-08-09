@@ -2,9 +2,12 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Currency;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareContainer;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.RiderCategory;
@@ -15,7 +18,7 @@ public class FareProductMapper {
 
   public static int NOT_SET = -999;
 
-  private final List<FareProduct> mappedFareProducts = new ArrayList<>();
+  private final Set<FareProduct> mappedFareProducts = new HashSet<>();
 
   public FareProduct map(org.onebusaway.gtfs.model.FareProduct rhs) {
     var id = AgencyAndIdMapper.mapAgencyAndId(rhs.getId());
@@ -34,18 +37,24 @@ public class FareProductMapper {
       rhs.getName(),
       price,
       duration,
-      mapRiderCategory(rhs.getRiderCategory()),
+      toInternalModel(rhs.getRiderCategory()),
       toInternalModel(rhs.egetFareContainer())
     );
     mappedFareProducts.add(fp);
     return fp;
   }
 
+  public Collection<FareProduct> map(
+    Collection<org.onebusaway.gtfs.model.FareProduct> allFareProducts
+  ) {
+    return allFareProducts.stream().map(this::map).toList();
+  }
+
   public Optional<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
     return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).findFirst();
   }
 
-  private static RiderCategory mapRiderCategory(
+  private static RiderCategory toInternalModel(
     org.onebusaway.gtfs.model.RiderCategory riderCategory
   ) {
     if (riderCategory == null) {
