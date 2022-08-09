@@ -33,7 +33,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
-  private final List<FareLegRule> fareLegRules = new ArrayList<>();
+  private FareRulesData fareLegRules;
 
   // mapping the stop ids to area ids. one stop can be in several areas.
   private final Multimap<FeedScopedId, String> stopAreas = ArrayListMultimap.create();
@@ -43,15 +43,14 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
 
-    var faresV2Service = new GtfsFaresV2Service(fareLegRules.stream().toList(), stopAreas);
+    var faresV2Service = new GtfsFaresV2Service(fareLegRules.fareLegRules(), stopAreas);
     return new GtfsFaresService(fareService, faresV2Service);
   }
 
   @Override
-  public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
-    fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), regularFareRules);
-
-    fareLegRules.addAll(fareRuleService.fareLegRules());
+  public void processGtfs(FareRulesData fareRulesData, OtpTransitService transitService) {
+    fillFareRules(fareRulesData.fareAttributes(), fareRulesData.fareRules(), regularFareRules);
+    this.fareLegRules = fareRulesData;
   }
 
   public void configure(JsonNode config) {

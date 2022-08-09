@@ -163,6 +163,9 @@ public class GTFSToOtpTransitServiceMapper {
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
     fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
     fareRulesBuilder.fareLegRules().addAll(fareLegRuleMapper.map(data.getAllFareLegRules()));
+    fareRulesBuilder
+      .fareTransferRules()
+      .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
 
     mapAndAddTransfersToBuilder();
   }
