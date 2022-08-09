@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ResourceBundleAdaptor {
 
-  public static final Logger LOG = LoggerFactory.getLogger(ResourceBundleAdaptor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResourceBundleAdaptor.class);
 
   private final String bundle;
 

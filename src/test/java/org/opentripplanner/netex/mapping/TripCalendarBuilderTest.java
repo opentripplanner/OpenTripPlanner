@@ -55,7 +55,7 @@ public class TripCalendarBuilderTest {
   private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
   public static final String OD_1 = "OD-1";
 
-  private final DataImportIssueStore issueStore = new DataImportIssueStore(true);
+  private final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
   private final CalendarServiceBuilder calendarServiceBuilder = new CalendarServiceBuilder(
     new FeedScopedIdFactory(FEED_ID)
   );

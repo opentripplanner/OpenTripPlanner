@@ -2,9 +2,7 @@ package org.opentripplanner.transit.service;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
@@ -42,13 +40,13 @@ public class TransitModelIndex {
   private static final Logger LOG = LoggerFactory.getLogger(TransitModelIndex.class);
 
   // TODO: consistently key on model object or id string
-  private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
-  private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
+  private final Map<FeedScopedId, Agency> agencyForId = new HashMap<>();
+  private final Map<FeedScopedId, Operator> operatorForId = new HashMap<>();
 
-  private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
-  private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
+  private final Map<FeedScopedId, Trip> tripForId = new HashMap<>();
+  private final Map<FeedScopedId, Route> routeForId = new HashMap<>();
 
-  private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
+  private final Map<Trip, TripPattern> patternForTrip = new HashMap<>();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
@@ -138,7 +136,7 @@ public class TransitModelIndex {
 
   /** Dynamically generate the set of Routes passing though a Stop on demand. */
   public Set<Route> getRoutesForStop(StopLocation stop) {
-    Set<Route> routes = Sets.newHashSet();
+    Set<Route> routes = new HashSet<>();
     for (TripPattern p : getPatternsForStop(stop)) {
       routes.add(p.getRoute());
     }

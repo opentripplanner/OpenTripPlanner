@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -58,5 +59,24 @@ class TripPatternTest {
     assertFalse(
       subject.sameAs(subject.copy().withStopPattern(StopPattern.create(11).build()).build())
     );
+  }
+
+  @Test
+  void initNameShouldThrow() {
+    Assertions.assertThrows(IllegalStateException.class, () -> subject.initName("abc"));
+  }
+
+  @Test
+  void shouldAddName() {
+    var name = "xyz";
+    var noNameYet = TripPattern
+      .of(TransitModelForTest.id(ID))
+      .withRoute(ROUTE)
+      .withStopPattern(STOP_PATTERN)
+      .build();
+
+    noNameYet.initName(name);
+
+    assertEquals(name, noNameYet.getName());
   }
 }

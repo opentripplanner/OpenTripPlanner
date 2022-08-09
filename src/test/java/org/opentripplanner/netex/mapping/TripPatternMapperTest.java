@@ -32,7 +32,7 @@ public class TripPatternMapperTest {
     NetexTestDataSample sample = new NetexTestDataSample();
 
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       sample.getStopsById(),
@@ -92,7 +92,7 @@ public class TripPatternMapperTest {
     datedServiceJourneys.addAll(sample.getDatedServiceJourneyBySjId().values());
 
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       sample.getStopsById(),

@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_positions;
 
-import com.google.common.base.MoreObjects;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +7,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +52,9 @@ public class GtfsRealtimeHttpVehiclePositionSource implements VehiclePositionSou
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this).add("url", url).toString();
+    return ToStringBuilder
+      .of(GtfsRealtimeHttpVehiclePositionSource.class)
+      .addObj("url", url)
+      .toString();
   }
 }

@@ -471,7 +471,7 @@ public class TimetableSnapshotSourceTest {
 
     // New trip pattern
     {
-      final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(
+      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
         new FeedScopedId(feedId, modifiedTripId),
         serviceDate
       );
@@ -725,7 +725,7 @@ public class TimetableSnapshotSourceTest {
 
     // New trip pattern
     {
-      final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(
+      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
         new FeedScopedId(feedId, scheduledTripId),
         serviceDate
       );
@@ -867,7 +867,7 @@ public class TimetableSnapshotSourceTest {
 
     // New trip pattern
     {
-      final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(
+      final TripPattern newTripPattern = snapshot.getRealtimeAddedTripPattern(
         new FeedScopedId(feedId, scheduledTripId),
         serviceDate
       );

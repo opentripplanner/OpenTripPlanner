@@ -4,7 +4,6 @@ import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.fares.FareService;
 
 /**
  * Group by Similarity filter parameters
@@ -103,6 +102,12 @@ public class ItineraryFilterParameters {
    */
   public boolean accessibilityScore;
 
+  /**
+   * Whether to remove timeshifted "duplicate" itineraries from the search results so that you get a
+   * greater variety of results rather than the same ones at different times.
+   */
+  public boolean removeItinerariesWithSameRoutesAndStops;
+
   private ItineraryFilterParameters() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
@@ -115,6 +120,7 @@ public class ItineraryFilterParameters {
     this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.accessibilityScore = false;
+    this.removeItinerariesWithSameRoutesAndStops = false;
   }
 
   public ItineraryFilterParameters(ItineraryFilterParameters i) {
@@ -128,7 +134,8 @@ public class ItineraryFilterParameters {
       i.bikeRentalDistanceRatio,
       i.parkAndRideDurationRatio,
       i.filterItinerariesWithSameFirstOrLastTrip,
-      i.accessibilityScore
+      i.accessibilityScore,
+      i.removeItinerariesWithSameRoutesAndStops
     );
   }
 
@@ -142,7 +149,8 @@ public class ItineraryFilterParameters {
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,
-    boolean accessibilityScore
+    boolean accessibilityScore,
+    boolean removeItinerariesWithSameRoutesAndStops
   ) {
     this.debug = debug;
     this.groupSimilarityKeepOne = groupSimilarityKeepOne;
@@ -154,6 +162,7 @@ public class ItineraryFilterParameters {
     this.parkAndRideDurationRatio = parkAndRideDurationRatio;
     this.filterItinerariesWithSameFirstOrLastTrip = filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = accessibilityScore;
+    this.removeItinerariesWithSameRoutesAndStops = removeItinerariesWithSameRoutesAndStops;
   }
 
   public static ItineraryFilterParameters createDefault() {

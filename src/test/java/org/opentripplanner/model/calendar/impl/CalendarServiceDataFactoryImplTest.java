@@ -128,7 +128,7 @@ public class CalendarServiceDataFactoryImplTest {
       ConstantsForTests.FAKE_GTFS
     );
     OtpTransitServiceBuilder builder = ctxBuilder
-      .withDataImportIssueStore(new DataImportIssueStore(false))
+      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore())
       .getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections

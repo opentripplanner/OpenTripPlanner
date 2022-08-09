@@ -13,7 +13,7 @@ public class SimpleIntersectionTraversalCostModel
   extends AbstractIntersectionTraversalCostModel
   implements Serializable {
 
-  public static final Logger LOG = LoggerFactory.getLogger(
+  private static final Logger LOG = LoggerFactory.getLogger(
     SimpleIntersectionTraversalCostModel.class
   );
   private final DrivingDirection drivingDirection;

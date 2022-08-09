@@ -26,7 +26,7 @@ public class TransitModelArchitectureTest {
 
   @Test
   void enforcePackageDependencies() {
-    FRAMEWORK.dependsOn(GUAVA, UTILS).verify();
+    FRAMEWORK.dependsOn(UTILS).verify();
     BASIC.dependsOn(UTILS, JTS_GEOM, FRAMEWORK).verify();
     ORGANIZATION.dependsOn(UTILS, FRAMEWORK, BASIC).verify();
     SITE
@@ -34,20 +34,10 @@ public class TransitModelArchitectureTest {
       .verify();
     // TODO OTP2 temporarily allow circular dependency between network and timetable
     NETWORK
-      .dependsOn(
-        UTILS,
-        GUAVA,
-        JTS_GEOM,
-        FRAMEWORK,
-        BASIC,
-        ORGANIZATION,
-        SITE,
-        TIMETABLE,
-        LEGACY_MODEL
-      )
+      .dependsOn(UTILS, JTS_GEOM, FRAMEWORK, BASIC, ORGANIZATION, SITE, TIMETABLE, LEGACY_MODEL)
       .verify();
     TIMETABLE
-      .dependsOn(GUAVA, UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
+      .dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
       .verify();
   }
 

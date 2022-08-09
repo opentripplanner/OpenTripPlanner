@@ -1,10 +1,9 @@
 package org.opentripplanner.ext.flex;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -20,13 +19,17 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexLocationsToStreetEdgesMapper.class);
 
+  private final Graph graph;
+  private final TransitModel transitModel;
+
+  @Inject
+  public FlexLocationsToStreetEdgesMapper(Graph graph, TransitModel transitModel) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+  }
+
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     if (!transitModel.getStopModel().hasFlexLocations()) {
       return;
     }

@@ -1,6 +1,8 @@
 package org.opentripplanner.index;
 
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,19 +49,17 @@ import org.opentripplanner.api.model.ApiTransfer;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
+import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
@@ -259,7 +259,7 @@ public class IndexAPI {
    * Return upcoming vehicle arrival/departure times at the given stop.
    *
    * @param stopIdString       Stop ID in Agency:Stop ID format
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
+   * @param startTimeSeconds          Start time for the search. Seconds from UNIX epoch
    * @param timeRange          Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    */
@@ -267,16 +267,20 @@ public class IndexAPI {
   @Path("/stops/{stopId}/stoptimes")
   public Collection<ApiStopTimesInPattern> getStopTimesForStop(
     @PathParam("stopId") String stopIdString,
-    @QueryParam("startTime") long startTime,
+    @QueryParam("startTime") long startTimeSeconds,
     @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
     @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
     @QueryParam("omitNonPickups") boolean omitNonPickups
   ) {
+    Instant startTime = startTimeSeconds == 0
+      ? Instant.now()
+      : Instant.ofEpochSecond(startTimeSeconds);
+
     return transitService()
       .stopTimesForStop(
         stop(stopIdString),
         startTime,
-        timeRange,
+        Duration.ofSeconds(timeRange),
         numberOfDepartures,
         omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
         false
@@ -432,7 +436,7 @@ public class IndexAPI {
   @Path("/trips/{tripId}/semanticHash")
   public String getSemanticHashForTrip(@PathParam("tripId") String tripId) {
     var trip = trip(tripId);
-    return tripPattern(trip).semanticHashString(trip);
+    return SemanticHash.forTripPattern(tripPattern(trip), trip);
   }
 
   @GET
@@ -498,7 +502,7 @@ public class IndexAPI {
   @Path("/patterns/{patternId}/semanticHash")
   public String getSemanticHashForPattern(@PathParam("patternId") String patternId) {
     var tripPattern = tripPattern(patternId);
-    return tripPattern.semanticHashString(null);
+    return SemanticHash.forTripPattern(tripPattern, null);
   }
 
   /** Return geometry for the pattern as a packed coordinate sequence */

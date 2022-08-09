@@ -45,14 +45,14 @@ public class GtfsContextBuilder {
     GtfsFeedId feedId = gtfsImport.getFeedId();
     var mapper = new GTFSToOtpTransitServiceMapper(
       feedId.getId(),
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       false,
       gtfsImport.getDao()
     );
     mapper.mapStopTripAndRouteDataIntoBuilder();
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
-      .withDataImportIssueStore(new DataImportIssueStore(false));
+      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore());
   }
 
   public GtfsFeedId getFeedId() {
@@ -64,7 +64,7 @@ public class GtfsContextBuilder {
   }
 
   public GtfsContextBuilder withIssueStoreAndDeduplicator(Graph graph) {
-    return withIssueStoreAndDeduplicator(graph, new DataImportIssueStore(false));
+    return withIssueStoreAndDeduplicator(graph, DataImportIssueStore.noopIssueStore());
   }
 
   public GtfsContextBuilder withIssueStoreAndDeduplicator(
