@@ -151,3 +151,5 @@ record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legPro
       .orElse(Set.of());
   }
 }
+
+record TransferCost(Leg fromLeg, Leg toLeg, FareProduct product) {}

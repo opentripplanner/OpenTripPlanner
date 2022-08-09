@@ -21,6 +21,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
+  String LEG_GROUP_ID = "legroup1";
   int ID = 100;
   String expressNetwork = "express";
   String localNetwork = "local";
@@ -104,14 +105,14 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      new FareLegRule(FEED_ID, null, null, null, single),
-      new FareLegRule(FEED_ID, null, null, OUTER_ZONE, singleToOuter),
-      new FareLegRule(FEED_ID, null, OUTER_ZONE, null, singleFromOuter),
-      new FareLegRule(FEED_ID, null, null, null, dayPass),
-      new FareLegRule(FEED_ID, expressNetwork, null, null, expressPass),
-      new FareLegRule(FEED_ID, localNetwork, null, null, localPass),
-      new FareLegRule(FEED_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
-      new FareLegRule("another-feed", null, null, null, monthlyPass)
+      new FareLegRule(LEG_GROUP_ID, null, null, null, single),
+      new FareLegRule(LEG_GROUP_ID, null, null, OUTER_ZONE, singleToOuter),
+      new FareLegRule(LEG_GROUP_ID, null, OUTER_ZONE, null, singleFromOuter),
+      new FareLegRule(LEG_GROUP_ID, null, null, null, dayPass),
+      new FareLegRule(LEG_GROUP_ID, expressNetwork, null, null, expressPass),
+      new FareLegRule(LEG_GROUP_ID, localNetwork, null, null, localPass),
+      new FareLegRule(LEG_GROUP_ID, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
+      new FareLegRule("another-leg-group", null, null, null, monthlyPass)
     ),
     List.of(),
     Multimaps.forMap(
