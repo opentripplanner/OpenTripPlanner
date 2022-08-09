@@ -7,6 +7,7 @@ import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
@@ -15,6 +16,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Stop;
 
@@ -47,6 +49,8 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
   private final int maxScore;
   private double sumOfScores;
 
+  private final Set<FeedScopedId> stopsCounted = new HashSet<>();
+
   public VehicleToStopSkipEdgeStrategy(Function<Stop, Set<Route>> getRoutesForStop) {
     this.maxScore = 300;
     this.getRoutesForStop = getRoutesForStop;
@@ -55,13 +59,19 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
     if (current.getNonTransitMode().isWalking()) {
-      if (current.getVertex() instanceof TransitStopVertex stopVertex) {
+      if (
+        current.getVertex() instanceof TransitStopVertex stopVertex &&
+        !stopsCounted.contains(stopVertex.getStop().getId())
+      ) {
+        var stop = stopVertex.getStop();
         var score = getRoutesForStop
-          .apply(stopVertex.getStop())
+          .apply(stop)
           .stream()
           .map(Route::getMode)
           .mapToInt(VehicleToStopSkipEdgeStrategy::score)
           .sum();
+
+        stopsCounted.add(stop.getId());
 
         sumOfScores = sumOfScores + score;
       }
