@@ -81,6 +81,11 @@ public class TripPatternNamer implements GraphBuilderModule {
     /* Iterate over all routes, giving the patterns within each route unique names. */
     for (Route route : patternsByRoute.keySet()) {
       Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
+
+      // Only generate name for patterns with at least one missing name
+      if (routeTripPatterns.stream().allMatch(tripPattern -> tripPattern.getName() != null)) {
+        continue;
+      }
       String routeName = route.getName();
 
       /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
@@ -109,6 +114,9 @@ public class TripPatternNamer implements GraphBuilderModule {
         }
       }
       PATTERN:for (TripPattern pattern : routeTripPatterns) {
+        if (pattern.getName() != null) {
+          continue;
+        }
         StringBuilder sb = new StringBuilder(routeName);
         String headsign = pattern.getTripHeadsign();
         if (headsign != null && signs.get(headsign).size() == 1) {
