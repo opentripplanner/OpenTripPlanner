@@ -16,6 +16,7 @@ import org.opentripplanner.api.model.ApiFareComponent;
 import org.opentripplanner.api.model.ApiFareProduct;
 import org.opentripplanner.api.model.ApiFareQualifier;
 import org.opentripplanner.api.model.ApiItineraryFares;
+import org.opentripplanner.api.model.ApiLegProducts;
 import org.opentripplanner.api.model.ApiMoney;
 import org.opentripplanner.ext.fares.model.FareContainer;
 import org.opentripplanner.ext.fares.model.FareProduct;
@@ -47,21 +48,22 @@ public class FareMapper {
     );
   }
 
-  private Map<Integer, Collection<ApiFareProduct>> toApiLegProducts(
+  private List<ApiLegProducts> toApiLegProducts(
     Itinerary itinerary,
     Multimap<Leg, FareProduct> legProducts
   ) {
     if (legProducts.isEmpty()) {
       return null;
     } else {
-      var products = new HashMap<Integer, Collection<ApiFareProduct>>();
-      legProducts
+      return legProducts
         .keySet()
-        .forEach(leg -> {
+        .stream()
+        .map(leg -> {
           var index = itinerary.getLegIndex(leg);
-          products.put(index, toApiFareProducts(legProducts.get(leg)));
-        });
-      return products;
+          // eventually we want to implement products that span multiple legs (but not the entire itinerary)
+          return new ApiLegProducts(List.of(index), toApiFareProducts(legProducts.get(leg)));
+        })
+        .toList();
     }
   }
 

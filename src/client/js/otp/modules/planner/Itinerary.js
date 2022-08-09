@@ -142,12 +142,12 @@ otp.modules.planner.Itinerary = otp.Class({
         }
 
         if (fare.legProducts) {
-            Object.keys(fare.legProducts).forEach(index => {
-                const name = `${legs[index].agencyName} ${legs[index].routeLongName}`;
+            fare.legProducts.forEach(legProducts => {
+                const name = legProducts.legIndices.map(index => `${legs[index].agencyName} ${legs[index].routeLongName}`).join(",");
                 const title = document.createElement("strong");
                 title.innerText = `Covering ${name}`;
                 allFares.appendChild(title);
-                allFares.appendChild(this.buildFaresTable(fare.legProducts[index]));
+                allFares.appendChild(this.buildFaresTable(legProducts.products));
             })
         }
 
