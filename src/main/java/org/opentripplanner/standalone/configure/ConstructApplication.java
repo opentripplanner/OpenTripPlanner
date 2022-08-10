@@ -54,9 +54,6 @@ public class ConstructApplication {
 
   private final CommandLineParameters cli;
   private final GraphBuilderDataSources graphBuilderDataSources;
-  private final ConfigModel config;
-  private final Graph graph;
-  private final TransitModel transitModel;
   private final ConstructApplicationFactory factory;
 
   /**
@@ -70,12 +67,14 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources
   ) {
     this.cli = cli;
-    this.config = config;
-    this.graph = graph;
-    this.transitModel = transitModel;
     this.graphBuilderDataSources = graphBuilderDataSources;
     this.factory =
-      DaggerConstructApplicationFactory.builder().configModel(config).graph(graph).build();
+      DaggerConstructApplicationFactory
+        .builder()
+        .configModel(config)
+        .graph(graph)
+        .transitModel(transitModel)
+        .build();
   }
 
   public ConstructApplicationFactory getFactory() {
@@ -181,23 +180,23 @@ public class ConstructApplication {
   }
 
   public TransitModel transitModel() {
-    return transitModel;
+    return factory.transitModel();
   }
 
   public Graph graph() {
-    return graph;
+    return factory.graph();
   }
 
   public OtpConfig otpConfig() {
-    return config.otpConfig();
+    return factory.config().otpConfig();
   }
 
   public RouterConfig routerConfig() {
-    return config.routerConfig();
+    return factory.config().routerConfig();
   }
 
   public BuildConfig buildConfig() {
-    return config.buildConfig();
+    return factory.config().buildConfig();
   }
 
   public RaptorConfig<TripSchedule> raptorConfig() {
@@ -212,8 +211,8 @@ public class ConstructApplication {
     return DefaultServerRequestContext.create(
       routerConfig(),
       raptorConfig(),
-      graph,
-      new DefaultTransitService(transitModel),
+      factory.graph(),
+      new DefaultTransitService(factory.transitModel()),
       Metrics.globalRegistry,
       traverseVisitor()
     );

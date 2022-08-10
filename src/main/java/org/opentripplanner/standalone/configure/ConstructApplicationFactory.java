@@ -8,6 +8,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
 /**
@@ -16,8 +17,10 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 @Singleton
 @Component(modules = ConfigModule.class)
 public interface ConstructApplicationFactory {
+  ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();
-
+  Graph graph();
+  TransitModel transitModel();
   GraphVisualizer graphVisualizer();
 
   @Component.Builder
@@ -27,6 +30,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder graph(Graph graph);
+
+    @BindsInstance
+    Builder transitModel(TransitModel transitModel);
 
     ConstructApplicationFactory build();
   }
