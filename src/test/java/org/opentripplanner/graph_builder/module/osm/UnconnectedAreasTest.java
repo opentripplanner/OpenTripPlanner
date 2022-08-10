@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
@@ -37,7 +38,7 @@ public class UnconnectedAreasTest {
     DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
-    assertEquals(2, issueStore.getIssues().size());
+    assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
 
     var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
     int nParkAndRide = vehicleParkingVertices.size();
@@ -54,7 +55,7 @@ public class UnconnectedAreasTest {
     DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
 
-    assertEquals(3, issueStore.getIssues().size());
+    assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
 
     var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
     int nParkAndRideEntrances = vehicleParkingVertices.size();
@@ -217,5 +218,13 @@ public class UnconnectedAreasTest {
       .forEach(e -> assertTrue(connections.contains(e.getFromVertex().getLabel())));
 
     return connections;
+  }
+
+  private int getParkAndRideUnlinkedIssueCount(DataImportIssueStore issueStore) {
+    return (int) issueStore
+      .getIssues()
+      .stream()
+      .filter(dataImportIssue -> dataImportIssue instanceof ParkAndRideUnlinked)
+      .count();
   }
 }

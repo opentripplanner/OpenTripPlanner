@@ -110,7 +110,7 @@ public final class TripPattern
   }
 
   public void initName(String name) {
-    if (name != null) {
+    if (this.name != null) {
       throw new IllegalStateException("Name has already been set");
     }
     this.name = name;
