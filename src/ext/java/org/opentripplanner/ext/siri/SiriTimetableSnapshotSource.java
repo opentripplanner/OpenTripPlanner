@@ -1084,20 +1084,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate
     );
 
-    /*
-     * Update pattern with triptimes so get correct dwell times and lower bound on running times.
-     * New patterns only affects a single trip, previously added tripTimes is no longer valid, and is therefore removed
-     */
-    pattern.getScheduledTimetable().getTripTimes().clear();
-    pattern.getScheduledTimetable().addTripTimes(updatedTripTimes);
-
-    // Remove trip times to avoid real time trip times being visible for ignoreRealtimeInformation queries
-    pattern.getScheduledTimetable().getTripTimes().clear();
-
-    // Add to buffer as-is to include it in the 'realtimeAddedTripPattern'
-    //TODO - Should this update be done twice?
-    buffer.update(pattern, updatedTripTimes, serviceDate);
-
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
     Supplier<Optional<String>> framedVehicleJourneySupplier = () ->
       Optional
@@ -1123,8 +1109,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         tripOnServiceDate
       );
     }
-
-    //TODO - SIRI: Add pattern to index?
 
     // Add new trip times to the buffer and return success
     return buffer.update(pattern, updatedTripTimes, serviceDate);

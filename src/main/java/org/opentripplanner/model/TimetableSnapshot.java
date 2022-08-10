@@ -413,6 +413,8 @@ public class TimetableSnapshot {
    */
   private void addPatternToIndex(TripPattern tripPattern) {
     if (tripPattern.isCreatedByRealtimeUpdater()) {
+      //TODO - SIRI: Add pattern to index?
+
       for (var stop : tripPattern.getStops()) {
         patternsForStop.put(stop, tripPattern);
       }
