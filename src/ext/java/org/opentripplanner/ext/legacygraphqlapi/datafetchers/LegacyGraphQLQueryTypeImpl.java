@@ -909,15 +909,19 @@ public class LegacyGraphQLQueryTypeImpl
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         routeStream =
-          routeStream.filter(route ->
-            Stream
-              .of(route.getShortName(), route.getLongName())
-              .filter(Objects::nonNull)
-              .map(s -> s.toString().toLowerCase(environment.getLocale()))
-              .anyMatch(s -> s.startsWith(name))
-          );
+          routeStream.filter(route -> {
+            if (
+              route.getShortName() != null &&
+              route.getShortName().toLowerCase(environment.getLocale()).startsWith(name)
+            ) {
+              return true;
+            }
+            return (
+              route.getLongName() != null &&
+              route.getLongName().toString(environment.getLocale()).toLowerCase().startsWith(name)
+            );
+          });
       }
-
       return routeStream.collect(Collectors.toList());
     };
   }
