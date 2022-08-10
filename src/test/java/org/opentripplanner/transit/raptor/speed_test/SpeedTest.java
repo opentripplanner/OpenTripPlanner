@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.OTPAppConstruction.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
 import static org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer.nanosToMillisecond;
 
 import java.io.File;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;

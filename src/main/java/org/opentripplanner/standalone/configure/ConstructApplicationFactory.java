@@ -26,7 +26,7 @@ import org.opentripplanner.transit.service.TransitModel;
 @Singleton
 @Component(
   modules = {
-    AppModule.class,
+    ConstructApplicationModule.class,
     ConfigModule.class,
     DataStoreModule.class,
     GraphModule.class,
@@ -34,7 +34,7 @@ import org.opentripplanner.transit.service.TransitModel;
     TransitModule.class,
   }
 )
-public interface OTPApplicationFactory {
+public interface ConstructApplicationFactory {
   RaptorConfig<TripSchedule> raptorConfig();
   OtpDataStore datastore();
   ConfigModel configModel();
@@ -47,6 +47,6 @@ public interface OTPApplicationFactory {
     @BindsInstance
     Builder baseDirectory(@OtpBaseDirectory File baseDirectory);
 
-    OTPApplicationFactory build();
+    ConstructApplicationFactory build();
   }
 }

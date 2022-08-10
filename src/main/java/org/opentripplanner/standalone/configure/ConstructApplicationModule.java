@@ -8,7 +8,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
 @Module
-class AppModule {
+class ConstructApplicationModule {
 
   @Provides
   @Singleton

@@ -45,12 +45,12 @@ import org.slf4j.LoggerFactory;
  * should be really fast, since the only IO operations are reading config files and logging. Loading
  * transit or map data should NOT happen during this phase.
  */
-public class OTPAppConstruction {
+public class ConstructApplication {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OTPAppConstruction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConstructApplication.class);
 
   private final CommandLineParameters cli;
-  private final OTPApplicationFactory factory;
+  private final ConstructApplicationFactory factory;
   private GraphBuilderDataSources graphBuilderDataSources = null;
   private DefaultServerContext context;
   private GraphVisualizer graphVisualizer;
@@ -58,13 +58,16 @@ public class OTPAppConstruction {
   /**
    * Create a new OTP configuration instance for a given directory.
    */
-  public OTPAppConstruction(CommandLineParameters commandLineParameters) {
+  public ConstructApplication(CommandLineParameters commandLineParameters) {
     this.cli = commandLineParameters;
     this.factory =
-      DaggerOTPApplicationFactory.builder().baseDirectory(this.cli.getBaseDirectory()).build();
+      DaggerConstructApplicationFactory
+        .builder()
+        .baseDirectory(this.cli.getBaseDirectory())
+        .build();
   }
 
-  public OTPApplicationFactory getFactory() {
+  public ConstructApplicationFactory getFactory() {
     return factory;
   }
 

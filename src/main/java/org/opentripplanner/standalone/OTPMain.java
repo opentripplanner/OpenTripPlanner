@@ -10,8 +10,8 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.configure.OTPAppConstruction;
-import org.opentripplanner.standalone.configure.OTPApplicationFactory;
+import org.opentripplanner.standalone.configure.ConstructApplication;
+import org.opentripplanner.standalone.configure.ConstructApplicationFactory;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -108,7 +108,7 @@ public class OTPMain {
       params.getBaseDirectory().getAbsolutePath()
     );
 
-    var app = new OTPAppConstruction(params);
+    var app = new ConstructApplication(params);
     var factory = app.getFactory();
     var datastore = factory.datastore();
     var configModel = factory.configModel();
@@ -167,7 +167,7 @@ public class OTPMain {
     }
   }
 
-  private static void startOtpWebServer(CommandLineParameters params, OTPAppConstruction app) {
+  private static void startOtpWebServer(CommandLineParameters params, ConstructApplication app) {
     // Index graph for travel search
     app.transitModel().index();
     app.graph().index();
@@ -235,7 +235,7 @@ public class OTPMain {
     }
   }
 
-  private static void setOtpConfigVersionsOnServerInfo(OTPApplicationFactory factory) {
+  private static void setOtpConfigVersionsOnServerInfo(ConstructApplicationFactory factory) {
     var c = factory.configModel();
     projectInfo().otpConfigVersion = c.otpConfig().configVersion;
     projectInfo().buildConfigVersion = c.buildConfig().configVersion;

@@ -1,6 +1,6 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.standalone.configure.OTPAppConstruction.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
 
 import io.micrometer.core.instrument.Metrics;
 import org.opentripplanner.routing.graph.Graph;
