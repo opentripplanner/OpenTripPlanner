@@ -14,7 +14,7 @@ public class RemoveWalkOnlyFilter implements ItineraryDeletionFlagger {
   }
 
   @Override
-  public Predicate<Itinerary> flagForRemoval() {
+  public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return Itinerary::isWalkingAllTheWay;
   }
 }

@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Itinerary;
  * <p>
  * Override one of the default methods in this interface to make a filter:
  * <ul>
- *  <li>{@link #flagForRemoval()} - If filtering is done based on looking at one itinerary at the time.</li>
+ *  <li>{@link #shouldBeFlaggedForRemoval()} - If filtering is done based on looking at one itinerary at the time.</li>
  *  <li>{@link #flagForRemoval(List)}}) - If you need more than one itinerary to decide which to delete.</li>
  * </ul>
  */
@@ -27,9 +27,9 @@ public interface ItineraryDeletionFlagger {
 
   /**
    * Override this to create a simple filter, which flags all itineraries for deletion where the
-   * predicate returns true.
+   * predicate returns {@code true}.
    */
-  default Predicate<Itinerary> flagForRemoval() {
+  default Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return null;
   }
 
@@ -39,7 +39,7 @@ public interface ItineraryDeletionFlagger {
    * using {@link Itinerary#flagForDeletion(SystemNotice)}.
    */
   default List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    return itineraries.stream().filter(flagForRemoval()).collect(Collectors.toList());
+    return itineraries.stream().filter(shouldBeFlaggedForRemoval()).collect(Collectors.toList());
   }
 
   // Tagging options:
