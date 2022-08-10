@@ -24,7 +24,6 @@ import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.OTPFeature;
@@ -209,10 +208,10 @@ public class ConstructApplication {
    */
   private DefaultServerRequestContext createServerContext() {
     return DefaultServerRequestContext.create(
-      routerConfig(),
-      raptorConfig(),
+      factory.config().routerConfig(),
+      factory.raptorConfig(),
       factory.graph(),
-      new DefaultTransitService(factory.transitModel()),
+      factory.transitService(),
       Metrics.globalRegistry,
       traverseVisitor()
     );
