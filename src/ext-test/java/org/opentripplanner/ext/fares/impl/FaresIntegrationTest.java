@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.List;
@@ -96,45 +94,6 @@ public class FaresIntegrationTest {
     // this is commented out because portland's fares are, I think, broken in the gtfs. see
     // thread on gtfs-changes.
     // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
-  }
-
-  @Test
-  public void testKCM() {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(
-      ConstantsForTests.KCM_GTFS,
-      new SeattleFareServiceFactory()
-    );
-    Graph graph = model.graph();
-    TransitModel transitModel = model.transitModel();
-
-    assertEquals("America/Los_Angeles", transitModel.getTimeZone().getId());
-
-    assertEquals(1, transitModel.getFeedIds().size());
-
-    var feedId = transitModel.getFeedIds().iterator().next();
-
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
-
-    var from = GenericLocation.fromStopId("Origin", feedId, "2010");
-    var to = GenericLocation.fromStopId("Destination", feedId, "2140");
-
-    var dateTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
-
-    var costOffPeak = getFare(from, to, dateTime, serverContext);
-
-    assertEquals(new Money(USD, 250), costOffPeak.getFare(FareType.regular));
-
-    var onPeakStartTime = TestUtils.dateInstant("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
-    var peakItinerary = getItineraries(from, to, onPeakStartTime, serverContext).get(1);
-    var leg = peakItinerary.getLegs().get(0);
-    assertTrue(leg.getStartTime().toLocalTime().isAfter(LocalTime.parse("08:00")));
-    var startTime = leg.getStartTime().toLocalTime();
-    assertTrue(
-      startTime.isBefore(LocalTime.parse("09:00")),
-      "Leg's start should be before 09:00 but is " + startTime
-    );
-
-    assertEquals(new Money(USD, 275), peakItinerary.getFares().getFare(FareType.regular));
   }
 
   @Test

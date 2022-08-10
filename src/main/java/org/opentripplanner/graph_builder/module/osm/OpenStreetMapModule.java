@@ -262,6 +262,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * The bike safety factor of the safest street
      */
     private float bestBikeSafety = 1.0f;
+    /**
+     * The walk safety factor of the safest street
+     */
+    private float bestWalkSafety = 1.0f;
 
     public Handler(Graph graph, OSMDatabase osmdb) {
       this.graph = graph;
@@ -303,7 +307,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         customNamer.postprocess(graph);
       }
 
-      applyBikeSafetyFactor(graph);
+      applySafetyFactors(graph);
     } // END buildGraph()
 
     // TODO Set this to private once WalkableAreaBuilder is gone
@@ -323,10 +327,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       boolean walkNoThrough = wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way);
 
       if (street != null) {
-        double safety = wayData.getSafetyFeatures().first;
-        street.setBicycleSafetyFactor((float) safety);
-        if (safety < bestBikeSafety) {
-          bestBikeSafety = (float) safety;
+        double bicycleSafety = wayData.getBicycleSafetyFeatures().first;
+        street.setBicycleSafetyFactor((float) bicycleSafety);
+        if (bicycleSafety < bestBikeSafety) {
+          bestBikeSafety = (float) bicycleSafety;
+        }
+        double walkSafety = wayData.getWalkSafetyFeatures().first;
+        street.setWalkSafetyFactor((float) walkSafety);
+        if (walkSafety < bestWalkSafety) {
+          bestWalkSafety = (float) walkSafety;
         }
         if (notes != null) {
           for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
@@ -341,11 +350,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
 
       if (backStreet != null) {
-        double safety = wayData.getSafetyFeatures().second;
-        if (safety < bestBikeSafety) {
-          bestBikeSafety = (float) safety;
+        double bicycleSafety = wayData.getBicycleSafetyFeatures().second;
+        if (bicycleSafety < bestBikeSafety) {
+          bestBikeSafety = (float) bicycleSafety;
         }
-        backStreet.setBicycleSafetyFactor((float) safety);
+        backStreet.setBicycleSafetyFactor((float) bicycleSafety);
+        double walkSafety = wayData.getWalkSafetyFeatures().second;
+        if (walkSafety < bestWalkSafety) {
+          bestWalkSafety = (float) walkSafety;
+        }
+        backStreet.setWalkSafetyFactor((float) walkSafety);
         if (notes != null) {
           for (T2<StreetNote, NoteMatcher> note : notes) graph.streetNotesService.addStaticNote(
             backStreet,
@@ -1415,9 +1429,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * <p>
      * TODO Move this away, this is common to all street builders.
      */
-    private void applyBikeSafetyFactor(Graph graph) {
+    private void applySafetyFactors(Graph graph) {
       issueStore.add(
         new Graphwide("Multiplying all bike safety values by " + (1 / bestBikeSafety))
+      );
+      issueStore.add(
+        new Graphwide("Multiplying all walk safety values by " + (1 / bestWalkSafety))
       );
       HashSet<Edge> seenEdges = new HashSet<>();
       HashSet<AreaEdgeList> seenAreas = new HashSet<>();
@@ -1429,6 +1446,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             seenAreas.add(areaEdgeList);
             for (NamedArea area : areaEdgeList.getAreas()) {
               area.setBicycleSafetyMultiplier(area.getBicycleSafetyMultiplier() / bestBikeSafety);
+              area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
             }
           }
           if (!(e instanceof StreetEdge)) {
@@ -1439,6 +1457,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           if (!seenEdges.contains(e)) {
             seenEdges.add(e);
             pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
+            pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
           }
         }
         for (Edge e : vertex.getIncoming()) {
@@ -1450,6 +1469,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           if (!seenEdges.contains(e)) {
             seenEdges.add(e);
             pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
+            pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
           }
         }
       }
