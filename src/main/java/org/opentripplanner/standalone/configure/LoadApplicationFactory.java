@@ -10,7 +10,7 @@ import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
-import org.opentripplanner.standalone.config.ConfigModule;
+import org.opentripplanner.standalone.config.configure.ConfigModule;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
