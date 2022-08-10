@@ -9,7 +9,6 @@ import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.api.StreetRoutingTimeout;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
-
 /**
  * Main focus is to provide bindings not provided elsewhere. For example binding specific config
  * parameters to DI managed input parameters. This allows us to keep avoid passing entire

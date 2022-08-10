@@ -14,21 +14,19 @@ import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@HttpRequestScoped
 public class DefaultServerContext implements OtpServerContext {
 
   private RoutingRequest routingRequest = null;
   private final Graph graph;
-  private final TransitModel transitModel;
-
   private TransitService transitService = null;
   private final RouterConfig routerConfig;
   private final MeterRegistry meterRegistry;
@@ -43,7 +41,7 @@ public class DefaultServerContext implements OtpServerContext {
    */
   private DefaultServerContext(
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     RouterConfig routerConfig,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
@@ -52,7 +50,7 @@ public class DefaultServerContext implements OtpServerContext {
     TraverseVisitor traverseVisitor
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.routerConfig = routerConfig;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
@@ -62,14 +60,13 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   /**
-   * Create a default server context witch can be cloned by calling
-   * {@link #createHttpRequestScopedCopy()} for each HTTP request.
+   * Create a server context valid for one http request only!
    */
   public static DefaultServerContext create(
     RouterConfig routerConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     MeterRegistry meterRegistry,
     @Nullable TraverseVisitor traverseVisitor
   ) {
@@ -77,7 +74,7 @@ public class DefaultServerContext implements OtpServerContext {
 
     return new DefaultServerContext(
       graph,
-      transitModel,
+      transitService,
       routerConfig,
       meterRegistry,
       raptorConfig,
@@ -121,9 +118,6 @@ public class DefaultServerContext implements OtpServerContext {
 
   @Override
   public TransitService transitService() {
-    if (transitService == null) {
-      this.transitService = new DefaultTransitService(transitModel);
-    }
     return transitService;
   }
 
@@ -150,19 +144,6 @@ public class DefaultServerContext implements OtpServerContext {
   @Override
   public TraverseVisitor traverseVisitor() {
     return traverseVisitor;
-  }
-
-  public OtpServerContext createHttpRequestScopedCopy() {
-    return new DefaultServerContext(
-      graph,
-      transitModel,
-      routerConfig,
-      meterRegistry,
-      raptorConfig,
-      requestLogger,
-      tileRendererManager,
-      traverseVisitor
-    );
   }
 
   /**

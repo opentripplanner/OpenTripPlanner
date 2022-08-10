@@ -36,6 +36,7 @@ import org.slf4j.Logger;
  * for the synchronization. Only request scoped components need to be synchronized - they are
  * potentially lazy initialized.
  */
+@HttpRequestScoped
 public interface OtpServerContext {
   /**
    * A RoutingRequest containing default parameters that will be cloned when handling each request.
@@ -81,5 +82,6 @@ public interface OtpServerContext {
    * Callback witch is injected into the {@code DirectStreetRouter}, used to visualize the
    * search.
    */
+  @HttpRequestScoped
   TraverseVisitor traverseVisitor();
 }

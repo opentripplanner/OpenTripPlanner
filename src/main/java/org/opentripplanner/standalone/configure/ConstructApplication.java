@@ -23,8 +23,8 @@ import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.OTPFeature;
@@ -59,9 +59,6 @@ public class ConstructApplication {
   private final TransitModel transitModel;
   private final ConstructApplicationFactory factory;
 
-  /* Lazy initialized fields */
-  private DefaultServerContext context;
-
   /**
    * Create a new OTP configuration instance for a given directory.
    */
@@ -83,25 +80,6 @@ public class ConstructApplication {
 
   public ConstructApplicationFactory getFactory() {
     return factory;
-  }
-
-  /**
-   * After the graph and transitModel is read from file or build, then it should be set here,
-   * so it can be used during construction of the web server.
-   */
-  public DefaultServerContext serverContext() {
-    if (context == null) {
-      this.context =
-        DefaultServerContext.create(
-          routerConfig(),
-          raptorConfig(),
-          graph,
-          transitModel,
-          Metrics.globalRegistry,
-          traverseVisitor()
-        );
-    }
-    return context;
   }
 
   /**
@@ -141,7 +119,7 @@ public class ConstructApplication {
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    return new OTPWebApplication(() -> serverContext().createHttpRequestScopedCopy());
+    return new OTPWebApplication(this::createServerContext);
   }
 
   public GraphVisualizer graphVisualizer() {
@@ -173,7 +151,7 @@ public class ConstructApplication {
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(serverContext());
+      LuceneIndex.forServer(createServerContext());
     }
   }
 
@@ -210,10 +188,6 @@ public class ConstructApplication {
     return graph;
   }
 
-  public Deduplicator deduplicator() {
-    return transitModel().getDeduplicator();
-  }
-
   public OtpConfig otpConfig() {
     return config.otpConfig();
   }
@@ -228,5 +202,20 @@ public class ConstructApplication {
 
   public RaptorConfig<TripSchedule> raptorConfig() {
     return factory.raptorConfig();
+  }
+
+  /**
+   * After the graph and transitModel is read from file or build, then it should be set here,
+   * so it can be used during construction of the web server.
+   */
+  private DefaultServerContext createServerContext() {
+    return DefaultServerContext.create(
+      routerConfig(),
+      raptorConfig(),
+      graph,
+      new DefaultTransitService(transitModel),
+      Metrics.globalRegistry,
+      traverseVisitor()
+    );
   }
 }

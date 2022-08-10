@@ -31,6 +31,7 @@ import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseInpu
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 
@@ -74,7 +75,7 @@ public class SpeedTest {
         routerConfig,
         new RaptorConfig<>(routerConfig.raptorTuningParameters()),
         graph,
-        transitModel,
+        new DefaultTransitService(transitModel),
         timer.getRegistry(),
         null
       );
