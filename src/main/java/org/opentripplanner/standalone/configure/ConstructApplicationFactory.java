@@ -2,50 +2,30 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
-import java.io.File;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Singleton;
-import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.configure.GraphModule;
 import org.opentripplanner.standalone.config.ConfigModel;
-import org.opentripplanner.standalone.config.ConfigModule;
-import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
-import org.opentripplanner.transit.configure.TransitModule;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.visualizer.GraphVisualizer;
 
 /**
- * This abstract class provide the top level service created and wired together using the Dagger 2
- * Dependency Injection framework. Dagger picks up this class and implement it.
+ * Dagger dependency injection Factory to create components for the OTP construct application phase.
  */
 @Singleton
-@Component(
-  modules = {
-    ConstructApplicationModule.class,
-    ConfigModule.class,
-    DataStoreModule.class,
-    GraphModule.class,
-    GsDataSourceModule.class,
-    TransitModule.class,
-  }
-)
+@Component(modules = ConstructApplicationModule.class)
 public interface ConstructApplicationFactory {
   RaptorConfig<TripSchedule> raptorConfig();
-  OtpDataStore datastore();
-  ConfigModel configModel();
-  Deduplicator deduplicator();
-  AtomicReference<Graph> graph();
-  AtomicReference<TransitModel> transitModel();
+
+  GraphVisualizer graphVisualizer();
 
   @Component.Builder
   interface Builder {
     @BindsInstance
-    Builder baseDirectory(@OtpBaseDirectory File baseDirectory);
+    Builder configModel(ConfigModel config);
+
+    @BindsInstance
+    Builder graph(Graph graph);
 
     ConstructApplicationFactory build();
   }

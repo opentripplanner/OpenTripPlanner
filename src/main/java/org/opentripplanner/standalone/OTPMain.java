@@ -6,12 +6,11 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
-import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.ConstructApplication;
-import org.opentripplanner.standalone.configure.ConstructApplicationFactory;
+import org.opentripplanner.standalone.configure.LoadApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -101,35 +100,35 @@ public class OTPMain {
    *
    * @throws RuntimeException if an error occurs while loading the graph.
    */
-  private static void startOTPServer(CommandLineParameters params) {
+  private static void startOTPServer(CommandLineParameters cli) {
     boolean graphAvailable = false;
     LOG.info(
       "Searching for configuration and input files in {}",
-      params.getBaseDirectory().getAbsolutePath()
+      cli.getBaseDirectory().getAbsolutePath()
     );
 
-    var app = new ConstructApplication(params);
-    var factory = app.getFactory();
-    var datastore = factory.datastore();
-    var configModel = factory.configModel();
+    // Init loading phase (Separate DI scope)
+    var loadApp = new LoadApplication(cli);
+    var config = loadApp.config();
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
-    app.validateConfigAndDataSources();
+    loadApp.validateConfigAndDataSources();
+
+    ConstructApplication app = null;
 
     /* Load graph from disk if one is not present from build. */
-    if (params.doLoadGraph() || params.doLoadStreetGraph()) {
-      DataSource graphFile = params.doLoadGraph()
-        ? datastore.getGraph()
-        : datastore.getStreetGraph();
-      SerializedGraphObject obj = SerializedGraphObject.load(graphFile);
-      app.updateModel(obj.graph, obj.transitModel);
-      configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+    if (cli.doLoadGraph() || cli.doLoadStreetGraph()) {
+      SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());
+      app = loadApp.appConstruction(obj);
+      config.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
       graphAvailable = true;
+    } else {
+      app = loadApp.appConstruction();
     }
 
     /* Start graph builder if requested. */
-    if (params.doBuildStreet() || params.doBuildTransit()) {
+    if (cli.doBuildStreet() || cli.doBuildTransit()) {
       // Abort building a graph if the file can not be saved
       SerializedGraphObject.verifyTheOutputGraphIsWritableIfDataSourceExist(
         app.graphOutputDataSource()
@@ -147,8 +146,8 @@ public class OTPMain {
       new SerializedGraphObject(
         app.graph(),
         app.transitModel(),
-        configModel.buildConfig(),
-        configModel.routerConfig()
+        config.buildConfig(),
+        config.routerConfig()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
@@ -160,8 +159,8 @@ public class OTPMain {
       System.exit(101);
     }
 
-    if (params.doServe()) {
-      startOtpWebServer(params, app);
+    if (cli.doServe()) {
+      startOtpWebServer(cli, app);
     } else {
       LOG.info("Done building graph. Exiting.");
     }
@@ -173,7 +172,7 @@ public class OTPMain {
     app.graph().index();
 
     // publishing the config version info make it available to the APIs
-    setOtpConfigVersionsOnServerInfo(app.getFactory());
+    setOtpConfigVersionsOnServerInfo(app);
 
     /* Start visualizer if requested. */
     if (params.visualize) {
@@ -200,7 +199,7 @@ public class OTPMain {
             ThrowableUtils.detailedString(throwable)
           );
         }
-        logLocationOfRequestLog(app.getFactory().configModel().routerConfig().requestLogFile());
+        logLocationOfRequestLog(app.routerConfig().requestLogFile());
       }
     }
   }
@@ -235,10 +234,9 @@ public class OTPMain {
     }
   }
 
-  private static void setOtpConfigVersionsOnServerInfo(ConstructApplicationFactory factory) {
-    var c = factory.configModel();
-    projectInfo().otpConfigVersion = c.otpConfig().configVersion;
-    projectInfo().buildConfigVersion = c.buildConfig().configVersion;
-    projectInfo().routerConfigVersion = c.routerConfig().getConfigVersion();
+  private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {
+    projectInfo().otpConfigVersion = app.otpConfig().configVersion;
+    projectInfo().buildConfigVersion = app.buildConfig().configVersion;
+    projectInfo().routerConfigVersion = app.routerConfig().getConfigVersion();
   }
 }

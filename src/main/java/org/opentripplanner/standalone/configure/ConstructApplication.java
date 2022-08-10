@@ -14,9 +14,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
@@ -39,7 +40,9 @@ import org.slf4j.LoggerFactory;
  * from running it.
  * <p>
  * The top level construction class(this class) may delegate to other construction classes
- * to inject configuration and services into sub-modules.
+ * to inject configuration and services into sub-modules. An instance of this class is created
+ * using the {@link LoadApplication} - A application is constructed AFTER config and input files
+ * are loaded.
  * <p>
  * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
  * should be really fast, since the only IO operations are reading config files and logging. Loading
@@ -50,21 +53,32 @@ public class ConstructApplication {
   private static final Logger LOG = LoggerFactory.getLogger(ConstructApplication.class);
 
   private final CommandLineParameters cli;
+  private final GraphBuilderDataSources graphBuilderDataSources;
+  private final ConfigModel config;
+  private final Graph graph;
+  private final TransitModel transitModel;
   private final ConstructApplicationFactory factory;
-  private GraphBuilderDataSources graphBuilderDataSources = null;
+
+  /* Lazy initialized fields */
   private DefaultServerContext context;
-  private GraphVisualizer graphVisualizer;
 
   /**
    * Create a new OTP configuration instance for a given directory.
    */
-  public ConstructApplication(CommandLineParameters commandLineParameters) {
-    this.cli = commandLineParameters;
+  ConstructApplication(
+    CommandLineParameters cli,
+    Graph graph,
+    TransitModel transitModel,
+    ConfigModel config,
+    GraphBuilderDataSources graphBuilderDataSources
+  ) {
+    this.cli = cli;
+    this.config = config;
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.graphBuilderDataSources = graphBuilderDataSources;
     this.factory =
-      DaggerConstructApplicationFactory
-        .builder()
-        .baseDirectory(this.cli.getBaseDirectory())
-        .build();
+      DaggerConstructApplicationFactory.builder().configModel(config).graph(graph).build();
   }
 
   public ConstructApplicationFactory getFactory() {
@@ -75,22 +89,18 @@ public class ConstructApplication {
    * After the graph and transitModel is read from file or build, then it should be set here,
    * so it can be used during construction of the web server.
    */
-  public void updateModel(Graph graph, TransitModel transitModel) {
-    getFactory().graph().set(graph);
-    getFactory().transitModel().set(transitModel);
-
-    this.context =
-      DefaultServerContext.create(
-        factory.configModel().routerConfig(),
-        factory.raptorConfig(),
-        factory.graph().get(),
-        factory.transitModel().get(),
-        Metrics.globalRegistry,
-        traverseVisitor()
-      );
-  }
-
-  public OtpServerContext serverContext() {
+  public DefaultServerContext serverContext() {
+    if (context == null) {
+      this.context =
+        DefaultServerContext.create(
+          routerConfig(),
+          raptorConfig(),
+          graph,
+          transitModel,
+          Metrics.globalRegistry,
+          traverseVisitor()
+        );
+    }
     return context;
   }
 
@@ -102,11 +112,6 @@ public class ConstructApplication {
     return new GrizzlyServer(cli, createApplication());
   }
 
-  public void validateConfigAndDataSources() {
-    // Load Graph Builder Data Sources to validate it.
-    graphBuilderDataSources();
-  }
-
   /**
    * Create the default graph builder.
    */
@@ -114,7 +119,7 @@ public class ConstructApplication {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
       buildConfig(),
-      graphBuilderDataSources(),
+      graphBuilderDataSources,
       graph(),
       transitModel(),
       cli.doLoadStreetGraph(),
@@ -130,32 +135,17 @@ public class ConstructApplication {
    */
   @Nullable
   public DataSource graphOutputDataSource() {
-    return graphBuilderDataSources().getOutputGraph();
-  }
-
-  private GraphBuilderDataSources graphBuilderDataSources() {
-    if (graphBuilderDataSources == null) {
-      graphBuilderDataSources =
-        GraphBuilderDataSources.create(cli, buildConfig(), factory.datastore());
-    }
-    return graphBuilderDataSources;
+    return graphBuilderDataSources.getOutputGraph();
   }
 
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    return new OTPWebApplication(() -> context.createHttpRequestScopedCopy());
+    return new OTPWebApplication(() -> serverContext().createHttpRequestScopedCopy());
   }
 
   public GraphVisualizer graphVisualizer() {
-    if (cli.visualize && graphVisualizer == null) {
-      graphVisualizer =
-        new GraphVisualizer(
-          factory.graph().get(),
-          factory.configModel().routerConfig().streetRoutingTimeout()
-        );
-    }
-    return graphVisualizer;
+    return cli.visualize ? factory.graphVisualizer() : null;
   }
 
   public TraverseVisitor traverseVisitor() {
@@ -183,7 +173,7 @@ public class ConstructApplication {
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(context);
+      LuceneIndex.forServer(serverContext());
     }
   }
 
@@ -212,27 +202,31 @@ public class ConstructApplication {
     );
   }
 
-  public RaptorConfig<TripSchedule> raptorConfig() {
-    return factory.raptorConfig();
-  }
-
   public TransitModel transitModel() {
-    return getFactory().transitModel().get();
+    return transitModel;
   }
 
   public Graph graph() {
-    return getFactory().graph().get();
+    return graph;
   }
 
   public Deduplicator deduplicator() {
-    return getFactory().deduplicator();
+    return transitModel().getDeduplicator();
   }
 
-  private BuildConfig buildConfig() {
-    return getFactory().configModel().buildConfig();
+  public OtpConfig otpConfig() {
+    return config.otpConfig();
   }
 
-  private RouterConfig routerConfig() {
-    return getFactory().configModel().routerConfig();
+  public RouterConfig routerConfig() {
+    return config.routerConfig();
+  }
+
+  public BuildConfig buildConfig() {
+    return config.buildConfig();
+  }
+
+  public RaptorConfig<TripSchedule> raptorConfig() {
+    return factory.raptorConfig();
   }
 }
