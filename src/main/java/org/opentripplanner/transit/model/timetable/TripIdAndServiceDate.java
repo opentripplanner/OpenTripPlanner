@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.transit.model.timetable;
 
 import java.time.LocalDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
