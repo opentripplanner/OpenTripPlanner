@@ -364,15 +364,10 @@ public class TimetableSnapshot {
     this.patternsForStop = patternsForStop;
   }
 
-  public void addLastAddedTripOnServiceDate(
-    Trip trip,
-    LocalDate serviceDate,
-    FeedScopedId datedServiceJourneyId,
-    TripOnServiceDate tripOnServiceDate
-  ) {
-    realtimeAddedTripOnServiceDate.put(datedServiceJourneyId, tripOnServiceDate);
+  public void addLastAddedTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
+    realtimeAddedTripOnServiceDate.put(tripOnServiceDate.getId(), tripOnServiceDate);
     realtimeAddedTripOnServiceDateByTripIdAndServiceDate.put(
-      new TripIdAndServiceDate(trip.getId(), serviceDate),
+      tripOnServiceDate.getTripIdAndServiceDate(),
       tripOnServiceDate
     );
   }
