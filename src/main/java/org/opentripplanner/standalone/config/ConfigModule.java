@@ -5,6 +5,7 @@ import dagger.Provides;
 import java.io.File;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
+import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 
 @Module
 public class ConfigModule {

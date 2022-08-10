@@ -13,7 +13,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.configure.GraphModule;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.ConfigModule;
-import org.opentripplanner.standalone.config.OtpBaseDirectory;
+import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;

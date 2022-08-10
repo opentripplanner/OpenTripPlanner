@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
