@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
@@ -29,7 +29,7 @@ public class ParkAndRideResource {
   private final DirectGraphFinder graphFinder;
 
   public ParkAndRideResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760

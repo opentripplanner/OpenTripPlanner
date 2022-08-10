@@ -22,7 +22,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
@@ -33,14 +33,14 @@ import org.opentripplanner.util.WorldEnvelope;
  */
 public class RoutingService {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final Graph graph;
 
   private final ZoneId timeZone;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(OtpServerContext serverContext) {
+  public RoutingService(OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
     this.graph = serverContext.graph();
     this.timeZone = serverContext.transitService().getTimeZone();

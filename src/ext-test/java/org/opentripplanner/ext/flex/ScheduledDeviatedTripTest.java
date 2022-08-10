@@ -36,7 +36,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -231,7 +231,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
-    OtpServerContext serverContext
+    OtpServerRequestContext serverContext
   ) {
     RoutingRequest request = new RoutingRequest();
     Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);

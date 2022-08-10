@@ -15,7 +15,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @HttpRequestScoped
-public class DefaultServerContext implements OtpServerContext {
+public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private RoutingRequest routingRequest = null;
   private final Graph graph;
@@ -39,7 +39,7 @@ public class DefaultServerContext implements OtpServerContext {
    * Copy constructor - used to make an HTTP Request scoped copy of the context. All mutable
    * components need to be coped here. This is
    */
-  private DefaultServerContext(
+  private DefaultServerRequestContext(
     Graph graph,
     TransitService transitService,
     RouterConfig routerConfig,
@@ -62,7 +62,7 @@ public class DefaultServerContext implements OtpServerContext {
   /**
    * Create a server context valid for one http request only!
    */
-  public static DefaultServerContext create(
+  public static DefaultServerRequestContext create(
     RouterConfig routerConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
@@ -72,7 +72,7 @@ public class DefaultServerContext implements OtpServerContext {
   ) {
     var defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
-    return new DefaultServerContext(
+    return new DefaultServerRequestContext(
       graph,
       transitService,
       routerConfig,

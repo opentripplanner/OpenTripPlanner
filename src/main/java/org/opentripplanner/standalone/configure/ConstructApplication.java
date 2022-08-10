@@ -19,7 +19,7 @@ import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerContext;
+import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
@@ -208,8 +208,8 @@ public class ConstructApplication {
    * After the graph and transitModel is read from file or build, then it should be set here,
    * so it can be used during construction of the web server.
    */
-  private DefaultServerContext createServerContext() {
-    return DefaultServerContext.create(
+  private DefaultServerRequestContext createServerContext() {
+    return DefaultServerRequestContext.create(
       routerConfig(),
       raptorConfig(),
       graph,

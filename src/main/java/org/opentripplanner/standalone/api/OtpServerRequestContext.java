@@ -37,7 +37,7 @@ import org.slf4j.Logger;
  * potentially lazy initialized.
  */
 @HttpRequestScoped
-public interface OtpServerContext {
+public interface OtpServerRequestContext {
   /**
    * A RoutingRequest containing default parameters that will be cloned when handling each request.
    */

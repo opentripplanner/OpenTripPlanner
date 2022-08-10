@@ -20,7 +20,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -35,7 +35,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class OTPWebApplication extends Application {
 
   /* This object groups together all the modules for a single running OTP server. */
-  private final Supplier<OtpServerContext> contextProvider;
+  private final Supplier<OtpServerRequestContext> contextProvider;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -45,7 +45,7 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
-  public OTPWebApplication(Supplier<OtpServerContext> contextProvider) {
+  public OTPWebApplication(Supplier<OtpServerRequestContext> contextProvider) {
     this.contextProvider = contextProvider;
   }
 
@@ -122,11 +122,11 @@ public class OTPWebApplication extends Application {
    * <p>
    * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
-  private Binder makeBinder(Supplier<OtpServerContext> contextProvider) {
+  private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bindFactory(contextProvider).to(OtpServerContext.class);
+        bindFactory(contextProvider).to(OtpServerRequestContext.class);
       }
     };
   }
