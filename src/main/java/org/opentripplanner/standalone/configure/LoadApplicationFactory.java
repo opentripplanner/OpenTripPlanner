@@ -11,6 +11,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
+import org.opentripplanner.standalone.config.configure.LoadConfigModule;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -20,6 +21,7 @@ import org.opentripplanner.transit.service.TransitModel;
 @Component(
   modules = {
     ConfigModule.class,
+    LoadConfigModule.class,
     DataStoreModule.class,
     GsDataSourceModule.class,
     LoadApplicationModule.class,

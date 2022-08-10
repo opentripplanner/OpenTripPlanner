@@ -2,24 +2,18 @@ package org.opentripplanner.standalone.config.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import java.io.File;
+import java.time.Duration;
 import javax.inject.Singleton;
-import org.opentripplanner.datastore.api.OtpDataStoreConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
+import org.opentripplanner.standalone.config.api.StreetRoutingTimeout;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
 @Module
 public class ConfigModule {
-
-  @Provides
-  @Singleton
-  static ConfigModel provideModel(ConfigLoader loader) {
-    return new ConfigModel(loader);
-  }
 
   @Provides
   static OtpConfig provideOtpConfig(ConfigModel model) {
@@ -37,12 +31,14 @@ public class ConfigModule {
   }
 
   @Provides
-  static OtpDataStoreConfig provideDataStoreConfig(BuildConfig buildConfig) {
-    return buildConfig.storage;
+  @Singleton
+  static RaptorConfig<TripSchedule> providesRaptorConfig(ConfigModel config) {
+    return new RaptorConfig<>(config.routerConfig().raptorTuningParameters());
   }
 
   @Provides
-  static ConfigLoader provideConfigLoader(@OtpBaseDirectory File configDirectory) {
-    return new ConfigLoader(configDirectory);
+  @StreetRoutingTimeout
+  static Duration streetRoutingTimeout(ConfigModel config) {
+    return config.routerConfig().streetRoutingTimeout();
   }
 }
