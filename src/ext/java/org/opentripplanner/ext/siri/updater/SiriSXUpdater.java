@@ -62,7 +62,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
-    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"));
+    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
 
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",

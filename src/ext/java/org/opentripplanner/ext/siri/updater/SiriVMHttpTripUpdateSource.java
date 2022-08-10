@@ -51,7 +51,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
       this.timeout = 1000 * timeoutSec;
     }
 
-    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"));
+    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-VM"));
   }
 
   @Override
