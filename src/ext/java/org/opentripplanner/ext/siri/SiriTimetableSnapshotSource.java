@@ -1084,10 +1084,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate
     );
 
-    // Add service code to bitset of pattern if needed (using copy on write)
-    final int serviceCode = transitModel.getServiceCodes().get(trip.getServiceId());
-    pattern.setServiceCode(serviceCode);
-
     /*
      * Update pattern with triptimes so get correct dwell times and lower bound on running times.
      * New patterns only affects a single trip, previously added tripTimes is no longer valid, and is therefore removed

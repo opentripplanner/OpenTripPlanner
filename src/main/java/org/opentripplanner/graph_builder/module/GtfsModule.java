@@ -141,12 +141,19 @@ public class GtfsModule implements GraphBuilderModule {
 
         repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
 
+        GeometryProcessor geometryProcessor = new GeometryProcessor(
+          builder,
+          gtfsBundle.getMaxStopToShapeSnapDistance(),
+          issueStore
+        );
+
         // NB! The calls below have side effects - the builder state is updated!
         createTripPatterns(
           graph,
           transitModel,
           builder,
           calendarServiceData.getServiceIds(),
+          geometryProcessor,
           issueStore
         );
 
@@ -156,13 +163,6 @@ public class GtfsModule implements GraphBuilderModule {
         hasTransit = hasTransit || otpTransitService.hasActiveTransit();
 
         addTransitModelToGraph(graph, transitModel, gtfsBundle, otpTransitService);
-
-        new GeometryProcessor(
-          otpTransitService,
-          gtfsBundle.getMaxStopToShapeSnapDistance(),
-          issueStore
-        )
-          .run(transitModel);
 
         if (blockBasedInterlining) {
           new InterlineProcessor(
@@ -217,13 +217,15 @@ public class GtfsModule implements GraphBuilderModule {
     TransitModel transitModel,
     OtpTransitServiceBuilder builder,
     Set<FeedScopedId> calServiceIds,
+    GeometryProcessor geometryProcessor,
     DataImportIssueStore issueStore
   ) {
     GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
       builder,
       issueStore,
       graph.deduplicator,
-      calServiceIds
+      calServiceIds,
+      geometryProcessor
     );
     buildTPOp.run();
     transitModel.setHasFrequencyService(

@@ -156,8 +156,10 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TIntSet getServiceCodesRunningForDate(LocalDate date) {
-    return transitModelIndex.getServiceCodesRunningForDate().get(date);
+  public TIntSet getServiceCodesRunningForDate(LocalDate serviceDate) {
+    return transitModelIndex
+      .getServiceCodesRunningForDate()
+      .getOrDefault(serviceDate, new TIntHashSet());
   }
 
   /** {@link StopModel#getLocationById(FeedScopedId)} */
@@ -535,13 +537,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public FlexIndex getFlexIndex() {
     return this.transitModelIndex.getFlexIndex();
-  }
-
-  @Override
-  public TIntSet getServicesRunningForDate(LocalDate serviceDate) {
-    return transitModelIndex
-      .getServiceCodesRunningForDate()
-      .getOrDefault(serviceDate, new TIntHashSet());
   }
 
   @Override

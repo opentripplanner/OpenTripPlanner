@@ -227,13 +227,13 @@ class TripPatternMapper {
       .of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
-      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue());
+      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
+      .withHopGeometries(
+        serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
+      );
 
     TripPattern tripPattern = tripPatternBuilder.build();
     createTripTimes(trips, tripPattern);
-    tripPattern.setHopGeometries(
-      serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, tripPattern)
-    );
 
     result.tripPatterns.put(stopPattern, tripPattern);
 

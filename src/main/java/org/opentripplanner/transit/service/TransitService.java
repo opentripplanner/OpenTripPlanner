@@ -172,8 +172,6 @@ public interface TransitService {
 
   FlexIndex getFlexIndex();
 
-  TIntSet getServicesRunningForDate(LocalDate parseString);
-
   ZonedDateTime getTransitServiceEnds();
 
   ZonedDateTime getTransitServiceStarts();

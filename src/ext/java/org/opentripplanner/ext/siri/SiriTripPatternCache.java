@@ -68,13 +68,6 @@ public class SiriTripPatternCache {
         .withRoute(trip.getRoute())
         .withStopPattern(stopPattern);
 
-      // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-      tripPatternBuilder.withServiceCodes(transitModel.getServiceCodes());
-
-      // Create vertices and edges for new TripPattern
-      // TODO: purge these vertices and edges once in a while?
-      //            tripPattern.makePatternVerticesAndEdges(transitModel, transitModel.index.stopVertexForStop);
-
       // TODO - SIRI: Add pattern to transitModel index?
 
       TripPattern originalTripPattern = transitModel
@@ -86,10 +79,6 @@ public class SiriTripPatternCache {
       tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
       tripPattern = tripPatternBuilder.build();
-      // Copy information from the TripPattern this is replacing
-      if (originalTripPattern != null) {
-        tripPattern.setHopGeometriesFromPattern(originalTripPattern);
-      }
 
       // Add pattern to cache
       cache.put(key, tripPattern);

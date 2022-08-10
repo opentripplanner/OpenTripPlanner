@@ -166,8 +166,6 @@ public class NetexBundleSmokeTest {
       p.scheduledTripsAsStream().toList().toString()
     );
 
-    // TODO OTP2 - Why?
-    assertNull(p.getServices());
     assertEquals(4, patterns.size());
   }
 

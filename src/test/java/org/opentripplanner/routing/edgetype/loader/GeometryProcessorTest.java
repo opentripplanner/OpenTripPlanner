@@ -67,8 +67,6 @@ public class GeometryProcessorTest {
       contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
 
     feedId = context.getFeedId().getId();
-    GeometryProcessor factory = new GeometryProcessor(context);
-    factory.run(transitModel);
     transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
 
     String[] stops = {
