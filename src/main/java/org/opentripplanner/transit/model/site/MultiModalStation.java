@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As a
@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity2;
  * part of GTFS.
  */
 public class MultiModalStation
-  extends TransitEntity2<MultiModalStation, MultiModalStationBuilder>
+  extends TransitEntity<MultiModalStation, MultiModalStationBuilder>
   implements StopCollection {
 
   private final Collection<Station> childStations;

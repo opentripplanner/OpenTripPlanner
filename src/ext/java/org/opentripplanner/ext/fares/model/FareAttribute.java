@@ -4,11 +4,9 @@ package org.opentripplanner.ext.fares.model;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitBuilder;
 import org.opentripplanner.transit.model.framework.TransitEntity;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
 
-public final class FareAttribute extends TransitEntity2<FareAttribute, FareAttributeBuilder> {
+public final class FareAttribute extends TransitEntity<FareAttribute, FareAttributeBuilder> {
 
   private final float price;
 

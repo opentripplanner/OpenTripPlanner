@@ -14,7 +14,7 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * adhere to.
  */
 public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuilder<T, B>>
-  extends TransitEntity2<T, B> {
+  extends TransitEntity<T, B> {
 
   private final Trip trip;
 

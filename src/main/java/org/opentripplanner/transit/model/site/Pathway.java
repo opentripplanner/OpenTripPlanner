@@ -4,9 +4,9 @@ package org.opentripplanner.transit.model.site;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
-public final class Pathway extends TransitEntity2<Pathway, PathwayBuilder> {
+public final class Pathway extends TransitEntity<Pathway, PathwayBuilder> {
 
   private final PathwayMode pathwayMode;
 
