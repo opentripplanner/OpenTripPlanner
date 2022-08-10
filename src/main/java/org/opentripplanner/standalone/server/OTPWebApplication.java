@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.server;
 
-import com.google.common.collect.Sets;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
 import io.micrometer.jersey2.server.MetricsApplicationEventListener;
@@ -8,6 +7,7 @@ import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -78,17 +78,19 @@ public class OTPWebApplication extends Application {
    */
   @Override
   public Set<Object> getSingletons() {
-    var singletons = Sets.newHashSet(
-      // Show exception messages in responses
-      new OTPExceptionMapper(),
-      // Enable Jackson JSON response serialization
-      new JacksonJsonProvider(),
-      // Serialize POJOs (unannotated) JSON using Jackson
-      new JSONObjectMapperProvider(),
-      // Allow injecting the OTP server object into Jersey resource classes
-      makeBinder(contextProvider),
-      // Add performance instrumentation of Jersey requests to micrometer
-      getMetricsApplicationEventListener()
+    var singletons = new HashSet<>(
+      List.of(
+        // Show exception messages in responses
+        new OTPExceptionMapper(),
+        // Enable Jackson JSON response serialization
+        new JacksonJsonProvider(),
+        // Serialize POJOs (unannotated) JSON using Jackson
+        new JSONObjectMapperProvider(),
+        // Allow injecting the OTP server object into Jersey resource classes
+        makeBinder(contextProvider),
+        // Add performance instrumentation of Jersey requests to micrometer
+        getMetricsApplicationEventListener()
+      )
     );
 
     if (OTPFeature.ActuatorAPI.isOn()) {

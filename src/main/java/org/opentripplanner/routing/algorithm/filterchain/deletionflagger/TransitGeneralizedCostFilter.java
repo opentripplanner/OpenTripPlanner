@@ -33,7 +33,7 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
   }
 
   @Override
-  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     List<Itinerary> transitItineraries = itineraries
       .stream()
       .filter(Itinerary::hasTransit)

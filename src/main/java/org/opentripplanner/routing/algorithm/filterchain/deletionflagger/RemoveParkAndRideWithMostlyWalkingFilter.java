@@ -28,7 +28,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
   }
 
   @Override
-  public Predicate<Itinerary> predicate() {
+  public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return itinerary -> {
       var containsTransit = itinerary
         .getLegs()
@@ -52,11 +52,11 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
   }
 
   @Override
-  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     if (itineraries.size() == 1) {
       return List.of();
     }
 
-    return itineraries.stream().filter(predicate()).collect(Collectors.toList());
+    return itineraries.stream().filter(shouldBeFlaggedForRemoval()).collect(Collectors.toList());
   }
 }
