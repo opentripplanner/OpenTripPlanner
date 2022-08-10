@@ -3,6 +3,8 @@ package org.opentripplanner.ext.siri.updater;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
@@ -25,6 +27,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final long RETRY_INTERVAL_MILLIS = 5000;
+  private static final Map<String, String> requestHeaders = new HashMap<>();
   private final String url;
   private final String feedId;
   private final long earlyStart;
@@ -58,6 +61,8 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     }
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+
+    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"));
 
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
@@ -144,7 +149,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
 
-      InputStream is = SiriHttpUtils.postData(url, sxServiceRequest, timeout);
+      InputStream is = SiriHttpUtils.postData(url, sxServiceRequest, timeout, requestHeaders);
 
       fetching = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
