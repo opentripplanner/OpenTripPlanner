@@ -512,13 +512,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
 
-    Route replacedRoute = null;
-    if (externalLineRef != null) {
-      replacedRoute =
-        transitModel
-          .getTransitModelIndex()
-          .getRouteForId(new FeedScopedId(feedId, externalLineRef));
-    }
+    Route replacedRoute = externalLineRef != null
+      ? transitModel.getTransitModelIndex().getRouteForId(new FeedScopedId(feedId, externalLineRef))
+      : null;
 
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
     Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
@@ -543,8 +539,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           route1 != null && route1.getOperator() != null && route1.getOperator().equals(operator)
         )
         .findFirst()
-        .get()
-        .getAgency();
+        .map(Route::getAgency)
+        // If not found, copy from replaced route
+        .orElseGet(() -> replacedRoute.getAgency());
       routeBuilder.withAgency(agency);
 
       if (
