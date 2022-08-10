@@ -1,10 +1,5 @@
 package org.opentripplanner.standalone.server;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
 import javax.annotation.Nullable;
@@ -17,10 +12,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.configure.RequestLoggerFactory;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @HttpRequestScoped
 public class DefaultServerRequestContext implements OtpServerRequestContext {
@@ -78,7 +73,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       routerConfig,
       meterRegistry,
       raptorConfig,
-      createLogger(routerConfig.requestLogFile()),
+      RequestLoggerFactory.createLogger(routerConfig.requestLogFile()),
       new TileRendererManager(graph, defaultRoutingRequest),
       traverseVisitor
     );
@@ -144,33 +139,5 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public TraverseVisitor traverseVisitor() {
     return traverseVisitor;
-  }
-
-  /**
-   * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this
-   * router. http://stackoverflow.com/a/17215011/778449
-   */
-  private static Logger createLogger(@Nullable String file) {
-    if (file == null) {
-      return null;
-    }
-
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-    PatternLayoutEncoder ple = new PatternLayoutEncoder();
-    ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
-    ple.setContext(lc);
-    ple.start();
-    FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
-    fileAppender.setFile(file);
-    fileAppender.setEncoder(ple);
-    fileAppender.setContext(lc);
-    fileAppender.start();
-    ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(
-      "REQ_LOG"
-    );
-    logger.addAppender(fileAppender);
-    logger.setLevel(Level.INFO);
-    logger.setAdditive(false);
-    return logger;
   }
 }
