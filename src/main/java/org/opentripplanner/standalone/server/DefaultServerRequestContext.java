@@ -22,7 +22,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private RoutingRequest routingRequest = null;
   private final Graph graph;
-  private TransitService transitService = null;
+  private final TransitService transitService;
   private final RouterConfig routerConfig;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
