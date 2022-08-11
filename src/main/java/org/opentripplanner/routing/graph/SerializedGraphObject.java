@@ -80,7 +80,7 @@ public class SerializedGraphObject implements Serializable {
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
-    this.stopLocationCounter = StopLocation.numberOfStopLocations();
+    this.stopLocationCounter = StopLocation.indexCounter();
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
@@ -156,7 +156,7 @@ public class SerializedGraphObject implements Serializable {
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
       SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
-      StopLocation.setCounterValue(serObj.stopLocationCounter);
+      StopLocation.initIndexCounter(serObj.stopLocationCounter);
       CompactElevationProfile.setDistanceBetweenSamplesM(
         serObj.graph.getDistanceBetweenElevationSamples()
       );

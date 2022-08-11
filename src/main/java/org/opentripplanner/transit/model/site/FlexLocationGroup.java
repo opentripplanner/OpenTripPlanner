@@ -27,7 +27,7 @@ public class FlexLocationGroup
 
   FlexLocationGroup(FlexLocationGroupBuilder builder) {
     super(builder.getId());
-    this.index = COUNTER.getAndIncrement();
+    this.index = INDEX_COUNTER.getAndIncrement();
     this.name = builder.name();
     this.geometry = builder.geometry();
     this.centroid = builder.centroid();

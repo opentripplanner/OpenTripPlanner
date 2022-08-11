@@ -38,7 +38,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   Stop(StopBuilder builder) {
     super(builder);
-    this.index = COUNTER.getAndIncrement();
+    this.index = INDEX_COUNTER.getAndIncrement();
     this.platformCode = builder.platformCode();
     this.url = builder.url();
     this.timeZone = builder.timeZone();

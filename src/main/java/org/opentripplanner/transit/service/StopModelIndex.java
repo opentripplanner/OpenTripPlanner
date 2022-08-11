@@ -40,7 +40,7 @@ public class StopModelIndex {
   public StopModelIndex(StopModel stopModel) {
     LOG.info("StopModelIndex init...");
 
-    stopsByIndex = new StopLocation[StopLocation.numberOfStopLocations()];
+    stopsByIndex = new StopLocation[StopLocation.indexCounter()];
 
     /* We will keep a separate set of all vertices in case some have the same label.
      * Maybe we should just guarantee unique labels. */

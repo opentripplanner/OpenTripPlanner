@@ -36,7 +36,7 @@ public class FlexStopLocation
 
   FlexStopLocation(FlexStopLocationBuilder builder) {
     super(builder.getId());
-    this.index = COUNTER.getAndIncrement();
+    this.index = INDEX_COUNTER.getAndIncrement();
     // according to the spec stop location names are optional for flex zones so, we set the id
     // as the bogus name. *shrug*
     if (builder.name() == null) {
