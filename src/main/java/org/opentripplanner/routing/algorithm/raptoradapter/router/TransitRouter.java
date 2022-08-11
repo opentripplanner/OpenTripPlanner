@@ -96,7 +96,7 @@ public class TransitRouter {
 
     debugTimingAggregator.finishedPatternFiltering();
 
-    var accessEgresses = getAccessEgresses(transitLayer);
+    var accessEgresses = getAccessEgresses();
 
     debugTimingAggregator.finishedAccessEgress(
       accessEgresses.getAccesses().size(),
@@ -155,8 +155,8 @@ public class TransitRouter {
     return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());
   }
 
-  private AccessEgresses getAccessEgresses(TransitLayer transitLayer) {
-    var accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
+  private AccessEgresses getAccessEgresses() {
+    var accessEgressMapper = new AccessEgressMapper();
     var accessList = new ArrayList<AccessEgress>();
     var egressList = new ArrayList<AccessEgress>();
 

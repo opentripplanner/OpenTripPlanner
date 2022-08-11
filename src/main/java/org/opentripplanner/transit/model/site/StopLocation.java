@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -21,8 +22,12 @@ import org.opentripplanner.util.lang.ObjectUtils;
  * transit. StopLocations are referred to in stop times.
  */
 public interface StopLocation extends LogInfo {
+  AtomicInteger COUNTER = new AtomicInteger(0);
+
   /** The ID for the StopLocation */
   FeedScopedId getId();
+
+  int getIndex();
 
   /** Name of the StopLocation, if provided */
   @Nullable
@@ -136,5 +141,16 @@ public interface StopLocation extends LogInfo {
       return stationElement.getParentStation().getId();
     }
     return getId();
+  }
+
+  static int numberOfStopLocations() {
+    return COUNTER.get();
+  }
+
+  /**
+   * Use this ONLY when deserializing the graph. Sets the counter value to the highest recorded value
+   */
+  static void setCounterValue(int stopLocationCounter) {
+    COUNTER.set(stopLocationCounter);
   }
 }

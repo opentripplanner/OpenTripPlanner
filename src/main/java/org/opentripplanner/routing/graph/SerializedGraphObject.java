@@ -24,6 +24,7 @@ import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -65,6 +66,8 @@ public class SerializedGraphObject implements Serializable {
    */
   public final List<SubMode> allTransitSubModes;
 
+  public final int stopLocationCounter;
+
   public SerializedGraphObject(
     Graph graph,
     TransitModel transitModel,
@@ -77,6 +80,7 @@ public class SerializedGraphObject implements Serializable {
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
+    this.stopLocationCounter = StopLocation.numberOfStopLocations();
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
@@ -152,6 +156,7 @@ public class SerializedGraphObject implements Serializable {
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
       SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
+      StopLocation.setCounterValue(serObj.stopLocationCounter);
       CompactElevationProfile.setDistanceBetweenSamplesM(
         serObj.graph.getDistanceBetweenElevationSamples()
       );
