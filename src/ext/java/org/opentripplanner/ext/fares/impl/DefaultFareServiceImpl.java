@@ -286,7 +286,7 @@ public class DefaultFareServiceImpl implements FareService {
     return r;
   }
 
-  private FareAndId getBestFareAndId(
+  protected FareAndId getBestFareAndId(
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
@@ -363,7 +363,7 @@ public class DefaultFareServiceImpl implements FareService {
     return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
   }
 
-  private float getFarePrice(FareAttribute fare, FareType type) {
+  protected float getFarePrice(FareAttribute fare, FareType type) {
     switch (type) {
       case senior:
         if (fare.getSeniorPrice() >= 0) {
