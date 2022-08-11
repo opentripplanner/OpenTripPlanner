@@ -322,6 +322,9 @@ public class TransmodelGraphQLSchema {
 
     GraphQLOutputType datedServiceJourneyType = DatedServiceJourneyType.create(
       serviceJourneyType,
+      journeyPatternType,
+      estimatedCallType,
+      quayType,
       gqlUtil
     );
 
