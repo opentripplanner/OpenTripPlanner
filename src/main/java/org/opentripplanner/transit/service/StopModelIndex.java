@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-public class StopModelIndex {
+class StopModelIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModelIndex.class);
 

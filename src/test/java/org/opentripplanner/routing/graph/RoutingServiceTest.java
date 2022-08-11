@@ -48,11 +48,11 @@ public class RoutingServiceTest extends GtfsTest {
     agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "azerty"));
     assertNull(agency);
     agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "agency"));
-    assertEquals(agency.getId().toString(), feedId + ":" + "agency");
-    assertEquals(agency.getName(), "Fake Agency");
+    assertEquals(feedId + ":" + "agency", agency.getId().toString());
+    assertEquals("Fake Agency", agency.getName());
 
     /* Stops */
-    transitModel.getStopModel().getStopModelIndex().getStopForId(new FeedScopedId("X", "Y"));
+    transitModel.getStopModel().getStopForId(new FeedScopedId("X", "Y"));
     /* Trips */
     //        graph.index.tripForId;
     //        graph.index.routeForId;
@@ -79,7 +79,7 @@ public class RoutingServiceTest extends GtfsTest {
         assertEquals(pattern.getRoute(), route);
       }
     }
-    for (var stop : transitModel.getStopModel().getStopModelIndex().getAllStops()) {
+    for (var stop : transitModel.getStopModel().getAllStops()) {
       for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");
@@ -90,40 +90,19 @@ public class RoutingServiceTest extends GtfsTest {
   @Test
   public void testSpatialIndex() {
     String feedId = transitModel.getFeedIds().iterator().next();
-    var stopJ = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .getStopForId(new FeedScopedId(feedId, "J"));
-    var stopL = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .getStopForId(new FeedScopedId(feedId, "L"));
-    var stopM = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .getStopForId(new FeedScopedId(feedId, "M"));
-    TransitStopVertex stopvJ = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .getStopVertexForStop((Stop) stopJ);
-    TransitStopVertex stopvL = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .getStopVertexForStop((Stop) stopL);
-    TransitStopVertex stopvM = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .getStopVertexForStop((Stop) stopM);
+    var stopJ = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "J"));
+    var stopL = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "L"));
+    var stopM = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "M"));
+    TransitStopVertex stopvJ = transitModel.getStopModel().getStopVertexForStop((Stop) stopJ);
+    TransitStopVertex stopvL = transitModel.getStopModel().getStopVertexForStop((Stop) stopL);
+    TransitStopVertex stopvM = transitModel.getStopModel().getStopVertexForStop((Stop) stopM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<Stop> stops = transitModel
-      .getStopModel()
-      .getStopModelIndex()
-      .queryStopSpatialIndex(env);
+    Collection<Stop> stops = transitModel.getStopModel().queryStopSpatialIndex(env);
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));
