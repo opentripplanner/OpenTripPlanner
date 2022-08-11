@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import javax.inject.Inject;
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -74,7 +73,6 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.config.api.StreetRoutingTimeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -249,8 +247,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   protected State lastStateClicked = null;
   private JCheckBox longDistanceModeCheckbox;
 
-  @Inject
-  public GraphVisualizer(Graph graph, @StreetRoutingTimeout Duration streetRoutingTimeout) {
+  public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
     super();
     LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");

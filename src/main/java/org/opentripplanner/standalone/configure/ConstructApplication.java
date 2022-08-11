@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import io.micrometer.core.instrument.Metrics;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
@@ -8,20 +7,18 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
-import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -67,12 +64,20 @@ public class ConstructApplication {
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
+
+    // We create the optional GraphVisualizer here, because it would be significant more complex to
+    // use Dagger DI to do it - passing in a parameter to enable it or not.
+    var graphVisualizer = cli.visualize
+      ? new GraphVisualizer(graph, config.routerConfig().streetRoutingTimeout())
+      : null;
+
     this.factory =
       DaggerConstructApplicationFactory
         .builder()
         .configModel(config)
         .graph(graph)
         .transitModel(transitModel)
+        .graphVisualizer(graphVisualizer)
         .build();
   }
 
@@ -120,17 +125,9 @@ public class ConstructApplication {
     return new OTPWebApplication(this::createServerContext);
   }
 
-  public GraphVisualizer graphVisualizer() {
-    return cli.visualize ? factory.graphVisualizer() : null;
-  }
-
-  public TraverseVisitor traverseVisitor() {
-    var gv = graphVisualizer();
-    return gv == null ? null : gv.traverseVisitor;
-  }
-
   private void setupTransitRoutingServer() {
-    new MetricsLogging(transitModel(), raptorConfig());
+    // Create MetricsLogging
+    factory.metricsLogging();
 
     creatTransitLayerForRaptor(transitModel(), routerConfig());
 
@@ -202,18 +199,11 @@ public class ConstructApplication {
     return factory.raptorConfig();
   }
 
-  /**
-   * After the graph and transitModel is read from file or build, then it should be set here,
-   * so it can be used during construction of the web server.
-   */
-  private DefaultServerRequestContext createServerContext() {
-    return DefaultServerRequestContext.create(
-      factory.config().routerConfig(),
-      factory.raptorConfig(),
-      factory.graph(),
-      factory.transitService(),
-      Metrics.globalRegistry,
-      traverseVisitor()
-    );
+  public GraphVisualizer graphVisualizer() {
+    return factory.graphVisualizer();
+  }
+
+  private OtpServerRequestContext createServerContext() {
+    return factory.createServerContext();
   }
 }

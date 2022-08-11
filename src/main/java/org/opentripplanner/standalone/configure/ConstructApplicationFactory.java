@@ -2,11 +2,14 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.configure.ConfigModule;
+import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -17,14 +20,20 @@ import org.opentripplanner.visualizer.GraphVisualizer;
  * Dagger dependency injection Factory to create components for the OTP construct application phase.
  */
 @Singleton
-@Component(modules = { ConfigModule.class, TransitModule.class })
+@Component(modules = { ConfigModule.class, TransitModule.class, ConstructApplicationModule.class })
 public interface ConstructApplicationFactory {
   ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();
   Graph graph();
   TransitModel transitModel();
+
+  @Nullable
   GraphVisualizer graphVisualizer();
+
   TransitService transitService();
+  OtpServerRequestContext createServerContext();
+
+  MetricsLogging metricsLogging();
 
   @Component.Builder
   interface Builder {
@@ -36,6 +45,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder transitModel(TransitModel transitModel);
+
+    @BindsInstance
+    Builder graphVisualizer(@Nullable GraphVisualizer graphVisualizer);
 
     ConstructApplicationFactory build();
   }
