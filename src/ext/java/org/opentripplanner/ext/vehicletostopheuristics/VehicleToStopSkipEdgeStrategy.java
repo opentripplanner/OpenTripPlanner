@@ -7,6 +7,8 @@ import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -47,11 +49,16 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
   );
   private final Function<Stop, Set<Route>> getRoutesForStop;
   private final int maxScore;
+  private final EnumSet<TransitMode> allowedModes;
   private double sumOfScores;
 
   private final Set<FeedScopedId> stopsCounted = new HashSet<>();
 
-  public VehicleToStopSkipEdgeStrategy(Function<Stop, Set<Route>> getRoutesForStop) {
+  public VehicleToStopSkipEdgeStrategy(
+    Function<Stop, Set<Route>> getRoutesForStop,
+    Collection<TransitMode> allowedModes
+  ) {
+    this.allowedModes = EnumSet.copyOf(allowedModes);
     this.maxScore = 300;
     this.getRoutesForStop = getRoutesForStop;
   }
@@ -68,6 +75,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
           .apply(stop)
           .stream()
           .map(Route::getMode)
+          .filter(allowedModes::contains)
           .mapToInt(VehicleToStopSkipEdgeStrategy::score)
           .sum();
 
