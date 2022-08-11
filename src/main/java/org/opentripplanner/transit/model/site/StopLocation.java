@@ -27,6 +27,13 @@ public interface StopLocation extends LogInfo {
   /** The ID for the StopLocation */
   FeedScopedId getId();
 
+  /**
+   * This is the OTP internal <em>synthetic key</em>, used to reference a StopLocation inside OTP.  This is used
+   * to optimize routing, we do not access the stop instance only keep the {code index}. The index will not change.
+   * <p>
+   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP instances, 
+   * use the {code id} for external references.
+   */
   int getIndex();
 
   /** Name of the StopLocation, if provided */
@@ -150,7 +157,7 @@ public interface StopLocation extends LogInfo {
   /**
    * Use this ONLY when deserializing the graph. Sets the counter value to the highest recorded value
    */
-  static void setCounterValue(int stopLocationCounter) {
-    COUNTER.set(stopLocationCounter);
+  static void initIndexCounter(int indexCounter) {
+    COUNTER.set(indexCounter);
   }
 }
