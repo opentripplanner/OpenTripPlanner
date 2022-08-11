@@ -19,11 +19,7 @@ public class TripTimesShortHelper {
     Trip trip,
     LocalDate serviceDate
   ) {
-    // Check if realtime-data changed pattern for trip, otherwise use original
-    TripPattern pattern = transitService.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
-    if (pattern == null) {
-      pattern = transitService.getPatternForTrip(trip);
-    }
+    TripPattern pattern = transitService.getPatternForTrip(trip, serviceDate);
 
     Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
 
