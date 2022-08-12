@@ -59,7 +59,7 @@ public class BikeRental {
 
     VehicleRentalStationService vehicleRentalService = serverContext
       .graph()
-      .getService(VehicleRentalStationService.class);
+      .getVehicleRentalStationService();
     Locale locale = locale_param != null && !locale_param.isBlank()
       ? Locale.forLanguageTag(locale_param.replaceAll("-", "_"))
       : Locale.ENGLISH;

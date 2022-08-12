@@ -4,10 +4,8 @@ import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +21,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -30,6 +29,7 @@ import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarServi
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -58,8 +58,6 @@ public class Graph implements Serializable {
   );
 
   public final StreetNotesService streetNotesService = new StreetNotesService();
-
-  private final Map<Class<?>, Serializable> services = new HashMap<>();
 
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
   private final Map<String, Vertex> vertices = new ConcurrentHashMap<>();
@@ -116,6 +114,10 @@ public class Graph implements Serializable {
   private double distanceBetweenElevationSamples;
 
   private transient RealtimeVehiclePositionService vehiclePositionService;
+  private final VehicleRentalStationService vehicleRentalStationService = new VehicleRentalStationService();
+
+  private final VehicleParkingService vehicleParkingService = new VehicleParkingService();
+  private FareService fareService;
 
   private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
 
@@ -136,6 +138,7 @@ public class Graph implements Serializable {
    * creating the data overlay context when routing.
    */
   public DataOverlayParameterBindings dataOverlayParameterBindings;
+  private LuceneIndex luceneIndex;
 
   public Graph(StopModel stopModel, Deduplicator deduplicator) {
     this.stopModel = stopModel;
@@ -258,37 +261,6 @@ public class Graph implements Serializable {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Serializable> T putService(Class<T> serviceType, T service) {
-    return (T) services.put(serviceType, service);
-  }
-
-  public boolean hasService(Class<? extends Serializable> serviceType) {
-    return services.containsKey(serviceType);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends Serializable> T getService(Class<T> serviceType) {
-    return (T) services.get(serviceType);
-  }
-
-  public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
-    T t = (T) services.get(serviceType);
-    if (t == null && autoCreate) {
-      try {
-        t = serviceType.getDeclaredConstructor().newInstance();
-      } catch (
-        IllegalAccessException
-        | InvocationTargetException
-        | NoSuchMethodException
-        | InstantiationException e
-      ) {
-        throw new RuntimeException(e);
-      }
-      services.put(serviceType, t);
-    }
-    return t;
-  }
-
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
   }
@@ -461,11 +433,19 @@ public class Graph implements Serializable {
   }
 
   public VehicleRentalStationService getVehicleRentalStationService() {
-    return getService(VehicleRentalStationService.class);
+    return vehicleRentalStationService;
   }
 
   public VehicleParkingService getVehicleParkingService() {
-    return getService(VehicleParkingService.class);
+    return vehicleParkingService;
+  }
+
+  public FareService getFareService() {
+    return fareService;
+  }
+
+  public void setFareService(FareService fareService) {
+    this.fareService = fareService;
   }
 
   public DrivingDirection getDrivingDirection() {
@@ -488,6 +468,14 @@ public class Graph implements Serializable {
 
   public StopModel getStopModel() {
     return stopModel;
+  }
+
+  public LuceneIndex getLuceneIndex() {
+    return luceneIndex;
+  }
+
+  public void setLuceneIndex(LuceneIndex luceneIndex) {
+    this.luceneIndex = luceneIndex;
   }
 
   private void readObject(ObjectInputStream inputStream)
