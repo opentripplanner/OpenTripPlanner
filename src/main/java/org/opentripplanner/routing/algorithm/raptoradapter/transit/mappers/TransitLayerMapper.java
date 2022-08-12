@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;

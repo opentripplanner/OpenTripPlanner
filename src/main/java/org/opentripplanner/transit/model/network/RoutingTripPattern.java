@@ -1,13 +1,13 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.transit;
+package org.opentripplanner.transit.model.network;
 
 import java.util.BitSet;
 import java.util.Objects;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;

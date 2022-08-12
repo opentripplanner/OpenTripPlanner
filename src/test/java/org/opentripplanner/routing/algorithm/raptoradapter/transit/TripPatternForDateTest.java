@@ -14,6 +14,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;

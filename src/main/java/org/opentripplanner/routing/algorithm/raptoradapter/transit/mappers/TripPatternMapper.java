@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 public class TripPatternMapper {
