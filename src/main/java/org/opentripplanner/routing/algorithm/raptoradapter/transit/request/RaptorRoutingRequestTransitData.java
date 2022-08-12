@@ -12,6 +12,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
@@ -78,13 +79,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       transitLayer,
       transitSearchTimeZero
     );
-    this.patternIndex =
-      transitDataCreator.createTripPatterns(
-        additionalPastSearchDays,
-        additionalFutureSearchDays,
-        filter
-      );
-    this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
+    List<TripPatternForDates> tripPatterns = transitDataCreator.createTripPatterns(
+      additionalPastSearchDays,
+      additionalFutureSearchDays,
+      filter
+    );
+    this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
+    this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
 
     var mcCostParams = McCostParamsMapper.map(routingContext.opt);
@@ -120,7 +121,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   @Override
   public IntIterator routeIndexIterator(IntIterator stops) {
-    BitSet activeTripPatternsForGivenStops = new BitSet(patternIndex.size());
+    BitSet activeTripPatternsForGivenStops = new BitSet(RoutingTripPattern.indexCounter());
 
     while (stops.hasNext()) {
       int[] patterns = activeTripPatternsPerStop.get(stops.next());

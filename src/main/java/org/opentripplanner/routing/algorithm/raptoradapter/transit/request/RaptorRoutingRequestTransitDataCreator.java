@@ -6,6 +6,7 @@ import gnu.trove.list.array.TIntArrayList;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -53,10 +54,10 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     // Loop through all patterns, and mark all stops containing that pattern
-    int numPatterns = tripPatternsForDate.size();
-    for (int patternIndex = 0; patternIndex < numPatterns; patternIndex++) {
-      TripPatternForDates tripPatternForDateList = tripPatternsForDate.get(patternIndex);
-      for (int i : tripPatternForDateList.getTripPattern().getStopIndexes()) {
+    for (TripPatternForDates tripPatternForDateList : tripPatternsForDate) {
+      final RoutingTripPattern tripPattern = tripPatternForDateList.getTripPattern();
+      final int patternIndex = tripPattern.getIndex();
+      for (int i : tripPattern.getStopIndexes()) {
         patternsForStop[i].add(patternIndex);
       }
     }
@@ -68,6 +69,14 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     return result;
+  }
+
+  public List<TripPatternForDates> createPatternIndex(List<TripPatternForDates> tripPatterns) {
+    TripPatternForDates[] result = new TripPatternForDates[RoutingTripPattern.indexCounter()];
+    for (var pattern : tripPatterns) {
+      result[pattern.getTripPattern().getIndex()] = pattern;
+    }
+    return Arrays.asList(result);
   }
 
   /**
