@@ -7,6 +7,14 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
+/**
+ * The split between TripPattern and RoutingTripPattern is done for the following technical reasons:
+ *  - The RTP is accessed frequently during the Raptor search, and we want it to be as small as
+ *    possible to load/access it in the cache and CPU for performance reasons.
+ *  - Also, we deduplicate these so a RTP can be reused by more than one TP.
+ *  - This also provide explicit documentation on witch fields are used during a search and witch
+ *    are not.
+ */
 public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   private static final AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
