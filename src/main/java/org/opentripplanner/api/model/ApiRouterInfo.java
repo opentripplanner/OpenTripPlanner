@@ -34,14 +34,8 @@ public class ApiRouterInfo {
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
   public ApiRouterInfo(String routerId, Graph graph, TransitService transitService) {
-    VehicleRentalStationService vehicleRentalService = graph.getService(
-      VehicleRentalStationService.class,
-      false
-    );
-    VehicleParkingService vehicleParkingService = graph.getService(
-      VehicleParkingService.class,
-      false
-    );
+    VehicleRentalStationService vehicleRentalService = graph.getVehicleRentalStationService();
+    VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
     this.routerId = routerId;
     this.polygon = graph.getConvexHull();

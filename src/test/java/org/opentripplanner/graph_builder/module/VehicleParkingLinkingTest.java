@@ -12,7 +12,6 @@ import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -132,7 +131,7 @@ public class VehicleParkingLinkingTest {
       .entrance(builder -> builder.entranceId(id("Entrance-1")).vertex(A).walkAccessible(true))
       .build();
 
-    var vehicleParkingService = graph.getService(VehicleParkingService.class, true);
+    var vehicleParkingService = graph.getVehicleParkingService();
     vehicleParkingService.addVehicleParking(vehicleParking);
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
