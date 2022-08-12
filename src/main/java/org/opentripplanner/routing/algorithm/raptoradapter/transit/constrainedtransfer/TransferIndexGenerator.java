@@ -25,7 +25,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModelIndex;
 
 public class TransferIndexGenerator {
 
@@ -37,15 +36,12 @@ public class TransferIndexGenerator {
   private final Map<StopLocation, Set<TripPatternWithRaptorStopIndexes>> patternsByStop = new HashMap<>();
   private final Map<Route, Set<TripPatternWithRaptorStopIndexes>> patternsByRoute = new HashMap<>();
   private final Map<Trip, Set<TripPatternWithRaptorStopIndexes>> patternsByTrip = new HashMap<>();
-  private final StopModelIndex stopIndex;
 
   public TransferIndexGenerator(
     Collection<ConstrainedTransfer> constrainedTransfers,
-    Collection<TripPatternWithRaptorStopIndexes> tripPatterns,
-    StopModelIndex stopIndex
+    Collection<TripPatternWithRaptorStopIndexes> tripPatterns
   ) {
     this.constrainedTransfers = constrainedTransfers;
-    this.stopIndex = stopIndex;
     setupPatternByTripIndex(tripPatterns);
   }
 
@@ -154,7 +150,7 @@ public class TransferIndexGenerator {
       return List.of();
     }
 
-    var sourcePoint = createTransferPointForPattern(station, stopIndex);
+    var sourcePoint = createTransferPointForPattern(station);
     var result = new ArrayList<TPoint>();
 
     for (TripPatternWithRaptorStopIndexes pattern : patterns) {
@@ -176,7 +172,7 @@ public class TransferIndexGenerator {
       return List.of();
     }
 
-    var sourcePoint = createTransferPointForPattern(stopIndex.indexOf(stop));
+    var sourcePoint = createTransferPointForPattern(stop.getIndex());
     var result = new ArrayList<TPoint>();
 
     for (TripPatternWithRaptorStopIndexes pattern : patterns) {

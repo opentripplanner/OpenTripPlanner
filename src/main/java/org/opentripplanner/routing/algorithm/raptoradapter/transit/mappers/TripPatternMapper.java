@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class TripPatternMapper {
 
@@ -17,7 +17,6 @@ public class TripPatternMapper {
    * source data.
    */
   Map<TripPattern, TripPatternWithRaptorStopIndexes> mapOldTripPatternToRaptorTripPattern(
-    StopModelIndex stopIndex,
     Collection<TripPattern> oldTripPatterns
   ) {
     for (TripPattern oldTripPattern : oldTripPatterns) {
@@ -26,7 +25,7 @@ public class TripPatternMapper {
       }
       TripPatternWithRaptorStopIndexes newTripPattern = new TripPatternWithRaptorStopIndexes(
         oldTripPattern,
-        oldTripPattern.getStops().stream().mapToInt(stopIndex::indexOf).toArray()
+        oldTripPattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray()
       );
       newTripPatternForOld.put(oldTripPattern, newTripPattern);
     }

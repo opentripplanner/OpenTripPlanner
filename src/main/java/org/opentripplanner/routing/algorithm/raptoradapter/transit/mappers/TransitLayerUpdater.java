@@ -77,7 +77,6 @@ public class TransitLayerUpdater {
     final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = realtimeTransitLayer
       .getTripPatternMapper()
       .mapOldTripPatternToRaptorTripPattern(
-        realtimeTransitLayer.getStopIndex(),
         updatedTimetables.stream().map(Timetable::getPattern).collect(Collectors.toSet())
       );
 

@@ -81,8 +81,7 @@ public class TransitLayerMapper {
 
     Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
     TripPatternMapper tripPatternMapper = new TripPatternMapper();
-    newTripPatternForOld =
-      tripPatternMapper.mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
+    newTripPatternForOld = tripPatternMapper.mapOldTripPatternToRaptorTripPattern(allTripPatterns);
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns, newTripPatternForOld);
 
@@ -93,8 +92,7 @@ public class TransitLayerMapper {
       transferIndexGenerator =
         new TransferIndexGenerator(
           transitModel.getTransferService().listAll(),
-          newTripPatternForOld.values(),
-          stopIndex
+          newTripPatternForOld.values()
         );
       transferIndexGenerator.generateTransfers();
     }

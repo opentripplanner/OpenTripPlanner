@@ -18,11 +18,6 @@ public class StopIndexMock extends StopModelIndex {
   }
 
   @Override
-  public int indexOf(StopLocation stop) {
-    return stops.indexOf(stop);
-  }
-
-  @Override
   public int size() {
     return stops.size();
   }

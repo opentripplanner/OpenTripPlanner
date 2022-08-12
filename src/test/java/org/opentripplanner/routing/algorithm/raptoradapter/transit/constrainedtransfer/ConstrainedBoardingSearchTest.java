@@ -5,13 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.RAPTOR_STOP_INDEX;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STATION_B;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_A;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_B;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_C;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_D;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.stopIndex;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,8 +31,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
-import org.opentripplanner.transit.service.StopIndexMock;
-import org.opentripplanner.transit.service.StopModelIndex;
 import org.opentripplanner.util.OTPFeature;
 
 public class ConstrainedBoardingSearchTest {
@@ -75,7 +71,6 @@ public class ConstrainedBoardingSearchTest {
   private TestRouteData route2;
   private TripPatternWithRaptorStopIndexes pattern1;
   private TripPatternWithRaptorStopIndexes pattern2;
-  private StopModelIndex stopIndex;
 
   /**
    * Create transit data with 2 routes with a trip each.
@@ -136,8 +131,6 @@ public class ConstrainedBoardingSearchTest {
 
     this.pattern1 = route1.getRaptorTripPattern();
     this.pattern2 = route2.getRaptorTripPattern();
-
-    this.stopIndex = new StopIndexMock(List.of(RAPTOR_STOP_INDEX));
   }
 
   @Test
@@ -356,7 +349,7 @@ public class ConstrainedBoardingSearchTest {
     var subject = pattern2.constrainedTransferForwardSearch();
 
     int targetStopPos = route2.stopPosition(transferStop);
-    int stopIndex = stopIndex(transferStop);
+    int stopIndex = transferStop.getIndex();
     int sourceArrivalTime = route1.lastTrip().getStopTime(transferStop).getArrivalTime();
 
     // Check that transfer exist
@@ -383,7 +376,7 @@ public class ConstrainedBoardingSearchTest {
     var subject = pattern1.constrainedTransferReverseSearch();
     int targetStopPos = route1.stopPosition(transferStop);
 
-    int stopIndex = stopIndex(transferStop);
+    int stopIndex = transferStop.getIndex();
     int sourceArrivalTime = route2.firstTrip().getStopTime(transferStop).getDepartureTime();
 
     // Check that transfer exist
@@ -435,6 +428,6 @@ public class ConstrainedBoardingSearchTest {
   }
 
   private void generateTransfersForPatterns(Collection<ConstrainedTransfer> txList) {
-    new TransferIndexGenerator(txList, List.of(pattern1, pattern2), stopIndex).generateTransfers();
+    new TransferIndexGenerator(txList, List.of(pattern1, pattern2)).generateTransfers();
   }
 }

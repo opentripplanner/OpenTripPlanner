@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.DATE;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.OFFSET;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.stopIndex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,7 +131,7 @@ public class TestRouteData {
   }
 
   int[] stopIndexes(Collection<StopTime> times) {
-    return times.stream().mapToInt(it -> stopIndex(it.getStop())).toArray();
+    return times.stream().map(StopTime::getStop).mapToInt(StopLocation::getIndex).toArray();
   }
 
   private Trip parseTripInfo(
