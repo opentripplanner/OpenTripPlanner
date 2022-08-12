@@ -89,6 +89,7 @@ public class TransitLayerUpdater {
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
       LocalDate date = timetable.getServiceDate();
+      TripPattern tripPattern = timetable.getPattern();
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
@@ -100,13 +101,11 @@ public class TransitLayerUpdater {
 
       TripPatternForDate oldTripPatternForDate = tripPatternsStartingOnDateMapCache
         .get(date)
-        .get(timetable.getPattern());
+        .get(tripPattern);
 
       if (oldTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache
-          .get(date)
-          .remove(timetable.getPattern(), oldTripPatternForDate);
-        oldTripPatternsForDate.put(timetable.getPattern(), oldTripPatternForDate);
+        tripPatternsStartingOnDateMapCache.get(date).remove(tripPattern, oldTripPatternForDate);
+        oldTripPatternsForDate.put(tripPattern, oldTripPatternForDate);
         datesToBeUpdated.addAll(oldTripPatternForDate.getRunningPeriodDates());
       }
 
@@ -116,17 +115,15 @@ public class TransitLayerUpdater {
       );
 
       if (newTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache
-          .get(date)
-          .put(timetable.getPattern(), newTripPatternForDate);
-        newTripPatternsForDate.put(timetable.getPattern(), newTripPatternForDate);
+        tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);
+        newTripPatternsForDate.put(tripPattern, newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
         if (
           transferIndexGenerator != null &&
           newTripPatternForDate.getTripPattern().getPattern().isCreatedByRealtimeUpdater()
         ) {
           transferIndexGenerator.addRealtimeTrip(
-            newTripPatternForDate.getTripPattern(),
+            tripPattern,
             timetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList())
           );
         }
@@ -146,7 +143,7 @@ public class TransitLayerUpdater {
             LOG.debug(
               "NEW TripPatternForDate: {} - {}",
               newTripPatternForDate.getLocalDate(),
-              newTripPatternForDate.getTripPattern().getId()
+              newTripPatternForDate.getTripPattern().debugInfo()
             );
           }
         }

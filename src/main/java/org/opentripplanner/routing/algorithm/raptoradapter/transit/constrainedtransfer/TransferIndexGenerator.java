@@ -84,8 +84,8 @@ public class TransferIndexGenerator {
    * Add information about a newly created pattern and timetables in the index, in order to be able
    * to create constrained transfers for these patterns.
    */
-  public void addRealtimeTrip(RoutingTripPattern pattern, List<Trip> trips) {
-    setupPattern(pattern.getPattern(), trips, pattern);
+  public void addRealtimeTrip(TripPattern tripPattern, List<Trip> trips) {
+    setupPattern(tripPattern, trips);
   }
 
   /**
@@ -93,15 +93,12 @@ public class TransferIndexGenerator {
    */
   private void setupPatterns(Collection<TripPattern> tripPatterns) {
     for (TripPattern tripPattern : tripPatterns) {
-      setupPattern(
-        tripPattern,
-        tripPattern.scheduledTripsAsStream().toList(),
-        tripPattern.getRoutingTripPattern()
-      );
+      setupPattern(tripPattern, tripPattern.scheduledTripsAsStream().toList());
     }
   }
 
-  private void setupPattern(TripPattern tripPattern, List<Trip> trips, RoutingTripPattern pattern) {
+  private void setupPattern(TripPattern tripPattern, List<Trip> trips) {
+    RoutingTripPattern pattern = tripPattern.getRoutingTripPattern();
     patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
 
     for (Trip trip : trips) {
@@ -273,14 +270,14 @@ public class TransferIndexGenerator {
     boolean canBoard() {
       // We prevent boarding at the last stop, this might be enforced by the
       // canBoard method, but we do not trust it here.
-      int lastStopPosition = pattern.getPattern().numberOfStops() - 1;
-      return stopPosition != lastStopPosition && pattern.getPattern().canBoard(stopPosition);
+      int lastStopPosition = pattern.numberOfStopsInPattern() - 1;
+      return stopPosition != lastStopPosition && pattern.boardingPossibleAt(stopPosition);
     }
 
     boolean canAlight() {
       // We prevent alighting at the first stop, this might be enforced by the
       // canAlight method, but we do not trust it here.
-      return stopPosition != 0 && pattern.getPattern().canAlight(stopPosition);
+      return stopPosition != 0 && pattern.alightingPossibleAt(stopPosition);
     }
 
     void addTransferConstraints(

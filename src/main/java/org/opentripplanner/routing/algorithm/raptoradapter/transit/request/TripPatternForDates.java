@@ -40,8 +40,6 @@ public class TripPatternForDates
 
   private final boolean isFrequencyBased;
 
-  private final int slackIndex;
-
   /**
    * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
    * by the stop position and then by trip index, so with stops 1 and 2, and trips A and B, the
@@ -57,7 +55,8 @@ public class TripPatternForDates
 
   private final WheelchairAccessibility[] wheelchairBoardings;
 
-  // bit arrays with boarding/alighting information for all stops on trip pattern
+  // bit arrays with boarding/alighting information for all stops on trip pattern,
+  // potentially filtered by wheelchair accessibility
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
 
@@ -73,7 +72,6 @@ public class TripPatternForDates
     this.offsets = offsets.stream().mapToInt(i -> i).toArray();
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
-    this.slackIndex = SlackProvider.slackIndex(tripPattern.getPattern());
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
@@ -88,7 +86,7 @@ public class TripPatternForDates
 
     wheelchairBoardings = new WheelchairAccessibility[numberOfTripSchedules];
 
-    final int nStops = tripPattern.getStopIndexes().length;
+    final int nStops = tripPattern.numberOfStopsInPattern();
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
     this.departureTimes = new int[nStops * numberOfTripSchedules];
     int i = 0;
@@ -145,7 +143,7 @@ public class TripPatternForDates
 
   @Override
   public int numberOfStopsInPattern() {
-    return tripPattern.getStopIndexes().length;
+    return tripPattern.numberOfStopsInPattern();
   }
 
   @Override
@@ -165,14 +163,12 @@ public class TripPatternForDates
 
   @Override
   public int slackIndex() {
-    return slackIndex;
+    return tripPattern.slackIndex();
   }
 
   @Override
   public String debugInfo() {
-    return (
-      tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().getRoute().getShortName()
-    );
+    return tripPattern.debugInfo();
   }
 
   /*  Implementing RaptorTimeTable */

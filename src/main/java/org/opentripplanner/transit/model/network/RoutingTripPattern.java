@@ -2,13 +2,12 @@ package org.opentripplanner.transit.model.network;
 
 import java.io.Serializable;
 import java.util.BitSet;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-public class RoutingTripPattern implements Serializable {
+public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   private static final AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
   private final int index;
@@ -17,6 +16,8 @@ public class RoutingTripPattern implements Serializable {
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
   private final BitSet wheelchairAccessible;
+  private final int slackIndex;
+  private final String debugInfo;
 
   RoutingTripPattern(TripPattern pattern) {
     this.pattern = pattern;
@@ -33,10 +34,9 @@ public class RoutingTripPattern implements Serializable {
       alightingPossible.set(s, pattern.canAlight(s));
       wheelchairAccessible.set(s, pattern.wheelchairAccessible(s));
     }
-  }
 
-  public FeedScopedId getId() {
-    return pattern.getId();
+    this.slackIndex = SlackProvider.slackIndex(pattern);
+    this.debugInfo = pattern.getRoute().getMode().name() + " " + pattern.getRoute().getName();
   }
 
   /**
@@ -48,14 +48,6 @@ public class RoutingTripPattern implements Serializable {
    */
   public int getIndex() {
     return index;
-  }
-
-  public TransitMode getTransitMode() {
-    return pattern.getMode();
-  }
-
-  public int[] getStopIndexes() {
-    return stopIndexes;
   }
 
   public final TripPattern getPattern() {
@@ -74,6 +66,11 @@ public class RoutingTripPattern implements Serializable {
     return wheelchairAccessible;
   }
 
+  @Override
+  public int numberOfStopsInPattern() {
+    return stopIndexes.length;
+  }
+
   /**
    * See {@link org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern#stopIndex(int)}
    */
@@ -90,8 +87,18 @@ public class RoutingTripPattern implements Serializable {
   }
 
   @Override
+  public int slackIndex() {
+    return slackIndex;
+  }
+
+  @Override
+  public String debugInfo() {
+    return debugInfo;
+  }
+
+  @Override
   public int hashCode() {
-    return Objects.hash(getId());
+    return index;
   }
 
   @Override
@@ -99,16 +106,15 @@ public class RoutingTripPattern implements Serializable {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof RoutingTripPattern that)) {
       return false;
     }
-    RoutingTripPattern that = (RoutingTripPattern) o;
-    return getId() == that.getId();
+    return index == that.getIndex();
   }
 
   @Override
   public String toString() {
-    return "TripPattern{" + "id=" + getId() + ", transitMode=" + pattern.getMode() + '}';
+    return "TripPattern{" + "index=" + index + ", debugInfo=" + debugInfo + '}';
   }
 
   public static int indexCounter() {

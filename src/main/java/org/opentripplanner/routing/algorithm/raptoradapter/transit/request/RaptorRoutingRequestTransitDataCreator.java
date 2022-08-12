@@ -57,8 +57,9 @@ class RaptorRoutingRequestTransitDataCreator {
     for (TripPatternForDates tripPatternForDateList : tripPatternsForDate) {
       final RoutingTripPattern tripPattern = tripPatternForDateList.getTripPattern();
       final int patternIndex = tripPattern.getIndex();
-      for (int i : tripPattern.getStopIndexes()) {
-        patternsForStop[i].add(patternIndex);
+      final int numberOfStopsInPattern = tripPattern.numberOfStopsInPattern();
+      for (int i = 0; i < numberOfStopsInPattern; i++) {
+        patternsForStop[tripPattern.stopIndex(i)].add(patternIndex);
       }
     }
 
