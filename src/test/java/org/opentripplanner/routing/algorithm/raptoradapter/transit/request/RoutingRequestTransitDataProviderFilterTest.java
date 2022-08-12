@@ -73,13 +73,12 @@ public class RoutingRequestTransitDataProviderFilterTest {
     stopTimeEnd.setStop(lastStop);
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
-    var pattern = TripPattern
+    var tripPattern = TripPattern
       .of(TransitModelForTest.id("P1"))
       .withRoute(TransitModelForTest.route("1").build())
       .withStopPattern(stopPattern)
-      .build();
-
-    var tripPattern = new RoutingTripPattern(pattern);
+      .build()
+      .getRoutingTripPattern();
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
@@ -517,13 +516,12 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = TripPattern
+    RoutingTripPattern tripPattern = TripPattern
       .of(TransitModelForTest.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
-      .build();
-
-    RoutingTripPattern tripPattern = new RoutingTripPattern(pattern);
+      .build()
+      .getRoutingTripPattern();
 
     TripTimes tripTimes = Mockito.mock(TripTimes.class);
 

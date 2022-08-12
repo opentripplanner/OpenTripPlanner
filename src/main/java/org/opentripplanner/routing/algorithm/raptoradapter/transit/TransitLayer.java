@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -42,8 +41,6 @@ public class TransitLayer {
 
   private final RaptorRequestTransferCache transferCache;
 
-  private final TripPatternMapper tripPatternMapper;
-
   private final TransferIndexGenerator transferIndexGenerator;
 
   private final int[] stopBoardAlightCosts;
@@ -61,7 +58,6 @@ public class TransitLayer {
       transitLayer.stopIndex,
       transitLayer.transitDataZoneId,
       transitLayer.transferCache,
-      transitLayer.tripPatternMapper,
       transitLayer.transferIndexGenerator,
       transitLayer.stopBoardAlightCosts
     );
@@ -74,7 +70,6 @@ public class TransitLayer {
     StopModelIndex stopIndex,
     ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
-    TripPatternMapper tripPatternMapper,
     TransferIndexGenerator transferIndexGenerator,
     int[] stopBoardAlightCosts
   ) {
@@ -84,7 +79,6 @@ public class TransitLayer {
     this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
-    this.tripPatternMapper = tripPatternMapper;
     this.transferIndexGenerator = transferIndexGenerator;
     this.stopBoardAlightCosts = stopBoardAlightCosts;
   }
@@ -139,10 +133,6 @@ public class TransitLayer {
 
   public RaptorRequestTransferCache getTransferCache() {
     return transferCache;
-  }
-
-  public TripPatternMapper getTripPatternMapper() {
-    return tripPatternMapper;
   }
 
   public TransferIndexGenerator getTransferIndexGenerator() {

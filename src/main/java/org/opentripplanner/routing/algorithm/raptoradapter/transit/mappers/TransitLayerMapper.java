@@ -71,7 +71,6 @@ public class TransitLayerMapper {
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
     StopModelIndex stopIndex;
-    Map<TripPattern, RoutingTripPattern> newTripPatternForOld;
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
 
@@ -80,20 +79,15 @@ public class TransitLayerMapper {
     stopIndex = transitModel.getStopModel().getStopModelIndex();
 
     Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
-    TripPatternMapper tripPatternMapper = new TripPatternMapper();
-    newTripPatternForOld = tripPatternMapper.mapOldTripPatternToRaptorTripPattern(allTripPatterns);
 
-    tripPatternsByStopByDate = mapTripPatterns(allTripPatterns, newTripPatternForOld);
+    tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
     transferByStopIndex = mapTransfers(stopIndex, transitModel);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator =
-        new TransferIndexGenerator(
-          transitModel.getTransferService().listAll(),
-          newTripPatternForOld.values()
-        );
+        new TransferIndexGenerator(transitModel.getTransferService().listAll(), allTripPatterns);
       transferIndexGenerator.generateTransfers();
     }
 
@@ -108,7 +102,6 @@ public class TransitLayerMapper {
       stopIndex,
       transitModel.getTimeZone(),
       transferCache,
-      tripPatternMapper,
       transferIndexGenerator,
       createStopTransferCosts(stopIndex, tuningParameters)
     );
@@ -121,12 +114,10 @@ public class TransitLayerMapper {
    * <p>
    */
   private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns(
-    Collection<TripPattern> allTripPatterns,
-    Map<TripPattern, RoutingTripPattern> newTripPatternForOld
+    Collection<TripPattern> allTripPatterns
   ) {
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      transitModel.getTransitModelIndex().getServiceCodesRunningForDate(),
-      newTripPatternForOld
+      transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
     );
 
     Set<LocalDate> allServiceDates = transitModel

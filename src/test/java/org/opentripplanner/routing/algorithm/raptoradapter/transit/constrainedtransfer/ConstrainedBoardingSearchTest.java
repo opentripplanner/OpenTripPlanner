@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.OTPFeature;
@@ -69,8 +70,10 @@ public class ConstrainedBoardingSearchTest {
 
   private TestRouteData route1;
   private TestRouteData route2;
-  private RoutingTripPattern pattern1;
-  private RoutingTripPattern pattern2;
+  private TripPattern pattern1;
+  private TripPattern pattern2;
+  private RoutingTripPattern routingPattern1;
+  private RoutingTripPattern routingPattern2;
 
   /**
    * Create transit data with 2 routes with a trip each.
@@ -129,8 +132,10 @@ public class ConstrainedBoardingSearchTest {
         "10:40 10:55 11:05"
       );
 
-    this.pattern1 = route1.getRaptorTripPattern();
-    this.pattern2 = route2.getRaptorTripPattern();
+    this.pattern1 = route1.getTripPattern();
+    this.pattern2 = route2.getTripPattern();
+    this.routingPattern1 = pattern1.getRoutingTripPattern();
+    this.routingPattern2 = pattern2.getRoutingTripPattern();
   }
 
   @Test
@@ -147,11 +152,11 @@ public class ConstrainedBoardingSearchTest {
     generateTransfersForPatterns(List.of(txAllowed));
 
     // Forward
-    var subject = route2.getRaptorTripPattern().constrainedTransferForwardSearch();
+    var subject = routingPattern2.constrainedTransferForwardSearch();
     assertTrue(subject.transferExist(toStopPos));
 
     // Reverse
-    subject = route1.getRaptorTripPattern().constrainedTransferReverseSearch();
+    subject = routingPattern1.constrainedTransferReverseSearch();
     assertTrue(subject.transferExist(fromStopPos));
   }
 
@@ -346,7 +351,7 @@ public class ConstrainedBoardingSearchTest {
     TransferConstraint expectedConstraint
   ) {
     generateTransfersForPatterns(txList);
-    var subject = pattern2.constrainedTransferForwardSearch();
+    var subject = routingPattern2.constrainedTransferForwardSearch();
 
     int targetStopPos = route2.stopPosition(transferStop);
     int stopIndex = transferStop.getIndex();
@@ -373,7 +378,7 @@ public class ConstrainedBoardingSearchTest {
     TransferConstraint expectedConstraint
   ) {
     generateTransfersForPatterns(txList);
-    var subject = pattern1.constrainedTransferReverseSearch();
+    var subject = routingPattern1.constrainedTransferReverseSearch();
     int targetStopPos = route1.stopPosition(transferStop);
 
     int stopIndex = transferStop.getIndex();

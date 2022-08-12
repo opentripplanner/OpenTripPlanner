@@ -39,7 +39,7 @@ public class TransferIndexGenerator {
 
   public TransferIndexGenerator(
     Collection<ConstrainedTransfer> constrainedTransfers,
-    Collection<RoutingTripPattern> tripPatterns
+    Collection<TripPattern> tripPatterns
   ) {
     this.constrainedTransfers = constrainedTransfers;
     setupPatternByTripIndex(tripPatterns);
@@ -108,9 +108,9 @@ public class TransferIndexGenerator {
   /**
    * Index scheduled patterns when loading the graph initially.
    */
-  private void setupPatternByTripIndex(Collection<RoutingTripPattern> tripPatterns) {
-    for (RoutingTripPattern pattern : tripPatterns) {
-      TripPattern tripPattern = pattern.getPattern();
+  private void setupPatternByTripIndex(Collection<TripPattern> tripPatterns) {
+    for (TripPattern tripPattern : tripPatterns) {
+      RoutingTripPattern pattern = tripPattern.getRoutingTripPattern();
 
       patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
 

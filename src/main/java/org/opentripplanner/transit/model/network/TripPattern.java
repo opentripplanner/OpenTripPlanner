@@ -73,6 +73,8 @@ public final class TripPattern
    */
   private final boolean createdByRealtimeUpdater;
 
+  private final RoutingTripPattern routingTripPattern;
+
   public TripPattern(TripPatternBuilder builder) {
     super(builder.getId());
     this.name = builder.getName();
@@ -88,6 +90,7 @@ public final class TripPattern
     this.originalTripPattern = builder.getOriginalTripPattern();
 
     this.hopGeometries = builder.hopGeometries();
+    this.routingTripPattern = new RoutingTripPattern(this);
   }
 
   public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
@@ -415,6 +418,10 @@ public final class TripPattern
   public String getFeedId() {
     // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
     return route.getId().getFeedId();
+  }
+
+  public RoutingTripPattern getRoutingTripPattern() {
+    return routingTripPattern;
   }
 
   private static Coordinate coordinate(StopLocation s) {

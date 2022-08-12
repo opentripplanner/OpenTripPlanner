@@ -73,17 +73,9 @@ public class TransitLayerUpdater {
     // changed during this update process.
     TransitLayer realtimeTransitLayer = new TransitLayer(transitModel.getRealtimeTransitLayer());
 
-    // Map TripPatterns for this update to Raptor TripPatterns
-    final Map<TripPattern, RoutingTripPattern> newTripPatternForOld = realtimeTransitLayer
-      .getTripPatternMapper()
-      .mapOldTripPatternToRaptorTripPattern(
-        updatedTimetables.stream().map(Timetable::getPattern).collect(Collectors.toSet())
-      );
-
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      serviceCodesRunningForDate,
-      newTripPatternForOld
+      serviceCodesRunningForDate
     );
 
     Set<LocalDate> datesToBeUpdated = new HashSet<>();

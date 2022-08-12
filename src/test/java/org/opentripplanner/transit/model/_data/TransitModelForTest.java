@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -10,6 +11,7 @@ import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
+import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
@@ -137,5 +139,15 @@ public class TransitModelForTest {
     stopTime.setArrivalTime(time);
     stopTime.setDepartureTime(time);
     return stopTime;
+  }
+
+  public static StopPattern stopPattern(int numberOfStops) {
+    var builder = StopPattern.create(numberOfStops);
+    for (int i = 0; i < numberOfStops; i++) {
+      builder.stops[i] = TransitModelForTest.stop("Stop_" + i).build();
+      builder.pickups[i] = PickDrop.SCHEDULED;
+      builder.dropoffs[i] = PickDrop.SCHEDULED;
+    }
+    return builder.build();
   }
 }

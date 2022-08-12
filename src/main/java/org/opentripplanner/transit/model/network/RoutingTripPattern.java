@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.network;
 
+import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Objects;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -12,7 +13,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-public class RoutingTripPattern {
+public class RoutingTripPattern implements Serializable {
 
   private final TripPattern pattern;
   private final int[] stopIndexes;
@@ -39,7 +40,7 @@ public class RoutingTripPattern {
    */
   private boolean sealedConstrainedTransfers = false;
 
-  public RoutingTripPattern(TripPattern pattern) {
+  RoutingTripPattern(TripPattern pattern) {
     this.pattern = pattern;
     this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
 
