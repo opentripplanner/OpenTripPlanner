@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
@@ -363,15 +364,10 @@ public class TimetableSnapshot {
     this.patternsForStop = patternsForStop;
   }
 
-  public void addLastAddedTripOnServiceDate(
-    Trip trip,
-    LocalDate serviceDate,
-    FeedScopedId datedServiceJourneyId,
-    TripOnServiceDate tripOnServiceDate
-  ) {
-    realtimeAddedTripOnServiceDate.put(datedServiceJourneyId, tripOnServiceDate);
+  public void addLastAddedTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
+    realtimeAddedTripOnServiceDate.put(tripOnServiceDate.getId(), tripOnServiceDate);
     realtimeAddedTripOnServiceDateByTripIdAndServiceDate.put(
-      new TripIdAndServiceDate(trip.getId(), serviceDate),
+      tripOnServiceDate.getTripIdAndServiceDate(),
       tripOnServiceDate
     );
   }
@@ -413,6 +409,8 @@ public class TimetableSnapshot {
    */
   private void addPatternToIndex(TripPattern tripPattern) {
     if (tripPattern.isCreatedByRealtimeUpdater()) {
+      //TODO - SIRI: Add pattern to index?
+
       for (var stop : tripPattern.getStops()) {
         patternsForStop.put(stop, tripPattern);
       }

@@ -251,6 +251,10 @@ public class SiriFuzzyTripMatcher {
       for (Trip trip : index.getAllTrips()) {
         TripPattern tripPattern = index.getPatternForTrip(trip);
 
+        if (tripPattern == null) {
+          continue;
+        }
+
         String currentTripId = getUnpaddedTripId(trip.getId().getId());
 
         if (mappedTripsCache.containsKey(currentTripId)) {
@@ -261,10 +265,7 @@ public class SiriFuzzyTripMatcher {
           mappedTripsCache.put(currentTripId, initialSet);
         }
 
-        if (
-          tripPattern != null &&
-          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))
-        ) {
+        if (tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))) {
           if (trip.getNetexInternalPlanningCode() != null) {
             String internalPlanningCode = trip.getNetexInternalPlanningCode();
             if (mappedVehicleRefCache.containsKey(internalPlanningCode)) {

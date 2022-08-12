@@ -512,13 +512,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     FeedScopedId tripId = new FeedScopedId(feedId, newServiceJourneyRef);
 
-    Route replacedRoute = null;
-    if (externalLineRef != null) {
-      replacedRoute =
-        transitModel
-          .getTransitModelIndex()
-          .getRouteForId(new FeedScopedId(feedId, externalLineRef));
-    }
+    Route replacedRoute = externalLineRef != null
+      ? transitModel.getTransitModelIndex().getRouteForId(new FeedScopedId(feedId, externalLineRef))
+      : null;
 
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
     Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
@@ -543,8 +539,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           route1 != null && route1.getOperator() != null && route1.getOperator().equals(operator)
         )
         .findFirst()
-        .get()
-        .getAgency();
+        .map(Route::getAgency)
+        // If not found, copy from replaced route
+        .orElseGet(() -> replacedRoute.getAgency());
       routeBuilder.withAgency(agency);
 
       if (
@@ -1084,50 +1081,40 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate
     );
 
-    /*
-     * Update pattern with triptimes so get correct dwell times and lower bound on running times.
-     * New patterns only affects a single trip, previously added tripTimes is no longer valid, and is therefore removed
-     */
-    pattern.getScheduledTimetable().getTripTimes().clear();
-    pattern.getScheduledTimetable().addTripTimes(updatedTripTimes);
-
-    // Remove trip times to avoid real time trip times being visible for ignoreRealtimeInformation queries
-    pattern.getScheduledTimetable().getTripTimes().clear();
-
-    // Add to buffer as-is to include it in the 'realtimeAddedTripPattern'
-    //TODO - Should this update be done twice?
-    buffer.update(pattern, updatedTripTimes, serviceDate);
+    // Add new trip times to the buffer and return success
+    final boolean updated = buffer.update(pattern, updatedTripTimes, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-    Supplier<Optional<String>> framedVehicleJourneySupplier = () ->
+    addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
+
+    return updated;
+  }
+
+  private void addTripOnServiceDateToBuffer(
+    Trip trip,
+    LocalDate serviceDate,
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    String feedId
+  ) {
+    // Fallback to FramedVehicleJourneyRef if DatedVehicleJourneyRef is not set
+    Supplier<Optional<String>> getFramedVehicleJourney = () ->
       Optional
         .ofNullable(estimatedVehicleJourney.getFramedVehicleJourneyRef())
         .map(FramedVehicleJourneyRefStructure::getDatedVehicleJourneyRef);
-    Optional<String> dsjId = Optional
+
+    Optional
       .ofNullable(estimatedVehicleJourney.getDatedVehicleJourneyRef())
       .map(DatedVehicleJourneyRef::getValue)
-      .or(framedVehicleJourneySupplier);
-
-    if (dsjId.isPresent()) {
-      FeedScopedId datedServiceJourneyId = new FeedScopedId(feedId, dsjId.get());
-      var tripOnServiceDate = TripOnServiceDate
-        .of(datedServiceJourneyId)
-        .withTrip(trip)
-        .withServiceDate(serviceDate)
-        .build();
-
-      buffer.addLastAddedTripOnServiceDate(
-        trip,
-        serviceDate,
-        datedServiceJourneyId,
-        tripOnServiceDate
+      .or(getFramedVehicleJourney)
+      .ifPresent(datedServiceJourneyId ->
+        buffer.addLastAddedTripOnServiceDate(
+          TripOnServiceDate
+            .of(new FeedScopedId(feedId, datedServiceJourneyId))
+            .withTrip(trip)
+            .withServiceDate(serviceDate)
+            .build()
+        )
       );
-    }
-
-    //TODO - SIRI: Add pattern to index?
-
-    // Add new trip times to the buffer and return success
-    return buffer.update(pattern, updatedTripTimes, serviceDate);
   }
 
   /**
