@@ -29,12 +29,6 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   public static final FeedScopedId TP_ID_2 = id("2");
   public static final FeedScopedId TP_ID_3 = id("3");
 
-  private static final TripPattern TP = TripPattern
-    .of(id("P1"))
-    .withRoute(TransitModelForTest.route("1").withMode(TransitMode.BUS).build())
-    .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
-    .build();
-
   @Test
   public void testMergeTripPatterns() {
     LocalDate first = LocalDate.of(2019, 3, 30);
@@ -49,9 +43,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
     // Total available trip patterns
-    RoutingTripPattern tripPattern1 = new TripPatternWithId(TP_ID_1, TP);
-    RoutingTripPattern tripPattern2 = new TripPatternWithId(TP_ID_2, TP);
-    RoutingTripPattern tripPattern3 = new TripPatternWithId(TP_ID_3, TP);
+    RoutingTripPattern tripPattern1 = getTripPattern(TP_ID_1);
+    RoutingTripPattern tripPattern2 = getTripPattern(TP_ID_2);
+    RoutingTripPattern tripPattern3 = getTripPattern(TP_ID_3);
 
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
@@ -126,6 +120,15 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     var st = new StopTime();
     st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
     return st;
+  }
+
+  private static RoutingTripPattern getTripPattern(FeedScopedId id) {
+    return TripPattern
+      .of(id)
+      .withRoute(TransitModelForTest.route("1").withMode(TransitMode.BUS).build())
+      .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
+      .build()
+      .getRoutingTripPattern();
   }
 
   /**
