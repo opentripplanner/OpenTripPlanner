@@ -48,12 +48,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     return pattern;
   }
 
-  @Override
   public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch() {
     return transferConstraintsForwardSearch;
   }
 
-  @Override
   public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch() {
     return transferConstraintsReverseSearch;
   }

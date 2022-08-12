@@ -2,6 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferPointForPatternFactory.createTransferPointForPattern;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,10 +44,18 @@ public class TransferIndexGenerator {
     Collection<TripPattern> tripPatterns
   ) {
     this.constrainedTransfers = constrainedTransfers;
-    setupPatternByTripIndex(tripPatterns);
+    setupPatterns(tripPatterns);
   }
 
-  public void generateTransfers() {
+  public ConstrainedTransfers generateTransfers() {
+    TIntObjectMap<TransferForPatternByStopPos> forwardTransfers = new TIntObjectHashMap<>(
+      RoutingTripPattern.indexCounter()
+    );
+
+    TIntObjectMap<TransferForPatternByStopPos> reverseTransfers = new TIntObjectHashMap<>(
+      RoutingTripPattern.indexCounter()
+    );
+
     for (ConstrainedTransfer tx : constrainedTransfers) {
       var c = tx.getTransferConstraint();
       // Only add transfers witch have an effect on the Raptor routing here.
@@ -61,12 +71,13 @@ public class TransferIndexGenerator {
         .forEachOrdered(fromPoint -> {
           for (var toPoint : findTPoints(tx.getTo(), BOARD)) {
             if (toPoint.canBoard() && !fromPoint.equals(toPoint)) {
-              fromPoint.addTransferConstraints(tx, toPoint);
+              fromPoint.addTransferConstraints(tx, toPoint, forwardTransfers, reverseTransfers);
             }
           }
         });
     }
-    sealConstrainedTransfers();
+
+    return new ConstrainedTransfers(forwardTransfers, reverseTransfers);
   }
 
   /**
@@ -74,8 +85,23 @@ public class TransferIndexGenerator {
    * to create constrained transfers for these patterns.
    */
   public void addRealtimeTrip(RoutingTripPattern pattern, List<Trip> trips) {
-    TripPattern tripPattern = pattern.getPattern();
+    setupPattern(pattern.getPattern(), trips, pattern);
+  }
 
+  /**
+   * Index scheduled patterns when loading the graph initially.
+   */
+  private void setupPatterns(Collection<TripPattern> tripPatterns) {
+    for (TripPattern tripPattern : tripPatterns) {
+      setupPattern(
+        tripPattern,
+        tripPattern.scheduledTripsAsStream().toList(),
+        tripPattern.getRoutingTripPattern()
+      );
+    }
+  }
+
+  private void setupPattern(TripPattern tripPattern, List<Trip> trips, RoutingTripPattern pattern) {
     patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
 
     for (Trip trip : trips) {
@@ -87,43 +113,6 @@ public class TransferIndexGenerator {
       Station station = stop.getParentStation();
       if (station != null) {
         patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
-      }
-    }
-  }
-
-  /**
-   * This sorts and seals the constrained transfers for all patterns in order to protect them from
-   * modification, while they are used in the routing.
-   * <p>
-   * {@link RoutingTripPattern#sealConstrainedTransfers()}
-   */
-  private void sealConstrainedTransfers() {
-    for (var patterns : patternsByRoute.values()) {
-      for (var pattern : patterns) {
-        pattern.sealConstrainedTransfers();
-      }
-    }
-  }
-
-  /**
-   * Index scheduled patterns when loading the graph initially.
-   */
-  private void setupPatternByTripIndex(Collection<TripPattern> tripPatterns) {
-    for (TripPattern tripPattern : tripPatterns) {
-      RoutingTripPattern pattern = tripPattern.getRoutingTripPattern();
-
-      patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
-
-      tripPattern
-        .scheduledTripsAsStream()
-        .forEach(trip -> patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern));
-
-      for (StopLocation stop : tripPattern.getStops()) {
-        patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
-        Station station = stop.getParentStation();
-        if (station != null) {
-          patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
-        }
       }
     }
   }
@@ -271,10 +260,9 @@ public class TransferIndexGenerator {
       if (this == o) {
         return true;
       }
-      if (!(o instanceof TPoint)) {
+      if (!(o instanceof TPoint tPoint)) {
         return false;
       }
-      final TPoint tPoint = (TPoint) o;
       return (
         stopPosition == tPoint.stopPosition &&
         Objects.equals(pattern, tPoint.pattern) &&
@@ -295,20 +283,25 @@ public class TransferIndexGenerator {
       return stopPosition != 0 && pattern.getPattern().canAlight(stopPosition);
     }
 
-    void addTransferConstraints(ConstrainedTransfer tx, TPoint to) {
+    void addTransferConstraints(
+      ConstrainedTransfer tx,
+      TPoint to,
+      TIntObjectMap<TransferForPatternByStopPos> forwardTransfers,
+      TIntObjectMap<TransferForPatternByStopPos> reverseTransfers
+    ) {
       int rank = tx.getSpecificityRanking();
       var c = tx.getTransferConstraint();
 
       // Forward search
-      to.pattern.addTransferConstraintsForwardSearch(
-        to.stopPosition,
-        new TransferForPattern(sourcePoint, to.trip, rank, c)
-      );
+      forwardTransfers.putIfAbsent(to.pattern.getIndex(), new TransferForPatternByStopPos());
+      forwardTransfers
+        .get(to.pattern.getIndex())
+        .add(to.stopPosition, new TransferForPattern(sourcePoint, to.trip, rank, c));
       // Reverse search
-      pattern.addTransferConstraintsReverseSearch(
-        stopPosition,
-        new TransferForPattern(to.sourcePoint, trip, rank, c)
-      );
+      reverseTransfers.putIfAbsent(pattern.getIndex(), new TransferForPatternByStopPos());
+      reverseTransfers
+        .get(pattern.getIndex())
+        .add(stopPosition, new TransferForPattern(to.sourcePoint, trip, rank, c));
     }
   }
 }

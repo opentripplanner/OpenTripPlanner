@@ -149,14 +149,21 @@ public class ConstrainedBoardingSearchTest {
       STOP_C_TX_POINT,
       GUARANTEED_CONSTRAINT
     );
-    generateTransfersForPatterns(List.of(txAllowed));
+    var constrainedTransfers = generateTransfersForPatterns(List.of(txAllowed));
 
     // Forward
-    var subject = routingPattern2.constrainedTransferForwardSearch();
+    var subject = new ConstrainedBoardingSearch(
+      true,
+      constrainedTransfers.forward().get(routingPattern2.getIndex())
+    );
     assertTrue(subject.transferExist(toStopPos));
 
     // Reverse
-    subject = routingPattern1.constrainedTransferReverseSearch();
+    subject =
+      new ConstrainedBoardingSearch(
+        false,
+        constrainedTransfers.reverse().get(routingPattern1.getIndex())
+      );
     assertTrue(subject.transferExist(fromStopPos));
   }
 
@@ -350,8 +357,11 @@ public class ConstrainedBoardingSearchTest {
     int expectedTripIndex,
     TransferConstraint expectedConstraint
   ) {
-    generateTransfersForPatterns(txList);
-    var subject = routingPattern2.constrainedTransferForwardSearch();
+    var constrainedTransfers = generateTransfersForPatterns(txList);
+    var subject = new ConstrainedBoardingSearch(
+      true,
+      constrainedTransfers.forward().get(routingPattern2.getIndex())
+    );
 
     int targetStopPos = route2.stopPosition(transferStop);
     int stopIndex = transferStop.getIndex();
@@ -377,8 +387,11 @@ public class ConstrainedBoardingSearchTest {
     int expectedTripIndex,
     TransferConstraint expectedConstraint
   ) {
-    generateTransfersForPatterns(txList);
-    var subject = routingPattern1.constrainedTransferReverseSearch();
+    var constrainedTransfers = generateTransfersForPatterns(txList);
+    var subject = new ConstrainedBoardingSearch(
+      false,
+      constrainedTransfers.reverse().get(routingPattern1.getIndex())
+    );
     int targetStopPos = route1.stopPosition(transferStop);
 
     int stopIndex = transferStop.getIndex();
@@ -432,7 +445,9 @@ public class ConstrainedBoardingSearchTest {
     }
   }
 
-  private void generateTransfersForPatterns(Collection<ConstrainedTransfer> txList) {
-    new TransferIndexGenerator(txList, List.of(pattern1, pattern2)).generateTransfers();
+  private ConstrainedTransfers generateTransfersForPatterns(
+    Collection<ConstrainedTransfer> txList
+  ) {
+    return new TransferIndexGenerator(txList, List.of(pattern1, pattern2)).generateTransfers();
   }
 }

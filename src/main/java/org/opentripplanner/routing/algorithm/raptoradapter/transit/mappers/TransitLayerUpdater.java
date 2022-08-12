@@ -13,7 +13,6 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -216,7 +215,7 @@ public class TransitLayerUpdater {
     }
 
     if (transferIndexGenerator != null) {
-      transferIndexGenerator.generateTransfers();
+      realtimeTransitLayer.setConstrainedTransfers(transferIndexGenerator.generateTransfers());
     }
 
     // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to

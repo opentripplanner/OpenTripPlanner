@@ -11,7 +11,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.Tri
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -140,16 +139,6 @@ public class TripPatternForDates
   @Override
   public RaptorTripPattern pattern() {
     return this;
-  }
-
-  @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsForwardSearch() {
-    return getTripPattern().constrainedTransferForwardSearch();
-  }
-
-  @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsReverseSearch() {
-    return getTripPattern().constrainedTransferReverseSearch();
   }
 
   /* Implementing RaptorTripPattern */

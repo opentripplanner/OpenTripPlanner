@@ -123,4 +123,8 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
    * Unit: seconds since midnight of the day of the search
    */
   int getValidTransitDataEndTime();
+
+  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsForwardSearch(int routeIndex);
+
+  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsReverseSearch(int routeIndex);
 }

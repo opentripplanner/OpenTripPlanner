@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import gnu.trove.map.TIntObjectMap;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfers;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -41,6 +44,8 @@ public class TransitLayer {
 
   private final RaptorRequestTransferCache transferCache;
 
+  private ConstrainedTransfers constrainedTransfers;
+
   private final TransferIndexGenerator transferIndexGenerator;
 
   private final int[] stopBoardAlightCosts;
@@ -58,6 +63,7 @@ public class TransitLayer {
       transitLayer.stopIndex,
       transitLayer.transitDataZoneId,
       transitLayer.transferCache,
+      transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
       transitLayer.stopBoardAlightCosts
     );
@@ -70,6 +76,7 @@ public class TransitLayer {
     StopModelIndex stopIndex,
     ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
+    ConstrainedTransfers constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
     int[] stopBoardAlightCosts
   ) {
@@ -79,6 +86,7 @@ public class TransitLayer {
     this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
+    this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
     this.stopBoardAlightCosts = stopBoardAlightCosts;
   }
@@ -135,6 +143,14 @@ public class TransitLayer {
     return transferCache;
   }
 
+  public TIntObjectMap<TransferForPatternByStopPos> getForwardConstrainedTransfers() {
+    return constrainedTransfers != null ? constrainedTransfers.forward() : null;
+  }
+
+  public TIntObjectMap<TransferForPatternByStopPos> getReverseConstrainedTransfers() {
+    return constrainedTransfers != null ? constrainedTransfers.reverse() : null;
+  }
+
   public TransferIndexGenerator getTransferIndexGenerator() {
     return transferIndexGenerator;
   }
@@ -152,5 +168,9 @@ public class TransitLayer {
     List<TripPatternForDate> tripPatternForDates
   ) {
     this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
+  }
+
+  public void setConstrainedTransfers(ConstrainedTransfers constrainedTransfers) {
+    this.constrainedTransfers = constrainedTransfers;
   }
 }

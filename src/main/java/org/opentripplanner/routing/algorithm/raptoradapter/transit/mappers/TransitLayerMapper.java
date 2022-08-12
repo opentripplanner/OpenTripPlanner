@@ -18,10 +18,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfers;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -73,6 +73,7 @@ public class TransitLayerMapper {
     StopModelIndex stopIndex;
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
+    ConstrainedTransfers constrainedTransfers = null;
 
     LOG.info("Mapping transitLayer from Graph...");
 
@@ -88,7 +89,7 @@ public class TransitLayerMapper {
     if (OTPFeature.TransferConstraints.isOn()) {
       transferIndexGenerator =
         new TransferIndexGenerator(transitModel.getTransferService().listAll(), allTripPatterns);
-      transferIndexGenerator.generateTransfers();
+      constrainedTransfers = transferIndexGenerator.generateTransfers();
     }
 
     var transferCache = new RaptorRequestTransferCache(tuningParameters.transferCacheMaxSize());
@@ -102,6 +103,7 @@ public class TransitLayerMapper {
       stopIndex,
       transitModel.getTimeZone(),
       transferCache,
+      constrainedTransfers,
       transferIndexGenerator,
       createStopTransferCosts(stopIndex, tuningParameters)
     );

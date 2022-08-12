@@ -216,7 +216,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
         var pattern = route.pattern();
         var tripSearch = createTripSearch(route.timetable());
         var txSearch = enableTransferConstraints
-          ? calculator.transferConstraintsSearch(route)
+          ? calculator.transferConstraintsSearch(transitData, routeIndex)
           : null;
 
         int alightSlack = slackProvider.alightSlack(pattern.slackIndex());
