@@ -85,6 +85,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add walk safety to way property sets and walkSafetyFactor routing parameter [#4328](https://github.com/opentripplanner/OpenTripPlanner/pull/4328)
 - Remove unmaintained custom fare calculators for NYC, Seattle, SF Bay Area, Netherlands [#4273](https://github.com/opentripplanner/OpenTripPlanner/pull/4273)
 - Throw RoutingValidationException if origin and destination are the same [#4364](https://github.com/opentripplanner/OpenTripPlanner/pull/4364)
+- Improve SIRI updaters [#4363](https://github.com/opentripplanner/OpenTripPlanner/pull/4363)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
