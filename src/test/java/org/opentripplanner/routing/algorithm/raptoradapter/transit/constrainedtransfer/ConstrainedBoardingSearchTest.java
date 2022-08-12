@@ -23,7 +23,7 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestRouteData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -69,8 +69,8 @@ public class ConstrainedBoardingSearchTest {
 
   private TestRouteData route1;
   private TestRouteData route2;
-  private TripPatternWithRaptorStopIndexes pattern1;
-  private TripPatternWithRaptorStopIndexes pattern2;
+  private RoutingTripPattern pattern1;
+  private RoutingTripPattern pattern2;
 
   /**
    * Create transit data with 2 routes with a trip each.

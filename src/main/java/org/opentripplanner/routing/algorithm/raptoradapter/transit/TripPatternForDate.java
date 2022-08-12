@@ -22,7 +22,7 @@ public class TripPatternForDate {
    * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules. Its
    * TripSchedules remain unchanged.
    */
-  private final TripPatternWithRaptorStopIndexes tripPattern;
+  private final RoutingTripPattern tripPattern;
 
   /**
    * The filtered TripSchedules for only those trips in the TripPattern that are active on the given
@@ -52,7 +52,7 @@ public class TripPatternForDate {
   private final LocalDateTime endOfRunningPeriod;
 
   public TripPatternForDate(
-    TripPatternWithRaptorStopIndexes tripPattern,
+    RoutingTripPattern tripPattern,
     List<TripTimes> tripTimes,
     List<FrequencyEntry> frequencies,
     LocalDate localDate
@@ -101,7 +101,7 @@ public class TripPatternForDate {
     return frequencies;
   }
 
-  public TripPatternWithRaptorStopIndexes getTripPattern() {
+  public RoutingTripPattern getTripPattern() {
     return tripPattern;
   }
 

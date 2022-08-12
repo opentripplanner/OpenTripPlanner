@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ class RaptorRoutingRequestTransitDataCreator {
   ) {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
-    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
+    Map<RoutingTripPattern, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
     for (TripPatternForDate patternForDate : patternForDateList) {
       patternForDateByPattern
         .computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>())
@@ -94,7 +94,7 @@ class RaptorRoutingRequestTransitDataCreator {
 
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates
-    for (Map.Entry<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
+    for (Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
       // Sort by date. We can mutate the array, as it was created above in the grouping.
       List<TripPatternForDate> patternsSorted = patternEntry.getValue();
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
@@ -108,7 +108,7 @@ class RaptorRoutingRequestTransitDataCreator {
       }
 
       // Combine TripPatternForDate objects
-      final TripPatternWithRaptorStopIndexes tripPattern = patternEntry.getKey();
+      final RoutingTripPattern tripPattern = patternEntry.getKey();
 
       combinedList.add(
         new TripPatternForDates(

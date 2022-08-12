@@ -3,9 +3,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
@@ -31,7 +31,7 @@ public class TripPatternForDates
     RaptorTripPattern,
     TripSearchTimetable<TripSchedule> {
 
-  private final TripPatternWithRaptorStopIndexes tripPattern;
+  private final RoutingTripPattern tripPattern;
 
   private final TripPatternForDate[] tripPatternForDates;
 
@@ -63,7 +63,7 @@ public class TripPatternForDates
   private final BitSet alightingPossible;
 
   TripPatternForDates(
-    TripPatternWithRaptorStopIndexes tripPattern,
+    RoutingTripPattern tripPattern,
     List<TripPatternForDate> tripPatternForDates,
     List<Integer> offsets,
     BitSet boardingPossible,
@@ -106,7 +106,7 @@ public class TripPatternForDates
     }
   }
 
-  public TripPatternWithRaptorStopIndexes getTripPattern() {
+  public RoutingTripPattern getTripPattern() {
     return tripPattern;
   }
 

@@ -5,14 +5,13 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.reques
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -35,7 +34,7 @@ public class TestRouteData {
   private final Map<Trip, TripTimes> tripTimesByTrip = new HashMap<>();
   private final Map<Trip, TripSchedule> tripSchedulesByTrip = new HashMap<>();
   private final RaptorTimeTable<TripSchedule> timetable;
-  private final TripPatternWithRaptorStopIndexes raptorTripPattern;
+  private final RoutingTripPattern raptorTripPattern;
   private Trip currentTrip;
 
   public TestRouteData(String route, TransitMode mode, List<Stop> stops, String... times) {
@@ -55,7 +54,7 @@ public class TestRouteData {
       .collect(Collectors.toList());
 
     raptorTripPattern =
-      new TripPatternWithRaptorStopIndexes(
+      new RoutingTripPattern(
         TripPattern
           .of(TransitModelForTest.id("TP:" + route))
           .withRoute(this.route)
@@ -115,7 +114,7 @@ public class TestRouteData {
     return tripSchedulesByTrip.get(currentTrip);
   }
 
-  public TripPatternWithRaptorStopIndexes getRaptorTripPattern() {
+  public RoutingTripPattern getRaptorTripPattern() {
     return raptorTripPattern;
   }
 

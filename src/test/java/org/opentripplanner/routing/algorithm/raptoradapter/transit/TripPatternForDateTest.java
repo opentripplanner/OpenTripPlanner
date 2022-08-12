@@ -43,7 +43,7 @@ class TripPatternForDateTest {
       .withStopPattern(stopPattern)
       .build();
 
-    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(pattern);
+    RoutingTripPattern tripPattern = new RoutingTripPattern(pattern);
 
     var withFrequencies = new TripPatternForDate(
       tripPattern,

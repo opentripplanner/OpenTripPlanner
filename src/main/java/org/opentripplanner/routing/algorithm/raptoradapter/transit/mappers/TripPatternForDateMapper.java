@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -39,7 +39,7 @@ public class TripPatternForDateMapper {
 
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
 
-  private final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
+  private final Map<TripPattern, RoutingTripPattern> newTripPatternForOld;
 
   /**
    * @param serviceCodesRunningForDate - READ ONLY
@@ -47,7 +47,7 @@ public class TripPatternForDateMapper {
    */
   TripPatternForDateMapper(
     Map<LocalDate, TIntSet> serviceCodesRunningForDate,
-    Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld
+    Map<TripPattern, RoutingTripPattern> newTripPatternForOld
   ) {
     this.serviceCodesRunningForDate = Collections.unmodifiableMap(serviceCodesRunningForDate);
     this.newTripPatternForOld = Collections.unmodifiableMap(newTripPatternForOld);

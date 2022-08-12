@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-public class TripPatternWithRaptorStopIndexes {
+public class RoutingTripPattern {
 
   private final TripPattern pattern;
   private final int[] stopIndexes;
@@ -39,7 +39,7 @@ public class TripPatternWithRaptorStopIndexes {
    */
   private boolean sealedConstrainedTransfers = false;
 
-  public TripPatternWithRaptorStopIndexes(TripPattern pattern) {
+  public RoutingTripPattern(TripPattern pattern) {
     this.pattern = pattern;
     this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
 
@@ -119,7 +119,7 @@ public class TripPatternWithRaptorStopIndexes {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TripPatternWithRaptorStopIndexes that = (TripPatternWithRaptorStopIndexes) o;
+    RoutingTripPattern that = (RoutingTripPattern) o;
     return getId() == that.getId();
   }
 
@@ -160,7 +160,7 @@ public class TripPatternWithRaptorStopIndexes {
    * This method should be called AFTER all transfers are added, and before the pattern is used in a
    * Raptor search. This is done to protect against modification when processing real-time updates
    * <p>
-   * {@link TripPatternWithRaptorStopIndexes#sealedConstrainedTransfers}
+   * {@link RoutingTripPattern#sealedConstrainedTransfers}
    */
   public void sealConstrainedTransfers() {
     if (sealedConstrainedTransfers) {

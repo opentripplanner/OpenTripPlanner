@@ -15,8 +15,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -79,7 +79,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       .withStopPattern(stopPattern)
       .build();
 
-    var tripPattern = new TripPatternWithRaptorStopIndexes(pattern);
+    var tripPattern = new RoutingTripPattern(pattern);
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
@@ -523,7 +523,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       .withStopPattern(stopPattern)
       .build();
 
-    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(pattern);
+    RoutingTripPattern tripPattern = new RoutingTripPattern(pattern);
 
     TripTimes tripTimes = Mockito.mock(TripTimes.class);
 

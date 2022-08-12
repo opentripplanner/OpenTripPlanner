@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
@@ -71,7 +71,7 @@ public class TransitLayerMapper {
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
     StopModelIndex stopIndex;
-    Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
+    Map<TripPattern, RoutingTripPattern> newTripPatternForOld;
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
 
@@ -122,7 +122,7 @@ public class TransitLayerMapper {
    */
   private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns(
     Collection<TripPattern> allTripPatterns,
-    Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld
+    Map<TripPattern, RoutingTripPattern> newTripPatternForOld
   ) {
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
       transitModel.getTransitModelIndex().getServiceCodesRunningForDate(),

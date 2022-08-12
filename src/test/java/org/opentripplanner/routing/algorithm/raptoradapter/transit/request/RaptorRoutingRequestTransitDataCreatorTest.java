@@ -12,8 +12,8 @@ import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -49,9 +49,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
     // Total available trip patterns
-    TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, TP);
-    TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2, TP);
-    TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3, TP);
+    RoutingTripPattern tripPattern1 = new TripPatternWithId(TP_ID_1, TP);
+    RoutingTripPattern tripPattern2 = new TripPatternWithId(TP_ID_2, TP);
+    RoutingTripPattern tripPattern3 = new TripPatternWithId(TP_ID_3, TP);
 
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
@@ -144,10 +144,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     }
 
     @Override
-    public BitSet filterAvailableStops(
-      TripPatternWithRaptorStopIndexes tripPattern,
-      BitSet boardingPossible
-    ) {
+    public BitSet filterAvailableStops(RoutingTripPattern tripPattern, BitSet boardingPossible) {
       return boardingPossible;
     }
   }
