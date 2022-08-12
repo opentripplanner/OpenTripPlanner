@@ -8,8 +8,8 @@ public class TripPatternWithId extends TripPatternWithRaptorStopIndexes {
 
   private final FeedScopedId id;
 
-  public TripPatternWithId(FeedScopedId id, int[] stopIndexes, TripPattern originalTripPattern) {
-    super(originalTripPattern, stopIndexes);
+  public TripPatternWithId(FeedScopedId id, TripPattern originalTripPattern) {
+    super(originalTripPattern);
     this.id = id;
   }
 

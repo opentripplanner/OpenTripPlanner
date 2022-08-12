@@ -79,7 +79,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       .withStopPattern(stopPattern)
       .build();
 
-    var tripPattern = new TripPatternWithRaptorStopIndexes(pattern, new int[2]);
+    var tripPattern = new TripPatternWithRaptorStopIndexes(pattern);
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
@@ -523,10 +523,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       .withStopPattern(stopPattern)
       .build();
 
-    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
-      pattern,
-      new int[0]
-    );
+    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(pattern);
 
     TripTimes tripTimes = Mockito.mock(TripTimes.class);
 

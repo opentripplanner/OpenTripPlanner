@@ -8,6 +8,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
@@ -38,9 +39,9 @@ public class TripPatternWithRaptorStopIndexes {
    */
   private boolean sealedConstrainedTransfers = false;
 
-  public TripPatternWithRaptorStopIndexes(TripPattern pattern, int[] stopIndexes) {
+  public TripPatternWithRaptorStopIndexes(TripPattern pattern) {
     this.pattern = pattern;
-    this.stopIndexes = stopIndexes;
+    this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
 
     final int nStops = stopIndexes.length;
     boardingPossible = new BitSet(nStops);

@@ -48,12 +48,10 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
-    int[] stopIndexes = new int[] { 0, 1 };
-
     // Total available trip patterns
-    TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, stopIndexes, TP);
-    TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2, stopIndexes, TP);
-    TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3, stopIndexes, TP);
+    TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, TP);
+    TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2, TP);
+    TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3, TP);
 
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 

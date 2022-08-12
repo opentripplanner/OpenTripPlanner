@@ -60,8 +60,7 @@ public class TestRouteData {
           .of(TransitModelForTest.id("TP:" + route))
           .withRoute(this.route)
           .withStopPattern(new StopPattern(stopTimesFistTrip))
-          .build(),
-        stopIndexes(stopTimesFistTrip)
+          .build()
       );
     tripTimes.forEach(t -> raptorTripPattern.getPattern().add(t));
 
@@ -128,10 +127,6 @@ public class TestRouteData {
       }
     }
     throw new IllegalArgumentException();
-  }
-
-  int[] stopIndexes(Collection<StopTime> times) {
-    return times.stream().map(StopTime::getStop).mapToInt(StopLocation::getIndex).toArray();
   }
 
   private Trip parseTripInfo(
