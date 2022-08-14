@@ -37,7 +37,7 @@ public class RoutingServiceTest extends GtfsTest {
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex) {
         Stop stop = ((TransitStopVertex) vertex).getStop();
-        Vertex index_vertex = transitModel.getStopModel().getStopVertexForStop(stop);
+        Vertex index_vertex = graph.getStopVertexForStopId(stop.getId());
         assertEquals(index_vertex, vertex);
       }
     }
@@ -52,7 +52,7 @@ public class RoutingServiceTest extends GtfsTest {
     assertEquals("Fake Agency", agency.getName());
 
     /* Stops */
-    transitModel.getStopModel().getStopForId(new FeedScopedId("X", "Y"));
+    transitModel.getStopModel().getRegularTransitStopById(new FeedScopedId("X", "Y"));
     /* Trips */
     //        graph.index.tripForId;
     //        graph.index.routeForId;
@@ -90,12 +90,15 @@ public class RoutingServiceTest extends GtfsTest {
   @Test
   public void testSpatialIndex() {
     String feedId = transitModel.getFeedIds().iterator().next();
-    var stopJ = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "J"));
-    var stopL = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "L"));
-    var stopM = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "M"));
-    TransitStopVertex stopvJ = transitModel.getStopModel().getStopVertexForStop((Stop) stopJ);
-    TransitStopVertex stopvL = transitModel.getStopModel().getStopVertexForStop((Stop) stopL);
-    TransitStopVertex stopvM = transitModel.getStopModel().getStopVertexForStop((Stop) stopM);
+    FeedScopedId idJ = new FeedScopedId(feedId, "J");
+    var stopJ = transitModel.getStopModel().getRegularTransitStopById(idJ);
+    FeedScopedId idL = new FeedScopedId(feedId, "L");
+    var stopL = transitModel.getStopModel().getRegularTransitStopById(idL);
+    FeedScopedId idM = new FeedScopedId(feedId, "M");
+    var stopM = transitModel.getStopModel().getRegularTransitStopById(idM);
+    TransitStopVertex stopvJ = graph.getStopVertexForStopId(idJ);
+    TransitStopVertex stopvL = graph.getStopVertexForStopId(idL);
+    TransitStopVertex stopvM = graph.getStopVertexForStopId(idM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(

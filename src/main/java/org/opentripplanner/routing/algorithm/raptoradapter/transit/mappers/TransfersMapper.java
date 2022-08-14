@@ -12,6 +12,7 @@ class TransfersMapper {
 
   /**
    * Copy pre-calculated transfers from the original graph
+   * @return a list where each element is a list of transfers for the corresponding stop index
    */
   static List<List<Transfer>> mapTransfers(StopModel stopModel, TransitModel transitModel) {
     List<List<Transfer>> transferByStopIndex = new ArrayList<>();

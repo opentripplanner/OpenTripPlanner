@@ -275,7 +275,9 @@ public class TimetableSnapshotSourceTest {
 
     // THEN
     // Find new pattern in graph starting from stop A
-    var stopA = transitModel.getStopModel().getStopForId(new FeedScopedId(feedId, "A"));
+    var stopA = transitModel
+      .getStopModel()
+      .getRegularTransitStopById(new FeedScopedId(feedId, "A"));
     // Get trip pattern of last (most recently added) outgoing edge
     var snapshot = updater.getTimetableSnapshot();
     var patternsAtA = snapshot.getPatternsForStop(stopA);

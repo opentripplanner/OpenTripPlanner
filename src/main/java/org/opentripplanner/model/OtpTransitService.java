@@ -73,8 +73,10 @@ public interface OtpTransitService {
 
   Collection<BoardingArea> getAllBoardingAreas();
 
+  // TODO Rename this
   Collection<FlexStopLocation> getAllLocations();
 
+  // TODO Rename this
   Collection<FlexLocationGroup> getAllLocationGroups();
 
   /**

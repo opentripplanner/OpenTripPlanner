@@ -38,7 +38,9 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.standalone.config.api.TransitServicePeriod;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
@@ -248,6 +250,10 @@ public class Graph implements Serializable {
       .filter(cls::isInstance)
       .map(cls::cast)
       .collect(Collectors.toList());
+  }
+
+  public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+    return streetIndex.findTransitStopVertices(id);
   }
 
   /**

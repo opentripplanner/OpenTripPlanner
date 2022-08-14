@@ -47,16 +47,12 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TestHalfEdges {
-
-  //@Rule
-  //public final ExpectedException exception = ExpectedException.none();
 
   Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
@@ -167,22 +163,14 @@ public class TestHalfEdges {
         true
       );
 
-    Stop s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
+    var s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
+    var s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
-    Stop s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
+    stopModel.addStop(s1);
+    stopModel.addStop(s2);
 
-    station1 =
-      new TransitStopVertexBuilder()
-        .withGraph(graph)
-        .withStop(s1)
-        .withTransitModel(transitModel)
-        .build();
-    station2 =
-      new TransitStopVertexBuilder()
-        .withGraph(graph)
-        .withStop(s2)
-        .withTransitModel(transitModel)
-        .build();
+    station1 = new TransitStopVertexBuilder().withGraph(graph).withStop(s1).build();
+    station2 = new TransitStopVertexBuilder().withGraph(graph).withStop(s2).build();
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 

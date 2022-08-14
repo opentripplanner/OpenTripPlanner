@@ -263,20 +263,19 @@ public class TravelTimeResource {
       initialStates.add(new State(vertex, startTime, routingContext, stateData));
     }
 
-    for (int i = 0; i < graph.getStopModel().size(); i++) {
-      if (arrivals.reachedByTransit(i)) {
+    // TODO - Add a method to return all Stops, not StopLocations
+    for (StopLocation stopLocation : transitService.getAllStops()) {
+      int i = stopLocation.getIndex();
+      if ((stopLocation instanceof Stop stop) && arrivals.reachedByTransit(i)) {
         final int arrivalTime = arrivals.bestTransitArrivalTime(i);
-        StopLocation stopLocation = graph.getStopModel().stopByIndex(i);
-        if (stopLocation instanceof Stop stop) {
-          Vertex v = transitService.getStopVertexForStop(stop);
-          if (v != null) {
-            Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-            State s = new State(v, time, routingContext, stateData.clone());
-            s.weight = startTime.until(time, ChronoUnit.SECONDS);
-            // TODO: This shouldn't be overridden in state initialization
-            s.stateData.startTime = stateData.startTime;
-            initialStates.add(s);
-          }
+        Vertex v = graph.getStopVertexForStopId(stop.getId());
+        if (v != null) {
+          Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
+          State s = new State(v, time, routingContext, stateData.clone());
+          s.weight = startTime.until(time, ChronoUnit.SECONDS);
+          // TODO: This shouldn't be overridden in state initialization
+          s.stateData.startTime = stateData.startTime;
+          initialStates.add(s);
         }
       }
     }

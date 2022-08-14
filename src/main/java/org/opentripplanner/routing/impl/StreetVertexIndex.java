@@ -3,8 +3,10 @@ package org.opentripplanner.routing.impl;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -26,9 +28,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -46,11 +51,13 @@ import org.slf4j.LoggerFactory;
 public class StreetVertexIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndex.class);
-  private final Graph graph;
 
   private final StopModel stopModel;
 
   private final VertexLinker vertexLinker;
+
+  private final Map<FeedScopedId, TransitStopVertex> transitStopVertices;
+
   /**
    * Contains only instances of {@link StreetEdge}
    */
@@ -61,12 +68,12 @@ public class StreetVertexIndex {
    * Should only be called by the graph.
    */
   public StreetVertexIndex(Graph graph, StopModel stopModel) {
-    this.graph = graph;
     this.stopModel = stopModel;
-    edgeTree = new HashGridSpatialIndex<>();
-    verticesTree = new HashGridSpatialIndex<>();
-    vertexLinker = new VertexLinker(graph, stopModel);
-    postSetup();
+    this.edgeTree = new HashGridSpatialIndex<>();
+    this.verticesTree = new HashGridSpatialIndex<>();
+    this.vertexLinker = new VertexLinker(graph, stopModel);
+    this.transitStopVertices = filterTransitStopVertices(graph.getVertices());
+    postSetup(graph.getVertices());
   }
 
   /**
@@ -132,6 +139,10 @@ public class StreetVertexIndex {
     return vertexLinker;
   }
 
+  public TransitStopVertex findTransitStopVertices(FeedScopedId stopId) {
+    return transitStopVertices.get(stopId);
+  }
+
   /**
    * Returns the vertices intersecting with the specified envelope.
    */
@@ -194,7 +205,7 @@ public class StreetVertexIndex {
     } else {
       // Check if Stop/StopCollection is found by FeedScopeId
       if (location.stopId != null) {
-        Set<Vertex> transitStopVertices = stopModel.getStopVerticesById(location.stopId);
+        Set<Vertex> transitStopVertices = getStopVerticesById(location.stopId);
         if (transitStopVertices != null) {
           return transitStopVertices;
         }
@@ -207,6 +218,20 @@ public class StreetVertexIndex {
     }
 
     return null;
+  }
+
+  /**
+   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+   * @return The associated TransitStopVertex or all underlying TransitStopVertices
+   */
+  public Set<Vertex> getStopVerticesById(FeedScopedId id) {
+    return stopModel
+      .getStopsForId(id)
+      .stream()
+      .filter(Stop.class::isInstance)
+      .map(Stop.class::cast)
+      .map(it -> transitStopVertices.get(it.getId()))
+      .collect(Collectors.toSet());
   }
 
   @Override
@@ -383,11 +408,11 @@ public class StreetVertexIndex {
     return nonTransitMode;
   }
 
-  private void postSetup() {
-    var progress = ProgressTracker.track("Index street vertex", 1000, graph.getVertices().size());
+  private void postSetup(Collection<Vertex> vertices) {
+    var progress = ProgressTracker.track("Index street vertex", 1000, vertices.size());
     LOG.info(progress.startMessage());
 
-    for (Vertex gv : graph.getVertices()) {
+    for (Vertex gv : vertices) {
       /*
        * We add all edges with geometry, skipping transit, filtering them out after. We do not
        * index transit edges as we do not need them and some GTFS do not have shape data, so
@@ -408,5 +433,17 @@ public class StreetVertexIndex {
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
+  }
+
+  private static Map<FeedScopedId, TransitStopVertex> filterTransitStopVertices(
+    Collection<Vertex> vertices
+  ) {
+    return Map.copyOf(
+      vertices
+        .stream()
+        .filter(TransitStopVertex.class::isInstance)
+        .map(TransitStopVertex.class::cast)
+        .collect(Collectors.toMap(it -> it.getStop().getId(), it -> it))
+    );
   }
 }

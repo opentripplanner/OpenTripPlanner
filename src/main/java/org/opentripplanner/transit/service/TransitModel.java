@@ -379,10 +379,10 @@ public class TransitModel implements Serializable {
   }
 
   /**
-   * Finds a {@link StopLocation} by id.
+   * Return a transit stop, a flex stop location or flex stop location group.
    */
   public StopLocation getStopLocationById(FeedScopedId id) {
-    return stopModel.getStopForId(id);
+    return stopModel.getStopLocationById(id);
   }
 
   /**

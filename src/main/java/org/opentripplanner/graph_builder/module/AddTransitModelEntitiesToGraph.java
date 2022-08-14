@@ -91,6 +91,7 @@ public class AddTransitModelEntitiesToGraph {
   private void applyToGraph(Graph graph, TransitModel transitModel) {
     addStopsToGraphAndGenerateStopVertexes(graph, transitModel);
     addStationsToGraph(transitModel);
+    addStopsToGraph(transitModel);
     addMultiModalStationsToGraph(transitModel);
     addGroupsOfStationsToGraph(transitModel);
     addEntrancesToGraph(graph);
@@ -136,9 +137,9 @@ public class AddTransitModelEntitiesToGraph {
       TransitStopVertex stopVertex = new TransitStopVertexBuilder()
         .withStop(stop)
         .withGraph(graph)
-        .withTransitModel(transitModel)
         .withModes(modes)
         .build();
+
       if (modes != null && modes.contains(TransitMode.SUBWAY)) {
         stopVertex.setStreetToStopTime(subwayAccessTime);
       }
@@ -151,6 +152,12 @@ public class AddTransitModelEntitiesToGraph {
   private void addStationsToGraph(TransitModel transitModel) {
     for (Station station : otpTransitService.getAllStations()) {
       transitModel.getStopModel().addStation(station);
+    }
+  }
+
+  private void addStopsToGraph(TransitModel transitModel) {
+    for (Stop stop : otpTransitService.getAllStops()) {
+      transitModel.getStopModel().addStop(stop);
     }
   }
 
@@ -369,16 +376,16 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void addLocationsToGraph(TransitModel transitModel) {
-    for (FlexStopLocation flexStopLocation : otpTransitService.getAllLocations()) {
-      transitModel.getStopModel().addFlexLocation(flexStopLocation.getId(), flexStopLocation);
+    var stopModel = transitModel.getStopModel();
+    for (FlexStopLocation it : otpTransitService.getAllLocations()) {
+      stopModel.addFlexLocation(it);
     }
   }
 
   private void addLocationGroupsToGraph(TransitModel transitModel) {
-    for (FlexLocationGroup flexLocationGroup : otpTransitService.getAllLocationGroups()) {
-      transitModel
-        .getStopModel()
-        .addFlexLocationGroup(flexLocationGroup.getId(), flexLocationGroup);
+    var stopModel = transitModel.getStopModel();
+    for (FlexLocationGroup it : otpTransitService.getAllLocationGroups()) {
+      stopModel.addFlexLocationGroup(it);
     }
   }
 

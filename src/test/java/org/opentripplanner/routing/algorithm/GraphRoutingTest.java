@@ -238,14 +238,15 @@ public abstract class GraphRoutingTest {
     }
 
     public Stop stopEntity(String id, double latitude, double longitude) {
-      return TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+      var stop = TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+      transitModel.getStopModel().addStop(stop);
+      return stop;
     }
 
     public TransitStopVertex stop(String id, double latitude, double longitude) {
       return new TransitStopVertexBuilder()
         .withGraph(graph)
         .withStop(stopEntity(id, latitude, longitude))
-        .withTransitModel(transitModel)
         .build();
     }
 

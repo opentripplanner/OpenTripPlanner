@@ -29,7 +29,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -164,10 +163,10 @@ public class DefaultTransitService implements TransitEditorService {
       .getOrDefault(serviceDate, new TIntHashSet());
   }
 
-  /** {@link StopModel#getLocationById(FeedScopedId)} */
+  /** {@link StopModel#getFlexStopsById(FeedScopedId)} */
   @Override
   public FlexStopLocation getLocationById(FeedScopedId id) {
-    return this.transitModel.getStopModel().getLocationById(id);
+    return this.transitModel.getStopModel().getFlexStopsById(id);
   }
 
   /** {@link TransitModelIndex#getAgencyForId(FeedScopedId)} */
@@ -176,10 +175,10 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getAgencyForId(id);
   }
 
-  /** {@link StopModelIndex#getStopForId(FeedScopedId)} */
+  /** {@link StopModel#getRegularTransitStopById(FeedScopedId)} */
   @Override
   public StopLocation getStopForId(FeedScopedId id) {
-    return this.transitModel.getStopModel().getStopForId(id);
+    return this.transitModel.getStopModel().getRegularTransitStopById(id);
   }
 
   /** {@link TransitModelIndex#getRouteForId(FeedScopedId)} */
@@ -223,7 +222,7 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getOperatorForId().get(id);
   }
 
-  /** {@link StopModelIndex#getAllStops()} */
+  /** {@link StopModel#getAllStops()} */
   @Override
   public Collection<StopLocation> getAllStops() {
     return transitModel.getStopModel().getAllStops();
@@ -231,12 +230,12 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public StopLocation getStopLocationById(FeedScopedId id) {
-    return transitModel.getStopModel().getStopForId(id);
+    return transitModel.getStopModel().getRegularTransitStopById(id);
   }
 
   @Override
   public Collection<StopCollection> getAllStopCollections() {
-    return transitModel.getStopModel().getAllStopCollections().toList();
+    return transitModel.getStopModel().getAllStopCollections();
   }
 
   @Override
@@ -556,12 +555,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public ZonedDateTime getTransitServiceStarts() {
     return transitModel.getTransitServiceStarts();
-  }
-
-  /** {@link StopModelIndex#getStopVertexForStop(Stop)} */
-  @Override
-  public TransitStopVertex getStopVertexForStop(Stop stop) {
-    return transitModel.getStopModel().getStopVertexForStop(stop);
   }
 
   @Override

@@ -2,19 +2,14 @@ package org.opentripplanner.transit.service;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
@@ -26,6 +21,7 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.MedianCalcForDoubles;
+import org.opentripplanner.util.lang.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +32,8 @@ public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
 
-  /** Parent stops **/
+  private final Map<FeedScopedId, Stop> regularTransitStopById = new HashMap<>();
   private final Map<FeedScopedId, Station> stationById = new HashMap<>();
-  /**
-   * Optional level above parent stops (only supported in NeTEx)
-   */
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
   /**
    * Optional grouping that can contain both stations and multimodal stations (only supported in
@@ -48,14 +41,12 @@ public class StopModel implements Serializable {
    */
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
 
-  private final Map<FeedScopedId, TransitStopVertex> transitStopVertices = new HashMap<>();
-
   /** The density center of the graph for determining the initial geographic extent in the client. */
   private Coordinate center = null;
 
-  private final Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexStopLocation> flexStopsById = new HashMap<>();
 
-  private final Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexLocationGroup> flexStopGroupsById = new HashMap<>();
 
   private transient StopModelIndex index;
 
@@ -64,7 +55,8 @@ public class StopModel implements Serializable {
 
   public void index() {
     LOG.info("Index stop model...");
-    index = new StopModelIndex(this);
+    index =
+      new StopModelIndex(getAllStops(), multiModalStationById.values(), flexStopsById.values());
     LOG.info("Index stop model complete.");
   }
 
@@ -78,26 +70,6 @@ public class StopModel implements Serializable {
 
   /**
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
-   * @return The associated TransitStopVertex or all underlying TransitStopVertices
-   */
-  @Nullable
-  public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-    var stops = getStopsForId(id);
-
-    if (stops == null) {
-      return null;
-    }
-
-    return stops
-      .stream()
-      .filter(Stop.class::isInstance)
-      .map(Stop.class::cast)
-      .map(it -> getStopModelIndex().getStopVertexForStop(it))
-      .collect(Collectors.toSet());
-  }
-
-  /**
-   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The coordinate for the transit entity
    */
   @Nullable
@@ -107,100 +79,77 @@ public class StopModel implements Serializable {
     if (groupOfStations != null) {
       return groupOfStations.getCoordinate();
     }
-
     // Multimodal station
     MultiModalStation multiModalStation = multiModalStationById.get(id);
     if (multiModalStation != null) {
       return multiModalStation.getCoordinate();
     }
-
     // Station
     Station station = stationById.get(id);
     if (station != null) {
       return station.getCoordinate();
     }
-
-    // Single stop
-    var stop = getStopModelIndex().getStopForId(id);
-    if (stop != null) {
-      return stop.getCoordinate();
-    }
-
-    return null;
-  }
-
-  public Collection<MultiModalStation> getAllMultiModalStations() {
-    return multiModalStationById.values();
-  }
-
-  public Collection<TransitStopVertex> getAllStopVertices() {
-    return transitStopVertices.values();
+    // Single stop (regular transit and flex)
+    StopLocation stop = getStopLocationById(id);
+    return stop == null ? null : stop.getCoordinate();
   }
 
   public boolean hasFlexLocations() {
-    return !locationsById.isEmpty();
+    return !flexStopsById.isEmpty();
   }
 
-  public void addFlexLocation(FeedScopedId id, FlexStopLocation flexStopLocation) {
+  public void addFlexLocation(FlexStopLocation stop) {
     invalidateIndex();
-    locationsById.put(id, flexStopLocation);
+    flexStopsById.put(stop.getId(), stop);
   }
 
   public Collection<FlexStopLocation> getAllFlexLocations() {
-    return locationsById.values();
+    return flexStopsById.values();
   }
 
-  public Collection<FlexLocationGroup> getAllFlexLocationGroups() {
-    return locationGroupsById.values();
-  }
-
-  public void addFlexLocationGroup(FeedScopedId id, FlexLocationGroup flexLocationGroup) {
+  public void addFlexLocationGroup(FlexLocationGroup group) {
     invalidateIndex();
-    locationGroupsById.put(id, flexLocationGroup);
-  }
-
-  private Collection<StopLocation> getStopsForId(FeedScopedId id) {
-    // GroupOfStations
-    GroupOfStations groupOfStations = groupOfStationsById.get(id);
-    if (groupOfStations != null) {
-      return groupOfStations.getChildStops();
-    }
-
-    // Multimodal station
-    MultiModalStation multiModalStation = multiModalStationById.get(id);
-    if (multiModalStation != null) {
-      return multiModalStation.getChildStops();
-    }
-
-    // Station
-    Station station = stationById.get(id);
-    if (station != null) {
-      return station.getChildStops();
-    }
-    // Single stop
-    var stop = getStopModelIndex().getStopForId(id);
-    if (stop != null) {
-      return Collections.singleton(stop);
-    }
-
-    return null;
+    flexStopGroupsById.put(group.getId(), group);
   }
 
   /**
-   * Returns all {@link StopCollection}s present in this graph, including stations, group of
-   * stations and multimodal stations.
+   * Return all stops associated with the given id. All child stops are returned in case a Station,
+   * a MultiModalStation, or a GroupOfStations id found. If not regular transit stops, flex stop
+   * locations and flex location groups are search and a list with one item is returned if found.
+   * An empty list is if nothing is found.
+   * <p>
+   * TODO OTP2 - This method is use-case specific and only used in one place - refactor this,
+   *           - and remove the coupling between StopModel and Graph.
    */
-  public Stream<StopCollection> getAllStopCollections() {
-    return Stream.concat(
-      stationById.values().stream(),
-      Stream.concat(groupOfStationsById.values().stream(), multiModalStationById.values().stream())
+  public Collection<StopLocation> getStopsForId(FeedScopedId id) {
+    StopCollection stopCollection = getStopCollectionById(id);
+    if (stopCollection != null) {
+      return stopCollection.getChildStops();
+    }
+
+    // Single stop (regular transit and flex)
+    StopLocation stop = getStopLocationById(id);
+    return stop == null ? List.of() : List.of(stop);
+  }
+
+  /**
+   * Returns all {@link StopCollection}s present, including stations, group of stations and
+   * multimodal stations.
+   */
+  public Collection<StopCollection> getAllStopCollections() {
+    return new CollectionsView<>(
+      stationById.values(),
+      multiModalStationById.values(),
+      groupOfStationsById.values()
     );
   }
 
+  @Nullable
   public Station getStationById(FeedScopedId id) {
     return stationById.get(id);
   }
 
+  @Nullable
   public MultiModalStation getMultiModalStation(FeedScopedId id) {
     return multiModalStationById.get(id);
   }
@@ -210,30 +159,17 @@ public class StopModel implements Serializable {
   }
 
   /**
-   * Finds a {@link StopCollection} by id.
+   * Finds a {@link StopCollection} by id. Return a station, multimodal station, or group of
+   * station.
    */
+  @Nullable
   public StopCollection getStopCollectionById(FeedScopedId id) {
-    var station = stationById.get(id);
-    if (station != null) {
-      return station;
-    }
-
-    var groupOfStations = groupOfStationsById.get(id);
-    if (groupOfStations != null) {
-      return groupOfStations;
-    }
-
-    return multiModalStationById.get(id);
-  }
-
-  public void addTransitStopVertex(FeedScopedId id, TransitStopVertex stopVertex) {
-    invalidateIndex();
-    transitStopVertices.put(id, stopVertex);
+    return findById(id, stationById, multiModalStationById, groupOfStationsById);
   }
 
   /**
    * Calculates Transit center from median of coordinates of all transitStops if graph has transit.
-   * If it doesn't it isn't calculated. (mean walue of min, max latitude and longitudes are used)
+   * If it doesn't it isn't calculated. (mean value of min, max latitude and longitudes are used)
    * <p>
    * Transit center is saved in center variable
    * <p>
@@ -242,22 +178,24 @@ public class StopModel implements Serializable {
    * without a problem on New York State.
    */
   public void calculateTransitCenter() {
-    var vertices = getAllStopVertices();
+    var stops = getAllStops();
+
+    if (stops.isEmpty()) {
+      return;
+    }
 
     // we need this check because there could be only FlexStopLocations (which don't have vertices)
     // in the graph
-    if (!vertices.isEmpty()) {
-      var medianCalculator = new MedianCalcForDoubles(vertices.size());
+    var medianCalculator = new MedianCalcForDoubles(stops.size());
 
-      vertices.forEach(v -> medianCalculator.add(v.getLon()));
-      double lon = medianCalculator.median();
+    stops.forEach(v -> medianCalculator.add(v.getLon()));
+    double lon = medianCalculator.median();
 
-      medianCalculator.reset();
-      vertices.forEach(v -> medianCalculator.add(v.getLat()));
-      double lat = medianCalculator.median();
+    medianCalculator.reset();
+    stops.forEach(v -> medianCalculator.add(v.getLat()));
+    double lat = medianCalculator.median();
 
-      this.center = new Coordinate(lon, lat);
-    }
+    this.center = new Coordinate(lon, lat);
   }
 
   public Optional<Coordinate> getCenter() {
@@ -284,21 +222,19 @@ public class StopModel implements Serializable {
    * built
    */
   @Nullable
-  public FlexStopLocation getLocationById(FeedScopedId id) {
-    return locationsById.get(id);
-  }
-
-  public TransitStopVertex getStopVertexForStop(Stop stop) {
-    return getStopModelIndex().getStopVertexForStop(stop);
+  public FlexStopLocation getFlexStopsById(FeedScopedId id) {
+    return flexStopsById.get(id);
   }
 
   public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
     return getStopModelIndex().queryStopSpatialIndex(envelope);
   }
 
-  @Nullable
-  public StopLocation getStopForId(FeedScopedId id) {
-    return getStopModelIndex().getStopForId(id);
+  /**
+   * Return a regular transit stop if found(not flex stops).
+   */
+  public Stop getRegularTransitStopById(FeedScopedId id) {
+    return regularTransitStopById.get(id);
   }
 
   @Nullable
@@ -306,16 +242,37 @@ public class StopModel implements Serializable {
     return getStopModelIndex().getMultiModalStationForStation(station);
   }
 
+  /**
+   * Return all stops including regular transit stops, flex stops and flex group of stops.
+   */
   public Collection<StopLocation> getAllStops() {
-    return getStopModelIndex().getAllStops();
+    return new CollectionsView<>(
+      regularTransitStopById.values(),
+      flexStopsById.values(),
+      flexStopGroupsById.values()
+    );
+  }
+
+  /**
+   * Return regular transit stop, flex stop or flex group of stops.
+   */
+  @Nullable
+  public StopLocation getStopLocationById(FeedScopedId id) {
+    return findById(id, regularTransitStopById, flexStopsById, flexStopGroupsById);
+  }
+
+  public void addStop(Stop stop) {
+    invalidateIndex();
+    regularTransitStopById.put(stop.getId(), stop);
   }
 
   public StopLocation stopByIndex(int index) {
     return getStopModelIndex().stopByIndex(index);
   }
 
+  // TODO rename to stopIndexSize
   public int size() {
-    return getStopModelIndex().size();
+    return getStopModelIndex().stopIndexSize();
   }
 
   public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
@@ -324,5 +281,17 @@ public class StopModel implements Serializable {
 
   private void invalidateIndex() {
     this.index = null;
+  }
+
+  @Nullable
+  @SafeVarargs
+  private static <V> V findById(FeedScopedId id, Map<FeedScopedId, ? extends V>... maps) {
+    for (Map<FeedScopedId, ? extends V> map : maps) {
+      V v = map.get(id);
+      if (v != null) {
+        return v;
+      }
+    }
+    return null;
   }
 }

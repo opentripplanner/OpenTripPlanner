@@ -1,15 +1,10 @@
 package org.opentripplanner.transit.service;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
@@ -29,78 +24,50 @@ class StopModelIndex {
 
   // TODO: consistently key on model object or id string
 
-  private final Map<Stop, TransitStopVertex> stopVertexForStop = new HashMap<>();
   private final HashGridSpatialIndex<Stop> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
-  private final Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
   private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
-  private final Map<FeedScopedId, StopLocation> stopForId = new HashMap<>();
   private final StopLocation[] stopsByIndex;
 
-  public StopModelIndex(StopModel stopModel) {
-    LOG.info("StopModelIndex init...");
-
+  /**
+   * @param stops All stops including regular transit and flex
+   */
+  public StopModelIndex(
+    Collection<StopLocation> stops,
+    Collection<MultiModalStation> multiModalStations,
+    Collection<FlexStopLocation> flexStopLocations
+  ) {
     stopsByIndex = new StopLocation[StopLocation.indexCounter()];
 
-    /* We will keep a separate set of all vertices in case some have the same label.
-     * Maybe we should just guarantee unique labels. */
-    for (TransitStopVertex stopVertex : stopModel.getAllStopVertices()) {
-      Stop stop = stopVertex.getStop();
-      stopForId.put(stop.getId(), stop);
-      stopVertexForStop.put(stop, stopVertex);
-      stopsByIndex[stop.getIndex()] = stop;
-    }
-    for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
-      Envelope envelope = new Envelope(stopVertex.getCoordinate());
-      stopSpatialIndex.insert(envelope, stopVertex.getStop());
+    for (StopLocation it : stops) {
+      Envelope envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
+      stopSpatialIndex.insert(envelope, it);
+      stopsByIndex[it.getIndex()] = it;
     }
 
-    for (MultiModalStation multiModalStation : stopModel.getAllMultiModalStations()) {
-      for (Station childStation : multiModalStation.getChildStations()) {
-        multiModalStationForStations.put(childStation, multiModalStation);
+    for (MultiModalStation it : multiModalStations) {
+      for (Station childStation : it.getChildStations()) {
+        multiModalStationForStations.put(childStation, it);
       }
     }
-    for (FlexLocationGroup flexLocationGroup : stopModel.getAllFlexLocationGroups()) {
-      for (StopLocation stop : flexLocationGroup.getLocations()) {
-        locationGroupsByStop.put(stop, flexLocationGroup);
-      }
-      stopForId.put(flexLocationGroup.getId(), flexLocationGroup);
-      stopsByIndex[flexLocationGroup.getIndex()] = flexLocationGroup;
+    for (FlexStopLocation it : flexStopLocations) {
+      locationIndex.insert(it.getGeometry().getEnvelopeInternal(), it);
     }
-    for (FlexStopLocation flexStopLocation : stopModel.getAllFlexLocations()) {
-      locationIndex.insert(flexStopLocation.getGeometry().getEnvelopeInternal(), flexStopLocation);
-      stopForId.put(flexStopLocation.getId(), flexStopLocation);
-      stopsByIndex[flexStopLocation.getIndex()] = flexStopLocation;
-    }
-
-    LOG.info("StopModelIndex init complete.");
-  }
-
-  public TransitStopVertex getStopVertexForStop(Stop stop) {
-    return stopVertexForStop.get(stop);
   }
 
   public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
     return stopSpatialIndex.query(envelope);
   }
 
-  public StopLocation getStopForId(FeedScopedId id) {
-    return stopForId.get(id);
-  }
-
   public MultiModalStation getMultiModalStationForStation(Station station) {
     return multiModalStationForStations.get(station);
-  }
-
-  public Collection<StopLocation> getAllStops() {
-    return stopForId.values();
   }
 
   public StopLocation stopByIndex(int index) {
     return stopsByIndex[index];
   }
 
-  public int size() {
+  public int stopIndexSize() {
     return stopsByIndex.length;
   }
 

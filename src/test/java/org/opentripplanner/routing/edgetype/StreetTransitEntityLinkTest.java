@@ -90,7 +90,6 @@ class StreetTransitEntityLinkTest {
     var to = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(stop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 

@@ -23,7 +23,6 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -74,11 +73,7 @@ public interface TransitService {
 
   TIntSet getServiceCodesRunningForDate(LocalDate date);
 
-  FlexStopLocation getLocationById(FeedScopedId id);
-
   Agency getAgencyForId(FeedScopedId id);
-
-  StopLocation getStopForId(FeedScopedId id);
 
   Route getRouteForId(FeedScopedId id);
 
@@ -94,6 +89,8 @@ public interface TransitService {
 
   Operator getOperatorForId(FeedScopedId id);
 
+  StopLocation getStopForId(FeedScopedId id);
+
   Collection<StopLocation> getAllStops();
 
   StopLocation getStopLocationById(FeedScopedId parseId);
@@ -101,6 +98,8 @@ public interface TransitService {
   Collection<StopCollection> getAllStopCollections();
 
   StopCollection getStopCollectionById(FeedScopedId id);
+
+  FlexStopLocation getLocationById(FeedScopedId id);
 
   Trip getTripForId(FeedScopedId id);
 
@@ -177,8 +176,6 @@ public interface TransitService {
   ZonedDateTime getTransitServiceEnds();
 
   ZonedDateTime getTransitServiceStarts();
-
-  TransitStopVertex getStopVertexForStop(Stop stop);
 
   Optional<Coordinate> getCenter();
 
