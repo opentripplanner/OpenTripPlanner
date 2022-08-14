@@ -1,4 +1,4 @@
-package org.opentripplanner.model.impl;
+package org.opentripplanner.transit.model.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,10 +8,6 @@ import java.util.Collections;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitBuilder;
 
 public class EntityByIdTest {
 
