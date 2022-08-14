@@ -188,7 +188,7 @@ public class IndexAPI {
   ) {
     /* When no parameters are supplied, return all stops. */
     if (uriInfo.getQueryParameters().isEmpty()) {
-      return StopMapper.mapToApiShort(transitService().getAllStops());
+      return StopMapper.mapToApiShort(transitService().getAllStopsLocations());
     }
 
     /* If any of the circle parameters are specified, expect a circle not a box. */

@@ -79,7 +79,7 @@ public class RoutingServiceTest extends GtfsTest {
         assertEquals(pattern.getRoute(), route);
       }
     }
-    for (var stop : transitModel.getStopModel().getAllStops()) {
+    for (var stop : transitModel.getStopModel().getAllStopLocations()) {
       for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");

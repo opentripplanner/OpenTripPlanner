@@ -110,7 +110,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getNoticesByElement()} */
   @Override
-  public Collection<Notice> getNoticesByEntity(TransitEntity entity) {
+  public Collection<Notice> getNoticesByEntity(TransitEntity<?, ?> entity) {
     return this.transitModel.getNoticesByElement().get(entity);
   }
 
@@ -222,9 +222,14 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getOperatorForId().get(id);
   }
 
-  /** {@link StopModel#getAllStops()} */
+  /** {@link StopModel#getAllStopLocations()} */
   @Override
-  public Collection<StopLocation> getAllStops() {
+  public Collection<StopLocation> getAllStopsLocations() {
+    return transitModel.getStopModel().getAllStopLocations();
+  }
+
+  @Override
+  public Collection<Stop> getAllStops() {
     return transitModel.getStopModel().getAllStops();
   }
 

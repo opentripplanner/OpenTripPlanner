@@ -992,7 +992,6 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsArgs(environment.getArguments());
 
-      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
       if (args.getLegacyGraphQLIds() != null) {
@@ -1003,7 +1002,7 @@ public class LegacyGraphQLQueryTypeImpl
           .collect(Collectors.toList());
       }
 
-      var stopStream = transitService.getAllStops().stream();
+      var stopStream = transitService.getAllStopsLocations().stream();
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());

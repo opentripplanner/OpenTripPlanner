@@ -56,7 +56,13 @@ public class StopModel implements Serializable {
   public void index() {
     LOG.info("Index stop model...");
     index =
-      new StopModelIndex(getAllStops(), multiModalStationById.values(), flexStopsById.values());
+      new StopModelIndex(
+        regularTransitStopById.values(),
+        flexStopsById.values(),
+        flexStopGroupsById.values(),
+        multiModalStationById.values(),
+        flexStopsById.values()
+      );
     LOG.info("Index stop model complete.");
   }
 
@@ -178,7 +184,7 @@ public class StopModel implements Serializable {
    * without a problem on New York State.
    */
   public void calculateTransitCenter() {
-    var stops = getAllStops();
+    var stops = getAllStopLocations();
 
     if (stops.isEmpty()) {
       return;
@@ -245,12 +251,19 @@ public class StopModel implements Serializable {
   /**
    * Return all stops including regular transit stops, flex stops and flex group of stops.
    */
-  public Collection<StopLocation> getAllStops() {
+  public Collection<StopLocation> getAllStopLocations() {
     return new CollectionsView<>(
       regularTransitStopById.values(),
       flexStopsById.values(),
       flexStopGroupsById.values()
     );
+  }
+
+  /**
+   * Return all regular transit stops, not flex stops and flex group of stops.
+   */
+  public Collection<Stop> getAllStops() {
+    return regularTransitStopById.values();
   }
 
   /**

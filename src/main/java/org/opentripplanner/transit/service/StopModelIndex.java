@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.lang.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +35,16 @@ class StopModelIndex {
    * @param stops All stops including regular transit and flex
    */
   public StopModelIndex(
-    Collection<StopLocation> stops,
+    Collection<Stop> stops,
+    Collection<FlexStopLocation> flexStops,
+    Collection<FlexLocationGroup> flexLocationGroups,
     Collection<MultiModalStation> multiModalStations,
     Collection<FlexStopLocation> flexStopLocations
   ) {
     stopsByIndex = new StopLocation[StopLocation.indexCounter()];
 
-    for (StopLocation it : stops) {
+    var allStops = new CollectionsView<StopLocation>(stops, flexStops, flexLocationGroups);
+    for (StopLocation it : allStops) {
       Envelope envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
       stopSpatialIndex.insert(envelope, it);
       stopsByIndex[it.getIndex()] = it;

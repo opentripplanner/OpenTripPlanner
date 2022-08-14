@@ -55,7 +55,7 @@ public interface TransitService {
 
   Collection<Operator> getOperators();
 
-  Collection<Notice> getNoticesByEntity(TransitEntity entity);
+  Collection<Notice> getNoticesByEntity(TransitEntity<?, ?> entity);
 
   TripPattern getTripPatternForId(FeedScopedId id);
 
@@ -91,7 +91,9 @@ public interface TransitService {
 
   StopLocation getStopForId(FeedScopedId id);
 
-  Collection<StopLocation> getAllStops();
+  Collection<StopLocation> getAllStopsLocations();
+
+  Collection<Stop> getAllStops();
 
   StopLocation getStopLocationById(FeedScopedId parseId);
 

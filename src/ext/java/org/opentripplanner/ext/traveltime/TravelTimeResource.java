@@ -65,7 +65,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -264,10 +263,10 @@ public class TravelTimeResource {
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
-    for (StopLocation stopLocation : transitService.getAllStops()) {
-      int i = stopLocation.getIndex();
-      if ((stopLocation instanceof Stop stop) && arrivals.reachedByTransit(i)) {
-        final int arrivalTime = arrivals.bestTransitArrivalTime(i);
+    for (Stop stop : transitService.getAllStops()) {
+      int index = stop.getIndex();
+      if (arrivals.reachedByTransit(index)) {
+        final int arrivalTime = arrivals.bestTransitArrivalTime(index);
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
