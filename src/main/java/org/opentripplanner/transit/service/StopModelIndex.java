@@ -12,8 +12,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.lang.CollectionsView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Indexed access to Stop entities.
@@ -21,10 +19,6 @@ import org.slf4j.LoggerFactory;
  * They are rebuilt at runtime after graph deserialization.
  */
 class StopModelIndex {
-
-  private static final Logger LOG = LoggerFactory.getLogger(StopModelIndex.class);
-
-  // TODO: consistently key on model object or id string
 
   private final HashGridSpatialIndex<Stop> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();

@@ -202,7 +202,7 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return new DirectGraphFinder(serverContext.graph())
+      return new DirectGraphFinder(serverContext.transitService()::queryStopSpatialIndex)
         .findClosestStops(lat, lon, radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))

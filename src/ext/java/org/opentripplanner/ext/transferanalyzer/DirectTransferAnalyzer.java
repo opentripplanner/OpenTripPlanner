@@ -68,7 +68,9 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     List<TransferInfo> directTransfersTooLong = new ArrayList<>();
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
-    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(graph);
+    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
+      transitModel.getStopModel()::queryStopSpatialIndex
+    );
     StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 
     int stopsAnalyzed = 0;
@@ -99,15 +101,15 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       List<Stop> stopsConnected = stopsEuclidean
         .keySet()
         .stream()
-        .filter(t -> stopsStreets.keySet().contains(t) && t != originStop)
-        .collect(Collectors.toList());
+        .filter(t -> stopsStreets.containsKey(t) && t != originStop)
+        .toList();
 
       /* Get stops found by euclidean search but not street search */
       List<Stop> stopsUnconnected = stopsEuclidean
         .keySet()
         .stream()
-        .filter(t -> !stopsStreets.keySet().contains(t) && t != originStop)
-        .collect(Collectors.toList());
+        .filter(t -> !stopsStreets.containsKey(t) && t != originStop)
+        .toList();
 
       for (Stop destStop : stopsConnected) {
         NearbyStop euclideanStop = stopsEuclidean.get(destStop);
