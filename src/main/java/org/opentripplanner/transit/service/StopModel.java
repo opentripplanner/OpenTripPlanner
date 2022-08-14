@@ -65,6 +65,10 @@ public class StopModel implements Serializable {
     this.flexStopGroupsById = builder.flexStopGroupsById().asImmutableMap();
   }
 
+  public static StopModelBuilder of() {
+    return new StopModelBuilder();
+  }
+
   public void index() {
     LOG.info("Index stop model...");
     index =
