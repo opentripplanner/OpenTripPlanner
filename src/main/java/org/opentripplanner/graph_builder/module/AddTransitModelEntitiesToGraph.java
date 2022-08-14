@@ -377,14 +377,14 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addLocationsToGraph(TransitModel transitModel) {
     var stopModel = transitModel.getStopModel();
-    for (FlexStopLocation it : otpTransitService.getAllLocations()) {
+    for (FlexStopLocation it : otpTransitService.getAllFlexStopLocations()) {
       stopModel.addFlexLocation(it);
     }
   }
 
   private void addLocationGroupsToGraph(TransitModel transitModel) {
     var stopModel = transitModel.getStopModel();
-    for (FlexLocationGroup it : otpTransitService.getAllLocationGroups()) {
+    for (FlexLocationGroup it : otpTransitService.getAllFlexLocationGroups()) {
       stopModel.addFlexLocationGroup(it);
     }
   }

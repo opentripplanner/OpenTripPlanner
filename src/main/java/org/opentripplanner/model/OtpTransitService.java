@@ -74,10 +74,10 @@ public interface OtpTransitService {
   Collection<BoardingArea> getAllBoardingAreas();
 
   // TODO Rename this
-  Collection<FlexStopLocation> getAllLocations();
+  Collection<FlexStopLocation> getAllFlexStopLocations();
 
   // TODO Rename this
-  Collection<FlexLocationGroup> getAllLocationGroups();
+  Collection<FlexLocationGroup> getAllFlexLocationGroups();
 
   /**
    * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link

@@ -206,12 +206,12 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Collection<FlexStopLocation> getAllLocations() {
+  public Collection<FlexStopLocation> getAllFlexStopLocations() {
     return immutableList(locationsById.values());
   }
 
   @Override
-  public Collection<FlexLocationGroup> getAllLocationGroups() {
+  public Collection<FlexLocationGroup> getAllFlexLocationGroups() {
     return immutableList(locationGroupsById.values());
   }
 
