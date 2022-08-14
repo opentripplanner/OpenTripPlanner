@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
@@ -97,11 +97,13 @@ public class ToStringBuilderTest {
     var trip = TransitModelForTest.trip("1").build();
     assertEquals(
       "ToStringBuilderTest{tripId: F:1}",
-      subject().addObjOp("tripId", trip, TransitEntity::getId).toString()
+      subject().addObjOp("tripId", trip, AbstractTransitEntity::getId).toString()
     );
     assertEquals(
       "ToStringBuilderTest{}",
-      subject().addObjOp("tripId", (TransitEntity<?, ?>) null, TransitEntity::getId).toString()
+      subject()
+        .addObjOp("tripId", (AbstractTransitEntity<?, ?>) null, AbstractTransitEntity::getId)
+        .toString()
     );
   }
 

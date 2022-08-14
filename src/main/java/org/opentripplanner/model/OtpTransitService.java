@@ -6,8 +6,8 @@ import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -48,7 +48,7 @@ public interface OtpTransitService {
    * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
    * any type (Serializable).
    */
-  Multimap<TransitEntity, Notice> getNoticeAssignments();
+  Multimap<AbstractTransitEntity, Notice> getNoticeAssignments();
 
   Collection<Pathway> getAllPathways();
 

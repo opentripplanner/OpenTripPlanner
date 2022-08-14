@@ -16,8 +16,8 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -58,7 +58,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<MultiModalStation> multiModalStations;
 
-  private final ImmutableListMultimap<TransitEntity, Notice> noticeAssignments;
+  private final ImmutableListMultimap<AbstractTransitEntity, Notice> noticeAssignments;
 
   private final Collection<Pathway> pathways;
 
@@ -147,7 +147,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
    * since some entities have String, while other have FeedScopeId ids.
    */
   @Override
-  public Multimap<TransitEntity, Notice> getNoticeAssignments() {
+  public Multimap<AbstractTransitEntity, Notice> getNoticeAssignments() {
     return noticeAssignments;
   }
 

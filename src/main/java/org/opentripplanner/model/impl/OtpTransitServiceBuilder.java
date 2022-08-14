@@ -22,8 +22,8 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -70,7 +70,7 @@ public class OtpTransitServiceBuilder {
 
   private final EntityById<MultiModalStation> multiModalStationsById = new EntityById<>();
 
-  private final Multimap<TransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
 
   private final EntityById<Operator> operatorsById = new EntityById<>();
 
@@ -152,7 +152,7 @@ public class OtpTransitServiceBuilder {
    * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable).
    * Entities that might have Notices are Routes, Trips, Stops and StopTimes.
    */
-  public Multimap<TransitEntity, Notice> getNoticeAssignments() {
+  public Multimap<AbstractTransitEntity, Notice> getNoticeAssignments() {
     return noticeAssignments;
   }
 

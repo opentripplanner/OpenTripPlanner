@@ -38,9 +38,9 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -64,7 +64,7 @@ public class TransitModel implements Serializable {
   private final Collection<String> feedIds = new HashSet<>();
   private final Map<String, FeedInfo> feedInfoForId = new HashMap<>();
 
-  private final Multimap<TransitEntity, Notice> noticesByElement = HashMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticesByElement = HashMultimap.create();
   private final DefaultTransferService transferService = new DefaultTransferService();
 
   private final HashSet<TransitMode> transitModes = new HashSet<>();
@@ -353,13 +353,13 @@ public class TransitModel implements Serializable {
   /**
    * Allows a notice element to be attached to an object in the OTP model by its id and then
    * retrieved by the API when navigating from that object. The map key is entity id:
-   * {@link TransitEntity#getId()}. The notice is part of the static transit data.
+   * {@link AbstractTransitEntity#getId()}. The notice is part of the static transit data.
    */
-  public Multimap<TransitEntity, Notice> getNoticesByElement() {
+  public Multimap<AbstractTransitEntity, Notice> getNoticesByElement() {
     return noticesByElement;
   }
 
-  public void addNoticeAssignments(Multimap<TransitEntity, Notice> noticesByElement) {
+  public void addNoticeAssignments(Multimap<AbstractTransitEntity, Notice> noticesByElement) {
     this.noticesByElement.putAll(noticesByElement);
   }
 

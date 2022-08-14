@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 public class EntityByIdTest {
 
@@ -63,7 +63,7 @@ public class EntityByIdTest {
     assertFalse(subject.containsKey(FAKE_ID));
   }
 
-  private static class TestEntity extends TransitEntity<TestEntity, TestEntityBuilder> {
+  private static class TestEntity extends AbstractTransitEntity<TestEntity, TestEntityBuilder> {
 
     TestEntity(FeedScopedId id) {
       super(id);

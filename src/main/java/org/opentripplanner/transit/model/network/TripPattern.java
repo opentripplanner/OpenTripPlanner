@@ -15,8 +15,8 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * JourneyPattern id is used.
  */
 public final class TripPattern
-  extends TransitEntity<TripPattern, TripPatternBuilder>
+  extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
   implements Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);

@@ -3,8 +3,8 @@ package org.opentripplanner.transit.model.site;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * Equal to GTFS zone_id or NeTEx TariffZone.
@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity;
  * TODO This should at some point be connected to Agency or Operator. Currently is is up to the
  *      user to make this connection (based on TariffZone id).
  */
-public class FareZone extends TransitEntity<FareZone, FareZoneBuilder> {
+public class FareZone extends AbstractTransitEntity<FareZone, FareZoneBuilder> {
 
   private final String name;
 

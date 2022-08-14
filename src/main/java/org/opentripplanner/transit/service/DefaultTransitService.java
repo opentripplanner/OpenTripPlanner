@@ -31,8 +31,8 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -110,7 +110,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   /** {@link TransitModel#getNoticesByElement()} */
   @Override
-  public Collection<Notice> getNoticesByEntity(TransitEntity<?, ?> entity) {
+  public Collection<Notice> getNoticesByEntity(AbstractTransitEntity<?, ?> entity) {
     return this.transitModel.getNoticesByElement().get(entity);
   }
 

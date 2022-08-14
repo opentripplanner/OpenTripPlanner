@@ -7,8 +7,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * A grouping that can contain a mix of Stations and MultiModalStations. It can be used to link
@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity;
  * stops that naturally belong together.
  */
 public class GroupOfStations
-  extends TransitEntity<GroupOfStations, GroupOfStationsBuilder>
+  extends AbstractTransitEntity<GroupOfStations, GroupOfStationsBuilder>
   implements StopCollection {
 
   private final Set<StopCollection> childStations;

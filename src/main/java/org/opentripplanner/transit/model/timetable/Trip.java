@@ -11,15 +11,15 @@ import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.lang.StringUtils;
 
-public final class Trip extends TransitEntity<Trip, TripBuilder> implements LogInfo {
+public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
   private final Operator operator;
   private final Route route;
