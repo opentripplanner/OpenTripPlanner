@@ -45,6 +45,13 @@ public class EntityById<E extends TransitEntity> {
     return map.size();
   }
 
+  /**
+   * Returns {@code true} if there are no entries in the map.
+   */
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
   public boolean containsKey(FeedScopedId id) {
     return map.containsKey(id);
   }

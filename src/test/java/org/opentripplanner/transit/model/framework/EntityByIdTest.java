@@ -46,6 +46,20 @@ public class EntityByIdTest {
   }
 
   @Test
+  public void size() {
+    assertEquals(0, subject.size());
+    subject.add(E);
+    assertEquals(1, subject.size());
+  }
+
+  @Test
+  public void isEmpty() {
+    assertTrue(subject.isEmpty());
+    subject.add(E);
+    assertFalse(subject.isEmpty());
+  }
+
+  @Test
   public void asImmutableMap() {
     subject.add(E);
     assertEquals(E_TO_STRING, subject.get(ID).toString());
