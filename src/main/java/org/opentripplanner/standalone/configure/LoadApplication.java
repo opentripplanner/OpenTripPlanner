@@ -10,7 +10,7 @@ import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This class is responsible for loading configuration and setting up the OTP data store.
- * This is used to load any graphs and finally this class can create the
+ * This is used to load the graph, and finally this class can create the
  * {@link ConstructApplication} for the next phase.
  * <p>
  * By splitting the these two responsibilities into two separate phases we are sure all
