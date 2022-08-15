@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.site.PathwayNode;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * Methods for accessing imported entities.
@@ -39,6 +40,9 @@ public interface OtpTransitService {
   Collection<Operator> getAllOperators();
 
   Collection<FeedInfo> getAllFeedInfos();
+
+  StopModel stopModel();
+
 
   Collection<GroupOfStations> getAllGroupsOfStations();
 

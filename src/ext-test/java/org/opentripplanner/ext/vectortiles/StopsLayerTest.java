@@ -26,8 +26,7 @@ public class StopsLayerTest {
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
     transitModel.index();
     var transitService = new DefaultTransitService(transitModel);
 

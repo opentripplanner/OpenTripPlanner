@@ -95,7 +95,6 @@ class StopModelTest {
   @Test
   void testStopGroup() {
     var m = StopModel.of().withFlexStopGroup(STOP_GROUP).build();
-    assertEquals(STOP_GROUP, m.getStopLocationById(ID));
     assertEquals("[FlexLocationGroup{F:A}]", m.getAllFlexStopGroups().toString());
     assertEquals("[FlexLocationGroup{F:A}]", m.getAllStopLocations().toString());
     assertEquals(STOP_GROUP, m.stopByIndex(STOP_GROUP.getIndex()));

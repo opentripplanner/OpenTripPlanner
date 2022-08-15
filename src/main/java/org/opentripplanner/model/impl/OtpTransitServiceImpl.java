@@ -114,6 +114,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
     return feedInfos;
   }
 
+  @Override
   public StopModel stopModel() {
     return stopModel;
   }

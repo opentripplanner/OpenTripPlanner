@@ -450,12 +450,19 @@ public class TransitModel implements Serializable {
     return hasTransit;
   }
 
+  private void updateHasTransit(boolean hasTransit) {
+    this.hasTransit = this.hasTransit || hasTransit;
+  }
+
   public void setTransitLayerUpdater(TransitLayerUpdater transitLayerUpdater) {
     this.transitLayerUpdater = transitLayerUpdater;
   }
 
-  private void updateHasTransit(boolean hasTransit) {
-    this.hasTransit = this.hasTransit || hasTransit;
+  /**
+   * Updating the stop model is only allowed during graph build
+   */
+  public void mergeStopModels(StopModel newStopModel) {
+    this.stopModel = this.stopModel.copy().addAll(newStopModel).build();
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {

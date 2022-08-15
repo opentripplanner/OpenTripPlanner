@@ -67,6 +67,10 @@ public class StopModel implements Serializable {
     return new StopModelBuilder();
   }
 
+  public StopModelBuilder copy() {
+    return new StopModelBuilder(this);
+  }
+
   public void index() {
     LOG.info("Index stop model...");
     index =

@@ -81,6 +81,20 @@ public class StopModelBuilder {
   }
 
   /**
+   * Add the content of another stop model. There are no collision check, entities in the given
+   * {@code other} model, will replace existing entities.
+   */
+  public StopModelBuilder addAll(StopModel other) {
+    stopsById.addAll(other.getAllStops());
+    stationById.addAll(other.getStations());
+    multiModalStationById.addAll(other.getAllMultiModalStations());
+    groupOfStationsById.addAll(other.getAllGroupOfStations());
+    flexStopsById.addAll(other.getAllFlexLocations());
+    flexStopGroupsById.addAll(other.getAllFlexStopGroups());
+    return this;
+  }
+
+  /**
    * Calculates Transit center from median of coordinates of all transitStops if graph has transit.
    * If it doesn't it isn't calculated. (mean value of min, max latitude and longitudes are used)
    * <p>
@@ -113,16 +127,6 @@ public class StopModelBuilder {
     double lat = medianCalculator.median();
 
     return new WgsCoordinate(lat, lon);
-  }
-
-  public StopModelBuilder addAll(StopModel stopModel) {
-    stopsById.addAll(stopModel.getAllStops());
-    stationById.addAll(stopModel.getStations());
-    multiModalStationById.addAll(stopModel.getAllMultiModalStations());
-    groupOfStationsById.addAll(stopModel.getAllGroupOfStations());
-    flexStopsById.addAll(stopModel.getAllFlexLocations());
-    flexStopGroupsById.addAll(stopModel.getAllFlexStopGroups());
-    return this;
   }
 
   public StopModel build() {

@@ -72,9 +72,8 @@ public class TestHalfEdges {
   @BeforeEach
   public void setUp() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    transitModel = new TransitModel(new StopModel(), deduplicator);
     // a 0.1 degree x 0.1 degree square
     tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
     tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
@@ -166,8 +165,8 @@ public class TestHalfEdges {
     var s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
     var s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
-    stopModel.addStop(s1);
-    stopModel.addStop(s2);
+    transitModel.getStopModel().addStop(s1);
+    transitModel.getStopModel().addStop(s2);
 
     station1 = new TransitStopVertexBuilder().withGraph(graph).withStop(s1).build();
     station2 = new TransitStopVertexBuilder().withGraph(graph).withStop(s2).build();
