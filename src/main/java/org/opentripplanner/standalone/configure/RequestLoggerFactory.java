@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 public class RequestLoggerFactory {
 
   /**
-   * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this
-   * router. http://stackoverflow.com/a/17215011/778449
+   * Programmatically (i.e. not in XML) create a Logback logger for routing requests.
+   * See http://stackoverflow.com/a/17215011/778449
    */
   public static Logger createLogger(@Nullable String filename) {
     if (filename == null) {

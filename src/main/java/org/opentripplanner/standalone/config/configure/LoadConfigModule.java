@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
@@ -47,5 +48,11 @@ public class LoadConfigModule {
   @TransitServicePeriod
   static ServiceDateInterval providesTransitServicePeriod(BuildConfig buildConfig) {
     return buildConfig.getTransitServicePeriod();
+  }
+
+  @Provides
+  @OtpBaseDirectory
+  static File baseDirectory(CommandLineParameters cli) {
+    return cli.getBaseDirectory();
   }
 }

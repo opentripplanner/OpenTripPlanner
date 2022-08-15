@@ -17,14 +17,7 @@ import org.opentripplanner.transit.service.TransitModel;
  * Dagger dependency injection Factory to create components for the OTP load application phase.
  */
 @Singleton
-@Component(
-  modules = {
-    LoadConfigModule.class,
-    DataStoreModule.class,
-    GsDataSourceModule.class,
-    LoadApplicationModule.class,
-  }
-)
+@Component(modules = { LoadConfigModule.class, DataStoreModule.class, GsDataSourceModule.class })
 public interface LoadApplicationFactory {
   OtpDataStore datastore();
 

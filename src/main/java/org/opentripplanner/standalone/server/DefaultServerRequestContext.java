@@ -31,8 +31,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public final TraverseVisitor traverseVisitor;
 
   /**
-   * Copy constructor - used to make an HTTP Request scoped copy of the context. All mutable
-   * components need to be coped here. This is
+   * Make sure all mutable components are copied/cloned before calling this constructor.
    */
   private DefaultServerRequestContext(
     Graph graph,
