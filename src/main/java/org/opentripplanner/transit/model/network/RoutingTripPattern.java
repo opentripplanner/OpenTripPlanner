@@ -24,7 +24,6 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
   private final BitSet alightingPossible;
   private final BitSet wheelchairAccessible;
   private final int slackIndex;
-  private final String debugInfo;
 
   RoutingTripPattern(TripPattern pattern, TripPatternBuilder builder) {
     this.pattern = pattern;
@@ -43,15 +42,15 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
     }
 
     this.slackIndex = builder.slackIndex();
-    this.debugInfo = pattern.getRoute().getMode().name() + " " + pattern.getRoute().getName();
   }
 
   /**
-   * This is the OTP internal <em>synthetic key</em>, used to reference a StopLocation inside OTP.  This is used
-   * to optimize routing, we do not access the stop instance only keep the {code index}. The index will not change.
+   * This is the OTP internal <em>synthetic key</em>, used to reference a RoutingTripPattern inside
+   * OTP. This is used to optimize routing, we do not access the trip pattern instance only keep the
+   * {code index}. The index will not change.
    * <p>
-   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP instances,
-   * use the {code id} for external references.
+   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP
+   * instances, use the {code id} for external references.
    */
   public int patternIndex() {
     return index;
@@ -100,7 +99,7 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   @Override
   public String debugInfo() {
-    return debugInfo;
+    return pattern.logName() + " @" + index;
   }
 
   @Override
@@ -121,7 +120,7 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
 
   @Override
   public String toString() {
-    return "TripPattern{" + "index=" + index + ", debugInfo=" + debugInfo + '}';
+    return "RoutingTripPattern{" + debugInfo() + '}';
   }
 
   public static int indexCounter() {

@@ -43,9 +43,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
     // Total available trip patterns
-    RoutingTripPattern tripPattern1 = getTripPattern(TP_ID_1);
-    RoutingTripPattern tripPattern2 = getTripPattern(TP_ID_2);
-    RoutingTripPattern tripPattern3 = getTripPattern(TP_ID_3);
+    RoutingTripPattern tripPattern1 = createTripPattern(TP_ID_1);
+    RoutingTripPattern tripPattern2 = createTripPattern(TP_ID_2);
+    RoutingTripPattern tripPattern3 = createTripPattern(TP_ID_3);
 
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
@@ -122,7 +122,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     return st;
   }
 
-  private static RoutingTripPattern getTripPattern(FeedScopedId id) {
+  private static RoutingTripPattern createTripPattern(FeedScopedId id) {
     return TripPattern
       .of(id)
       .withRoute(TransitModelForTest.route("1").withMode(TransitMode.BUS).build())

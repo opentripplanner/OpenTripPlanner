@@ -2,7 +2,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import gnu.trove.map.TIntObjectMap;
 
-public record ConstrainedTransfers(
+/**
+ * This is a container for returning a tuple of forward and reverse constrained transfers from the
+ * mapper to the transit layer.
+ */
+public record ConstrainedTransfersForPatterns(
   TIntObjectMap<TransferForPatternByStopPos> forward,
   TIntObjectMap<TransferForPatternByStopPos> reverse
 ) {}

@@ -192,6 +192,6 @@ public final class Route extends TransitEntity<Route, RouteBuilder> implements L
 
   @Override
   public String logName() {
-    return getName();
+    return mode.name() + " " + getName();
   }
 }

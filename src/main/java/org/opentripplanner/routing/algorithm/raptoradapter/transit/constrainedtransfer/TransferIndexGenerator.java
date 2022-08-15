@@ -47,7 +47,7 @@ public class TransferIndexGenerator {
     setupPatterns(tripPatterns);
   }
 
-  public ConstrainedTransfers generateTransfers() {
+  public ConstrainedTransfersForPatterns generateTransfers() {
     TIntObjectMap<TransferForPatternByStopPos> forwardTransfers = new TIntObjectHashMap<>(
       RoutingTripPattern.indexCounter()
     );
@@ -77,7 +77,7 @@ public class TransferIndexGenerator {
         });
     }
 
-    return new ConstrainedTransfers(forwardTransfers, reverseTransfers);
+    return new ConstrainedTransfersForPatterns(forwardTransfers, reverseTransfers);
   }
 
   /**
@@ -290,14 +290,14 @@ public class TransferIndexGenerator {
       var c = tx.getTransferConstraint();
 
       // Forward search
-      forwardTransfers.putIfAbsent(to.pattern.getIndex(), new TransferForPatternByStopPos());
+      forwardTransfers.putIfAbsent(to.pattern.patternIndex(), new TransferForPatternByStopPos());
       forwardTransfers
-        .get(to.pattern.getIndex())
+        .get(to.pattern.patternIndex())
         .add(to.stopPosition, new TransferForPattern(sourcePoint, to.trip, rank, c));
       // Reverse search
-      reverseTransfers.putIfAbsent(pattern.getIndex(), new TransferForPatternByStopPos());
+      reverseTransfers.putIfAbsent(pattern.patternIndex(), new TransferForPatternByStopPos());
       reverseTransfers
-        .get(pattern.getIndex())
+        .get(pattern.patternIndex())
         .add(stopPosition, new TransferForPattern(to.sourcePoint, trip, rank, c));
     }
   }

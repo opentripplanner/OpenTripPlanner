@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.PickDrop;
@@ -16,6 +17,7 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -45,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class TripPattern
   extends TransitEntity<TripPattern, TripPatternBuilder>
-  implements Cloneable {
+  implements Cloneable, LogInfo {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -422,6 +424,11 @@ public final class TripPattern
 
   public RoutingTripPattern getRoutingTripPattern() {
     return routingTripPattern;
+  }
+
+  @Override
+  public String logName() {
+    return route.logName();
   }
 
   private static Coordinate coordinate(StopLocation s) {
