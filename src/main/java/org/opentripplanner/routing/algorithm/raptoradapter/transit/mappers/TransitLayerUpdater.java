@@ -10,12 +10,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -77,7 +77,6 @@ public class TransitLayerUpdater {
     final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = realtimeTransitLayer
       .getTripPatternMapper()
       .mapOldTripPatternToRaptorTripPattern(
-        realtimeTransitLayer.getStopIndex(),
         updatedTimetables.stream().map(Timetable::getPattern).collect(Collectors.toSet())
       );
 

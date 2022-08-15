@@ -132,13 +132,13 @@ public class LuceneIndex implements Serializable {
 
   public static synchronized LuceneIndex forServer(OtpServerRequestContext serverContext) {
     var graph = serverContext.graph();
-    var existingIndex = graph.getService(LuceneIndex.class);
+    var existingIndex = graph.getLuceneIndex();
     if (existingIndex != null) {
       return existingIndex;
     }
 
     var newIndex = new LuceneIndex(graph, serverContext.transitService());
-    graph.putService(LuceneIndex.class, newIndex);
+    graph.setLuceneIndex(newIndex);
     return newIndex;
   }
 

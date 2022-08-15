@@ -19,6 +19,7 @@ public class FlexStopLocation
   extends TransitEntity<FlexStopLocation, FlexStopLocationBuilder>
   implements StopLocation {
 
+  private final int index;
   private final I18NString name;
 
   private final boolean hasFallbackName;
@@ -35,6 +36,7 @@ public class FlexStopLocation
 
   FlexStopLocation(FlexStopLocationBuilder builder) {
     super(builder.getId());
+    this.index = INDEX_COUNTER.getAndIncrement();
     // according to the spec stop location names are optional for flex zones so, we set the id
     // as the bogus name. *shrug*
     if (builder.name() == null) {
@@ -53,6 +55,11 @@ public class FlexStopLocation
 
   public static FlexStopLocationBuilder of(FeedScopedId id) {
     return new FlexStopLocationBuilder(id);
+  }
+
+  @Override
+  public int getIndex() {
+    return index;
   }
 
   /**

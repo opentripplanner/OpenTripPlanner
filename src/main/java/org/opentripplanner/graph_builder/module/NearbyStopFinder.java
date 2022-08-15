@@ -35,6 +35,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
@@ -285,7 +286,10 @@ public class NearbyStopFinder {
       OTPFeature.VehicleToStopHeuristics.isOn() &&
       VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)
     ) {
-      var strategy = new VehicleToStopSkipEdgeStrategy(transitService::getRoutesForStop);
+      var strategy = new VehicleToStopSkipEdgeStrategy(
+        transitService::getRoutesForStop,
+        routingRequest.modes.transitModes.stream().map(MainAndSubMode::mainMode).toList()
+      );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&

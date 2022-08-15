@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -138,7 +137,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       List.of(to)
     );
 
-    var filter = new FaresFilter(graph.getService(FareService.class));
+    var filter = new FaresFilter(graph.getFareService());
 
     var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
 

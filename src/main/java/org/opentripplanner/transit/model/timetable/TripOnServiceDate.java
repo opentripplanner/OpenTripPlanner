@@ -45,6 +45,10 @@ public class TripOnServiceDate extends TransitEntity<TripOnServiceDate, TripOnSe
     return replacementFor;
   }
 
+  public TripIdAndServiceDate getTripIdAndServiceDate() {
+    return new TripIdAndServiceDate(trip.getId(), serviceDate);
+  }
+
   @Override
   public boolean sameAs(@Nonnull TripOnServiceDate other) {
     return (

@@ -201,6 +201,9 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
       consumer.accept(routingRequest);
 
+      // Remove to, so that origin and destination are different
+      routingRequest.to = new GenericLocation(null, null);
+
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
         RoutingContext routingContext = new RoutingContext(
           routingRequest,
@@ -211,6 +214,21 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         if (fromStreetName != null) {
           assertFromLink(fromStreetName, streetMode, routingContext);
         }
+      }
+
+      routingRequest = new RoutingRequest().getStreetSearchRequest(streetMode);
+
+      consumer.accept(routingRequest);
+
+      // Remove from, so that origin and destination are different
+      routingRequest.from = new GenericLocation(null, null);
+
+      try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
+        RoutingContext routingContext = new RoutingContext(
+          routingRequest,
+          graph,
+          temporaryVertices
+        );
 
         if (toStreetName != null) {
           assertToLink(toStreetName, streetMode, routingContext);

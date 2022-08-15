@@ -23,7 +23,7 @@ class TransfersMapper {
 
       for (PathTransfer pathTransfer : transitModel.getTransfersByStop(stop)) {
         if (pathTransfer.to instanceof Stop) {
-          int toStopIndex = stopIndex.indexOf((Stop) pathTransfer.to);
+          int toStopIndex = pathTransfer.to.getIndex();
           Transfer newTransfer;
           if (pathTransfer.getEdges() != null) {
             newTransfer = new Transfer(toStopIndex, pathTransfer.getEdges());

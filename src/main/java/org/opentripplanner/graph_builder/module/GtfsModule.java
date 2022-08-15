@@ -39,7 +39,6 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -175,7 +174,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
 
         fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
-        graph.putService(FareService.class, fareServiceFactory.makeFareService());
+        graph.setFareService(fareServiceFactory.makeFareService());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);

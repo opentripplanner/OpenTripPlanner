@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -95,7 +96,13 @@ public class TemporaryVerticesContainer implements AutoCloseable {
       );
     }
 
-    if (routingErrors.size() > 0) {
+    // if from and to share any vertices, the user is already at their destination, and the result
+    // is a trivial path
+    if (from != null && to != null && !Sets.intersection(from, to).isEmpty()) {
+      routingErrors.add(new RoutingError(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, null));
+    }
+
+    if (!routingErrors.isEmpty()) {
       throw new RoutingValidationException(routingErrors);
     }
   }

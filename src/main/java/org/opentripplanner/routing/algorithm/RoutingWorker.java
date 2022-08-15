@@ -25,7 +25,6 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -135,7 +134,7 @@ public class RoutingWorker {
       it -> firstRemovedItinerary = it,
       request.wheelchairAccessibility.enabled(),
       request.wheelchairAccessibility.maxSlope(),
-      serverContext.graph().getService(FareService.class),
+      serverContext.graph().getFareService(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
     );

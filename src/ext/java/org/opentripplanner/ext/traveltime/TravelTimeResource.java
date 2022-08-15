@@ -250,7 +250,7 @@ public class TravelTimeResource {
       routingRequest.modes.accessMode,
       false
     );
-    return new AccessEgressMapper(transitLayer.getStopIndex()).mapNearbyStops(accessStops, false);
+    return new AccessEgressMapper().mapNearbyStops(accessStops, false);
   }
 
   private List<State> getInitialStates(

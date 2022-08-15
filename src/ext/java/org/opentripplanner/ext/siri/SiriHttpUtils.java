@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.apache.http.HttpEntity;
@@ -16,15 +17,28 @@ import org.opentripplanner.util.HttpUtils;
 
 public class SiriHttpUtils extends HttpUtils {
 
-  public static InputStream postData(String url, String xmlData, int timeout) throws IOException {
+  public static InputStream postData(
+    String url,
+    String xmlData,
+    int timeout,
+    Map<String, String> requestHeaderValues
+  ) throws IOException {
     HttpPost httppost = new HttpPost(url);
     if (xmlData != null) {
       httppost.setEntity(new StringEntity(xmlData, ContentType.APPLICATION_XML));
     }
+    if (requestHeaderValues != null) {
+      for (Map.Entry<String, String> entry : requestHeaderValues.entrySet()) {
+        httppost.addHeader(entry.getKey(), entry.getValue());
+      }
+    }
+
     org.apache.http.client.HttpClient httpclient = getClient(timeout, timeout);
 
     HttpResponse response = httpclient.execute(httppost);
-    if (response.getStatusLine().getStatusCode() != 200) return null;
+    if (response.getStatusLine().getStatusCode() != 200) {
+      return null;
+    }
 
     HttpEntity entity = response.getEntity();
     if (entity == null) {
@@ -39,7 +53,7 @@ public class SiriHttpUtils extends HttpUtils {
   public static String getUniqueETClientName(String postFix) {
     String hostname = System.getenv("HOSTNAME");
     if (hostname == null) {
-      hostname = "otp-" + UUID.randomUUID().toString();
+      hostname = "otp-" + UUID.randomUUID();
     }
     return hostname + postFix;
   }
