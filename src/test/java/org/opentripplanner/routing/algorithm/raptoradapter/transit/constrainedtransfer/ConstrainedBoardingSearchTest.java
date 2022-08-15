@@ -154,7 +154,7 @@ public class ConstrainedBoardingSearchTest {
     // Forward
     var subject = new ConstrainedBoardingSearch(
       true,
-      constrainedTransfers.forward().get(routingPattern2.getIndex())
+      constrainedTransfers.forward().get(routingPattern2.patternIndex())
     );
     assertTrue(subject.transferExist(toStopPos));
 
@@ -162,7 +162,7 @@ public class ConstrainedBoardingSearchTest {
     subject =
       new ConstrainedBoardingSearch(
         false,
-        constrainedTransfers.reverse().get(routingPattern1.getIndex())
+        constrainedTransfers.reverse().get(routingPattern1.patternIndex())
       );
     assertTrue(subject.transferExist(fromStopPos));
   }
@@ -360,7 +360,7 @@ public class ConstrainedBoardingSearchTest {
     var constrainedTransfers = generateTransfersForPatterns(txList);
     var subject = new ConstrainedBoardingSearch(
       true,
-      constrainedTransfers.forward().get(routingPattern2.getIndex())
+      constrainedTransfers.forward().get(routingPattern2.patternIndex())
     );
 
     int targetStopPos = route2.stopPosition(transferStop);
@@ -390,7 +390,7 @@ public class ConstrainedBoardingSearchTest {
     var constrainedTransfers = generateTransfersForPatterns(txList);
     var subject = new ConstrainedBoardingSearch(
       false,
-      constrainedTransfers.reverse().get(routingPattern1.getIndex())
+      constrainedTransfers.reverse().get(routingPattern1.patternIndex())
     );
     int targetStopPos = route1.stopPosition(transferStop);
 

@@ -53,7 +53,7 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
    * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP instances,
    * use the {code id} for external references.
    */
-  public int getIndex() {
+  public int patternIndex() {
     return index;
   }
 
@@ -116,7 +116,7 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
     if (!(o instanceof RoutingTripPattern that)) {
       return false;
     }
-    return index == that.getIndex();
+    return index == that.patternIndex();
   }
 
   @Override
