@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.network;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
@@ -27,7 +26,7 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
   private final int slackIndex;
   private final String debugInfo;
 
-  RoutingTripPattern(TripPattern pattern) {
+  RoutingTripPattern(TripPattern pattern, TripPatternBuilder builder) {
     this.pattern = pattern;
     this.stopIndexes = pattern.getStops().stream().mapToInt(StopLocation::getIndex).toArray();
     this.index = INDEX_COUNTER.getAndIncrement();
@@ -43,7 +42,7 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
       wheelchairAccessible.set(s, pattern.wheelchairAccessible(s));
     }
 
-    this.slackIndex = SlackProvider.slackIndex(pattern);
+    this.slackIndex = builder.slackIndex();
     this.debugInfo = pattern.getRoute().getMode().name() + " " + pattern.getRoute().getName();
   }
 

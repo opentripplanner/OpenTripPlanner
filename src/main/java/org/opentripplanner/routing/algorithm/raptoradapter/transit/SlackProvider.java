@@ -66,11 +66,7 @@ public final class SlackProvider implements RaptorSlackProvider {
     return result;
   }
 
-  public static int slackIndex(TripPattern pattern) {
-    return slackIndex(pattern.getMode());
-  }
-
-  private static int slackIndex(final TransitMode mode) {
+  public static int slackIndex(final TransitMode mode) {
     return mode.ordinal();
   }
 }

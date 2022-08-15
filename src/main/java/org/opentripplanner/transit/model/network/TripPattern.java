@@ -90,7 +90,7 @@ public final class TripPattern
     this.originalTripPattern = builder.getOriginalTripPattern();
 
     this.hopGeometries = builder.hopGeometries();
-    this.routingTripPattern = new RoutingTripPattern(this);
+    this.routingTripPattern = new RoutingTripPattern(this, builder);
   }
 
   public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
