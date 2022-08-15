@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 class FlexStopLocationTest {
@@ -23,7 +24,9 @@ class FlexStopLocationTest {
 
   private static final String ZONE_ID = TransitModelForTest.TIME_ZONE_ID;
 
-  private static final LineString GEOMETRY = GeometryUtils.makeLineString(0, 0, 0, 1);
+  private static final LineString GEOMETRY = GeometryUtils.makeLineString(10, 0, 12, 4);
+
+  private static final WgsCoordinate COORDINATE = new WgsCoordinate(2,11);
 
   private static final FlexStopLocation subject = FlexStopLocation
     .of(TransitModelForTest.id(ID))
@@ -55,6 +58,7 @@ class FlexStopLocationTest {
     assertEquals(URL, copy.getUrl());
     assertEquals(ZONE_ID, copy.getFirstZoneAsString());
     assertEquals(GEOMETRY, copy.getGeometry());
+    assertEquals(COORDINATE, copy.getCoordinate());
     assertEquals("v2", copy.getName().toString());
   }
 

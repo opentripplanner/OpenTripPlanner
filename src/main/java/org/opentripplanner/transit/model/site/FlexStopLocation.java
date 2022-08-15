@@ -50,7 +50,7 @@ public class FlexStopLocation
     this.url = builder.url();
     this.zoneId = builder.zoneId();
     this.geometry = builder.geometry();
-    this.centroid = builder.centroid();
+    this.centroid = Objects.requireNonNull(builder.centroid());
   }
 
   public static FlexStopLocationBuilder of(FeedScopedId id) {
