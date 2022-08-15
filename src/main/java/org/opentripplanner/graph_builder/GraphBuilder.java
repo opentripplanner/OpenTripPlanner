@@ -16,6 +16,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,7 +176,17 @@ public class GraphBuilder implements Runnable {
       "Graph building took {}.",
       DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime))
     );
-    LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+    var f = new OtpNumberFormat();
+    LOG.info(
+      "Main graph size: |V|={} |E|={}",
+      f.formatNumber(graph.countVertices()),
+      f.formatNumber(graph.countEdges())
+    );
+    LOG.info(
+      "Transit model size: |Stops|={}, |Patterns|={}",
+      f.formatNumber(transitModel.getStopModel().size()),
+      f.formatNumber(transitModel.getAllTripPatterns().size())
+    );
   }
 
   private void addModule(GraphBuilderModule module) {
