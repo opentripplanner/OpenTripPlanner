@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The top level construction class(this class) may delegate to other construction classes
  * to inject configuration and services into submodules. An instance of this class is created
- * using the {@link LoadApplication} - A application is constructed AFTER config and input files
+ * using the {@link LoadApplication} - An application is constructed AFTER config and input files
  * are loaded.
  * <p>
  * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
