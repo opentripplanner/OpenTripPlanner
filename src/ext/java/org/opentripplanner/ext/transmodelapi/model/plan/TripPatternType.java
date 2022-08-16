@@ -135,7 +135,7 @@ public class TripPatternType {
           .description("How much time is spent walking, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
           // TODO This unfortunately include BIKE and CAR
-          .dataFetcher(env -> itinerary(env).getNonTransitTime())
+          .dataFetcher(env -> itinerary(env).getNonTransitTime().toSeconds())
           .build()
       )
       .field(
