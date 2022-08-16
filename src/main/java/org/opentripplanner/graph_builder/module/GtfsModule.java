@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
 
-  public static final Set<Class<?>> faresV2Entities = Set.of(
+  public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
     FareProduct.class,
     FareLegRule.class,
     FareTransferRule.class,
@@ -280,11 +280,11 @@ public class GtfsModule implements GraphBuilderModule {
     if (LOG.isDebugEnabled()) reader.addEntityHandler(counter);
 
     for (Class<?> entityClass : reader.getEntityClasses()) {
-      if(skipEntityClass(entityClass)) {
-        LOG.info("Skip entities: " + entityClass.getName());
+      if (skipEntityClass(entityClass)) {
+        LOG.info("Skipping entity: " + entityClass.getName());
         continue;
       }
-      LOG.info("reading entities: " + entityClass.getName());
+      LOG.info("Reading entity: " + entityClass.getName());
       reader.readEntities(entityClass);
       store.flush();
       // NOTE that agencies are first in the list and read before all other entity types, so it is effective to
@@ -358,10 +358,7 @@ public class GtfsModule implements GraphBuilderModule {
    * it can easily lead to graph build failures.
    */
   private boolean skipEntityClass(Class<?> entityClass) {
-    if (OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass) { 
-      return true;
-    }
-    return false;
+    return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
   }
 
   /**
