@@ -191,12 +191,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    if (timeZoneId != null) {
-      this.osmOpeningHoursParser =
-        new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), timeZoneId, issueStore);
-    }
+    this.osmOpeningHoursParser =
+      new OSMOpeningHoursParser(
+        graph.getOpeningHoursCalendarService(),
+        this::getTimeZone,
+        issueStore
+      );
 
-    OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
+    OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags, this::getTimeZone);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: " + provider);
@@ -781,10 +783,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       final var id = entity.getId();
       final var link = entity.getOpenStreetMapLink();
       if (openingHoursTag != null) {
-        if (osmOpeningHoursParser == null) {
-          warnAboutMissingTimeZone();
-          return null;
-        }
         try {
           return osmOpeningHoursParser.parseOpeningHours(openingHoursTag, String.valueOf(id), link);
         } catch (OpeningHoursParseException e) {
@@ -1682,12 +1680,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
   }
 
-  private void warnAboutMissingTimeZone() {
-    if (!hasWarnedAboutMissingTimeZone) {
-      hasWarnedAboutMissingTimeZone = true;
-      LOG.warn(
-        "Missing time zone - time-restricted entities will not be created, please configure it in the build-config.json"
-      );
+  private ZoneId getTimeZone() {
+    if (timeZoneId == null) {
+      if (!hasWarnedAboutMissingTimeZone) {
+        hasWarnedAboutMissingTimeZone = true;
+        LOG.warn(
+          "Missing time zone - time-restricted entities will not be created, please configure it in the build-config.json"
+        );
+      }
     }
+    return timeZoneId;
   }
 }
