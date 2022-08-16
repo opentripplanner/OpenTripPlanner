@@ -337,15 +337,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
           ? ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate())
           : LocalDate.now(timeZone);
 
-        TripPattern tripPattern = transitService.getRealtimeAddedTripPattern(
-          trip.getId(),
-          serviceDate
-        );
-        // timetableSnapshot is null or no realtime added pattern found
-        if (tripPattern == null) {
-          tripPattern = getTripPattern(environment);
-        }
-        // no matching pattern found anywhere
+        TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
+        // no matching pattern found
         if (tripPattern == null) {
           return List.of();
         }

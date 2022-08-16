@@ -26,6 +26,7 @@ import org.opentripplanner.routing.TripTimesShortHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class ServiceJourneyType {
@@ -171,6 +172,10 @@ public class ServiceJourneyType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("journeyPattern")
+          .description(
+            "JourneyPattern for the service journey, according to scheduled data. If the " +
+            "ServiceJourney is not included in the scheduled data, null is returned."
+          )
           .type(journeyPatternType)
           .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip(trip(env)))
           .build()
@@ -179,7 +184,10 @@ public class ServiceJourneyType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("quays")
-          .description("Quays visited by service journey")
+          .description(
+            "Quays visited by service journey, according to scheduled data. If the " +
+            "ServiceJourney is not included in the scheduled data, an empty list is returned."
+          )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .argument(
             GraphQLArgument
@@ -201,10 +209,14 @@ public class ServiceJourneyType {
             Integer first = environment.getArgument("first");
             Integer last = environment.getArgument("last");
 
-            List<StopLocation> stops = GqlUtil
-              .getTransitService(environment)
-              .getPatternForTrip(trip(environment))
-              .getStops();
+            TransitService transitService = GqlUtil.getTransitService(environment);
+            TripPattern tripPattern = transitService.getPatternForTrip(trip(environment));
+
+            if (tripPattern == null) {
+              return List.of();
+            }
+
+            List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
               throw new AssertException("Both first and last can't be defined simultaneously.");
@@ -232,10 +244,11 @@ public class ServiceJourneyType {
           )
           .dataFetcher(env -> {
             Trip trip = trip(env);
-            return TripTimeOnDate.fromTripTimes(
-              GqlUtil.getTransitService(env).getPatternForTrip(trip).getScheduledTimetable(),
-              trip
-            );
+            TripPattern tripPattern = GqlUtil.getTransitService(env).getPatternForTrip(trip);
+            if (tripPattern == null) {
+              return List.of();
+            }
+            return TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip);
           })
           .build()
       )

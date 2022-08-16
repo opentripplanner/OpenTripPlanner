@@ -267,6 +267,15 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternForTrip().get(trip);
   }
 
+  @Override
+  public TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate) {
+    TripPattern realtimePattern = getRealtimeAddedTripPattern(trip.getId(), serviceDate);
+    if (realtimePattern != null) {
+      return realtimePattern;
+    }
+    return getPatternForTrip(trip);
+  }
+
   /** {@link TransitModelIndex#getPatternsForRoute()} */
   @Override
   public Collection<TripPattern> getPatternsForRoute(Route route) {
