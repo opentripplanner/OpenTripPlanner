@@ -188,6 +188,10 @@ public class NodeAdapter {
     return param(paramName).asText(defaultValue);
   }
 
+  public String asText() {
+    return json.asText();
+  }
+
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
     if (!exist(paramName)) return defaultValue;
     return new HashSet<>(arrayAsList(paramName, JsonNode::asText));
