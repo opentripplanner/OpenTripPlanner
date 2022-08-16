@@ -200,6 +200,15 @@ formats like 02/01/12.
 
 The OTP code style is described on a separate [style guide page](Codestyle.md).
 
+## Code conventions and architecture
+
+The [architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
+and [code conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVETIONS.md) 
+are only available on GitHub, not in the project documentation. These documents contain relative 
+links to code so, they are a bit easier to maintain that way. The target audience is also active 
+OTP developers that have the code checked out locally.
+
+
 ## Continuous Integration
 
 The OpenTripPlanner project uses
