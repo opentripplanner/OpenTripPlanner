@@ -188,6 +188,15 @@ public class ToStringBuilder {
     return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
   }
 
+  /** Add the Lucene BitSet: name : {cardinality}/{logical size}/{size} */
+  public ToStringBuilder addBitSetSize(String name, org.apache.lucene.util.BitSet bitSet) {
+    if (bitSet == null) {
+      return this;
+    }
+    // TODO Lucene BitSet length() has a different meaning
+    return addIt(name, bitSet.cardinality() + "/" + bitSet.length());
+  }
+
   /* Special purpose formatters */
 
   /** Add a Coordinate location, longitude or latitude */

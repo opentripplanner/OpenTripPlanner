@@ -202,7 +202,10 @@ public class ToStringBuilderTest {
       subject().addBitSetSize("bitSet", bset).toString()
     );
 
-    assertEquals("ToStringBuilderTest{}", subject().addBitSetSize("bitSet", null).toString());
+    assertEquals(
+      "ToStringBuilderTest{}",
+      subject().addBitSetSize("bitSet", (BitSet) null).toString()
+    );
   }
 
   @Test

@@ -29,6 +29,8 @@ public class RaptorArchitectureTest {
   private static final Package RR_STD_CONFIGURE = RR_STANDARD.subPackage("configure");
   private static final Package RR_CONTEXT = RANGE_RAPTOR.subPackage("context");
 
+  private static final Package LUCENE_BITSET = Package.of("org.apache.lucene.util");
+
   @Test
   void enforcePackageDependenciesRaptorAPI() {
     var api = RAPTOR.subPackage("api");
@@ -42,7 +44,7 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesUtil() {
-    RAPTOR_UTIL.dependsOn(UTILS, RAPTOR_API).verify();
+    RAPTOR_UTIL.dependsOn(UTILS, RAPTOR_API, LUCENE_BITSET).verify();
     RAPTOR_UTIL_PARETO_SET.verify();
   }
 
@@ -70,7 +72,7 @@ public class RaptorArchitectureTest {
     var stdInternalApi = RR_STANDARD.subPackage("internalapi").dependsOn(RAPTOR_API).verify();
     var stdBestTimes = RR_STANDARD
       .subPackage("besttimes")
-      .dependsOn(rrCommon, stdInternalApi)
+      .dependsOn(rrCommon, stdInternalApi, LUCENE_BITSET)
       .verify();
     var stdStopArrivals = RR_STANDARD
       .subPackage("stoparrivals")
@@ -118,7 +120,7 @@ public class RaptorArchitectureTest {
       .subPackage("heuristic")
       .dependsOn(rrCommon, mcArrivals)
       .verify();
-    RR_MULTI_CRITERIA.dependsOn(rrCommon, mcArrivals, mcHeuristics).verify();
+    RR_MULTI_CRITERIA.dependsOn(rrCommon, mcArrivals, mcHeuristics, LUCENE_BITSET).verify();
 
     RR_MC_CONFIGURE
       .dependsOn(rrCommon, RR_CONTEXT, pathConfigure, mcHeuristics, RR_MULTI_CRITERIA)

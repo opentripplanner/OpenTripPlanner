@@ -10,6 +10,8 @@ public class UtilArchitectureTest {
   private static final Package LANG = UTIL.subPackage("lang");
   private static final Package TIME = UTIL.subPackage("time");
 
+  private static final Package LUCENE_BITSET = Package.of("org.apache.lucene.util");
+
   @Test
   void enforcePackageDependencies() {
     // The util packages needs cleanup, it contains model, framework and API classes. The strategy
@@ -21,6 +23,6 @@ public class UtilArchitectureTest {
     // It might sound strange that lang depend on time, but we allow this to avoid creating another
     // util package where we can put the ToStringBuilder classes(witch depend on time). As long as
     // we do not get cyclic dependencies between lang and time there is not problem with this.
-    LANG.dependsOn(TIME).verify();
+    LANG.dependsOn(TIME, LUCENE_BITSET).verify();
   }
 }

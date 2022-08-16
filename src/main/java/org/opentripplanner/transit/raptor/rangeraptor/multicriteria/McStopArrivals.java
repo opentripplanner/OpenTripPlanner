@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import java.util.BitSet;
 import java.util.List;
+import org.apache.lucene.util.BitSet;
+import org.apache.lucene.util.FixedBitSet;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -10,7 +11,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
-import org.opentripplanner.transit.raptor.util.BitSetIterator;
+import org.opentripplanner.transit.raptor.util.LuceneBitSetIterator;
 
 /**
  * This class serve as a wrapper for all stop arrival pareto set, one set for each stop. It also
@@ -38,7 +39,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
   ) {
     //noinspection unchecked
     this.arrivals = (StopArrivalParetoSet<T>[]) new StopArrivalParetoSet[nStops];
-    this.touchedStops = new BitSet(nStops);
+    this.touchedStops = new FixedBitSet(nStops);
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
@@ -85,11 +86,11 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
   }
 
   boolean updateExist() {
-    return !touchedStops.isEmpty();
+    return touchedStops.cardinality() > 0;
   }
 
   IntIterator stopsTouchedIterator() {
-    return new BitSetIterator(touchedStops);
+    return new LuceneBitSetIterator(touchedStops);
   }
 
   void addStopArrival(AbstractStopArrival<T> arrival) {
@@ -117,7 +118,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
     while (it.hasNext()) {
       arrivals[it.next()].markAtEndOfSet();
     }
-    touchedStops.clear();
+    touchedStops.clear(0, touchedStops.length());
   }
 
   /* private methods */
