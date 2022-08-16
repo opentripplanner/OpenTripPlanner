@@ -29,6 +29,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
   }
 
   @Override
+  @SuppressWarnings("Convert2MethodRef")
   public void buildGraph() {
     if (!transitModel.getStopModel().hasFlexLocations()) {
       return;
@@ -49,7 +50,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
         flexStopLocation.getGeometry().getEnvelopeInternal()
       )) {
         // Check that the vertex is connected to both driveable and walkable edges
-        if (!(vertx instanceof StreetVertex)) {
+        if (!(vertx instanceof StreetVertex streetVertex)) {
           continue;
         }
         if (!((StreetVertex) vertx).isEligibleForCarPickupDropoff()) {
@@ -61,8 +62,6 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
         if (flexStopLocation.getGeometry().disjoint(p)) {
           continue;
         }
-
-        StreetVertex streetVertex = (StreetVertex) vertx;
 
         if (streetVertex.flexStopLocations == null) {
           streetVertex.flexStopLocations = new HashSet<>();

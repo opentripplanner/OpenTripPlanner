@@ -84,9 +84,7 @@ public abstract class GraphRoutingTest {
     builder.build();
     Graph graph = builder.graph();
     TransitModel transitModel = builder.transitModel();
-    transitModel.index();
-    graph.index();
-    return new TestOtpModel(graph, transitModel);
+    return new TestOtpModel(graph, transitModel).index();
   }
 
   protected GraphPath routeParkAndRide(
@@ -110,7 +108,7 @@ public abstract class GraphRoutingTest {
     protected Builder() {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      graph = new Graph(stopModel, deduplicator);
+      graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
     }
 

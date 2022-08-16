@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,9 +68,8 @@ class OsmBoardingLocationsModuleTest {
   void addAndLinkBoardingLocations(boolean skipVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
-    var extra = new HashMap<Class<?>, Object>();
 
     var provider = new OpenStreetMapProvider(file, false);
     var floatingBusVertex = new TransitStopVertexBuilder()
@@ -109,6 +107,9 @@ class OsmBoardingLocationsModuleTest {
       .withModes(Set.of(TransitMode.BUS))
       .build();
 
+    transitModel.index();
+    graph.index(stopModel);
+
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
 
@@ -135,7 +136,7 @@ class OsmBoardingLocationsModuleTest {
       .stream()
       .filter(b -> b.references.contains(busStop.getId().getId()))
       .findFirst()
-      .get();
+      .orElseThrow();
 
     assertConnections(
       busBoardingLocation,

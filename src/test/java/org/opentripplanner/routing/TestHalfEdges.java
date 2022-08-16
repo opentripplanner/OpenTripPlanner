@@ -54,7 +54,7 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TestHalfEdges {
 
-  Graph graph;
+  private Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
   private IntersectionVertex br, tr, bl, tl;
   private TransitStopVertex station1;
@@ -73,7 +73,7 @@ public class TestHalfEdges {
   public void setUp() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
     // a 0.1 degree x 0.1 degree square
     tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
@@ -176,6 +176,9 @@ public class TestHalfEdges {
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
+
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
   }
 
   @Test
@@ -557,8 +560,6 @@ public class TestHalfEdges {
   @Test
   public void testStreetLocationFinder() {
     RoutingRequest options = new RoutingRequest();
-    transitModel.index();
-    graph.index();
     StreetVertexIndex finder = graph.getStreetIndex();
     GraphFinder graphFinder = new DirectGraphFinder(
       transitModel.getStopModel()::queryStopSpatialIndex

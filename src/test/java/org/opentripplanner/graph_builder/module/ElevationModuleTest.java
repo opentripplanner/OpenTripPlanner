@@ -37,7 +37,7 @@ public class ElevationModuleTest {
     // create a graph with a StreetWithElevationEdge
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     OsmVertex from = new OsmVertex(graph, "from", -122.6932051, 45.5122964, 40513757);
     OsmVertex to = new OsmVertex(graph, "to", -122.6903532, 45.5115309, 1677595882);

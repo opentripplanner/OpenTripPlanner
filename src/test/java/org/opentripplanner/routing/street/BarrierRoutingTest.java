@@ -45,6 +45,7 @@ public class BarrierRoutingTest {
       ConstantsForTests.HERRENBERG_BARRIER_GATES_OSM
     );
     graph = model.graph();
+    graph.index(model.transitModel().getStopModel());
   }
 
   /**

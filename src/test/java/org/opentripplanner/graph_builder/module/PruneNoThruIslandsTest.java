@@ -25,6 +25,11 @@ public class PruneNoThruIslandsTest {
 
   private static Graph graph;
 
+  @BeforeAll
+  static void setup() {
+    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
+  }
+
   @Test
   public void bicycleNoThruIslandsBecomeNoThru() {
     Assertions.assertTrue(
@@ -63,16 +68,11 @@ public class PruneNoThruIslandsTest {
     );
   }
 
-  @BeforeAll
-  static void setup() {
-    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
-  }
-
   private static Graph buildOsmGraph(String osmPath) {
     try {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      var graph = new Graph(stopModel, deduplicator);
+      var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
@@ -103,6 +103,10 @@ public class PruneNoThruIslandsTest {
         };
       osmModule.skipVisibility = true;
       osmModule.buildGraph();
+
+      transitModel.index();
+      graph.index(stopModel);
+
       // Prune floating islands and set noThru where necessary
       PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(
         graph,

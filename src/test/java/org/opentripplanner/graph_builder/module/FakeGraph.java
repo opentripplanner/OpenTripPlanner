@@ -37,7 +37,7 @@ public class FakeGraph {
   public static TestOtpModel buildGraphNoTransit() throws URISyntaxException {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var gg = new Graph(stopModel, deduplicator);
+    var gg = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = getFileForResource("columbus.osm.pbf");
@@ -126,7 +126,7 @@ public class FakeGraph {
   /** link the stops in the graph */
   public static void link(Graph graph, TransitModel transitModel) {
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
 
     VertexLinker linker = graph.getLinker();
 

@@ -64,7 +64,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
     if (graph.hasStreets) {

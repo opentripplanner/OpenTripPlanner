@@ -40,7 +40,7 @@ public class UnroutableTest {
   public void setUp() throws Exception {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     TransitModel transitModel = new TransitModel(stopModel, deduplicator);
 
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");

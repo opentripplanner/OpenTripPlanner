@@ -41,7 +41,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
   public void buildGraph() {
     // Mapbuilder needs transit index
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
 
     StreetMatcher matcher = new StreetMatcher(graph);
     log.info("Finding corresponding street edges for trip patterns...");

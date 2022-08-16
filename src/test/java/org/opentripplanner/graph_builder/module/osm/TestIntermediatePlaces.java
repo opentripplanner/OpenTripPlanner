@@ -59,7 +59,7 @@ public class TestIntermediatePlaces {
       TransitModel transitModel = model.transitModel();
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
-      graph.index();
+      model.index();
       TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
       timeZone = transitModel.getTimeZone();
 

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
@@ -37,7 +35,6 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.config.api.TransitServicePeriod;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -70,9 +67,10 @@ public class Graph implements Serializable {
   public final transient Deduplicator deduplicator;
 
   public final Instant buildTime = Instant.now();
-  private final StopModel stopModel;
 
+  @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
+
   private transient StreetVertexIndex streetIndex;
 
   //Envelope of all OSM and transit vertices. Calculated during build time
@@ -147,29 +145,20 @@ public class Graph implements Serializable {
 
   @Inject
   public Graph(
-    StopModel stopModel,
     Deduplicator deduplicator,
-    @TransitServicePeriod ServiceDateInterval transitServicePeriod
+    @Nullable OpeningHoursCalendarService openingHoursCalendarService
   ) {
-    this.stopModel = stopModel;
     this.deduplicator = deduplicator;
-    this.openingHoursCalendarService =
-      transitServicePeriod == null
-        ? null
-        : new OpeningHoursCalendarService(
-          deduplicator,
-          transitServicePeriod.getStart(),
-          transitServicePeriod.getEnd()
-        );
+    this.openingHoursCalendarService = openingHoursCalendarService;
   }
 
-  public Graph(StopModel stopModel, Deduplicator deduplicator) {
-    this(stopModel, deduplicator, null);
+  public Graph(Deduplicator deduplicator) {
+    this(deduplicator, null);
   }
 
   /** Constructor for deserialization. */
   public Graph() {
-    this(null, new Deduplicator());
+    this(new Deduplicator(), null);
   }
 
   /**
@@ -328,7 +317,7 @@ public class Graph implements Serializable {
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graphbuilder to server in memory, without a round trip through serialization.
    */
-  public void index() {
+  public void index(StopModel stopModel) {
     LOG.info("Index street model...");
     streetIndex = new StreetVertexIndex(this, stopModel);
     LOG.info("Index street model complete.");
@@ -340,30 +329,11 @@ public class Graph implements Serializable {
   }
 
   public StreetVertexIndex getStreetIndex() {
-    //TODO refactoring transit model - thread safety
-    if (this.streetIndex == null) {
-      index();
-    }
     return this.streetIndex;
   }
 
   public VertexLinker getLinker() {
     return getStreetIndex().getVertexLinker();
-  }
-
-  public int removeEdgelessVertices() {
-    int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
-    for (Vertex v : this.getVertices()) if (v.getDegreeOut() + v.getDegreeIn() == 0) toRemove.add(
-      v
-    );
-    // avoid concurrent vertex map modification
-    for (Vertex v : toRemove) {
-      this.remove(v);
-      removed += 1;
-      LOG.trace("removed edgeless vertex {}", v);
-    }
-    return removed;
   }
 
   /**
@@ -482,10 +452,6 @@ public class Graph implements Serializable {
     IntersectionTraversalCostModel intersectionTraversalCostModel
   ) {
     this.intersectionTraversalCostModel = intersectionTraversalCostModel;
-  }
-
-  public StopModel getStopModel() {
-    return stopModel;
   }
 
   public LuceneIndex getLuceneIndex() {

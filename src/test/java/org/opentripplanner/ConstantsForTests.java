@@ -129,7 +129,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      var graph = new Graph(stopModel, deduplicator);
+      var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       {
@@ -170,7 +170,7 @@ public class ConstantsForTests {
       addPortlandVehicleRentals(graph);
 
       transitModel.index();
-      graph.index();
+      graph.index(stopModel);
 
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {
@@ -182,7 +182,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      var graph = new Graph(stopModel, deduplicator);
+      var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
@@ -230,7 +230,7 @@ public class ConstantsForTests {
   ) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     addGtfsToGraph(graph, transitModel, gtfsPath, fareServiceFactory, null);
     return new TestOtpModel(graph, transitModel);
@@ -240,7 +240,7 @@ public class ConstantsForTests {
     try {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      var graph = new Graph(stopModel, deduplicator);
+      var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       {
@@ -322,7 +322,7 @@ public class ConstantsForTests {
     module.buildGraph();
 
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {
