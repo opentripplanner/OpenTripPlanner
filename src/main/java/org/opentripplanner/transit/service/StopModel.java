@@ -92,7 +92,7 @@ public class StopModel implements Serializable {
       .stream()
       .filter(Stop.class::isInstance)
       .map(Stop.class::cast)
-      .map(index::getStopVertexForStop)
+      .map(it -> getStopModelIndex().getStopVertexForStop(it))
       .collect(Collectors.toSet());
   }
 
@@ -121,7 +121,7 @@ public class StopModel implements Serializable {
     }
 
     // Single stop
-    var stop = index.getStopForId(id);
+    var stop = getStopModelIndex().getStopForId(id);
     if (stop != null) {
       return stop.getCoordinate();
     }
@@ -176,7 +176,7 @@ public class StopModel implements Serializable {
       return station.getChildStops();
     }
     // Single stop
-    var stop = index.getStopForId(id);
+    var stop = getStopModelIndex().getStopForId(id);
     if (stop != null) {
       return Collections.singleton(stop);
     }
