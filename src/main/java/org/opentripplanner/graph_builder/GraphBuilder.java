@@ -171,22 +171,7 @@ public class GraphBuilder implements Runnable {
     issueStore.summarize();
     validate();
 
-    long endTime = System.currentTimeMillis();
-    LOG.info(
-      "Graph building took {}.",
-      DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime))
-    );
-    var f = new OtpNumberFormat();
-    LOG.info(
-      "Main graph size: |V|={} |E|={}",
-      f.formatNumber(graph.countVertices()),
-      f.formatNumber(graph.countEdges())
-    );
-    LOG.info(
-      "Transit model size: |Stops|={}, |Patterns|={}",
-      f.formatNumber(transitModel.getStopModel().size()),
-      f.formatNumber(transitModel.getAllTripPatterns().size())
-    );
+    logGraphBuilderCompleteStatus(startTime, graph, transitModel);
   }
 
   private void addModule(GraphBuilderModule module) {
@@ -216,5 +201,23 @@ public class GraphBuilder implements Runnable {
         "'transitServiceEnd'"
       );
     }
+  }
+
+  private static void logGraphBuilderCompleteStatus(
+    long startTime,
+    Graph graph,
+    TransitModel transitModel
+  ) {
+    long endTime = System.currentTimeMillis();
+    String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
+    var f = new OtpNumberFormat();
+    var nStops = f.formatNumber(transitModel.getStopModel().size());
+    var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
+    var nVertices = f.formatNumber(graph.countVertices());
+    var nEdges = f.formatNumber(graph.countEdges());
+
+    LOG.info("Graph building took {}.", time);
+    LOG.info("Graph built.   |V|={} |E|={}", nVertices, nEdges);
+    LOG.info("Transit built. |Stops|={} |Patterns|={}", nStops, nPatterns);
   }
 }

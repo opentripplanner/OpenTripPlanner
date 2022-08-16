@@ -27,6 +27,7 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,10 +161,9 @@ public class SerializedGraphObject implements Serializable {
       CompactElevationProfile.setDistanceBetweenSamplesM(
         serObj.graph.getDistanceBetweenElevationSamples()
       );
-      Graph graph = serObj.graph;
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
-      LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+      logSerializationCompleteStatus(serObj.graph, serObj.transitModel);
       return serObj;
     } catch (IOException e) {
       LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
@@ -227,5 +227,16 @@ public class SerializedGraphObject implements Serializable {
     LOG.info("Graph written: {}", graphName);
     // Summarize serialized classes and associated serializers to stdout:
     // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
+  }
+
+  private static void logSerializationCompleteStatus(Graph graph, TransitModel transitModel) {
+    var f = new OtpNumberFormat();
+    var nStops = f.formatNumber(transitModel.getStopModel().size());
+    var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
+    var nVertices = f.formatNumber(graph.countVertices());
+    var nEdges = f.formatNumber(graph.countEdges());
+
+    LOG.info("Graph loaded.   |V|={} |E|={}", nVertices, nEdges);
+    LOG.info("Transit loaded. |Stops|={} |Patterns|={}", nStops, nPatterns);
   }
 }
