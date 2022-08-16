@@ -90,7 +90,9 @@ public class DefaultFareServiceImpl implements FareService {
   public void addFareRules(FareType fareType, Collection<FareRuleSet> fareRules) {
     fareRulesPerType.put(fareType, new ArrayList<>(fareRules));
   }
-
+  public Map<FareType, Collection<FareRuleSet>> getFareRulesPerType() {
+    return fareRulesPerType;
+  }
   @Override
   public Fare getCost(Itinerary itinerary) {
     var fareLegs = itinerary

@@ -31,6 +31,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceImpl;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
@@ -46,8 +47,11 @@ import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -1071,10 +1075,18 @@ public class LegacyGraphQLQueryTypeImpl
     };
   }
 
-  //TODO
   @Override
-  public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
-    return environment -> null;
+  public DataFetcher<Iterable<TicketType>> ticketTypes() {
+    return environment -> {
+      Map<Fare.FareType, Collection<FareRuleSet>> fareRules =
+        ((DefaultFareServiceImpl) getFareService(environment)).getFareRulesPerType();
+
+      return fareRules.entrySet().stream().filter(entry -> entry.getKey() == Fare.FareType.regular)
+        .map(e -> e.getValue())
+        .map(frs -> frs.stream().map(fr -> new TicketType(fr)).toList()).toList()
+        .stream().flatMap(rs -> rs.stream()).collect(Collectors.toList());
+    };
+
   }
 
   @Override
@@ -1282,6 +1294,9 @@ public class LegacyGraphQLQueryTypeImpl
     return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
+  private FareService getFareService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getFareService();
+  }
   private static class CallerWithEnvironment {
 
     private final DataFetchingEnvironment environment;

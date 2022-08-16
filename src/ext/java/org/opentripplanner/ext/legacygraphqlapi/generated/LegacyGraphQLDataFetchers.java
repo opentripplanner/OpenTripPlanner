@@ -24,7 +24,7 @@ import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRe
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -587,7 +587,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Connection<NearbyStop>> stopsByRadius();
 
-    public DataFetcher<Iterable<FareRuleSet>> ticketTypes();
+    public DataFetcher<Iterable<TicketType>> ticketTypes();
 
     public DataFetcher<Trip> trip();
 
@@ -843,11 +843,11 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLTicketType {
     public DataFetcher<String> currency();
 
-    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> fareId();
+    public DataFetcher<String> fareId();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-    public DataFetcher<Double> price();
+    public DataFetcher<Float> price();
 
     public DataFetcher<Iterable<String>> zones();
   }
