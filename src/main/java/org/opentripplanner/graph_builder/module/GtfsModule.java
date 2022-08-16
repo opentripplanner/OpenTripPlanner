@@ -279,8 +279,11 @@ public class GtfsModule implements GraphBuilderModule {
 
     if (LOG.isDebugEnabled()) reader.addEntityHandler(counter);
 
-    var filteredEntities = getEntitiesToRead(reader);
-    for (Class<?> entityClass : filteredEntities) {
+    for (Class<?> entityClass : reader.getEntityClasses()) {
+      if(skipEntityClass(entityClass)) {
+        LOG.info("Skip entities: " + entityClass.getName());
+        continue;
+      }
       LOG.info("reading entities: " + entityClass.getName());
       reader.readEntities(entityClass);
       store.flush();
@@ -354,12 +357,11 @@ public class GtfsModule implements GraphBuilderModule {
    * in the data. We only want to try to parse them when the feature flag is explicitly enabled as
    * it can easily lead to graph build failures.
    */
-  private List<Class<?>> getEntitiesToRead(GtfsReader reader) {
-    if (OTPFeature.FaresV2.isOn()) {
-      return reader.getEntityClasses();
-    } else {
-      return reader.getEntityClasses().stream().filter(c -> !faresV2Entities.contains(c)).toList();
+  private boolean skipEntityClass(Class<?> entityClass) {
+    if (OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass) { 
+      return true;
     }
+    return false;
   }
 
   /**
