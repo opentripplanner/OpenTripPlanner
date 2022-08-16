@@ -108,6 +108,12 @@ public class NodeAdapterTest {
   }
 
   @Test
+  public void rawAsText() {
+    NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
+    assertEquals("TEXT", subject.path("aText").asText());
+  }
+
+  @Test
   public void asEnum() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A' }");
