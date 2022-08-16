@@ -1,8 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import gnu.trove.set.TIntSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -87,8 +90,8 @@ public class TransitLayerUpdater {
     );
 
     Set<LocalDate> datesToBeUpdated = new HashSet<>();
-    Map<TripPattern, TripPatternForDate> newTripPatternsForDate = new HashMap<>();
-    Map<TripPattern, TripPatternForDate> oldTripPatternsForDate = new HashMap<>();
+    SetMultimap<TripPattern, TripPatternForDate> newTripPatternsForDate = HashMultimap.create();
+    SetMultimap<TripPattern, TripPatternForDate> oldTripPatternsForDate = HashMultimap.create();
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -173,14 +176,15 @@ public class TransitLayerUpdater {
       // Remove old cached tripPatterns where tripTimes are no longer running
       Set<TripPatternForDate> patternsForDate = tripPatternsRunningOnDateMapCache.get(date);
 
-      for (Map.Entry<TripPattern, TripPatternForDate> entry : oldTripPatternsForDate.entrySet()) {
-        TripPattern tripPattern = entry.getKey();
-        TripPatternForDate oldTripPatternForDate = oldTripPatternsForDate.get(tripPattern);
-
-        // Remove old TripPatternForDate for this date if it was valid on this date
-        if (oldTripPatternForDate != null) {
-          if (oldTripPatternForDate.getRunningPeriodDates().contains(date)) {
-            patternsForDate.remove(oldTripPatternForDate);
+      for (Map.Entry<TripPattern, Collection<TripPatternForDate>> entry : oldTripPatternsForDate
+        .asMap()
+        .entrySet()) {
+        for (TripPatternForDate oldTripPatternForDate : entry.getValue()) {
+          // Remove old TripPatternForDate for this date if it was valid on this date
+          if (oldTripPatternForDate != null) {
+            if (oldTripPatternForDate.getRunningPeriodDates().contains(date)) {
+              patternsForDate.remove(oldTripPatternForDate);
+            }
           }
         }
       }
@@ -209,13 +213,15 @@ public class TransitLayerUpdater {
         }
       }
 
-      for (Map.Entry<TripPattern, TripPatternForDate> entry : newTripPatternsForDate.entrySet()) {
-        TripPatternForDate newTripPatternForDate = entry.getValue();
-
-        // Add new TripPatternForDate for this date if it mapped correctly and is valid on this date
-        if (newTripPatternForDate != null) {
-          if (newTripPatternForDate.getRunningPeriodDates().contains(date)) {
-            patternsForDate.add(newTripPatternForDate);
+      for (Map.Entry<TripPattern, Collection<TripPatternForDate>> entry : newTripPatternsForDate
+        .asMap()
+        .entrySet()) {
+        for (TripPatternForDate newTripPatternForDate : entry.getValue()) {
+          // Add new TripPatternForDate for this date if it mapped correctly and is valid on this date
+          if (newTripPatternForDate != null) {
+            if (newTripPatternForDate.getRunningPeriodDates().contains(date)) {
+              patternsForDate.add(newTripPatternForDate);
+            }
           }
         }
       }

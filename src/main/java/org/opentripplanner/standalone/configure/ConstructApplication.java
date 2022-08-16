@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import io.micrometer.core.instrument.Metrics;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Application;
 import org.opentripplanner.datastore.api.DataSource;
@@ -8,21 +7,19 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerContext;
 import org.opentripplanner.standalone.server.GrizzlyServer;
-import org.opentripplanner.standalone.server.MetricsLogging;
 import org.opentripplanner.standalone.server.OTPWebApplication;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
@@ -39,56 +36,53 @@ import org.slf4j.LoggerFactory;
  * from running it.
  * <p>
  * The top level construction class(this class) may delegate to other construction classes
- * to inject configuration and services into sub-modules.
+ * to inject configuration and services into submodules. An instance of this class is created
+ * using the {@link LoadApplication} - An application is constructed AFTER config and input files
+ * are loaded.
  * <p>
  * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
  * should be really fast, since the only IO operations are reading config files and logging. Loading
  * transit or map data should NOT happen during this phase.
  */
-public class OTPAppConstruction {
+public class ConstructApplication {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OTPAppConstruction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConstructApplication.class);
 
   private final CommandLineParameters cli;
-  private final OTPApplicationFactory factory;
-  private GraphBuilderDataSources graphBuilderDataSources = null;
-  private DefaultServerContext context;
-  private GraphVisualizer graphVisualizer;
+  private final GraphBuilderDataSources graphBuilderDataSources;
+  private final ConstructApplicationFactory factory;
 
   /**
    * Create a new OTP configuration instance for a given directory.
    */
-  public OTPAppConstruction(CommandLineParameters commandLineParameters) {
-    this.cli = commandLineParameters;
+  ConstructApplication(
+    CommandLineParameters cli,
+    Graph graph,
+    TransitModel transitModel,
+    ConfigModel config,
+    GraphBuilderDataSources graphBuilderDataSources
+  ) {
+    this.cli = cli;
+    this.graphBuilderDataSources = graphBuilderDataSources;
+
+    // We create the optional GraphVisualizer here, because it would be significant more complex to
+    // use Dagger DI to do it - passing in a parameter to enable it or not.
+    var graphVisualizer = cli.visualize
+      ? new GraphVisualizer(graph, config.routerConfig().streetRoutingTimeout())
+      : null;
+
     this.factory =
-      DaggerOTPApplicationFactory.builder().baseDirectory(this.cli.getBaseDirectory()).build();
+      DaggerConstructApplicationFactory
+        .builder()
+        .configModel(config)
+        .graph(graph)
+        .transitModel(transitModel)
+        .graphVisualizer(graphVisualizer)
+        .build();
   }
 
-  public OTPApplicationFactory getFactory() {
+  public ConstructApplicationFactory getFactory() {
     return factory;
-  }
-
-  /**
-   * After the graph and transitModel is read from file or build, then it should be set here,
-   * so it can be used during construction of the web server.
-   */
-  public void updateModel(Graph graph, TransitModel transitModel) {
-    getFactory().graph().set(graph);
-    getFactory().transitModel().set(transitModel);
-
-    this.context =
-      DefaultServerContext.create(
-        factory.configModel().routerConfig(),
-        factory.raptorConfig(),
-        factory.graph().get(),
-        factory.transitModel().get(),
-        Metrics.globalRegistry,
-        traverseVisitor()
-      );
-  }
-
-  public OtpServerContext serverContext() {
-    return context;
   }
 
   /**
@@ -99,11 +93,6 @@ public class OTPAppConstruction {
     return new GrizzlyServer(cli, createApplication());
   }
 
-  public void validateConfigAndDataSources() {
-    // Load Graph Builder Data Sources to validate it.
-    graphBuilderDataSources();
-  }
-
   /**
    * Create the default graph builder.
    */
@@ -111,7 +100,7 @@ public class OTPAppConstruction {
     LOG.info("Wiring up and configuring graph builder task.");
     return GraphBuilder.create(
       buildConfig(),
-      graphBuilderDataSources(),
+      graphBuilderDataSources,
       graph(),
       transitModel(),
       cli.doLoadStreetGraph(),
@@ -127,41 +116,18 @@ public class OTPAppConstruction {
    */
   @Nullable
   public DataSource graphOutputDataSource() {
-    return graphBuilderDataSources().getOutputGraph();
-  }
-
-  private GraphBuilderDataSources graphBuilderDataSources() {
-    if (graphBuilderDataSources == null) {
-      graphBuilderDataSources =
-        GraphBuilderDataSources.create(cli, buildConfig(), factory.datastore());
-    }
-    return graphBuilderDataSources;
+    return graphBuilderDataSources.getOutputGraph();
   }
 
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    return new OTPWebApplication(() -> context.createHttpRequestScopedCopy());
-  }
-
-  public GraphVisualizer graphVisualizer() {
-    if (cli.visualize && graphVisualizer == null) {
-      graphVisualizer =
-        new GraphVisualizer(
-          factory.graph().get(),
-          factory.configModel().routerConfig().streetRoutingTimeout()
-        );
-    }
-    return graphVisualizer;
-  }
-
-  public TraverseVisitor traverseVisitor() {
-    var gv = graphVisualizer();
-    return gv == null ? null : gv.traverseVisitor;
+    return new OTPWebApplication(this::createServerContext);
   }
 
   private void setupTransitRoutingServer() {
-    new MetricsLogging(transitModel(), raptorConfig());
+    // Create MetricsLogging
+    factory.metricsLogging();
 
     creatTransitLayerForRaptor(transitModel(), routerConfig());
 
@@ -180,7 +146,7 @@ public class OTPAppConstruction {
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(context);
+      LuceneIndex.forServer(createServerContext());
     }
   }
 
@@ -209,27 +175,35 @@ public class OTPAppConstruction {
     );
   }
 
+  public TransitModel transitModel() {
+    return factory.transitModel();
+  }
+
+  public Graph graph() {
+    return factory.graph();
+  }
+
+  public OtpConfig otpConfig() {
+    return factory.config().otpConfig();
+  }
+
+  public RouterConfig routerConfig() {
+    return factory.config().routerConfig();
+  }
+
+  public BuildConfig buildConfig() {
+    return factory.config().buildConfig();
+  }
+
   public RaptorConfig<TripSchedule> raptorConfig() {
     return factory.raptorConfig();
   }
 
-  public TransitModel transitModel() {
-    return getFactory().transitModel().get();
+  public GraphVisualizer graphVisualizer() {
+    return factory.graphVisualizer();
   }
 
-  public Graph graph() {
-    return getFactory().graph().get();
-  }
-
-  public Deduplicator deduplicator() {
-    return getFactory().deduplicator();
-  }
-
-  private BuildConfig buildConfig() {
-    return getFactory().configModel().buildConfig();
-  }
-
-  private RouterConfig routerConfig() {
-    return getFactory().configModel().routerConfig();
+  private OtpServerRequestContext createServerContext() {
+    return factory.createServerContext();
   }
 }

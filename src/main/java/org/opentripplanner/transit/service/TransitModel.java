@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -72,7 +73,7 @@ public class TransitModel implements Serializable {
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
-  private StopModel stopModel;
+  private final StopModel stopModel;
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
@@ -104,14 +105,16 @@ public class TransitModel implements Serializable {
 
   private transient TransitAlertService transitAlertService;
 
+  @Inject
   public TransitModel(StopModel stopModel, Deduplicator deduplicator) {
     this.stopModel = stopModel;
     this.deduplicator = deduplicator;
   }
 
-  // Constructor for deserialization.
+  // TODO OTP2 - Is this  needed - how does the final fields get set...
+  /** Constructor for deserialization. */
   public TransitModel() {
-    deduplicator = new Deduplicator();
+    this(null, new Deduplicator());
   }
 
   /**

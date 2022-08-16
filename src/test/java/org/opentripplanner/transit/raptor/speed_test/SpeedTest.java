@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.OTPAppConstruction.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
 import static org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer.nanosToMillisecond;
 
 import java.io.File;
@@ -15,15 +15,14 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.OtpDataStore;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.OtpStartupInfo;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerContext;
+import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.CsvFileIO;
@@ -32,6 +31,7 @@ import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseInpu
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
 
@@ -51,7 +51,7 @@ public class SpeedTest {
   private final SpeedTestCmdLineOpts opts;
   private final SpeedTestConfig config;
   private final List<TestCaseInput> testCaseInputs;
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
   private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
   private final CsvFileIO tcIO;
@@ -71,11 +71,11 @@ public class SpeedTest {
 
     var routerConfig = RouterConfig.DEFAULT;
     this.serverContext =
-      DefaultServerContext.create(
+      DefaultServerRequestContext.create(
         routerConfig,
         new RaptorConfig<>(routerConfig.raptorTuningParameters()),
         graph,
-        transitModel,
+        new DefaultTransitService(transitModel),
         timer.getRegistry(),
         null
       );

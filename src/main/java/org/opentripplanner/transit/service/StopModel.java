@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Vertex;
@@ -57,6 +58,9 @@ public class StopModel implements Serializable {
   private final Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
 
   private transient StopModelIndex index;
+
+  @Inject
+  public StopModel() {}
 
   public void index() {
     LOG.info("Index stop model...");

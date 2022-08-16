@@ -110,6 +110,8 @@ public interface TransitService {
 
   TripPattern getPatternForTrip(Trip trip);
 
+  TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate);
+
   Collection<TripPattern> getPatternsForRoute(Route route);
 
   MultiModalStation getMultiModalStationForStation(Station station);

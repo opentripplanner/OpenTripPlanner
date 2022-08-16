@@ -22,7 +22,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,11 +35,11 @@ public class LegacyGraphQLAPI {
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(LegacyGraphQLAPI.class);
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public LegacyGraphQLAPI(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760

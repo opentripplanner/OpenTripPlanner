@@ -30,13 +30,7 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    // Check if pattern is changed by real-time updater
-    TripPattern tripPattern = transitService.getRealtimeAddedTripPattern(tripId, serviceDate);
-
-    // Otherwise use scheduled pattern
-    if (tripPattern == null) {
-      tripPattern = transitService.getPatternForTrip(trip);
-    }
+    TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
 
     // no matching pattern found anywhere
     if (tripPattern == null) {
