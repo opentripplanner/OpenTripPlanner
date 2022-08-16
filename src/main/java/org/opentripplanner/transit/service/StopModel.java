@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -20,7 +19,6 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.util.MedianCalcForDoubles;
 import org.opentripplanner.util.lang.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +34,11 @@ public class StopModel implements Serializable {
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
+  private final Map<FeedScopedId, FlexStopLocation> flexStopsById;
+  private final Map<FeedScopedId, FlexLocationGroup> flexStopGroupsById;
 
   /** The density center of the graph for determining the initial geographic extent in the client. */
-  private Coordinate center = null;
-
-  private final Map<FeedScopedId, FlexStopLocation> flexStopsById;
-
-  private final Map<FeedScopedId, FlexLocationGroup> flexStopGroupsById;
+  private final WgsCoordinate stopLocationCenter;
 
   private transient StopModelIndex index;
 
@@ -54,6 +50,7 @@ public class StopModel implements Serializable {
     this.groupOfStationsById = new HashMap<>();
     this.flexStopsById = new HashMap<>();
     this.flexStopGroupsById = new HashMap<>();
+    this.stopLocationCenter = null;
   }
 
   public StopModel(StopModelBuilder builder) {
@@ -63,6 +60,7 @@ public class StopModel implements Serializable {
     this.groupOfStationsById = builder.groupOfStationsById().asImmutableMap();
     this.flexStopsById = builder.flexStopsById().asImmutableMap();
     this.flexStopGroupsById = builder.flexStopGroupsById().asImmutableMap();
+    this.stopLocationCenter = builder.calculateTransitCenter();
   }
 
   public static StopModelBuilder of() {
@@ -197,39 +195,8 @@ public class StopModel implements Serializable {
     return findById(id, stationById, multiModalStationById, groupOfStationsById);
   }
 
-  /**
-   * Calculates Transit center from median of coordinates of all transitStops if graph has transit.
-   * If it doesn't it isn't calculated. (mean value of min, max latitude and longitudes are used)
-   * <p>
-   * Transit center is saved in center variable
-   * <p>
-   * This speeds up calculation, but problem is that median needs to have all of
-   * latitudes/longitudes in memory, this can become problematic in large installations. It works
-   * without a problem on New York State.
-   */
-  public void calculateTransitCenter() {
-    var stops = getAllStopLocations();
-
-    if (stops.isEmpty()) {
-      return;
-    }
-
-    // we need this check because there could be only FlexStopLocations (which don't have vertices)
-    // in the graph
-    var medianCalculator = new MedianCalcForDoubles(stops.size());
-
-    stops.forEach(v -> medianCalculator.add(v.getLon()));
-    double lon = medianCalculator.median();
-
-    medianCalculator.reset();
-    stops.forEach(v -> medianCalculator.add(v.getLat()));
-    double lat = medianCalculator.median();
-
-    this.center = new Coordinate(lon, lat);
-  }
-
-  public Optional<Coordinate> getCenter() {
-    return Optional.ofNullable(center);
+  public Optional<WgsCoordinate> stopLocationCenter() {
+    return Optional.ofNullable(stopLocationCenter);
   }
 
   public void addStation(Station station) {
@@ -256,7 +223,7 @@ public class StopModel implements Serializable {
    * built
    */
   @Nullable
-  public FlexStopLocation getFlexStopsById(FeedScopedId id) {
+  public FlexStopLocation getFlexStopById(FeedScopedId id) {
     return flexStopsById.get(id);
   }
 
@@ -311,8 +278,7 @@ public class StopModel implements Serializable {
     return getStopModelIndex().stopByIndex(index);
   }
 
-  // TODO rename to stopIndexSize
-  public int size() {
+  public int stopIndexSize() {
     return getStopModelIndex().stopIndexSize();
   }
 

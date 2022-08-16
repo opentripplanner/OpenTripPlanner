@@ -26,7 +26,7 @@ class FlexStopLocationTest {
 
   private static final LineString GEOMETRY = GeometryUtils.makeLineString(10, 0, 12, 4);
 
-  private static final WgsCoordinate COORDINATE = new WgsCoordinate(2,11);
+  private static final WgsCoordinate COORDINATE = new WgsCoordinate(2, 11);
 
   private static final FlexStopLocation subject = FlexStopLocation
     .of(TransitModelForTest.id(ID))

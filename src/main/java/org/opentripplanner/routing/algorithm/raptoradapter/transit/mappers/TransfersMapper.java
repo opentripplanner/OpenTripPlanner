@@ -17,7 +17,7 @@ class TransfersMapper {
   static List<List<Transfer>> mapTransfers(StopModel stopModel, TransitModel transitModel) {
     List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
-    for (int i = 0; i < stopModel.size(); ++i) {
+    for (int i = 0; i < stopModel.stopIndexSize(); ++i) {
       var stop = stopModel.stopByIndex(i);
       ArrayList<Transfer> list = new ArrayList<>();
       transferByStopIndex.add(list);

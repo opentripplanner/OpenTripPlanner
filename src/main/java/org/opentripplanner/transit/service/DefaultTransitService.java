@@ -31,6 +31,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -163,10 +164,10 @@ public class DefaultTransitService implements TransitEditorService {
       .getOrDefault(serviceDate, new TIntHashSet());
   }
 
-  /** {@link StopModel#getFlexStopsById(FeedScopedId)} */
+  /** {@link StopModel#getFlexStopById(FeedScopedId)} */
   @Override
   public FlexStopLocation getLocationById(FeedScopedId id) {
-    return this.transitModel.getStopModel().getFlexStopsById(id);
+    return this.transitModel.getStopModel().getFlexStopById(id);
   }
 
   /** {@link TransitModelIndex#getAgencyForId(FeedScopedId)} */
@@ -574,7 +575,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Optional<Coordinate> getCenter() {
-    return transitModel.getStopModel().getCenter();
+    return transitModel.getStopModel().stopLocationCenter().map(WgsCoordinate::asJtsCoordinate);
   }
 
   @Override

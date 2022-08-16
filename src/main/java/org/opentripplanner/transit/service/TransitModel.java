@@ -399,10 +399,6 @@ public class TransitModel implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  public void calculateTransitCenter() {
-    stopModel.calculateTransitCenter();
-  }
-
   public StopModel getStopModel() {
     return stopModel;
   }
@@ -460,9 +456,6 @@ public class TransitModel implements Serializable {
 
   private void updateHasTransit(boolean hasTransit) {
     this.hasTransit = this.hasTransit || hasTransit;
-    if (hasTransit) {
-      calculateTransitCenter();
-    }
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
