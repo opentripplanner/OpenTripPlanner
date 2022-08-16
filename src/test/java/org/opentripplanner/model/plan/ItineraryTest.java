@@ -20,11 +20,11 @@ public class ItineraryTest implements PlanTestConstants {
     Itinerary result = newItinerary(A, T11_00).walk(D5m, B).build();
 
     // Expected fields on itinerary set
-    assertEquals(ofSeconds(300), result.getDuration());
+    assertEquals(ofMinutes(5), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(600, result.getGeneralizedCost());
     assertEquals(ZERO, result.getTransitTime());
-    assertEquals(ofSeconds(300), result.getNonTransitTime());
+    assertEquals(ofMinutes(5), result.getNonTransitTime());
     assertEquals(ZERO, result.getWaitingTime());
     assertTrue(result.isWalkOnly());
 
@@ -43,10 +43,10 @@ public class ItineraryTest implements PlanTestConstants {
   public void testDerivedFieldsWithBusAllTheWay() {
     Itinerary result = newItinerary(A).bus(55, T11_00, T11_10, B).build();
 
-    assertEquals(ofSeconds(600), result.getDuration());
+    assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
-    assertEquals(ofSeconds(600), result.getTransitTime());
+    assertEquals(ofMinutes(10), result.getTransitTime());
     assertEquals(ZERO, result.getNonTransitTime());
     assertEquals(ZERO, result.getWaitingTime());
     assertFalse(result.isWalkOnly());
@@ -67,10 +67,10 @@ public class ItineraryTest implements PlanTestConstants {
   public void testDerivedFieldsWithTrainAllTheWay() {
     Itinerary result = newItinerary(A).rail(20, T11_05, T11_15, B).build();
 
-    assertEquals(ofSeconds(600), result.getDuration());
+    assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
-    assertEquals(ofSeconds(600), result.getTransitTime());
+    assertEquals(ofMinutes(10), result.getTransitTime());
     assertEquals(ZERO, result.getNonTransitTime());
     assertEquals(ZERO, result.getWaitingTime());
     assertFalse(result.isWalkOnly());
@@ -99,7 +99,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(1, itinerary.getNumberOfTransfers());
     assertEquals(ofMinutes(28), itinerary.getDuration());
     assertEquals(ofMinutes(20), itinerary.getTransitTime());
-    assertEquals(ofSeconds(60), itinerary.getNonTransitTime());
+    assertEquals(ofMinutes(1), itinerary.getNonTransitTime());
     assertEquals(ofMinutes((2 + 5)), itinerary.getWaitingTime());
     // Cost: walk + wait + board + transit = 2 * 60 + .8 * 420 + 2 * 120 + 1200
     assertEquals(1896, itinerary.getGeneralizedCost());
@@ -117,11 +117,11 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D3m, D)
       .build();
 
-    assertEquals(ofSeconds(1080), result.getDuration());
+    assertEquals(ofMinutes(18), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(ofSeconds(600), result.getTransitTime());
-    assertEquals(ofSeconds(300), result.getNonTransitTime());
-    assertEquals(ofSeconds(180), result.getWaitingTime());
+    assertEquals(ofMinutes(10), result.getTransitTime());
+    assertEquals(ofMinutes(5), result.getNonTransitTime());
+    assertEquals(ofMinutes(3), result.getWaitingTime());
     // Cost: walk + wait + board + transit = 2 * 300 + .8 * 180 + 120 + 600
     assertEquals(1464, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
@@ -140,11 +140,11 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D1m, G)
       .build();
 
-    assertEquals(ofSeconds(3060), result.getDuration());
+    assertEquals(ofMinutes(51), result.getDuration());
     assertEquals(2, result.getNumberOfTransfers());
-    assertEquals(ofSeconds(2040), result.getTransitTime());
-    assertEquals(ofSeconds(360), result.getNonTransitTime());
-    assertEquals(ofSeconds(660), result.getWaitingTime());
+    assertEquals(ofMinutes(34), result.getTransitTime());
+    assertEquals(ofMinutes(6), result.getNonTransitTime());
+    assertEquals(ofMinutes(11), result.getWaitingTime());
     assertEquals(720 + 528 + 360 + 2040, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
     assertSameLocation(A, result.firstLeg().getFrom());
