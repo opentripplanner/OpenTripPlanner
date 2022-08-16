@@ -1307,7 +1307,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TripPattern realtimeAddedTripPattern = null;
     TimetableSnapshot timetableSnapshot = snapshot;
     if (timetableSnapshot != null) {
-      realtimeAddedTripPattern = timetableSnapshot.getRealtimeAddedTripPattern(trip.getId(), journeyDate);
+      realtimeAddedTripPattern =
+        timetableSnapshot.getRealtimeAddedTripPattern(trip.getId(), journeyDate);
     }
 
     TripPattern tripPattern;
