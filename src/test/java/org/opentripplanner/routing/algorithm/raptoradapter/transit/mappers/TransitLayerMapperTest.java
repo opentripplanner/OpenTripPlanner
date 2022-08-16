@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
-import org.opentripplanner.transit.service.StopIndexMock;
+import org.opentripplanner.transit.service.StopModelMock;
 
 class TransitLayerMapperTest {
 
@@ -54,7 +54,7 @@ class TransitLayerMapperTest {
   @Test
   public void createStopTransferCosts() {
     int[] result = TransitLayerMapper.createStopTransferCosts(
-      new StopIndexMock(STOPS),
+      new StopModelMock(STOPS),
       TransitTuningParameters.FOR_TEST
     );
 

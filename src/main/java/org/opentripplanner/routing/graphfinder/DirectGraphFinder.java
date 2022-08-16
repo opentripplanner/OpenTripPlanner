@@ -9,7 +9,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -18,10 +18,10 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class DirectGraphFinder implements GraphFinder {
 
-  private final StopModelIndex stopModelIndex;
+  private final StopModel stopModel;
 
   public DirectGraphFinder(Graph graph) {
-    this.stopModelIndex = graph.getStopModel().getStopModelIndex();
+    this.stopModel = graph.getStopModel();
   }
 
   /**
@@ -37,7 +37,7 @@ public class DirectGraphFinder implements GraphFinder {
       SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),
       SphericalDistanceLibrary.metersToDegrees(radiusMeters)
     );
-    for (Stop it : stopModelIndex.queryStopSpatialIndex(envelope)) {
+    for (Stop it : stopModel.queryStopSpatialIndex(envelope)) {
       double distance = Math.round(
         SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );

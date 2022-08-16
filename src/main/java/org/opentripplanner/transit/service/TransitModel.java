@@ -382,7 +382,7 @@ public class TransitModel implements Serializable {
    * Finds a {@link StopLocation} by id.
    */
   public StopLocation getStopLocationById(FeedScopedId id) {
-    return stopModel.getStopModelIndex().getStopForId(id);
+    return stopModel.getStopForId(id);
   }
 
   /**

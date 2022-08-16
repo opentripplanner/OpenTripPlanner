@@ -13,13 +13,10 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 class FlexLocationAdder {
 
   static void addFlexLocations(StreetEdge edge, SplitterVertex v0, StopModel stopModel) {
-    if (
-      stopModel.getStopModelIndex() != null &&
-      edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)
-    ) {
+    if (edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)) {
       Point p = GeometryUtils.getGeometryFactory().createPoint(v0.getCoordinate());
       Envelope env = p.getEnvelopeInternal();
-      for (FlexStopLocation location : stopModel.getStopModelIndex().queryLocationIndex(env)) {
+      for (FlexStopLocation location : stopModel.queryLocationIndex(env)) {
         if (!location.getGeometry().disjoint(p)) {
           if (v0.flexStopLocations == null) {
             v0.flexStopLocations = new HashSet<>();
