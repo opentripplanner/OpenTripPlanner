@@ -18,6 +18,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public final class GtfsFaresV2Service implements Serializable {
@@ -49,6 +50,21 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary, legProducts);
   }
 
+  private static Set<String> findAreasWithRules(
+    List<FareLegRule> legRules,
+    Function<FareLegRule, String> getArea
+  ) {
+    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
+  }
+
+  private static Set<String> findNetworksWithRules(Collection<FareLegRule> legRules) {
+    return legRules
+      .stream()
+      .map(FareLegRule::networkId)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toSet());
+  }
+
   private Set<FareProduct> productsCoveringItinerary(
     Itinerary itinerary,
     Collection<LegProducts> legProducts
@@ -66,21 +82,6 @@ public final class GtfsFaresV2Service implements Serializable {
     } else {
       return Set.of();
     }
-  }
-
-  private static Set<String> findAreasWithRules(
-    List<FareLegRule> legRules,
-    Function<FareLegRule, String> getArea
-  ) {
-    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
-  }
-
-  private static Set<String> findNetworksWithRules(Collection<FareLegRule> legRules) {
-    return legRules
-      .stream()
-      .map(FareLegRule::networkId)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toSet());
   }
 
   private LegProducts getLegProduct(ScheduledTransitLeg leg) {
@@ -112,16 +113,26 @@ public final class GtfsFaresV2Service implements Serializable {
    * depends on the presence/absence of other rules with that network id.
    */
   private boolean filterByNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
+    var routesNetworkIds = leg
+      .getRoute()
+      .getGroupsOfRoutes()
+      .stream()
+      .map(GroupOfRoutes::getPrivateCode)
+      .filter(Objects::nonNull)
+      .toList();
+
     return (
-      (isNull(rule.networkId()) && !networksWithRules.contains(leg.getRoute().getNetworkId())) ||
-      Objects.equals(rule.networkId(), leg.getRoute().getNetworkId())
+      (
+        isNull(rule.networkId()) && networksWithRules.stream().noneMatch(routesNetworkIds::contains)
+      ) ||
+      routesNetworkIds.contains(rule.networkId())
     );
   }
 }
 
 /**
  * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
- * @param legProducts The fare products that cover only individual legs.
+ * @param legProducts       The fare products that cover only individual legs.
  */
 record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
   public Set<FareProduct> getProducts(Leg leg) {

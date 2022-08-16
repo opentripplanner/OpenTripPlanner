@@ -18,6 +18,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -209,8 +211,20 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Place to,
     String networkId
   ) {
+    Route route = RAIL_ROUTE;
+    if (networkId != null) {
+      var builder = RAIL_ROUTE.copy();
+      var group = GroupOfRoutes
+        .of(new FeedScopedId("1", networkId))
+        .withPrivateCode(networkId)
+        .withName(networkId)
+        .build();
+      builder.getGroupsOfRoutes().add(group);
+      route = builder.build();
+    }
+
     return transit(
-      RAIL_ROUTE.copy().withNetworkId(networkId).build(),
+      route,
       tripId,
       startTime,
       endTime,
