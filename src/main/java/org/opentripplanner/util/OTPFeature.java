@@ -33,6 +33,7 @@ public enum OTPFeature {
   // Sandbox extension features - Must be turned OFF by default
   ActuatorAPI(false),
   DataOverlay(false),
+  FaresV2(false),
   FlexRouting(false),
   GoogleCloudStorage(false),
   ReportApi(false),
@@ -43,8 +44,7 @@ public enum OTPFeature {
   SandboxAPITravelTime(false),
   SandboxAPIParkAndRideApi(false),
   TransferAnalyzer(false),
-  VehicleToStopHeuristics(false),
-  FaresV2(false);
+  VehicleToStopHeuristics(false);
 
   private static final Object TEST_SEMAPHORE = new Object();
 
