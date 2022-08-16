@@ -25,9 +25,9 @@ review.
       so try to init them once, and throw an exception if set again. 
       Example:
 ```java 
-   Builder initStop(Stop stop) { 
-     if(this.stop != null) { throw new IllegalStateException("..."); } 
-   }  
+Builder initStop(Stop stop) { 
+   this.stop = requireNotInitialized(this.stop, stop);
+}
 ``` 
 
 
