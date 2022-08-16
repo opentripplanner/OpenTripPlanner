@@ -4,6 +4,7 @@ import dagger.BindsInstance;
 import dagger.Component;
 import java.time.ZoneId;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
@@ -64,7 +65,7 @@ public interface GraphBuilderFactory {
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);
 
     @BindsInstance
-    Builder timeZoneId(ZoneId zoneId);
+    Builder timeZoneId(@Nullable ZoneId zoneId);
 
     GraphBuilderFactory build();
   }

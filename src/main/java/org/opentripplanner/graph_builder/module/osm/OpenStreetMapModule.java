@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -141,11 +142,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final Graph graph;
   private final ZoneId timeZoneId;
 
+  private boolean hasWarnedAboutMissingTimeZone = false;
+
   public OpenStreetMapModule(
     Collection<OpenStreetMapProvider> providers,
     Set<String> boardingAreaRefTags,
     Graph graph,
-    ZoneId timeZoneId,
+    @Nullable ZoneId timeZoneId,
     DataImportIssueStore issueStore
   ) {
     this.providers = List.copyOf(providers);
@@ -175,15 +178,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.maxAreaNodes = config.maxAreaNodes;
   }
 
-  public OpenStreetMapModule(
-    OpenStreetMapProvider provider,
-    Graph graph,
-    ZoneId timeZoneId,
-    DataImportIssueStore issueStore
-  ) {
-    this(List.of(provider), Set.of(), graph, timeZoneId, issueStore);
-  }
-
   /**
    * Set the way properties from a {@link WayPropertySetSource} source.
    *
@@ -197,8 +191,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), timeZoneId, issueStore);
+    if (timeZoneId != null) {
+      this.osmOpeningHoursParser =
+        new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), timeZoneId, issueStore);
+    }
+
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
@@ -784,6 +781,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       final var id = entity.getId();
       final var link = entity.getOpenStreetMapLink();
       if (openingHoursTag != null) {
+        if (osmOpeningHoursParser == null) {
+          warnAboutMissingTimeZone();
+          return null;
+        }
         try {
           return osmOpeningHoursParser.parseOpeningHours(openingHoursTag, String.valueOf(id), link);
         } catch (OpeningHoursParseException e) {
@@ -1678,6 +1679,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         return vertex;
       }
       return vertices.get(level);
+    }
+  }
+
+  private void warnAboutMissingTimeZone() {
+    if (!hasWarnedAboutMissingTimeZone) {
+      hasWarnedAboutMissingTimeZone = true;
+      LOG.warn(
+        "Missing time zone - time-restricted entities will not be created, please configure it in the build-config.json"
+      );
     }
   }
 }
