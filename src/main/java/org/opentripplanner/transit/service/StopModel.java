@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -55,6 +56,9 @@ public class StopModel implements Serializable {
   private final Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
 
   private transient StopModelIndex index;
+
+  @Inject
+  public StopModel() {}
 
   public TransitStopVertex getStopVertexForStop(Stop stop) {
     return index.getStopVertexForStop(stop);

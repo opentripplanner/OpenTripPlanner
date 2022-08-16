@@ -64,7 +64,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -95,7 +95,7 @@ public class TravelTimeResource {
   private final TransitService transitService;
 
   public TravelTimeResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,

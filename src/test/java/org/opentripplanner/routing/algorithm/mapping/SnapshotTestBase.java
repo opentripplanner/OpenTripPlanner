@@ -42,11 +42,10 @@ import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.TestUtils;
@@ -69,7 +68,7 @@ public abstract class SnapshotTestBase {
 
   static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
 
-  protected OtpServerContext serverContext;
+  protected OtpServerRequestContext serverContext;
 
   public static void loadGraphBeforeClass(boolean withElevation) {
     if (withElevation) {
@@ -79,7 +78,7 @@ public abstract class SnapshotTestBase {
     }
   }
 
-  protected OtpServerContext serverContext() {
+  protected OtpServerRequestContext serverContext() {
     if (serverContext == null) {
       TestOtpModel model = getGraph();
       serverContext = TestServerContext.createServerContext(model.graph(), model.transitModel());
@@ -100,7 +99,7 @@ public abstract class SnapshotTestBase {
     int minute,
     int second
   ) {
-    OtpServerContext serverContext = serverContext();
+    OtpServerRequestContext serverContext = serverContext();
 
     RoutingRequest request = serverContext.defaultRoutingRequest();
     request.setDateTime(

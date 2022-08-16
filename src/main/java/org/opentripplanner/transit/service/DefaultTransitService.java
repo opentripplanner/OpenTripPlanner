@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -66,6 +67,7 @@ public class DefaultTransitService implements TransitEditorService {
    */
   private TimetableSnapshot timetableSnapshot;
 
+  @Inject
   public DefaultTransitService(TransitModel transitModel) {
     this.transitModel = transitModel;
     this.transitModelIndex = transitModel.getTransitModelIndex();
