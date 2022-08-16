@@ -142,6 +142,7 @@ public class StopModel implements Serializable {
   }
 
   public void addFlexLocation(FeedScopedId id, FlexStopLocation flexStopLocation) {
+    invalidateIndex();
     locationsById.put(id, flexStopLocation);
   }
 
@@ -154,6 +155,7 @@ public class StopModel implements Serializable {
   }
 
   public void addFlexLocationGroup(FeedScopedId id, FlexLocationGroup flexLocationGroup) {
+    invalidateIndex();
     locationGroupsById.put(id, flexLocationGroup);
   }
 
@@ -225,6 +227,7 @@ public class StopModel implements Serializable {
   }
 
   public void addTransitStopVertex(FeedScopedId id, TransitStopVertex stopVertex) {
+    invalidateIndex();
     transitStopVertices.put(id, stopVertex);
   }
 
@@ -262,14 +265,17 @@ public class StopModel implements Serializable {
   }
 
   public void addStation(Station station) {
+    invalidateIndex();
     stationById.put(station.getId(), station);
   }
 
   public void addMultiModalStation(MultiModalStation multiModalStation) {
+    invalidateIndex();
     multiModalStationById.put(multiModalStation.getId(), multiModalStation);
   }
 
   public void addGroupsOfStations(GroupOfStations groupOfStations) {
+    invalidateIndex();
     groupOfStationsById.put(groupOfStations.getId(), groupOfStations);
   }
 
@@ -314,5 +320,9 @@ public class StopModel implements Serializable {
 
   public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
     return getStopModelIndex().queryLocationIndex(envelope);
+  }
+
+  private void invalidateIndex() {
+    this.index = null;
   }
 }
