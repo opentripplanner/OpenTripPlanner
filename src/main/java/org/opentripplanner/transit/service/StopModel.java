@@ -32,32 +32,44 @@ public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
 
-  private final Map<FeedScopedId, Stop> regularTransitStopById = new HashMap<>();
-  private final Map<FeedScopedId, Station> stationById = new HashMap<>();
-  private final Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
-  /**
-   * Optional grouping that can contain both stations and multimodal stations (only supported in
-   * NeTEx)
-   */
-  private final Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
+  private final Map<FeedScopedId, Stop> stopsById;
+  private final Map<FeedScopedId, Station> stationById;
+  private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
+  private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
 
   /** The density center of the graph for determining the initial geographic extent in the client. */
   private Coordinate center = null;
 
-  private final Map<FeedScopedId, FlexStopLocation> flexStopsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexStopLocation> flexStopsById;
 
-  private final Map<FeedScopedId, FlexLocationGroup> flexStopGroupsById = new HashMap<>();
+  private final Map<FeedScopedId, FlexLocationGroup> flexStopGroupsById;
 
   private transient StopModelIndex index;
 
   @Inject
-  public StopModel() {}
+  public StopModel() {
+    this.stopsById = new HashMap<>();
+    this.stationById = new HashMap<>();
+    this.multiModalStationById = new HashMap<>();
+    this.groupOfStationsById = new HashMap<>();
+    this.flexStopsById = new HashMap<>();
+    this.flexStopGroupsById = new HashMap<>();
+  }
+
+  public StopModel(StopModelBuilder builder) {
+    this.stopsById = builder.stopsById().asImmutableMap();
+    this.stationById = builder.stationsById().asImmutableMap();
+    this.multiModalStationById = builder.multiModalStationsById().asImmutableMap();
+    this.groupOfStationsById = builder.groupOfStationsById().asImmutableMap();
+    this.flexStopsById = builder.flexStopsById().asImmutableMap();
+    this.flexStopGroupsById = builder.flexStopGroupsById().asImmutableMap();
+  }
 
   public void index() {
     LOG.info("Index stop model...");
     index =
       new StopModelIndex(
-        regularTransitStopById.values(),
+        stopsById.values(),
         flexStopsById.values(),
         flexStopGroupsById.values(),
         multiModalStationById.values(),
@@ -118,6 +130,10 @@ public class StopModel implements Serializable {
     flexStopGroupsById.put(group.getId(), group);
   }
 
+  public Collection<FlexLocationGroup> getAllFlexStopGroups() {
+    return flexStopGroupsById.values();
+  }
+
   /**
    * Return all stops associated with the given id. All child stops are returned in case a Station,
    * a MultiModalStation, or a GroupOfStations id found. If not regular transit stops, flex stop
@@ -155,13 +171,17 @@ public class StopModel implements Serializable {
     return stationById.get(id);
   }
 
+  public Collection<Station> getStations() {
+    return stationById.values();
+  }
+
   @Nullable
   public MultiModalStation getMultiModalStation(FeedScopedId id) {
     return multiModalStationById.get(id);
   }
 
-  public Collection<Station> getStations() {
-    return stationById.values();
+  public Collection<MultiModalStation> getAllMultiModalStations() {
+    return multiModalStationById.values();
   }
 
   /**
@@ -218,6 +238,10 @@ public class StopModel implements Serializable {
     multiModalStationById.put(multiModalStation.getId(), multiModalStation);
   }
 
+  public Collection<GroupOfStations> getAllGroupOfStations() {
+    return groupOfStationsById.values();
+  }
+
   public void addGroupsOfStations(GroupOfStations groupOfStations) {
     invalidateIndex();
     groupOfStationsById.put(groupOfStations.getId(), groupOfStations);
@@ -240,7 +264,7 @@ public class StopModel implements Serializable {
    * Return a regular transit stop if found(not flex stops).
    */
   public Stop getRegularTransitStopById(FeedScopedId id) {
-    return regularTransitStopById.get(id);
+    return stopsById.get(id);
   }
 
   @Nullable
@@ -253,7 +277,7 @@ public class StopModel implements Serializable {
    */
   public Collection<StopLocation> getAllStopLocations() {
     return new CollectionsView<>(
-      regularTransitStopById.values(),
+      stopsById.values(),
       flexStopsById.values(),
       flexStopGroupsById.values()
     );
@@ -263,7 +287,7 @@ public class StopModel implements Serializable {
    * Return all regular transit stops, not flex stops and flex group of stops.
    */
   public Collection<Stop> getAllStops() {
-    return regularTransitStopById.values();
+    return stopsById.values();
   }
 
   /**
@@ -271,12 +295,12 @@ public class StopModel implements Serializable {
    */
   @Nullable
   public StopLocation getStopLocationById(FeedScopedId id) {
-    return findById(id, regularTransitStopById, flexStopsById, flexStopGroupsById);
+    return findById(id, stopsById, flexStopsById, flexStopGroupsById);
   }
 
   public void addStop(Stop stop) {
     invalidateIndex();
-    regularTransitStopById.put(stop.getId(), stop);
+    stopsById.put(stop.getId(), stop);
   }
 
   public StopLocation stopByIndex(int index) {
