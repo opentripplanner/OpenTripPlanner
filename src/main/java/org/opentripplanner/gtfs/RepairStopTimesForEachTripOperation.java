@@ -34,8 +34,6 @@ public class RepairStopTimesForEachTripOperation {
     RepairStopTimesForEachTripOperation.class
   );
 
-  private static final int SECONDS_IN_HOUR = 60 * 60;
-
   private final TripStopTimes stopTimesByTrip;
 
   private final DataImportIssueStore issueStore;
@@ -71,7 +69,7 @@ public class RepairStopTimesForEachTripOperation {
       if (!removedStopSequences.isEmpty()) {
         issueStore.add(new RepeatedStops(trip, removedStopSequences));
       }
-      if (!FlexTrip.containsFlexStops(stopTimes) && !filterStopTimes(stopTimes)) {
+      if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
       } else {
         interpolateStopTimes(stopTimes);
@@ -132,7 +130,7 @@ public class RepairStopTimesForEachTripOperation {
    * @return whether the stop time is usable
    */
   private boolean filterStopTimes(List<StopTime> stopTimes) {
-    if (stopTimes.size() < 2) {
+    if (stopTimes.size() < 2 && !FlexTrip.containsFlexStops(stopTimes)) {
       return false;
     }
 
