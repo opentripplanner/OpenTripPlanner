@@ -77,7 +77,7 @@ public class CsvFileIO {
     if (!tcIds.isEmpty()) {
       LOG.warn(
         "No results file written, at least one test-case is not run or returned without any result!" +
-        " Test-Cases: " +
+        " Failed Test-Cases: " +
         tcIds
       );
       return;

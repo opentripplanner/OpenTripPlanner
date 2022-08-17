@@ -129,6 +129,9 @@ public class SpeedTestTimer {
 
   public int totalTimerMean(String timerName) {
     long count = getTotalTimers(timerName).mapToLong(Timer::count).sum();
+    if (count == 0) {
+      return 0;
+    }
     return (int) (testTotalTimeMs(timerName) / count);
   }
 

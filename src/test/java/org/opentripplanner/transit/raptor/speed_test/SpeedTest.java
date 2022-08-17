@@ -183,11 +183,10 @@ public class SpeedTest {
     // We assume we are debugging and not measuring performance if we only run 1 test-case
     // one time; Hence skip JIT compiler warm-up.
     int samplesPrProfile = opts.numberOfTestsSamplesToRun() / opts.profiles().length;
-    if (testCases.size() > 1 || samplesPrProfile > 1) {
+    if (testCases.size() > 1 && samplesPrProfile > 1) {
       // Warm-up JIT compiler, run the second test-case if it exist to avoid the same
       // test case from being repeated. If there is just one case, then run it.
-      int index = testCases.size() == 1 ? 0 : 1;
-      runSingleTestCase(testCases.get(index), true);
+      runSingleTestCase(testCases.get(1), true);
     }
 
     ResultPrinter.logSingleTestHeader(routeProfile);
