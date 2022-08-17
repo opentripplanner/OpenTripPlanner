@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 public class VilkkuBikeRentalDataSource extends GenericXmlDataSource<VehicleRentalPlace> {
 
   private static final Logger LOG = LoggerFactory.getLogger(VilkkuBikeRentalDataSource.class);
-  public static String DEFAULT_FEED_NAME = "vilkku";
-  private static String stationXpath = "//station";
-  private static List<String> REQUIRED_STATION_PROPERTIES = List.of(
+  public static final String DEFAULT_FEED_NAME = "vilkku";
+  private static final String stationXpath = "//station";
+  private static final List<String> REQUIRED_STATION_PROPERTIES = List.of(
     "name",
     "externallyLockedBikes",
     "latitude",
