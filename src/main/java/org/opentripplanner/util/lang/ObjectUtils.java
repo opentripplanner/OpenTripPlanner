@@ -17,6 +17,10 @@ public class ObjectUtils {
     return value != null ? value : defaultValue;
   }
 
+  /**
+   * Similar to {@link #ifNotNull(Object, Object)}, but take a function to access the
+   * entity field. The given {@code defaultValue} can be {@code null}.
+   * */
   @Nullable
   public static <E, T> T ifNotNull(
     @Nullable E entity,
@@ -27,5 +31,14 @@ public class ObjectUtils {
       return defaultValue;
     }
     return ifNotNull(getter.apply(entity), defaultValue);
+  }
+
+  public static <T> T requireNotInitialized(T oldValue, T newValue) {
+    if (oldValue != null) {
+      throw new IllegalStateException(
+        "Field is already set! Old value: " + oldValue + ", new value: " + newValue
+      );
+    }
+    return newValue;
   }
 }

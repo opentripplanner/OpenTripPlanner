@@ -2,6 +2,7 @@ package org.opentripplanner.util.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,5 +30,14 @@ class ObjectUtilsTest {
     var o = new AtomicReference<String>(null);
     assertEquals("DEFAULT", ObjectUtils.ifNotNull(o, AtomicReference::get, "DEFAULT"));
     assertNull(ObjectUtils.ifNotNull(o, AtomicReference::get, null));
+  }
+
+  @Test
+  void requireNotInitialized() {
+    assertEquals("new", ObjectUtils.requireNotInitialized(null, "new"));
+    assertThrows(
+      IllegalStateException.class,
+      () -> ObjectUtils.requireNotInitialized("old", "new")
+    );
   }
 }

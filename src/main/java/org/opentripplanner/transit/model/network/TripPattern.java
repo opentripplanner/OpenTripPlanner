@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentripplanner.util.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,10 +106,7 @@ public final class TripPattern
   }
 
   public void initName(String name) {
-    if (this.name != null) {
-      throw new IllegalStateException("Name has already been set");
-    }
-    this.name = name;
+    this.name = requireNotInitialized(this.name, name);
   }
 
   /**
