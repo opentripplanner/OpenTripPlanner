@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -18,8 +19,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * perm gen space and is broken anyway.
  */
 public class Deduplicator implements Serializable {
-
-  private static final long serialVersionUID = 20140524L;
 
   private final Map<BitSet, BitSet> canonicalBitSets = new HashMap<>();
   private final Map<IntArray, IntArray> canonicalIntArrays = new HashMap<>();
@@ -30,6 +29,9 @@ public class Deduplicator implements Serializable {
   private final Map<Class<?>, Map<List<?>, List<?>>> canonicalLists = new HashMap<>();
 
   private final Map<String, Integer> effectCounter = new HashMap<>();
+
+  @Inject
+  public Deduplicator() {}
 
   /** Free up any memory used by the deduplicator. */
   public void reset() {

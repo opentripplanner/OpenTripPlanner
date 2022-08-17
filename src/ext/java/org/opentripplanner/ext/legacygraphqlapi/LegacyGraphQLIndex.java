@@ -78,7 +78,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLplaceA
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLserviceTimeRangeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,7 +167,7 @@ class LegacyGraphQLIndex {
 
   static ExecutionResult getGraphQLExecutionResult(
     String query,
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -214,7 +214,7 @@ class LegacyGraphQLIndex {
 
   static Response getGraphQLResponse(
     String query,
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,

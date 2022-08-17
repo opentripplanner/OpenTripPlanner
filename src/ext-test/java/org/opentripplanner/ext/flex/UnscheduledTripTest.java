@@ -28,7 +28,7 @@ public class UnscheduledTripTest extends FlexTest {
   static TransitModel transitModel;
 
   @Test
-  public void parseAspenTaxiAsUnscheduledTrip() {
+  void parseAspenTaxiAsUnscheduledTrip() {
     var flexTrips = transitModel.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(
@@ -43,7 +43,7 @@ public class UnscheduledTripTest extends FlexTest {
   }
 
   @Test
-  public void calculateAccessTemplate() {
+  void calculateAccessTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
@@ -57,7 +57,7 @@ public class UnscheduledTripTest extends FlexTest {
   }
 
   @Test
-  public void calculateEgressTemplate() {
+  void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
     var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
@@ -67,6 +67,11 @@ public class UnscheduledTripTest extends FlexTest {
     var egress = egresses.get(0);
     assertEquals(0, egress.fromStopIndex);
     assertEquals(0, egress.toStopIndex);
+  }
+
+  @Test
+  void shouldGeneratePatternForFlexTripWithSingleStop() {
+    assertFalse(transitModel.getAllTripPatterns().isEmpty());
   }
 
   @BeforeAll

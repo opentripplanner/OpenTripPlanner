@@ -17,7 +17,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.service.StopModel;
 
 public class TransitLayer {
 
@@ -38,7 +38,7 @@ public class TransitLayer {
    */
   private final TransferService transferService;
 
-  private final StopModelIndex stopIndex;
+  private final StopModel stopModel;
 
   private final ZoneId transitDataZoneId;
 
@@ -60,7 +60,7 @@ public class TransitLayer {
       transitLayer.tripPatternsRunningOnDate,
       transitLayer.transfersByStopIndex,
       transitLayer.transferService,
-      transitLayer.stopIndex,
+      transitLayer.stopModel,
       transitLayer.transitDataZoneId,
       transitLayer.transferCache,
       transitLayer.constrainedTransfers,
@@ -73,7 +73,7 @@ public class TransitLayer {
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
     List<List<Transfer>> transfersByStopIndex,
     TransferService transferService,
-    StopModelIndex stopIndex,
+    StopModel stopModel,
     ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
     ConstrainedTransfersForPatterns constrainedTransfers,
@@ -83,7 +83,7 @@ public class TransitLayer {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
-    this.stopIndex = stopIndex;
+    this.stopModel = stopModel;
     this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
     this.constrainedTransfers = constrainedTransfers;
@@ -93,11 +93,7 @@ public class TransitLayer {
 
   @Nullable
   public StopLocation getStopByIndex(int stop) {
-    return stop == -1 ? null : this.stopIndex.stopByIndex(stop);
-  }
-
-  public StopModelIndex getStopIndex() {
-    return this.stopIndex;
+    return stop == -1 ? null : this.stopModel.stopByIndex(stop);
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
@@ -115,7 +111,7 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopIndex.size();
+    return stopModel.size();
   }
 
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {

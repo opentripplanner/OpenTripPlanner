@@ -25,7 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -70,20 +70,18 @@ public class TransitLayerMapper {
   }
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
-    StopModelIndex stopIndex;
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transferByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
+    StopModel stopModel = transitModel.getStopModel();
 
     LOG.info("Mapping transitLayer from Graph...");
-
-    stopIndex = transitModel.getStopModel().getStopModelIndex();
 
     Collection<TripPattern> allTripPatterns = transitModel.getAllTripPatterns();
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transferByStopIndex = mapTransfers(stopIndex, transitModel);
+    transferByStopIndex = mapTransfers(stopModel, transitModel);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -100,12 +98,12 @@ public class TransitLayerMapper {
       tripPatternsByStopByDate,
       transferByStopIndex,
       transitModel.getTransferService(),
-      stopIndex,
+      stopModel,
       transitModel.getTimeZone(),
       transferCache,
       constrainedTransfers,
       transferIndexGenerator,
-      createStopTransferCosts(stopIndex, tuningParameters)
+      createStopTransferCosts(stopModel, tuningParameters)
     );
   }
 
@@ -183,7 +181,7 @@ public class TransitLayerMapper {
   /**
    * Create static board/alight cost for Raptor to include for each stop.
    */
-  static int[] createStopTransferCosts(StopModelIndex stops, TransitTuningParameters tuningParams) {
+  static int[] createStopTransferCosts(StopModel stops, TransitTuningParameters tuningParams) {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }

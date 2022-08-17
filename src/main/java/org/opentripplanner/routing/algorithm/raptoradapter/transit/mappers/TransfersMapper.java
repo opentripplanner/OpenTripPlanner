@@ -5,7 +5,7 @@ import java.util.List;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 class TransfersMapper {
@@ -13,11 +13,11 @@ class TransfersMapper {
   /**
    * Copy pre-calculated transfers from the original graph
    */
-  static List<List<Transfer>> mapTransfers(StopModelIndex stopIndex, TransitModel transitModel) {
+  static List<List<Transfer>> mapTransfers(StopModel stopModel, TransitModel transitModel) {
     List<List<Transfer>> transferByStopIndex = new ArrayList<>();
 
-    for (int i = 0; i < stopIndex.size(); ++i) {
-      var stop = stopIndex.stopByIndex(i);
+    for (int i = 0; i < stopModel.size(); ++i) {
+      var stop = stopModel.stopByIndex(i);
       ArrayList<Transfer> list = new ArrayList<>();
       transferByStopIndex.add(list);
 

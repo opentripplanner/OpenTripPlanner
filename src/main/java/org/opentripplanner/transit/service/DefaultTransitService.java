@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -66,6 +67,7 @@ public class DefaultTransitService implements TransitEditorService {
    */
   private TimetableSnapshot timetableSnapshot;
 
+  @Inject
   public DefaultTransitService(TransitModel transitModel) {
     this.transitModel = transitModel;
     this.transitModelIndex = transitModel.getTransitModelIndex();
@@ -177,7 +179,7 @@ public class DefaultTransitService implements TransitEditorService {
   /** {@link StopModelIndex#getStopForId(FeedScopedId)} */
   @Override
   public StopLocation getStopForId(FeedScopedId id) {
-    return this.transitModel.getStopModel().getStopModelIndex().getStopForId(id);
+    return this.transitModel.getStopModel().getStopForId(id);
   }
 
   /** {@link TransitModelIndex#getRouteForId(FeedScopedId)} */
@@ -224,12 +226,12 @@ public class DefaultTransitService implements TransitEditorService {
   /** {@link StopModelIndex#getAllStops()} */
   @Override
   public Collection<StopLocation> getAllStops() {
-    return transitModel.getStopModel().getStopModelIndex().getAllStops();
+    return transitModel.getStopModel().getAllStops();
   }
 
   @Override
   public StopLocation getStopLocationById(FeedScopedId id) {
-    return transitModel.getStopModel().getStopModelIndex().getStopForId(id);
+    return transitModel.getStopModel().getStopForId(id);
   }
 
   @Override
@@ -265,6 +267,15 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternForTrip().get(trip);
   }
 
+  @Override
+  public TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate) {
+    TripPattern realtimePattern = getRealtimeAddedTripPattern(trip.getId(), serviceDate);
+    if (realtimePattern != null) {
+      return realtimePattern;
+    }
+    return getPatternForTrip(trip);
+  }
+
   /** {@link TransitModelIndex#getPatternsForRoute()} */
   @Override
   public Collection<TripPattern> getPatternsForRoute(Route route) {
@@ -274,9 +285,7 @@ public class DefaultTransitService implements TransitEditorService {
   /** {@link StopModelIndex#getMultiModalStationForStation(Station)} */
   @Override
   public MultiModalStation getMultiModalStationForStation(Station station) {
-    return this.transitModel.getStopModel()
-      .getStopModelIndex()
-      .getMultiModalStationForStation(station);
+    return this.transitModel.getStopModel().getMultiModalStationForStation(station);
   }
 
   /**
@@ -557,7 +566,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
-    return transitModel.getStopModel().getStopModelIndex().queryStopSpatialIndex(envelope);
+    return transitModel.getStopModel().queryStopSpatialIndex(envelope);
   }
 
   @Override

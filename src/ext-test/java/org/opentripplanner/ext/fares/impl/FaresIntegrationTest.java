@@ -19,7 +19,7 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
@@ -213,7 +213,7 @@ public class FaresIntegrationTest {
     GenericLocation from,
     GenericLocation to,
     Instant time,
-    OtpServerContext serverContext
+    OtpServerRequestContext serverContext
   ) {
     Itinerary itinerary = getItineraries(from, to, time, serverContext).get(0);
     return itinerary.getFare();
@@ -223,7 +223,7 @@ public class FaresIntegrationTest {
     GenericLocation from,
     GenericLocation to,
     Instant time,
-    OtpServerContext serverContext
+    OtpServerRequestContext serverContext
   ) {
     RoutingRequest request = new RoutingRequest();
     request.setDateTime(time);

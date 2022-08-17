@@ -16,7 +16,7 @@ import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.inspector.TileRenderer;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -42,10 +42,10 @@ import org.opentripplanner.standalone.api.OtpServerContext;
 @Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
 
   public GraphInspectorTileResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -69,7 +69,7 @@ public class GraphInspectorTileResource {
     Envelope2D env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);
 
-    OtpServerContext serverContext = this.serverContext;
+    OtpServerRequestContext serverContext = this.serverContext;
     BufferedImage image = serverContext.tileRendererManager().renderTile(mapTile, layer);
 
     MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
@@ -92,7 +92,7 @@ public class GraphInspectorTileResource {
   @Path("layers")
   @Produces(MediaType.APPLICATION_JSON)
   public InspectorLayersList getLayers() {
-    OtpServerContext serverContext = this.serverContext;
+    OtpServerRequestContext serverContext = this.serverContext;
     return new InspectorLayersList(serverContext.tileRendererManager().getRenderers());
   }
 }

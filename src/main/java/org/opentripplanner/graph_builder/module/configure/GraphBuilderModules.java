@@ -83,10 +83,6 @@ public class GraphBuilderModules {
     for (DataSource gtfsData : dataSources.get(GTFS)) {
       GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData);
 
-      if (config.parentStopLinking) {
-        gtfsBundle.linkStopsToParentStations = true;
-      }
-      gtfsBundle.parentStationTransfers = config.stationTransfers;
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
       gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
       gtfsBundles.add(gtfsBundle);

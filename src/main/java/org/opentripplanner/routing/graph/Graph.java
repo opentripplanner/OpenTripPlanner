@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -35,6 +37,7 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.standalone.config.api.TransitServicePeriod;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.ElevationUtils;
@@ -65,9 +68,9 @@ public class Graph implements Serializable {
   public final transient Deduplicator deduplicator;
 
   public final Instant buildTime = Instant.now();
-  private StopModel stopModel;
+  private final StopModel stopModel;
 
-  private OpeningHoursCalendarService openingHoursCalendarService;
+  private final OpeningHoursCalendarService openingHoursCalendarService;
   private transient StreetVertexIndex streetIndex;
 
   //Envelope of all OSM and transit vertices. Calculated during build time
@@ -140,14 +143,31 @@ public class Graph implements Serializable {
   public DataOverlayParameterBindings dataOverlayParameterBindings;
   private LuceneIndex luceneIndex;
 
-  public Graph(StopModel stopModel, Deduplicator deduplicator) {
+  @Inject
+  public Graph(
+    StopModel stopModel,
+    Deduplicator deduplicator,
+    @TransitServicePeriod ServiceDateInterval transitServicePeriod
+  ) {
     this.stopModel = stopModel;
     this.deduplicator = deduplicator;
+    this.openingHoursCalendarService =
+      transitServicePeriod == null
+        ? null
+        : new OpeningHoursCalendarService(
+          deduplicator,
+          transitServicePeriod.getStart(),
+          transitServicePeriod.getEnd()
+        );
   }
 
-  // Constructor for deserialization.
+  public Graph(StopModel stopModel, Deduplicator deduplicator) {
+    this(stopModel, deduplicator, null);
+  }
+
+  /** Constructor for deserialization. */
   public Graph() {
-    this.deduplicator = new Deduplicator();
+    this(null, new Deduplicator());
   }
 
   /**
@@ -308,17 +328,9 @@ public class Graph implements Serializable {
     LOG.info("Index street model complete.");
   }
 
+  @Nullable
   public OpeningHoursCalendarService getOpeningHoursCalendarService() {
     return this.openingHoursCalendarService;
-  }
-
-  public void initOpeningHoursCalendarService(ServiceDateInterval serviceDateInterval) {
-    this.openingHoursCalendarService =
-      new OpeningHoursCalendarService(
-        deduplicator,
-        serviceDateInterval.getStart(),
-        serviceDateInterval.getEnd()
-      );
   }
 
   public StreetVertexIndex getStreetIndex() {

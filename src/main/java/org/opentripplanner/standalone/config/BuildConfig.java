@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
@@ -85,16 +84,6 @@ public class BuildConfig {
    * Include all transit input files (GTFS) from scanned directory.
    */
   public final boolean transit;
-
-  /**
-   * Link GTFS stops to their parent stops.
-   */
-  public final boolean parentStopLinking;
-
-  /**
-   * Create direct transfers between the constituent stops of each parent station.
-   */
-  public final boolean stationTransfers;
 
   /**
    * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the
@@ -371,12 +360,10 @@ public class BuildConfig {
     multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
     osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
     osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
-    parentStopLinking = c.asBoolean("parentStopLinking", false);
     platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
     readCachedElevations = c.asBoolean("readCachedElevations", true);
     staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
     staticParkAndRide = c.asBoolean("staticParkAndRide", true);
-    stationTransfers = c.asBoolean("stationTransfers", false);
     streets = c.asBoolean("streets", true);
     subwayAccessTime = c.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
     transit = c.asBoolean("transit", true);

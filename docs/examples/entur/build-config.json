@@ -2,8 +2,6 @@
   "configVersion" : "{{ Entur CI config build number inserted here }}",
   "dataImportReport": true,
   "transit": true,
-  "parentStopLinking": true,
-  "stationTransfers": false,
   "subwayAccessTime": 0,
   "streets": true,
   "embedRouterConfig": true,
