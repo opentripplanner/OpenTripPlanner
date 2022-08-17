@@ -57,5 +57,4 @@ public class OpeningHoursCalendarService implements Serializable {
       daysInPeriod == that.daysInPeriod
     );
   }
-
 }
