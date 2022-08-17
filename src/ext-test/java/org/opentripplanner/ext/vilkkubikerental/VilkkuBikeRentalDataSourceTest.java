@@ -42,9 +42,11 @@ public class VilkkuBikeRentalDataSourceTest {
 
     assertEquals(8, station.getVehiclesAvailable());
     assertTrue(station.getSpacesAvailable() > 0);
-    assertTrue(station.getCapacity() > 0);
     assertTrue(station.isAllowDropoff());
     assertTrue(station.isAllowPickup());
     assertTrue(station.allowDropoffNow());
+
+    // ensure that null is not returned
+    assertEquals(station.getCapacity(), 0);
   }
 }
