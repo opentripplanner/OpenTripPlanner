@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
@@ -29,8 +29,5 @@ public interface TransitDataProviderFilter {
    * @param boardingPossible Initial information regarding boarding/alighting possible
    * @return Information if stops are available for boarding or alighting
    */
-  BitSet filterAvailableStops(
-    TripPatternWithRaptorStopIndexes tripPattern,
-    BitSet boardingPossible
-  );
+  BitSet filterAvailableStops(RoutingTripPattern tripPattern, BitSet boardingPossible);
 }

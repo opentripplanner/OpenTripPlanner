@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
@@ -76,17 +75,9 @@ public class TransitLayerUpdater {
     // changed during this update process.
     TransitLayer realtimeTransitLayer = new TransitLayer(transitModel.getRealtimeTransitLayer());
 
-    // Map TripPatterns for this update to Raptor TripPatterns
-    final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld = realtimeTransitLayer
-      .getTripPatternMapper()
-      .mapOldTripPatternToRaptorTripPattern(
-        updatedTimetables.stream().map(Timetable::getPattern).collect(Collectors.toSet())
-      );
-
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
-      serviceCodesRunningForDate,
-      newTripPatternForOld
+      serviceCodesRunningForDate
     );
 
     Set<LocalDate> datesToBeUpdated = new HashSet<>();
@@ -101,6 +92,7 @@ public class TransitLayerUpdater {
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
     for (Timetable timetable : updatedTimetables) {
       LocalDate date = timetable.getServiceDate();
+      TripPattern tripPattern = timetable.getPattern();
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
         Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
@@ -112,13 +104,11 @@ public class TransitLayerUpdater {
 
       TripPatternForDate oldTripPatternForDate = tripPatternsStartingOnDateMapCache
         .get(date)
-        .get(timetable.getPattern());
+        .get(tripPattern);
 
       if (oldTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache
-          .get(date)
-          .remove(timetable.getPattern(), oldTripPatternForDate);
-        oldTripPatternsForDate.put(timetable.getPattern(), oldTripPatternForDate);
+        tripPatternsStartingOnDateMapCache.get(date).remove(tripPattern, oldTripPatternForDate);
+        oldTripPatternsForDate.put(tripPattern, oldTripPatternForDate);
         datesToBeUpdated.addAll(oldTripPatternForDate.getRunningPeriodDates());
       }
 
@@ -128,17 +118,15 @@ public class TransitLayerUpdater {
       );
 
       if (newTripPatternForDate != null) {
-        tripPatternsStartingOnDateMapCache
-          .get(date)
-          .put(timetable.getPattern(), newTripPatternForDate);
-        newTripPatternsForDate.put(timetable.getPattern(), newTripPatternForDate);
+        tripPatternsStartingOnDateMapCache.get(date).put(tripPattern, newTripPatternForDate);
+        newTripPatternsForDate.put(tripPattern, newTripPatternForDate);
         datesToBeUpdated.addAll(newTripPatternForDate.getRunningPeriodDates());
         if (
           transferIndexGenerator != null &&
           newTripPatternForDate.getTripPattern().getPattern().isCreatedByRealtimeUpdater()
         ) {
           transferIndexGenerator.addRealtimeTrip(
-            newTripPatternForDate.getTripPattern(),
+            tripPattern,
             timetable.getTripTimes().stream().map(TripTimes::getTrip).collect(Collectors.toList())
           );
         }
@@ -158,7 +146,7 @@ public class TransitLayerUpdater {
             LOG.debug(
               "NEW TripPatternForDate: {} - {}",
               newTripPatternForDate.getLocalDate(),
-              newTripPatternForDate.getTripPattern().getId()
+              newTripPatternForDate.getTripPattern().debugInfo()
             );
           }
         }
@@ -230,7 +218,7 @@ public class TransitLayerUpdater {
     }
 
     if (transferIndexGenerator != null) {
-      transferIndexGenerator.generateTransfers();
+      realtimeTransitLayer.setConstrainedTransfers(transferIndexGenerator.generateTransfers());
     }
 
     // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to
