@@ -236,7 +236,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public StopLocation getStopLocationById(FeedScopedId id) {
-    return transitModel.getStopModel().getRegularTransitStopById(id);
+    return transitModel.getStopModel().getStopLocationById(id);
   }
 
   @Override
@@ -287,7 +287,7 @@ public class DefaultTransitService implements TransitEditorService {
     return this.transitModelIndex.getPatternsForRoute().get(route);
   }
 
-  /** {@link StopModelIndex#getMultiModalStationForStation(Station)} */
+  /** {@link StopModel#getMultiModalStationForStation(Station)} */
   @Override
   public MultiModalStation getMultiModalStationForStation(Station station) {
     return this.transitModel.getStopModel().getMultiModalStationForStation(station);

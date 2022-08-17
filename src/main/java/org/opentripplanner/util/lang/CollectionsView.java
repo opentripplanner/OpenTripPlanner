@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * This class provide a read-only view for a fixed set of collections. It does not copy the
+ * This class provides a read-only view for a fixed set of collections. It does not copy the
  * elements, instead it keeps a reference to the underlying collections. There is a very small
  * overhead when iterating over the collection and when calculating the size.
  * <p>
