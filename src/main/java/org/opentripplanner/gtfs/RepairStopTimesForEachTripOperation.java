@@ -21,6 +21,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +49,10 @@ public class RepairStopTimesForEachTripOperation {
 
   public void run() {
     final int tripSize = stopTimesByTrip.size();
-    int tripCount = 0;
+    var progress = ProgressTracker.track("Repair StopTimes", 100_000, tripSize);
+    LOG.info(progress.startMessage());
 
     for (Trip trip : stopTimesByTrip.keys()) {
-      if (++tripCount % 100000 == 0) {
-        LOG.debug("Repair StopTimes for trips {}/{}", tripCount, tripSize);
-      }
-
       /* Fetch the stop times for this trip. Copy the list since it's immutable. */
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
@@ -75,7 +73,12 @@ public class RepairStopTimesForEachTripOperation {
         interpolateStopTimes(stopTimes);
         stopTimesByTrip.replace(trip, stopTimes);
       }
+
+      //noinspection Convert2MethodRef
+      progress.step(m -> LOG.info(m));
     }
+
+    LOG.info(progress.completeMessage());
   }
 
   /**
