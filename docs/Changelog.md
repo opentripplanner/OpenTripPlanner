@@ -89,6 +89,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Allow configuring maxAccessEgressDuration, searchWindow, timetableView [#4377](https://github.com/opentripplanner/OpenTripPlanner/pull/4377)
 - Add custom bike rental data updater (vilkku) as an extension [#4381](https://github.com/opentripplanner/OpenTripPlanner/pull/4381)
 - Cleanup dev-guide and add code conventions [#4375](https://github.com/opentripplanner/OpenTripPlanner/pull/4375)
+- Flex: when optimizing paths preserve egress transfers [#4378](https://github.com/opentripplanner/OpenTripPlanner/pull/4378)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
