@@ -72,7 +72,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   /** Start by adding the last transit leg with the egress leg attached. */
   public OptimizedPathTail<T> addTransitTail(TransitPathLeg<T> leg) {
     var next = leg.nextLeg();
-    var transfer = (RaptorTransfer) null;
+    RaptorTransfer transfer = null;
     // this can also be a transfer leg to a flex trip
     if (next.isTransferLeg()) {
       transfer = next.asTransferLeg().transfer();
