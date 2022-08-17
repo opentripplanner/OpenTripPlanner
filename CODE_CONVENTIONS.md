@@ -8,7 +8,7 @@ review process easier:
 - discussions and personal preferences can be avoided saving time
 - new topics should be documented here
 
-These conventions are not "hard" rules, and often there might be other forces witch pull a
+These conventions are not "hard" rules, and often there might be other forces which pull a
 decision in another direction, in that case documenting your choice is often enough to pass the
 review.
 
