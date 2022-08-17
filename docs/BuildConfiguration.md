@@ -193,32 +193,16 @@ Therefore there is currently no per-mode access time, it is subway-specific.
 Subway systems tend to exist in their own layer of the city separate from the surface, though there
 are exceptions where tracks lie right below the street and transfers happen via the surface. In
 systems where the subway is quite deep and transfers happen via tunnels, the time required for an
-in-station transfer is often less than that for a surface transfer. A proposal was made to provide
-detailed station pathways in GTFS but it is not in common use.
+in-station transfer is often less than that for a surface transfer.
 
 One way to resolve this problem is by ensuring that the GTFS feed codes each platform as a separate
 stop, then micro-mapping stations in OSM. When OSM data contains a detailed description of walkways,
 stairs, and platforms within a station, GTFS stops can be linked to the nearest platform and
 transfers will happen via the OSM ways, which should yield very realistic transfer time
 expectations. This works particularly well in above-ground train stations where the layering of
-non-intersecting ways is less prevalent. Here's an example in the Netherlands:
+non-intersecting ways is less prevalent. See [BoardingLocations](BoardingLocations.md) for more details.
 
-<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=4.70502644777298%2C52.01675028000761%2C4.7070810198783875%2C52.01813190694357&amp;layer=mapnik" style="border: 1px solid black"></iframe><small><a href="http://www.openstreetmap.org/#map=19/52.01744/4.70605">
-View Larger Map</a></small>
-When such micro-mapping data is not available, we need to rely on information from GTFS including
-how stops are grouped into stations and a table of transfer timings where available. During the
-graph build, OTP can create preferential connections between each pair of stops in the same station
-to favor in-station transfers:
-
-```JSON
-// build-config.json
-{
-  "stationTransfers": true
-}
-```
-
-Note that this method is at odds with micro-mapping and might make some transfers artificially
-short.
+An alternative approach is to use GTFS pathways to model entrances and platforms within stations.
 
 ## Elevation data
 
