@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -748,9 +749,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     pattern.add(tripTimes);
 
+    OptionalInt invalidStopIndex = tripTimes.timesIncreasing();
     Preconditions.checkState(
-      tripTimes.timesIncreasing(),
-      "Non-increasing triptimes for added trip"
+      invalidStopIndex.isEmpty(),
+      "Non-increasing triptimes for added trip at stop index %s",
+      invalidStopIndex
     );
 
     return addTripToGraphAndBuffer(
