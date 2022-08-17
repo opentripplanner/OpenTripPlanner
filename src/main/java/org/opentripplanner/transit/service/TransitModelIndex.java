@@ -59,7 +59,7 @@ public class TransitModelIndex {
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
   private FlexIndex flexIndex = null;
 
-  public TransitModelIndex(TransitModel transitModel) {
+  TransitModelIndex(TransitModel transitModel) {
     LOG.info("Transit model index init...");
 
     for (Agency agency : transitModel.getAgencies()) {

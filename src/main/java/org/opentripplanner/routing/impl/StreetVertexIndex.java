@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class StreetVertexIndex {
     this.edgeTree = new HashGridSpatialIndex<>();
     this.verticesTree = new HashGridSpatialIndex<>();
     this.vertexLinker = new VertexLinker(graph, stopModel);
-    this.transitStopVertices = filterTransitStopVertices(graph.getVertices());
+    this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
     postSetup(graph.getVertices());
   }
 
@@ -220,20 +221,6 @@ public class StreetVertexIndex {
     return null;
   }
 
-  /**
-   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
-   * @return The associated TransitStopVertex or all underlying TransitStopVertices
-   */
-  public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-    return stopModel
-      .getStopsForId(id)
-      .stream()
-      .filter(Stop.class::isInstance)
-      .map(Stop.class::cast)
-      .map(it -> transitStopVertices.get(it.getId()))
-      .collect(Collectors.toSet());
-  }
-
   @Override
   public String toString() {
     return (
@@ -264,6 +251,20 @@ public class StreetVertexIndex {
     }
 
     return null;
+  }
+
+  /**
+   * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+   * @return The associated TransitStopVertex or all underlying TransitStopVertices
+   */
+  private Set<Vertex> getStopVerticesById(FeedScopedId id) {
+    return stopModel
+      .getStopsForId(id)
+      .stream()
+      .filter(Stop.class::isInstance)
+      .map(Stop.class::cast)
+      .map(it -> transitStopVertices.get(it.getId()))
+      .collect(Collectors.toSet());
   }
 
   private static void createHalfLocationForTest(
@@ -435,15 +436,13 @@ public class StreetVertexIndex {
     LOG.info(progress.completeMessage());
   }
 
-  private static Map<FeedScopedId, TransitStopVertex> filterTransitStopVertices(
-    Collection<Vertex> vertices
+  private static Map<FeedScopedId, TransitStopVertex> toImmutableMap(
+    Collection<TransitStopVertex> vertices
   ) {
-    return Map.copyOf(
-      vertices
-        .stream()
-        .filter(TransitStopVertex.class::isInstance)
-        .map(TransitStopVertex.class::cast)
-        .collect(Collectors.toMap(it -> it.getStop().getId(), it -> it))
-    );
+    var map = new HashMap<FeedScopedId, TransitStopVertex>();
+    for (TransitStopVertex it : vertices) {
+      map.put(it.getStop().getId(), it);
+    }
+    return Map.copyOf(map);
   }
 }

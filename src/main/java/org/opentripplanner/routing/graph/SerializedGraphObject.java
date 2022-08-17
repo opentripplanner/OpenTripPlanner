@@ -49,7 +49,6 @@ public class SerializedGraphObject implements Serializable {
 
   public final Graph graph;
   public final TransitModel transitModel;
-
   private final Collection<Edge> edges;
 
   /**
@@ -163,6 +162,8 @@ public class SerializedGraphObject implements Serializable {
       );
       LOG.debug("Graph read.");
       serObj.reconstructEdgeLists();
+      serObj.transitModel.getStopModel().reindexAfterDeserialization();
+      serObj.transitModel.index();
       logSerializationCompleteStatus(serObj.graph, serObj.transitModel);
       return serObj;
     } catch (IOException e) {
@@ -231,7 +232,7 @@ public class SerializedGraphObject implements Serializable {
 
   private static void logSerializationCompleteStatus(Graph graph, TransitModel transitModel) {
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(transitModel.getStopModel().size());
+    var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
     var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());

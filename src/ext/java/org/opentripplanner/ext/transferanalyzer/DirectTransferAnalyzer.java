@@ -18,7 +18,6 @@ import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitModelIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +59,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     /* Initialize transit index which is needed by the nearby stop finder. */
-    transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
-    transitModel.getStopModel().index();
+    transitModel.index();
 
     LOG.info("Analyzing transfers (this can be time consuming)...");
 

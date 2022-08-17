@@ -128,9 +128,8 @@ public class ConstantsForTests {
   public static TestOtpModel buildNewPortlandGraph(boolean withElevation) {
     try {
       var deduplicator = new Deduplicator();
-      var stopModel = new StopModel();
       var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(stopModel, deduplicator);
+      var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
       {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
@@ -170,7 +169,7 @@ public class ConstantsForTests {
       addPortlandVehicleRentals(graph);
 
       transitModel.index();
-      graph.index(stopModel);
+      graph.index(transitModel.getStopModel());
 
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {

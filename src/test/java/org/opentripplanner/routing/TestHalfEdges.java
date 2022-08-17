@@ -165,8 +165,7 @@ public class TestHalfEdges {
     var s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
     var s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
-    transitModel.getStopModel().addStop(s1);
-    transitModel.getStopModel().addStop(s2);
+    transitModel.mergeStopModels(StopModel.of().withStop(s1).withStop(s2).build());
 
     station1 = new TransitStopVertexBuilder().withGraph(graph).withStop(s1).build();
     station2 = new TransitStopVertexBuilder().withGraph(graph).withStop(s2).build();

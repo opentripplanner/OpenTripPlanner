@@ -2,7 +2,6 @@ package org.opentripplanner.transit.service;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,13 +43,14 @@ public class StopModel implements Serializable {
 
   @Inject
   public StopModel() {
-    this.stopsById = new HashMap<>();
-    this.stationById = new HashMap<>();
-    this.multiModalStationById = new HashMap<>();
-    this.groupOfStationsById = new HashMap<>();
-    this.flexStopsById = new HashMap<>();
-    this.flexStopGroupsById = new HashMap<>();
+    this.stopsById = Map.of();
+    this.stationById = Map.of();
+    this.multiModalStationById = Map.of();
+    this.groupOfStationsById = Map.of();
+    this.flexStopsById = Map.of();
+    this.flexStopGroupsById = Map.of();
     this.stopLocationCenter = null;
+    this.index = new StopModelIndex(List.of(), List.of(), List.of(), List.of());
   }
 
   public StopModel(StopModelBuilder builder) {
@@ -61,6 +61,7 @@ public class StopModel implements Serializable {
     this.flexStopsById = builder.flexStopsById().asImmutableMap();
     this.flexStopGroupsById = builder.flexStopGroupsById().asImmutableMap();
     this.stopLocationCenter = builder.calculateTransitCenter();
+    reindex();
   }
 
   public static StopModelBuilder of() {
@@ -69,27 +70,6 @@ public class StopModel implements Serializable {
 
   public StopModelBuilder copy() {
     return new StopModelBuilder(this);
-  }
-
-  public void index() {
-    LOG.info("Index stop model...");
-    index =
-      new StopModelIndex(
-        stopsById.values(),
-        flexStopsById.values(),
-        flexStopGroupsById.values(),
-        multiModalStationById.values(),
-        flexStopsById.values()
-      );
-    LOG.info("Index stop model complete.");
-  }
-
-  private StopModelIndex getStopModelIndex() {
-    //TODO refactoring transit model - thread safety
-    if (index == null) {
-      index();
-    }
-    return index;
   }
 
   /**
@@ -122,18 +102,8 @@ public class StopModel implements Serializable {
     return !flexStopsById.isEmpty();
   }
 
-  public void addFlexLocation(FlexStopLocation stop) {
-    invalidateIndex();
-    flexStopsById.put(stop.getId(), stop);
-  }
-
   public Collection<FlexStopLocation> getAllFlexLocations() {
     return flexStopsById.values();
-  }
-
-  public void addFlexLocationGroup(FlexLocationGroup group) {
-    invalidateIndex();
-    flexStopGroupsById.put(group.getId(), group);
   }
 
   public Collection<FlexLocationGroup> getAllFlexStopGroups() {
@@ -203,23 +173,8 @@ public class StopModel implements Serializable {
     return Optional.ofNullable(stopLocationCenter);
   }
 
-  public void addStation(Station station) {
-    invalidateIndex();
-    stationById.put(station.getId(), station);
-  }
-
-  public void addMultiModalStation(MultiModalStation multiModalStation) {
-    invalidateIndex();
-    multiModalStationById.put(multiModalStation.getId(), multiModalStation);
-  }
-
   public Collection<GroupOfStations> getAllGroupOfStations() {
     return groupOfStationsById.values();
-  }
-
-  public void addGroupsOfStations(GroupOfStations groupOfStations) {
-    invalidateIndex();
-    groupOfStationsById.put(groupOfStations.getId(), groupOfStations);
   }
 
   /**
@@ -232,7 +187,7 @@ public class StopModel implements Serializable {
   }
 
   public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
-    return getStopModelIndex().queryStopSpatialIndex(envelope);
+    return index.queryStopSpatialIndex(envelope);
   }
 
   /**
@@ -244,7 +199,7 @@ public class StopModel implements Serializable {
 
   @Nullable
   public MultiModalStation getMultiModalStationForStation(Station station) {
-    return getStopModelIndex().getMultiModalStationForStation(station);
+    return index.getMultiModalStationForStation(station);
   }
 
   /**
@@ -273,25 +228,39 @@ public class StopModel implements Serializable {
     return findById(id, stopsById, flexStopsById, flexStopGroupsById);
   }
 
-  public void addStop(Stop stop) {
-    invalidateIndex();
-    stopsById.put(stop.getId(), stop);
-  }
-
-  public StopLocation stopByIndex(int index) {
-    return getStopModelIndex().stopByIndex(index);
+  public StopLocation stopByIndex(int stopIndex) {
+    return index.stopByIndex(stopIndex);
   }
 
   public int stopIndexSize() {
-    return getStopModelIndex().stopIndexSize();
+    return index.stopIndexSize();
   }
 
   public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
-    return getStopModelIndex().queryLocationIndex(envelope);
+    return index.queryLocationIndex(envelope);
   }
 
-  private void invalidateIndex() {
-    this.index = null;
+  /**
+   * Call this method after deserializing this class. This will reindex the StopModel.
+   */
+  public void reindexAfterDeserialization() {
+    reindex();
+  }
+
+  /**
+   * This is public to be able to reindex the StopModel after deserialization. DO NOT call
+   * this from other places.
+   */
+  private void reindex() {
+    LOG.info("Index stop model...");
+    index =
+      new StopModelIndex(
+        stopsById.values(),
+        flexStopsById.values(),
+        flexStopGroupsById.values(),
+        multiModalStationById.values()
+      );
+    LOG.info("Index stop model complete.");
   }
 
   @Nullable

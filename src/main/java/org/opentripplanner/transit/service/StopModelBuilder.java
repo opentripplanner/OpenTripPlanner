@@ -104,7 +104,7 @@ public class StopModelBuilder {
    * latitudes/longitudes in memory, this can become problematic in large installations. It works
    * without a problem on New York State.
    */
-  public WgsCoordinate calculateTransitCenter() {
+  WgsCoordinate calculateTransitCenter() {
     var stops = new CollectionsView<>(
       stopsById.values(),
       flexStopsById.values(),

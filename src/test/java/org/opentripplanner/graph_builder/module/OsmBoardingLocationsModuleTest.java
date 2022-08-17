@@ -67,9 +67,8 @@ class OsmBoardingLocationsModuleTest {
   @VariableSource("testCases")
   void addAndLinkBoardingLocations(boolean skipVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
 
     var provider = new OpenStreetMapProvider(file, false);
     var floatingBusVertex = new TransitStopVertexBuilder()
@@ -108,7 +107,7 @@ class OsmBoardingLocationsModuleTest {
       .build();
 
     transitModel.index();
-    graph.index(stopModel);
+    graph.index(transitModel.getStopModel());
 
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
@@ -116,7 +115,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    new OsmBoardingLocationsModule(graph).buildGraph();
+    new OsmBoardingLocationsModule(graph, transitModel).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module

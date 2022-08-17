@@ -23,14 +23,8 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.GroupOfStations;
-import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.StopModel;
 
@@ -119,16 +113,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
     return stopModel;
   }
 
-  @Override
-  public Collection<GroupOfStations> getAllGroupsOfStations() {
-    return stopModel().getAllGroupOfStations();
-  }
-
-  @Override
-  public Collection<MultiModalStation> getAllMultiModalStations() {
-    return stopModel().getAllMultiModalStations();
-  }
-
   /**
    * Map from Transit Entity(id) to Notices. We need to use Serializable as a common type for ids,
    * since some entities have String, while other have FeedScopeId ids.
@@ -158,26 +142,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Station getStationForId(FeedScopedId id) {
-    return stopModel().getStationById(id);
-  }
-
-  @Override
-  public Stop getStopForId(FeedScopedId id) {
-    return stopModel().getRegularTransitStopById(id);
-  }
-
-  @Override
-  public Collection<Station> getAllStations() {
-    return stopModel().getStations();
-  }
-
-  @Override
-  public Collection<Stop> getAllStops() {
-    return stopModel.getAllStops();
-  }
-
-  @Override
   public Collection<Entrance> getAllEntrances() {
     return immutableList(entrancesById.values());
   }
@@ -190,16 +154,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<BoardingArea> getAllBoardingAreas() {
     return immutableList(boardingAreasById.values());
-  }
-
-  @Override
-  public Collection<FlexStopLocation> getAllFlexStopLocations() {
-    return stopModel().getAllFlexLocations();
-  }
-
-  @Override
-  public Collection<FlexLocationGroup> getAllFlexLocationGroups() {
-    return stopModel().getAllFlexStopGroups();
   }
 
   @Override

@@ -28,12 +28,11 @@ class StopModelIndex {
   /**
    * @param stops All stops including regular transit and flex
    */
-  public StopModelIndex(
+  StopModelIndex(
     Collection<Stop> stops,
     Collection<FlexStopLocation> flexStops,
     Collection<FlexLocationGroup> flexLocationGroups,
-    Collection<MultiModalStation> multiModalStations,
-    Collection<FlexStopLocation> flexStopLocations
+    Collection<MultiModalStation> multiModalStations
   ) {
     stopsByIndex = new StopLocation[StopLocation.indexCounter()];
 
@@ -49,28 +48,28 @@ class StopModelIndex {
         multiModalStationForStations.put(childStation, it);
       }
     }
-    for (FlexStopLocation it : flexStopLocations) {
+    for (FlexStopLocation it : flexStops) {
       locationIndex.insert(it.getGeometry().getEnvelopeInternal(), it);
     }
   }
 
-  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
+  Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
     return stopSpatialIndex.query(envelope);
   }
 
-  public MultiModalStation getMultiModalStationForStation(Station station) {
+  MultiModalStation getMultiModalStationForStation(Station station) {
     return multiModalStationForStations.get(station);
   }
 
-  public StopLocation stopByIndex(int index) {
+  StopLocation stopByIndex(int index) {
     return stopsByIndex[index];
   }
 
-  public int stopIndexSize() {
+  int stopIndexSize() {
     return stopsByIndex.length;
   }
 
-  public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
+  Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
     return locationIndex.query(envelope);
   }
 }

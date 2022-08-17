@@ -71,9 +71,8 @@ public class PruneNoThruIslandsTest {
   private static Graph buildOsmGraph(String osmPath) {
     try {
       var deduplicator = new Deduplicator();
-      var stopModel = new StopModel();
       var graph = new Graph(deduplicator);
-      var transitModel = new TransitModel(stopModel, deduplicator);
+      var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
       OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
@@ -105,7 +104,7 @@ public class PruneNoThruIslandsTest {
       osmModule.buildGraph();
 
       transitModel.index();
-      graph.index(stopModel);
+      graph.index(transitModel.getStopModel());
 
       // Prune floating islands and set noThru where necessary
       PruneNoThruIslands pruneNoThruIslands = new PruneNoThruIslands(

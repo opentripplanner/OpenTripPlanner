@@ -22,7 +22,6 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitModelIndex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -65,8 +64,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   public void buildGraph() {
     /* Initialize transit model index which is needed by the nearby stop finder. */
     if (transitModel.getTransitModelIndex() == null) {
-      transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
-      transitModel.getStopModel().index();
+      transitModel.index();
     }
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */

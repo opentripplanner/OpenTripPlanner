@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
@@ -316,6 +314,10 @@ public class Graph implements Serializable {
    * Perform indexing on vertices, edges and create transient data structures. This used to be done
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graphbuilder to server in memory, without a round trip through serialization.
+   * <p>
+   * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
+   *           - graph. This allows a module to index the streetIndex BEFORE another module add
+   *           - something that should go into the index; Hence, inconsistent data.
    */
   public void index(StopModel stopModel) {
     LOG.info("Index street model...");
@@ -328,12 +330,38 @@ public class Graph implements Serializable {
     return this.openingHoursCalendarService;
   }
 
+  /**
+   * Get streetIndex, safe to use while routing, but do not use during graph build.
+   * @see #getStreetIndexSafe(StopModel)
+   */
   public StreetVertexIndex getStreetIndex() {
     return this.streetIndex;
   }
 
+  /**
+   * Get streetIndex during graph build, both OSM street data and transit data must be loaded
+   * before calling this.
+   */
+  public StreetVertexIndex getStreetIndexSafe(StopModel stopModel) {
+    indexIfNotIndexed(stopModel);
+    return this.streetIndex;
+  }
+
+  /**
+   * Get VertexLinker, safe to use while routing, but do not use during graph build.
+   * @see #getLinkerSafe(StopModel)
+   */
   public VertexLinker getLinker() {
-    return getStreetIndex().getVertexLinker();
+    return streetIndex.getVertexLinker();
+  }
+
+  /**
+   * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
+   * before calling this.
+   */
+  public VertexLinker getLinkerSafe(StopModel stopModel) {
+    indexIfNotIndexed(stopModel);
+    return streetIndex.getVertexLinker();
   }
 
   /**
@@ -462,8 +490,9 @@ public class Graph implements Serializable {
     this.luceneIndex = luceneIndex;
   }
 
-  private void readObject(ObjectInputStream inputStream)
-    throws ClassNotFoundException, IOException {
-    inputStream.defaultReadObject();
+  private void indexIfNotIndexed(StopModel stopModel) {
+    if (streetIndex == null) {
+      index(stopModel);
+    }
   }
 }

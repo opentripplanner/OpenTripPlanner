@@ -34,14 +34,9 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.GroupOfStations;
-import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -89,21 +84,15 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void applyToGraph(Graph graph, TransitModel transitModel) {
+    transitModel.mergeStopModels(otpTransitService.stopModel());
+
     addStopsToGraphAndGenerateStopVertexes(graph, transitModel);
-    addStationsToGraph(transitModel);
-    addStopsToGraph(transitModel);
-    addMultiModalStationsToGraph(transitModel);
-    addGroupsOfStationsToGraph(transitModel);
     addEntrancesToGraph(graph);
     addPathwayNodesToGraph(graph);
     addBoardingAreasToGraph(graph);
 
     // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
     createPathwayEdgesAndAddThemToGraph(graph);
-    if (OTPFeature.FlexRouting.isOn()) {
-      addLocationsToGraph(transitModel);
-      addLocationGroupsToGraph(transitModel);
-    }
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);
     addServicesToTransitModel(transitModel);
@@ -132,7 +121,7 @@ public class AddTransitModelEntitiesToGraph {
 
     // Add a vertex representing the stop.
     // It is now possible for these vertices to not be connected to any edges.
-    for (Stop stop : otpTransitService.getAllStops()) {
+    for (Stop stop : otpTransitService.stopModel().getAllStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = new TransitStopVertexBuilder()
         .withStop(stop)
@@ -146,30 +135,6 @@ public class AddTransitModelEntitiesToGraph {
 
       // Add stops to internal index for Pathways to be created from this map
       stationElementNodes.put(stop, stopVertex);
-    }
-  }
-
-  private void addStationsToGraph(TransitModel transitModel) {
-    for (Station station : otpTransitService.getAllStations()) {
-      transitModel.getStopModel().addStation(station);
-    }
-  }
-
-  private void addStopsToGraph(TransitModel transitModel) {
-    for (Stop stop : otpTransitService.getAllStops()) {
-      transitModel.getStopModel().addStop(stop);
-    }
-  }
-
-  private void addMultiModalStationsToGraph(TransitModel transitModel) {
-    for (MultiModalStation multiModalStation : otpTransitService.getAllMultiModalStations()) {
-      transitModel.getStopModel().addMultiModalStation(multiModalStation);
-    }
-  }
-
-  private void addGroupsOfStationsToGraph(TransitModel transitModel) {
-    for (GroupOfStations groupOfStation : otpTransitService.getAllGroupsOfStations()) {
-      transitModel.getStopModel().addGroupsOfStations(groupOfStation);
     }
   }
 
@@ -372,20 +337,6 @@ public class AddTransitModelEntitiesToGraph {
         levels,
         pathway.getTraversalTime()
       );
-    }
-  }
-
-  private void addLocationsToGraph(TransitModel transitModel) {
-    var stopModel = transitModel.getStopModel();
-    for (FlexStopLocation it : otpTransitService.getAllFlexStopLocations()) {
-      stopModel.addFlexLocation(it);
-    }
-  }
-
-  private void addLocationGroupsToGraph(TransitModel transitModel) {
-    var stopModel = transitModel.getStopModel();
-    for (FlexLocationGroup it : otpTransitService.getAllFlexLocationGroups()) {
-      stopModel.addFlexLocationGroup(it);
     }
   }
 

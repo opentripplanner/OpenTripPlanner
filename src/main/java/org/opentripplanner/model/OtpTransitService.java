@@ -13,14 +13,8 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.GroupOfStations;
-import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.StopModel;
 
@@ -43,11 +37,6 @@ public interface OtpTransitService {
 
   StopModel stopModel();
 
-
-  Collection<GroupOfStations> getAllGroupsOfStations();
-
-  Collection<MultiModalStation> getAllMultiModalStations();
-
   /**
    * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
    * any type (Serializable).
@@ -63,25 +52,11 @@ public interface OtpTransitService {
 
   List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
 
-  Station getStationForId(FeedScopedId id);
-
-  Stop getStopForId(FeedScopedId id);
-
-  Collection<Station> getAllStations();
-
-  Collection<Stop> getAllStops();
-
   Collection<Entrance> getAllEntrances();
 
   Collection<PathwayNode> getAllPathwayNodes();
 
   Collection<BoardingArea> getAllBoardingAreas();
-
-  // TODO Rename this
-  Collection<FlexStopLocation> getAllFlexStopLocations();
-
-  // TODO Rename this
-  Collection<FlexLocationGroup> getAllFlexLocationGroups();
 
   /**
    * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link

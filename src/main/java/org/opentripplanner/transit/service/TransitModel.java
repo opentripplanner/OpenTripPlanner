@@ -3,9 +3,6 @@ package org.opentripplanner.transit.service;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import gnu.trove.set.hash.TIntHashSet;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -16,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -73,7 +71,7 @@ public class TransitModel implements Serializable {
 
   private final Multimap<StopLocation, PathTransfer> transfersByStop = HashMultimap.create();
 
-  private final StopModel stopModel;
+  private StopModel stopModel;
   private ZonedDateTime transitServiceStarts = LocalDate.MAX.atStartOfDay(ZoneId.systemDefault());
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
@@ -107,14 +105,13 @@ public class TransitModel implements Serializable {
 
   @Inject
   public TransitModel(StopModel stopModel, Deduplicator deduplicator) {
-    this.stopModel = stopModel;
+    this.stopModel = Objects.requireNonNull(stopModel);
     this.deduplicator = deduplicator;
   }
 
-  // TODO OTP2 - Is this  needed - how does the final fields get set...
   /** Constructor for deserialization. */
   public TransitModel() {
-    this(null, new Deduplicator());
+    this(new StopModel(), new Deduplicator());
   }
 
   /**
@@ -123,11 +120,12 @@ public class TransitModel implements Serializable {
    * graphbuilder to server in memory, without a round trip through serialization.
    */
   public void index() {
-    LOG.info("Index transit model...");
-    this.getStopModel().index();
-    // the transit model indexing updates the stop model index (flex stops added to the stop index)
-    this.index = new TransitModelIndex(this);
-    LOG.info("Index transit model complete.");
+    if (index == null) {
+      LOG.info("Index transit model...");
+      // the transit model indexing updates the stop model index (flex stops added to the stop index)
+      this.index = new TransitModelIndex(this);
+      LOG.info("Index transit model complete.");
+    }
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
@@ -196,6 +194,7 @@ public class TransitModel implements Serializable {
    * Adds mode of transport to transit modes in graph
    */
   public void addTransitMode(TransitMode mode) {
+    invalidateIndex();
     transitModes.add(mode);
   }
 
@@ -214,6 +213,7 @@ public class TransitModel implements Serializable {
     CalendarServiceData data,
     DataImportIssueStore issueStore
   ) {
+    invalidateIndex();
     updateTransitFeedValidity(data, issueStore);
     calendarServiceData.add(data);
 
@@ -272,11 +272,13 @@ public class TransitModel implements Serializable {
   }
 
   public void addAgency(String feedId, Agency agency) {
+    invalidateIndex();
     agencies.add(agency);
     this.feedIds.add(feedId);
   }
 
   public void addFeedInfo(FeedInfo info) {
+    invalidateIndex();
     this.feedInfoForId.put(info.getId(), info);
   }
 
@@ -300,6 +302,7 @@ public class TransitModel implements Serializable {
     if (this.timeZone != null) {
       throw new IllegalStateException("Timezone can't be re-set");
     }
+    invalidateIndex();
     this.timeZone = timeZone;
     this.timeZoneExplicitlySet = true;
   }
@@ -360,6 +363,7 @@ public class TransitModel implements Serializable {
   }
 
   public void addNoticeAssignments(Multimap<AbstractTransitEntity, Notice> noticesByElement) {
+    invalidateIndex();
     this.noticesByElement.putAll(noticesByElement);
   }
 
@@ -404,6 +408,7 @@ public class TransitModel implements Serializable {
   }
 
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
+    invalidateIndex();
     tripPatternForId.put(id, tripPattern);
   }
 
@@ -462,10 +467,12 @@ public class TransitModel implements Serializable {
    * Updating the stop model is only allowed during graph build
    */
   public void mergeStopModels(StopModel newStopModel) {
+    invalidateIndex();
     this.stopModel = this.stopModel.copy().addAll(newStopModel).build();
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {
+    invalidateIndex();
     flexTripsById.put(id, flexTrip);
   }
 
@@ -474,6 +481,7 @@ public class TransitModel implements Serializable {
   }
 
   public void addAllTransfersByStops(Multimap<StopLocation, PathTransfer> transfersByStop) {
+    invalidateIndex();
     this.transfersByStop.putAll(transfersByStop);
   }
 
@@ -500,12 +508,12 @@ public class TransitModel implements Serializable {
     this.hasScheduledService = hasScheduledService;
   }
 
-  public TransitModelIndex getTransitModelIndex() {
+  /**
+   * The caller is responsible for calling the {@link #index()} method if it is a
+   * possibility that the index is not initialized (during graph build).
+   */
+  public @Nullable TransitModelIndex getTransitModelIndex() {
     return index;
-  }
-
-  public void setTransitModelIndex(TransitModelIndex transitModelIndex) {
-    index = transitModelIndex;
   }
 
   public boolean hasFlexTrips() {
@@ -516,10 +524,8 @@ public class TransitModel implements Serializable {
     return flexTripsById.get(tripId);
   }
 
-  @Serial
-  private void readObject(ObjectInputStream inputStream)
-    throws ClassNotFoundException, IOException {
-    inputStream.defaultReadObject();
+  private void invalidateIndex() {
+    this.index = null;
   }
 
   /**
