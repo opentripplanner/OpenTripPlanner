@@ -69,7 +69,7 @@ There are several ways to get involved:
 
 As of August 2022, we work on OTP 2.x and are using a Git branching model derived from 
 [Gitflow](https://nvie.com/posts/a-successful-git-branching-model/). All development will occur
-on the `dev-2.x` branch. Only release commits setting the Maven artifact version toa non-snapshot 
+on the `dev-2.x` branch. Only release commits setting the Maven artifact version to a non-snapshot
 number should be pushed to the `master` branch of OTP. All other changes to master should result 
 from fast-forward merges of a Github pull request from the `dev-2.x` branch. In turn, all changes 
 to `dev-2.x` should result from a fast-forward merge of a Github pull request for a single feature, 
@@ -203,7 +203,7 @@ The OTP code style is described on a separate [style guide page](Codestyle.md).
 ## Code conventions and architecture
 
 The [architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
-and [code conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVETIONS.md) 
+and [code conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVENTIONS.md)
 are only available on GitHub, not in the project documentation. These documents contain relative 
 links to code so, they are a bit easier to maintain that way. The target audience is also active 
 OTP developers that have the code checked out locally.
