@@ -57,6 +57,6 @@ class ItinerariesCalculateLegTotals {
         this.totalElevationLost += leg.getElevationLost();
       }
     }
-    this.waitingTime = totalDuration.minus(transitTime).minus(nonTransitTime));
+    this.waitingTime = totalDuration.minus(transitTime).minus(nonTransitTime);
   }
 }
