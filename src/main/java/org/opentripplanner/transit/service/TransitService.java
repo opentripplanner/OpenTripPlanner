@@ -189,6 +189,4 @@ public interface TransitService {
   Collection<Stop> queryStopSpatialIndex(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
-
-  Collection<Route> getRoutesForAgency(FeedScopedId agencyId);
 }
