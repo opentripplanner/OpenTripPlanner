@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
@@ -136,7 +137,9 @@ public class Itinerary {
 
   /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
-    return !getTransitDuration().isZero();
+    return legs
+      .stream()
+      .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
   public Leg firstLeg() {
