@@ -3,12 +3,11 @@ package org.opentripplanner.transit.service;
 import java.util.List;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class StopIndexMock extends StopModelIndex {
+public class StopModelMock extends StopModel {
 
   private final List<StopLocation> stops;
 
-  public StopIndexMock(List<StopLocation> stops) {
-    super(new StopModel());
+  public StopModelMock(List<StopLocation> stops) {
     this.stops = stops;
   }
 
@@ -18,12 +17,7 @@ public class StopIndexMock extends StopModelIndex {
   }
 
   @Override
-  public int indexOf(StopLocation stop) {
-    return stops.indexOf(stop);
-  }
-
-  @Override
-  public int size() {
+  public int stopIndexSize() {
     return stops.size();
   }
 }

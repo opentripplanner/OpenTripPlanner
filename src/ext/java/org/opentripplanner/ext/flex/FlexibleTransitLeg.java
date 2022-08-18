@@ -16,7 +16,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -217,9 +217,9 @@ public class FlexibleTransitLeg implements Leg {
       .addTime("endTime", endTime)
       .addNum("distance", getDistanceMeters(), "m")
       .addNum("cost", generalizedCost)
-      .addObjOp("agencyId", getAgency(), TransitEntity::getId)
-      .addObjOp("routeId", getRoute(), TransitEntity::getId)
-      .addObjOp("tripId", getTrip(), TransitEntity::getId)
+      .addObjOp("agencyId", getAgency(), AbstractTransitEntity::getId)
+      .addObjOp("routeId", getRoute(), AbstractTransitEntity::getId)
+      .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
       .addObj("serviceDate", getServiceDate())
       .addObj("legGeometry", getLegGeometry())
       .addCol("transitAlerts", transitAlerts)

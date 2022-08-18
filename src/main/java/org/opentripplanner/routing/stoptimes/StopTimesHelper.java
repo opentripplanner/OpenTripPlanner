@@ -91,7 +91,7 @@ public class StopTimesHelper {
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
-    var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
+    var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
     Instant midnight = ServiceDateUtils
       .asStartOfService(serviceDate, transitService.getTimeZone())
       .toInstant();
@@ -219,7 +219,7 @@ public class StopTimesHelper {
         midnight,
         ZonedDateTime.ofInstant(startTime, zoneId)
       );
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
+      var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
       List<StopLocation> stops = pattern.getStops();
       for (int stopIndex = 0; stopIndex < stops.size(); stopIndex++) {

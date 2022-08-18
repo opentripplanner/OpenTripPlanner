@@ -391,13 +391,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
         trip,
-        serviceCodes,
         pattern
       );
-
-      // Add service code to bitset of pattern if needed (using copy on write)
-      final int serviceCode = serviceCodes.get(trip.getServiceId());
-      newPattern.setServiceCode(serviceCode);
 
       cancelScheduledTrip(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
@@ -733,13 +728,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      serviceCodes,
       originalTripPattern
     );
-
-    // Add service code to bitset of pattern if needed (using copy on write)
-    final int serviceCode = serviceCodes.get(trip.getServiceId());
-    pattern.setServiceCode(serviceCode);
 
     // Create new trip times
     final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
@@ -755,6 +745,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     // Set service code of new trip times
+    final int serviceCode = serviceCodes.get(trip.getServiceId());
     newTripTimes.setServiceCode(serviceCode);
 
     // Make sure that updated trip times have the correct real time state
@@ -1010,7 +1001,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return stop or null if stop doesn't exist
    */
   private StopLocation getStopForStopId(FeedScopedId stopId) {
-    return transitService.getStopForId(stopId);
+    return transitService.getRegularStop(stopId);
   }
 
   private static void warn(FeedScopedId id, String message, Object... params) {

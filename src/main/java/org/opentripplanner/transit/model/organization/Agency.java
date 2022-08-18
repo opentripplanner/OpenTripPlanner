@@ -1,20 +1,20 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.organization;
 
-import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
+import static org.opentripplanner.util.lang.StringUtils.assertHasValue;
 
 import java.time.ZoneId;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.
  */
-public final class Agency extends TransitEntity2<Agency, AgencyBuilder> implements LogInfo {
+public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> implements LogInfo {
 
   private final String name;
   private final ZoneId timezone;

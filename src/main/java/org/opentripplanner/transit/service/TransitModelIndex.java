@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -25,6 +24,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class TransitModelIndex {
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
   private FlexIndex flexIndex = null;
 
-  public TransitModelIndex(TransitModel transitModel) {
+  TransitModelIndex(TransitModel transitModel) {
     LOG.info("Transit model index init...");
 
     for (Agency agency : transitModel.getAgencies()) {

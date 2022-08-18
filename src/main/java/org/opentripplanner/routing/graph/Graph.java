@@ -1,21 +1,18 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -23,19 +20,22 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
+import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
@@ -59,17 +59,16 @@ public class Graph implements Serializable {
 
   public final StreetNotesService streetNotesService = new StreetNotesService();
 
-  private final Map<Class<?>, Serializable> services = new HashMap<>();
-
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
   private final Map<String, Vertex> vertices = new ConcurrentHashMap<>();
 
   public final transient Deduplicator deduplicator;
 
   public final Instant buildTime = Instant.now();
-  private StopModel stopModel;
 
-  private OpeningHoursCalendarService openingHoursCalendarService;
+  @Nullable
+  private final OpeningHoursCalendarService openingHoursCalendarService;
+
   private transient StreetVertexIndex streetIndex;
 
   //Envelope of all OSM and transit vertices. Calculated during build time
@@ -116,6 +115,10 @@ public class Graph implements Serializable {
   private double distanceBetweenElevationSamples;
 
   private transient RealtimeVehiclePositionService vehiclePositionService;
+  private final VehicleRentalStationService vehicleRentalStationService = new VehicleRentalStationService();
+
+  private final VehicleParkingService vehicleParkingService = new VehicleParkingService();
+  private FareService fareService;
 
   private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
 
@@ -136,15 +139,24 @@ public class Graph implements Serializable {
    * creating the data overlay context when routing.
    */
   public DataOverlayParameterBindings dataOverlayParameterBindings;
+  private LuceneIndex luceneIndex;
 
-  public Graph(StopModel stopModel, Deduplicator deduplicator) {
-    this.stopModel = stopModel;
+  @Inject
+  public Graph(
+    Deduplicator deduplicator,
+    @Nullable OpeningHoursCalendarService openingHoursCalendarService
+  ) {
     this.deduplicator = deduplicator;
+    this.openingHoursCalendarService = openingHoursCalendarService;
   }
 
-  // Constructor for deserialization.
+  public Graph(Deduplicator deduplicator) {
+    this(deduplicator, null);
+  }
+
+  /** Constructor for deserialization. */
   public Graph() {
-    this.deduplicator = new Deduplicator();
+    this(new Deduplicator(), null);
   }
 
   /**
@@ -160,10 +172,11 @@ public class Graph implements Serializable {
   public void addVertex(Vertex v) {
     Vertex old = vertices.put(v.getLabel(), v);
     if (old != null) {
-      if (old == v) LOG.error("repeatedly added the same vertex: {}", v); else LOG.error(
-        "duplicate vertex label in graph (added vertex to graph anyway): {}",
-        v
-      );
+      if (old == v) {
+        LOG.error("repeatedly added the same vertex: {}", v);
+      } else {
+        LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v);
+      }
     }
   }
 
@@ -226,6 +239,10 @@ public class Graph implements Serializable {
       .collect(Collectors.toList());
   }
 
+  public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+    return streetIndex.findTransitStopVertices(id);
+  }
+
   /**
    * Return all the edges in the graph. Derived from vertices on demand.
    */
@@ -257,37 +274,6 @@ public class Graph implements Serializable {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Serializable> T putService(Class<T> serviceType, T service) {
-    return (T) services.put(serviceType, service);
-  }
-
-  public boolean hasService(Class<? extends Serializable> serviceType) {
-    return services.containsKey(serviceType);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends Serializable> T getService(Class<T> serviceType) {
-    return (T) services.get(serviceType);
-  }
-
-  public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
-    T t = (T) services.get(serviceType);
-    if (t == null && autoCreate) {
-      try {
-        t = serviceType.getDeclaredConstructor().newInstance();
-      } catch (
-        IllegalAccessException
-        | InvocationTargetException
-        | NoSuchMethodException
-        | InstantiationException e
-      ) {
-        throw new RuntimeException(e);
-      }
-      services.put(serviceType, t);
-    }
-    return t;
-  }
-
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
   }
@@ -328,51 +314,54 @@ public class Graph implements Serializable {
    * Perform indexing on vertices, edges and create transient data structures. This used to be done
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graphbuilder to server in memory, without a round trip through serialization.
+   * <p>
+   * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
+   *           - graph. This allows a module to index the streetIndex BEFORE another module add
+   *           - something that should go into the index; Hence, inconsistent data.
    */
-  public void index() {
+  public void index(StopModel stopModel) {
     LOG.info("Index street model...");
     streetIndex = new StreetVertexIndex(this, stopModel);
     LOG.info("Index street model complete.");
   }
 
+  @Nullable
   public OpeningHoursCalendarService getOpeningHoursCalendarService() {
     return this.openingHoursCalendarService;
   }
 
-  public void initOpeningHoursCalendarService(ServiceDateInterval serviceDateInterval) {
-    this.openingHoursCalendarService =
-      new OpeningHoursCalendarService(
-        deduplicator,
-        serviceDateInterval.getStart(),
-        serviceDateInterval.getEnd()
-      );
-  }
-
+  /**
+   * Get streetIndex, safe to use while routing, but do not use during graph build.
+   * @see #getStreetIndexSafe(StopModel)
+   */
   public StreetVertexIndex getStreetIndex() {
-    //TODO refactoring transit model - thread safety
-    if (this.streetIndex == null) {
-      index();
-    }
     return this.streetIndex;
   }
 
-  public VertexLinker getLinker() {
-    return getStreetIndex().getVertexLinker();
+  /**
+   * Get streetIndex during graph build, both OSM street data and transit data must be loaded
+   * before calling this.
+   */
+  public StreetVertexIndex getStreetIndexSafe(StopModel stopModel) {
+    indexIfNotIndexed(stopModel);
+    return this.streetIndex;
   }
 
-  public int removeEdgelessVertices() {
-    int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
-    for (Vertex v : this.getVertices()) if (v.getDegreeOut() + v.getDegreeIn() == 0) toRemove.add(
-      v
-    );
-    // avoid concurrent vertex map modification
-    for (Vertex v : toRemove) {
-      this.remove(v);
-      removed += 1;
-      LOG.trace("removed edgeless vertex {}", v);
-    }
-    return removed;
+  /**
+   * Get VertexLinker, safe to use while routing, but do not use during graph build.
+   * @see #getLinkerSafe(StopModel)
+   */
+  public VertexLinker getLinker() {
+    return streetIndex.getVertexLinker();
+  }
+
+  /**
+   * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
+   * before calling this.
+   */
+  public VertexLinker getLinkerSafe(StopModel stopModel) {
+    indexIfNotIndexed(stopModel);
+    return streetIndex.getVertexLinker();
   }
 
   /**
@@ -460,11 +449,19 @@ public class Graph implements Serializable {
   }
 
   public VehicleRentalStationService getVehicleRentalStationService() {
-    return getService(VehicleRentalStationService.class);
+    return vehicleRentalStationService;
   }
 
   public VehicleParkingService getVehicleParkingService() {
-    return getService(VehicleParkingService.class);
+    return vehicleParkingService;
+  }
+
+  public FareService getFareService() {
+    return fareService;
+  }
+
+  public void setFareService(FareService fareService) {
+    this.fareService = fareService;
   }
 
   public DrivingDirection getDrivingDirection() {
@@ -485,12 +482,17 @@ public class Graph implements Serializable {
     this.intersectionTraversalCostModel = intersectionTraversalCostModel;
   }
 
-  public StopModel getStopModel() {
-    return stopModel;
+  public LuceneIndex getLuceneIndex() {
+    return luceneIndex;
   }
 
-  private void readObject(ObjectInputStream inputStream)
-    throws ClassNotFoundException, IOException {
-    inputStream.defaultReadObject();
+  public void setLuceneIndex(LuceneIndex luceneIndex) {
+    this.luceneIndex = luceneIndex;
+  }
+
+  private void indexIfNotIndexed(StopModel stopModel) {
+    if (streetIndex == null) {
+      index(stopModel);
+    }
   }
 }

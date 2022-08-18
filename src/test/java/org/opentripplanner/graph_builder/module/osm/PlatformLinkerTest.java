@@ -30,7 +30,7 @@ public class PlatformLinkerTest {
 
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var gg = new Graph(stopModel, deduplicator);
+    var gg = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(

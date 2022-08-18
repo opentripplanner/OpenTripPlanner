@@ -16,6 +16,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.util.OTPFeature;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -146,8 +147,12 @@ public class GTFSToOtpTransitServiceMapper {
 
     mapGtfsStopsToOtpTypes(data.getAllStops());
 
-    builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
-    builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
+    if (OTPFeature.FlexRouting.isOn()) {
+      // Stop areas and Stop groups are only used in FLEX routes
+      builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
+      builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
+    }
+
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
     builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
     builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));

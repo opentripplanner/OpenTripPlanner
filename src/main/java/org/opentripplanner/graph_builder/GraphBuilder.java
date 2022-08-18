@@ -16,6 +16,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,12 +171,7 @@ public class GraphBuilder implements Runnable {
     issueStore.summarize();
     validate();
 
-    long endTime = System.currentTimeMillis();
-    LOG.info(
-      "Graph building took {}.",
-      DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime))
-    );
-    LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+    logGraphBuilderCompleteStatus(startTime, graph, transitModel);
   }
 
   private void addModule(GraphBuilderModule module) {
@@ -205,5 +201,23 @@ public class GraphBuilder implements Runnable {
         "'transitServiceEnd'"
       );
     }
+  }
+
+  private static void logGraphBuilderCompleteStatus(
+    long startTime,
+    Graph graph,
+    TransitModel transitModel
+  ) {
+    long endTime = System.currentTimeMillis();
+    String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
+    var f = new OtpNumberFormat();
+    var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
+    var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
+    var nVertices = f.formatNumber(graph.countVertices());
+    var nEdges = f.formatNumber(graph.countEdges());
+
+    LOG.info("Graph building took {}.", time);
+    LOG.info("Graph built.   |V|={} |E|={}", nVertices, nEdges);
+    LOG.info("Transit built. |Stops|={} |Patterns|={}", nStops, nPatterns);
   }
 }

@@ -14,6 +14,7 @@ import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -78,8 +79,11 @@ public class PruneNoThruIslands implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Pruning islands and areas isolated by nothru edges in street network");
 
+    var vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
+
     pruneNoThruIslands(
       graph,
+      vertexLinker,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -87,6 +91,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     );
     pruneNoThruIslands(
       graph,
+      vertexLinker,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -94,6 +99,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     );
     pruneNoThruIslands(
       graph,
+      vertexLinker,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -150,6 +156,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static void pruneNoThruIslands(
     Graph graph,
+    VertexLinker vertexLinker,
     int maxIslandSize,
     int islandWithStopMaxSize,
     DataImportIssueStore issueStore,
@@ -182,6 +189,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     /* collect unreachable edges to a map */
     processIslands(
       graph,
+      vertexLinker,
       islands,
       isolated,
       true,
@@ -209,6 +217,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     count =
       processIslands(
         graph,
+        vertexLinker,
         islands,
         isolated,
         false,
@@ -222,6 +231,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static int processIslands(
     Graph graph,
+    VertexLinker vertexLinker,
     ArrayList<Subgraph> islands,
     Map<Edge, Boolean> isolated,
     boolean markIsolated,
@@ -246,7 +256,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         //for islands with stops
         islandsWithStops++;
         if (island.streetSize() < islandWithStopMaxSize) {
-          restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode, issueStore);
+          restrictOrRemove(
+            graph,
+            vertexLinker,
+            island,
+            isolated,
+            stats,
+            markIsolated,
+            traverseMode,
+            issueStore
+          );
           changed = true;
           islandsWithStopsChanged++;
           count++;
@@ -254,7 +273,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
       } else {
         //for islands without stops
         if (island.streetSize() < maxIslandSize) {
-          restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode, issueStore);
+          restrictOrRemove(
+            graph,
+            vertexLinker,
+            island,
+            isolated,
+            stats,
+            markIsolated,
+            traverseMode,
+            issueStore
+          );
           changed = true;
           count++;
         }
@@ -378,6 +406,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static void restrictOrRemove(
     Graph graph,
+    VertexLinker vertexLinker,
     Subgraph island,
     Map<Edge, Boolean> isolated,
     Map<String, Integer> stats,
@@ -418,7 +447,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
               }
               if (permission == StreetTraversalPermission.NONE) {
                 // currently we must update spatial index manually, graph.removeEdge does not do that
-                graph.getLinker().removePermanentEdgeFromIndex(pse);
+                vertexLinker.removePermanentEdgeFromIndex(pse);
                 graph.removeEdge(pse);
                 stats.put("removed", stats.get("removed") + 1);
               } else {

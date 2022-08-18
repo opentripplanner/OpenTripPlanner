@@ -290,7 +290,8 @@ public class QuayType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            Duration timeRange = Duration.ofSeconds(environment.getArgument("timeRange"));
+            Integer timeRangeInput = environment.getArgument("timeRange");
+            Duration timeRange = Duration.ofSeconds(timeRangeInput.longValue());
             Stop stop = environment.getSource();
 
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);

@@ -13,11 +13,14 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(OtpServerContext serverContext, RoutingRequest request) {
+  public static List<Itinerary> route(
+    OtpServerRequestContext serverContext,
+    RoutingRequest request
+  ) {
     if (request.modes.directMode == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }

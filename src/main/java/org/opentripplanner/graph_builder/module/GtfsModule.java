@@ -45,7 +45,6 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -156,12 +155,19 @@ public class GtfsModule implements GraphBuilderModule {
 
         repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
 
+        GeometryProcessor geometryProcessor = new GeometryProcessor(
+          builder,
+          gtfsBundle.getMaxStopToShapeSnapDistance(),
+          issueStore
+        );
+
         // NB! The calls below have side effects - the builder state is updated!
         createTripPatterns(
           graph,
           transitModel,
           builder,
           calendarServiceData.getServiceIds(),
+          geometryProcessor,
           issueStore
         );
 
@@ -171,13 +177,6 @@ public class GtfsModule implements GraphBuilderModule {
         hasTransit = hasTransit || otpTransitService.hasActiveTransit();
 
         addTransitModelToGraph(graph, transitModel, gtfsBundle, otpTransitService);
-
-        new GeometryProcessor(
-          otpTransitService,
-          gtfsBundle.getMaxStopToShapeSnapDistance(),
-          issueStore
-        )
-          .run(transitModel);
 
         if (blockBasedInterlining) {
           new InterlineProcessor(
@@ -190,7 +189,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
 
         fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
-        graph.putService(FareService.class, fareServiceFactory.makeFareService());
+        graph.setFareService(fareServiceFactory.makeFareService());
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -232,13 +231,15 @@ public class GtfsModule implements GraphBuilderModule {
     TransitModel transitModel,
     OtpTransitServiceBuilder builder,
     Set<FeedScopedId> calServiceIds,
+    GeometryProcessor geometryProcessor,
     DataImportIssueStore issueStore
   ) {
     GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
       builder,
       issueStore,
       graph.deduplicator,
-      calServiceIds
+      calServiceIds,
+      geometryProcessor
     );
     buildTPOp.run();
     transitModel.setHasFrequencyService(

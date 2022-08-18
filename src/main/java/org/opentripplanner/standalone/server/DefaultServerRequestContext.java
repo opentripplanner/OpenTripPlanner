@@ -1,10 +1,5 @@
 package org.opentripplanner.standalone.server;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.FileAppender;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
 import javax.annotation.Nullable;
@@ -14,22 +9,20 @@ import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.HttpRequestScoped;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.configure.RequestLoggerFactory;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class DefaultServerContext implements OtpServerContext {
+@HttpRequestScoped
+public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private RoutingRequest routingRequest = null;
   private final Graph graph;
-  private final TransitModel transitModel;
-
-  private TransitService transitService = null;
+  private final TransitService transitService;
   private final RouterConfig routerConfig;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
@@ -38,12 +31,11 @@ public class DefaultServerContext implements OtpServerContext {
   public final TraverseVisitor traverseVisitor;
 
   /**
-   * Copy constructor - used to make an HTTP Request scoped copy of the context. All mutable
-   * components need to be coped here. This is
+   * Make sure all mutable components are copied/cloned before calling this constructor.
    */
-  private DefaultServerContext(
+  private DefaultServerRequestContext(
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     RouterConfig routerConfig,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
@@ -52,7 +44,7 @@ public class DefaultServerContext implements OtpServerContext {
     TraverseVisitor traverseVisitor
   ) {
     this.graph = graph;
-    this.transitModel = transitModel;
+    this.transitService = transitService;
     this.routerConfig = routerConfig;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
@@ -62,26 +54,25 @@ public class DefaultServerContext implements OtpServerContext {
   }
 
   /**
-   * Create a default server context witch can be cloned by calling
-   * {@link #createHttpRequestScopedCopy()} for each HTTP request.
+   * Create a server context valid for one http request only!
    */
-  public static DefaultServerContext create(
+  public static DefaultServerRequestContext create(
     RouterConfig routerConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
-    TransitModel transitModel,
+    TransitService transitService,
     MeterRegistry meterRegistry,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     var defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
-    return new DefaultServerContext(
+    return new DefaultServerRequestContext(
       graph,
-      transitModel,
+      transitService,
       routerConfig,
       meterRegistry,
       raptorConfig,
-      createLogger(routerConfig.requestLogFile()),
+      RequestLoggerFactory.createLogger(routerConfig.requestLogFile()),
       new TileRendererManager(graph, defaultRoutingRequest),
       traverseVisitor
     );
@@ -121,9 +112,6 @@ public class DefaultServerContext implements OtpServerContext {
 
   @Override
   public TransitService transitService() {
-    if (transitService == null) {
-      this.transitService = new DefaultTransitService(transitModel);
-    }
     return transitService;
   }
 
@@ -150,46 +138,5 @@ public class DefaultServerContext implements OtpServerContext {
   @Override
   public TraverseVisitor traverseVisitor() {
     return traverseVisitor;
-  }
-
-  public OtpServerContext createHttpRequestScopedCopy() {
-    return new DefaultServerContext(
-      graph,
-      transitModel,
-      routerConfig,
-      meterRegistry,
-      raptorConfig,
-      requestLogger,
-      tileRendererManager,
-      traverseVisitor
-    );
-  }
-
-  /**
-   * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this
-   * router. http://stackoverflow.com/a/17215011/778449
-   */
-  private static Logger createLogger(@Nullable String file) {
-    if (file == null) {
-      return null;
-    }
-
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-    PatternLayoutEncoder ple = new PatternLayoutEncoder();
-    ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
-    ple.setContext(lc);
-    ple.start();
-    FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
-    fileAppender.setFile(file);
-    fileAppender.setEncoder(ple);
-    fileAppender.setContext(lc);
-    fileAppender.start();
-    ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(
-      "REQ_LOG"
-    );
-    logger.addAppender(fileAppender);
-    logger.setLevel(Level.INFO);
-    logger.setAdditive(false);
-    return logger;
   }
 }

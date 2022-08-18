@@ -10,6 +10,8 @@ import com.google.common.collect.Multimap;
 import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * the available data-sources against the configuration - and then if not valid - abort the entire
  * OTP startup early, before spending time on loading any data - like the streetGraph.
  */
+@Singleton
 public class GraphBuilderDataSources {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilderDataSources.class);
@@ -44,7 +47,12 @@ public class GraphBuilderDataSources {
   private final File cacheDirectory;
   private final DataSource outputGraph;
 
-  private GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
+  /**
+   * Create a wrapper around the data-store and resolve which files to import and export. Validate
+   * these files against the given command line arguments and the graph build parameters.
+   */
+  @Inject
+  public GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
     this.store = store;
     this.cacheDirectory = cli.cacheDirectory;
     this.outputGraph = getOutputGraph(cli);
@@ -63,18 +71,6 @@ public class GraphBuilderDataSources {
     // init input vil automatically validate it.
     // Check that the CLI is consistent with the input available
     validateCliMatchesInputData(cli);
-  }
-
-  /**
-   * Create a wrapper around the data-store and resolve which files to import and export. Validate
-   * these files against the given command line arguments and the graph build parameters.
-   */
-  public static GraphBuilderDataSources create(
-    CommandLineParameters cli,
-    BuildConfig bc,
-    OtpDataStore store
-  ) {
-    return new GraphBuilderDataSources(cli, bc, store);
   }
 
   public DataSource getOutputGraph() {

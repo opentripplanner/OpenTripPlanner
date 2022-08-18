@@ -12,7 +12,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.ShapePoint;
@@ -75,7 +74,7 @@ public class OtpTransitServiceBuilderTest {
     Collection<Route> routes = subject.getRoutes().values();
 
     assertEquals(18, routes.size());
-    assertEquals("Route{agency:1 1}", first(routes).toString());
+    assertEquals("Route{agency:1 BUS 1}", first(routes).toString());
   }
 
   @Test

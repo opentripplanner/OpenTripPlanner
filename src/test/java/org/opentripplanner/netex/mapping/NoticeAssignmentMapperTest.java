@@ -10,10 +10,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.MultilingualString;
@@ -61,7 +61,7 @@ public class NoticeAssignmentMapperTest {
       new HashMap<>()
     );
 
-    Multimap<TransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
+    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
       noticeAssignment
     );
 
@@ -112,7 +112,7 @@ public class NoticeAssignmentMapperTest {
       stopTimesById
     );
 
-    Multimap<TransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
+    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
       noticeAssignment
     );
 

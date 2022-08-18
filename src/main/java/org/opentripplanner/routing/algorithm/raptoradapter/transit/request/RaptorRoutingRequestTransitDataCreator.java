@@ -6,6 +6,7 @@ import gnu.trove.list.array.TIntArrayList;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +54,12 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     // Loop through all patterns, and mark all stops containing that pattern
-    int numPatterns = tripPatternsForDate.size();
-    for (int patternIndex = 0; patternIndex < numPatterns; patternIndex++) {
-      TripPatternForDates tripPatternForDateList = tripPatternsForDate.get(patternIndex);
-      for (int i : tripPatternForDateList.getTripPattern().getStopIndexes()) {
-        patternsForStop[i].add(patternIndex);
+    for (TripPatternForDates tripPatternForDateList : tripPatternsForDate) {
+      final RoutingTripPattern tripPattern = tripPatternForDateList.getTripPattern();
+      final int patternIndex = tripPattern.patternIndex();
+      final int numberOfStopsInPattern = tripPattern.numberOfStopsInPattern();
+      for (int i = 0; i < numberOfStopsInPattern; i++) {
+        patternsForStop[tripPattern.stopIndex(i)].add(patternIndex);
       }
     }
 
@@ -68,6 +70,14 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     return result;
+  }
+
+  public List<TripPatternForDates> createPatternIndex(List<TripPatternForDates> tripPatterns) {
+    TripPatternForDates[] result = new TripPatternForDates[RoutingTripPattern.indexCounter()];
+    for (var pattern : tripPatterns) {
+      result[pattern.getTripPattern().patternIndex()] = pattern;
+    }
+    return Arrays.asList(result);
   }
 
   /**
@@ -83,7 +93,7 @@ class RaptorRoutingRequestTransitDataCreator {
   ) {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
-    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
+    Map<RoutingTripPattern, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
     for (TripPatternForDate patternForDate : patternForDateList) {
       patternForDateByPattern
         .computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>())
@@ -94,7 +104,7 @@ class RaptorRoutingRequestTransitDataCreator {
 
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates
-    for (Map.Entry<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
+    for (Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
       // Sort by date. We can mutate the array, as it was created above in the grouping.
       List<TripPatternForDate> patternsSorted = patternEntry.getValue();
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
@@ -108,7 +118,7 @@ class RaptorRoutingRequestTransitDataCreator {
       }
 
       // Combine TripPatternForDate objects
-      final TripPatternWithRaptorStopIndexes tripPattern = patternEntry.getKey();
+      final RoutingTripPattern tripPattern = patternEntry.getKey();
 
       combinedList.add(
         new TripPatternForDates(

@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -22,6 +23,7 @@ import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.LocalizedString;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,16 +49,24 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private final Graph graph;
 
+  private final TransitModel transitModel;
+
+  private VertexLinker linker;
+
   @Inject
-  public OsmBoardingLocationsModule(Graph graph) {
+  public OsmBoardingLocationsModule(Graph graph, TransitModel transitModel) {
     this.graph = graph;
+    this.transitModel = transitModel;
   }
 
   @Override
   public void buildGraph() {
-    var streetIndex = graph.getStreetIndex();
     LOG.info("Improving boarding locations by checking OSM entities...");
+
+    StreetVertexIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
+    this.linker = streetIndex.getVertexLinker();
     int successes = 0;
+
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
       // if the street is already linked there is no need to linked it again,
       // could happened if using the prune isolated island
@@ -108,21 +118,19 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         boardingLocation.references.contains(stopId)
       ) {
         if (!boardingLocation.isConnectedToStreetNetwork()) {
-          graph
-            .getLinker()
-            .linkVertexPermanently(
-              boardingLocation,
-              new TraverseModeSet(TraverseMode.WALK),
-              LinkingDirection.BOTH_WAYS,
-              (osmBoardingLocationVertex, splitVertex) -> {
-                // the OSM boarding location vertex is not connected to the street network, so we
-                // need to link it first
-                return List.of(
-                  linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
-                  linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
-                );
-              }
-            );
+          linker.linkVertexPermanently(
+            boardingLocation,
+            new TraverseModeSet(TraverseMode.WALK),
+            LinkingDirection.BOTH_WAYS,
+            (osmBoardingLocationVertex, splitVertex) -> {
+              // the OSM boarding location vertex is not connected to the street network, so we
+              // need to link it first
+              return List.of(
+                linkBoardingLocationToStreetNetwork(boardingLocation, splitVertex),
+                linkBoardingLocationToStreetNetwork(splitVertex, boardingLocation)
+              );
+            }
+          );
         }
         linkBoardingLocationToStop(ts, stopCode, boardingLocation);
         return true;

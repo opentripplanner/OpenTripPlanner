@@ -55,7 +55,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -75,14 +75,14 @@ public class IndexAPI {
 
   private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
 
   /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
   @Context
   UriInfo uriInfo;
 
   public IndexAPI(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -188,7 +188,7 @@ public class IndexAPI {
   ) {
     /* When no parameters are supplied, return all stops. */
     if (uriInfo.getQueryParameters().isEmpty()) {
-      return StopMapper.mapToApiShort(transitService().getAllStops());
+      return StopMapper.mapToApiShort(transitService().listStopLocations());
     }
 
     /* If any of the circle parameters are specified, expect a circle not a box. */
@@ -202,7 +202,7 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return new DirectGraphFinder(serverContext.graph())
+      return new DirectGraphFinder(serverContext.transitService()::queryStopSpatialIndex)
         .findClosestStops(lat, lon, radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))
@@ -598,7 +598,7 @@ public class IndexAPI {
   }
 
   private StopLocation stop(String stopId) {
-    var stop = transitService().getStopForId(createId("stopId", stopId));
+    var stop = transitService().getRegularStop(createId("stopId", stopId));
     return validateExist("Stop", stop, "stopId", stop);
   }
 

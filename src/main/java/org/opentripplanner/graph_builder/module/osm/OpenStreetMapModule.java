@@ -486,10 +486,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private void processParkAndRideNodes(Collection<OSMNode> nodes, boolean isCarParkAndRide) {
       LOG.info("Processing {} P+R nodes.", isCarParkAndRide ? "car" : "bike");
       int n = 0;
-      VehicleParkingService vehicleParkingService = graph.getService(
-        VehicleParkingService.class,
-        true
-      );
+      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
       for (OSMNode node : nodes) {
         n++;
@@ -689,10 +686,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         entrances
       );
 
-      VehicleParkingService vehicleParkingService = graph.getService(
-        VehicleParkingService.class,
-        true
-      );
+      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
       vehicleParkingService.addVehicleParking(vehicleParking);
 
       VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);

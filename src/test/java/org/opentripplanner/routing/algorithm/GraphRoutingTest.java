@@ -84,9 +84,7 @@ public abstract class GraphRoutingTest {
     builder.build();
     Graph graph = builder.graph();
     TransitModel transitModel = builder.transitModel();
-    transitModel.index();
-    graph.index();
-    return new TestOtpModel(graph, transitModel);
+    return new TestOtpModel(graph, transitModel).index();
   }
 
   protected GraphPath routeParkAndRide(
@@ -110,7 +108,7 @@ public abstract class GraphRoutingTest {
     protected Builder() {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      graph = new Graph(stopModel, deduplicator);
+      graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
     }
 
@@ -238,14 +236,15 @@ public abstract class GraphRoutingTest {
     }
 
     public Stop stopEntity(String id, double latitude, double longitude) {
-      return TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+      var stop = TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+      transitModel.mergeStopModels(StopModel.of().withStop(stop).build());
+      return stop;
     }
 
     public TransitStopVertex stop(String id, double latitude, double longitude) {
       return new TransitStopVertexBuilder()
         .withGraph(graph)
         .withStop(stopEntity(id, latitude, longitude))
-        .withTransitModel(transitModel)
         .build();
     }
 

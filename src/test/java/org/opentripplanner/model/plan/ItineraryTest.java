@@ -1,12 +1,14 @@
 package org.opentripplanner.model.plan;
 
+import static java.time.Duration.ZERO;
+import static java.time.Duration.ofMinutes;
+import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
-import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -18,12 +20,12 @@ public class ItineraryTest implements PlanTestConstants {
     Itinerary result = newItinerary(A, T11_00).walk(D5m, B).build();
 
     // Expected fields on itinerary set
-    assertEquals(300, result.getDurationSeconds());
+    assertEquals(ofMinutes(5), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(600, result.getGeneralizedCost());
-    assertEquals(Duration.ZERO, result.getTransitDuration());
-    assertEquals(300, result.getNonTransitTimeSeconds());
-    assertEquals(0, result.getWaitingTimeSeconds());
+    assertEquals(ZERO, result.getTransitDuration());
+    assertEquals(ofMinutes(5), result.getNonTransitDuration());
+    assertEquals(ZERO, result.getWaitingDuration());
     assertTrue(result.isWalkOnly());
 
     // Expected fields on walking leg set
@@ -41,12 +43,12 @@ public class ItineraryTest implements PlanTestConstants {
   public void testDerivedFieldsWithBusAllTheWay() {
     Itinerary result = newItinerary(A).bus(55, T11_00, T11_10, B).build();
 
-    assertEquals(600, result.getDurationSeconds());
+    assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
-    assertEquals(Duration.ofMinutes(10), result.getTransitDuration());
-    assertEquals(0, result.getNonTransitTimeSeconds());
-    assertEquals(0, result.getWaitingTimeSeconds());
+    assertEquals(ofMinutes(10), result.getTransitDuration());
+    assertEquals(ZERO, result.getNonTransitDuration());
+    assertEquals(ZERO, result.getWaitingDuration());
     assertFalse(result.isWalkOnly());
 
     // Expected fields on bus leg set
@@ -65,12 +67,12 @@ public class ItineraryTest implements PlanTestConstants {
   public void testDerivedFieldsWithTrainAllTheWay() {
     Itinerary result = newItinerary(A).rail(20, T11_05, T11_15, B).build();
 
-    assertEquals(600, result.getDurationSeconds());
+    assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
-    assertEquals(Duration.ofMinutes(10), result.getTransitDuration());
-    assertEquals(0, result.getNonTransitTimeSeconds());
-    assertEquals(0, result.getWaitingTimeSeconds());
+    assertEquals(ofMinutes(10), result.getTransitDuration());
+    assertEquals(ZERO, result.getNonTransitDuration());
+    assertEquals(ZERO, result.getWaitingDuration());
     assertFalse(result.isWalkOnly());
 
     // Expected fields on bus leg set
@@ -95,10 +97,10 @@ public class ItineraryTest implements PlanTestConstants {
       .build();
 
     assertEquals(1, itinerary.getNumberOfTransfers());
-    assertEquals(28 * 60, itinerary.getDurationSeconds());
-    assertEquals(Duration.ofMinutes(20), itinerary.getTransitDuration());
-    assertEquals(60, itinerary.getNonTransitTimeSeconds());
-    assertEquals((2 + 5) * 60, itinerary.getWaitingTimeSeconds());
+    assertEquals(ofMinutes(28), itinerary.getDuration());
+    assertEquals(ofMinutes(20), itinerary.getTransitDuration());
+    assertEquals(ofMinutes(1), itinerary.getNonTransitDuration());
+    assertEquals(ofMinutes((2 + 5)), itinerary.getWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 60 + .8 * 420 + 2 * 120 + 1200
     assertEquals(1896, itinerary.getGeneralizedCost());
 
@@ -115,11 +117,11 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D3m, D)
       .build();
 
-    assertEquals(1080, result.getDurationSeconds());
+    assertEquals(ofMinutes(18), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(Duration.ofMinutes(10), result.getTransitDuration());
-    assertEquals(300, result.getNonTransitTimeSeconds());
-    assertEquals(180, result.getWaitingTimeSeconds());
+    assertEquals(ofMinutes(10), result.getTransitDuration());
+    assertEquals(ofMinutes(5), result.getNonTransitDuration());
+    assertEquals(ofMinutes(3), result.getWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 300 + .8 * 180 + 120 + 600
     assertEquals(1464, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
@@ -138,11 +140,11 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D1m, G)
       .build();
 
-    assertEquals(3060, result.getDurationSeconds());
+    assertEquals(ofMinutes(51), result.getDuration());
     assertEquals(2, result.getNumberOfTransfers());
-    assertEquals(Duration.ofMinutes(34), result.getTransitDuration());
-    assertEquals(360, result.getNonTransitTimeSeconds());
-    assertEquals(660, result.getWaitingTimeSeconds());
+    assertEquals(ofMinutes(34), result.getTransitDuration());
+    assertEquals(ofMinutes(6), result.getNonTransitDuration());
+    assertEquals(ofMinutes(11), result.getWaitingDuration());
     assertEquals(720 + 528 + 360 + 2040, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
     assertSameLocation(A, result.firstLeg().getFrom());

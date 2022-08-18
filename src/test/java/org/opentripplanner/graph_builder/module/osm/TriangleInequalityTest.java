@@ -46,7 +46,7 @@ public class TriangleInequalityTest {
   public static void onlyOnce() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(

@@ -5,13 +5,11 @@ import java.util.Set;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.service.TransitModel;
 
 public class TransitStopVertexBuilder {
 
   private Stop stop;
   private Graph graph;
-  private TransitModel transitModel;
   private Set<TransitMode> modes;
 
   public TransitStopVertexBuilder withStop(Stop stop) {
@@ -24,11 +22,6 @@ public class TransitStopVertexBuilder {
     return this;
   }
 
-  public TransitStopVertexBuilder withTransitModel(TransitModel transitModel) {
-    this.transitModel = transitModel;
-    return this;
-  }
-
   public TransitStopVertexBuilder withModes(Set<TransitMode> modes) {
     this.modes = modes;
     return this;
@@ -36,10 +29,7 @@ public class TransitStopVertexBuilder {
 
   public TransitStopVertex build() {
     Objects.requireNonNull(graph);
-    Objects.requireNonNull(transitModel);
     Objects.requireNonNull(stop);
-    TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, modes);
-    transitModel.getStopModel().addTransitStopVertex(stopVertex.getStop().getId(), stopVertex);
-    return stopVertex;
+    return new TransitStopVertex(graph, stop, modes);
   }
 }

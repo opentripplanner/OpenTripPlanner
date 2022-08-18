@@ -35,7 +35,6 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
 ```json
 {
   "areaVisibility": true,
-  "parentStopLinking": true,
   "platformEntriesLinking": true,
   "osmWayPropertySet": "norway",
   "islandWithoutStopsMaxSize": 5,

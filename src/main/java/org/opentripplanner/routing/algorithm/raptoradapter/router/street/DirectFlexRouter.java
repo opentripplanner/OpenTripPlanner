@@ -12,12 +12,12 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class DirectFlexRouter {
 
   public static List<Itinerary> route(
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     RoutingRequest request,
     AdditionalSearchDays additionalSearchDays
   ) {

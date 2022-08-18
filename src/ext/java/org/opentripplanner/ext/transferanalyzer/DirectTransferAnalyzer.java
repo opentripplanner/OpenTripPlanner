@@ -18,7 +18,6 @@ import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitModelIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,15 +59,16 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     /* Initialize transit index which is needed by the nearby stop finder. */
-    transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
-    transitModel.getStopModel().index();
+    transitModel.index();
 
     LOG.info("Analyzing transfers (this can be time consuming)...");
 
     List<TransferInfo> directTransfersTooLong = new ArrayList<>();
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
-    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(graph);
+    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
+      transitModel.getStopModel()::findRegularStops
+    );
     StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 
     int stopsAnalyzed = 0;
@@ -99,15 +99,15 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       List<Stop> stopsConnected = stopsEuclidean
         .keySet()
         .stream()
-        .filter(t -> stopsStreets.keySet().contains(t) && t != originStop)
-        .collect(Collectors.toList());
+        .filter(t -> stopsStreets.containsKey(t) && t != originStop)
+        .toList();
 
       /* Get stops found by euclidean search but not street search */
       List<Stop> stopsUnconnected = stopsEuclidean
         .keySet()
         .stream()
-        .filter(t -> !stopsStreets.keySet().contains(t) && t != originStop)
-        .collect(Collectors.toList());
+        .filter(t -> !stopsStreets.containsKey(t) && t != originStop)
+        .toList();
 
       for (Stop destStop : stopsConnected) {
         NearbyStop euclideanStop = stopsEuclidean.get(destStop);

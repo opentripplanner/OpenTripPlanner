@@ -86,7 +86,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
     int startTime,
     LocalDate date
   ) {
-    TIntSet servicesRunningForDate = transitService.getServicesRunningForDate(date);
+    TIntSet servicesRunningForDate = transitService.getServiceCodesRunningForDate(date);
     for (TripPattern pattern : transitService.getPatternsForRoute(route)) {
       if (pattern.getDirection() != direction) continue;
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {

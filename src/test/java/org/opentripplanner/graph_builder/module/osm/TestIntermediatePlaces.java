@@ -59,7 +59,7 @@ public class TestIntermediatePlaces {
       TransitModel transitModel = model.transitModel();
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
-      graph.index();
+      model.index();
       TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
       timeZone = transitModel.getTimeZone();
 
@@ -320,15 +320,15 @@ public class TestIntermediatePlaces {
       assertFalse(leg.getStartTime().isAfter(leg.getEndTime()));
 
       departTime = leg.getEndTime().toInstant();
-      sumOfDuration += leg.getDuration();
+      sumOfDuration += leg.getDuration().toSeconds();
     }
-    sumOfDuration += itinerary.getWaitingTimeSeconds();
+    sumOfDuration += itinerary.getWaitingDuration().toSeconds();
 
     assertFalse(departTime.isAfter(arriveTime));
 
     // Check the total duration of the legs,
     int accuracy = itinerary.getLegs().size(); // allow 1 second per leg for rounding errors
-    assertEquals(sumOfDuration, itinerary.getDurationSeconds(), accuracy);
+    assertEquals(sumOfDuration, itinerary.getDuration().toSeconds(), accuracy);
   }
 
   private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

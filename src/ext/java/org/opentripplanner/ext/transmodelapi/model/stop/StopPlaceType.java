@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
@@ -40,8 +41,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -64,7 +65,16 @@ public class StopPlaceType {
         "Named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location."
       )
       .withInterface(placeInterface)
-      .field(GqlUtil.newTransitIdField())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("id")
+          .type(new GraphQLNonNull(Scalars.GraphQLID))
+          .dataFetcher(env ->
+            TransitIdMapper.mapIDToApi(((MonoOrMultiModalStation) env.getSource()).getId())
+          )
+          .build()
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -328,7 +338,8 @@ public class StopPlaceType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            Duration timeRage = Duration.ofSeconds(environment.getArgument("timeRange"));
+            Integer timeRangeInput = environment.getArgument("timeRange");
+            Duration timeRage = Duration.ofSeconds(timeRangeInput.longValue());
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
@@ -521,7 +532,10 @@ public class StopPlaceType {
     }
   }
 
-  public static boolean isStopPlaceInUse(StopCollection station, TransitService transitService) {
+  public static boolean isStopPlaceInUse(
+    StopLocationsGroup station,
+    TransitService transitService
+  ) {
     for (var quay : station.getChildStops()) {
       if (!transitService.getPatternsForStop(quay, true).isEmpty()) {
         return true;

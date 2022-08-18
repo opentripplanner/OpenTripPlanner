@@ -17,7 +17,6 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
@@ -65,7 +64,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
     if (graph.hasStreets) {
@@ -274,7 +273,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.remove(vehicleParkingEntranceVertex);
 
     if (removeVehicleParking) {
-      var vehicleParkingService = graph.getService(VehicleParkingService.class);
+      var vehicleParkingService = graph.getVehicleParkingService();
       vehicleParkingService.removeVehicleParking(vehicleParking);
     } else {
       vehicleParking.getEntrances().remove(entrance);

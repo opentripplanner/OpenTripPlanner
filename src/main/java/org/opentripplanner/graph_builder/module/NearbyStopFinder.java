@@ -35,6 +35,7 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
@@ -91,10 +92,10 @@ public class NearbyStopFinder {
     this.durationLimit = durationLimit;
 
     if (!useStreets) {
-      // We need to accommodate straight line distance (in meters) but when streets are present we use an
-      // earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
+      // We need to accommodate straight line distance (in meters) but when streets are present we
+      // use an earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
       // but we don't have much of a choice here. Use the default walking speed to convert.
-      this.directGraphFinder = new DirectGraphFinder(graph);
+      this.directGraphFinder = new DirectGraphFinder(transitService::queryStopSpatialIndex);
     }
   }
 
@@ -156,12 +157,9 @@ public class NearbyStopFinder {
   ) {
     if (useStreets) {
       return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest);
+    } else {
+      return findNearbyStopsViaDirectTransfers(vertex);
     }
-    // It make sense for the directGraphFinder to use meters as a limit, so we convert first
-    double limitMeters =
-      durationLimit.toSeconds() * new RoutingRequest(TraverseMode.WALK).walkSpeed;
-    Coordinate c0 = vertex.getCoordinate();
-    return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
   }
 
   /**
@@ -267,6 +265,14 @@ public class NearbyStopFinder {
     return stopsFound;
   }
 
+  private List<NearbyStop> findNearbyStopsViaDirectTransfers(Vertex vertex) {
+    // It make sense for the directGraphFinder to use meters as a limit, so we convert first
+    double limitMeters =
+      durationLimit.toSeconds() * new RoutingRequest(TraverseMode.WALK).walkSpeed;
+    Coordinate c0 = vertex.getCoordinate();
+    return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
+  }
+
   private SkipEdgeStrategy getSkipEdgeStrategy(
     boolean reverseDirection,
     RoutingRequest routingRequest
@@ -285,7 +291,10 @@ public class NearbyStopFinder {
       OTPFeature.VehicleToStopHeuristics.isOn() &&
       VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)
     ) {
-      var strategy = new VehicleToStopSkipEdgeStrategy(transitService::getRoutesForStop);
+      var strategy = new VehicleToStopSkipEdgeStrategy(
+        transitService::getRoutesForStop,
+        routingRequest.modes.transitModes.stream().map(MainAndSubMode::mainMode).toList()
+      );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&

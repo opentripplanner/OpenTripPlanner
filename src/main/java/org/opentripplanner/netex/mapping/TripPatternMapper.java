@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Objects;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -227,13 +227,13 @@ class TripPatternMapper {
       .of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
-      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue());
+      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
+      .withHopGeometries(
+        serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
+      );
 
     TripPattern tripPattern = tripPatternBuilder.build();
     createTripTimes(trips, tripPattern);
-    tripPattern.setHopGeometries(
-      serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, tripPattern)
-    );
 
     result.tripPatterns.put(stopPattern, tripPattern);
 

@@ -8,12 +8,12 @@ import java.util.List;
  */
 class ItinerariesCalculateLegTotals {
 
-  int totalDurationSeconds = 0;
-  int transitTimeSeconds = 0;
+  Duration totalDuration = Duration.ZERO;
+  Duration transitDuration = Duration.ZERO;
   int nTransitLegs = 0;
-  int nonTransitTimeSeconds = 0;
+  Duration nonTransitDuration = Duration.ZERO;
   double nonTransitDistanceMeters = 0.0;
-  int waitingTimeSeconds;
+  Duration walkingDuration;
   boolean walkOnly = true;
   boolean streetOnly = true;
   double totalElevationGained = 0.0;
@@ -31,21 +31,19 @@ class ItinerariesCalculateLegTotals {
   }
 
   private void calculate(List<Leg> legs) {
-    totalDurationSeconds =
-      (int) Duration
-        .between(legs.get(0).getStartTime(), legs.get(legs.size() - 1).getEndTime())
-        .toSeconds();
+    totalDuration =
+      Duration.between(legs.get(0).getStartTime(), legs.get(legs.size() - 1).getEndTime());
 
     for (Leg leg : legs) {
-      long dt = leg.getDuration();
+      Duration dt = leg.getDuration();
 
       if (leg.isTransitLeg()) {
-        transitTimeSeconds += dt;
+        transitDuration = transitDuration.plus(dt);
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
       } else if (leg.isStreetLeg()) {
-        nonTransitTimeSeconds += dt;
+        nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
       }
       if (!leg.isWalkingLeg()) {
@@ -59,6 +57,6 @@ class ItinerariesCalculateLegTotals {
         this.totalElevationLost += leg.getElevationLost();
       }
     }
-    this.waitingTimeSeconds = totalDurationSeconds - (transitTimeSeconds + nonTransitTimeSeconds);
+    this.walkingDuration = totalDuration.minus(transitDuration).minus(nonTransitDuration);
   }
 }

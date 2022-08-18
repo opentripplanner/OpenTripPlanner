@@ -21,6 +21,7 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  */
 public final class Stop extends StationElement<Stop, StopBuilder> implements StopLocation {
 
+  private final int index;
   private final String platformCode;
 
   private final I18NString url;
@@ -37,6 +38,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   Stop(StopBuilder builder) {
     super(builder);
+    this.index = INDEX_COUNTER.getAndIncrement();
     this.platformCode = builder.platformCode();
     this.url = builder.url();
     this.timeZone = builder.timeZone();
@@ -51,6 +53,11 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   public static StopBuilder of(FeedScopedId id) {
     return new StopBuilder(id);
+  }
+
+  @Override
+  public int getIndex() {
+    return index;
   }
 
   /**

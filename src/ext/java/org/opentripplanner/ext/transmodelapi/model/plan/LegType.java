@@ -21,11 +21,11 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {

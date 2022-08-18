@@ -14,14 +14,13 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -119,12 +118,6 @@ public class ServiceLinkMapperTest {
       stopsById.add(stop);
     }
 
-    TripPattern tripPattern = TripPattern
-      .of(ID_FACTORY.createId("RUT:JourneyPattern:1"))
-      .withRoute(null)
-      .withStopPattern(stopPatternBuilder.build())
-      .build();
-
     ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(
       ID_FACTORY,
       serviceLinksById,
@@ -134,12 +127,12 @@ public class ServiceLinkMapperTest {
       150
     );
 
-    LineString[] shape = serviceLinkMapper.getGeometriesByJourneyPattern(
+    List<LineString> shape = serviceLinkMapper.getGeometriesByJourneyPattern(
       journeyPattern,
-      tripPattern
+      stopPatternBuilder.build()
     );
 
-    Coordinate[] coordinates = shape[0].getCoordinates();
+    Coordinate[] coordinates = shape.get(0).getCoordinates();
 
     assertEquals(0, issueStore.getIssues().size());
 
@@ -148,7 +141,7 @@ public class ServiceLinkMapperTest {
     assertEquals(COORDINATES[2], coordinates[1].getY(), 0.000001);
     assertEquals(COORDINATES[3], coordinates[1].getX(), 0.000001);
 
-    coordinates = shape[1].getCoordinates();
+    coordinates = shape.get(1).getCoordinates();
 
     assertEquals(COORDINATES[2], coordinates[0].getY(), 0.000001);
     assertEquals(COORDINATES[3], coordinates[0].getX(), 0.000001);

@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -140,7 +141,8 @@ public class GtfsContextBuilder {
       transitBuilder,
       issueStore,
       deduplicator(),
-      calendarService().getServiceIds()
+      calendarService().getServiceIds(),
+      new GeometryProcessor(transitBuilder, 150, issueStore)
     )
       .run();
   }

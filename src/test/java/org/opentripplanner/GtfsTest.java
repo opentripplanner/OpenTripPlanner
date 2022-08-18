@@ -28,7 +28,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -45,7 +45,7 @@ public abstract class GtfsTest {
   AlertsUpdateHandler alertsUpdateHandler;
   TimetableSnapshotSource timetableSnapshotSource;
   TransitAlertServiceImpl alertPatchServiceImpl;
-  public OtpServerContext serverContext;
+  public OtpServerRequestContext serverContext;
   public GtfsFeedId feedId;
 
   public abstract String getFeedName();
@@ -145,9 +145,8 @@ public abstract class GtfsTest {
 
     alertsUpdateHandler = new AlertsUpdateHandler();
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    transitModel = new TransitModel(new StopModel(), deduplicator);
 
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,
@@ -158,7 +157,7 @@ public abstract class GtfsTest {
 
     gtfsGraphBuilderImpl.buildGraph();
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
     serverContext = TestServerContext.createServerContext(graph, transitModel);
     timetableSnapshotSource = TimetableSnapshotSource.ofTransitModel(transitModel);
     timetableSnapshotSource.purgeExpiredData = false;

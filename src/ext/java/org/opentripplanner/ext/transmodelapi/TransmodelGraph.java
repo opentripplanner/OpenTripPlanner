@@ -17,9 +17,7 @@ import java.util.concurrent.Executors;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,7 @@ class TransmodelGraph {
 
   ExecutionResult getGraphQLExecutionResult(
     String query,
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -82,7 +80,7 @@ class TransmodelGraph {
 
   Response getGraphQLResponse(
     String query,
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,

@@ -12,7 +12,7 @@ public class GroupOfStationsBuilder
   extends AbstractEntityBuilder<GroupOfStations, GroupOfStationsBuilder> {
 
   private I18NString name;
-  private Set<StopCollection> childStations = new HashSet<>();
+  private Set<StopLocationsGroup> childStations = new HashSet<>();
   private GroupOfStationsPurpose purposeOfGrouping;
   private WgsCoordinate coordinate;
 
@@ -44,12 +44,12 @@ public class GroupOfStationsBuilder
     return name;
   }
 
-  public GroupOfStationsBuilder addChildStation(StopCollection station) {
+  public GroupOfStationsBuilder addChildStation(StopLocationsGroup station) {
     this.childStations.add(station);
     return this;
   }
 
-  public Set<StopCollection> childStations() {
+  public Set<StopLocationsGroup> childStations() {
     return Set.copyOf(this.childStations);
   }
 

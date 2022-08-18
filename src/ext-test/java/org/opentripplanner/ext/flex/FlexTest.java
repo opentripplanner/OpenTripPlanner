@@ -49,9 +49,8 @@ public abstract class FlexTest {
     }
 
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
     GtfsBundle gtfsBundle = new GtfsBundle(file);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
@@ -62,7 +61,7 @@ public abstract class FlexTest {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     module.buildGraph();
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     assertTrue(transitModel.hasFlexTrips());
     return new TestOtpModel(graph, transitModel);

@@ -37,11 +37,11 @@ import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
 
 public class LuceneIndex implements Serializable {
@@ -78,7 +78,7 @@ public class LuceneIndex implements Serializable {
         )
       ) {
         transitService
-          .getAllStops()
+          .listStopLocations()
           .forEach(stopLocation ->
             addToIndex(
               directoryWriter,
@@ -92,16 +92,16 @@ public class LuceneIndex implements Serializable {
           );
 
         transitService
-          .getAllStopCollections()
-          .forEach(stopCollection ->
+          .listStopLocationGroups()
+          .forEach(stopLocationsGroup ->
             addToIndex(
               directoryWriter,
-              StopCollection.class,
-              stopCollection.getId().toString(),
-              stopCollection.getName(),
+              StopLocationsGroup.class,
+              stopLocationsGroup.getId().toString(),
+              stopLocationsGroup.getName(),
               null,
-              stopCollection.getCoordinate().latitude(),
-              stopCollection.getCoordinate().longitude()
+              stopLocationsGroup.getCoordinate().latitude(),
+              stopLocationsGroup.getCoordinate().longitude()
             )
           );
 
@@ -130,26 +130,26 @@ public class LuceneIndex implements Serializable {
     }
   }
 
-  public static synchronized LuceneIndex forServer(OtpServerContext serverContext) {
+  public static synchronized LuceneIndex forServer(OtpServerRequestContext serverContext) {
     var graph = serverContext.graph();
-    var existingIndex = graph.getService(LuceneIndex.class);
+    var existingIndex = graph.getLuceneIndex();
     if (existingIndex != null) {
       return existingIndex;
     }
 
     var newIndex = new LuceneIndex(graph, serverContext.transitService());
-    graph.putService(LuceneIndex.class, newIndex);
+    graph.setLuceneIndex(newIndex);
     return newIndex;
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
     return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> transitService.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
+      .map(document -> transitService.getStopLocation(FeedScopedId.parseId(document.get(ID))));
   }
 
-  public Stream<StopCollection> queryStopCollections(String query, boolean autocomplete) {
-    return matchingDocuments(StopCollection.class, query, autocomplete)
-      .map(document -> transitService.getStopCollectionById(FeedScopedId.parseId(document.get(ID)))
+  public Stream<StopLocationsGroup> findStopLocationGroups(String query, boolean autocomplete) {
+    return matchingDocuments(StopLocationsGroup.class, query, autocomplete)
+      .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parseId(document.get(ID)))
       );
   }
 

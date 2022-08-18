@@ -82,7 +82,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
   public String toString() {
     return String.format(
       Locale.ROOT,
-      "stop %s at %.1f meters%s%s%s",
+      "stop %s at %.1f meters%s%s",
       stop,
       distance,
       edges != null ? " (" + edges.size() + " edges)" : "",

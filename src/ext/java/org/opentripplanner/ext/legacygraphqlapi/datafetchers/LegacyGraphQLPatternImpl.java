@@ -209,7 +209,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
       try {
         TIntSet services = getTransitService(environment)
-          .getServicesRunningForDate(ServiceDateUtils.parseString(serviceDate));
+          .getServiceCodesRunningForDate(ServiceDateUtils.parseString(serviceDate));
         return getSource(environment)
           .getScheduledTimetable()
           .getTripTimes()

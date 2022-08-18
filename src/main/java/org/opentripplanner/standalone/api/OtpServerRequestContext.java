@@ -8,6 +8,7 @@ import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
@@ -36,7 +37,8 @@ import org.slf4j.Logger;
  * for the synchronization. Only request scoped components need to be synchronized - they are
  * potentially lazy initialized.
  */
-public interface OtpServerContext {
+@HttpRequestScoped
+public interface OtpServerRequestContext {
   /**
    * A RoutingRequest containing default parameters that will be cloned when handling each request.
    */
@@ -81,5 +83,10 @@ public interface OtpServerContext {
    * Callback witch is injected into the {@code DirectStreetRouter}, used to visualize the
    * search.
    */
+  @HttpRequestScoped
   TraverseVisitor traverseVisitor();
+
+  default GraphFinder graphFinder() {
+    return GraphFinder.getInstance(graph(), transitService()::queryStopSpatialIndex);
+  }
 }
