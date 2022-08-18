@@ -69,7 +69,6 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   private final int validTransitDataEndTime;
 
   public RaptorRoutingRequestTransitData(
-    TransferService transferService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
@@ -77,7 +76,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     TransitDataProviderFilter filter,
     RoutingContext routingContext
   ) {
-    this.transferService = transferService;
+    this.transferService = transitLayer.getTransferService();
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
 

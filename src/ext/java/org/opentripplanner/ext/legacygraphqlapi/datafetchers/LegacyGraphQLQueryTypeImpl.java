@@ -665,11 +665,11 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
       callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
       callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
-      callWith.argument("unpreferred.unpreferredRouteCost", request::setUnpreferredRouteCost);
+      callWith.argument("unpreferred.unpreferredRouteCost", request::setUnpreferredCost);
       callWith.argument(
         "unpreferred.useUnpreferredRoutesPenalty",
         (Integer v) ->
-          request.setUnpreferredRouteCost(
+          request.setUnpreferredCost(
             RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
           )
       );

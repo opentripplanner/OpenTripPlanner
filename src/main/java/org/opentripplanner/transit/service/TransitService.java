@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -188,4 +189,6 @@ public interface TransitService {
   Collection<Stop> queryStopSpatialIndex(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
+
+  Collection<Route> getRoutesForAgency(FeedScopedId agencyId);
 }

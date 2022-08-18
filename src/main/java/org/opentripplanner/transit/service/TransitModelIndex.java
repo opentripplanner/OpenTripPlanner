@@ -50,6 +50,8 @@ public class TransitModelIndex {
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
+  private final Multimap<FeedScopedId, Route> routesForAgency = ArrayListMultimap.create();
+
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<FeedScopedId, TripOnServiceDate> tripOnServiceDateById = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
@@ -84,6 +86,7 @@ public class TransitModelIndex {
     }
     for (Route route : patternsForRoute.asMap().keySet()) {
       routeForId.put(route.getId(), route);
+      routesForAgency.put(route.getAgency().getId(), route);
       for (GroupOfRoutes groupOfRoutes : route.getGroupsOfRoutes()) {
         routesForGroupOfRoutes.put(groupOfRoutes, route);
       }
@@ -205,6 +208,10 @@ public class TransitModelIndex {
 
   public Multimap<Route, TripPattern> getPatternsForRoute() {
     return patternsForRoute;
+  }
+
+  public Multimap<FeedScopedId, Route> getRoutesForAgency() {
+    return routesForAgency;
   }
 
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {

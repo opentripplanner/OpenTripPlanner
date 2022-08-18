@@ -536,6 +536,11 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public Collection<Route> getRoutesForAgency(FeedScopedId agencyId) {
+    return transitModelIndex.getRoutesForAgency().get(agencyId);
+  }
+
+  @Override
   public Optional<Coordinate> getCenter() {
     return transitModel.getStopModel().stopLocationCenter().map(WgsCoordinate::asJtsCoordinate);
   }

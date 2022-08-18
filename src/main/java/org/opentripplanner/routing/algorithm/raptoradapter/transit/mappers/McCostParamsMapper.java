@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
@@ -32,19 +33,22 @@ public class McCostParamsMapper {
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
 
     final BitSet unpreferredPatterns = new BitSet();
-    final List<FeedScopedId> unpreferredRoutes = request.unpreferredRoutes;
+    final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
+    final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
 
-    if (!unpreferredRoutes.isEmpty()) {
+    if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
       for (var pattern : patternIndex) {
-        final FeedScopedId routeId = pattern.route().getId();
-        if (unpreferredRoutes.contains(routeId)) {
+        if (
+          unpreferredRoutes.contains(pattern.route().getId()) ||
+          unpreferredAgencies.contains(pattern.route().getAgency().getId())
+        ) {
           unpreferredPatterns.set(pattern.patternIndex());
         }
       }
     }
 
     builder.unpreferredPatterns(unpreferredPatterns);
-    builder.unpreferredCost(request.unpreferredRouteCost);
+    builder.unpreferredCost(request.unpreferredCost);
 
     return builder.build();
   }

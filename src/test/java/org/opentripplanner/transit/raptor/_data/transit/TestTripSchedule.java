@@ -206,6 +206,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
           pattern.numberOfStopsInPattern()
         );
       }
+
       return new TestTripSchedule(
         pattern,
         arrivalTimes,
