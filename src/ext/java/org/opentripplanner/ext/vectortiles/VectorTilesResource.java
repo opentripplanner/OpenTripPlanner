@@ -27,7 +27,7 @@ import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.VectorTileConfig;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
@@ -36,7 +36,7 @@ import org.opentripplanner.util.WorldEnvelope;
 public class VectorTilesResource {
 
   private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final String ignoreRouterId;
 
   static {
@@ -47,7 +47,7 @@ public class VectorTilesResource {
   }
 
   public VectorTilesResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760

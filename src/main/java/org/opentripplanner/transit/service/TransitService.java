@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import gnu.trove.set.TIntSet;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -16,9 +17,6 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripIdAndServiceDate;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
@@ -42,6 +40,8 @@ import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -86,11 +86,6 @@ public interface TransitService {
 
   Collection<TripPattern> getPatternsForStop(StopLocation stop);
 
-  Collection<TripPattern> getPatternsForStop(
-    StopLocation stop,
-    TimetableSnapshot timetableSnapshot
-  );
-
   Collection<TripPattern> getPatternsForStop(StopLocation stop, boolean includeRealtimeUpdates);
 
   Collection<Trip> getTripsForStop(StopLocation stop);
@@ -115,14 +110,16 @@ public interface TransitService {
 
   TripPattern getPatternForTrip(Trip trip);
 
+  TripPattern getPatternForTrip(Trip trip, LocalDate serviceDate);
+
   Collection<TripPattern> getPatternsForRoute(Route route);
 
   MultiModalStation getMultiModalStationForStation(Station station);
 
   List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips
@@ -137,8 +134,8 @@ public interface TransitService {
   List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
-    long startTime,
-    int timeRange,
+    Instant startTime,
+    Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   );
@@ -151,6 +148,10 @@ public interface TransitService {
 
   Timetable getTimetableForTripPattern(TripPattern tripPattern, LocalDate serviceDate);
 
+  TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate);
+
+  boolean hasRealtimeAddedTripPatterns();
+
   TripOnServiceDate getTripOnServiceDateForTripAndDay(TripIdAndServiceDate tripIdAndServiceDate);
 
   TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId);
@@ -160,8 +161,6 @@ public interface TransitService {
   Set<TransitMode> getTransitModes();
 
   Collection<PathTransfer> getTransfersByStop(StopLocation stop);
-
-  TimetableSnapshot getTimetableSnapshot();
 
   TransitLayer getTransitLayer();
 
@@ -174,8 +173,6 @@ public interface TransitService {
   TransitAlertService getTransitAlertService();
 
   FlexIndex getFlexIndex();
-
-  TIntSet getServicesRunningForDate(LocalDate parseString);
 
   ZonedDateTime getTransitServiceEnds();
 

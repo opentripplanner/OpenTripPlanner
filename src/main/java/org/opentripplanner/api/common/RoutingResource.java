@@ -18,7 +18,7 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -369,6 +369,13 @@ public abstract class RoutingResource {
   @QueryParam("bikeBoardCost")
   protected Integer bikeBoardCost;
 
+  /**
+   * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+   * If the value is set to be 0, safety is ignored. Default is 1.0.
+   */
+  @QueryParam("walkSafetyFactor")
+  protected Double walkSafetyFactor;
+
   @QueryParam("allowKeepingRentedBicycleAtDestination")
   protected Boolean allowKeepingRentedBicycleAtDestination;
 
@@ -695,7 +702,7 @@ public abstract class RoutingResource {
    * semantic equality checks.
    */
   @Context
-  protected OtpServerContext serverContext;
+  protected OtpServerRequestContext serverContext;
 
   /**
    * Range/sanity check the query parameter fields and build a Request object from them.
@@ -839,6 +846,9 @@ public abstract class RoutingResource {
     }
     if (bikeBoardCost != null) {
       request.setBikeBoardCost(bikeBoardCost);
+    }
+    if (walkSafetyFactor != null) {
+      request.setWalkSafetyFactor(walkSafetyFactor);
     }
     if (bannedRoutes != null) {
       request.setBannedRoutesFromString(bannedRoutes);

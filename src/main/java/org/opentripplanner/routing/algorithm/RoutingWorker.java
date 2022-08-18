@@ -25,9 +25,8 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
@@ -50,7 +49,7 @@ public class RoutingWorker {
   public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
   private final RoutingRequest request;
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   /**
    * The transit service time-zero normalized for the current search. All transit times are relative
    * to a "time-zero". This enables us to use an integer(small memory footprint). The times are
@@ -65,7 +64,11 @@ public class RoutingWorker {
   private SearchParams raptorSearchParamsUsed = null;
   private Itinerary firstRemovedItinerary = null;
 
-  public RoutingWorker(OtpServerContext serverContext, RoutingRequest request, ZoneId zoneId) {
+  public RoutingWorker(
+    OtpServerRequestContext serverContext,
+    RoutingRequest request,
+    ZoneId zoneId
+  ) {
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
@@ -131,7 +134,7 @@ public class RoutingWorker {
       it -> firstRemovedItinerary = it,
       request.wheelchairAccessibility.enabled(),
       request.wheelchairAccessibility.maxSlope(),
-      serverContext.graph().getService(FareService.class),
+      serverContext.graph().getFareService(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
     );

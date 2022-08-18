@@ -33,7 +33,7 @@ public class OtherThanSameLegsMaxGeneralizedCostFilter implements ItineraryDelet
   }
 
   @Override
-  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     if (itineraries.size() < 2) {
       return List.of();
     }

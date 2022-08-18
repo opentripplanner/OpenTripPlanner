@@ -343,7 +343,7 @@ public class State implements Cloneable {
         }
       }
       if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
-        editor.setVehicleParked(true, orig.getNonTransitMode());
+        editor.setVehicleParked(true, orig.getBackState().getNonTransitMode());
       }
 
       ret = editor.makeState();

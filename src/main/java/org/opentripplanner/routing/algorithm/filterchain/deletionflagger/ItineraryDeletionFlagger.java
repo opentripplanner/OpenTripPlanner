@@ -11,8 +11,8 @@ import org.opentripplanner.model.plan.Itinerary;
  * <p>
  * Override one of the default methods in this interface to make a filter:
  * <ul>
- *  <li>{@link #predicate()} - If filtering is done based on looking at one itinerary at the time.</li>
- *  <li>{@link #getFlaggedItineraries(List)}}) - If you need more than one itinerary to decide which to delete.</li>
+ *  <li>{@link #shouldBeFlaggedForRemoval()} - If filtering is done based on looking at one itinerary at the time.</li>
+ *  <li>{@link #flagForRemoval(List)}}) - If you need more than one itinerary to decide which to delete.</li>
  * </ul>
  */
 public interface ItineraryDeletionFlagger {
@@ -27,9 +27,9 @@ public interface ItineraryDeletionFlagger {
 
   /**
    * Override this to create a simple filter, which flags all itineraries for deletion where the
-   * predicate returns true.
+   * predicate returns {@code true}.
    */
-  default Predicate<Itinerary> predicate() {
+  default Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return null;
   }
 
@@ -38,15 +38,15 @@ public interface ItineraryDeletionFlagger {
    * flagged for removal. All itineraries returned from this function will be flagged for deletion
    * using {@link Itinerary#flagForDeletion(SystemNotice)}.
    */
-  default List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
-    return itineraries.stream().filter(predicate()).collect(Collectors.toList());
+  default List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
+    return itineraries.stream().filter(shouldBeFlaggedForRemoval()).collect(Collectors.toList());
   }
 
   // Tagging options:
 
   /**
    * Should itineraries already marked for deletion by previous deletionflagger be removed from the
-   * list passed to {@link ItineraryDeletionFlagger#getFlaggedItineraries(List)}. The default value
+   * list passed to {@link ItineraryDeletionFlagger#flagForRemoval(List)}. The default value
    * is true, as usually the already removed itineraries are not needed further in the filter
    * chain.
    */

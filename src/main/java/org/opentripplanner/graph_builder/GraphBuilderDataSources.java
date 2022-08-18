@@ -10,6 +10,7 @@ import com.google.common.collect.Multimap;
 import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
+import javax.inject.Inject;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -44,7 +45,12 @@ public class GraphBuilderDataSources {
   private final File cacheDirectory;
   private final DataSource outputGraph;
 
-  private GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
+  /**
+   * Create a wrapper around the data-store and resolve which files to import and export. Validate
+   * these files against the given command line arguments and the graph build parameters.
+   */
+  @Inject
+  public GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
     this.store = store;
     this.cacheDirectory = cli.cacheDirectory;
     this.outputGraph = getOutputGraph(cli);
@@ -65,18 +71,6 @@ public class GraphBuilderDataSources {
     validateCliMatchesInputData(cli);
   }
 
-  /**
-   * Create a wrapper around the data-store and resolve which files to import and export. Validate
-   * these files against the given command line arguments and the graph build parameters.
-   */
-  public static GraphBuilderDataSources create(
-    CommandLineParameters cli,
-    BuildConfig bc,
-    OtpDataStore store
-  ) {
-    return new GraphBuilderDataSources(cli, bc, store);
-  }
-
   public DataSource getOutputGraph() {
     return outputGraph;
   }
@@ -85,19 +79,19 @@ public class GraphBuilderDataSources {
    * @return {@code true} if and only if the data source exist, proper command line parameters is
    * set and not disabled by the loaded configuration files.
    */
-  boolean has(FileType type) {
+  public boolean has(FileType type) {
     return inputData.containsKey(type);
   }
 
-  Iterable<DataSource> get(FileType type) {
+  public Iterable<DataSource> get(FileType type) {
     return inputData.get(type);
   }
 
-  CompositeDataSource getBuildReportDir() {
+  public CompositeDataSource getBuildReportDir() {
     return store.getBuildReportDir();
   }
 
-  File getCacheDirectory() {
+  public File getCacheDirectory() {
     return cacheDirectory;
   }
 

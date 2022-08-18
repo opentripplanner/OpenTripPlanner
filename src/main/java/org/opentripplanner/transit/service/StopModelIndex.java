@@ -1,11 +1,9 @@
 package org.opentripplanner.transit.service;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
@@ -25,23 +23,24 @@ import org.slf4j.LoggerFactory;
  * For performance reasons these indexes are not part of the serialized state of the graph.
  * They are rebuilt at runtime after graph deserialization.
  */
-public class StopModelIndex {
+class StopModelIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModelIndex.class);
 
   // TODO: consistently key on model object or id string
 
-  private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
+  private final Map<Stop, TransitStopVertex> stopVertexForStop = new HashMap<>();
   private final HashGridSpatialIndex<Stop> stopSpatialIndex = new HashGridSpatialIndex<>();
-  private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
+  private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
   private final Multimap<StopLocation, FlexLocationGroup> locationGroupsByStop = ArrayListMultimap.create();
   private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
-  private final Map<FeedScopedId, StopLocation> stopForId = Maps.newHashMap();
-  private final List<StopLocation> stopsByIndex;
-  private final Map<StopLocation, Integer> indexByStop = new HashMap<>();
+  private final Map<FeedScopedId, StopLocation> stopForId = new HashMap<>();
+  private final StopLocation[] stopsByIndex;
 
   public StopModelIndex(StopModel stopModel) {
     LOG.info("StopModelIndex init...");
+
+    stopsByIndex = new StopLocation[StopLocation.indexCounter()];
 
     /* We will keep a separate set of all vertices in case some have the same label.
      * Maybe we should just guarantee unique labels. */
@@ -49,6 +48,7 @@ public class StopModelIndex {
       Stop stop = stopVertex.getStop();
       stopForId.put(stop.getId(), stop);
       stopVertexForStop.put(stop, stopVertex);
+      stopsByIndex[stop.getIndex()] = stop;
     }
     for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
       Envelope envelope = new Envelope(stopVertex.getCoordinate());
@@ -65,15 +65,12 @@ public class StopModelIndex {
         locationGroupsByStop.put(stop, flexLocationGroup);
       }
       stopForId.put(flexLocationGroup.getId(), flexLocationGroup);
+      stopsByIndex[flexLocationGroup.getIndex()] = flexLocationGroup;
     }
     for (FlexStopLocation flexStopLocation : stopModel.getAllFlexLocations()) {
       locationIndex.insert(flexStopLocation.getGeometry().getEnvelopeInternal(), flexStopLocation);
       stopForId.put(flexStopLocation.getId(), flexStopLocation);
-    }
-
-    this.stopsByIndex = List.copyOf(stopForId.values());
-    for (int i = 0; i < stopsByIndex.size(); ++i) {
-      indexByStop.put(stopsByIndex.get(i), i);
+      stopsByIndex[flexStopLocation.getIndex()] = flexStopLocation;
     }
 
     LOG.info("StopModelIndex init complete.");
@@ -100,15 +97,11 @@ public class StopModelIndex {
   }
 
   public StopLocation stopByIndex(int index) {
-    return stopsByIndex.get(index);
-  }
-
-  public int indexOf(StopLocation stop) {
-    return indexByStop.get(stop);
+    return stopsByIndex[index];
   }
 
   public int size() {
-    return stopsByIndex.size();
+    return stopsByIndex.length;
   }
 
   public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {

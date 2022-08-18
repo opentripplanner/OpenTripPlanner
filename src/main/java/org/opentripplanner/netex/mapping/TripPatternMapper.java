@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
@@ -24,6 +23,7 @@ import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
@@ -227,13 +227,13 @@ class TripPatternMapper {
       .of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
-      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue());
+      .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
+      .withHopGeometries(
+        serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)
+      );
 
     TripPattern tripPattern = tripPatternBuilder.build();
     createTripTimes(trips, tripPattern);
-    tripPattern.setHopGeometries(
-      serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, tripPattern)
-    );
 
     result.tripPatterns.put(stopPattern, tripPattern);
 
@@ -311,7 +311,13 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .toList();
 
-    return new TripOnServiceDate(id, trip, serviceDate, alteration, replacementFor);
+    return TripOnServiceDate
+      .of(id)
+      .withTrip(trip)
+      .withServiceDate(serviceDate)
+      .withTripAlteration(alteration)
+      .withReplacementFor(replacementFor)
+      .build();
   }
 
   private org.opentripplanner.transit.model.network.Route lookupRoute(

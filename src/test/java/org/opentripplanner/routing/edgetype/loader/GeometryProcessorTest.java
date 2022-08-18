@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -62,14 +61,12 @@ public class GeometryProcessorTest {
     var stopModel = new StopModel();
     graph = new Graph(stopModel, deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
-    this.issueStore = new DataImportIssueStore(true);
+    this.issueStore = new DataImportIssueStore();
 
     context =
       contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
 
     feedId = context.getFeedId().getId();
-    GeometryProcessor factory = new GeometryProcessor(context);
-    factory.run(transitModel);
     transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
 
     String[] stops = {
@@ -127,10 +124,9 @@ public class GeometryProcessorTest {
       );
     }
 
-    StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
   }
 
   @Test

@@ -225,7 +225,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
 
-          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue());
+          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue(), feedId);
 
           if (stopId == null) {
             stopId = new FeedScopedId(feedId, stopPointRef.getValue());
@@ -242,7 +242,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
 
-          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue());
+          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue(), feedId);
 
           if (stopId == null) {
             stopId = new FeedScopedId(feedId, stopPlace.getValue());
@@ -289,7 +289,8 @@ public class SiriAlertsUpdateHandler {
               if (!affectedStops.isEmpty()) {
                 for (AffectedStopPointStructure affectedStop : affectedStops) {
                   FeedScopedId stop = siriFuzzyTripMatcher.getStop(
-                    affectedStop.getStopPointRef().getValue()
+                    affectedStop.getStopPointRef().getValue(),
+                    feedId
                   );
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -374,7 +375,8 @@ public class SiriAlertsUpdateHandler {
                 if (!affectedStops.isEmpty()) {
                   for (AffectedStopPointStructure affectedStop : affectedStops) {
                     FeedScopedId stop = siriFuzzyTripMatcher.getStop(
-                      affectedStop.getStopPointRef().getValue()
+                      affectedStop.getStopPointRef().getValue(),
+                      feedId
                     );
                     if (stop == null) {
                       stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -408,7 +410,8 @@ public class SiriAlertsUpdateHandler {
               if (!affectedStops.isEmpty()) {
                 for (AffectedStopPointStructure affectedStop : affectedStops) {
                   FeedScopedId stop = siriFuzzyTripMatcher.getStop(
-                    affectedStop.getStopPointRef().getValue()
+                    affectedStop.getStopPointRef().getValue(),
+                    feedId
                   );
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());

@@ -9,7 +9,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
@@ -56,9 +59,8 @@ public class StopModel implements Serializable {
 
   private transient StopModelIndex index;
 
-  public TransitStopVertex getStopVertexForStop(Stop stop) {
-    return index.getStopVertexForStop(stop);
-  }
+  @Inject
+  public StopModel() {}
 
   public void index() {
     LOG.info("Index stop model...");
@@ -66,7 +68,7 @@ public class StopModel implements Serializable {
     LOG.info("Index stop model complete.");
   }
 
-  public StopModelIndex getStopModelIndex() {
+  private StopModelIndex getStopModelIndex() {
     //TODO refactoring transit model - thread safety
     if (index == null) {
       index();
@@ -78,6 +80,7 @@ public class StopModel implements Serializable {
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
+  @Nullable
   public Set<Vertex> getStopVerticesById(FeedScopedId id) {
     var stops = getStopsForId(id);
 
@@ -89,7 +92,7 @@ public class StopModel implements Serializable {
       .stream()
       .filter(Stop.class::isInstance)
       .map(Stop.class::cast)
-      .map(index::getStopVertexForStop)
+      .map(it -> getStopModelIndex().getStopVertexForStop(it))
       .collect(Collectors.toSet());
   }
 
@@ -97,6 +100,7 @@ public class StopModel implements Serializable {
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The coordinate for the transit entity
    */
+  @Nullable
   public WgsCoordinate getCoordinateById(FeedScopedId id) {
     // GroupOfStations
     GroupOfStations groupOfStations = groupOfStationsById.get(id);
@@ -117,7 +121,7 @@ public class StopModel implements Serializable {
     }
 
     // Single stop
-    var stop = index.getStopForId(id);
+    var stop = getStopModelIndex().getStopForId(id);
     if (stop != null) {
       return stop.getCoordinate();
     }
@@ -138,6 +142,7 @@ public class StopModel implements Serializable {
   }
 
   public void addFlexLocation(FeedScopedId id, FlexStopLocation flexStopLocation) {
+    invalidateIndex();
     locationsById.put(id, flexStopLocation);
   }
 
@@ -150,6 +155,7 @@ public class StopModel implements Serializable {
   }
 
   public void addFlexLocationGroup(FeedScopedId id, FlexLocationGroup flexLocationGroup) {
+    invalidateIndex();
     locationGroupsById.put(id, flexLocationGroup);
   }
 
@@ -172,7 +178,7 @@ public class StopModel implements Serializable {
       return station.getChildStops();
     }
     // Single stop
-    var stop = index.getStopForId(id);
+    var stop = getStopModelIndex().getStopForId(id);
     if (stop != null) {
       return Collections.singleton(stop);
     }
@@ -221,6 +227,7 @@ public class StopModel implements Serializable {
   }
 
   public void addTransitStopVertex(FeedScopedId id, TransitStopVertex stopVertex) {
+    invalidateIndex();
     transitStopVertices.put(id, stopVertex);
   }
 
@@ -236,16 +243,21 @@ public class StopModel implements Serializable {
    */
   public void calculateTransitCenter() {
     var vertices = getAllStopVertices();
-    var medianCalculator = new MedianCalcForDoubles(vertices.size());
 
-    vertices.forEach(v -> medianCalculator.add(v.getLon()));
-    double lon = medianCalculator.median();
+    // we need this check because there could be only FlexStopLocations (which don't have vertices)
+    // in the graph
+    if (!vertices.isEmpty()) {
+      var medianCalculator = new MedianCalcForDoubles(vertices.size());
 
-    medianCalculator.reset();
-    vertices.forEach(v -> medianCalculator.add(v.getLat()));
-    double lat = medianCalculator.median();
+      vertices.forEach(v -> medianCalculator.add(v.getLon()));
+      double lon = medianCalculator.median();
 
-    this.center = new Coordinate(lon, lat);
+      medianCalculator.reset();
+      vertices.forEach(v -> medianCalculator.add(v.getLat()));
+      double lat = medianCalculator.median();
+
+      this.center = new Coordinate(lon, lat);
+    }
   }
 
   public Optional<Coordinate> getCenter() {
@@ -253,14 +265,17 @@ public class StopModel implements Serializable {
   }
 
   public void addStation(Station station) {
+    invalidateIndex();
     stationById.put(station.getId(), station);
   }
 
   public void addMultiModalStation(MultiModalStation multiModalStation) {
+    invalidateIndex();
     multiModalStationById.put(multiModalStation.getId(), multiModalStation);
   }
 
   public void addGroupsOfStations(GroupOfStations groupOfStations) {
+    invalidateIndex();
     groupOfStationsById.put(groupOfStations.getId(), groupOfStations);
   }
 
@@ -268,7 +283,46 @@ public class StopModel implements Serializable {
    * Flex locations are generated by GTFS graph builder, but consumed only after the street graph is
    * built
    */
+  @Nullable
   public FlexStopLocation getLocationById(FeedScopedId id) {
     return locationsById.get(id);
+  }
+
+  public TransitStopVertex getStopVertexForStop(Stop stop) {
+    return getStopModelIndex().getStopVertexForStop(stop);
+  }
+
+  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
+    return getStopModelIndex().queryStopSpatialIndex(envelope);
+  }
+
+  @Nullable
+  public StopLocation getStopForId(FeedScopedId id) {
+    return getStopModelIndex().getStopForId(id);
+  }
+
+  @Nullable
+  public MultiModalStation getMultiModalStationForStation(Station station) {
+    return getStopModelIndex().getMultiModalStationForStation(station);
+  }
+
+  public Collection<StopLocation> getAllStops() {
+    return getStopModelIndex().getAllStops();
+  }
+
+  public StopLocation stopByIndex(int index) {
+    return getStopModelIndex().stopByIndex(index);
+  }
+
+  public int size() {
+    return getStopModelIndex().size();
+  }
+
+  public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
+    return getStopModelIndex().queryLocationIndex(envelope);
+  }
+
+  private void invalidateIndex() {
+    this.index = null;
   }
 }

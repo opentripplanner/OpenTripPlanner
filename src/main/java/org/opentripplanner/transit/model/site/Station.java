@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity2;
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
 public class Station
-  extends TransitEntity2<Station, StationBuilder>
+  extends TransitEntity<Station, StationBuilder>
   implements StopCollection, LogInfo {
 
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;

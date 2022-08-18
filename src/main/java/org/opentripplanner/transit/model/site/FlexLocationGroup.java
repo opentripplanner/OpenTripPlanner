@@ -9,15 +9,16 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * A group of stopLocations, which can share a common Stoptime
  */
 public class FlexLocationGroup
-  extends TransitEntity2<FlexLocationGroup, FlexLocationGroupBuilder>
+  extends TransitEntity<FlexLocationGroup, FlexLocationGroupBuilder>
   implements StopLocation {
 
+  private final int index;
   private final Set<StopLocation> stopLocations;
   private final I18NString name;
   private final GeometryCollection geometry;
@@ -26,6 +27,7 @@ public class FlexLocationGroup
 
   FlexLocationGroup(FlexLocationGroupBuilder builder) {
     super(builder.getId());
+    this.index = INDEX_COUNTER.getAndIncrement();
     this.name = builder.name();
     this.geometry = builder.geometry();
     this.centroid = builder.centroid();
@@ -34,6 +36,11 @@ public class FlexLocationGroup
 
   public static FlexLocationGroupBuilder of(FeedScopedId id) {
     return new FlexLocationGroupBuilder(id);
+  }
+
+  @Override
+  public int getIndex() {
+    return index;
   }
 
   @Override

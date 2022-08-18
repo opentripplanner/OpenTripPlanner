@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.astar;
 
-import com.google.common.collect.Lists;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +74,7 @@ public class AStar {
     initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
     this.pq = new BinHeap<>(initialSize);
     this.nVisited = 0;
-    this.targetAcceptedStates = Lists.newArrayList();
+    this.targetAcceptedStates = new ArrayList<>();
 
     for (State initialState : initialStates) {
       spt.add(initialState);

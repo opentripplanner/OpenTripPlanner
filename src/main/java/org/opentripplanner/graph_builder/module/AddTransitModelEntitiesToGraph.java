@@ -408,12 +408,10 @@ public class AddTransitModelEntitiesToGraph {
   private void addTripPatternsToTransitModel(TransitModel transitModel) {
     Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
 
-    /* Generate unique human-readable names for all the TableTripPatterns. */
-    TripPattern.generateUniqueNames(tripPatterns);
-
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {
-      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
+      // TODO this could be more elegant
+      tripPattern.getScheduledTimetable().setServiceCodes(transitModel.getServiceCodes());
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
       transitModel.addTripPattern(tripPattern.getId(), tripPattern);
@@ -421,7 +419,7 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void addFlexTripsToGraph(TransitModel transitModel) {
-    for (FlexTrip flexTrip : otpTransitService.getAllFlexTrips()) {
+    for (FlexTrip<?, ?> flexTrip : otpTransitService.getAllFlexTrips()) {
       transitModel.addFlexTrip(flexTrip.getId(), flexTrip);
     }
   }

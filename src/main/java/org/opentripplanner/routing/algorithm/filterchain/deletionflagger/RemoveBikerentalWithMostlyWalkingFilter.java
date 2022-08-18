@@ -25,7 +25,7 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletio
   }
 
   @Override
-  public Predicate<Itinerary> predicate() {
+  public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return itinerary -> {
       var containsTransit = itinerary
         .getLegs()

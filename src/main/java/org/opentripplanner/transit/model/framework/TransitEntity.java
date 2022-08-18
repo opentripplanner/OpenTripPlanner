@@ -1,7 +1,10 @@
 package org.opentripplanner.transit.model.framework;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import javax.annotation.Nonnull;
 
 /**
@@ -18,8 +21,12 @@ import javax.annotation.Nonnull;
  *     frequently use this to index and lookup entities.
  *   </li>
  * </ol>
+ * This class also enforce a strong type-safe relationship between entity and builder.
  */
-public abstract class TransitEntity implements Serializable {
+public abstract class TransitEntity<
+  E extends TransitEntity<E, B>, B extends AbstractEntityBuilder<E, B>
+>
+  implements TransitObject<E, B>, Serializable {
 
   private final FeedScopedId id;
 
@@ -33,7 +40,7 @@ public abstract class TransitEntity implements Serializable {
 
   @Override
   public final int hashCode() {
-    return getId().hashCode();
+    return id.hashCode();
   }
 
   /**
@@ -46,7 +53,7 @@ public abstract class TransitEntity implements Serializable {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    TransitEntity other = (TransitEntity) obj;
+    TransitEntity<E, B> other = (TransitEntity<E, B>) obj;
     return getId().equals(other.getId());
   }
 
@@ -64,5 +71,19 @@ public abstract class TransitEntity implements Serializable {
     }
     buf.append('}');
     return buf.toString();
+  }
+
+  protected static <T> List<T> listOfNullSafe(List<T> list) {
+    if (list == null || list.isEmpty()) {
+      return List.of();
+    }
+    return List.copyOf(list);
+  }
+
+  protected static <T> Set<T> setOfNullSafe(Collection<T> input) {
+    if (input == null || input.isEmpty()) {
+      return Set.of();
+    }
+    return Set.copyOf(input);
   }
 }

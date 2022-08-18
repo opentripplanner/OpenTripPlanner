@@ -17,12 +17,12 @@ import org.opentripplanner.api.model.ApiVehicleRentalStation;
 import org.opentripplanner.api.model.ApiVehicleRentalStationList;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 @Path("/routers/{ignoreRouterId}/bike_rental")
 public class BikeRental {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
 
   public BikeRental(
     /**
@@ -30,7 +30,7 @@ public class BikeRental {
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId,
-    @Context OtpServerContext serverContext
+    @Context OtpServerRequestContext serverContext
   ) {
     this.serverContext = serverContext;
   }
@@ -55,11 +55,11 @@ public class BikeRental {
     @QueryParam("upperRight") String upperRight,
     @QueryParam("locale") String locale_param
   ) {
-    OtpServerContext serverContext = this.serverContext;
+    OtpServerRequestContext serverContext = this.serverContext;
 
     VehicleRentalStationService vehicleRentalService = serverContext
       .graph()
-      .getService(VehicleRentalStationService.class);
+      .getVehicleRentalStationService();
     Locale locale = locale_param != null && !locale_param.isBlank()
       ? Locale.forLanguageTag(locale_param.replaceAll("-", "_"))
       : Locale.ENGLISH;

@@ -1,14 +1,13 @@
 package org.opentripplanner.transit.model.network;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hasher;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
@@ -131,7 +130,7 @@ public final class StopPattern implements Serializable {
     return sb.toString();
   }
 
-  int getSize() {
+  public int getSize() {
     return stops.length;
   }
 
@@ -161,37 +160,12 @@ public final class StopPattern implements Serializable {
     return findStopPosition(1, stops.length, station::includes);
   }
 
-  /**
-   * In most cases we want to use identity equality for StopPatterns. There is a single StopPattern
-   * instance for each semantic StopPattern, and we don't want to calculate complicated hashes or
-   * equality values during normal execution. However, in some cases we want a way to consistently
-   * identify trips across versions of a GTFS feed, when the feed publisher cannot ensure stable
-   * trip IDs. Therefore we define some additional hash functions.
-   */
-  HashCode semanticHash(HashFunction hashFunction) {
-    Hasher hasher = hashFunction.newHasher();
-    int size = stops.length;
-    for (StopLocation stop : stops) {
-      // Truncate the lat and lon to 6 decimal places in case they move slightly between
-      // feed versions
-      hasher.putLong((long) (stop.getLat() * 1000000));
-      hasher.putLong((long) (stop.getLon() * 1000000));
-    }
-    // Use hops rather than stops because drop-off at stop 0 and pick-up at last stop are
-    // not important and have changed between OTP versions.
-    for (int hop = 0; hop < size - 1; hop++) {
-      hasher.putInt(pickups[hop].ordinal());
-      hasher.putInt(dropoffs[hop + 1].ordinal());
-    }
-    return hasher.hash();
-  }
-
   /** Get a copy of the internal collection of stops. */
   List<StopLocation> getStops() {
     return List.of(stops);
   }
 
-  StopLocation getStop(int stopPosInPattern) {
+  public StopLocation getStop(int stopPosInPattern) {
     return stops[stopPosInPattern];
   }
 
@@ -254,6 +228,49 @@ public final class StopPattern implements Serializable {
       }
     }
     return -1;
+  }
+
+  /**
+   * Check if given stop and next stop on this stop pattern and other are equal.
+   *
+   * @param other Other instance of stop pattern with list of stops.
+   * @param index Given index for stop
+   * @return true if stop and next stop are equal on both stop patterns, else false
+   */
+  boolean sameStops(@Nonnull StopPattern other, int index) {
+    var otherOrigin = other.getStop(index);
+    var otherDestination = other.getStop(index + 1);
+    var origin = getStop(index);
+    var destination = getStop(index + 1);
+
+    return origin.equals(otherOrigin) && destination.equals(otherDestination);
+  }
+
+  /**
+   * Check if Station is equal on given stop and next stop for this trip pattern and other.
+   *
+   * @param other Other instance of stop pattern with list of stops.
+   * @param index Given index for stop
+   * @return true if the stops have the same stations, else false. If any station is null then
+   * false.
+   */
+  boolean sameStations(@Nonnull StopPattern other, int index) {
+    var otherOrigin = other.getStop(index).getParentStation();
+    var otherDestination = other.getStop(index + 1).getParentStation();
+    var origin = getStop(index).getParentStation();
+    var destionation = getStop(index + 1).getParentStation();
+
+    var sameOrigin = Optional
+      .ofNullable(origin)
+      .map(o -> o.equals(otherOrigin))
+      .orElse(getStop(index).equals(other.getStop(index)));
+
+    var sameDestination = Optional
+      .ofNullable(destionation)
+      .map(o -> o.equals(otherDestination))
+      .orElse(getStop(index + 1).equals(other.getStop(index + 1)));
+
+    return sameOrigin && sameDestination;
   }
 
   public static class StopPatternBuilder {

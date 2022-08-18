@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer;
 
-import java.util.function.IntFunction;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.service.StopModelIndex;
 
 /**
  * This class generate TransferPoints adapted to Raptor. The internal model {@link
@@ -23,11 +23,8 @@ final class TransferPointForPatternFactory {
     /* empty */
   }
 
-  static TransferPointMatcher createTransferPointForPattern(
-    Station station,
-    StopModelIndex stopIndex
-  ) {
-    return new StationSP(stopIndex::stopByIndex, station);
+  static TransferPointMatcher createTransferPointForPattern(Station station) {
+    return new StationSP(station);
   }
 
   static TransferPointMatcher createTransferPointForPattern(int stopIndex) {
@@ -44,19 +41,18 @@ final class TransferPointForPatternFactory {
 
   private static class StationSP implements TransferPointMatcher {
 
-    // This is potentially slow, can be replaced with a set of stopIndexes for the
-    // station to improve performance - not tested
-    private final IntFunction<StopLocation> toStop;
-    private final Station station;
+    private final TIntSet childStops;
 
-    private StationSP(IntFunction<StopLocation> toStop, Station station) {
-      this.toStop = toStop;
-      this.station = station;
+    private StationSP(Station station) {
+      this.childStops =
+        new TIntHashSet(
+          station.getChildStops().stream().mapToInt(StopLocation::getIndex).toArray()
+        );
     }
 
     @Override
     public boolean match(int stopIndex, Trip trip) {
-      return station == toStop.apply(stopIndex).getParentStation();
+      return childStops.contains(stopIndex);
     }
   }
 

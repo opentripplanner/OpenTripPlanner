@@ -11,7 +11,7 @@ public class DeletionFlaggerTestHelper {
     List<Itinerary> itineraries,
     ItineraryDeletionFlagger flagger
   ) {
-    List<Itinerary> filtered = flagger.getFlaggedItineraries(itineraries);
+    List<Itinerary> filtered = flagger.flagForRemoval(itineraries);
     return itineraries
       .stream()
       .filter(Predicate.not(filtered::contains))

@@ -1,8 +1,10 @@
 package org.opentripplanner.ext.flex.trip;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -23,13 +25,14 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * subclasses encapsulates the different business logic, which the different types of services
  * adhere to.
  */
-public abstract class FlexTrip extends TransitEntity {
+public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuilder<T, B>>
+  extends TransitEntity<T, B> {
 
-  protected final Trip trip;
+  private final Trip trip;
 
-  public FlexTrip(Trip trip) {
-    super(trip.getId());
-    this.trip = trip;
+  FlexTrip(FlexTripBuilder<T, B> builder) {
+    super(builder.getId());
+    this.trip = builder.trip();
   }
 
   public static boolean containsFlexStops(List<StopTime> stopTimes) {
@@ -93,4 +96,9 @@ public abstract class FlexTrip extends TransitEntity {
   public abstract boolean isBoardingPossible(NearbyStop stop);
 
   public abstract boolean isAlightingPossible(NearbyStop stop);
+
+  @Override
+  public boolean sameAs(@Nonnull T other) {
+    return getId().equals(other.getId()) && Objects.equals(trip, other.getTrip());
+  }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graphfinder;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -9,7 +9,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -18,10 +18,10 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class DirectGraphFinder implements GraphFinder {
 
-  private final StopModelIndex stopModelIndex;
+  private final StopModel stopModel;
 
   public DirectGraphFinder(Graph graph) {
-    this.stopModelIndex = graph.getStopModel().getStopModelIndex();
+    this.stopModel = graph.getStopModel();
   }
 
   /**
@@ -30,14 +30,14 @@ public class DirectGraphFinder implements GraphFinder {
    */
   @Override
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-    List<NearbyStop> stopsFound = Lists.newArrayList();
+    List<NearbyStop> stopsFound = new ArrayList<>();
     Coordinate coordinate = new Coordinate(lon, lat);
     Envelope envelope = new Envelope(coordinate);
     envelope.expandBy(
       SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),
       SphericalDistanceLibrary.metersToDegrees(radiusMeters)
     );
-    for (Stop it : stopModelIndex.queryStopSpatialIndex(envelope)) {
+    for (Stop it : stopModel.queryStopSpatialIndex(envelope)) {
       double distance = Math.round(
         SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );

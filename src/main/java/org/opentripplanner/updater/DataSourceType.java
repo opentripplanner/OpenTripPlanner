@@ -4,6 +4,7 @@ public enum DataSourceType {
   // Vehicle Rental
   GBFS,
   SMOOVE,
+  VILKKU,
 
   // Vehicle Parking
   KML,

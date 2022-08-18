@@ -20,6 +20,6 @@ class OtherThanSameLegsMaxGeneralizedCostFilterTest implements PlanTestConstants
     Itinerary second = newItinerary(A).rail(20, T11_05, T11_14, B).walk(D10m, C).build();
 
     var subject = new OtherThanSameLegsMaxGeneralizedCostFilter(2.0);
-    assertEquals(List.of(second), subject.getFlaggedItineraries(List.of(first, second)));
+    assertEquals(List.of(second), subject.flagForRemoval(List.of(first, second)));
   }
 }

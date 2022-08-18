@@ -1,6 +1,5 @@
 {
   "areaVisibility": true,
-  "parentStopLinking": true,
   "platformEntriesLinking": true,
   "osmWayPropertySet": "norway",
   "islandWithoutStopsMaxSize": 5,

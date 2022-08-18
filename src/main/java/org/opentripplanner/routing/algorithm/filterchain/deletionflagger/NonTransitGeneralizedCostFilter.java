@@ -31,7 +31,7 @@ public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger
   }
 
   @Override
-  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
     OptionalDouble minGeneralizedCost = itineraries
       .stream()

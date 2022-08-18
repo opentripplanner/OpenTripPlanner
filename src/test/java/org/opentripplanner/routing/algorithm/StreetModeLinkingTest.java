@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -111,7 +110,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @BeforeEach
   protected void setUp() throws Exception {
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new GraphRoutingTest.Builder() {
         @Override
         public void build() {
@@ -159,7 +158,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
     graph.hasStreets = true;
     transitModel = otpModel.transitModel();
-    new StreetLinkerModule().buildGraph(graph, transitModel, null, new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
   }
 
   private void assertLinkedFromTo(
@@ -202,6 +201,9 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
       consumer.accept(routingRequest);
 
+      // Remove to, so that origin and destination are different
+      routingRequest.to = new GenericLocation(null, null);
+
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
         RoutingContext routingContext = new RoutingContext(
           routingRequest,
@@ -212,6 +214,21 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         if (fromStreetName != null) {
           assertFromLink(fromStreetName, streetMode, routingContext);
         }
+      }
+
+      routingRequest = new RoutingRequest().getStreetSearchRequest(streetMode);
+
+      consumer.accept(routingRequest);
+
+      // Remove from, so that origin and destination are different
+      routingRequest.from = new GenericLocation(null, null);
+
+      try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
+        RoutingContext routingContext = new RoutingContext(
+          routingRequest,
+          graph,
+          temporaryVertices
+        );
 
         if (toStreetName != null) {
           assertToLink(toStreetName, streetMode, routingContext);

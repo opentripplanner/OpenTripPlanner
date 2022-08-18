@@ -51,6 +51,8 @@
   [#4198](https://github.com/opentripplanner/OpenTripPlanner/pull/4198)
 - Add support for groupOfLines in top level query
   [#4232](https://github.com/opentripplanner/OpenTripPlanner/pull/4232)
+- Fix issue when ServiceJourney is created by an updater and expose necessary information via DSJ
+  [#4365](https://github.com/opentripplanner/OpenTripPlanner/pull/4365)
 
 ## Documentation
 

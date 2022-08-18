@@ -1,5 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,7 +16,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.slf4j.Logger;
@@ -50,9 +52,7 @@ public class WayPropertySet {
 
   public WayPropertySet() {
     /* sensible defaults */
-    defaultProperties = new WayProperties();
-    defaultProperties.setSafetyFeatures(new P2<>(1.0, 1.0));
-    defaultProperties.setPermission(StreetTraversalPermission.ALL);
+    defaultProperties = withModes(ALL).build();
     defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
     wayProperties = new ArrayList<>();
     creativeNamers = new ArrayList<>();
@@ -100,17 +100,24 @@ public class WayPropertySet {
       }
     }
 
-    WayProperties result = rightResult.clone();
-    result.setSafetyFeatures(
-      new P2<>(rightResult.getSafetyFeatures().first, leftResult.getSafetyFeatures().second)
-    );
+    WayProperties result = rightResult
+      .mutate()
+      .bicycleSafety(
+        rightResult.getBicycleSafetyFeatures().first,
+        leftResult.getBicycleSafetyFeatures().second
+      )
+      .walkSafety(
+        rightResult.getWalkSafetyFeatures().first,
+        leftResult.getWalkSafetyFeatures().second
+      )
+      .build();
 
     /* apply mixins */
     if (leftMixins.size() > 0) {
-      applyMixins(result, leftMixins, false);
+      result = applyMixins(result, leftMixins, false);
     }
     if (rightMixins.size() > 0) {
-      applyMixins(result, rightMixins, true);
+      result = applyMixins(result, rightMixins, true);
     }
     if (
       (bestLeftScore == 0 || bestRightScore == 0) &&
@@ -329,34 +336,20 @@ public class WayPropertySet {
     addNote(new OSMSpecifier(spec), properties);
   }
 
-  public void setProperties(String spec, StreetTraversalPermission permission) {
-    setProperties(spec, permission, 1.0, 1.0);
+  public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
+    setMixinProperties(spec, properties.build());
   }
 
-  /**
-   * Note that the safeties here will be adjusted such that the safest street has a safety value of
-   * 1, with all others scaled proportionately.
-   */
-  public void setProperties(
-    String spec,
-    StreetTraversalPermission permission,
-    double safety,
-    double safetyBack
-  ) {
-    setProperties(spec, permission, safety, safetyBack, false);
+  public void setMixinProperties(String spec, WayProperties properties) {
+    addProperties(new OSMSpecifier(spec), properties, true);
   }
 
-  public void setProperties(
-    String spec,
-    StreetTraversalPermission permission,
-    double safety,
-    double safetyBack,
-    boolean mixin
-  ) {
-    WayProperties properties = new WayProperties();
-    properties.setPermission(permission);
-    properties.setSafetyFeatures(new P2<>(safety, safetyBack));
-    addProperties(new OSMSpecifier(spec), properties, mixin);
+  public void setProperties(String spec, WayPropertiesBuilder properties) {
+    setProperties(spec, properties.build());
+  }
+
+  public void setProperties(String spec, WayProperties properties) {
+    addProperties(new OSMSpecifier(spec), properties, false);
   }
 
   public void setCarSpeed(String spec, float speed) {
@@ -387,17 +380,30 @@ public class WayPropertySet {
     return all_tags;
   }
 
-  private void applyMixins(WayProperties result, List<WayProperties> mixins, boolean right) {
-    P2<Double> safetyFeatures = result.getSafetyFeatures();
-    double first = safetyFeatures.first;
-    double second = safetyFeatures.second;
+  private WayProperties applyMixins(
+    WayProperties result,
+    List<WayProperties> mixins,
+    boolean right
+  ) {
+    P2<Double> bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
+    double firstBicycle = bicycleSafetyFeatures.first;
+    double secondBicycle = bicycleSafetyFeatures.second;
+    P2<Double> walkSafetyFeatures = result.getWalkSafetyFeatures();
+    double firstWalk = walkSafetyFeatures.first;
+    double secondWalk = walkSafetyFeatures.second;
     for (WayProperties properties : mixins) {
       if (right) {
-        second *= properties.getSafetyFeatures().second;
+        secondBicycle *= properties.getBicycleSafetyFeatures().second;
+        secondWalk *= properties.getWalkSafetyFeatures().second;
       } else {
-        first *= properties.getSafetyFeatures().first;
+        firstBicycle *= properties.getBicycleSafetyFeatures().first;
+        firstWalk *= properties.getWalkSafetyFeatures().first;
       }
     }
-    result.setSafetyFeatures(new P2<>(first, second));
+    return result
+      .mutate()
+      .bicycleSafety(firstBicycle, secondBicycle)
+      .walkSafety(firstWalk, secondWalk)
+      .build();
   }
 }
