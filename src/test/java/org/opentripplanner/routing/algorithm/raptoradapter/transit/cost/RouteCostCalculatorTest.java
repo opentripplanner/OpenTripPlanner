@@ -41,7 +41,7 @@ public class RouteCostCalculatorTest {
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_RELUCTANCE)
   );
 
-  protected static final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator = new DefaultCostCalculator(
+  protected static final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE_FACTOR,
@@ -49,7 +49,7 @@ public class RouteCostCalculatorTest {
     null
   );
 
-  static Stream<Arguments> testCases = List
+  static Stream<Arguments> testCases = Stream
     .of(
       // !prefAgency | !prefRoute | unPrefA | unPrefR | expected cost
       "       -      |      -     |    -    |    -    |     0",
@@ -63,7 +63,6 @@ public class RouteCostCalculatorTest {
       "       -      |      x     |    x    |    -    |   600",
       "       x      |      x     |    x    |    x    |   600"
     )
-    .stream()
     .map(Arguments::of);
 
   @Test
@@ -80,7 +79,7 @@ public class RouteCostCalculatorTest {
     assertFalse(routes.contains(DEFAULT_ROUTE_ID));
 
     // test creation of linear cost function
-    double expected = (double) 300 + 1.0 * TRANSIT_TIME;
+    double expected = 300 + 1.0 * TRANSIT_TIME;
     double actual = costParams.unnpreferredCost().apply(TRANSIT_TIME);
 
     assertEquals(expected, actual);
@@ -122,12 +121,12 @@ public class RouteCostCalculatorTest {
     // TODO: preferred agency
   }
 
-  private int transitArrivalCost(DefaultTripSchedule schedule, CostCalculator calc) {
+  private int transitArrivalCost(TestTripSchedule schedule, CostCalculator<TestTripSchedule> calc) {
     int boardCost = boardingCost(schedule, calc);
     return calc.transitArrivalCost(boardCost, 0, TRANSIT_TIME, schedule, 6);
   }
 
-  private int boardingCost(DefaultTripSchedule schedule, CostCalculator calc) {
+  private int boardingCost(TestTripSchedule schedule, CostCalculator<TestTripSchedule> calc) {
     return calc.boardingCost(true, 0, 5, 100, schedule, RaptorTransferConstraint.REGULAR_TRANSFER);
   }
 
@@ -164,19 +163,19 @@ public class RouteCostCalculatorTest {
         sb.append(", unPrefRoute=X");
       }
 
-      return "RoutePenaltyTC {" + sb.substring(sb.length() == 0 ? 0 : 2) + "}";
+      return "RoutePenaltyTC {" + sb.substring(sb.isEmpty() ? 0 : 2) + "}";
     }
 
     boolean isDefault() {
       return !(prefAgency || prefRoute || unPrefAgency || unPrefRoute);
     }
 
-    RouteCostCalculator createRouteCostCalculator() {
+    RouteCostCalculator<TestTripSchedule> createRouteCostCalculator() {
       var unprefCostFn = RequestFunctions.createLinearFunction(
         UNPREFERRED_ROUTE_PENALTY,
         UNPREFERRED_ROUTE_RELUCTANCE
       );
-      Set<FeedScopedId> unprefRouteIds = new HashSet();
+      Set<FeedScopedId> unprefRouteIds = new HashSet<>();
 
       if (unPrefRoute) {
         unprefRouteIds.add(UNPREFERRED_ROUTE_ID);

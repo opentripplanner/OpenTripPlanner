@@ -13,7 +13,7 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
   public static final double DEFAULT_ROUTE_RELUCTANCE = 1.0;
   public static final double UNPREFERRED_ROUTE_RELUCTANCE = 2.0;
 
-  private final CostCalculator delegate;
+  private final CostCalculator<T> delegate;
   private final Set<FeedScopedId> unpreferredRoutes;
   private final DoubleFunction<Double> unpreferredRouteCost;
 
