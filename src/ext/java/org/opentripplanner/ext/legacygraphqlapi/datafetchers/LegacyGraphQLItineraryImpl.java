@@ -82,7 +82,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Long> waitingTime() {
-    return environment -> (long) getSource(environment).getWaitingTime().toSeconds();
+    return environment -> (long) getSource(environment).getWaitingDuration().toSeconds();
   }
 
   @Override
@@ -92,7 +92,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).getNonTransitTime().toSeconds();
+    return environment -> (long) getSource(environment).getNonTransitDuration().toSeconds();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

@@ -34,9 +34,9 @@ public class ItineraryMapper {
     api.duration = domain.getDuration().toSeconds();
     api.startTime = GregorianCalendar.from(domain.startTime());
     api.endTime = GregorianCalendar.from(domain.endTime());
-    api.walkTime = domain.getNonTransitTime().toSeconds();
-    api.transitTime = domain.getTransitTime().toSeconds();
-    api.waitingTime = domain.getWaitingTime().toSeconds();
+    api.walkTime = domain.getNonTransitDuration().toSeconds();
+    api.transitTime = domain.getTransitDuration().toSeconds();
+    api.waitingTime = domain.getWaitingDuration().toSeconds();
     api.walkDistance = domain.getNonTransitDistanceMeters();
     api.generalizedCost = domain.getGeneralizedCost();
     api.elevationLost = domain.getElevationLost();

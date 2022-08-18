@@ -21,13 +21,13 @@ public class Itinerary {
 
   /* final primitive properties */
   private final Duration duration;
-  private final Duration transitTime;
+  private final Duration transitDuration;
   private final int numberOfTransfers;
-  private final Duration waitingTime;
+  private final Duration waitingDuration;
   private final double nonTransitDistanceMeters;
   private final boolean walkOnly;
   private final boolean streetOnly;
-  private final Duration nonTransitTime;
+  private final Duration nonTransitDuration;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
@@ -56,10 +56,10 @@ public class Itinerary {
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
     this.duration = totals.totalDuration;
     this.numberOfTransfers = totals.transfers();
-    this.transitTime = totals.transitTime;
-    this.nonTransitTime = totals.nonTransitTime;
+    this.transitDuration = totals.transitTime;
+    this.nonTransitDuration = totals.nonTransitTime;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingTime = totals.waitingTime;
+    this.waitingDuration = totals.waitingTime;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
@@ -110,7 +110,7 @@ public class Itinerary {
    * This is the amount of time used to travel. {@code waitingTime} is NOT included.
    */
   public Duration effectiveDuration() {
-    return getTransitTime().plus(getNonTransitTime());
+    return getTransitDuration().plus(getNonTransitDuration());
   }
 
   /**
@@ -134,9 +134,9 @@ public class Itinerary {
     return isStreetOnly();
   }
 
-  /** TRUE if alt least one leg is a transit leg. */
+  /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
-    return !getTransitTime().isZero();
+    return !getTransitDuration().isZero();
   }
 
   public Leg firstLeg() {
@@ -214,9 +214,9 @@ public class Itinerary {
       .addNum("nTransfers", numberOfTransfers, -1)
       .addDuration("duration", duration)
       .addNum("generalizedCost", generalizedCost)
-      .addDuration("nonTransitTime", nonTransitTime)
-      .addDuration("transitTime", transitTime)
-      .addDuration("waitingTime", waitingTime)
+      .addDuration("nonTransitTime", nonTransitDuration)
+      .addDuration("transitTime", transitDuration)
+      .addDuration("waitingTime", waitingDuration)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
       .addNum("elevationLost", elevationLost, 0.0)
@@ -276,8 +276,8 @@ public class Itinerary {
   /**
    * How much time is spent on transit, in seconds.
    */
-  public Duration getTransitTime() {
-    return transitTime;
+  public Duration getTransitDuration() {
+    return transitDuration;
   }
 
   /**
@@ -290,8 +290,8 @@ public class Itinerary {
   /**
    * How much time is spent waiting for transit to arrive, in seconds.
    */
-  public Duration getWaitingTime() {
-    return waitingTime;
+  public Duration getWaitingDuration() {
+    return waitingDuration;
   }
 
   /**
@@ -363,8 +363,8 @@ public class Itinerary {
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
-  public Duration getNonTransitTime() {
-    return nonTransitTime;
+  public Duration getNonTransitDuration() {
+    return nonTransitDuration;
   }
 
   /**

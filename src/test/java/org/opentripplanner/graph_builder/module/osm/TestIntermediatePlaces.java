@@ -267,7 +267,7 @@ public class TestIntermediatePlaces {
         validateLegsTemporally(request, itinerary);
         validateLegsSpatially(plan, itinerary);
         if (modes.contains(TraverseMode.TRANSIT)) {
-          assertTrue(itinerary.getTransitTime().toSeconds() > 0);
+          assertTrue(itinerary.getTransitDuration().toSeconds() > 0);
         }
       }
     }
@@ -322,7 +322,7 @@ public class TestIntermediatePlaces {
       departTime = leg.getEndTime().toInstant();
       sumOfDuration += leg.getDuration().toSeconds();
     }
-    sumOfDuration += itinerary.getWaitingTime().toSeconds();
+    sumOfDuration += itinerary.getWaitingDuration().toSeconds();
 
     assertFalse(departTime.isAfter(arriveTime));
 

@@ -23,9 +23,9 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(ofMinutes(5), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(600, result.getGeneralizedCost());
-    assertEquals(ZERO, result.getTransitTime());
-    assertEquals(ofMinutes(5), result.getNonTransitTime());
-    assertEquals(ZERO, result.getWaitingTime());
+    assertEquals(ZERO, result.getTransitDuration());
+    assertEquals(ofMinutes(5), result.getNonTransitDuration());
+    assertEquals(ZERO, result.getWaitingDuration());
     assertTrue(result.isWalkOnly());
 
     // Expected fields on walking leg set
@@ -46,9 +46,9 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
-    assertEquals(ofMinutes(10), result.getTransitTime());
-    assertEquals(ZERO, result.getNonTransitTime());
-    assertEquals(ZERO, result.getWaitingTime());
+    assertEquals(ofMinutes(10), result.getTransitDuration());
+    assertEquals(ZERO, result.getNonTransitDuration());
+    assertEquals(ZERO, result.getWaitingDuration());
     assertFalse(result.isWalkOnly());
 
     // Expected fields on bus leg set
@@ -70,9 +70,9 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
     assertEquals(720, result.getGeneralizedCost());
-    assertEquals(ofMinutes(10), result.getTransitTime());
-    assertEquals(ZERO, result.getNonTransitTime());
-    assertEquals(ZERO, result.getWaitingTime());
+    assertEquals(ofMinutes(10), result.getTransitDuration());
+    assertEquals(ZERO, result.getNonTransitDuration());
+    assertEquals(ZERO, result.getWaitingDuration());
     assertFalse(result.isWalkOnly());
 
     // Expected fields on bus leg set
@@ -98,9 +98,9 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(1, itinerary.getNumberOfTransfers());
     assertEquals(ofMinutes(28), itinerary.getDuration());
-    assertEquals(ofMinutes(20), itinerary.getTransitTime());
-    assertEquals(ofMinutes(1), itinerary.getNonTransitTime());
-    assertEquals(ofMinutes((2 + 5)), itinerary.getWaitingTime());
+    assertEquals(ofMinutes(20), itinerary.getTransitDuration());
+    assertEquals(ofMinutes(1), itinerary.getNonTransitDuration());
+    assertEquals(ofMinutes((2 + 5)), itinerary.getWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 60 + .8 * 420 + 2 * 120 + 1200
     assertEquals(1896, itinerary.getGeneralizedCost());
 
@@ -119,9 +119,9 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(ofMinutes(18), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(ofMinutes(10), result.getTransitTime());
-    assertEquals(ofMinutes(5), result.getNonTransitTime());
-    assertEquals(ofMinutes(3), result.getWaitingTime());
+    assertEquals(ofMinutes(10), result.getTransitDuration());
+    assertEquals(ofMinutes(5), result.getNonTransitDuration());
+    assertEquals(ofMinutes(3), result.getWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 300 + .8 * 180 + 120 + 600
     assertEquals(1464, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
@@ -142,9 +142,9 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(ofMinutes(51), result.getDuration());
     assertEquals(2, result.getNumberOfTransfers());
-    assertEquals(ofMinutes(34), result.getTransitTime());
-    assertEquals(ofMinutes(6), result.getNonTransitTime());
-    assertEquals(ofMinutes(11), result.getWaitingTime());
+    assertEquals(ofMinutes(34), result.getTransitDuration());
+    assertEquals(ofMinutes(6), result.getNonTransitDuration());
+    assertEquals(ofMinutes(11), result.getWaitingDuration());
     assertEquals(720 + 528 + 360 + 2040, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
     assertSameLocation(A, result.firstLeg().getFrom());

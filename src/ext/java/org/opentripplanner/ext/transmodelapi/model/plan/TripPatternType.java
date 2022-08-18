@@ -116,7 +116,7 @@ public class TripPatternType {
           .name("waitingTime")
           .description("How much time is spent waiting for transit to arrive, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getWaitingTime().toSeconds())
+          .dataFetcher(env -> itinerary(env).getWaitingDuration().toSeconds())
           .build()
       )
       .field(
@@ -135,7 +135,7 @@ public class TripPatternType {
           .description("How much time is spent walking, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
           // TODO This unfortunately include BIKE and CAR
-          .dataFetcher(env -> itinerary(env).getNonTransitTime().toSeconds())
+          .dataFetcher(env -> itinerary(env).getNonTransitDuration().toSeconds())
           .build()
       )
       .field(
