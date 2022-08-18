@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>53</otp.serialization.version.id>
+        <otp.serialization.version.id>54</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>27.0</geotools.version>
         <google.dagger.version>2.42</google.dagger.version>
@@ -33,7 +33,7 @@
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <lucene.version>9.1.0</lucene.version>
-        <graphql.version>18.1</graphql.version>
+        <graphql.version>18.3</graphql.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -788,7 +788,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>${graphql.version}</version>
+            <version>18.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

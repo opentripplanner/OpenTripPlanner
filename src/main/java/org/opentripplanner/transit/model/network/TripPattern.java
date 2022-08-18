@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentripplanner.util.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -45,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class TripPattern
   extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
-  implements Cloneable {
+  implements Cloneable, LogInfo {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
@@ -73,6 +75,8 @@ public final class TripPattern
    */
   private final boolean createdByRealtimeUpdater;
 
+  private final RoutingTripPattern routingTripPattern;
+
   public TripPattern(TripPatternBuilder builder) {
     super(builder.getId());
     this.name = builder.getName();
@@ -88,6 +92,7 @@ public final class TripPattern
     this.originalTripPattern = builder.getOriginalTripPattern();
 
     this.hopGeometries = builder.hopGeometries();
+    this.routingTripPattern = new RoutingTripPattern(this, builder);
   }
 
   public static TripPatternBuilder of(@Nonnull FeedScopedId id) {
@@ -100,10 +105,7 @@ public final class TripPattern
   }
 
   public void initName(String name) {
-    if (this.name != null) {
-      throw new IllegalStateException("Name has already been set");
-    }
-    this.name = name;
+    this.name = requireNotInitialized(this.name, name);
   }
 
   /**
@@ -415,6 +417,15 @@ public final class TripPattern
   public String getFeedId() {
     // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
     return route.getId().getFeedId();
+  }
+
+  public RoutingTripPattern getRoutingTripPattern() {
+    return routingTripPattern;
+  }
+
+  @Override
+  public String logName() {
+    return route.logName();
   }
 
   private static Coordinate coordinate(StopLocation s) {

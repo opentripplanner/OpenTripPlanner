@@ -1,10 +1,9 @@
 package org.opentripplanner.standalone.config.updaters.sources;
 
-import static org.opentripplanner.updater.DataSourceType.GBFS;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
+import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
@@ -22,8 +21,9 @@ public class VehicleRentalSourceFactory {
   private final NodeAdapter c;
 
   static {
-    CONFIG_MAPPING.put("gbfs", GBFS);
+    CONFIG_MAPPING.put("gbfs", DataSourceType.GBFS);
     CONFIG_MAPPING.put("smoove", DataSourceType.SMOOVE);
+    CONFIG_MAPPING.put("vilkku", DataSourceType.VILKKU);
   }
 
   public VehicleRentalSourceFactory(DataSourceType type, NodeAdapter c) {
@@ -51,6 +51,13 @@ public class VehicleRentalSourceFactory {
         );
       case SMOOVE:
         return new SmooveBikeRentalDataSourceParameters(
+          url(),
+          network(),
+          allowOverloading(),
+          headers()
+        );
+      case VILKKU:
+        return new VilkkuBikeRentalDataSourceParameters(
           url(),
           network(),
           allowOverloading(),

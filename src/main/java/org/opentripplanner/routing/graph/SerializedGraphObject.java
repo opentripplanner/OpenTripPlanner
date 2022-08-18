@@ -24,6 +24,7 @@ import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OtpAppException;
@@ -64,9 +65,10 @@ public class SerializedGraphObject implements Serializable {
    * All submodes are cached in a static collection inside SubMode,
    * hence we need to serialize that as well
    */
-  public final List<SubMode> allTransitSubModes;
+  private final List<SubMode> allTransitSubModes;
 
-  public final int stopLocationCounter;
+  private final int stopLocationCounter;
+  private final int routingTripPatternCounter;
 
   public SerializedGraphObject(
     Graph graph,
@@ -81,6 +83,7 @@ public class SerializedGraphObject implements Serializable {
     this.routerConfig = routerConfig;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.stopLocationCounter = StopLocation.indexCounter();
+    this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
@@ -157,6 +160,7 @@ public class SerializedGraphObject implements Serializable {
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
       SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
       StopLocation.initIndexCounter(serObj.stopLocationCounter);
+      RoutingTripPattern.initIndexCounter(serObj.routingTripPatternCounter);
       CompactElevationProfile.setDistanceBetweenSamplesM(
         serObj.graph.getDistanceBetweenElevationSamples()
       );

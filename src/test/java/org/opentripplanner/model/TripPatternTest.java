@@ -96,6 +96,10 @@ public class TripPatternTest {
     var builder = StopPattern.create(2);
     builder.stops[0] = origin;
     builder.stops[1] = destination;
+    for (int i = 0; i < 2; i++) {
+      builder.pickups[i] = PickDrop.SCHEDULED;
+      builder.dropoffs[i] = PickDrop.SCHEDULED;
+    }
 
     var stopPattern = builder.build();
     var route = TransitModelForTest.route("R1").build();

@@ -2,6 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferPointForPatternFactory.createTransferPointForPattern;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,8 +21,8 @@ import org.opentripplanner.model.transfer.StationTransferPoint;
 import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -32,20 +34,28 @@ public class TransferIndexGenerator {
   private static final boolean ALIGHT = false;
 
   private final Collection<ConstrainedTransfer> constrainedTransfers;
-  private final Map<Station, Set<TripPatternWithRaptorStopIndexes>> patternsByStation = new HashMap<>();
-  private final Map<StopLocation, Set<TripPatternWithRaptorStopIndexes>> patternsByStop = new HashMap<>();
-  private final Map<Route, Set<TripPatternWithRaptorStopIndexes>> patternsByRoute = new HashMap<>();
-  private final Map<Trip, Set<TripPatternWithRaptorStopIndexes>> patternsByTrip = new HashMap<>();
+  private final Map<Station, Set<RoutingTripPattern>> patternsByStation = new HashMap<>();
+  private final Map<StopLocation, Set<RoutingTripPattern>> patternsByStop = new HashMap<>();
+  private final Map<Route, Set<RoutingTripPattern>> patternsByRoute = new HashMap<>();
+  private final Map<Trip, Set<RoutingTripPattern>> patternsByTrip = new HashMap<>();
 
   public TransferIndexGenerator(
     Collection<ConstrainedTransfer> constrainedTransfers,
-    Collection<TripPatternWithRaptorStopIndexes> tripPatterns
+    Collection<TripPattern> tripPatterns
   ) {
     this.constrainedTransfers = constrainedTransfers;
-    setupPatternByTripIndex(tripPatterns);
+    setupPatterns(tripPatterns);
   }
 
-  public void generateTransfers() {
+  public ConstrainedTransfersForPatterns generateTransfers() {
+    TIntObjectMap<TransferForPatternByStopPos> forwardTransfers = new TIntObjectHashMap<>(
+      RoutingTripPattern.indexCounter()
+    );
+
+    TIntObjectMap<TransferForPatternByStopPos> reverseTransfers = new TIntObjectHashMap<>(
+      RoutingTripPattern.indexCounter()
+    );
+
     for (ConstrainedTransfer tx : constrainedTransfers) {
       var c = tx.getTransferConstraint();
       // Only add transfers witch have an effect on the Raptor routing here.
@@ -61,21 +71,34 @@ public class TransferIndexGenerator {
         .forEachOrdered(fromPoint -> {
           for (var toPoint : findTPoints(tx.getTo(), BOARD)) {
             if (toPoint.canBoard() && !fromPoint.equals(toPoint)) {
-              fromPoint.addTransferConstraints(tx, toPoint);
+              fromPoint.addTransferConstraints(tx, toPoint, forwardTransfers, reverseTransfers);
             }
           }
         });
     }
-    sealConstrainedTransfers();
+
+    return new ConstrainedTransfersForPatterns(forwardTransfers, reverseTransfers);
   }
 
   /**
    * Add information about a newly created pattern and timetables in the index, in order to be able
    * to create constrained transfers for these patterns.
    */
-  public void addRealtimeTrip(TripPatternWithRaptorStopIndexes pattern, List<Trip> trips) {
-    TripPattern tripPattern = pattern.getPattern();
+  public void addRealtimeTrip(TripPattern tripPattern, List<Trip> trips) {
+    setupPattern(tripPattern, trips);
+  }
 
+  /**
+   * Index scheduled patterns when loading the graph initially.
+   */
+  private void setupPatterns(Collection<TripPattern> tripPatterns) {
+    for (TripPattern tripPattern : tripPatterns) {
+      setupPattern(tripPattern, tripPattern.scheduledTripsAsStream().toList());
+    }
+  }
+
+  private void setupPattern(TripPattern tripPattern, List<Trip> trips) {
+    RoutingTripPattern pattern = tripPattern.getRoutingTripPattern();
     patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
 
     for (Trip trip : trips) {
@@ -87,43 +110,6 @@ public class TransferIndexGenerator {
       Station station = stop.getParentStation();
       if (station != null) {
         patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
-      }
-    }
-  }
-
-  /**
-   * This sorts and seals the constrained transfers for all patterns in order to protect them from
-   * modification, while they are used in the routing.
-   * <p>
-   * {@link TripPatternWithRaptorStopIndexes#sealConstrainedTransfers()}
-   */
-  private void sealConstrainedTransfers() {
-    for (var patterns : patternsByRoute.values()) {
-      for (var pattern : patterns) {
-        pattern.sealConstrainedTransfers();
-      }
-    }
-  }
-
-  /**
-   * Index scheduled patterns when loading the graph initially.
-   */
-  private void setupPatternByTripIndex(Collection<TripPatternWithRaptorStopIndexes> tripPatterns) {
-    for (TripPatternWithRaptorStopIndexes pattern : tripPatterns) {
-      TripPattern tripPattern = pattern.getPattern();
-
-      patternsByRoute.computeIfAbsent(tripPattern.getRoute(), t -> new HashSet<>()).add(pattern);
-
-      tripPattern
-        .scheduledTripsAsStream()
-        .forEach(trip -> patternsByTrip.computeIfAbsent(trip, t -> new HashSet<>()).add(pattern));
-
-      for (StopLocation stop : tripPattern.getStops()) {
-        patternsByStop.computeIfAbsent(stop, t -> new HashSet<>()).add(pattern);
-        Station station = stop.getParentStation();
-        if (station != null) {
-          patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
-        }
       }
     }
   }
@@ -153,7 +139,7 @@ public class TransferIndexGenerator {
     var sourcePoint = createTransferPointForPattern(station);
     var result = new ArrayList<TPoint>();
 
-    for (TripPatternWithRaptorStopIndexes pattern : patterns) {
+    for (RoutingTripPattern pattern : patterns) {
       var tripPattern = pattern.getPattern();
       for (int pos = 0; pos < tripPattern.numberOfStops(); ++pos) {
         if (point.getStation() == tripPattern.getStop(pos).getParentStation()) {
@@ -175,7 +161,7 @@ public class TransferIndexGenerator {
     var sourcePoint = createTransferPointForPattern(stop.getIndex());
     var result = new ArrayList<TPoint>();
 
-    for (TripPatternWithRaptorStopIndexes pattern : patterns) {
+    for (RoutingTripPattern pattern : patterns) {
       var p = pattern.getPattern();
       for (int pos = 0; pos < p.numberOfStops(); ++pos) {
         if (point.getStop() == p.getStop(pos)) {
@@ -244,13 +230,13 @@ public class TransferIndexGenerator {
 
   private static class TPoint {
 
-    TripPatternWithRaptorStopIndexes pattern;
+    RoutingTripPattern pattern;
     TransferPointMatcher sourcePoint;
     Trip trip;
     int stopPosition;
 
     private TPoint(
-      TripPatternWithRaptorStopIndexes pattern,
+      RoutingTripPattern pattern,
       TransferPointMatcher sourcePoint,
       Trip trip,
       int stopPosition
@@ -271,10 +257,9 @@ public class TransferIndexGenerator {
       if (this == o) {
         return true;
       }
-      if (!(o instanceof TPoint)) {
+      if (!(o instanceof TPoint tPoint)) {
         return false;
       }
-      final TPoint tPoint = (TPoint) o;
       return (
         stopPosition == tPoint.stopPosition &&
         Objects.equals(pattern, tPoint.pattern) &&
@@ -285,30 +270,35 @@ public class TransferIndexGenerator {
     boolean canBoard() {
       // We prevent boarding at the last stop, this might be enforced by the
       // canBoard method, but we do not trust it here.
-      int lastStopPosition = pattern.getPattern().numberOfStops() - 1;
-      return stopPosition != lastStopPosition && pattern.getPattern().canBoard(stopPosition);
+      int lastStopPosition = pattern.numberOfStopsInPattern() - 1;
+      return stopPosition != lastStopPosition && pattern.boardingPossibleAt(stopPosition);
     }
 
     boolean canAlight() {
       // We prevent alighting at the first stop, this might be enforced by the
       // canAlight method, but we do not trust it here.
-      return stopPosition != 0 && pattern.getPattern().canAlight(stopPosition);
+      return stopPosition != 0 && pattern.alightingPossibleAt(stopPosition);
     }
 
-    void addTransferConstraints(ConstrainedTransfer tx, TPoint to) {
+    void addTransferConstraints(
+      ConstrainedTransfer tx,
+      TPoint to,
+      TIntObjectMap<TransferForPatternByStopPos> forwardTransfers,
+      TIntObjectMap<TransferForPatternByStopPos> reverseTransfers
+    ) {
       int rank = tx.getSpecificityRanking();
       var c = tx.getTransferConstraint();
 
       // Forward search
-      to.pattern.addTransferConstraintsForwardSearch(
-        to.stopPosition,
-        new TransferForPattern(sourcePoint, to.trip, rank, c)
-      );
+      forwardTransfers.putIfAbsent(to.pattern.patternIndex(), new TransferForPatternByStopPos());
+      forwardTransfers
+        .get(to.pattern.patternIndex())
+        .add(to.stopPosition, new TransferForPattern(sourcePoint, to.trip, rank, c));
       // Reverse search
-      pattern.addTransferConstraintsReverseSearch(
-        stopPosition,
-        new TransferForPattern(to.sourcePoint, trip, rank, c)
-      );
+      reverseTransfers.putIfAbsent(pattern.patternIndex(), new TransferForPatternByStopPos());
+      reverseTransfers
+        .get(pattern.patternIndex())
+        .add(stopPosition, new TransferForPattern(to.sourcePoint, trip, rank, c));
     }
   }
 }

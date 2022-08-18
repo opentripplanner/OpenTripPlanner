@@ -16,6 +16,12 @@ public interface OtpArchitectureModules {
   Package UTIL = OTP_ROOT.subPackage("util");
   Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
 
+  Package RAPTOR_ADAPTER = OTP_ROOT
+    .subPackage("routing")
+    .subPackage("algorithm")
+    .subPackage("raptoradapter");
+  Package RAPTOR_ADAPTER_TRANSIT = RAPTOR_ADAPTER.subPackage("transit");
+
   /**
    * This is a bag of TRUE util classes - no dependencies to other OTP classes of frameworks.
    * The {@link #UTIL} packages needs cleanup, it contains model, framework and API classes.

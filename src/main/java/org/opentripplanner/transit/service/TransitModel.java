@@ -46,6 +46,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.lang.ObjectUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -299,11 +300,8 @@ public class TransitModel implements Serializable {
     if (timeZone == null || timeZone.equals(this.timeZone)) {
       return;
     }
-    if (this.timeZone != null) {
-      throw new IllegalStateException("Timezone can't be re-set");
-    }
     invalidateIndex();
-    this.timeZone = timeZone;
+    this.timeZone = ObjectUtils.requireNotInitialized(this.timeZone, timeZone);
     this.timeZoneExplicitlySet = true;
   }
 

@@ -22,12 +22,14 @@ import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class VehiclePositionsMatcherTest {
 
+  public static final Route ROUTE = TransitModelForTest.route("1").build();
   ZoneId zoneId = ZoneId.of("Europe/Berlin");
   String tripId = "trip1";
   FeedScopedId scopedTripId = TransitModelForTest.id(tripId);
@@ -58,6 +60,7 @@ public class VehiclePositionsMatcherTest {
     var pattern = TripPattern
       .of(TransitModelForTest.id(tripId))
       .withStopPattern(stopPattern)
+      .withRoute(ROUTE)
       .build();
     pattern
       .getScheduledTimetable()
@@ -118,10 +121,12 @@ public class VehiclePositionsMatcherTest {
     var pattern1 = TripPattern
       .of(TransitModelForTest.id(tripId1))
       .withStopPattern(stopPattern1)
+      .withRoute(ROUTE)
       .build();
     var pattern2 = TripPattern
       .of(TransitModelForTest.id(tripId2))
       .withStopPattern(stopPattern2)
+      .withRoute(ROUTE)
       .build();
 
     var tripForId = Map.of(scopedTripId1, trip1, scopedTripId2, trip2);

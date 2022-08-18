@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.util.lang.AssertUtils;
+import org.opentripplanner.util.lang.StringUtils;
 
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
@@ -25,7 +25,7 @@ public class GroupOfRoutes
   GroupOfRoutes(GroupOfRoutesBuilder builder) {
     super(builder.getId());
     // required fields
-    this.name = AssertUtils.assertHasValue(builder.getName());
+    this.name = StringUtils.assertHasValue(builder.getName());
 
     // Optional fields
     this.privateCode = builder.getPrivateCode();

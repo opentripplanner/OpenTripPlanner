@@ -192,6 +192,6 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
 
   @Override
   public String logName() {
-    return getName();
+    return mode.name() + " " + getName();
   }
 }
