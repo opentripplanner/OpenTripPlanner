@@ -15,10 +15,4 @@ public interface DefaultTripSchedule extends RaptorTripSchedule {
    * give non-wheelchair friendly trips a generalized-cost penalty.
    */
   WheelchairAccessibility wheelchairBoarding();
-
-  /**
-   * This is not used by the default calculator, but by the {@link RouteCostCalculator} to
-   * give unpreferred routes or agencies a generalized-cost penalty.
-   */
-  FeedScopedId routeId();
 }

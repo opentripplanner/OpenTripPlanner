@@ -6,6 +6,8 @@ package org.opentripplanner.transit.raptor.api.transit;
  * no gaps, as the trips visit the stops.
  */
 public interface RaptorTripPattern {
+  int patternIndex();
+
   /**
    * Number of stops in the pattern.
    */

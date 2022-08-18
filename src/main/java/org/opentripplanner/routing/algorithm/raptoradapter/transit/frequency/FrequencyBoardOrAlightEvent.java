@@ -140,9 +140,4 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   public WheelchairAccessibility wheelchairBoarding() {
     return wheelChairBoarding;
   }
-
-  @Override
-  public FeedScopedId routeId() {
-    return raptorTripPattern.getTripPattern().getPattern().getRoute().getId();
-  }
 }

@@ -3,8 +3,8 @@ package org.opentripplanner.transit.model.network;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
  * The split between TripPattern and RoutingTripPattern is done for the following technical reasons:
@@ -14,7 +14,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
  *  - This also provide explicit documentation on witch fields are used during a search and witch
  *    are not.
  */
-public class RoutingTripPattern implements RaptorTripPattern, Serializable {
+public class RoutingTripPattern implements DefaultTripPattern, Serializable {
 
   private static final AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
   private final int index;
@@ -95,6 +95,11 @@ public class RoutingTripPattern implements RaptorTripPattern, Serializable {
   @Override
   public int slackIndex() {
     return slackIndex;
+  }
+
+  @Override
+  public Route route() {
+    return pattern.getRoute();
   }
 
   @Override

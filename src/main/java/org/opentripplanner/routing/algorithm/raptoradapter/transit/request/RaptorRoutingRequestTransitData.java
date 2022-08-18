@@ -100,7 +100,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.forwardConstrainedTransfers = transitLayer.getForwardConstrainedTransfers();
     this.reverseConstrainedTransfers = transitLayer.getReverseConstrainedTransfers();
 
-    var mcCostParams = McCostParamsMapper.map(routingContext.opt);
+    var mcCostParams = McCostParamsMapper.map(routingContext.opt, patternIndex);
 
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(

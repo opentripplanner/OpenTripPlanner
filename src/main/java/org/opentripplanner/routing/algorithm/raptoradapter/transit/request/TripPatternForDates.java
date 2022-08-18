@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
@@ -26,7 +28,7 @@ public class TripPatternForDates
   implements
     RaptorRoute<TripSchedule>,
     RaptorTimeTable<TripSchedule>,
-    RaptorTripPattern,
+    DefaultTripPattern,
     TripSearchTimetable<TripSchedule> {
 
   private final RoutingTripPattern tripPattern;
@@ -141,6 +143,11 @@ public class TripPatternForDates
   /* Implementing RaptorTripPattern */
 
   @Override
+  public int patternIndex() {
+    return tripPattern.patternIndex();
+  }
+
+  @Override
   public int numberOfStopsInPattern() {
     return tripPattern.numberOfStopsInPattern();
   }
@@ -210,6 +217,11 @@ public class TripPatternForDates
   @Override
   public int numberOfTripSchedules() {
     return numberOfTripSchedules;
+  }
+
+  @Override
+  public Route route() {
+    return tripPattern.route();
   }
 
   /**
