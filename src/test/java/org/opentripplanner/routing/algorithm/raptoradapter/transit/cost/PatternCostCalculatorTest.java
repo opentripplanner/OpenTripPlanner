@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static graphql.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.UNPREFERRED_ROUTE_RELUCTANCE;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.UNPREFERRED_ROUTE_RELUCTANCE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
@@ -29,7 +29,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
-public class RouteCostCalculatorTest {
+public class PatternCostCalculatorTest {
 
   private static final int BOARD_COST_SEC = 5;
   private static final int TRANSFER_COST_SEC = 2;
@@ -198,7 +198,7 @@ public class RouteCostCalculatorTest {
         unpreferredPatterns.set(UNPREFERRED_PATTERN.patternIndex());
       }
 
-      return new RouteCostCalculator<>(defaultCostCalculator, unpreferredPatterns, unprefCostFn);
+      return new PatternCostCalculator<>(defaultCostCalculator, unpreferredPatterns, unprefCostFn);
     }
 
     /**

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
