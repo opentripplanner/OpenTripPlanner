@@ -6,14 +6,14 @@ import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.MedianCalcForDoubles;
 import org.opentripplanner.util.lang.CollectionsView;
 
 public class StopModelBuilder {
 
-  private final EntityById<Stop> stopsById = new EntityById<>();
+  private final EntityById<RegularStop> stopsById = new EntityById<>();
   private final EntityById<Station> stationById = new EntityById<>();
   private final EntityById<MultiModalStation> multiModalStationById = new EntityById<>();
   private final EntityById<GroupOfStations> groupOfStationsById = new EntityById<>();
@@ -26,11 +26,11 @@ public class StopModelBuilder {
     addAll(stopModel);
   }
 
-  public EntityById<Stop> stopsById() {
+  public EntityById<RegularStop> stopsById() {
     return stopsById;
   }
 
-  public StopModelBuilder withStop(Stop stop) {
+  public StopModelBuilder withStop(RegularStop stop) {
     stopsById.add(stop);
     return this;
   }

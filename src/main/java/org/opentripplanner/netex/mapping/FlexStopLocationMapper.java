@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexLocationGroupBuilder;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.rutebanken.netex.model.FlexibleArea;
@@ -33,12 +33,12 @@ class FlexStopLocationMapper {
   private static final String UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE =
     "UnrestrictedPublicTransportAreas";
   private final FeedScopedIdFactory idFactory;
-  private final HashGridSpatialIndex<Stop> stopsSpatialIndex;
+  private final HashGridSpatialIndex<RegularStop> stopsSpatialIndex;
 
-  FlexStopLocationMapper(FeedScopedIdFactory idFactory, Collection<Stop> stops) {
+  FlexStopLocationMapper(FeedScopedIdFactory idFactory, Collection<RegularStop> stops) {
     this.idFactory = idFactory;
     this.stopsSpatialIndex = new HashGridSpatialIndex<>();
-    for (Stop stop : stops) {
+    for (RegularStop stop : stops) {
       Envelope env = new Envelope(stop.getCoordinate().asJtsCoordinate());
       this.stopsSpatialIndex.insert(env, stop);
     }
@@ -104,7 +104,7 @@ class FlexStopLocationMapper {
 
     Geometry geometry = OpenGisMapper.mapGeometry(area.getPolygon());
 
-    for (Stop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
+    for (RegularStop stop : stopsSpatialIndex.query(geometry.getEnvelopeInternal())) {
       Point p = GeometryUtils
         .getGeometryFactory()
         .createPoint(stop.getCoordinate().asJtsCoordinate());

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -100,8 +100,8 @@ public class FlexStopLocationMapperTest {
 
   @Test
   public void mapFlexStopLocationGroup() {
-    Stop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    Stop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
       ID_FACTORY,

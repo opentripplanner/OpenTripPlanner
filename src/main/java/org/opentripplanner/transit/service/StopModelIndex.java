@@ -8,8 +8,8 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.lang.CollectionsView;
 
@@ -20,7 +20,7 @@ import org.opentripplanner.util.lang.CollectionsView;
  */
 class StopModelIndex {
 
-  private final HashGridSpatialIndex<Stop> stopSpatialIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<RegularStop> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
   private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
   private final StopLocation[] stopsByIndex;
@@ -29,7 +29,7 @@ class StopModelIndex {
    * @param stops All stops including regular transit and flex
    */
   StopModelIndex(
-    Collection<Stop> stops,
+    Collection<RegularStop> stops,
     Collection<FlexStopLocation> flexStops,
     Collection<FlexLocationGroup> flexLocationGroups,
     Collection<MultiModalStation> multiModalStations
@@ -53,7 +53,7 @@ class StopModelIndex {
     }
   }
 
-  Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
+  Collection<RegularStop> queryStopSpatialIndex(Envelope envelope) {
     return stopSpatialIndex.query(envelope);
   }
 

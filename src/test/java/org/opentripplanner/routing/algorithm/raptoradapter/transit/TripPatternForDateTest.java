@@ -17,13 +17,13 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class TripPatternForDateTest {
 
-  private static final Stop STOP = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
+  private static final RegularStop STOP = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
   private static final TripTimes tripTimes = Mockito.mock(TripTimes.class);
 
   static Stream<Arguments> testCases = Stream

@@ -21,7 +21,7 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -102,7 +102,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
           .stream()
           .filter(s -> s instanceof FlexLocationGroup)
           .flatMap(g ->
-            ((FlexLocationGroup) g).getLocations().stream().filter(e -> e instanceof Stop)
+            ((FlexLocationGroup) g).getLocations().stream().filter(e -> e instanceof RegularStop)
           )
           .toList()
       );

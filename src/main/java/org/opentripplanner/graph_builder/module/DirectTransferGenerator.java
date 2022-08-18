@@ -18,7 +18,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -104,7 +104,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
          * Use map based on the list of edges, so that only distinct transfers are stored. */
         Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
-        Stop stop = ts0.getStop();
+        RegularStop stop = ts0.getStop();
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RoutingRequest transferProfile : transferRequests) {
@@ -136,7 +136,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
               if (sd.stop == stop) {
                 continue;
               }
-              if (sd.stop instanceof Stop) {
+              if (sd.stop instanceof RegularStop) {
                 continue;
               }
               distinctTransfers.put(

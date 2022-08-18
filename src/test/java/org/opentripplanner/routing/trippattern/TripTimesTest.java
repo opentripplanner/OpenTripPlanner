@@ -11,7 +11,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -50,7 +50,7 @@ public class TripTimesTest {
     for (int i = 0; i < stops.length; ++i) {
       StopTime stopTime = new StopTime();
 
-      Stop stop = TransitModelForTest.stopForTest(stops[i].getId(), 0.0, 0.0);
+      RegularStop stop = TransitModelForTest.stopForTest(stops[i].getId(), 0.0, 0.0);
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -149,9 +149,9 @@ public class TripTimesTest {
     StopTime stopTime1 = new StopTime();
     StopTime stopTime2 = new StopTime();
 
-    Stop stop0 = TransitModelForTest.stopForTest(stops[0].getId(), 0.0, 0.0);
-    Stop stop1 = TransitModelForTest.stopForTest(stops[1].getId(), 0.0, 0.0);
-    Stop stop2 = TransitModelForTest.stopForTest(stops[2].getId(), 0.0, 0.0);
+    RegularStop stop0 = TransitModelForTest.stopForTest(stops[0].getId(), 0.0, 0.0);
+    RegularStop stop1 = TransitModelForTest.stopForTest(stops[1].getId(), 0.0, 0.0);
+    RegularStop stop2 = TransitModelForTest.stopForTest(stops[2].getId(), 0.0, 0.0);
 
     stopTime0.setStop(stop0);
     stopTime0.setDepartureTime(0);

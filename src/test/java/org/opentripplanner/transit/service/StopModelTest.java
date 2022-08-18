@@ -15,8 +15,8 @@ import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 class StopModelTest {
@@ -35,7 +35,7 @@ class StopModelTest {
     .build();
   private static final String EXP_STATIONS = List.of(STATION).toString();
 
-  private static final Stop STOP = Stop
+  private static final RegularStop STOP = RegularStop
     .of(ID)
     .withCoordinate(COOR_A)
     .withName(NAME)

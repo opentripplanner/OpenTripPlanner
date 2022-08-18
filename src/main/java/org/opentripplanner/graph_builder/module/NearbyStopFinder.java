@@ -38,7 +38,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
@@ -124,7 +124,7 @@ public class NearbyStopFinder {
     )) {
       StopLocation ts1 = nearbyStop.stop;
 
-      if (ts1 instanceof Stop) {
+      if (ts1 instanceof RegularStop) {
         /* Consider this destination stop as a candidate for every trip pattern passing through it. */
         for (TripPattern pattern : transitService.getPatternsForStop(ts1)) {
           closestStopForPattern.putMin(pattern, nearbyStop);

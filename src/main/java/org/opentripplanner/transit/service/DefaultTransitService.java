@@ -41,8 +41,8 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -206,7 +206,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Stop> listRegularStops() {
+  public Collection<RegularStop> listRegularStops() {
     return transitModel.getStopModel().listRegularStops();
   }
 
@@ -526,7 +526,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
+  public Collection<RegularStop> queryStopSpatialIndex(Envelope envelope) {
     return transitModel.getStopModel().findRegularStops(envelope);
   }
 

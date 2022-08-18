@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 
 public final class TestTransitCaseData {
 
@@ -16,10 +16,20 @@ public final class TestTransitCaseData {
     .withCoordinate(61.0, 11.5)
     .build();
 
-  public static final Stop STOP_A = TransitModelForTest.stopForTest("A", 60.0, 11.0, STATION_A);
-  public static final Stop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.2, STATION_B);
-  public static final Stop STOP_C = TransitModelForTest.stopForTest("C", 61.0, 11.4);
-  public static final Stop STOP_D = TransitModelForTest.stopForTest("D", 61.0, 11.6);
+  public static final RegularStop STOP_A = TransitModelForTest.stopForTest(
+    "A",
+    60.0,
+    11.0,
+    STATION_A
+  );
+  public static final RegularStop STOP_B = TransitModelForTest.stopForTest(
+    "B",
+    60.0,
+    11.2,
+    STATION_B
+  );
+  public static final RegularStop STOP_C = TransitModelForTest.stopForTest("C", 61.0, 11.4);
+  public static final RegularStop STOP_D = TransitModelForTest.stopForTest("D", 61.0, 11.6);
 
   public static final LocalDate DATE = LocalDate.of(2021, 12, 24);
 

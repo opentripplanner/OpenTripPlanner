@@ -61,7 +61,7 @@ public class FlexLocationGroupBuilder
     for (int i = 0; i < numGeometries; i++) {
       newGeometries[i] = geometry.getGeometryN(i);
     }
-    if (location instanceof Stop) {
+    if (location instanceof RegularStop) {
       WgsCoordinate coordinate = location.getCoordinate();
       Envelope envelope = new Envelope(coordinate.asJtsCoordinate());
       double xscale = Math.cos(coordinate.latitude() * Math.PI / 180);

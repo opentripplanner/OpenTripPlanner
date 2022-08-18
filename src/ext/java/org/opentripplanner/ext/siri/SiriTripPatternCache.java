@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
@@ -158,7 +158,7 @@ public class SiriTripPatternCache {
    * @param stop the stop
    * @return list of TripPatterns created by real time sources for the stop.
    */
-  public List<TripPattern> getAddedTripPatternsForStop(Stop stop) {
+  public List<TripPattern> getAddedTripPatternsForStop(RegularStop stop) {
     return patternsForStop.get(stop);
   }
 }

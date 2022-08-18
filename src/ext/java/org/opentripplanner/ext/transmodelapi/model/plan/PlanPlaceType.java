@@ -14,7 +14,7 @@ import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlanPlaceType {
 
@@ -79,8 +79,8 @@ public class PlanPlaceType {
           .description("The quay related to the place.")
           .type(quayType)
           .dataFetcher(environment ->
-            ((Place) environment.getSource()).stop instanceof Stop
-              ? ((Stop) ((Place) environment.getSource()).stop)
+            ((Place) environment.getSource()).stop instanceof RegularStop
+              ? ((RegularStop) ((Place) environment.getSource()).stop)
               : null
           )
           .build()

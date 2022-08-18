@@ -14,8 +14,8 @@ import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.util.lang.CollectionsView;
@@ -29,7 +29,7 @@ public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
 
-  private final Map<FeedScopedId, Stop> regularStopsById;
+  private final Map<FeedScopedId, RegularStop> regularStopsById;
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
@@ -75,18 +75,18 @@ public class StopModel implements Serializable {
   /**
    * Return a regular transit stop if found(not flex stops).
    */
-  public Stop getRegularStop(FeedScopedId id) {
+  public RegularStop getRegularStop(FeedScopedId id) {
     return regularStopsById.get(id);
   }
 
   /**
    * Return all regular transit stops, not flex stops and flex group of stops.
    */
-  public Collection<Stop> listRegularStops() {
+  public Collection<RegularStop> listRegularStops() {
     return regularStopsById.values();
   }
 
-  public Collection<Stop> findRegularStops(Envelope envelope) {
+  public Collection<RegularStop> findRegularStops(Envelope envelope) {
     return index.queryStopSpatialIndex(envelope);
   }
 

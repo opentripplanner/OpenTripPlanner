@@ -22,8 +22,8 @@ import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComp
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -57,7 +57,7 @@ class StopAndStationMapper {
    */
   private final Set<String> quaysAlreadyProcessed = new HashSet<>();
 
-  final List<Stop> resultStops = new ArrayList<>();
+  final List<RegularStop> resultStops = new ArrayList<>();
   final List<Station> resultStations = new ArrayList<>();
   final Multimap<String, Station> resultStationByMultiModalStationRfs = ArrayListMultimap.create();
 
@@ -174,7 +174,7 @@ class StopAndStationMapper {
 
     var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
-    Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
+    RegularStop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
     if (stop == null) {
       return;
     }

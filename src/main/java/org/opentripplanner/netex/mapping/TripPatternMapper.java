@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -81,7 +81,7 @@ class TripPatternMapper {
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     EntityById<Operator> operatorById,
-    EntityById<Stop> stopsById,
+    EntityById<RegularStop> stopsById,
     EntityById<FlexStopLocation> flexStopLocationsById,
     EntityById<FlexLocationGroup> flexLocationGroupsById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,

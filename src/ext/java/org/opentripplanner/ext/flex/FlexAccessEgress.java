@@ -2,11 +2,11 @@ package org.opentripplanner.ext.flex;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class FlexAccessEgress {
 
-  public final Stop stop;
+  public final RegularStop stop;
   public final int preFlexTime;
   public final int flexTime;
   public final int postFlexTime;
@@ -18,7 +18,7 @@ public class FlexAccessEgress {
   public final boolean directToStop;
 
   public FlexAccessEgress(
-    Stop stop,
+    RegularStop stop,
     int preFlexTime,
     int flexTime,
     int postFlexTime,

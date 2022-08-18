@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> {
+public final class StopBuilder extends StationElementBuilder<RegularStop, StopBuilder> {
 
   private String platformCode;
 
@@ -33,7 +33,7 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
     super(id);
   }
 
-  StopBuilder(Stop original) {
+  StopBuilder(RegularStop original) {
     super(original);
     this.platformCode = original.getPlatformCode();
     this.url = original.getUrl();
@@ -111,7 +111,7 @@ public final class StopBuilder extends StationElementBuilder<Stop, StopBuilder> 
   }
 
   @Override
-  protected Stop buildFromValues() {
-    return new Stop(this);
+  protected RegularStop buildFromValues() {
+    return new RegularStop(this);
   }
 }

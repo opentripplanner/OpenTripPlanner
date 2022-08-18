@@ -21,7 +21,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
@@ -54,7 +54,7 @@ class StopTimesMapper {
 
   private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
-  private final EntityById<Stop> stopsById;
+  private final EntityById<RegularStop> stopsById;
 
   private final EntityById<FlexStopLocation> flexibleStopLocationsById;
 
@@ -75,7 +75,7 @@ class StopTimesMapper {
   StopTimesMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
-    EntityById<Stop> stopsById,
+    EntityById<RegularStop> stopsById,
     EntityById<FlexStopLocation> flexStopLocationsById,
     EntityById<FlexLocationGroup> flexLocationGroupsById,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,

@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class PlaceTest {
@@ -101,7 +101,7 @@ public class PlaceTest {
     assertNull(p.coordinate);
   }
 
-  private static Place place(Stop stop) {
+  private static Place place(RegularStop stop) {
     return Place.forStop(stop);
   }
 }

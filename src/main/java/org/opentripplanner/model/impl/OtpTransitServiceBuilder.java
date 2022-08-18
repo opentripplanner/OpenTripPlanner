@@ -41,8 +41,8 @@ import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.StopModel;
@@ -175,7 +175,7 @@ public class OtpTransitServiceBuilder {
     return stopModelBuilder().stationsById();
   }
 
-  public EntityById<Stop> getStops() {
+  public EntityById<RegularStop> getStops() {
     return stopModelBuilder().stopsById();
   }
 
