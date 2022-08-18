@@ -97,7 +97,7 @@ public class ServiceLinkMapperTest {
     EntityById<RegularStop> stopsById = new EntityById<>();
 
     DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
-    StopMapper stopMapper = new StopMapper(ID_FACTORY, issueStore);
+    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore);
     StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
 
     Station parentStation = Station
@@ -107,7 +107,7 @@ public class ServiceLinkMapperTest {
       .build();
 
     for (int i = 0; i < quaysById.size(); i++) {
-      RegularStop stop = stopMapper.mapQuayToStop(
+      RegularStop stop = quayMapper.mapQuayToStop(
         quaysById.get(i),
         parentStation,
         List.of(),

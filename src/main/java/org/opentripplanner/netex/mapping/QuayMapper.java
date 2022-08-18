@@ -16,13 +16,13 @@ import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
-class StopMapper {
+class QuayMapper {
 
   private final DataImportIssueStore issueStore;
 
   private final FeedScopedIdFactory idFactory;
 
-  StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
+  QuayMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
   }

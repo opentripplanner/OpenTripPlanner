@@ -47,7 +47,7 @@ class StopAndStationMapper {
 
   private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
   private final StationMapper stationMapper;
-  private final StopMapper stopMapper;
+  private final QuayMapper quayMapper;
   private final TariffZoneMapper tariffZoneMapper;
   private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
   private final DataImportIssueStore issueStore;
@@ -68,7 +68,7 @@ class StopAndStationMapper {
     DataImportIssueStore issueStore
   ) {
     this.stationMapper = new StationMapper(issueStore, idFactory);
-    this.stopMapper = new StopMapper(idFactory, issueStore);
+    this.quayMapper = new QuayMapper(idFactory, issueStore);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;
@@ -174,7 +174,7 @@ class StopAndStationMapper {
 
     var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
-    RegularStop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
+    RegularStop stop = quayMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
     if (stop == null) {
       return;
     }
