@@ -26,8 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is responsible for cleaning stop times, removing duplicates, correcting bad data and
- * so on. This only applies to GTFS imports.
+ * This class is responsible for making sure, that all trips have arrival and departure times for
+ * all stops. It also removes all stop times for trips, which have invalid stop times.
  */
 public class ValidateAndInterpolateStopTimesForEachTrip {
 
@@ -49,11 +49,11 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
   public void run() {
     final int tripSize = stopTimesByTrip.size();
-    var progress = ProgressTracker.track("Repair StopTimes", 100_000, tripSize);
+    var progress = ProgressTracker.track("Validate StopTimes", 100_000, tripSize);
     LOG.info(progress.startMessage());
 
     for (Trip trip : stopTimesByTrip.keys()) {
-      /* Fetch the stop times for this trip. Copy the list since it's immutable. */
+      // Fetch the stop times for this trip. Copy the list since it's immutable.
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
       // if we don't have flex routing enabled then remove all the flex locations and location
@@ -62,7 +62,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
         stopTimes.removeIf(st -> !(st.getStop() instanceof Stop));
       }
 
-      /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
+      // Stop times frequently contain duplicate, missing, or incorrect entries. Repair them.
       TIntList removedStopSequences = removeRepeatedStops(stopTimes);
       if (!removedStopSequences.isEmpty()) {
         issueStore.add(new RepeatedStops(trip, removedStopSequences));
@@ -86,8 +86,6 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
    * array-backed list, but we are assuming that this is a rare occurrence. The alternative is to
    * copy every list of stop times during filtering.
    * <p>
-   * TODO: OBA GFTS makes the stoptime lists unmodifiable, so this will not work.
-   * We need to copy any modified list.
    *
    * @return whether any repeated stops were filtered out.
    */
@@ -99,18 +97,16 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       StopTime st = it.next();
       if (prev != null) {
         if (prev.getStop().equals(st.getStop())) {
-          // OBA gives us unmodifiable lists, but we have copied them.
-
-          // Merge the two stop times, making sure we're not throwing out a stop time with times in favor of an
-          // interpolated stop time
-          // keep the arrival time of the previous stop, unless it didn't have an arrival time, in which case
-          // replace it with the arrival time of this stop time
-          // This is particularly important at the last stop in a route (see issue #2220)
+          // Merge the two stop times, making sure we're not throwing out a stop time with times in
+          // favor of an interpolated stop time. Keep the arrival time of the previous stop, unless
+          // it didn't have an arrival time, in which case replace it with the arrival time of this
+          // stop time. This is particularly important at the last stop in a route (see issue #2220)
           if (prev.getArrivalTime() == StopTime.MISSING_VALUE) {
             prev.setArrivalTime(st.getArrivalTime());
           }
 
-          // prefer to replace with the departure time of this stop time, unless this stop time has no departure time
+          // prefer to replace with the departure time of this stop time, unless this stop time has
+          // no departure time
           if (st.getDepartureTime() != StopTime.MISSING_VALUE) {
             prev.setDepartureTime(st.getDepartureTime());
           }
@@ -125,11 +121,11 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   }
 
   /**
-   * Scan through the given list, looking for clearly incorrect series of stoptimes. This includes
+   * Scan through the given list, looking for clearly incorrect series of stop times. This includes
    * duplicate times (0-time hops), as well as negative, fast or slow hops. {@link DataImportIssue}s
    * are reported to reveal the problems to the user.
    *
-   * @param stopTimes the stoptimes to be filtered (from a single trip)
+   * @param stopTimes the stop times to be filtered (from a single trip)
    * @return whether the stop time is usable
    */
   private boolean filterStopTimes(List<StopTime> stopTimes) {
@@ -139,10 +135,10 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
     StopTime st0 = stopTimes.get(0);
 
-    /* If the feed does not specify any timepoints, we want to mark all times that are present as timepoints. */
+    // If the feed does not specify any time points, we want to mark all times that are present as
+    // time points.
     boolean hasTimepoints = stopTimes.stream().anyMatch(stopTime -> stopTime.getTimepoint() == 1);
 
-    // TODO verify that the first (and last?) stop should always be considered a timepoint.
     if (!hasTimepoints) {
       st0.setTimepoint(1);
     }
@@ -150,20 +146,21 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
     for (int i = 1; i < stopTimes.size(); i++) {
       StopTime st1 = stopTimes.get(i);
 
-      /* If the feed did not specify any timepoints, mark all times that are present as timepoints. */
+      // If the feed did not specify any time points, mark all times that are present as time points
       if (!hasTimepoints && (st1.isDepartureTimeSet() || st1.isArrivalTimeSet())) {
         st1.setTimepoint(1);
       }
 
-      /* Set arrival and departure times if either is missing. */
+      // Set arrival and departure times if one of them is missing.
       if (!st1.isArrivalTimeSet() && st1.isDepartureTimeSet()) {
         st1.setArrivalTime(st1.getDepartureTime());
       } else if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
         st1.setDepartureTime(st1.getArrivalTime());
       }
 
-      /* Do not process (skip over) non-timepoint stoptimes, leaving them in place for interpolation. */
-      // All non-timepoint stoptimes in a series will have identical arrival and departure values of MISSING_VALUE.
+      // Do not process non-time-point stop times, leaving them in place for interpolation.
+      // All non-timepoint stoptimes in a series will have identical arrival and departure values of
+      // MISSING_VALUE.
       if (!(st1.isArrivalTimeSet() && st1.isDepartureTimeSet())) {
         continue;
       }
@@ -175,7 +172,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
       int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
       if (runningTime < 0) {
-        issueStore.add(new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
+        issueStore.add(new NegativeHopTime(st0, st1));
         return false;
       }
 
@@ -190,7 +187,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       }
       // sanity-check the hop
       if (runningTime == 0) {
-        // series of identical stop times at different stops
+        // identical stop times at different stops
         issueStore.add(new HopZeroTime((float) hopDistance, st1.getTrip(), st1.getStopSequence()));
       } else if (hopSpeed > 45) {
         // 45 m/sec ~= 100 miles/hr
@@ -229,19 +226,18 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
    */
   private void interpolateStopTimes(List<StopTime> stopTimes) {
     int lastStop = stopTimes.size() - 1;
-    int numInterpStops = -1;
-    int departureTime = -1, prevDepartureTime = -1;
-    int interpStep = 0;
+    int numInterpStops;
+    int departureTime = -1;
+    int prevDepartureTime;
+    int interpStep;
 
-    int i;
-    for (i = 0; i < lastStop; i++) {
+    for (int i = 0; i < lastStop; i++) {
       StopTime st0 = stopTimes.get(i);
 
       prevDepartureTime = departureTime;
       departureTime = st0.getDepartureTime();
 
-      /* Interpolate, if necessary, the times of non-timepoint stops */
-      /* genuine interpolation needed */
+      // Interpolate, if necessary, the times of non-timepoint stops
       if (
         !(st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) && !FlexTrip.isFlexStop(st0.getStop())
       ) {

@@ -137,7 +137,7 @@ public class GtfsModule implements GraphBuilderModule {
           builder.getFlexTripsById().addAll(FlexTripsMapper.createFlexTrips(builder, issueStore));
         }
 
-        repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
+        validateAndInterpolateStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
 
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
@@ -200,7 +200,7 @@ public class GtfsModule implements GraphBuilderModule {
   /**
    * This method has side effects, the {@code stopTimesByTrip} is updated.
    */
-  private void repairStopTimesForEachTrip(
+  private void validateAndInterpolateStopTimesForEachTrip(
     TripStopTimes stopTimesByTrip,
     DataImportIssueStore issueStore
   ) {
