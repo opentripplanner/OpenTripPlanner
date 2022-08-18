@@ -56,10 +56,10 @@ public class Itinerary {
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
     this.duration = totals.totalDuration;
     this.numberOfTransfers = totals.transfers();
-    this.transitDuration = totals.transitTime;
-    this.nonTransitDuration = totals.nonTransitTime;
+    this.transitDuration = totals.transitDuration;
+    this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingDuration = totals.waitingTime;
+    this.waitingDuration = totals.walkingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);

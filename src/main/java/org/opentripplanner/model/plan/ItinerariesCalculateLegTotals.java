@@ -9,11 +9,11 @@ import java.util.List;
 class ItinerariesCalculateLegTotals {
 
   Duration totalDuration = Duration.ZERO;
-  Duration transitTime = Duration.ZERO;
+  Duration transitDuration = Duration.ZERO;
   int nTransitLegs = 0;
-  Duration nonTransitTime = Duration.ZERO;
+  Duration nonTransitDuration = Duration.ZERO;
   double nonTransitDistanceMeters = 0.0;
-  Duration waitingTime;
+  Duration walkingDuration;
   boolean walkOnly = true;
   boolean streetOnly = true;
   double totalElevationGained = 0.0;
@@ -38,12 +38,12 @@ class ItinerariesCalculateLegTotals {
       Duration dt = leg.getDuration();
 
       if (leg.isTransitLeg()) {
-        transitTime = transitTime.plus(dt);
+        transitDuration = transitDuration.plus(dt);
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
       } else if (leg.isStreetLeg()) {
-        nonTransitTime = nonTransitTime.plus(dt);
+        nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
       }
       if (!leg.isWalkingLeg()) {
@@ -57,6 +57,6 @@ class ItinerariesCalculateLegTotals {
         this.totalElevationLost += leg.getElevationLost();
       }
     }
-    this.waitingTime = totalDuration.minus(transitTime).minus(nonTransitTime);
+    this.walkingDuration = totalDuration.minus(transitDuration).minus(nonTransitDuration);
   }
 }
