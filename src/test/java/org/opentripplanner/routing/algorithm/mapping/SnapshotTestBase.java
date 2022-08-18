@@ -133,9 +133,9 @@ public abstract class SnapshotTestBase {
       System.out.printf(
         "Itinerary %2d - duration: %s [%5s] (effective: %s [%5s]) - wait time: %s, transit time: %s \n",
         i,
-        TimeUtils.timeToStrCompact(itinerary.getDuration()),
+        TimeUtils.durationToStrCompact(itinerary.getDuration()),
         itinerary.getDuration(),
-        TimeUtils.timeToStrCompact(itinerary.effectiveDuration()),
+        TimeUtils.durationToStrCompact(itinerary.effectiveDuration()),
         itinerary.effectiveDuration(),
         itinerary.getWaitingDuration(),
         itinerary.getTransitDuration()
