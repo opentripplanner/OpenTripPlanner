@@ -1,4 +1,4 @@
-package org.opentripplanner.gtfs;
+package org.opentripplanner.graph_builder.module;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -29,17 +29,17 @@ import org.slf4j.LoggerFactory;
  * This class is responsible for cleaning stop times, removing duplicates, correcting bad data and
  * so on. This only applies to GTFS imports.
  */
-public class RepairStopTimesForEachTripOperation {
+public class ValidateAndInterpolateStopTimesForEachTrip {
 
   private static final Logger LOG = LoggerFactory.getLogger(
-    RepairStopTimesForEachTripOperation.class
+    ValidateAndInterpolateStopTimesForEachTrip.class
   );
 
   private final TripStopTimes stopTimesByTrip;
 
   private final DataImportIssueStore issueStore;
 
-  public RepairStopTimesForEachTripOperation(
+  public ValidateAndInterpolateStopTimesForEachTrip(
     TripStopTimes stopTimesByTrip,
     DataImportIssueStore issueStore
   ) {

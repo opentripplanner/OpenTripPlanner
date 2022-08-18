@@ -32,7 +32,6 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.graph_builder.module.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
-import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -205,7 +204,7 @@ public class GtfsModule implements GraphBuilderModule {
     TripStopTimes stopTimesByTrip,
     DataImportIssueStore issueStore
   ) {
-    new RepairStopTimesForEachTripOperation(stopTimesByTrip, issueStore).run();
+    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, issueStore).run();
   }
 
   /**
