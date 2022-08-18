@@ -4,7 +4,19 @@ import java.time.Duration;
 import org.opentripplanner.model.GenericLocation;
 
 public class ViaLocation {
-  GenericLocation point;
-  boolean passThroughPoint = false;
-  Duration slack = Duration.ofMinutes(60);
+  private GenericLocation point;
+  private boolean passThroughPoint = false;
+  private Duration slack = Duration.ofMinutes(60);
+
+  public GenericLocation point() {
+    return point;
+  }
+
+  public boolean passThroughPoint() {
+    return passThroughPoint;
+  }
+
+  public Duration slack() {
+    return slack;
+  }
 }

@@ -2,15 +2,15 @@ package org.opentripplanner.routing.api.request.refactor.preference;
 
 // * User/trip cost/time/slack/reluctance search config.
 public class RoutingPreferences {
-  private TransitPreferences transit;
-  private TransferPreferences transfer;
-  private WalkPreferences walk;
-  private StreetPreferences street;
-  private WheelchairPreferences wheelchair;
-  private BikePreferences bike;
-  private CarPreferences car;
-  private VehicleRentalPreferences rental;
-  private SystemPreferences system;
+  private TransitPreferences transit = new TransitPreferences();
+  private TransferPreferences transfer = new TransferPreferences();
+  private WalkPreferences walk = new WalkPreferences();
+  private StreetPreferences street = new StreetPreferences();
+  private WheelchairPreferences wheelchair = new WheelchairPreferences();
+  private BikePreferences bike = new BikePreferences();
+  private CarPreferences car = new CarPreferences();
+  private VehicleRentalPreferences rental = new VehicleRentalPreferences();
+  private SystemPreferences system = new SystemPreferences();
 
   public TransitPreferences transit() {
     return transit;

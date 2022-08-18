@@ -16,7 +16,7 @@ public class SystemPreferences {
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
    * tags. Currently, all tags are added to all the timer instances for this request.
    */
-  Set<RoutingTag> tags = Set.of();
+  private Set<RoutingTag> tags = Set.of();
   /**
    * The filled request parameters for penalties and thresholds values
    */
