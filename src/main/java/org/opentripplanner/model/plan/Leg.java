@@ -68,8 +68,8 @@ public interface Leg {
   /**
    * The leg's duration in seconds
    */
-  default long getDuration() {
-    return Duration.between(getStartTime(), getEndTime()).toSeconds();
+  default Duration getDuration() {
+    return Duration.between(getStartTime(), getEndTime());
   }
 
   /**
