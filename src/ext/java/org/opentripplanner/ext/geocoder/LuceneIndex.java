@@ -78,7 +78,7 @@ public class LuceneIndex implements Serializable {
         )
       ) {
         transitService
-          .getAllStopsLocations()
+          .listStopLocations()
           .forEach(stopLocation ->
             addToIndex(
               directoryWriter,
@@ -144,7 +144,7 @@ public class LuceneIndex implements Serializable {
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
     return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> transitService.getStopLocationById(FeedScopedId.parseId(document.get(ID))));
+      .map(document -> transitService.getStopLocation(FeedScopedId.parseId(document.get(ID))));
   }
 
   public Stream<StopLocationsGroup> findStopLocationGroups(String query, boolean autocomplete) {

@@ -188,7 +188,7 @@ public class IndexAPI {
   ) {
     /* When no parameters are supplied, return all stops. */
     if (uriInfo.getQueryParameters().isEmpty()) {
-      return StopMapper.mapToApiShort(transitService().getAllStopsLocations());
+      return StopMapper.mapToApiShort(transitService().listStopLocations());
     }
 
     /* If any of the circle parameters are specified, expect a circle not a box. */
@@ -598,7 +598,7 @@ public class IndexAPI {
   }
 
   private StopLocation stop(String stopId) {
-    var stop = transitService().getStopForId(createId("stopId", stopId));
+    var stop = transitService().getRegularStop(createId("stopId", stopId));
     return validateExist("Stop", stop, "stopId", stop);
   }
 

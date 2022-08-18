@@ -560,7 +560,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             return GqlUtil
               .getTransitService(environment)
-              .getStopForId(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
+              .getRegularStop(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
           })
           .build()
       )
@@ -594,11 +594,11 @@ public class TransmodelGraphQLSchema {
               }
               TransitService transitService = GqlUtil.getTransitService(environment);
               return ((List<String>) environment.getArgument("ids")).stream()
-                .map(id -> transitService.getStopForId(TransitIdMapper.mapIDToDomain(id)))
+                .map(id -> transitService.getRegularStop(TransitIdMapper.mapIDToDomain(id)))
                 .collect(Collectors.toList());
             }
             if (environment.getArgument("name") == null) {
-              return GqlUtil.getTransitService(environment).getAllStopsLocations();
+              return GqlUtil.getTransitService(environment).listStopLocations();
             }
             //                            else {
             //                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)

@@ -29,7 +29,7 @@ public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
 
-  private final Map<FeedScopedId, Stop> stopsById;
+  private final Map<FeedScopedId, Stop> regularStopsById;
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
@@ -43,7 +43,7 @@ public class StopModel implements Serializable {
 
   @Inject
   public StopModel() {
-    this.stopsById = Map.of();
+    this.regularStopsById = Map.of();
     this.stationById = Map.of();
     this.multiModalStationById = Map.of();
     this.groupOfStationsById = Map.of();
@@ -54,7 +54,7 @@ public class StopModel implements Serializable {
   }
 
   public StopModel(StopModelBuilder builder) {
-    this.stopsById = builder.stopsById().asImmutableMap();
+    this.regularStopsById = builder.stopsById().asImmutableMap();
     this.stationById = builder.stationsById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationsById().asImmutableMap();
     this.groupOfStationsById = builder.groupOfStationsById().asImmutableMap();
@@ -75,18 +75,18 @@ public class StopModel implements Serializable {
   /**
    * Return a regular transit stop if found(not flex stops).
    */
-  public Stop getRegularTransitStopById(FeedScopedId id) {
-    return stopsById.get(id);
+  public Stop getRegularStop(FeedScopedId id) {
+    return regularStopsById.get(id);
   }
 
   /**
    * Return all regular transit stops, not flex stops and flex group of stops.
    */
-  public Collection<Stop> getAllStops() {
-    return stopsById.values();
+  public Collection<Stop> listRegularStops() {
+    return regularStopsById.values();
   }
 
-  public Collection<Stop> queryStopSpatialIndex(Envelope envelope) {
+  public Collection<Stop> findRegularStops(Envelope envelope) {
     return index.queryStopSpatialIndex(envelope);
   }
 
@@ -132,7 +132,7 @@ public class StopModel implements Serializable {
    */
   @Nullable
   public StopLocation getStopLocation(FeedScopedId id) {
-    return getById(id, stopsById, flexStopsById, flexStopGroupsById);
+    return getById(id, regularStopsById, flexStopsById, flexStopGroupsById);
   }
 
   /**
@@ -140,7 +140,7 @@ public class StopModel implements Serializable {
    */
   public Collection<StopLocation> listStopLocations() {
     return new CollectionsView<>(
-      stopsById.values(),
+      regularStopsById.values(),
       flexStopsById.values(),
       flexStopGroupsById.values()
     );
@@ -252,7 +252,7 @@ public class StopModel implements Serializable {
     LOG.info("Index stop model...");
     index =
       new StopModelIndex(
-        stopsById.values(),
+        regularStopsById.values(),
         flexStopsById.values(),
         flexStopGroupsById.values(),
         multiModalStationById.values()

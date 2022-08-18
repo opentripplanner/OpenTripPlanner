@@ -52,7 +52,7 @@ public class RoutingServiceTest extends GtfsTest {
     assertEquals("Fake Agency", agency.getName());
 
     /* Stops */
-    transitModel.getStopModel().getRegularTransitStopById(new FeedScopedId("X", "Y"));
+    transitModel.getStopModel().getRegularStop(new FeedScopedId("X", "Y"));
     /* Trips */
     //        graph.index.tripForId;
     //        graph.index.routeForId;
@@ -91,11 +91,11 @@ public class RoutingServiceTest extends GtfsTest {
   public void testSpatialIndex() {
     String feedId = transitModel.getFeedIds().iterator().next();
     FeedScopedId idJ = new FeedScopedId(feedId, "J");
-    var stopJ = transitModel.getStopModel().getRegularTransitStopById(idJ);
+    var stopJ = transitModel.getStopModel().getRegularStop(idJ);
     FeedScopedId idL = new FeedScopedId(feedId, "L");
-    var stopL = transitModel.getStopModel().getRegularTransitStopById(idL);
+    var stopL = transitModel.getStopModel().getRegularStop(idL);
     FeedScopedId idM = new FeedScopedId(feedId, "M");
-    var stopM = transitModel.getStopModel().getRegularTransitStopById(idM);
+    var stopM = transitModel.getStopModel().getRegularStop(idM);
     TransitStopVertex stopvJ = graph.getStopVertexForStopId(idJ);
     TransitStopVertex stopvL = graph.getStopVertexForStopId(idL);
     TransitStopVertex stopvM = graph.getStopVertexForStopId(idM);
@@ -105,7 +105,7 @@ public class RoutingServiceTest extends GtfsTest {
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<Stop> stops = transitModel.getStopModel().queryStopSpatialIndex(env);
+    Collection<Stop> stops = transitModel.getStopModel().findRegularStops(env);
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));

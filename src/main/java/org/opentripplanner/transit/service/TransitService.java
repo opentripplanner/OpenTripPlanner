@@ -89,13 +89,13 @@ public interface TransitService {
 
   Operator getOperatorForId(FeedScopedId id);
 
-  StopLocation getStopForId(FeedScopedId id);
+  StopLocation getRegularStop(FeedScopedId id);
 
-  Collection<StopLocation> getAllStopsLocations();
+  Collection<StopLocation> listStopLocations();
 
-  Collection<Stop> getAllStops();
+  Collection<Stop> listRegularStops();
 
-  StopLocation getStopLocationById(FeedScopedId parseId);
+  StopLocation getStopLocation(FeedScopedId parseId);
 
   Collection<StopLocationsGroup> listStopLocationGroups();
 

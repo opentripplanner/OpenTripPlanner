@@ -1223,14 +1223,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         boolean lastStopIsMatch = lastStop.getId().getId().equals(siriDestinationRef);
 
         if (!firstStopIsMatch && firstStop.isPartOfStation()) {
-          var otherFirstStop = transitService.getStopForId(
+          var otherFirstStop = transitService.getRegularStop(
             new FeedScopedId(firstStop.getId().getFeedId(), siriOriginRef)
           );
           firstStopIsMatch = firstStop.isPartOfSameStationAs(otherFirstStop);
         }
 
         if (!lastStopIsMatch && lastStop.isPartOfStation()) {
-          var otherLastStop = transitService.getStopForId(
+          var otherLastStop = transitService.getRegularStop(
             new FeedScopedId(lastStop.getId().getFeedId(), siriDestinationRef)
           );
           lastStopIsMatch = lastStop.isPartOfSameStationAs(otherLastStop);
@@ -1326,14 +1326,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       boolean lastStopIsMatch = lastStop.getId().getId().equals(journeyLastStopId);
 
       if (!firstStopIsMatch && firstStop.isPartOfStation()) {
-        var otherFirstStop = transitService.getStopForId(
+        var otherFirstStop = transitService.getRegularStop(
           new FeedScopedId(firstStop.getId().getFeedId(), journeyFirstStopId)
         );
         firstStopIsMatch = firstStop.isPartOfSameStationAs(otherFirstStop);
       }
 
       if (!lastStopIsMatch && lastStop.isPartOfStation()) {
-        var otherLastStop = transitService.getStopForId(
+        var otherLastStop = transitService.getRegularStop(
           new FeedScopedId(lastStop.getId().getFeedId(), journeyLastStopId)
         );
         lastStopIsMatch = lastStop.isPartOfSameStationAs(otherLastStop);
@@ -1458,7 +1458,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             firstReportedStopIsFound = true;
           } else {
             if (stop.isPartOfStation()) {
-              var alternativeStop = transitService.getStopForId(
+              var alternativeStop = transitService.getRegularStop(
                 new FeedScopedId(stop.getId().getFeedId(), firstStopId)
               );
               if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
@@ -1501,6 +1501,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return stop or null if stop doesn't exist
    */
   private StopLocation getStopForStopId(String feedId, String stopId) {
-    return transitService.getStopForId(new FeedScopedId(feedId, stopId));
+    return transitService.getRegularStop(new FeedScopedId(feedId, stopId));
   }
 }

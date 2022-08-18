@@ -559,9 +559,7 @@ public class TestHalfEdges {
   public void testStreetLocationFinder() {
     RoutingRequest options = new RoutingRequest();
     StreetVertexIndex finder = graph.getStreetIndex();
-    GraphFinder graphFinder = new DirectGraphFinder(
-      transitModel.getStopModel()::queryStopSpatialIndex
-    );
+    GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
     assertTrue(graphFinder.findClosestStops(40.01, -74.005000001, 100).size() > 0);

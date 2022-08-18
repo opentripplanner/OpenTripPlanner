@@ -263,7 +263,7 @@ public class TravelTimeResource {
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
-    for (Stop stop : transitService.getAllStops()) {
+    for (Stop stop : transitService.listRegularStops()) {
       int index = stop.getIndex();
       if (arrivals.reachedByTransit(index)) {
         final int arrivalTime = arrivals.bestTransitArrivalTime(index);

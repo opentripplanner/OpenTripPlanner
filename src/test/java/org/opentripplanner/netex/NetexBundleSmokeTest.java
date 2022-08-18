@@ -69,7 +69,7 @@ public class NetexBundleSmokeTest {
     assertAgencies(otpModel.getAllAgencies());
     assertMultiModalStations(otpModel.stopModel().getAllMultiModalStations());
     assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.stopModel().getAllStops());
+    assertStops(otpModel.stopModel().listRegularStops());
     assertStations(otpModel.stopModel().getStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());

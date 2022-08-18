@@ -102,7 +102,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStops() {
-    Collection<Stop> stops = subject.stopModel().getAllStops();
+    Collection<Stop> stops = subject.stopModel().listRegularStops();
 
     assertEquals(22, stops.size());
     assertEquals("Stop{F:A A}", first(stops).toString());
@@ -132,7 +132,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    Stop stop = subject.stopModel().getRegularTransitStopById(TransitModelForTest.id("P"));
+    Stop stop = subject.stopModel().getRegularStop(TransitModelForTest.id("P"));
     assertEquals("Stop{F:P P}", stop.toString());
   }
 

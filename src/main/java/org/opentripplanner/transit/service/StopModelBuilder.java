@@ -85,7 +85,7 @@ public class StopModelBuilder {
    * {@code other} model, will replace existing entities.
    */
   public StopModelBuilder addAll(StopModel other) {
-    stopsById.addAll(other.getAllStops());
+    stopsById.addAll(other.listRegularStops());
     stationById.addAll(other.getStations());
     multiModalStationById.addAll(other.getAllMultiModalStations());
     groupOfStationsById.addAll(other.getAllGroupOfStations());

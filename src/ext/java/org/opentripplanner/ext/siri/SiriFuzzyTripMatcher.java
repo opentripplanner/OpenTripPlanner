@@ -146,7 +146,7 @@ public class SiriFuzzyTripMatcher {
   }
 
   public Set<Route> getRoutesForStop(FeedScopedId siriStopId) {
-    var stop = transitService.getStopForId(siriStopId);
+    var stop = transitService.getRegularStop(siriStopId);
     return transitService.getRoutesForStop(stop);
   }
 
@@ -156,7 +156,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     FeedScopedId id = new FeedScopedId(feedId, siriStopId);
-    if (transitService.getStopForId(id) != null) {
+    if (transitService.getRegularStop(id) != null) {
       return id;
     } else if (transitService.getStationById(id) != null) {
       return id;
@@ -364,7 +364,7 @@ public class SiriFuzzyTripMatcher {
 
     if (trips == null || trips.isEmpty()) {
       //SIRI-data may report other platform, but still on the same Parent-stop
-      var stop = transitService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
+      var stop = transitService.getRegularStop(new FeedScopedId(feedId, lastStopPoint));
       if (stop != null && stop.isPartOfStation()) {
         // TODO OTP2 resolve stop-station split
         var allQuays = stop.getParentStation().getChildStops();

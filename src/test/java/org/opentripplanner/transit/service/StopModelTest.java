@@ -69,9 +69,9 @@ class StopModelTest {
   @Test
   void testStop() {
     var m = StopModel.of().withStop(STOP).build();
-    assertEquals(STOP, m.getRegularTransitStopById(ID));
+    assertEquals(STOP, m.getRegularStop(ID));
     assertEquals(STOP, m.getStopLocation(ID));
-    assertEquals(EXP_STOPS, m.getAllStops().toString());
+    assertEquals(EXP_STOPS, m.listRegularStops().toString());
     assertEquals(EXP_STOPS, m.listStopLocations().toString());
     assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(STOP, m.stopByIndex(STOP.getIndex()));
