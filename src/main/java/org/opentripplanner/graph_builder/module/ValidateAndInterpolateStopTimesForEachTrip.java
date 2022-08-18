@@ -36,14 +36,16 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   );
 
   private final TripStopTimes stopTimesByTrip;
-
+  private final boolean interpolate;
   private final DataImportIssueStore issueStore;
 
   public ValidateAndInterpolateStopTimesForEachTrip(
     TripStopTimes stopTimesByTrip,
+    boolean interpolate,
     DataImportIssueStore issueStore
   ) {
     this.stopTimesByTrip = stopTimesByTrip;
+    this.interpolate = interpolate;
     this.issueStore = issueStore;
   }
 
@@ -69,8 +71,11 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       }
       if (!filterStopTimes(stopTimes)) {
         stopTimesByTrip.replace(trip, List.of());
-      } else {
+      } else if (interpolate) {
         interpolateStopTimes(stopTimes);
+        stopTimesByTrip.replace(trip, stopTimes);
+      } else {
+        stopTimes.removeIf(st -> !st.isArrivalTimeSet() || !st.isDepartureTimeSet());
         stopTimesByTrip.replace(trip, stopTimes);
       }
 

@@ -204,7 +204,7 @@ public class GtfsModule implements GraphBuilderModule {
     TripStopTimes stopTimesByTrip,
     DataImportIssueStore issueStore
   ) {
-    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, issueStore).run();
+    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, true, issueStore).run();
   }
 
   /**

@@ -135,6 +135,7 @@ public class GtfsContextBuilder {
   private void repairStopTimesForEachTrip() {
     new ValidateAndInterpolateStopTimesForEachTrip(
       transitBuilder.getStopTimesSortedByTrip(),
+      true,
       issueStore
     )
       .run();
