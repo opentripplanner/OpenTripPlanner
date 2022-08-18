@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -33,7 +33,7 @@ public class StopModel implements Serializable {
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
   private final Map<FeedScopedId, GroupOfStations> groupOfStationsById;
-  private final Map<FeedScopedId, FlexStopLocation> flexStopsById;
+  private final Map<FeedScopedId, AreaStop> flexStopsById;
   private final Map<FeedScopedId, FlexLocationGroup> flexStopGroupsById;
 
   /** The density center of the graph for determining the initial geographic extent in the client. */
@@ -99,11 +99,11 @@ public class StopModel implements Serializable {
    * built
    */
   @Nullable
-  public FlexStopLocation getFlexStopById(FeedScopedId id) {
+  public AreaStop getFlexStopById(FeedScopedId id) {
     return flexStopsById.get(id);
   }
 
-  public Collection<FlexStopLocation> getAllFlexLocations() {
+  public Collection<AreaStop> getAllFlexLocations() {
     return flexStopsById.values();
   }
 
@@ -111,7 +111,7 @@ public class StopModel implements Serializable {
     return flexStopGroupsById.values();
   }
 
-  public Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
+  public Collection<AreaStop> queryLocationIndex(Envelope envelope) {
     return index.queryLocationIndex(envelope);
   }
 

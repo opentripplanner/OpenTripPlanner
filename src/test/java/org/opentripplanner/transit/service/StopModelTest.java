@@ -11,8 +11,8 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -42,7 +42,7 @@ class StopModelTest {
     .withParentStation(STATION)
     .build();
   private static final String EXP_STOPS = List.of(STOP).toString();
-  private static final FlexStopLocation STOP_AREA = FlexStopLocation
+  private static final AreaStop STOP_AREA = AreaStop
     .of(ID)
     .withName(NAME)
     .withGeometry(GEOMETRY)
@@ -80,12 +80,12 @@ class StopModelTest {
   }
 
   @Test
-  void testStopArea() {
+  void testAreaStop() {
     var m = StopModel.of().withFlexStop(STOP_AREA).build();
     assertEquals(STOP_AREA, m.getFlexStopById(ID));
     assertEquals(STOP_AREA, m.getStopLocation(ID));
-    assertEquals("[FlexStopLocation{F:A Name}]", m.getAllFlexLocations().toString());
-    assertEquals("[FlexStopLocation{F:A Name}]", m.listStopLocations().toString());
+    assertEquals("[AreaStop{F:A Name}]", m.getAllFlexLocations().toString());
+    assertEquals("[AreaStop{F:A Name}]", m.listStopLocations().toString());
     assertEquals(STOP_AREA, m.stopByIndex(STOP_AREA.getIndex()));
     assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(COOR_A, m.getCoordinateById(ID));

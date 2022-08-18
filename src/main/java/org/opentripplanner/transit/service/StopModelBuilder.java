@@ -2,8 +2,8 @@ package org.opentripplanner.transit.service;
 
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -17,7 +17,7 @@ public class StopModelBuilder {
   private final EntityById<Station> stationById = new EntityById<>();
   private final EntityById<MultiModalStation> multiModalStationById = new EntityById<>();
   private final EntityById<GroupOfStations> groupOfStationsById = new EntityById<>();
-  private final EntityById<FlexStopLocation> flexStopsById = new EntityById<>();
+  private final EntityById<AreaStop> flexStopsById = new EntityById<>();
   private final EntityById<FlexLocationGroup> flexStopGroupsById = new EntityById<>();
 
   StopModelBuilder() {}
@@ -62,11 +62,11 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<FlexStopLocation> flexStopsById() {
+  public EntityById<AreaStop> flexStopsById() {
     return flexStopsById;
   }
 
-  public StopModelBuilder withFlexStop(FlexStopLocation stop) {
+  public StopModelBuilder withFlexStop(AreaStop stop) {
     flexStopsById.add(stop);
     return this;
   }
@@ -115,7 +115,7 @@ public class StopModelBuilder {
       return null;
     }
 
-    // we need this check because there could be only FlexStopLocations (which don't have vertices)
+    // we need this check because there could be only AreaStops (which don't have vertices)
     // in the graph
     var medianCalculator = new MedianCalcForDoubles(stops.size());
 

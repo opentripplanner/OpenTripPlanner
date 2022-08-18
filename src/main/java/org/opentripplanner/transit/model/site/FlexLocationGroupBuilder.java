@@ -67,7 +67,7 @@ public class FlexLocationGroupBuilder
       double xscale = Math.cos(coordinate.latitude() * Math.PI / 180);
       envelope.expandBy(100 / xscale, 100);
       newGeometries[numGeometries] = GeometryUtils.getGeometryFactory().toGeometry(envelope);
-    } else if (location instanceof FlexStopLocation) {
+    } else if (location instanceof AreaStop) {
       newGeometries[numGeometries] = location.getGeometry();
     } else {
       throw new RuntimeException("Unknown location type");

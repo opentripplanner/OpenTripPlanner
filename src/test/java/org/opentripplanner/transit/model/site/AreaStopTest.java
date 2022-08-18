@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
-class FlexStopLocationTest {
+class AreaStopTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
@@ -28,7 +28,7 @@ class FlexStopLocationTest {
 
   private static final WgsCoordinate COORDINATE = new WgsCoordinate(2, 11);
 
-  private static final FlexStopLocation subject = FlexStopLocation
+  private static final AreaStop subject = AreaStop
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)

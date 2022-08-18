@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -22,7 +22,7 @@ class StopModelIndex {
 
   private final HashGridSpatialIndex<RegularStop> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
-  private final HashGridSpatialIndex<FlexStopLocation> locationIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<AreaStop> locationIndex = new HashGridSpatialIndex<>();
   private final StopLocation[] stopsByIndex;
 
   /**
@@ -30,7 +30,7 @@ class StopModelIndex {
    */
   StopModelIndex(
     Collection<RegularStop> stops,
-    Collection<FlexStopLocation> flexStops,
+    Collection<AreaStop> flexStops,
     Collection<FlexLocationGroup> flexLocationGroups,
     Collection<MultiModalStation> multiModalStations
   ) {
@@ -48,7 +48,7 @@ class StopModelIndex {
         multiModalStationForStations.put(childStation, it);
       }
     }
-    for (FlexStopLocation it : flexStops) {
+    for (AreaStop it : flexStops) {
       locationIndex.insert(it.getGeometry().getEnvelopeInternal(), it);
     }
   }
@@ -69,7 +69,7 @@ class StopModelIndex {
     return stopsByIndex.length;
   }
 
-  Collection<FlexStopLocation> queryLocationIndex(Envelope envelope) {
+  Collection<AreaStop> queryLocationIndex(Envelope envelope) {
     return locationIndex.query(envelope);
   }
 }

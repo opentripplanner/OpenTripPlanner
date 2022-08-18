@@ -32,7 +32,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -101,7 +101,7 @@ public interface TransitService {
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
 
-  FlexStopLocation getLocationById(FeedScopedId id);
+  AreaStop getLocationById(FeedScopedId id);
 
   Trip getTripForId(FeedScopedId id);
 

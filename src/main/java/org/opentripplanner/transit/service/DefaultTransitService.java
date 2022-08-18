@@ -39,7 +39,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -151,7 +151,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public FlexStopLocation getLocationById(FeedScopedId id) {
+  public AreaStop getLocationById(FeedScopedId id) {
     return this.transitModel.getStopModel().getFlexStopById(id);
   }
 

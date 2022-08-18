@@ -12,7 +12,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 
 /**
  * Abstract base class for vertices in the street layer of the graph. This includes both vertices
@@ -23,7 +23,7 @@ public abstract class StreetVertex extends Vertex {
   private static final long serialVersionUID = 1L;
 
   /** All locations for flex transit, which this vertex is part of */
-  public Set<FlexStopLocation> flexStopLocations;
+  public Set<AreaStop> areaStops;
 
   public StreetVertex(Graph g, String label, Coordinate coord, I18NString streetName) {
     this(g, label, coord.x, coord.y, streetName);

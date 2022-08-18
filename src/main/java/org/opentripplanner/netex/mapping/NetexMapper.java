@@ -24,8 +24,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.Authority;
@@ -337,15 +337,15 @@ public class NetexMapper {
       return;
     }
 
-    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
+    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       idFactory,
       transitBuilder.getStops().values()
     );
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
-      StopLocation stopLocation = flexStopLocationMapper.map(flexibleStopPlace);
-      if (stopLocation instanceof FlexStopLocation) {
-        transitBuilder.getLocations().add((FlexStopLocation) stopLocation);
+      StopLocation stopLocation = flexStopsMapper.map(flexibleStopPlace);
+      if (stopLocation instanceof AreaStop) {
+        transitBuilder.getLocations().add((AreaStop) stopLocation);
       } else if (stopLocation instanceof FlexLocationGroup) {
         transitBuilder.getLocationGroups().add((FlexLocationGroup) stopLocation);
       }

@@ -19,8 +19,8 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -82,7 +82,7 @@ class TripPatternMapper {
     FeedScopedIdFactory idFactory,
     EntityById<Operator> operatorById,
     EntityById<RegularStop> stopsById,
-    EntityById<FlexStopLocation> flexStopLocationsById,
+    EntityById<AreaStop> areaStopById,
     EntityById<FlexLocationGroup> flexLocationGroupsById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
@@ -121,7 +121,7 @@ class TripPatternMapper {
         issueStore,
         idFactory,
         stopsById,
-        flexStopLocationsById,
+        areaStopById,
         flexLocationGroupsById,
         destinationDisplayById,
         quayIdByStopPointRef,
@@ -204,15 +204,13 @@ class TripPatternMapper {
       return result;
     }
 
-    // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
-    //           for this is added.
+    // TODO OTP2 - Trips containing AreaStops are not added to StopPatterns until support
+    //           - for this is added.
     if (
       result.tripStopTimes
         .get(trips.get(0))
         .stream()
-        .anyMatch(t ->
-          t.getStop() instanceof FlexStopLocation || t.getStop() instanceof FlexLocationGroup
-        )
+        .anyMatch(t -> t.getStop() instanceof AreaStop || t.getStop() instanceof FlexLocationGroup)
     ) {
       return result;
     }

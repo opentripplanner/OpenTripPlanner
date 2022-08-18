@@ -8,9 +8,9 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.FlexLocationGroupBuilder;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -20,9 +20,9 @@ import org.rutebanken.netex.model.KeyValueStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class FlexStopLocationMapper {
+class FlexStopsMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexStopLocationMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FlexStopsMapper.class);
   /**
    * Key-value pair used until proper NeTEx support is added
    */
@@ -35,7 +35,7 @@ class FlexStopLocationMapper {
   private final FeedScopedIdFactory idFactory;
   private final HashGridSpatialIndex<RegularStop> stopsSpatialIndex;
 
-  FlexStopLocationMapper(FeedScopedIdFactory idFactory, Collection<RegularStop> stops) {
+  FlexStopsMapper(FeedScopedIdFactory idFactory, Collection<RegularStop> stops) {
     this.idFactory = idFactory;
     this.stopsSpatialIndex = new HashGridSpatialIndex<>();
     for (RegularStop stop : stops) {
@@ -85,9 +85,9 @@ class FlexStopLocationMapper {
   /**
    * Allows pickup / drop off along any eligible street inside the area
    */
-  FlexStopLocation mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
+  AreaStop mapFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
     var name = new NonLocalizedString(flexibleStopPlace.getName().getValue());
-    return FlexStopLocation
+    return AreaStop
       .of(idFactory.createId(flexibleStopPlace.getId()))
       .withName(name)
       .withGeometry(OpenGisMapper.mapGeometry(area.getPolygon()))
