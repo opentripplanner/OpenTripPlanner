@@ -16,7 +16,7 @@ import java.util.Iterator;
  * to it is safe.
  * <p>
  * Any attempts to modify the view will throw an exception - it is READ-ONLY, even when the
- * underling collections are modifiable.
+ * underlying collections are modifiable.
  * <p>
  * This class is serializable, but be aware that the underlying collections also must be
  * serializable for it to work. The view is very light-weight, so in general it is better to

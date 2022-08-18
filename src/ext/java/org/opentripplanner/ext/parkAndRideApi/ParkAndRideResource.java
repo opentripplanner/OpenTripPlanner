@@ -41,6 +41,8 @@ public class ParkAndRideResource {
 
     // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
     //           - serverContext.graphFinder(). This needs at least a comment!
+    //           - This can be replaced with a search done with the StopModel
+    //           - if we have a radius search there.
     this.graphFinder = new DirectGraphFinder(serverContext.transitService()::queryStopSpatialIndex);
   }
 
