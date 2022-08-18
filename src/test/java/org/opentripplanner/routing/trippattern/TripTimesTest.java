@@ -94,7 +94,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
 
-    OptionalInt invalidStopOIndex = updatedTripTimesA.timesIncreasing();
+    OptionalInt invalidStopOIndex = updatedTripTimesA.findFirstNoneIncreasingStopTime();
     assertTrue(invalidStopOIndex.isPresent());
     assertEquals(1, invalidStopOIndex.getAsInt());
 
@@ -103,7 +103,7 @@ public class TripTimesTest {
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
 
-    invalidStopOIndex = updatedTripTimesB.timesIncreasing();
+    invalidStopOIndex = updatedTripTimesB.findFirstNoneIncreasingStopTime();
     assertTrue(invalidStopOIndex.isPresent());
     assertEquals(7, invalidStopOIndex.getAsInt());
   }
@@ -115,7 +115,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
 
-    assertTrue(updatedTripTimesA.timesIncreasing().isEmpty());
+    assertTrue(updatedTripTimesA.findFirstNoneIncreasingStopTime().isEmpty());
   }
 
   @Test
@@ -182,7 +182,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 89);
     updatedTripTimesA.updateDepartureTime(1, 98);
 
-    OptionalInt invalidStopOIndex = updatedTripTimesA.timesIncreasing();
+    OptionalInt invalidStopOIndex = updatedTripTimesA.findFirstNoneIncreasingStopTime();
     assertTrue(invalidStopOIndex.isPresent());
     assertEquals(2, invalidStopOIndex.getAsInt());
   }

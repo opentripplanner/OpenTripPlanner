@@ -373,7 +373,7 @@ public class TimetableHelper {
       newTimes.cancelTrip();
     }
 
-    OptionalInt invalidStopIndex = newTimes.timesIncreasing();
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
     if (invalidStopIndex.isPresent()) {
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
@@ -766,7 +766,7 @@ public class TimetableHelper {
       }
     }
 
-    OptionalInt invalidStopIndex = newTimes.timesIncreasing();
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
     if (invalidStopIndex.isPresent()) {
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",

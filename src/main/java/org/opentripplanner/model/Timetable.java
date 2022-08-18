@@ -313,7 +313,7 @@ public class Timetable implements Serializable {
       }
     }
 
-    OptionalInt invalidStopIndex = newTimes.timesIncreasing();
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
     if (invalidStopIndex.isPresent()) {
       LOG.error(
         "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",

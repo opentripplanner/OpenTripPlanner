@@ -749,7 +749,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     pattern.add(tripTimes);
 
-    OptionalInt invalidStopIndex = tripTimes.timesIncreasing();
+    OptionalInt invalidStopIndex = tripTimes.findFirstNoneIncreasingStopTime();
     Preconditions.checkState(
       invalidStopIndex.isEmpty(),
       "Non-increasing triptimes for added trip at stop index %s",

@@ -356,7 +356,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public OptionalInt timesIncreasing() {
+  public OptionalInt findFirstNoneIncreasingStopTime() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
