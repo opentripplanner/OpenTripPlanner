@@ -55,6 +55,9 @@ public class BikePreferences {
   /** For the bike triangle, how important safety is */
   private double triangleSafetyFactor;
 
+  // TODO: 2022-08-18 Is this right?
+  private boolean parkAndRide = false;
+
   public BicycleOptimizeType optimizeType() {
     return optimizeType;
   }
@@ -105,5 +108,13 @@ public class BikePreferences {
 
   public double triangleSafetyFactor() {
     return triangleSafetyFactor;
+  }
+
+  public void setParkAndRide(boolean parkAndRide) {
+    this.parkAndRide = parkAndRide;
+  }
+
+  public boolean parkAndRide() {
+    return parkAndRide;
   }
 }

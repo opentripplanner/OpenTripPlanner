@@ -4,6 +4,9 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 public class VehicleRentalPreferences {
+
+  private boolean allow = false;
+
   /** Time to rent a vehicle */
   private int pickupTime = 60;
   /**
@@ -19,7 +22,7 @@ public class VehicleRentalPreferences {
    * Whether or not vehicle rental availability information will be used to plan vehicle rental
    * trips
    */
-  public boolean useVehicleRentalAvailabilityInformation = false;
+  private boolean useVehicleRentalAvailabilityInformation = false;
   // TODO: 2022-08-18 fix documentation
   /**
    * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
@@ -28,7 +31,7 @@ public class VehicleRentalPreferences {
    * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
-  public boolean allowKeepingRentedVehicleAtDestination = false;
+  private boolean allowKeepingRentedVehicleAtDestination = false;
   /**
    * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
    *
@@ -62,5 +65,13 @@ public class VehicleRentalPreferences {
 
   public double keepingVehicleAtDestinationCost() {
     return keepingVehicleAtDestinationCost;
+  }
+
+  public boolean allow() {
+    return allow;
+  }
+
+  public void setAllow(boolean allow) {
+    this.allow = allow;
   }
 }

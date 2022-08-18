@@ -8,7 +8,12 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,8 +109,7 @@ public class NewRouteRequest {
    */
   protected int numItineraries = 50;
 
-  // TODO: 2022-08-18 Should it be here?
-  protected RequestModes modes = RequestModes.defaultRequestModes();
+  protected JourneyRequest journeyRequest = new JourneyRequest();
 
   // TODO: 2022-08-18 Should it be here?
   /**
@@ -136,8 +140,8 @@ public class NewRouteRequest {
       }
       this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
 
-      // TODO: 2022-08-18 Figure out what to do with modes
-      modes = modes.copy().withDirectMode(StreetMode.NOT_SET).build();
+      // TODO: 2022-08-18 this was a builder pattern before
+      journeyRequest.direct().setMode(StreetMode.NOT_SET);
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }
@@ -182,6 +186,81 @@ public class NewRouteRequest {
     return pageCursor.type == PageType.NEXT_PAGE;
   }
 
+  // TODO: 2022-08-18 This should probably not be here
+  public NewRouteRequest getStreetSearchRequest(StreetMode streetMode, RoutingPreferences routingPreferences) {
+    NewRouteRequest streetRequest = this.clone();
+    var journeyRequest = streetRequest.journeyRequest;
+    journeyRequest.setStreetSubRequestModes(new TraverseModeSet());
+
+    if (streetMode != null) {
+      switch (streetMode) {
+        case WALK:
+        case FLEXIBLE:
+          journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK));
+          break;
+        case BIKE:
+          journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE));
+          break;
+        case BIKE_TO_PARK:
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
+          );
+          routingPreferences.bike().setParkAndRide(true);
+          break;
+        case BIKE_RENTAL:
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
+          );
+          routingPreferences.rental().setAllow(true);
+          // TODO: 2022-08-18 does it make sense?
+          journeyRequest.direct().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
+          journeyRequest.egress().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
+          journeyRequest.access().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
+          break;
+        case SCOOTER_RENTAL:
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
+          );
+          routingPreferences.rental().setAllow(true);
+          // TODO: 2022-08-18 does it make sense?
+          journeyRequest.direct().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
+          journeyRequest.egress().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
+          journeyRequest.access().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
+          break;
+        case CAR:
+          journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
+          break;
+        case CAR_TO_PARK:
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
+          );
+          routingPreferences.car().setParkAndRide(true);
+          break;
+        case CAR_PICKUP:
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
+          );
+          routingPreferences.car().allowPickup();
+          break;
+        case CAR_RENTAL:
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
+          );
+          routingPreferences.rental().setAllow(true);
+          journeyRequest.direct().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
+          journeyRequest.egress().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
+          journeyRequest.access().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
+      }
+    }
+
+    return streetRequest;
+  }
+
+  // TODO: 2022-08-18 implement
+  protected NewRouteRequest clone() {
+    return this;
+  }
+
   public Instant dateTime() {
     return dateTime;
   }
@@ -218,13 +297,12 @@ public class NewRouteRequest {
     return numItineraries;
   }
 
-  public RequestModes modes() {
-    return modes;
+  public JourneyRequest journeyRequest() {
+    return journeyRequest;
   }
-  public void setModes(RequestModes modes) {
-    this.modes = modes;
-  }
+
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
   }
+
 }

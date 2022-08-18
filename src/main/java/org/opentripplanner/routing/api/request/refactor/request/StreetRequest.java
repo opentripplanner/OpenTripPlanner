@@ -15,11 +15,16 @@ public class StreetRequest {
   private Duration maxDuration; // <- Default from StreetPreferences
   // TODO: 2022-08-18 Do we need this?
   private StreetMode mode = StreetMode.WALK;
+  // TODO: 2022-08-18 Not sure if having those two here makes sene
   private VehicleRentalRequest vehicleRental;
   private VehicleParkingRequest vehicleParking;
 
   public Duration maxDuration() {
     return maxDuration;
+  }
+
+  public void setMode(StreetMode mode) {
+    this.mode = mode;
   }
 
   public StreetMode mode() {

@@ -92,12 +92,10 @@ public class RoutingWorker {
   public RoutingResponse route() {
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
-    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes());
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.journeyRequest().direct().mode());
 
-    // TODO: 2022-08-18 is this correct?
-    request.setModes(
-      request.modes().copy().withDirectMode(emptyDirectModeHandler.resolveDirectMode()).build()
-    );
+    // TODO: 2022-08-18 this was a builder pattern before
+    request.journeyRequest().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -160,8 +158,9 @@ public class RoutingWorker {
     this.debugTimingAggregator.finishedFiltering();
 
 
+    // TODO: 2022-08-18 this was a builder pattern before
     // Restore original directMode.
-    request.setModes(request.modes().copy().withDirectMode(emptyDirectModeHandler.originalDirectMode()).build());
+    request.journeyRequest().direct().setMode(emptyDirectModeHandler.originalDirectMode());
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).

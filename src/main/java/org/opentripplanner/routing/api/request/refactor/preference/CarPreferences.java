@@ -32,6 +32,11 @@ public class CarPreferences {
   // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
   private double accelerationSpeed = 2.9;
 
+  // TODO: 2022-08-18 should it be here?
+  private boolean parkAndRide = false;
+  // TODO: 2022-08-18 should it be here?
+  private boolean allowPickup = false;
+
   public double speed() {
     return speed;
   }
@@ -66,5 +71,21 @@ public class CarPreferences {
 
   public double accelerationSpeed() {
     return accelerationSpeed;
+  }
+
+  public boolean parkAndRide() {
+    return parkAndRide;
+  }
+
+  public void setParkAndRide(boolean parkAndRide) {
+    this.parkAndRide = parkAndRide;
+  }
+
+  public boolean allowPickup() {
+    return allowPickup;
+  }
+
+  public void setAllowPickup(boolean allowPickup) {
+    this.allowPickup = allowPickup;
   }
 }
