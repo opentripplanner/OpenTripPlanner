@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -93,14 +94,18 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
 
-    assertFalse(updatedTripTimesA.timesIncreasing());
+    OptionalInt invalidStopOIndex = updatedTripTimesA.findFirstNoneIncreasingStopTime();
+    assertTrue(invalidStopOIndex.isPresent());
+    assertEquals(1, invalidStopOIndex.getAsInt());
 
     TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
 
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
 
-    assertFalse(updatedTripTimesB.timesIncreasing());
+    invalidStopOIndex = updatedTripTimesB.findFirstNoneIncreasingStopTime();
+    assertTrue(invalidStopOIndex.isPresent());
+    assertEquals(7, invalidStopOIndex.getAsInt());
   }
 
   @Test
@@ -110,7 +115,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
 
-    assertTrue(updatedTripTimesA.timesIncreasing());
+    assertTrue(updatedTripTimesA.findFirstNoneIncreasingStopTime().isEmpty());
   }
 
   @Test
@@ -177,6 +182,8 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 89);
     updatedTripTimesA.updateDepartureTime(1, 98);
 
-    assertFalse(updatedTripTimesA.timesIncreasing());
+    OptionalInt invalidStopOIndex = updatedTripTimesA.findFirstNoneIncreasingStopTime();
+    assertTrue(invalidStopOIndex.isPresent());
+    assertEquals(2, invalidStopOIndex.getAsInt());
   }
 }
