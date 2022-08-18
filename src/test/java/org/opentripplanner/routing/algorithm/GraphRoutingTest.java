@@ -237,7 +237,7 @@ public abstract class GraphRoutingTest {
 
     public RegularStop stopEntity(String id, double latitude, double longitude) {
       var stop = TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
-      transitModel.mergeStopModels(StopModel.of().withStop(stop).build());
+      transitModel.mergeStopModels(StopModel.of().withRegularStop(stop).build());
       return stop;
     }
 

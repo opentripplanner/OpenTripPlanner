@@ -259,7 +259,7 @@ public class StreetVertexIndex {
    */
   private Set<Vertex> getStopVerticesById(FeedScopedId id) {
     return stopModel
-      .getStopOrChildStops(id)
+      .findStopOrChildStops(id)
       .stream()
       .filter(RegularStop.class::isInstance)
       .map(RegularStop.class::cast)

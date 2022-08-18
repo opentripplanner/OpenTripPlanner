@@ -144,7 +144,7 @@ public class GTFSToOtpTransitServiceMapper {
     if (OTPFeature.FlexRouting.isOn()) {
       // Stop areas and Stop groups are only used in FLEX routes
       builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
-      builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
+      builder.getGroupStops().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
     }
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));

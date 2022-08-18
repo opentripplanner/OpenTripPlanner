@@ -67,10 +67,10 @@ public class NetexBundleSmokeTest {
     OtpTransitService otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.stopModel().getAllMultiModalStations());
+    assertMultiModalStations(otpModel.stopModel().listMultiModalStations());
     assertOperators(otpModel.getAllOperators());
     assertStops(otpModel.stopModel().listRegularStops());
-    assertStations(otpModel.stopModel().getStations());
+    assertStations(otpModel.stopModel().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());

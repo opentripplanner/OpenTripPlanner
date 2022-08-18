@@ -135,7 +135,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Collection<Station> getStations() {
-    return this.transitModel.getStopModel().getStations();
+    return this.transitModel.getStopModel().listStations();
   }
 
   @Override
@@ -151,8 +151,8 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public AreaStop getLocationById(FeedScopedId id) {
-    return this.transitModel.getStopModel().getFlexStopById(id);
+  public AreaStop getAreaStop(FeedScopedId id) {
+    return this.transitModel.getStopModel().getAreaStop(id);
   }
 
   @Override
@@ -161,7 +161,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public StopLocation getRegularStop(FeedScopedId id) {
+  public RegularStop getRegularStop(FeedScopedId id) {
     return this.transitModel.getStopModel().getRegularStop(id);
   }
 
@@ -526,7 +526,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<RegularStop> queryStopSpatialIndex(Envelope envelope) {
+  public Collection<RegularStop> findRegularStop(Envelope envelope) {
     return transitModel.getStopModel().findRegularStops(envelope);
   }
 

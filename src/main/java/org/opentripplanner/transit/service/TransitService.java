@@ -89,7 +89,7 @@ public interface TransitService {
 
   Operator getOperatorForId(FeedScopedId id);
 
-  StopLocation getRegularStop(FeedScopedId id);
+  RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();
 
@@ -101,7 +101,7 @@ public interface TransitService {
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
 
-  AreaStop getLocationById(FeedScopedId id);
+  AreaStop getAreaStop(FeedScopedId id);
 
   Trip getTripForId(FeedScopedId id);
 
@@ -185,7 +185,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<RegularStop> queryStopSpatialIndex(Envelope envelope);
+  Collection<RegularStop> findRegularStop(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
 }

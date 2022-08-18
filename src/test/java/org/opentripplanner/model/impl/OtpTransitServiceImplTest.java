@@ -94,7 +94,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStations() {
-    Collection<Station> stations = subject.stopModel().getStations();
+    Collection<Station> stations = subject.stopModel().listStations();
 
     assertEquals(1, stations.size());
     assertEquals("Station{F:station station}", first(stations).toString());

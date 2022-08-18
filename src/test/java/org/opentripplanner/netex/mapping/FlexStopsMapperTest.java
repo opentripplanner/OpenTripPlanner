@@ -15,7 +15,7 @@ import net.opengis.gml._3.PolygonType;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
@@ -94,11 +94,9 @@ public class FlexStopsMapperTest {
   }
 
   @Test
-  public void mapFlexLocationGroup() {
+  public void mapGroupStop() {
     RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
     RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
-
-    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(ID_FACTORY, List.of(stop1, stop2));
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
     flexibleStopPlace.setKeyList(
@@ -110,14 +108,14 @@ public class FlexStopsMapperTest {
         )
     );
 
-    FlexLocationGroup flexLocationGroup = (FlexLocationGroup) flexStopsMapper.map(
-      flexibleStopPlace
-    );
+    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(stop1, stop2));
+
+    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
     // Only one of the stops should be inside the polygon
-    assertEquals(1, flexLocationGroup.getLocations().size());
+    assertEquals(1, groupStop.getLocations().size());
 
-    assertNotNull(flexLocationGroup);
+    assertNotNull(groupStop);
   }
 
   private FlexibleStopPlace getFlexibleStopPlace() {

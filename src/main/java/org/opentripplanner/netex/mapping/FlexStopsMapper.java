@@ -9,8 +9,8 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexLocationGroupBuilder;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -45,7 +45,7 @@ class FlexStopsMapper {
   }
 
   /**
-   * Maps NeTEx FlexibleStopPlace to FlexStopLocation. The support for FlexLocationGroup is
+   * Maps NeTEx FlexibleStopPlace to FlexStopLocation. The support for GroupStop is
    * dependent on a key/value in the NeTEx file, until proper NeTEx support is added.
    */
   StopLocation map(FlexibleStopPlace flexibleStopPlace) {
@@ -97,8 +97,8 @@ class FlexStopsMapper {
   /**
    * Allows pickup / drop off at any regular Stop inside the area
    */
-  FlexLocationGroup mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
-    FlexLocationGroupBuilder result = FlexLocationGroup
+  GroupStop mapStopsInFlexArea(FlexibleStopPlace flexibleStopPlace, FlexibleArea area) {
+    GroupStopBuilder result = GroupStop
       .of(idFactory.createId(flexibleStopPlace.getId()))
       .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
 

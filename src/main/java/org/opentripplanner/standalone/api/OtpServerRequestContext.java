@@ -87,6 +87,6 @@ public interface OtpServerRequestContext {
   TraverseVisitor traverseVisitor();
 
   default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(graph(), transitService()::queryStopSpatialIndex);
+    return GraphFinder.getInstance(graph(), transitService()::findRegularStop);
   }
 }

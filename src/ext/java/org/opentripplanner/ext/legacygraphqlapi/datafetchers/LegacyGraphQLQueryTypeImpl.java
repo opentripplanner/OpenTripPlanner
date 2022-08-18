@@ -1033,7 +1033,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       Stream<RegularStop> stopStream = getTransitService(environment)
-        .queryStopSpatialIndex(envelope)
+        .findRegularStop(envelope)
         .stream()
         .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()));
 

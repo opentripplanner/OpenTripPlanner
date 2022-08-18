@@ -3,8 +3,8 @@ package org.opentripplanner.transit.service;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
 import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -13,12 +13,12 @@ import org.opentripplanner.util.lang.CollectionsView;
 
 public class StopModelBuilder {
 
-  private final EntityById<RegularStop> stopsById = new EntityById<>();
+  private final EntityById<RegularStop> regularStopById = new EntityById<>();
+  private final EntityById<AreaStop> areaStopById = new EntityById<>();
+  private final EntityById<GroupStop> groupStopById = new EntityById<>();
   private final EntityById<Station> stationById = new EntityById<>();
   private final EntityById<MultiModalStation> multiModalStationById = new EntityById<>();
-  private final EntityById<GroupOfStations> groupOfStationsById = new EntityById<>();
-  private final EntityById<AreaStop> flexStopsById = new EntityById<>();
-  private final EntityById<FlexLocationGroup> flexStopGroupsById = new EntityById<>();
+  private final EntityById<GroupOfStations> groupOfStationById = new EntityById<>();
 
   StopModelBuilder() {}
 
@@ -26,16 +26,16 @@ public class StopModelBuilder {
     addAll(stopModel);
   }
 
-  public EntityById<RegularStop> stopsById() {
-    return stopsById;
+  public EntityById<RegularStop> regularStopsById() {
+    return regularStopById;
   }
 
-  public StopModelBuilder withStop(RegularStop stop) {
-    stopsById.add(stop);
+  public StopModelBuilder withRegularStop(RegularStop stop) {
+    regularStopById.add(stop);
     return this;
   }
 
-  public EntityById<Station> stationsById() {
+  public EntityById<Station> stationById() {
     return stationById;
   }
 
@@ -44,7 +44,7 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<MultiModalStation> multiModalStationsById() {
+  public EntityById<MultiModalStation> multiModalStationById() {
     return multiModalStationById;
   }
 
@@ -53,30 +53,30 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<GroupOfStations> groupOfStationsById() {
-    return groupOfStationsById;
+  public EntityById<GroupOfStations> groupOfStationById() {
+    return groupOfStationById;
   }
 
   public StopModelBuilder withGroupOfStation(GroupOfStations station) {
-    groupOfStationsById.add(station);
+    groupOfStationById.add(station);
     return this;
   }
 
-  public EntityById<AreaStop> flexStopsById() {
-    return flexStopsById;
+  public EntityById<AreaStop> areaStopById() {
+    return areaStopById;
   }
 
-  public StopModelBuilder withFlexStop(AreaStop stop) {
-    flexStopsById.add(stop);
+  public StopModelBuilder withAreaStop(AreaStop stop) {
+    areaStopById.add(stop);
     return this;
   }
 
-  public EntityById<FlexLocationGroup> flexStopGroupsById() {
-    return flexStopGroupsById;
+  public EntityById<GroupStop> groupStopById() {
+    return groupStopById;
   }
 
-  public StopModelBuilder withFlexStopGroup(FlexLocationGroup group) {
-    flexStopGroupsById.add(group);
+  public StopModelBuilder withGroupStop(GroupStop group) {
+    groupStopById.add(group);
     return this;
   }
 
@@ -85,12 +85,12 @@ public class StopModelBuilder {
    * {@code other} model, will replace existing entities.
    */
   public StopModelBuilder addAll(StopModel other) {
-    stopsById.addAll(other.listRegularStops());
-    stationById.addAll(other.getStations());
-    multiModalStationById.addAll(other.getAllMultiModalStations());
-    groupOfStationsById.addAll(other.getAllGroupOfStations());
-    flexStopsById.addAll(other.getAllFlexLocations());
-    flexStopGroupsById.addAll(other.getAllFlexStopGroups());
+    regularStopById.addAll(other.listRegularStops());
+    stationById.addAll(other.listStations());
+    multiModalStationById.addAll(other.listMultiModalStations());
+    groupOfStationById.addAll(other.listGroupOfStations());
+    areaStopById.addAll(other.listAreaStops());
+    groupStopById.addAll(other.listGroupStops());
     return this;
   }
 
@@ -106,9 +106,9 @@ public class StopModelBuilder {
    */
   WgsCoordinate calculateTransitCenter() {
     var stops = new CollectionsView<>(
-      stopsById.values(),
-      flexStopsById.values(),
-      flexStopGroupsById.values()
+      regularStopById.values(),
+      areaStopById.values(),
+      groupStopById.values()
     );
 
     if (stops.isEmpty()) {
