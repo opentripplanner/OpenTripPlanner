@@ -4,9 +4,19 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.model.plan.pagecursor.PageType;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RouteRequest {
+// TODO: 2022-08-18 rename class when done
+public class NewRouteRequest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(NewRouteRequest.class);
+
   /**
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
@@ -94,6 +104,84 @@ public class RouteRequest {
    */
   protected int numItineraries = 50;
 
+  // TODO: 2022-08-18 Should it be here?
+  protected RequestModes modes = RequestModes.defaultRequestModes();
+
+  // TODO: 2022-08-18 Should it be here?
+  /**
+   * The expected maximum time a journey can last across all possible journeys for the current
+   * deployment. Normally you would just do an estimate and add enough slack, so you are sure that
+   * there is no journeys that falls outside this window. The parameter is used find all possible
+   * dates for the journey and then search only the services which run on those dates. The duration
+   * must include access, egress, wait-time and transit time for the whole journey. It should also
+   * take low frequency days/periods like holidays into account. In other words, pick the two points
+   * within your area that has the worst connection and then try to travel on the worst possible
+   * day, and find the maximum journey duration. Using a value that is too high has the effect of
+   * including more patterns in the search, hence, making it a bit slower. Recommended values would
+   * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
+   */
+  private Duration maxJourneyDuration = Duration.ofHours(24);
+
+  /**
+   * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page". The date-time is
+   * used for many things, for example finding the days to search, but the transit search is using
+   * the cursor[if exist], not the date-time.
+   */
+  public void applyPageCursor() {
+    if (pageCursor != null) {
+      // We switch to "depart-after" search when paging next(lat==null). It does not make
+      // sense anymore to keep the latest-arrival-time when going to the "next page".
+      if (pageCursor.latestArrivalTime == null) {
+        arriveBy = false;
+      }
+      this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
+
+      // TODO: 2022-08-18 Figure out what to do with modes
+      modes = modes.copy().withDirectMode(StreetMode.NOT_SET).build();
+      LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
+    }
+  }
+
+  /**
+   * When paging we must crop the list of itineraries in the right end according to the sorting of
+   * the original search and according to the page cursor type (next or previous).
+   * <p>
+   * We need to flip the cropping and crop the head/start of the itineraries when:
+   * <ul>
+   * <li>Paging to the previous page for a {@code depart-after/sort-on-arrival-time} search.
+   * <li>Paging to the next page for a {@code arrive-by/sort-on-departure-time} search.
+   * </ul>
+   */
+  public boolean maxNumberOfItinerariesCropHead() {
+    if (pageCursor == null) {
+      return false;
+    }
+
+    var previousPage = pageCursor.type == PageType.PREVIOUS_PAGE;
+    return pageCursor.originalSortOrder.isSortedByArrivalTimeAcceding() == previousPage;
+  }
+
+  public SortOrder itinerariesSortOrder() {
+    if (pageCursor != null) {
+      return pageCursor.originalSortOrder;
+    }
+    return arriveBy ? SortOrder.STREET_AND_DEPARTURE_TIME : SortOrder.STREET_AND_ARRIVAL_TIME;
+  }
+
+  /**
+   * Related to {@link #maxNumberOfItinerariesCropHead()}, but is {@code true} if we should crop the
+   * search-window head(in the beginning) or tail(in the end).
+   * <p>
+   * For the first search we look if the sort is ascending(crop tail) or descending(crop head), and
+   * for paged results we look at the paging type: next(tail) and previous(head).
+   */
+  public boolean doCropSearchWindowAtTail() {
+    if (pageCursor == null) {
+      return itinerariesSortOrder().isSortedByArrivalTimeAcceding();
+    }
+    return pageCursor.type == PageType.NEXT_PAGE;
+  }
+
   public Instant dateTime() {
     return dateTime;
   }
@@ -128,5 +216,15 @@ public class RouteRequest {
 
   public int numItineraries() {
     return numItineraries;
+  }
+
+  public RequestModes modes() {
+    return modes;
+  }
+  public void setModes(RequestModes modes) {
+    this.modes = modes;
+  }
+  public Duration maxJourneyDuration() {
+    return maxJourneyDuration;
   }
 }

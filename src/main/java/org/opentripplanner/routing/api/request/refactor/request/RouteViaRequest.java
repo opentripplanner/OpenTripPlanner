@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request.refactor.request;
 import java.util.List;
 
 //  User request: from/to time/location; preferences slack/cost/reluctance
-public class RouteViaRequest extends RouteRequest {
+public class RouteViaRequest extends NewRouteRequest {
 
   // TODO: 2022-08-18 documentation
   List<ViaLocation> viaPoints;
