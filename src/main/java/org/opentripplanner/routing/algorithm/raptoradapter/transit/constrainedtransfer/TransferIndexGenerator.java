@@ -72,6 +72,9 @@ public class TransferIndexGenerator {
         });
     }
 
+    sortTransfers(forwardTransfers);
+    sortTransfers(reverseTransfers);
+
     return new ConstrainedTransfersForPatterns(
       Arrays.asList(forwardTransfers),
       Arrays.asList(reverseTransfers)
@@ -108,6 +111,15 @@ public class TransferIndexGenerator {
       Station station = stop.getParentStation();
       if (station != null) {
         patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
+      }
+    }
+  }
+
+  /** Sort trips in a TransferForPatternByStopPos, if it is not null */
+  private void sortTransfers(TransferForPatternByStopPos[] transfers) {
+    for (var transfersForStop : transfers) {
+      if (transfersForStop != null) {
+        transfersForStop.sortOnSpecificityRanking();
       }
     }
   }
