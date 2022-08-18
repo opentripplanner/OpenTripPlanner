@@ -13,7 +13,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class StopBuilder extends StationElementBuilder<RegularStop, StopBuilder> {
+public final class RegularStopBuilder
+  extends StationElementBuilder<RegularStop, RegularStopBuilder> {
 
   private String platformCode;
 
@@ -29,11 +30,11 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
 
   private final Set<FareZone> fareZones = new HashSet<>();
 
-  StopBuilder(FeedScopedId id) {
+  RegularStopBuilder(FeedScopedId id) {
     super(id);
   }
 
-  StopBuilder(RegularStop original) {
+  RegularStopBuilder(RegularStop original) {
     super(original);
     this.platformCode = original.getPlatformCode();
     this.url = original.getUrl();
@@ -46,7 +47,7 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
     return platformCode;
   }
 
-  public StopBuilder withPlatformCode(String platformCode) {
+  public RegularStopBuilder withPlatformCode(String platformCode) {
     this.platformCode = platformCode;
     return this;
   }
@@ -55,7 +56,7 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
     return url;
   }
 
-  public StopBuilder withUrl(I18NString url) {
+  public RegularStopBuilder withUrl(I18NString url) {
     this.url = url;
     return this;
   }
@@ -64,7 +65,7 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
     return gtfsVehicleType;
   }
 
-  public StopBuilder withVehicleType(TransitMode vehicleType) {
+  public RegularStopBuilder withVehicleType(TransitMode vehicleType) {
     this.gtfsVehicleType = vehicleType;
     return this;
   }
@@ -73,7 +74,7 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
     return netexVehicleSubmode;
   }
 
-  public StopBuilder withNetexVehicleSubmode(String netexVehicleSubmode) {
+  public RegularStopBuilder withNetexVehicleSubmode(String netexVehicleSubmode) {
     this.netexVehicleSubmode = netexVehicleSubmode;
     return this;
   }
@@ -82,12 +83,12 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
     return timeZone;
   }
 
-  public StopBuilder withTimeZone(ZoneId timeZone) {
+  public RegularStopBuilder withTimeZone(ZoneId timeZone) {
     this.timeZone = timeZone;
     return this;
   }
 
-  public StopBuilder addFareZones(FareZone fareZone) {
+  public RegularStopBuilder addFareZones(FareZone fareZone) {
     this.fareZones.add(fareZone);
     return this;
   }
@@ -96,7 +97,7 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
     return fareZones;
   }
 
-  public StopBuilder addBoardingArea(BoardingArea boardingArea) {
+  public RegularStopBuilder addBoardingArea(BoardingArea boardingArea) {
     boardingAreas.add(boardingArea);
     return this;
   }
@@ -106,7 +107,7 @@ public final class StopBuilder extends StationElementBuilder<RegularStop, StopBu
   }
 
   @Override
-  StopBuilder instance() {
+  RegularStopBuilder instance() {
     return this;
   }
 

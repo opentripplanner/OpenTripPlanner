@@ -8,8 +8,8 @@ import java.util.function.Function;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopBuilder;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
@@ -45,7 +45,7 @@ class StopMapper {
     }
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
-    StopBuilder builder = RegularStop
+    RegularStopBuilder builder = RegularStop
       .of(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())

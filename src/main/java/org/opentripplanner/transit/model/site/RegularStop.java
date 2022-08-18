@@ -20,7 +20,7 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
 public final class RegularStop
-  extends StationElement<RegularStop, StopBuilder>
+  extends StationElement<RegularStop, RegularStopBuilder>
   implements StopLocation {
 
   private final int index;
@@ -38,7 +38,7 @@ public final class RegularStop
 
   private final Set<FareZone> fareZones;
 
-  RegularStop(StopBuilder builder) {
+  RegularStop(RegularStopBuilder builder) {
     super(builder);
     this.index = INDEX_COUNTER.getAndIncrement();
     this.platformCode = builder.platformCode();
@@ -53,8 +53,8 @@ public final class RegularStop
     }
   }
 
-  public static StopBuilder of(FeedScopedId id) {
-    return new StopBuilder(id);
+  public static RegularStopBuilder of(FeedScopedId id) {
+    return new RegularStopBuilder(id);
   }
 
   @Override
@@ -132,8 +132,8 @@ public final class RegularStop
 
   @Override
   @Nonnull
-  public StopBuilder copy() {
-    return new StopBuilder(this);
+  public RegularStopBuilder copy() {
+    return new RegularStopBuilder(this);
   }
 
   @Override

@@ -14,9 +14,9 @@ import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
-import org.opentripplanner.transit.model.site.StopBuilder;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
@@ -64,7 +64,7 @@ public class TransitModelForTest {
     return stopForTest(idAndName, null, lat, lon, null, wheelchair);
   }
 
-  public static StopBuilder stop(String idAndName) {
+  public static RegularStopBuilder stop(String idAndName) {
     return RegularStop
       .of(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
