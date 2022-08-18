@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class MultiModalStation
   extends AbstractTransitEntity<MultiModalStation, MultiModalStationBuilder>
-  implements StopCollection {
+  implements StopLocationsGroup {
 
   private final Collection<Station> childStations;
 

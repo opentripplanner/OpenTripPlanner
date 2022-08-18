@@ -17,9 +17,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class GroupOfStations
   extends AbstractTransitEntity<GroupOfStations, GroupOfStationsBuilder>
-  implements StopCollection {
+  implements StopLocationsGroup {
 
-  private final Set<StopCollection> childStations;
+  private final Set<StopLocationsGroup> childStations;
   private final I18NString name;
   private final GroupOfStationsPurpose purposeOfGrouping;
   private final WgsCoordinate coordinate;
@@ -57,7 +57,7 @@ public class GroupOfStations
   }
 
   @Nonnull
-  public Collection<StopCollection> getChildStations() {
+  public Collection<StopLocationsGroup> getChildStations() {
     return this.childStations;
   }
 

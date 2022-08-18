@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.framework.LogInfo;
  */
 public class Station
   extends AbstractTransitEntity<Station, StationBuilder>
-  implements StopCollection, LogInfo {
+  implements StopLocationsGroup, LogInfo {
 
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 

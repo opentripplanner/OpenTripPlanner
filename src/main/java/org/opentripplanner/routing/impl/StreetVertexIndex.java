@@ -175,8 +175,8 @@ public class StreetVertexIndex {
   }
 
   /**
-   * Gets a set of vertices corresponding to the location provided. It first tries to match a
-   * Stop/StopCollection by id, and if not successful it uses the coordinates if provided.
+   * Gets a set of vertices corresponding to the location provided. It first tries to match one of
+   * the stop or station types by id, and if not successful it uses the coordinates if provided.
    *
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
@@ -259,7 +259,7 @@ public class StreetVertexIndex {
    */
   private Set<Vertex> getStopVerticesById(FeedScopedId id) {
     return stopModel
-      .getStopsForId(id)
+      .getStopOrChildStops(id)
       .stream()
       .filter(Stop.class::isInstance)
       .map(Stop.class::cast)

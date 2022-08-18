@@ -11,7 +11,7 @@ import org.opentripplanner.util.lang.ObjectUtils;
  * A grouping of Stops referred to by the same name. No actual boarding or alighting happens at this
  * point, but rather at its underlying childStops.
  */
-public interface StopCollection extends LogInfo {
+public interface StopLocationsGroup extends LogInfo {
   FeedScopedId getId();
 
   I18NString getName();

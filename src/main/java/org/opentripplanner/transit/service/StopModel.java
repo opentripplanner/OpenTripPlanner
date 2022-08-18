@@ -16,8 +16,8 @@ import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.util.lang.CollectionsView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,9 +72,6 @@ public class StopModel implements Serializable {
     return new StopModelBuilder(this);
   }
 
-
-
-  /* Access methods */
   /**
    * Return a regular transit stop if found(not flex stops).
    */
@@ -134,14 +131,14 @@ public class StopModel implements Serializable {
    * Return regular transit stop, flex stop or flex group of stops.
    */
   @Nullable
-  public StopLocation getStopLocationById(FeedScopedId id) {
-    return findById(id, stopsById, flexStopsById, flexStopGroupsById);
+  public StopLocation getStopLocation(FeedScopedId id) {
+    return getById(id, stopsById, flexStopsById, flexStopGroupsById);
   }
 
   /**
    * Return all stops including regular transit stops, flex stops and flex group of stops.
    */
-  public Collection<StopLocation> getAllStopLocations() {
+  public Collection<StopLocation> listStopLocations() {
     return new CollectionsView<>(
       stopsById.values(),
       flexStopsById.values(),
@@ -153,7 +150,6 @@ public class StopModel implements Serializable {
   public Station getStationById(FeedScopedId id) {
     return stationById.get(id);
   }
-
 
   public Collection<Station> getStations() {
     return stationById.values();
@@ -168,30 +164,29 @@ public class StopModel implements Serializable {
     return multiModalStationById.values();
   }
 
-  public Collection<GroupOfStations> getAllGroupOfStations() {
-    return groupOfStationsById.values();
-  }
-
-  /**
-   * Finds a {@link StopCollection} by id. Return a station, multimodal station, or group of
-   * station.
-   */
-  @Nullable
-  public StopCollection getStopCollectionById(FeedScopedId id) {
-    return findById(id, stationById, multiModalStationById, groupOfStationsById);
-  }
-
   @Nullable
   public MultiModalStation getMultiModalStationForStation(Station station) {
     return index.getMultiModalStationForStation(station);
   }
 
+  public Collection<GroupOfStations> getAllGroupOfStations() {
+    return groupOfStationsById.values();
+  }
 
   /**
-   * Returns all {@link StopCollection}s present, including stations, group of stations and
+   * Finds a {@link StopLocationsGroup} by id. Return a station, multimodal station, or group of
+   * station.
+   */
+  @Nullable
+  public StopLocationsGroup getStopLocationsGroup(FeedScopedId id) {
+    return getById(id, stationById, multiModalStationById, groupOfStationsById);
+  }
+
+  /**
+   * Returns all {@link StopLocationsGroup}s present, including stations, group of stations and
    * multimodal stations.
    */
-  public Collection<StopCollection> getAllStopCollections() {
+  public Collection<StopLocationsGroup> listStopLocationGroups() {
     return new CollectionsView<>(
       stationById.values(),
       multiModalStationById.values(),
@@ -221,30 +216,26 @@ public class StopModel implements Serializable {
       return station.getCoordinate();
     }
     // Single stop (regular transit and flex)
-    StopLocation stop = getStopLocationById(id);
+    StopLocation stop = getStopLocation(id);
     return stop == null ? null : stop.getCoordinate();
   }
 
   /**
-   * Return all stops associated with the given id. All child stops are returned in case a Station,
-   * a MultiModalStation, or a GroupOfStations id found. If not regular transit stops, flex stop
-   * locations and flex location groups are search and a list with one item is returned if found.
+   * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
+   * GroupOfStations matches the id, then all child stops are returned. If the id matches a regular
+   * stops, area stop or stop group, then a list with one item is returned.
    * An empty list is if nothing is found.
-   * <p>
-   * TODO OTP2 - This method is use-case specific and only used in one place - refactor this,
-   *           - and remove the coupling between StopModel and Graph.
    */
-  public Collection<StopLocation> getStopsForId(FeedScopedId id) {
-    StopCollection stopCollection = getStopCollectionById(id);
-    if (stopCollection != null) {
-      return stopCollection.getChildStops();
+  public Collection<StopLocation> getStopOrChildStops(FeedScopedId id) {
+    StopLocationsGroup stops = getStopLocationsGroup(id);
+    if (stops != null) {
+      return stops.getChildStops();
     }
 
     // Single stop (regular transit and flex)
-    StopLocation stop = getStopLocationById(id);
+    StopLocation stop = getStopLocation(id);
     return stop == null ? List.of() : List.of(stop);
   }
-
 
   /**
    * Call this method after deserializing this class. This will reindex the StopModel.
@@ -271,7 +262,7 @@ public class StopModel implements Serializable {
 
   @Nullable
   @SafeVarargs
-  private static <V> V findById(FeedScopedId id, Map<FeedScopedId, ? extends V>... maps) {
+  private static <V> V getById(FeedScopedId id, Map<FeedScopedId, ? extends V>... maps) {
     for (Map<FeedScopedId, ? extends V> map : maps) {
       V v = map.get(id);
       if (v != null) {
