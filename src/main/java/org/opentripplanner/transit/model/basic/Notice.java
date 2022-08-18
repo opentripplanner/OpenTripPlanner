@@ -2,15 +2,15 @@ package org.opentripplanner.transit.model.basic;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * This is an element that originates from the NeTEx specification and is described as "Text-based
  * notification describing circumstances which cannot be modelled as structured data." Any NeTEx
  * element can have a notice attached, although not all are supported in OTP.
  */
-public class Notice extends TransitEntity<Notice, NoticeBuilder> {
+public class Notice extends AbstractTransitEntity<Notice, NoticeBuilder> {
 
   private final String text;
   private final String publicCode;

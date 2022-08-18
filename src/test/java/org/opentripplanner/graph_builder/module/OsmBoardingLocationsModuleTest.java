@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,16 +67,13 @@ class OsmBoardingLocationsModuleTest {
   @VariableSource("testCases")
   void addAndLinkBoardingLocations(boolean skipVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
-    var extra = new HashMap<Class<?>, Object>();
+    var graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
 
     var provider = new OpenStreetMapProvider(file, false);
     var floatingBusVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(floatingBusStop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.BUS))
       .build();
     var floatingBoardingLocation = new OsmBoardingLocationVertex(
@@ -102,15 +98,16 @@ class OsmBoardingLocationsModuleTest {
     var platformVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(platform)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
     var busVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(busStop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.BUS))
       .build();
+
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
 
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
@@ -118,7 +115,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    new OsmBoardingLocationsModule(graph).buildGraph();
+    new OsmBoardingLocationsModule(graph, transitModel).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -138,7 +135,7 @@ class OsmBoardingLocationsModuleTest {
       .stream()
       .filter(b -> b.references.contains(busStop.getId().getId()))
       .findFirst()
-      .get();
+      .orElseThrow();
 
     assertConnections(
       busBoardingLocation,

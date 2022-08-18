@@ -45,6 +45,10 @@ class VehicleParkingUpdaterTest {
 
     var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
     vehicleParkingUpdater = new VehicleParkingUpdater(parameters, dataSource);
+
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
+
     vehicleParkingUpdater.setup(graph, transitModel);
   }
 

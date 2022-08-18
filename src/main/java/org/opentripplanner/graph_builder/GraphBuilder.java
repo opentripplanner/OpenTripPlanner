@@ -211,7 +211,7 @@ public class GraphBuilder implements Runnable {
     long endTime = System.currentTimeMillis();
     String time = DurationUtils.durationToStr(Duration.ofMillis(endTime - startTime));
     var f = new OtpNumberFormat();
-    var nStops = f.formatNumber(transitModel.getStopModel().size());
+    var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
     var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());

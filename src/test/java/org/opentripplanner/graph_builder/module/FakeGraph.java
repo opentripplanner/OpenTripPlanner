@@ -37,7 +37,7 @@ public class FakeGraph {
   public static TestOtpModel buildGraphNoTransit() throws URISyntaxException {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var gg = new Graph(stopModel, deduplicator);
+    var gg = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = getFileForResource("columbus.osm.pbf");
@@ -91,11 +91,7 @@ public class FakeGraph {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
         String id = Integer.toString(count++);
         Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-        new TransitStopVertexBuilder()
-          .withGraph(g)
-          .withStop(stop)
-          .withTransitModel(transitModel)
-          .build();
+        new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
       }
     }
   }
@@ -107,11 +103,7 @@ public class FakeGraph {
     for (double lat = 40; lat < 40.01; lat += 0.005) {
       String id = "EXTRA_" + count++;
       Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-      new TransitStopVertexBuilder()
-        .withGraph(g)
-        .withStop(stop)
-        .withTransitModel(transitModel)
-        .build();
+      new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
     }
 
     // add some duplicate stops, identical to the regular stop grid
@@ -119,11 +111,7 @@ public class FakeGraph {
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       String id = "DUPE_" + count++;
       Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-      new TransitStopVertexBuilder()
-        .withGraph(g)
-        .withStop(stop)
-        .withTransitModel(transitModel)
-        .build();
+      new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
     }
 
     // add some almost duplicate stops
@@ -131,18 +119,14 @@ public class FakeGraph {
     for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
       String id = "ALMOST_" + count++;
       Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-      new TransitStopVertexBuilder()
-        .withGraph(g)
-        .withStop(stop)
-        .withTransitModel(transitModel)
-        .build();
+      new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
     }
   }
 
   /** link the stops in the graph */
   public static void link(Graph graph, TransitModel transitModel) {
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
 
     VertexLinker linker = graph.getLinker();
 

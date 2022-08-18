@@ -19,7 +19,6 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -59,7 +58,7 @@ public class GeometryProcessorTest {
   public void setUp() throws Exception {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
     this.issueStore = new DataImportIssueStore();
 

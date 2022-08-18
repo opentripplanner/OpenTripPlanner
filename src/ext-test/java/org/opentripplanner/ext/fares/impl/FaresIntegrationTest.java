@@ -1,10 +1,8 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.List;

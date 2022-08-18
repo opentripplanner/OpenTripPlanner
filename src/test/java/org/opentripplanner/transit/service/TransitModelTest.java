@@ -24,7 +24,7 @@ class TransitModelTest {
     // First GTFS bundle should be added successfully
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     ConstantsForTests.addGtfsToGraph(
       graph,
@@ -62,7 +62,7 @@ class TransitModelTest {
   void validateTimeZonesWithExplicitTimeZone() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     // Whit explicit time zone

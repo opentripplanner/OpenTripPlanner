@@ -8,14 +8,14 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * A group of stopLocations, which can share a common Stoptime
  */
 public class FlexLocationGroup
-  extends TransitEntity<FlexLocationGroup, FlexLocationGroupBuilder>
+  extends AbstractTransitEntity<FlexLocationGroup, FlexLocationGroupBuilder>
   implements StopLocation {
 
   private final int index;

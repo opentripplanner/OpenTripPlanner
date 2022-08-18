@@ -207,7 +207,7 @@ public class FlexIntegrationTest {
       .buildGraph();
 
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
   }
 
   private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {

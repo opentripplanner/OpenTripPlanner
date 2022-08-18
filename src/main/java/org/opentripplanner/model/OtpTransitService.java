@@ -6,22 +6,17 @@ import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.GroupOfStations;
-import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * Methods for accessing imported entities.
@@ -40,15 +35,13 @@ public interface OtpTransitService {
 
   Collection<FeedInfo> getAllFeedInfos();
 
-  Collection<GroupOfStations> getAllGroupsOfStations();
-
-  Collection<MultiModalStation> getAllMultiModalStations();
+  StopModel stopModel();
 
   /**
    * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
    * any type (Serializable).
    */
-  Multimap<TransitEntity, Notice> getNoticeAssignments();
+  Multimap<AbstractTransitEntity, Notice> getNoticeAssignments();
 
   Collection<Pathway> getAllPathways();
 
@@ -59,23 +52,11 @@ public interface OtpTransitService {
 
   List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
 
-  Station getStationForId(FeedScopedId id);
-
-  Stop getStopForId(FeedScopedId id);
-
-  Collection<Station> getAllStations();
-
-  Collection<Stop> getAllStops();
-
   Collection<Entrance> getAllEntrances();
 
   Collection<PathwayNode> getAllPathwayNodes();
 
   Collection<BoardingArea> getAllBoardingAreas();
-
-  Collection<FlexStopLocation> getAllLocations();
-
-  Collection<FlexLocationGroup> getAllLocationGroups();
 
   /**
    * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link

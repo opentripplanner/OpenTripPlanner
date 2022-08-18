@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Map;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 
 /**

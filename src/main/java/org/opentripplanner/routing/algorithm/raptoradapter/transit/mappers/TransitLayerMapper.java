@@ -185,9 +185,9 @@ public class TransitLayerMapper {
     if (!tuningParams.enableStopTransferPriority()) {
       return null;
     }
-    int[] stopTransferCosts = new int[stops.size()];
+    int[] stopTransferCosts = new int[stops.stopIndexSize()];
 
-    for (int i = 0; i < stops.size(); ++i) {
+    for (int i = 0; i < stops.stopIndexSize(); ++i) {
       StopTransferPriority priority = stops.stopByIndex(i).getPriority();
       int domainCost = tuningParams.stopTransferCost(priority);
       stopTransferCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);

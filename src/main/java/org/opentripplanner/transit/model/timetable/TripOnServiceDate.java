@@ -4,13 +4,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * Class for holding data about a certain trip on a certain day. Essentially a DatedServiceJourney.
  */
-public class TripOnServiceDate extends TransitEntity<TripOnServiceDate, TripOnServiceDateBuilder> {
+public class TripOnServiceDate
+  extends AbstractTransitEntity<TripOnServiceDate, TripOnServiceDateBuilder> {
 
   private final Trip trip;
   private final LocalDate serviceDate;

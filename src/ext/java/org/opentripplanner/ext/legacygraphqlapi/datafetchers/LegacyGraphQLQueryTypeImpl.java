@@ -538,13 +538,13 @@ public class LegacyGraphQLQueryTypeImpl
         case "Route":
           return transitService.getRouteForId(FeedScopedId.parseId(id));
         case "Stop":
-          return transitService.getStopForId(FeedScopedId.parseId(id));
+          return transitService.getRegularStop(FeedScopedId.parseId(id));
         case "Stoptime":
           return null; //TODO
         case "stopAtDistance":
           {
             String[] parts = id.split(";");
-            var stop = transitService.getStopForId(FeedScopedId.parseId(parts[1]));
+            var stop = transitService.getRegularStop(FeedScopedId.parseId(parts[1]));
 
             // TODO: Add geometry
             return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
@@ -979,7 +979,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Object> stop() {
     return environment ->
       getTransitService(environment)
-        .getStopForId(
+        .getRegularStop(
           FeedScopedId.parseId(
             new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopArgs(environment.getArguments())
               .getLegacyGraphQLId()
@@ -992,18 +992,17 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsArgs(environment.getArguments());
 
-      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
       if (args.getLegacyGraphQLIds() != null) {
         return StreamSupport
           .stream(args.getLegacyGraphQLIds().spliterator(), false)
           .map(FeedScopedId::parseId)
-          .map(transitService::getStopForId)
+          .map(transitService::getRegularStop)
           .collect(Collectors.toList());
       }
 
-      var stopStream = transitService.getAllStops().stream();
+      var stopStream = transitService.listStopLocations().stream();
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());

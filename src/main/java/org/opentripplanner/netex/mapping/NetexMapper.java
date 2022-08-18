@@ -18,9 +18,9 @@ import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMapperIndexes;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -455,7 +455,7 @@ public class NetexMapper {
     for (NoticeAssignment noticeAssignment : currentNetexIndex
       .getNoticeAssignmentById()
       .localValues()) {
-      Multimap<TransitEntity, Notice> noticesByElementId;
+      Multimap<AbstractTransitEntity, Notice> noticesByElementId;
       noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
       transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
     }

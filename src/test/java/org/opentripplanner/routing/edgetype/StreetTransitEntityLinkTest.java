@@ -58,9 +58,8 @@ class StreetTransitEntityLinkTest {
   @BeforeAll
   static void setup() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    transitModel = new TransitModel(new StopModel(), deduplicator);
   }
 
   @Test
@@ -90,7 +89,6 @@ class StreetTransitEntityLinkTest {
     var to = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(stop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 

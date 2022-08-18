@@ -23,9 +23,9 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -67,10 +67,10 @@ public class NetexBundleSmokeTest {
     OtpTransitService otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.getAllMultiModalStations());
+    assertMultiModalStations(otpModel.stopModel().getAllMultiModalStations());
     assertOperators(otpModel.getAllOperators());
-    assertStops(otpModel.getAllStops());
-    assertStations(otpModel.getAllStations());
+    assertStops(otpModel.stopModel().listRegularStops());
+    assertStations(otpModel.stopModel().getStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
@@ -182,7 +182,7 @@ public class NetexBundleSmokeTest {
     assertEquals(4, trips.size());
   }
 
-  private void assertNoticeAssignments(Multimap<TransitEntity, Notice> map) {
+  private void assertNoticeAssignments(Multimap<AbstractTransitEntity, Notice> map) {
     assertNote(map, fId("RUT:ServiceJourney:4-101468-583"), "045", "Notice on ServiceJourney");
     assertNote(
       map,
@@ -201,12 +201,12 @@ public class NetexBundleSmokeTest {
   }
 
   private void assertNote(
-    Multimap<TransitEntity, Notice> map,
+    Multimap<AbstractTransitEntity, Notice> map,
     Serializable entityKey,
     String code,
     String text
   ) {
-    TransitEntity key = map
+    AbstractTransitEntity key = map
       .keySet()
       .stream()
       .filter(it -> entityKey.equals(it.getId()))

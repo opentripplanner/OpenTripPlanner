@@ -1,13 +1,10 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +23,6 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
@@ -37,8 +33,9 @@ import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.config.api.TransitServicePeriod;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
@@ -68,9 +65,10 @@ public class Graph implements Serializable {
   public final transient Deduplicator deduplicator;
 
   public final Instant buildTime = Instant.now();
-  private final StopModel stopModel;
 
+  @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
+
   private transient StreetVertexIndex streetIndex;
 
   //Envelope of all OSM and transit vertices. Calculated during build time
@@ -145,29 +143,20 @@ public class Graph implements Serializable {
 
   @Inject
   public Graph(
-    StopModel stopModel,
     Deduplicator deduplicator,
-    @TransitServicePeriod ServiceDateInterval transitServicePeriod
+    @Nullable OpeningHoursCalendarService openingHoursCalendarService
   ) {
-    this.stopModel = stopModel;
     this.deduplicator = deduplicator;
-    this.openingHoursCalendarService =
-      transitServicePeriod == null
-        ? null
-        : new OpeningHoursCalendarService(
-          deduplicator,
-          transitServicePeriod.getStart(),
-          transitServicePeriod.getEnd()
-        );
+    this.openingHoursCalendarService = openingHoursCalendarService;
   }
 
-  public Graph(StopModel stopModel, Deduplicator deduplicator) {
-    this(stopModel, deduplicator, null);
+  public Graph(Deduplicator deduplicator) {
+    this(deduplicator, null);
   }
 
   /** Constructor for deserialization. */
   public Graph() {
-    this(null, new Deduplicator());
+    this(new Deduplicator(), null);
   }
 
   /**
@@ -250,6 +239,10 @@ public class Graph implements Serializable {
       .collect(Collectors.toList());
   }
 
+  public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+    return streetIndex.findTransitStopVertices(id);
+  }
+
   /**
    * Return all the edges in the graph. Derived from vertices on demand.
    */
@@ -321,8 +314,12 @@ public class Graph implements Serializable {
    * Perform indexing on vertices, edges and create transient data structures. This used to be done
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
    * graphbuilder to server in memory, without a round trip through serialization.
+   * <p>
+   * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
+   *           - graph. This allows a module to index the streetIndex BEFORE another module add
+   *           - something that should go into the index; Hence, inconsistent data.
    */
-  public void index() {
+  public void index(StopModel stopModel) {
     LOG.info("Index street model...");
     streetIndex = new StreetVertexIndex(this, stopModel);
     LOG.info("Index street model complete.");
@@ -333,31 +330,38 @@ public class Graph implements Serializable {
     return this.openingHoursCalendarService;
   }
 
+  /**
+   * Get streetIndex, safe to use while routing, but do not use during graph build.
+   * @see #getStreetIndexSafe(StopModel)
+   */
   public StreetVertexIndex getStreetIndex() {
-    //TODO refactoring transit model - thread safety
-    if (this.streetIndex == null) {
-      index();
-    }
     return this.streetIndex;
   }
 
-  public VertexLinker getLinker() {
-    return getStreetIndex().getVertexLinker();
+  /**
+   * Get streetIndex during graph build, both OSM street data and transit data must be loaded
+   * before calling this.
+   */
+  public StreetVertexIndex getStreetIndexSafe(StopModel stopModel) {
+    indexIfNotIndexed(stopModel);
+    return this.streetIndex;
   }
 
-  public int removeEdgelessVertices() {
-    int removed = 0;
-    List<Vertex> toRemove = new LinkedList<>();
-    for (Vertex v : this.getVertices()) if (v.getDegreeOut() + v.getDegreeIn() == 0) toRemove.add(
-      v
-    );
-    // avoid concurrent vertex map modification
-    for (Vertex v : toRemove) {
-      this.remove(v);
-      removed += 1;
-      LOG.trace("removed edgeless vertex {}", v);
-    }
-    return removed;
+  /**
+   * Get VertexLinker, safe to use while routing, but do not use during graph build.
+   * @see #getLinkerSafe(StopModel)
+   */
+  public VertexLinker getLinker() {
+    return streetIndex.getVertexLinker();
+  }
+
+  /**
+   * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
+   * before calling this.
+   */
+  public VertexLinker getLinkerSafe(StopModel stopModel) {
+    indexIfNotIndexed(stopModel);
+    return streetIndex.getVertexLinker();
   }
 
   /**
@@ -478,10 +482,6 @@ public class Graph implements Serializable {
     this.intersectionTraversalCostModel = intersectionTraversalCostModel;
   }
 
-  public StopModel getStopModel() {
-    return stopModel;
-  }
-
   public LuceneIndex getLuceneIndex() {
     return luceneIndex;
   }
@@ -490,8 +490,9 @@ public class Graph implements Serializable {
     this.luceneIndex = luceneIndex;
   }
 
-  private void readObject(ObjectInputStream inputStream)
-    throws ClassNotFoundException, IOException {
-    inputStream.defaultReadObject();
+  private void indexIfNotIndexed(StopModel stopModel) {
+    if (streetIndex == null) {
+      index(stopModel);
+    }
   }
 }

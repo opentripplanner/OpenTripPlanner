@@ -20,7 +20,7 @@ class GtfsModuleTest {
   public void addShapesForFrequencyTrips() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));

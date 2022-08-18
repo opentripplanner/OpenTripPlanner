@@ -7,8 +7,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * Location corresponding to a location where riders may request pickup or drop off, defined in the
@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity;
  */
 
 public class FlexStopLocation
-  extends TransitEntity<FlexStopLocation, FlexStopLocationBuilder>
+  extends AbstractTransitEntity<FlexStopLocation, FlexStopLocationBuilder>
   implements StopLocation {
 
   private final int index;
@@ -50,7 +50,7 @@ public class FlexStopLocation
     this.url = builder.url();
     this.zoneId = builder.zoneId();
     this.geometry = builder.geometry();
-    this.centroid = builder.centroid();
+    this.centroid = Objects.requireNonNull(builder.centroid());
   }
 
   public static FlexStopLocationBuilder of(FeedScopedId id) {

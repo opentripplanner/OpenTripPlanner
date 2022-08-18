@@ -1001,7 +1001,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return stop or null if stop doesn't exist
    */
   private StopLocation getStopForStopId(FeedScopedId stopId) {
-    return transitService.getStopForId(stopId);
+    return transitService.getRegularStop(stopId);
   }
 
   private static void warn(FeedScopedId id, String message, Object... params) {

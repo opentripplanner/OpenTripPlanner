@@ -5,18 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.util.geometry.GeometryUtils;
+import org.opentripplanner.transit.service.StopModel;
 
 class DirectGraphFinderTest extends GraphRoutingTest {
 
-  private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
-  private Graph graph;
+  private StopModel stopModel;
 
   private TransitStopVertex S1, S2, S3;
 
@@ -32,7 +28,7 @@ class DirectGraphFinderTest extends GraphRoutingTest {
         }
       }
     );
-    graph = model.graph();
+    stopModel = model.transitModel().getStopModel();
   }
 
   @Test
@@ -40,9 +36,9 @@ class DirectGraphFinderTest extends GraphRoutingTest {
     var ns1 = new NearbyStop(S1.getStop(), 0, null, null);
     var ns2 = new NearbyStop(S2.getStop(), 1112, null, null);
 
-    var testee = new DirectGraphFinder(graph);
-    assertEquals(List.of(ns1), testee.findClosestStops(47.500, 19.000, 100));
+    var subject = new DirectGraphFinder(stopModel::findRegularStops);
+    assertEquals(List.of(ns1), subject.findClosestStops(47.500, 19.000, 100));
 
-    assertEquals(List.of(ns1, ns2), testee.findClosestStops(47.500, 19.000, 2000));
+    assertEquals(List.of(ns1, ns2), subject.findClosestStops(47.500, 19.000, 2000));
   }
 }

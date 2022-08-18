@@ -3,10 +3,10 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
-public final class Pathway extends TransitEntity<Pathway, PathwayBuilder> {
+public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder> {
 
   private final PathwayMode pathwayMode;
 

@@ -35,7 +35,6 @@ public class LinkStopToPlatformTest {
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
   private Graph graph;
-  private TransitModel transitModel;
 
   @BeforeEach
   public void before() {
@@ -43,8 +42,8 @@ public class LinkStopToPlatformTest {
 
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
 
@@ -75,11 +74,10 @@ public class LinkStopToPlatformTest {
 
     Stop stop = TransitModelForTest.stop("TestStop").withCoordinate(59.13545, 10.22213).build();
 
-    TransitStopVertex stopVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
-      .withStop(stop)
-      .withTransitModel(transitModel)
-      .build();
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
+
+    new TransitStopVertexBuilder().withGraph(graph).withStop(stop).build();
   }
 
   /**

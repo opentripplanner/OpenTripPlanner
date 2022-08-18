@@ -3,10 +3,11 @@ package org.opentripplanner.ext.fares.model;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
-public final class FareAttribute extends TransitEntity<FareAttribute, FareAttributeBuilder> {
+public final class FareAttribute
+  extends AbstractTransitEntity<FareAttribute, FareAttributeBuilder> {
 
   private final float price;
 

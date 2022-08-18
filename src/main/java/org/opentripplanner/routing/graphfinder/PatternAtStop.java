@@ -47,7 +47,7 @@ public class PatternAtStop {
       new String(decoder.decode(parts[1]), StandardCharsets.UTF_8)
     );
     return new PatternAtStop(
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       transitService.getTripPatternForId(patternId)
     );
   }

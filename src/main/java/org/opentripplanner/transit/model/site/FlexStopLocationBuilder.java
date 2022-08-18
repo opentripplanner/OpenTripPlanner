@@ -32,6 +32,7 @@ public class FlexStopLocationBuilder
     this.description = original.getDescription();
     this.zoneId = original.getFirstZoneAsString();
     this.geometry = original.getGeometry();
+    this.centroid = original.getCoordinate();
   }
 
   public FlexStopLocationBuilder withZoneId(String zoneId) {

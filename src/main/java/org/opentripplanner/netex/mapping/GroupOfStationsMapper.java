@@ -3,16 +3,16 @@ package org.opentripplanner.netex.mapping;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupOfStationsBuilder;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopCollection;
+import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.StopPlaceRefStructure;
 import org.rutebanken.netex.model.StopPlaceRefs_RelStructure;
@@ -72,7 +72,7 @@ class GroupOfStationsMapper {
       List<StopPlaceRefStructure> memberList = members.getStopPlaceRef();
       for (StopPlaceRefStructure stopPlaceRefStructure : memberList) {
         FeedScopedId stationId = idFactory.createId(stopPlaceRefStructure.getRef());
-        StopCollection station = lookupStation(stationId);
+        StopLocationsGroup station = lookupStation(stationId);
         if (station != null) {
           groupOfStations.addChildStation(station);
         } else {
@@ -88,7 +88,7 @@ class GroupOfStationsMapper {
   }
 
   @Nullable
-  private StopCollection lookupStation(FeedScopedId stationId) {
+  private StopLocationsGroup lookupStation(FeedScopedId stationId) {
     if (stations.containsKey(stationId)) {
       return stations.get(stationId);
     } else if (multiModalStations.containsKey(stationId)) {

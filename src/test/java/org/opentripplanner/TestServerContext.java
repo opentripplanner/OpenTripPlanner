@@ -10,7 +10,6 @@ import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitModelIndex;
 
 public class TestServerContext {
 
@@ -21,7 +20,7 @@ public class TestServerContext {
     Graph graph,
     TransitModel transitModel
   ) {
-    transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
+    transitModel.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig,

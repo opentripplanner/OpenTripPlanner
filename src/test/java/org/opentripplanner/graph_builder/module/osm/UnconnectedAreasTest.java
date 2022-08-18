@@ -150,7 +150,7 @@ public class UnconnectedAreasTest {
   private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     var fileUrl = getClass().getResource(osmFileName);
     Assertions.assertNotNull(fileUrl);

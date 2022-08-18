@@ -17,7 +17,7 @@ public class StopModelMock extends StopModel {
   }
 
   @Override
-  public int size() {
+  public int stopIndexSize() {
     return stops.size();
   }
 }

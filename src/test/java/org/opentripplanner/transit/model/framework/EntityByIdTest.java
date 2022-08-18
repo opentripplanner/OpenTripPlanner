@@ -1,4 +1,4 @@
-package org.opentripplanner.model.impl;
+package org.opentripplanner.transit.model.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,10 +8,6 @@ import java.util.Collections;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitBuilder;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 public class EntityByIdTest {
 
@@ -50,6 +46,20 @@ public class EntityByIdTest {
   }
 
   @Test
+  public void size() {
+    assertEquals(0, subject.size());
+    subject.add(E);
+    assertEquals(1, subject.size());
+  }
+
+  @Test
+  public void isEmpty() {
+    assertTrue(subject.isEmpty());
+    subject.add(E);
+    assertFalse(subject.isEmpty());
+  }
+
+  @Test
   public void asImmutableMap() {
     subject.add(E);
     assertEquals(E_TO_STRING, subject.get(ID).toString());
@@ -63,7 +73,7 @@ public class EntityByIdTest {
     assertFalse(subject.containsKey(FAKE_ID));
   }
 
-  private static class TestEntity extends TransitEntity<TestEntity, TestEntityBuilder> {
+  private static class TestEntity extends AbstractTransitEntity<TestEntity, TestEntityBuilder> {
 
     TestEntity(FeedScopedId id) {
       super(id);

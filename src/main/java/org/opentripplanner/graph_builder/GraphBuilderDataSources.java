@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * the available data-sources against the configuration - and then if not valid - abort the entire
  * OTP startup early, before spending time on loading any data - like the streetGraph.
  */
+@Singleton
 public class GraphBuilderDataSources {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilderDataSources.class);
