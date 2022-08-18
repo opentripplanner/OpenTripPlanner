@@ -40,30 +40,30 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
 
   @Override
-  protected FareAndId getBestFareAndId(FareType fareType, List<Leg> rides, Collection<FareRuleSet> fareRules) {
+  protected FareAndId getBestFareAndId(FareType fareType, List<Leg> legs, Collection<FareRuleSet> fareRules) {
     Set<String> zones = new HashSet<String>();
-    ZonedDateTime startTime = rides.get(0).getStartTime();
+    ZonedDateTime startTime = legs.get(0).getStartTime();
     ZonedDateTime lastRideStartTime = startTime;
 
     float specialRouteFare = Float.POSITIVE_INFINITY;
     FareAttribute specialFareAttribute = null;
 
-    for (Leg ride : rides) {
-      lastRideStartTime = ride.getStartTime();
+    for (Leg leg : legs) {
+      lastRideStartTime = leg.getStartTime();
 
             /* HSL specific logic: all exception routes start and end from the defined zone set,
                but visit temporarily (maybe 1 stop only) an 'external' zone */
       float bestSpecialFare = Float.POSITIVE_INFINITY;
       Set<String> ruleZones = null;
       for (FareRuleSet ruleSet : fareRules) {
-        String routeOriginDestination = ride.getRoute() + ", " + ride.getFrom().stop.getFirstZoneAsString()+ ", " + ride.getFrom().stop.getFirstZoneAsString();
+        String routeOriginDestination = leg.getRoute() + ", " + leg.getFrom().stop.getFirstZoneAsString()+ ", " + leg.getTo().stop.getFirstZoneAsString();
         boolean isSpecialRoute = false;
         if(!ruleSet.getRouteOriginDestinations().isEmpty() && ruleSet.getRouteOriginDestinations().toString().indexOf(routeOriginDestination) != -1) {
           isSpecialRoute = true;
         }
-        if(isSpecialRoute || (ruleSet.getRoutes().contains(ride.getRoute()) &&
-          ruleSet.getContains().contains(ride.getFrom().stop.getFirstZoneAsString()) &&
-          ruleSet.getContains().contains(ride.getTo().stop.getFirstZoneAsString()))) {
+        if(isSpecialRoute || (ruleSet.getRoutes().contains(leg.getRoute()) &&
+          ruleSet.getContains().contains(leg.getFrom().stop.getFirstZoneAsString()) &&
+          ruleSet.getContains().contains(leg.getTo().stop.getFirstZoneAsString()))) {
           // check validity of this special rule and that it is the cheapest applicable one
           FareAttribute attribute = ruleSet.getFareAttribute();
           if (!attribute.isTransferDurationSet() ||
@@ -82,17 +82,17 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
       }
       if (ruleZones != null) { // the special case
         // evaluate boolean ride.zones AND rule.zones
-        Set<String> zoneIntersection = new HashSet<String>(ride.getFareZones().stream().map(z -> z.getId().getId()).toList());
+        Set<String> zoneIntersection = new HashSet<String>(leg.getFareZones().stream().map(z -> z.getId().getId()).toList());
         zoneIntersection.retainAll(ruleZones); // don't add temporarily visited zones
         zones.addAll(zoneIntersection);
       } else {
-        zones.addAll(ride.getFareZones().stream().map(z -> z.getId().getId()).toList());
+        zones.addAll(leg.getFareZones().stream().map(z -> z.getId().getId()).toList());
       }
     }
 
     FareAttribute bestAttribute = null;
     float bestFare = Float.POSITIVE_INFINITY;
-    long tripTime = Duration.between(lastRideStartTime, startTime).getSeconds();
+    long tripTime = Duration.between( startTime, lastRideStartTime).getSeconds();
 
     if(zones.size() > 0) {
       // find the best fare that matches this set of rides
@@ -123,7 +123,7 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
       bestFare = specialRouteFare;
       bestAttribute = specialFareAttribute;
     }
-    LOG.debug("HSL {} best for {}", bestAttribute, rides);
+    LOG.debug("HSL {} best for {}", bestAttribute, legs);
     return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
   }
 

@@ -15,7 +15,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -30,13 +29,14 @@ public class HSLFareServiceTest implements PlanTestConstants{
     String testCaseName, // used to create parameterized test name
     FareService fareService,
     Itinerary i,
-    FareAttribute expectedFare
+    List<String>
+      expectedFareIds
   ) {
-    Assertions.assertEquals(
-      expectedFare.getId(),
-      fareService.getCost(i).getDetails(Fare.FareType.regular).get(0).fareId
+    Assertions.assertArrayEquals(
+      expectedFareIds.toArray(),
+      fareService.getCost(i).getDetails(Fare.FareType.regular).stream().map(f -> f.fareId).toArray()
     );
-    System.out.println("=================");
+
   }
 
   private static List<Arguments> createTestCases() {
@@ -65,10 +65,8 @@ public class HSLFareServiceTest implements PlanTestConstants{
     float AB_PRICE = 2.80f;
     float BC_PRICE = 2.80f;
     float CD_PRICE = 3.20f;
-
     float ABC_PRICE = 4.10f;
     float BCD_PRICE = 4.10f;
-
     float ABCD_PRICE = 5.70f;
     float D_PRICE = 2.80f;
 
@@ -80,7 +78,6 @@ public class HSLFareServiceTest implements PlanTestConstants{
     FareAttribute fareAttributeAB = new FareAttribute(new FeedScopedId(FEED_ID, "AB"));
     FareAttribute fareAttributeBC = new FareAttribute(new FeedScopedId(FEED_ID, "BC"));
     FareAttribute fareAttributeCD = new FareAttribute(new FeedScopedId(FEED_ID, "CD"));
-
     FareAttribute fareAttributeABC = new FareAttribute(new FeedScopedId(FEED_ID, "ABC"));
     FareAttribute fareAttributeBCD = new FareAttribute(new FeedScopedId(FEED_ID, "BCD"));
     FareAttribute fareAttributeABCD = new FareAttribute(new FeedScopedId(FEED_ID, "ABCD"));
@@ -90,7 +87,6 @@ public class HSLFareServiceTest implements PlanTestConstants{
     fareAttributeAB.setCurrencyType("EUR");
     fareAttributeBC.setCurrencyType("EUR");
     fareAttributeCD.setCurrencyType("EUR");
-
     fareAttributeABC.setCurrencyType("EUR");
     fareAttributeBCD.setCurrencyType("EUR");
     fareAttributeABCD.setCurrencyType("EUR");
@@ -99,12 +95,19 @@ public class HSLFareServiceTest implements PlanTestConstants{
     fareAttributeAB.setPrice(AB_PRICE);
     fareAttributeBC.setPrice(BC_PRICE);
     fareAttributeCD.setPrice(CD_PRICE);
-
     fareAttributeABC.setPrice(ABC_PRICE);
     fareAttributeBCD.setPrice(BCD_PRICE);
-
     fareAttributeABCD.setPrice(ABCD_PRICE);
     fareAttributeD.setPrice(D_PRICE);
+
+    // Transfer times to test multiple tickets for itinerary
+    fareAttributeAB.setTransferDuration(60*5);
+    fareAttributeBC.setTransferDuration(60*5);
+    fareAttributeCD.setTransferDuration(60*5);
+    fareAttributeABC.setTransferDuration(60*5);
+    fareAttributeBCD.setTransferDuration(60*5);
+    fareAttributeABCD.setTransferDuration(60*5);
+    fareAttributeD.setTransferDuration(60*5);
 
     // Fare rule sets
     FareRuleSet ruleSetAB = new FareRuleSet(fareAttributeAB);
@@ -157,7 +160,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride within zone A", hslFareService, A1_A2, fareAttributeAB)
+      Arguments.of("Bus ride within zone A", hslFareService, A1_A2, List.of(fareAttributeAB.getId()))
     );
 
 
@@ -167,7 +170,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride within zone B", hslFareService, B1_B2, fareAttributeAB)
+      Arguments.of("Bus ride within zone B", hslFareService, B1_B2, List.of(fareAttributeAB.getId()))
     );
 
 
@@ -177,7 +180,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride within zone C", hslFareService, C1_C2, fareAttributeBC)
+      Arguments.of("Bus ride within zone C", hslFareService, C1_C2, List.of(fareAttributeBC.getId()))
     );
 
     // Itineraries within zone D
@@ -186,7 +189,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride within zone D", hslFareService, D1_D2, fareAttributeD)
+      Arguments.of("Bus ride within zone D", hslFareService, D1_D2, List.of(fareAttributeD.getId()))
     );
 
     // Itineraries between zones A and B
@@ -195,7 +198,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride between zones A and B", hslFareService, A1_B1, fareAttributeAB)
+      Arguments.of("Bus ride between zones A and B", hslFareService, A1_B1, List.of(fareAttributeAB.getId()))
     );
 
     // Itineraries between zones B and C
@@ -204,7 +207,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride between zones B and C", hslFareService, B1_C1, fareAttributeBC)
+      Arguments.of("Bus ride between zones B and C", hslFareService, B1_C1, List.of(fareAttributeBC.getId()))
     );
 
     // Itineraries between zones C and D
@@ -213,7 +216,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride between zones C and D", hslFareService, C1_D1, fareAttributeCD)
+      Arguments.of("Bus ride between zones C and D", hslFareService, C1_D1, List.of(fareAttributeCD.getId()))
     );
 
     // Itineraries between zones A and D
@@ -222,7 +225,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride between zones A and D", hslFareService, A1_D1, fareAttributeABCD)
+      Arguments.of("Bus ride between zones A and D", hslFareService, A1_D1, List.of(fareAttributeABCD.getId()))
     );
 
 
@@ -232,7 +235,7 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride between zones A and C", hslFareService, A1_C1, fareAttributeABC)
+      Arguments.of("Bus ride between zones A and C", hslFareService, A1_C1, List.of(fareAttributeABC.getId()))
     );
 
     // Itineraries between zones B and D
@@ -241,7 +244,18 @@ public class HSLFareServiceTest implements PlanTestConstants{
       .build();
 
     args.add(
-      Arguments.of("Bus ride between zones B and D", hslFareService, B1_D1, fareAttributeBCD)
+      Arguments.of("Bus ride between zones B and D", hslFareService, B1_D1, List.of(fareAttributeBCD.getId()))
+    );
+
+    Itinerary twoTicketsItinerary = newItinerary(A1, T11_20)
+      .bus(1, T11_20, T11_30, B1)
+      .bus(1, T11_33, T11_50, C1).
+      build();
+
+
+
+    args.add(
+      Arguments.of("Ride that needs two tickets", hslFareService, twoTicketsItinerary, List.of(fareAttributeAB.getId(), fareAttributeBC.getId()))
     );
 
 
