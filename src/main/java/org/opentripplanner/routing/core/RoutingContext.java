@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -21,7 +23,9 @@ public class RoutingContext {
 
   /* FINAL FIELDS */
 
-  public final RoutingRequest opt;
+  public final NewRouteRequest opt;
+
+  public final RoutingPreferences pref;
 
   public final Graph graph;
 
@@ -40,12 +44,14 @@ public class RoutingContext {
    * Constructor that automatically computes origin/target from TemporaryVerticesContainer.
    */
   public RoutingContext(
-    RoutingRequest routingRequest,
+    NewRouteRequest request,
+    RoutingPreferences preferences,
     Graph graph,
     TemporaryVerticesContainer temporaryVertices
   ) {
     this(
-      routingRequest,
+      request,
+      preferences,
       graph,
       temporaryVertices.getFromVertices(),
       temporaryVertices.getToVertices()
@@ -55,15 +61,16 @@ public class RoutingContext {
   /**
    * Constructor that takes to/from vertices as input.
    */
-  public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
-    this(routingRequest, graph, Collections.singleton(from), Collections.singleton(to));
+  public RoutingContext(NewRouteRequest request, RoutingPreferences preferences, Graph graph, Vertex from, Vertex to) {
+    this(request, preferences, graph, Collections.singleton(from), Collections.singleton(to));
   }
 
   /**
    * Constructor that takes sets of to/from vertices as input.
    */
   public RoutingContext(
-    RoutingRequest routingRequest,
+    NewRouteRequest request,
+    RoutingPreferences preferences,
     Graph graph,
     Set<Vertex> from,
     Set<Vertex> to
@@ -71,13 +78,14 @@ public class RoutingContext {
     if (graph == null) {
       throw new GraphNotFoundException();
     }
-    this.opt = routingRequest;
+    this.opt = request;
+    this.pref = preferences;
     this.graph = graph;
-    this.fromVertices = routingRequest.arriveBy ? to : from;
-    this.toVertices = routingRequest.arriveBy ? from : to;
+    this.fromVertices = request.arriveBy() ? to : from;
+    this.toVertices = request.arriveBy() ? from : to;
     this.dataOverlayContext =
       OTPFeature.DataOverlay.isOnElseNull(() ->
-        new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
+        new DataOverlayContext(graph.dataOverlayParameterBindings, preferences.system().dataOverlay())
       );
   }
 }

@@ -28,12 +28,13 @@ public class DirectStreetRouter {
       return Collections.emptyList();
     }
 
-    RoutingRequest directRequest = request.getStreetSearchRequest(request.modes().directMode);
+    NewRouteRequest directRequest = request.getStreetSearchRequest(request.journeyRequest().direct().mode(), preferences);
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
+      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest, preferences)
     ) {
       final RoutingContext routingContext = new RoutingContext(
         directRequest,
+        preferences,
         serverContext.graph(),
         temporaryVertices
       );
@@ -56,7 +57,7 @@ public class DirectStreetRouter {
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
+      ItinerariesHelper.decorateItinerariesWithRequestData(response, preferences.wheelchair());
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
@@ -70,7 +71,7 @@ public class DirectStreetRouter {
       routingContext.fromVertices.iterator().next().getCoordinate(),
       routingContext.toVertices.iterator().next().getCoordinate()
     );
-    return distance < calculateDistanceMaxLimit(routingContext.opt);
+    return distance < calculateDistanceMaxLimit(routingContext.opt, routingContext.pref);
   }
 
   /**
@@ -78,17 +79,18 @@ public class DirectStreetRouter {
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RoutingRequest.
    */
-  private static double calculateDistanceMaxLimit(RoutingRequest request) {
+  private static double calculateDistanceMaxLimit(NewRouteRequest request, RoutingPreferences preferences) {
     double distanceLimit;
-    StreetMode mode = request.modes.directMode;
-    double durationLimit = request.getMaxDirectStreetDuration(mode).toSeconds();
+    StreetMode mode = request.journeyRequest().direct().mode();
+
+    double durationLimit = preferences.street().maxDirectStreetDurationForMode().get(mode).toSeconds();
 
     if (mode.includesDriving()) {
-      distanceLimit = durationLimit * request.carSpeed;
+      distanceLimit = durationLimit * preferences.car().speed();
     } else if (mode.includesBiking()) {
-      distanceLimit = durationLimit * request.bikeSpeed;
+      distanceLimit = durationLimit * preferences.bike().speed();
     } else if (mode.includesWalking()) {
-      distanceLimit = durationLimit * request.walkSpeed;
+      distanceLimit = durationLimit * preferences.walk().speed();
     } else {
       throw new IllegalStateException("Could not set max limit for StreetMode");
     }

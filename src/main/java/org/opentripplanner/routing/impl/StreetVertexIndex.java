@@ -19,6 +19,8 @@ import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -182,12 +184,13 @@ public class StreetVertexIndex {
    */
   public Set<Vertex> getVerticesForLocation(
     GenericLocation location,
-    RoutingRequest options,
+    NewRouteRequest options,
+    RoutingPreferences preferences,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
     // Differentiate between driving and non-driving, as driving is not available from transit stops
-    TraverseMode nonTransitMode = getTraverseModeForLinker(options, endVertex);
+    TraverseMode nonTransitMode = getTraverseModeForLinker(options, preferences, endVertex);
 
     if (nonTransitMode.isDriving()) {
       // Fetch coordinate from stop, if not given in request
@@ -215,7 +218,7 @@ public class StreetVertexIndex {
 
     // Check if coordinate is provided and connect it to graph
     if (location.getCoordinate() != null) {
-      return Set.of(createVertexFromLocation(location, options, endVertex, tempEdges));
+      return Set.of(createVertexFromLocation(location, options, preferences, endVertex, tempEdges));
     }
 
     return null;
@@ -239,7 +242,8 @@ public class StreetVertexIndex {
    */
   public Vertex getVertexForLocationForTest(
     GenericLocation location,
-    RoutingRequest options,
+    NewRouteRequest options,
+    RoutingPreferences preferences,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -247,7 +251,7 @@ public class StreetVertexIndex {
     Coordinate coordinate = location.getCoordinate();
     if (coordinate != null) {
       //return getClosestVertex(loc, options, endVertex);
-      return createVertexFromLocation(location, options, endVertex, tempEdges);
+      return createVertexFromLocation(location, options, preferences, endVertex, tempEdges);
     }
 
     return null;
@@ -339,7 +343,8 @@ public class StreetVertexIndex {
 
   private Vertex createVertexFromLocation(
     GenericLocation location,
-    RoutingRequest options,
+    NewRouteRequest options,
+    RoutingPreferences preferences,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -367,7 +372,7 @@ public class StreetVertexIndex {
       endVertex
     );
 
-    TraverseMode nonTransitMode = getTraverseModeForLinker(options, endVertex);
+    TraverseMode nonTransitMode = getTraverseModeForLinker(options, preferences, endVertex);
 
     tempEdges.add(
       vertexLinker.linkVertexForRequest(
@@ -394,13 +399,13 @@ public class StreetVertexIndex {
     return temporaryStreetLocation;
   }
 
-  private TraverseMode getTraverseModeForLinker(RoutingRequest options, boolean endVertex) {
+  private TraverseMode getTraverseModeForLinker(NewRouteRequest options, RoutingPreferences preferences, boolean endVertex) {
     TraverseMode nonTransitMode = TraverseMode.WALK;
     //It can be null in tests
     if (options != null) {
-      TraverseModeSet modes = options.streetSubRequestModes;
+      TraverseModeSet modes = options.journeyRequest().streetSubRequestModes();
       // for park and ride we will start in car mode and walk to the end vertex
-      boolean parkAndRideDepart = modes.getCar() && options.parkAndRide && !endVertex;
+      boolean parkAndRideDepart = modes.getCar() && preferences.car().parkAndRide() && !endVertex;
       boolean onlyCarAvailable = modes.getCar() && !(modes.getWalk() || modes.getBicycle());
       if (onlyCarAvailable || parkAndRideDepart) {
         nonTransitMode = TraverseMode.CAR;
