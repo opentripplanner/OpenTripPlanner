@@ -261,12 +261,24 @@ public class NewRouteRequest {
     return this;
   }
 
+  public void setDateTime(Instant dateTime) {
+    this.dateTime = dateTime;
+  }
+
   public Instant dateTime() {
     return dateTime;
   }
 
+  public void setFrom(GenericLocation from) {
+    this.from = from;
+  }
+
   public GenericLocation from() {
     return from;
+  }
+
+  public void setTo(GenericLocation to) {
+    this.to = to;
   }
 
   public GenericLocation to() {
@@ -283,6 +295,10 @@ public class NewRouteRequest {
 
   public boolean timetableView() {
     return timetableView;
+  }
+
+  public void setArriveBy(boolean arriveBy) {
+    this.arriveBy = arriveBy;
   }
 
   public boolean arriveBy() {

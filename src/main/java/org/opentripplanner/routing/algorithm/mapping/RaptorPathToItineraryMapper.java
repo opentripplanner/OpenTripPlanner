@@ -20,6 +20,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -49,7 +51,9 @@ public class RaptorPathToItineraryMapper {
 
   private final TransitLayer transitLayer;
 
-  private final RoutingRequest request;
+  private final NewRouteRequest request;
+
+  private final RoutingPreferences preferences;
 
   private final ZonedDateTime transitSearchTimeZero;
 
@@ -68,12 +72,14 @@ public class RaptorPathToItineraryMapper {
     TransitService transitService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
-    RoutingRequest request
+    NewRouteRequest request,
+    RoutingPreferences preferences
   ) {
     this.graph = graph;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.request = request;
+    this.preferences = preferences;
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
@@ -98,12 +104,13 @@ public class RaptorPathToItineraryMapper {
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
+
       // Map transfer leg
       else if (pathLeg.isTransferLeg()) {
         legs.addAll(
           mapTransferLeg(
             pathLeg.asTransferLeg(),
-            request.modes.transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+            request.journeyRequest().transfer().mode() == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
           )
         );
       }
@@ -260,10 +267,12 @@ public class RaptorPathToItineraryMapper {
     } else {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges
       // may be re-traversed to create the leg(s) from the list of edges.
-      RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
-      traverseRequest.arriveBy = false;
+      NewRouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request, preferences);
+
+      traverseRequest.setArriveBy(false);
       RoutingContext routingContext = new RoutingContext(
         traverseRequest,
+        preferences,
         graph,
         (Vertex) null,
         null

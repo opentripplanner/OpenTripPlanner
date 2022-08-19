@@ -224,7 +224,7 @@ public class RoutingWorker {
   ) {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      itineraries.addAll(DirectStreetRouter.route(serverContext, request));
+      itineraries.addAll(DirectStreetRouter.route(serverContext, request, preferences));
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -242,7 +242,7 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      itineraries.addAll(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
+      itineraries.addAll(DirectFlexRouter.route(serverContext, request, preferences, additionalSearchDays));
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -255,6 +255,7 @@ public class RoutingWorker {
     try {
       var transitResults = TransitRouter.route(
         request,
+        preferences,
         serverContext,
         transitSearchTimeZero,
         additionalSearchDays,

@@ -27,6 +27,10 @@ public class VehicleRentalRequest {
     return useAvailabilityInformation;
   }
 
+  public void setAllowKeepingVehicleAtDestination(boolean allowKeepingVehicleAtDestination) {
+    this.allowKeepingVehicleAtDestination = allowKeepingVehicleAtDestination;
+  }
+
   public boolean allowKeepingVehicleAtDestination() {
     return allowKeepingVehicleAtDestination;
   }

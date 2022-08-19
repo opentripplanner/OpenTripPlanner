@@ -36,23 +36,63 @@ public class WalkPreferences {
    */
   private double stairsTimeFactor = 3.0;
 
+  /**
+   * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+   * If the value is set to be 0, safety is ignored.
+   */
+  private double safetyFactor = 1.0;
+
+  public void setSpeed(double speed) {
+    this.speed = speed;
+  }
+
   public double speed() {
     return speed;
+  }
+
+  public void setReluctance(double reluctance) {
+    this.reluctance = reluctance;
   }
 
   public double reluctance() {
     return reluctance;
   }
 
+  public void setBoardCost(int boardCost) {
+    this.boardCost = boardCost;
+  }
+
   public int boardCost() {
     return boardCost;
+  }
+
+  public void setStairsReluctance(double stairsReluctance) {
+    this.stairsReluctance = stairsReluctance;
   }
 
   public double stairsReluctance() {
     return stairsReluctance;
   }
 
+  public void setStairsTimeFactor(double stairsTimeFactor) {
+    this.stairsTimeFactor = stairsTimeFactor;
+  }
+
   public double stairsTimeFactor() {
     return stairsTimeFactor;
+  }
+
+  public void setSafetyFactor(double walkSafetyFactor) {
+    if (walkSafetyFactor < 0) {
+      this.safetyFactor = 0;
+    } else if (walkSafetyFactor > 1) {
+      this.safetyFactor = 1;
+    } else {
+      this.safetyFactor = walkSafetyFactor;
+    }
+  }
+
+  public double safetyFactor() {
+    return safetyFactor;
   }
 }

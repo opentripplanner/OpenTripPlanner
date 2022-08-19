@@ -47,6 +47,11 @@ public class StreetPreferences {
   private int elevatorBoardCost = 90;
   /** How long does it take to advance one floor on an elevator? */
   private int elevatorHopTime = 20;
+
+  // it is assumed that getting off an elevator is completely free
+  /** What is the cost of travelling one floor on an elevator? */
+  private int elevatorHopCost = 20;
+
   /**
    * Which path comparator to use
    *
@@ -55,36 +60,80 @@ public class StreetPreferences {
   @Deprecated
   private String pathComparator = null;
 
+  public void setMaxAccessEgressDuration(Duration maxAccessEgressDuration) {
+    this.maxAccessEgressDuration = maxAccessEgressDuration;
+  }
+
   public Duration maxAccessEgressDuration() {
     return maxAccessEgressDuration;
+  }
+
+  public void setMaxAccessEgressDurationForMode(Map<StreetMode, Duration> maxAccessEgressDurationForMode) {
+    this.maxAccessEgressDurationForMode = maxAccessEgressDurationForMode;
   }
 
   public Map<StreetMode, Duration> maxAccessEgressDurationForMode() {
     return maxAccessEgressDurationForMode;
   }
 
+  public void setMaxDirectStreetDuration(Duration maxDirectStreetDuration) {
+    this.maxDirectStreetDuration = maxDirectStreetDuration;
+  }
+
   public Duration maxDirectStreetDuration() {
     return maxDirectStreetDuration;
+  }
+
+  public void setMaxDirectStreetDurationForMode(Map<StreetMode, Duration> maxDirectStreetDurationForMode) {
+    this.maxDirectStreetDurationForMode = maxDirectStreetDurationForMode;
   }
 
   public Map<StreetMode, Duration> maxDirectStreetDurationForMode() {
     return maxDirectStreetDurationForMode;
   }
 
+  public void setTurnReluctance(double turnReluctance) {
+    this.turnReluctance = turnReluctance;
+  }
+
   public double turnReluctance() {
     return turnReluctance;
+  }
+
+  public void setElevatorBoardTime(int elevatorBoardTime) {
+    this.elevatorBoardTime = elevatorBoardTime;
   }
 
   public int elevatorBoardTime() {
     return elevatorBoardTime;
   }
 
+  public void setElevatorBoardCost(int elevatorBoardCost) {
+    this.elevatorBoardCost = elevatorBoardCost;
+  }
+
   public int elevatorBoardCost() {
     return elevatorBoardCost;
   }
 
+  public void setElevatorHopTime(int elevatorHopTime) {
+    this.elevatorHopTime = elevatorHopTime;
+  }
+
   public int elevatorHopTime() {
     return elevatorHopTime;
+  }
+
+  public void setPathComparator(String pathComparator) {
+    this.pathComparator = pathComparator;
+  }
+
+  public void setElevatorHopCost(int elevatorHopCost) {
+    this.elevatorHopCost = elevatorHopCost;
+  }
+
+  public int elevatorHopCost() {
+    return elevatorHopCost;
   }
 
   public String pathComparator() {

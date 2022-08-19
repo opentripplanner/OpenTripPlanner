@@ -9,6 +9,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -18,18 +20,20 @@ public class DirectFlexRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
-    RoutingRequest request,
+    NewRouteRequest request,
+    RoutingPreferences preferences,
     AdditionalSearchDays additionalSearchDays
   ) {
-    if (!StreetMode.FLEXIBLE.equals(request.modes.directMode)) {
+    if (!StreetMode.FLEXIBLE.equals(request.journeyRequest().direct().mode())) {
       return Collections.emptyList();
     }
-    RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+    NewRouteRequest directRequest = request.getStreetSearchRequest(request.journeyRequest().direct().mode(), preferences);
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
+      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest, preferences)
     ) {
       RoutingContext routingContext = new RoutingContext(
         directRequest,
+        preferences,
         serverContext.graph(),
         temporaryVertices
       );
@@ -51,9 +55,9 @@ public class DirectFlexRouter {
       FlexRouter flexRouter = new FlexRouter(
         serverContext.graph(),
         serverContext.transitService(),
-        serverContext.routerConfig().flexParameters(request),
-        directRequest.getDateTime(),
-        directRequest.arriveBy,
+        serverContext.routerConfig().flexParameters(preferences),
+        directRequest.dateTime(),
+        directRequest.arriveBy(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,

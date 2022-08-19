@@ -62,6 +62,10 @@ public class BikePreferences {
     return optimizeType;
   }
 
+  public void setSpeed(double speed) {
+    this.speed = speed;
+  }
+
   public double speed() {
     return speed;
   }
@@ -82,8 +86,16 @@ public class BikePreferences {
     return reluctance;
   }
 
+  public void setSwitchTime(int switchTime) {
+    this.switchTime = switchTime;
+  }
+
   public int switchTime() {
     return switchTime;
+  }
+
+  public void setSwitchCost(int switchCost) {
+    this.switchCost = switchCost;
   }
 
   public int switchCost() {
@@ -98,12 +110,24 @@ public class BikePreferences {
     return parkCost;
   }
 
+  public void setTriangleTimeFactor(double triangleTimeFactor) {
+    this.triangleTimeFactor = triangleTimeFactor;
+  }
+
   public double triangleTimeFactor() {
     return triangleTimeFactor;
   }
 
+  public void setTriangleSlopeFactor(double triangleSlopeFactor) {
+    this.triangleSlopeFactor = triangleSlopeFactor;
+  }
+
   public double triangleSlopeFactor() {
     return triangleSlopeFactor;
+  }
+
+  public void setTriangleSafetyFactor(double triangleSafetyFactor) {
+    this.triangleSafetyFactor = triangleSafetyFactor;
   }
 
   public double triangleSafetyFactor() {
