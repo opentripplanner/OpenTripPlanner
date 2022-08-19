@@ -135,6 +135,9 @@ public class RoutingRequestMapper {
         "useVehicleParkingAvailabilityInformation",
         dft.useVehicleParkingAvailabilityInformation
       );
+    request.unpreferredModes = c.asEnumSet("unpreferredModes", TransitMode.class);
+    request.unpreferredModeCost =
+      c.asLinearFunction("unpreferredModeCost", dft.unpreferredModeCost);
     request.unpreferredRouteCost =
       c.asLinearFunction("unpreferredRouteCost", dft.unpreferredRouteCost);
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);

@@ -185,6 +185,20 @@ multiplier for transit leg  travel time `x` (in seconds). Example configuration:
 }
 ```
 
+## Unpreferred transit modes
+Routing engine can be configured to define unpreferred transit modes by adding penalty. This is
+configured in `router-config.json` setting list of modes and a linear cost function. The function
+is defined as linear function of the form A + B x, where A is a fixed cost (in seconds) and B is
+reluctance multiplier for transit leg travel time x (in seconds). Example configuration:
+````JSON
+// router-config.json
+"routingDefaults": {
+"unpreferredModeCost": "840 + 1.5 x",
+"unpreferredModes": ["RAIL", "BUS"]
+}
+````
+
+
 ## Timeout
 
 In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not

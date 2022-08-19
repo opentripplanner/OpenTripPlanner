@@ -81,7 +81,7 @@ public class RouteCostCalculatorTest {
 
     // test creation of linear cost function
     double expected = (double) 300 + 1.0 * TRANSIT_TIME;
-    double actual = costParams.unnpreferredCost().apply(TRANSIT_TIME);
+    double actual = costParams.unpreferredCost().apply(TRANSIT_TIME);
 
     assertEquals(expected, actual);
   }

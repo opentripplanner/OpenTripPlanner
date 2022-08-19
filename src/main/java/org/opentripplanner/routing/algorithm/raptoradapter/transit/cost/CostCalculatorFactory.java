@@ -21,7 +21,16 @@ public class CostCalculatorFactory {
         new RouteCostCalculator(
           calculator,
           mcCostParams.unpreferredRoutes(),
-          mcCostParams.unnpreferredCost()
+          mcCostParams.unpreferredCost()
+        );
+    }
+
+    if (!mcCostParams.unpreferredModes().isEmpty()) {
+      calculator =
+        new UnpreferredModesCostCalculator(
+          calculator,
+          mcCostParams.unpreferredModes(),
+          mcCostParams.unpreferredModesCost()
         );
     }
 

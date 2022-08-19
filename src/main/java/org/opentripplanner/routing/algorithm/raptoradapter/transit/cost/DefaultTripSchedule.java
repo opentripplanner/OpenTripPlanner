@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -21,4 +22,10 @@ public interface DefaultTripSchedule extends RaptorTripSchedule {
    * give unpreferred routes or agencies a generalized-cost penalty.
    */
   FeedScopedId routeId();
+
+  /**
+   * This is not used by the default calculatorm but by the {@link UnpreferredModesCostCalculator} to
+   * give unpreferred modes a generalized-cost penalty
+   */
+  TransitMode transitMode();
 }

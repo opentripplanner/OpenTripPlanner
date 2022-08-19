@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import java.util.Set;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -18,6 +19,8 @@ public class McCostParamsBuilder {
   private WheelchairAccessibilityRequest accessibilityRequest;
   private Set<FeedScopedId> unpreferredRoutes;
   private DoubleFunction<Double> unpreferredCost;
+  private Set<TransitMode> unpreferredModes;
+  private DoubleFunction<Double> unpreferredModesCost;
 
   public McCostParamsBuilder() {
     this(McCostParams.DEFAULTS);
@@ -30,6 +33,8 @@ public class McCostParamsBuilder {
     this.waitReluctanceFactor = other.waitReluctanceFactor();
     this.accessibilityRequest = other.accessibilityRequirements();
     this.unpreferredRoutes = other.unpreferredRoutes();
+    this.unpreferredModes = other.unpreferredModes();
+    this.unpreferredModesCost = other.unpreferredModesCost();
   }
 
   public int boardCost() {
@@ -92,6 +97,24 @@ public class McCostParamsBuilder {
 
   public McCostParamsBuilder unpreferredCost(DoubleFunction<Double> unpreferredCost) {
     this.unpreferredCost = unpreferredCost;
+    return this;
+  }
+
+  public Set<TransitMode> unpreferredModes() {
+    return unpreferredModes;
+  }
+
+  public McCostParamsBuilder unpreferredModes(Set<TransitMode> unpreferredModes) {
+    this.unpreferredModes = unpreferredModes;
+    return this;
+  }
+
+  public DoubleFunction<Double> unpreferredModesCost() {
+    return unpreferredModesCost;
+  }
+
+  public McCostParamsBuilder unpreferredModesCost(DoubleFunction<Double> unpreferredModesCost) {
+    this.unpreferredModesCost = unpreferredModesCost;
     return this;
   }
 

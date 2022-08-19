@@ -28,6 +28,9 @@ public class McCostParamsMapper {
     builder.unpreferredRoutes(request.unpreferredRoutes.stream().collect(Collectors.toSet()));
     builder.unpreferredCost(request.unpreferredRouteCost);
 
+    builder.unpreferredModes(request.unpreferredModes);
+    builder.unpreferredModesCost(request.unpreferredModeCost);
+
     return builder.build();
   }
 

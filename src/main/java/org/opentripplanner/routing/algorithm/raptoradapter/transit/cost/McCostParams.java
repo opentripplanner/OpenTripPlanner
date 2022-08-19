@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -28,6 +29,8 @@ public class McCostParams {
   private final WheelchairAccessibilityRequest accessibilityRequest;
   private final Set<FeedScopedId> unpreferredRoutes;
   private final DoubleFunction<Double> unpreferredCost;
+  private final Set<TransitMode> unpreferredModes;
+  private final DoubleFunction<Double> unpreferredModesCost;
 
   /**
    * Default constructor defines default values. These defaults are overridden by defaults in the
@@ -41,6 +44,9 @@ public class McCostParams {
     this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
     this.unpreferredRoutes = Set.of();
     this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
+    this.unpreferredModes = Set.of();
+    this.unpreferredModesCost =
+      RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
   McCostParams(McCostParamsBuilder builder) {
@@ -51,6 +57,8 @@ public class McCostParams {
     this.accessibilityRequest = builder.wheelchairAccessibility();
     this.unpreferredRoutes = builder.unpreferredRoutes();
     this.unpreferredCost = builder.unpreferredCost();
+    this.unpreferredModes = builder.unpreferredModes();
+    this.unpreferredModesCost = builder.unpreferredModesCost();
   }
 
   public int boardCost() {
@@ -89,8 +97,16 @@ public class McCostParams {
     return unpreferredRoutes;
   }
 
-  public DoubleFunction<Double> unnpreferredCost() {
+  public DoubleFunction<Double> unpreferredCost() {
     return unpreferredCost;
+  }
+
+  public Set<TransitMode> unpreferredModes() {
+    return unpreferredModes;
+  }
+
+  public DoubleFunction<Double> unpreferredModesCost() {
+    return unpreferredModesCost;
   }
 
   @Override

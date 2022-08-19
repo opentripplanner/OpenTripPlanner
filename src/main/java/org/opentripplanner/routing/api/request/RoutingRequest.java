@@ -684,6 +684,19 @@ public class RoutingRequest implements Cloneable, Serializable {
    */
   public Set<RoutingTag> tags = Set.of();
 
+  /**
+   * Set of TransitModes that should have a penalty cost added to them during routing
+   */
+  public Set<TransitMode> unpreferredModes = Set.of();
+
+  /**
+   * The function applying a penalty cost to unpreferred TransitModes
+   */
+  public DoubleFunction<Double> unpreferredModeCost = RequestFunctions.createLinearFunction(
+    0.0,
+    DEFAULT_ROUTE_RELUCTANCE
+  );
+
   private Envelope fromEnvelope;
 
   private Envelope toEnvelope;

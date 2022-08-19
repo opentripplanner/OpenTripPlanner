@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor._data.transit;
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -26,6 +27,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
   private final int transitReluctanceIndex;
   private final WheelchairAccessibility wheelchairBoarding;
   private final FeedScopedId routeId;
+  private final TransitMode transitMode;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
@@ -33,7 +35,8 @@ public class TestTripSchedule implements DefaultTripSchedule {
     int[] departureTimes,
     int transitReluctanceIndex,
     WheelchairAccessibility wheelchairBoarding,
-    FeedScopedId routeId
+    FeedScopedId routeId,
+    TransitMode transitMode
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -41,6 +44,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
     this.transitReluctanceIndex = transitReluctanceIndex;
     this.wheelchairBoarding = wheelchairBoarding;
     this.routeId = routeId;
+    this.transitMode = transitMode;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -91,6 +95,11 @@ public class TestTripSchedule implements DefaultTripSchedule {
     return routeId;
   }
 
+  @Override
+  public TransitMode transitMode() {
+    return transitMode;
+  }
+
   public int size() {
     return arrivalTimes.length;
   }
@@ -120,6 +129,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
     private int transitReluctanceIndex = 0;
     private WheelchairAccessibility wheelchairBoarding = NO_INFORMATION;
     private FeedScopedId routeId;
+    private TransitMode transitMode;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -195,6 +205,11 @@ public class TestTripSchedule implements DefaultTripSchedule {
       return this;
     }
 
+    public TestTripSchedule.Builder transitMode() {
+      this.transitMode = transitMode;
+      return this;
+    }
+
     public TestTripSchedule build() {
       if (arrivalTimes == null) {
         arrivalTimes = copyWithOffset(departureTimes, -arrivalDepartureOffset);
@@ -225,13 +240,19 @@ public class TestTripSchedule implements DefaultTripSchedule {
       if (routeId == null) {
         routeId = new FeedScopedId(DEFAULT_ROUTE_FEED, DEFAULT_ROUTE_ID_STR);
       }
+
+      if (transitMode == null) {
+        transitMode = TransitMode.BUS;
+      }
+
       return new TestTripSchedule(
         pattern,
         arrivalTimes,
         departureTimes,
         transitReluctanceIndex,
         wheelchairBoarding,
-        routeId
+        routeId,
+        transitMode
       );
     }
 

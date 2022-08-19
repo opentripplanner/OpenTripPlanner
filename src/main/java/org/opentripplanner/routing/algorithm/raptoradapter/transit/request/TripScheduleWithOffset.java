@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -82,6 +83,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
   @Override
   public FeedScopedId routeId() {
     return routeId;
+  }
+
+  @Override
+  public TransitMode transitMode() {
+    return pattern.getTripPattern().getPattern().getMode();
   }
 
   /*
