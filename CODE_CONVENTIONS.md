@@ -60,3 +60,18 @@ These prefixes are also "allowed", but not preferred - they have some kind of ne
 | `getStop() : Stop`                          | Old style accessor, use the shorter form `stop() : Stop`                                              |
 
 
+###  Services, Models, Editors and Builders 
+Naming convention for builders with and without a context. 
+
+##### Graph Build and tests run without a context
+
+```Java
+// Create a new Stop
+trip = Trip.of(id).withName("The Express").build();
+
+// Modify and existing stop
+stop = stop.copyOf().withPrivateCode("TEX").build();
+```
+
+#### Updaters run with a context(editor)
+TODO See issue 4002 - Document when implemented
