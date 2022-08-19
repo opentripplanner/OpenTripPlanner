@@ -15,8 +15,8 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -40,7 +40,7 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
   }
 
   public static boolean isFlexStop(StopLocation stop) {
-    return stop instanceof FlexLocationGroup || stop instanceof FlexStopLocation;
+    return stop instanceof GroupStop || stop instanceof AreaStop;
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(

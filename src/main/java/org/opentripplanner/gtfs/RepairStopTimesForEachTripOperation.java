@@ -18,7 +18,7 @@ import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class RepairStopTimesForEachTripOperation {
       // if we don't have flex routing enabled then remove all the flex locations and location
       // groups
       if (OTPFeature.FlexRouting.isOff()) {
-        stopTimes.removeIf(st -> !(st.getStop() instanceof Stop));
+        stopTimes.removeIf(st -> !(st.getStop() instanceof RegularStop));
       }
 
       /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */

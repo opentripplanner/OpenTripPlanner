@@ -7,8 +7,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class FlexStopLocationBuilder
-  extends AbstractEntityBuilder<FlexStopLocation, FlexStopLocationBuilder> {
+public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBuilder> {
 
   private I18NString name;
   private boolean hasFallbackName;
@@ -19,11 +18,11 @@ public class FlexStopLocationBuilder
   private I18NString url;
   private String zoneId;
 
-  FlexStopLocationBuilder(FeedScopedId id) {
+  AreaStopBuilder(FeedScopedId id) {
     super(id);
   }
 
-  FlexStopLocationBuilder(@Nonnull FlexStopLocation original) {
+  AreaStopBuilder(@Nonnull AreaStop original) {
     super(original);
     // Optional fields
     this.name = original.getName();
@@ -35,7 +34,7 @@ public class FlexStopLocationBuilder
     this.centroid = original.getCoordinate();
   }
 
-  public FlexStopLocationBuilder withZoneId(String zoneId) {
+  public AreaStopBuilder withZoneId(String zoneId) {
     this.zoneId = zoneId;
     return this;
   }
@@ -45,26 +44,26 @@ public class FlexStopLocationBuilder
   }
 
   @Override
-  protected FlexStopLocation buildFromValues() {
-    return new FlexStopLocation(this);
+  protected AreaStop buildFromValues() {
+    return new AreaStop(this);
   }
 
-  public FlexStopLocationBuilder withName(I18NString name) {
+  public AreaStopBuilder withName(I18NString name) {
     this.name = name;
     return this;
   }
 
-  public FlexStopLocationBuilder withDescription(I18NString description) {
+  public AreaStopBuilder withDescription(I18NString description) {
     this.description = description;
     return this;
   }
 
-  public FlexStopLocationBuilder withUrl(I18NString url) {
+  public AreaStopBuilder withUrl(I18NString url) {
     this.url = url;
     return this;
   }
 
-  public FlexStopLocationBuilder withGeometry(Geometry geometry) {
+  public AreaStopBuilder withGeometry(Geometry geometry) {
     this.geometry = geometry;
     this.centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
     return this;

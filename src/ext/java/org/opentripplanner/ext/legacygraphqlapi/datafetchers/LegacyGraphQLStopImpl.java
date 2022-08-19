@@ -34,8 +34,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -418,7 +418,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             .getTransfersByStop(stop)
             .stream()
             .filter(transfer -> maxDistance == null || transfer.getDistanceMeters() < maxDistance)
-            .filter(transfer -> transfer.to instanceof Stop)
+            .filter(transfer -> transfer.to instanceof RegularStop)
             .map(transfer ->
               new NearbyStop(transfer.to, transfer.getDistanceMeters(), transfer.getEdges(), null)
             )

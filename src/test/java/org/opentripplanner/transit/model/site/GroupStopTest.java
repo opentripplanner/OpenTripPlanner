@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
-class FlexLocationGroupTest {
+class GroupStopTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
@@ -21,7 +21,7 @@ class FlexLocationGroupTest {
     1d,
     1d
   );
-  private static final FlexLocationGroup subject = FlexLocationGroup
+  private static final GroupStop subject = GroupStop
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
     .addLocation(STOP_LOCATION)

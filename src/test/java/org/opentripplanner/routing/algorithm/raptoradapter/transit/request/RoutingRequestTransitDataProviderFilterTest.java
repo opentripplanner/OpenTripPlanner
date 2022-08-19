@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
@@ -42,7 +42,11 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
 
-  private static final Stop STOP_FOR_TEST = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
+  private static final RegularStop STOP_FOR_TEST = TransitModelForTest.stopForTest(
+    "TEST:STOP",
+    0,
+    0
+  );
 
   private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
     WheelchairAccessibilityRequest.DEFAULT;

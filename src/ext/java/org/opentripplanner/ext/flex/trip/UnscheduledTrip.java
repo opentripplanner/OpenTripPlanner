@@ -24,7 +24,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -233,8 +233,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {
-    return stop instanceof FlexLocationGroup
-      ? ((FlexLocationGroup) stop).getLocations()
+    return stop instanceof GroupStop groupStop
+      ? groupStop.getLocations()
       : Collections.singleton(stop);
   }
 
@@ -244,8 +244,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
-      if (stop instanceof FlexLocationGroup) {
-        if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
+      if (stop instanceof GroupStop groupStop) {
+        if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {
@@ -263,8 +263,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
-      if (stop instanceof FlexLocationGroup) {
-        if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
+      if (stop instanceof GroupStop groupStop) {
+        if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {

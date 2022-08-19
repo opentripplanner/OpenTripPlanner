@@ -58,7 +58,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayMode;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -235,9 +235,9 @@ public abstract class GraphRoutingTest {
         .build();
     }
 
-    public Stop stopEntity(String id, double latitude, double longitude) {
+    public RegularStop stopEntity(String id, double latitude, double longitude) {
       var stop = TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
-      transitModel.mergeStopModels(StopModel.of().withStop(stop).build());
+      transitModel.mergeStopModels(StopModel.of().withRegularStop(stop).build());
       return stop;
     }
 

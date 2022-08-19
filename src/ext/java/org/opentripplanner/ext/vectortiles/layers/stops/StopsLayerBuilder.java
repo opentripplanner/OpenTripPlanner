@@ -10,12 +10,12 @@ import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class StopsLayerBuilder extends LayerBuilder<Stop> {
+public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
-  static Map<MapperType, Function<TransitService, PropertyMapper<Stop>>> mappers = Map.of(
+  static Map<MapperType, Function<TransitService, PropertyMapper<RegularStop>>> mappers = Map.of(
     MapperType.Digitransit,
     DigitransitStopPropertyMapper::create
   );
@@ -35,7 +35,7 @@ public class StopsLayerBuilder extends LayerBuilder<Stop> {
 
   protected List<Geometry> getGeometries(Envelope query) {
     return transitService
-      .queryStopSpatialIndex(query)
+      .findRegularStop(query)
       .stream()
       .map(stop -> {
         Geometry point = stop.getGeometry();

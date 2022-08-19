@@ -67,7 +67,7 @@ public class Station
     return new StationBuilder(id);
   }
 
-  void addChildStop(Stop stop) {
+  void addChildStop(RegularStop stop) {
     this.childStops.add(stop);
     this.geometry = computeGeometry(coordinate, childStops);
   }

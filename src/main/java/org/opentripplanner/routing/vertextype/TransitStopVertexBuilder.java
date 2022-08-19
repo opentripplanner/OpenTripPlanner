@@ -4,15 +4,15 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class TransitStopVertexBuilder {
 
-  private Stop stop;
+  private RegularStop stop;
   private Graph graph;
   private Set<TransitMode> modes;
 
-  public TransitStopVertexBuilder withStop(Stop stop) {
+  public TransitStopVertexBuilder withStop(RegularStop stop) {
     this.stop = stop;
     return this;
   }

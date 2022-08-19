@@ -19,9 +19,9 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -81,9 +81,9 @@ class TripPatternMapper {
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     EntityById<Operator> operatorById,
-    EntityById<Stop> stopsById,
-    EntityById<FlexStopLocation> flexStopLocationsById,
-    EntityById<FlexLocationGroup> flexLocationGroupsById,
+    EntityById<RegularStop> stopById,
+    EntityById<AreaStop> areaStopById,
+    EntityById<GroupStop> groupStopById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
     ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
@@ -92,7 +92,7 @@ class TripPatternMapper {
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
     ReadOnlyHierarchicalMap<String, ServiceJourney> serviceJourneyById,
     ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
-    ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById,
+    ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLineById,
     ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById,
     ReadOnlyHierarchicalMapById<DatedServiceJourney> datedServiceJourneyById,
     Multimap<String, DatedServiceJourney> datedServiceJourneysBySJId,
@@ -120,13 +120,13 @@ class TripPatternMapper {
       new StopTimesMapper(
         issueStore,
         idFactory,
-        stopsById,
-        flexStopLocationsById,
-        flexLocationGroupsById,
+        stopById,
+        areaStopById,
+        groupStopById,
         destinationDisplayById,
         quayIdByStopPointRef,
         flexibleStopPlaceIdByStopPointRef,
-        flexibleLinesById,
+        flexibleLineById,
         routeById
       );
     this.serviceLinkMapper =
@@ -134,7 +134,7 @@ class TripPatternMapper {
         idFactory,
         serviceLinkById,
         quayIdByStopPointRef,
-        stopsById,
+        stopById,
         issueStore,
         maxStopToShapeSnapDistance
       );
@@ -204,15 +204,13 @@ class TripPatternMapper {
       return result;
     }
 
-    // TODO OTP2 Trips containing FlexStopLocations are not added to StopPatterns until support
-    //           for this is added.
+    // TODO OTP2 - Trips containing AreaStops are not added to StopPatterns until support
+    //           - for this is added.
     if (
       result.tripStopTimes
         .get(trips.get(0))
         .stream()
-        .anyMatch(t ->
-          t.getStop() instanceof FlexStopLocation || t.getStop() instanceof FlexLocationGroup
-        )
+        .anyMatch(t -> t.getStop() instanceof AreaStop || t.getStop() instanceof GroupStop)
     ) {
       return result;
     }

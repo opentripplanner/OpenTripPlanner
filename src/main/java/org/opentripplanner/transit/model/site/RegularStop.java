@@ -19,7 +19,9 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class Stop extends StationElement<Stop, StopBuilder> implements StopLocation {
+public final class RegularStop
+  extends StationElement<RegularStop, RegularStopBuilder>
+  implements StopLocation {
 
   private final int index;
   private final String platformCode;
@@ -36,7 +38,7 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   private final Set<FareZone> fareZones;
 
-  Stop(StopBuilder builder) {
+  RegularStop(RegularStopBuilder builder) {
     super(builder);
     this.index = INDEX_COUNTER.getAndIncrement();
     this.platformCode = builder.platformCode();
@@ -51,8 +53,8 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
     }
   }
 
-  public static StopBuilder of(FeedScopedId id) {
-    return new StopBuilder(id);
+  public static RegularStopBuilder of(FeedScopedId id) {
+    return new RegularStopBuilder(id);
   }
 
   @Override
@@ -130,12 +132,12 @@ public final class Stop extends StationElement<Stop, StopBuilder> implements Sto
 
   @Override
   @Nonnull
-  public StopBuilder copy() {
-    return new StopBuilder(this);
+  public RegularStopBuilder copy() {
+    return new RegularStopBuilder(this);
   }
 
   @Override
-  public boolean sameAs(@Nonnull Stop other) {
+  public boolean sameAs(@Nonnull RegularStop other) {
     return (
       super.sameAs(other) &&
       Objects.equals(platformCode, other.platformCode) &&

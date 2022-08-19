@@ -19,9 +19,9 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.EntityById;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
@@ -54,11 +54,11 @@ class StopTimesMapper {
 
   private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
-  private final EntityById<Stop> stopsById;
+  private final EntityById<RegularStop> stopsById;
 
-  private final EntityById<FlexStopLocation> flexibleStopLocationsById;
+  private final EntityById<AreaStop> flexibleStopLocationsById;
 
-  private final EntityById<FlexLocationGroup> flexLocationGroupsByid;
+  private final EntityById<GroupStop> groupStopById;
 
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
@@ -75,9 +75,9 @@ class StopTimesMapper {
   StopTimesMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
-    EntityById<Stop> stopsById,
-    EntityById<FlexStopLocation> flexStopLocationsById,
-    EntityById<FlexLocationGroup> flexLocationGroupsById,
+    EntityById<RegularStop> stopsById,
+    EntityById<AreaStop> areaStopById,
+    EntityById<GroupStop> groupStopById,
     ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
     ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
@@ -88,8 +88,8 @@ class StopTimesMapper {
     this.idFactory = idFactory;
     this.destinationDisplayById = destinationDisplayById;
     this.stopsById = stopsById;
-    this.flexibleStopLocationsById = flexStopLocationsById;
-    this.flexLocationGroupsByid = flexLocationGroupsById;
+    this.flexibleStopLocationsById = areaStopById;
+    this.groupStopById = groupStopById;
     this.quayIdByStopPointRef = quayIdByStopPointRef;
     this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
     this.flexibleLinesById = flexibleLinesById;
@@ -240,9 +240,7 @@ class StopTimesMapper {
       stopTimes.size() == 2 &&
       stopTimes
         .stream()
-        .allMatch(s ->
-          s.getStop() instanceof FlexStopLocation || s.getStop() instanceof FlexLocationGroup
-        )
+        .allMatch(s -> s.getStop() instanceof AreaStop || s.getStop() instanceof GroupStop)
     ) {
       int departureTime = stopTimes.get(0).getDepartureTime();
       int arrivalTime = stopTimes.get(1).getArrivalTime();
@@ -408,16 +406,12 @@ class StopTimesMapper {
     if (stopId != null) {
       stopLocation = stopsById.get(idFactory.createId(stopId));
     } else {
-      FlexStopLocation flexStopLocation = flexibleStopLocationsById.get(
-        idFactory.createId(flexibleStopPlaceId)
-      );
-      FlexLocationGroup flexLocationGroup = flexLocationGroupsByid.get(
-        idFactory.createId(flexibleStopPlaceId)
-      );
+      AreaStop areaStop = flexibleStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
+      GroupStop groupStop = groupStopById.get(idFactory.createId(flexibleStopPlaceId));
 
-      if (flexStopLocation != null) {
-        stopLocation = flexStopLocation;
-      } else stopLocation = flexLocationGroup;
+      if (areaStop != null) {
+        stopLocation = areaStop;
+      } else stopLocation = groupStop;
     }
 
     if (stopLocation == null) {

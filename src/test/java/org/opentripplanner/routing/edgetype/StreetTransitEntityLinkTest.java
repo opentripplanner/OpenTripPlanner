@@ -20,7 +20,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -29,7 +29,7 @@ class StreetTransitEntityLinkTest {
   private static Graph graph;
   private static TransitModel transitModel;
 
-  Stop inaccessibleStop = TransitModelForTest.stopForTest(
+  RegularStop inaccessibleStop = TransitModelForTest.stopForTest(
     "A:inaccessible",
     "wheelchair inaccessible stop",
     10.001,
@@ -37,7 +37,7 @@ class StreetTransitEntityLinkTest {
     null,
     NOT_POSSIBLE
   );
-  Stop accessibleStop = TransitModelForTest.stopForTest(
+  RegularStop accessibleStop = TransitModelForTest.stopForTest(
     "A:accessible",
     "wheelchair accessible stop",
     10.001,
@@ -46,7 +46,7 @@ class StreetTransitEntityLinkTest {
     POSSIBLE
   );
 
-  Stop unknownStop = TransitModelForTest.stopForTest(
+  RegularStop unknownStop = TransitModelForTest.stopForTest(
     "A:unknown",
     "unknown",
     10.001,
@@ -84,7 +84,7 @@ class StreetTransitEntityLinkTest {
     assertNull(afterStrictTraversal);
   }
 
-  private State traverse(Stop stop, boolean onlyAccessible) {
+  private State traverse(RegularStop stop, boolean onlyAccessible) {
     var from = new SimpleVertex(graph, "A", 10, 10);
     var to = new TransitStopVertexBuilder()
       .withGraph(graph)

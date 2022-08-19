@@ -11,18 +11,18 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
-class StopMapper {
+class QuayMapper {
 
   private final DataImportIssueStore issueStore;
 
   private final FeedScopedIdFactory idFactory;
 
-  StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
+  QuayMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
   }
@@ -31,7 +31,7 @@ class StopMapper {
    * Map Netex Quay to OTP Stop
    */
   @Nullable
-  Stop mapQuayToStop(
+  RegularStop mapQuayToStop(
     Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
@@ -45,7 +45,7 @@ class StopMapper {
       return null;
     }
 
-    var builder = Stop
+    var builder = RegularStop
       .of(idFactory.createId(quay.getId()))
       .withParentStation(parentStation)
       .withName(parentStation.getName())

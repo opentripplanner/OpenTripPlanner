@@ -13,8 +13,8 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlanPlaceType {
 
@@ -79,8 +79,8 @@ public class PlanPlaceType {
           .description("The quay related to the place.")
           .type(quayType)
           .dataFetcher(environment ->
-            ((Place) environment.getSource()).stop instanceof Stop
-              ? ((Stop) ((Place) environment.getSource()).stop)
+            ((Place) environment.getSource()).stop instanceof RegularStop
+              ? ((RegularStop) ((Place) environment.getSource()).stop)
               : null
           )
           .build()
@@ -92,9 +92,8 @@ public class PlanPlaceType {
           .description("The flexible area related to the place.")
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
           .dataFetcher(environment ->
-            ((Place) environment.getSource()).stop instanceof FlexStopLocation
-              ? ((FlexStopLocation) ((Place) environment.getSource()).stop).getGeometry()
-                .getCoordinates()
+            ((Place) environment.getSource()).stop instanceof AreaStop
+              ? ((AreaStop) ((Place) environment.getSource()).stop).getGeometry().getCoordinates()
               : null
           )
           .build()

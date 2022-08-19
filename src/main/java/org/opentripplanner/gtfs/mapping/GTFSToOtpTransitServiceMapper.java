@@ -14,8 +14,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.OTPFeature;
 
 /**
@@ -86,7 +86,7 @@ public class GTFSToOtpTransitServiceMapper {
   ) {
     // Create callbacks for mappers to retrieve stop and stations
     Function<FeedScopedId, Station> stationLookup = id -> builder.getStations().get(id);
-    Function<FeedScopedId, Stop> stopLookup = id -> builder.getStops().get(id);
+    Function<FeedScopedId, RegularStop> stopLookup = id -> builder.getStops().get(id);
 
     this.issueStore = issueStore;
     this.data = data;
@@ -144,7 +144,7 @@ public class GTFSToOtpTransitServiceMapper {
     if (OTPFeature.FlexRouting.isOn()) {
       // Stop areas and Stop groups are only used in FLEX routes
       builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
-      builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
+      builder.getGroupStops().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
     }
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));

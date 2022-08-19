@@ -19,8 +19,8 @@ public class GenericLocation {
   public final String label;
 
   /**
-   * Refers to a specific element in the OTP model. This can currently be a stop, station,
-   * multi-modal station or group of stations.
+   * Refers to a specific element in the OTP model. This can currently be a regular stop, area stop,
+   * group stop, station, multi-modal station or group of stations.
    */
   public final FeedScopedId stopId;
 

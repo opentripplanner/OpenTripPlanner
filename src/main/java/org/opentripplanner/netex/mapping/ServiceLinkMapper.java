@@ -18,7 +18,7 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -36,7 +36,7 @@ class ServiceLinkMapper {
   private final FeedScopedIdFactory idFactory;
   private final ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById;
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
-  private final EntityById<Stop> stopById;
+  private final EntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
 
@@ -44,7 +44,7 @@ class ServiceLinkMapper {
     FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-    EntityById<Stop> stopById,
+    EntityById<RegularStop> stopById,
     DataImportIssueStore issueStore,
     double maxStopToShapeSnapDistance
   ) {
@@ -168,10 +168,10 @@ class ServiceLinkMapper {
     int stopIndex
   ) {
     String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
-    Stop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
+    RegularStop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
 
     String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
-    Stop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
+    RegularStop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
 
     if (fromPointStop == null || toPointStop == null) {
       issueStore.add(
