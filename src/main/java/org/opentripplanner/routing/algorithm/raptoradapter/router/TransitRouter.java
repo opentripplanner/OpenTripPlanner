@@ -256,7 +256,7 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
+    NewRouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request, preferences);
 
     return new RaptorRoutingRequestTransitData(
       transitLayer,
@@ -264,14 +264,14 @@ public class TransitRouter {
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       createRequestTransitDataProviderFilter(serverContext.transitService()),
-      new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null)
+      new RoutingContext(transferRoutingRequest, preferences, serverContext.graph(), (Vertex) null, null)
     );
   }
 
   private TransitDataProviderFilter createRequestTransitDataProviderFilter(
     TransitService transitService
   ) {
-    return new RoutingRequestTransitDataProviderFilter(request, transitService);
+    return new RoutingRequestTransitDataProviderFilter(request, preferences, transitService);
   }
 
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {

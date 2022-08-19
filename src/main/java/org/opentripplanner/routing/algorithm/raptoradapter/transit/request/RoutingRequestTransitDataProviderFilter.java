@@ -8,6 +8,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -48,16 +50,17 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   }
 
   public RoutingRequestTransitDataProviderFilter(
-    RoutingRequest request,
+    NewRouteRequest request,
+    RoutingPreferences preferences,
     TransitService transitService
   ) {
     this(
-      request.modes.transferMode == StreetMode.BIKE,
-      request.wheelchairAccessibility,
-      request.includePlannedCancellations,
-      request.modes.transitModes,
-      request.getBannedRoutes(transitService.getAllRoutes()),
-      request.bannedTrips
+      request.journeyRequest().transfer().mode() == StreetMode.BIKE,
+      preferences.wheelchair().accessibility(),
+      preferences.transit().includePlannedCancellations(),
+      request.journeyRequest().transit().modes(),
+      request.journeyRequest().transit().bannedRoutes(transitService.getAllRoutes()),
+      request.journeyRequest().transit().bannedTrips()
     );
   }
 
