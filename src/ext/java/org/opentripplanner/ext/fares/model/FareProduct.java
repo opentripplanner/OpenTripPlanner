@@ -15,7 +15,7 @@ public record FareProduct(
   FareContainer container
 ) {
   public boolean coversItinerary(Itinerary i) {
-    var transitLegs = i.getTransitLegs();
+    var transitLegs = i.getScheduledTransitLegs();
     var allLegsInProductFeed = transitLegs
       .stream()
       .allMatch(leg -> leg.getAgency().getId().getFeedId().equals(id.getFeedId()));

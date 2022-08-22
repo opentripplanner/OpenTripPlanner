@@ -39,7 +39,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
   public ProductResult getProducts(Itinerary itinerary) {
     var legProducts = itinerary
-      .getTransitLegs()
+      .getScheduledTransitLegs()
       .stream()
       .map(this::getLegProduct)
       .filter(lp -> !lp.products().isEmpty())

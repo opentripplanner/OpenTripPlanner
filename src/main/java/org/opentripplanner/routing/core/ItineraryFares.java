@@ -24,10 +24,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class ItineraryFares {
 
   /**
-   * A mapping from {@link FareType} to a list of {@link FareComponent}. The FareComponents are
-   * stored in an array instead of a list because JAXB doesn't know how to deal with interfaces when
-   * serializing a trip planning response, and List is an interface. See
-   * https://stackoverflow.com/a/1119241/778449
+   * A mapping from {@link FareType} to a list of {@link FareComponent}.
    */
   private final HashMap<FareType, List<FareComponent>> details = new HashMap<>();
   private final Set<FareProduct> itineraryProducts = new HashSet<>();
@@ -43,7 +40,8 @@ public class ItineraryFares {
     }
   }
 
-  public ItineraryFares() {}
+  public ItineraryFares() {
+  }
 
   public static ItineraryFares empty() {
     return new ItineraryFares();
@@ -77,6 +75,14 @@ public class ItineraryFares {
     return details.get(type);
   }
 
+  public Set<FareType> getTypes() {
+    return fare.keySet();
+  }
+
+  public void addLegProducts(Collection<LegProducts> legProducts) {
+    legProducts.forEach(lp -> this.legProducts.putAll(lp.leg(), lp.products()));
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(fare, details, itineraryProducts, legProducts);
@@ -87,11 +93,7 @@ public class ItineraryFares {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ItineraryFares fare1 = (ItineraryFares) o;
-    return (
-      Objects.equals(details, fare1.details) &&
-      Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
-      Objects.equals(legProducts, fare1.legProducts)
-    );
+    return (Objects.equals(details, fare1.details) && Objects.equals(itineraryProducts, fare1.itineraryProducts) && Objects.equals(legProducts, fare1.legProducts));
   }
 
   @Override
@@ -99,22 +101,7 @@ public class ItineraryFares {
     return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
   }
 
-  public Set<FareType> getTypes() {
-    return fare.keySet();
-  }
-
-  public void addLegProducts(Collection<LegProducts> legProducts) {
-    legProducts.forEach(lp -> this.legProducts.putAll(lp.leg(), lp.products()));
-  }
-
-  public void updateAllCurrencies(Currency newCurrency) {}
-
   public enum FareType implements Serializable {
-    regular,
-    student,
-    senior,
-    tram,
-    special,
-    youth,
+    regular, student, senior, tram, special, youth,
   }
 }

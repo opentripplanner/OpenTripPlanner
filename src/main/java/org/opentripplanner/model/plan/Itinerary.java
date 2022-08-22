@@ -479,17 +479,24 @@ public class Itinerary {
     this.arrivedAtDestinationWithRentedVehicle = arrivedAtDestinationWithRentedVehicle;
   }
 
+  /**
+   * Get the index of a leg when you want to reference it in an API response, for example when you
+   * want to say that a fare is valid for legs 2 and 3.
+   */
   public int getLegIndex(Leg leg) {
     var index = legs.indexOf(leg);
+    // the filter pipeline can also modify the identity of Leg instances. that's why we not only
+    // check that but also the start and end point as a replacement for the identity.
     if (index > -1) {
       return index;
     } else {
-      return legs
-        .stream()
-        .filter(l -> l.getFrom().sameLocation(leg.getFrom()) && l.getTo().sameLocation(leg.getTo()))
-        .findFirst()
-        .map(legs::indexOf)
-        .orElse(-1);
+      for (int i = 0; i < legs.size() - 1; i++) {
+        var currentLeg = legs.get(i);
+        if(currentLeg.getFrom().sameLocation(leg.getFrom()) && currentLeg.getTo().sameLocation(leg.getTo())){
+          return i;
+        }
+      }
+      return -1;
     }
   }
 
@@ -504,7 +511,7 @@ public class Itinerary {
     this.fare = fare;
   }
 
-  public List<ScheduledTransitLeg> getTransitLegs() {
+  public List<ScheduledTransitLeg> getScheduledTransitLegs() {
     return getLegs()
       .stream()
       .filter(ScheduledTransitLeg.class::isInstance)
