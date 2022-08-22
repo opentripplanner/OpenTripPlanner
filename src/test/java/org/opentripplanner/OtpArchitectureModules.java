@@ -20,7 +20,7 @@ public interface OtpArchitectureModules {
     .subPackage("routing")
     .subPackage("algorithm")
     .subPackage("raptoradapter");
-  Package RAPTOR_ADAPTER_TRANSIT = RAPTOR_ADAPTER.subPackage("transit");
+  Package RAPTOR_ADAPTER_API = RAPTOR_ADAPTER.subPackage("api");
 
   /**
    * This is a bag of TRUE util classes - no dependencies to other OTP classes of frameworks.

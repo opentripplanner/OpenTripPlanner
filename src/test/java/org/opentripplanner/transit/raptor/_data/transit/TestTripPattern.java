@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class TestTripPattern implements DefaultTripPattern {

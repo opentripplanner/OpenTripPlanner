@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.CompactLineStringUtils;

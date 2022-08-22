@@ -5,7 +5,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
