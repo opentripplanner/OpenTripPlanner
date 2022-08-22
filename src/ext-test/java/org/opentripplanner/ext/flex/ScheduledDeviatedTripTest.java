@@ -26,7 +26,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.ItineraryFares.FareType;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;

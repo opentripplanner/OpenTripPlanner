@@ -10,7 +10,7 @@ import java.util.Set;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.routing.core.ItineraryFares.FareType;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

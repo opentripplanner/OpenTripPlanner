@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
@@ -30,7 +31,7 @@ public class FaresFilterTest implements PlanTestConstants {
     input.forEach(i -> assertEquals(ItineraryFares.empty(), i.getFares()));
 
     var twoEighty = new ItineraryFares();
-    twoEighty.addFare(ItineraryFares.FareType.regular, Money.euros(280));
+    twoEighty.addFare(FareType.regular, Money.euros(280));
 
     var filter = new FaresFilter((FareService) itinerary -> twoEighty);
     var filtered = filter.filter(input);

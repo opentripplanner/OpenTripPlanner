@@ -15,7 +15,7 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -41,7 +41,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   ) {
     Assertions.assertEquals(
       Money.usDollars(Math.round(expectedFare * 100)),
-      fareService.getCost(i).getFare(ItineraryFares.FareType.regular)
+      fareService.getCost(i).getFare(FareType.regular)
     );
   }
 

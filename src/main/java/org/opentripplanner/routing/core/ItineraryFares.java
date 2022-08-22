@@ -3,9 +3,7 @@ package org.opentripplanner.routing.core;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,7 +99,4 @@ public class ItineraryFares {
     return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
   }
 
-  public enum FareType implements Serializable {
-    regular, student, senior, tram, special, youth,
-  }
 }

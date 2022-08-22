@@ -19,7 +19,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.ItineraryFares;
-import org.opentripplanner.routing.core.ItineraryFares.FareType;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
