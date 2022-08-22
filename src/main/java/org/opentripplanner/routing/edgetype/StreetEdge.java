@@ -304,12 +304,13 @@ public class StreetEdge
       return calculateCarSpeed();
     }
 
-    final double speed = switch (traverseMode) {
-      case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
-      case BICYCLE -> preferences.bike().speed();
-      case CAR -> preferences.car().speed();
-      default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
-    };
+    final double speed =
+      switch (traverseMode) {
+        case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
+        case BICYCLE -> preferences.bike().speed();
+        case CAR -> preferences.car().speed();
+        default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
+      };
 
     return isStairs() ? (speed / preferences.walk().stairsTimeFactor()) : speed;
   }
@@ -1143,11 +1144,11 @@ public class StreetEdge
         double slope = getEffectiveBikeDistanceForWorkCost();
         weight =
           quick *
-            pref.bike().triangleTimeFactor() +
+          pref.bike().triangleTimeFactor() +
           slope *
-            pref.bike().triangleSlopeFactor() +
+          pref.bike().triangleSlopeFactor() +
           safety *
-            pref.bike().triangleSafetyFactor();
+          pref.bike().triangleSafetyFactor();
         weight /= speed;
       }
       default -> weight = getDistanceMeters() / speed;
@@ -1196,7 +1197,7 @@ public class StreetEdge
       time = getEffectiveWalkDistance() / speed;
       weight =
         getEffectiveWalkSafetyDistance() *
-          preferences.walk().safetyFactor() +
+        preferences.walk().safetyFactor() +
         getEffectiveWalkDistance() *
         (1 - preferences.walk().safetyFactor());
       weight /= speed;

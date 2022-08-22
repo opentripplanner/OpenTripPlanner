@@ -4,7 +4,8 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -70,13 +71,17 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   private ShortestPathTree routeToMany(Vertex vertex) {
-    RoutingRequest routingRequest = new RoutingRequest(TraverseMode.CAR);
-    routingRequest.arriveBy = reverseDirection;
+    // TODO: 2022-08-22 guess this should not be a problem since we are using defaults for everything
+    // TODO: 2022-08-22 maybe use builder pattern?
+    NewRouteRequest routingRequest = new NewRouteRequest(TraverseMode.CAR);
+    routingRequest.setArriveBy(reverseDirection);
+    RoutingPreferences preferences = new RoutingPreferences();
+
     RoutingContext rctx;
     if (reverseDirection) {
-      rctx = new RoutingContext(routingRequest, graph, null, vertex);
+      rctx = new RoutingContext(routingRequest, preferences, graph, null, vertex);
     } else {
-      rctx = new RoutingContext(routingRequest, graph, vertex, null);
+      rctx = new RoutingContext(routingRequest, preferences, graph, vertex, null);
     }
 
     return AStarBuilder

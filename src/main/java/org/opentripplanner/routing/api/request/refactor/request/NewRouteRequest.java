@@ -126,6 +126,17 @@ public class NewRouteRequest {
    */
   private Duration maxJourneyDuration = Duration.ofHours(24);
 
+  public NewRouteRequest() {
+    // So that they are never null.
+    from = new GenericLocation(null, null);
+    to = new GenericLocation(null, null);
+  }
+
+  public NewRouteRequest(TraverseMode mode) {
+    this();
+    this.journeyRequest.setStreetSubRequestModes(new TraverseModeSet(mode));
+  }
+
   /**
    * Adjust the 'dateTime' if the page cursor is set to "goto next/previous page". The date-time is
    * used for many things, for example finding the days to search, but the transit search is using

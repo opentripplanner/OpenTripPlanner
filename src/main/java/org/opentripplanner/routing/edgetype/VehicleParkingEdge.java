@@ -2,6 +2,8 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -49,13 +51,14 @@ public class VehicleParkingEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
-    RoutingRequest options = s0.getOptions();
+    NewRouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
-    if (!options.parkAndRide) {
+    if (!preferences.car().parkAndRide()) {
       return null;
     }
 
-    if (options.arriveBy) {
+    if (options.arriveBy()) {
       return traverseUnPark(s0);
     } else {
       return traversePark(s0);
@@ -83,28 +86,33 @@ public class VehicleParkingEdge extends Edge {
   }
 
   protected State traverseUnPark(State s0) {
-    RoutingRequest options = s0.getOptions();
+    NewRouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
     if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
       return null;
     }
 
-    if (options.streetSubRequestModes.getBicycle()) {
-      return traverseUnPark(s0, options.bikeParkCost, options.bikeParkTime, TraverseMode.BICYCLE);
-    } else if (options.streetSubRequestModes.getCar()) {
-      return traverseUnPark(s0, options.carParkCost, options.carParkTime, TraverseMode.CAR);
+    if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
+      return traverseUnPark(s0, preferences.bike().parkCost(), preferences.bike().parkTime(), TraverseMode.BICYCLE);
+    } else if (options.journeyRequest().streetSubRequestModes().getCar()) {
+      return traverseUnPark(s0, preferences.car().parkCost(), preferences.car().parkTime(), TraverseMode.CAR);
     } else {
       return null;
     }
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
-    RoutingRequest options = s0.getOptions();
+    NewRouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
+
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
-        options.wheelchairAccessibility.enabled(),
-        options.useVehicleParkingAvailabilityInformation
+        preferences.wheelchair().accessibility().enabled(),
+        // TODO: 2022-08-22 this can't be right
+        // how do we figure out whether it should be access, egress or direct?
+        options.journeyRequest().access().vehicleParking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -118,34 +126,38 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0) {
-    RoutingRequest options = s0.getOptions();
+    NewRouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
-    if (!options.streetSubRequestModes.getWalk() || s0.isVehicleParked()) {
+    if (!options.journeyRequest().streetSubRequestModes().getWalk() || s0.isVehicleParked()) {
       return null;
     }
 
-    if (options.streetSubRequestModes.getBicycle()) {
+    if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
       // Parking a rented bike is not allowed
       if (s0.isRentingVehicle()) {
         return null;
       }
 
-      return traversePark(s0, options.bikeParkCost, options.bikeParkTime);
-    } else if (options.streetSubRequestModes.getCar()) {
-      return traversePark(s0, options.carParkCost, options.carParkTime);
+      return traversePark(s0, preferences.bike().parkCost(), preferences.bike().parkTime());
+    } else if (options.journeyRequest().streetSubRequestModes().getCar()) {
+      return traversePark(s0, preferences.car().parkCost(), preferences.car().parkTime());
     } else {
       return null;
     }
   }
 
   private State traversePark(State s0, int parkingCost, int parkingTime) {
-    RoutingRequest options = s0.getOptions();
+    NewRouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
     if (
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
-        options.wheelchairAccessibility.enabled(),
-        options.useVehicleParkingAvailabilityInformation
+        preferences.wheelchair().accessibility().enabled(),
+        // TODO: 2022-08-22 this can't be right
+        // how do we figure out whether it should be access, egress or direct?
+        options.journeyRequest().access().vehicleParking().useAvailabilityInformation()
       )
     ) {
       return null;
