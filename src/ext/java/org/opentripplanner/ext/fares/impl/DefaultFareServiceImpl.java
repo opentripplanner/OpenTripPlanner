@@ -133,10 +133,6 @@ public class DefaultFareServiceImpl implements FareService {
     return new Money(currency, cents);
   }
 
-  protected float addFares(List<Leg> ride0, List<Leg> ride1, float cost0, float cost1) {
-    return cost0 + cost1;
-  }
-
   protected float getLowestCost(
     FareType fareType,
     List<Leg> rides,
@@ -268,12 +264,7 @@ public class DefaultFareServiceImpl implements FareService {
         r.resultTable[j][j + i] = cost;
         r.fareIds[j][j + i] = best.fareId;
         for (int k = 0; k < i; k++) {
-          float via = addFares(
-            rides.subList(j, j + k + 1),
-            rides.subList(j + k + 1, j + i + 1),
-            r.resultTable[j][j + k],
-            r.resultTable[j + k + 1][j + i]
-          );
+          float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
           if (r.resultTable[j][j + i] > via) {
             r.resultTable[j][j + i] = via;
             r.endOfComponent[j] = j + i;
