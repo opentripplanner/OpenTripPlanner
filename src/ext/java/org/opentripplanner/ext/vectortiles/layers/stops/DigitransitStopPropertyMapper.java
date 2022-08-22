@@ -11,10 +11,10 @@ import org.json.simple.JSONObject;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
-public class DigitransitStopPropertyMapper extends PropertyMapper<Stop> {
+public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
   private final TransitService transitService;
 
@@ -27,7 +27,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<Stop> {
   }
 
   @Override
-  public Collection<T2<String, Object>> map(Stop stop) {
+  public Collection<T2<String, Object>> map(RegularStop stop) {
     Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
 
     String type = patternsForStop

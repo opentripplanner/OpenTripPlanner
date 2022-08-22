@@ -23,7 +23,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -90,7 +90,7 @@ public class FakeGraph {
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
         String id = Integer.toString(count++);
-        Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+        RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
         new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
       }
     }
@@ -102,7 +102,7 @@ public class FakeGraph {
     double lon = -83;
     for (double lat = 40; lat < 40.01; lat += 0.005) {
       String id = "EXTRA_" + count++;
-      Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+      RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
       new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
     }
 
@@ -110,7 +110,7 @@ public class FakeGraph {
     lon = -83.1341 + 0.1;
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       String id = "DUPE_" + count++;
-      Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+      RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
       new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
     }
 
@@ -118,7 +118,7 @@ public class FakeGraph {
     lon = -83.1341 + 0.15;
     for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
       String id = "ALMOST_" + count++;
-      Stop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+      RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
       new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
     }
   }

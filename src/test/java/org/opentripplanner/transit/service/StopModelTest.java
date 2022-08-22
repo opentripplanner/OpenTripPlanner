@@ -11,12 +11,12 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 class StopModelTest {
@@ -35,22 +35,19 @@ class StopModelTest {
     .build();
   private static final String EXP_STATIONS = List.of(STATION).toString();
 
-  private static final Stop STOP = Stop
+  private static final RegularStop STOP = RegularStop
     .of(ID)
     .withCoordinate(COOR_A)
     .withName(NAME)
     .withParentStation(STATION)
     .build();
   private static final String EXP_STOPS = List.of(STOP).toString();
-  private static final FlexStopLocation STOP_AREA = FlexStopLocation
+  private static final AreaStop STOP_AREA = AreaStop
     .of(ID)
     .withName(NAME)
     .withGeometry(GEOMETRY)
     .build();
-  private static final FlexLocationGroup STOP_GROUP = FlexLocationGroup
-    .of(ID)
-    .addLocation(STOP)
-    .build();
+  private static final GroupStop STOP_GROUP = GroupStop.of(ID).addLocation(STOP).build();
   private static final MultiModalStation MM_STATION = MultiModalStation
     .of(ID)
     .withName(NAME)
@@ -68,7 +65,7 @@ class StopModelTest {
 
   @Test
   void testStop() {
-    var m = StopModel.of().withStop(STOP).build();
+    var m = StopModel.of().withRegularStop(STOP).build();
     assertEquals(STOP, m.getRegularStop(ID));
     assertEquals(STOP, m.getStopLocation(ID));
     assertEquals(EXP_STOPS, m.listRegularStops().toString());
@@ -76,44 +73,44 @@ class StopModelTest {
     assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(STOP, m.stopByIndex(STOP.getIndex()));
     assertEquals(COOR_A, m.getCoordinateById(ID));
-    assertFalse(m.hasFlexLocations());
+    assertFalse(m.hasAreaStops());
   }
 
   @Test
-  void testStopArea() {
-    var m = StopModel.of().withFlexStop(STOP_AREA).build();
-    assertEquals(STOP_AREA, m.getFlexStopById(ID));
+  void testAreaStop() {
+    var m = StopModel.of().withAreaStop(STOP_AREA).build();
+    assertEquals(STOP_AREA, m.getAreaStop(ID));
     assertEquals(STOP_AREA, m.getStopLocation(ID));
-    assertEquals("[FlexStopLocation{F:A Name}]", m.getAllFlexLocations().toString());
-    assertEquals("[FlexStopLocation{F:A Name}]", m.listStopLocations().toString());
+    assertEquals("[AreaStop{F:A Name}]", m.listAreaStops().toString());
+    assertEquals("[AreaStop{F:A Name}]", m.listStopLocations().toString());
     assertEquals(STOP_AREA, m.stopByIndex(STOP_AREA.getIndex()));
     assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(COOR_A, m.getCoordinateById(ID));
-    assertTrue(m.hasFlexLocations());
+    assertTrue(m.hasAreaStops());
   }
 
   @Test
   void testStopGroup() {
-    var m = StopModel.of().withFlexStopGroup(STOP_GROUP).build();
-    assertEquals("[FlexLocationGroup{F:A}]", m.getAllFlexStopGroups().toString());
-    assertEquals("[FlexLocationGroup{F:A}]", m.listStopLocations().toString());
+    var m = StopModel.of().withGroupStop(STOP_GROUP).build();
+    assertEquals("[GroupStop{F:A}]", m.listGroupStops().toString());
+    assertEquals("[GroupStop{F:A}]", m.listStopLocations().toString());
     assertEquals(STOP_GROUP, m.stopByIndex(STOP_GROUP.getIndex()));
     assertEquals(COOR_A, m.stopLocationCenter().orElseThrow());
     assertEquals(COOR_A, m.getCoordinateById(ID));
-    assertFalse(m.hasFlexLocations());
+    assertFalse(m.hasAreaStops());
   }
 
   @Test
   void testStations() {
     var m = StopModel.of().withStation(STATION).build();
     assertEquals(STATION, m.getStationById(ID));
-    assertEquals(EXP_STATIONS, m.getStations().toString());
+    assertEquals(EXP_STATIONS, m.listStations().toString());
     assertEquals(STATION, m.getStopLocationsGroup(ID));
-    assertEquals(EXP_STOPS, m.getStopOrChildStops(ID).toString());
+    assertEquals(EXP_STOPS, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_STATIONS, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
     assertTrue(m.stopLocationCenter().isEmpty());
-    assertFalse(m.hasFlexLocations());
+    assertFalse(m.hasAreaStops());
   }
 
   @Test
@@ -121,24 +118,24 @@ class StopModelTest {
     var m = StopModel.of().withMultiModalStation(MM_STATION).build();
     assertEquals(MM_STATION, m.getMultiModalStation(ID));
     assertEquals(MM_STATION, m.getMultiModalStationForStation(STATION));
-    assertEquals(EXP_MM_STATIONS, m.getAllMultiModalStations().toString());
+    assertEquals(EXP_MM_STATIONS, m.listMultiModalStations().toString());
     assertEquals(MM_STATION, m.getStopLocationsGroup(ID));
-    assertEquals(EXP_STOPS, m.getStopOrChildStops(ID).toString());
+    assertEquals(EXP_STOPS, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_MM_STATIONS, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
     assertTrue(m.stopLocationCenter().isEmpty());
-    assertFalse(m.hasFlexLocations());
+    assertFalse(m.hasAreaStops());
   }
 
   @Test
   void testGroupOfStations() {
     var m = StopModel.of().withGroupOfStation(GROUP_OF_STATIONS).build();
-    assertEquals(EXP_GROUP_OF_STATION, m.getAllGroupOfStations().toString());
+    assertEquals(EXP_GROUP_OF_STATION, m.listGroupOfStations().toString());
     assertEquals(GROUP_OF_STATIONS, m.getStopLocationsGroup(ID));
-    assertEquals(EXP_STOPS, m.getStopOrChildStops(ID).toString());
+    assertEquals(EXP_STOPS, m.findStopOrChildStops(ID).toString());
     assertEquals(EXP_GROUP_OF_STATION, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
     assertTrue(m.stopLocationCenter().isEmpty());
-    assertFalse(m.hasFlexLocations());
+    assertFalse(m.hasAreaStops());
   }
 }

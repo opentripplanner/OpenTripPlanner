@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -21,7 +21,7 @@ public interface GraphFinder {
    */
   static GraphFinder getInstance(
     Graph graph,
-    Function<Envelope, Collection<Stop>> queryNearbyStops
+    Function<Envelope, Collection<RegularStop>> queryNearbyStops
   ) {
     return graph.hasStreets
       ? new StreetGraphFinder(graph)

@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -38,12 +38,16 @@ import org.opentripplanner.transit.service.TransitModel;
 class OsmBoardingLocationsModuleTest {
 
   File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  Stop platform = TransitModelForTest
+  RegularStop platform = TransitModelForTest
     .stop("de:08115:4512:4:101")
     .withCoordinate(48.59328, 8.86128)
     .build();
-  Stop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
-  Stop floatingBusStop = TransitModelForTest.stopForTest("floating-bus-stop", 48.59417, 8.86464);
+  RegularStop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
+  RegularStop floatingBusStop = TransitModelForTest.stopForTest(
+    "floating-bus-stop",
+    48.59417,
+    8.86464
+  );
 
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(

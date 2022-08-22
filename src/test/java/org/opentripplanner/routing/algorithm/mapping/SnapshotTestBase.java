@@ -131,14 +131,14 @@ public abstract class SnapshotTestBase {
     for (int i = 0; i < itineraries.size(); i++) {
       Itinerary itinerary = itineraries.get(i);
       System.out.printf(
-        "Itinerary %2d - duration: %s [%5d] (effective: %s [%5d]) - wait time: %d seconds, transit time: %d seconds\n",
+        "Itinerary %2d - duration: %s [%5s] (effective: %s [%5s]) - wait time: %s, transit time: %s \n",
         i,
-        TimeUtils.timeToStrCompact(itinerary.getDurationSeconds()),
-        itinerary.getDurationSeconds(),
-        TimeUtils.timeToStrCompact(itinerary.effectiveDurationSeconds()),
-        itinerary.effectiveDurationSeconds(),
-        itinerary.getWaitingTimeSeconds(),
-        itinerary.getTransitTimeSeconds()
+        TimeUtils.durationToStrCompact(itinerary.getDuration()),
+        itinerary.getDuration(),
+        TimeUtils.durationToStrCompact(itinerary.effectiveDuration()),
+        itinerary.effectiveDuration(),
+        itinerary.getWaitingDuration(),
+        itinerary.getTransitDuration()
       );
 
       for (int j = 0; j < itinerary.getLegs().size(); j++) {

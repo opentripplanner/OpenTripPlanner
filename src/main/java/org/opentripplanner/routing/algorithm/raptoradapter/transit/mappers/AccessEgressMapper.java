@@ -8,12 +8,12 @@ import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AccessEgressMapper {
 
   public AccessEgress mapNearbyStop(NearbyStop nearbyStop, boolean isEgress) {
-    if (!(nearbyStop.stop instanceof Stop)) {
+    if (!(nearbyStop.stop instanceof RegularStop)) {
       return null;
     }
 

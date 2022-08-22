@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -311,10 +312,13 @@ public class Timetable implements Serializable {
         );
       }
     }
-    if (!newTimes.timesIncreasing()) {
+
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
+    if (invalidStopIndex.isPresent()) {
       LOG.error(
-        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {}.",
-        tripId
+        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
+        tripId,
+        invalidStopIndex.getAsInt()
       );
       return null;
     }

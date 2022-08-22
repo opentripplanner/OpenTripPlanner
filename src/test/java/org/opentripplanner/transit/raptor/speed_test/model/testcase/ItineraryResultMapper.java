@@ -81,7 +81,7 @@ class ItineraryResultMapper {
         .map(id -> buf.sep().stop(id).sep());
 
       if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration());
+        buf.walk((int) leg.getDuration().toSeconds());
       } else if (leg.isTransitLeg()) {
         buf.transit(
           leg.getMode().name() + " " + leg.getRoute().getShortName(),
@@ -130,7 +130,7 @@ class ItineraryResultMapper {
     return new Result(
       testCaseId,
       itinerary.getNumberOfTransfers(),
-      itinerary.getDurationSeconds(),
+      itinerary.getDuration(),
       itinerary.getGeneralizedCost(),
       itinerary
         .getLegs()

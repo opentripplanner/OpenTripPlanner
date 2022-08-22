@@ -20,8 +20,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -42,7 +42,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
-  private Boolean addExtraEdgesToAreas;
+  private final Boolean addExtraEdgesToAreas;
 
   public StreetLinkerModule(
     Graph graph,
@@ -100,10 +100,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
       stopLocationsUsedForFlexTrips.addAll(
         stopLocationsUsedForFlexTrips
           .stream()
-          .filter(s -> s instanceof FlexLocationGroup)
-          .flatMap(g ->
-            ((FlexLocationGroup) g).getLocations().stream().filter(e -> e instanceof Stop)
-          )
+          .filter(GroupStop.class::isInstance)
+          .map(GroupStop.class::cast)
+          .flatMap(g -> g.getLocations().stream().filter(RegularStop.class::isInstance))
           .toList()
       );
     }

@@ -37,8 +37,8 @@ import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -121,7 +121,7 @@ public class AddTransitModelEntitiesToGraph {
 
     // Add a vertex representing the stop.
     // It is now possible for these vertices to not be connected to any edges.
-    for (Stop stop : otpTransitService.stopModel().listRegularStops()) {
+    for (RegularStop stop : otpTransitService.stopModel().listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = new TransitStopVertexBuilder()
         .withStop(stop)

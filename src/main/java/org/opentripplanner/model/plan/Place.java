@@ -10,7 +10,7 @@ import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -95,7 +95,7 @@ public class Place {
   public static Place forFlexStop(StopLocation stop, Vertex vertex) {
     var name = stop.getName();
 
-    if (stop instanceof FlexStopLocation flexArea && vertex instanceof StreetVertex s) {
+    if (stop instanceof AreaStop flexArea && vertex instanceof StreetVertex s) {
       if (flexArea.hasFallbackName()) {
         name = s.getIntersectionName();
       } else {

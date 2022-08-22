@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -151,7 +151,7 @@ public class StopAndStationMapperTest {
 
     stopMapper.mapParentAndChildStops(stopPlaces);
 
-    Collection<Stop> stops = stopMapper.resultStops;
+    Collection<RegularStop> stops = stopMapper.resultStops;
     Collection<Station> stations = stopMapper.resultStations;
 
     assertEquals(3, stops.size());
@@ -162,17 +162,17 @@ public class StopAndStationMapperTest {
       .filter(s -> s.getId().getId().equals("NSR:StopPlace:1"))
       .findFirst()
       .get();
-    Stop childStop1 = stops
+    RegularStop childStop1 = stops
       .stream()
       .filter(s -> s.getId().getId().equals("NSR:Quay:1"))
       .findFirst()
       .get();
-    Stop childStop2 = stops
+    RegularStop childStop2 = stops
       .stream()
       .filter(s -> s.getId().getId().equals("NSR:Quay:2"))
       .findFirst()
       .get();
-    Stop childStop3 = stops
+    RegularStop childStop3 = stops
       .stream()
       .filter(s -> s.getId().getId().equals("NSR:Quay:3"))
       .findFirst()
@@ -241,13 +241,13 @@ public class StopAndStationMapperTest {
   private void assertWheelchairAccessibility(
     String quayId,
     WheelchairAccessibility expected,
-    List<Stop> stops
+    List<RegularStop> stops
   ) {
     var wheelchairAccessibility = stops
       .stream()
       .filter(s -> s.getId().getId().equals(quayId))
       .findAny()
-      .map(Stop::getWheelchairAccessibility)
+      .map(RegularStop::getWheelchairAccessibility)
       .orElse(null);
 
     assertNotNull(wheelchairAccessibility, "wheelchairAccessibility must not be null");

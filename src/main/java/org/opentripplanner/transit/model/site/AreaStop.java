@@ -15,8 +15,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * GTFS bundle.
  */
 
-public class FlexStopLocation
-  extends AbstractTransitEntity<FlexStopLocation, FlexStopLocationBuilder>
+public class AreaStop
+  extends AbstractTransitEntity<AreaStop, AreaStopBuilder>
   implements StopLocation {
 
   private final int index;
@@ -34,7 +34,7 @@ public class FlexStopLocation
 
   private final WgsCoordinate centroid;
 
-  FlexStopLocation(FlexStopLocationBuilder builder) {
+  AreaStop(AreaStopBuilder builder) {
     super(builder.getId());
     this.index = INDEX_COUNTER.getAndIncrement();
     // according to the spec stop location names are optional for flex zones so, we set the id
@@ -53,8 +53,8 @@ public class FlexStopLocation
     this.centroid = Objects.requireNonNull(builder.centroid());
   }
 
-  public static FlexStopLocationBuilder of(FeedScopedId id) {
-    return new FlexStopLocationBuilder(id);
+  public static AreaStopBuilder of(FeedScopedId id) {
+    return new AreaStopBuilder(id);
   }
 
   @Override
@@ -121,7 +121,7 @@ public class FlexStopLocation
   }
 
   @Override
-  public boolean sameAs(@Nonnull FlexStopLocation other) {
+  public boolean sameAs(@Nonnull AreaStop other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
@@ -134,7 +134,7 @@ public class FlexStopLocation
 
   @Override
   @Nonnull
-  public FlexStopLocationBuilder copy() {
-    return new FlexStopLocationBuilder(this);
+  public AreaStopBuilder copy() {
+    return new AreaStopBuilder(this);
   }
 }

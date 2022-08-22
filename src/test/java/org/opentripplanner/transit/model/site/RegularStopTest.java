@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
-class StopTest {
+class RegularStopTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
@@ -34,7 +34,7 @@ class StopTest {
   public static final ZoneId TIME_ZONE = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
 
-  private static final Stop subject = Stop
+  private static final RegularStop subject = RegularStop
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)

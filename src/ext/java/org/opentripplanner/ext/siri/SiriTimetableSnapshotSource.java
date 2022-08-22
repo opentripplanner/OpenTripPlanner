@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import static com.google.common.base.Strings.lenientFormat;
 import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -748,10 +750,16 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     pattern.add(tripTimes);
 
-    Preconditions.checkState(
-      tripTimes.timesIncreasing(),
-      "Non-increasing triptimes for added trip"
-    );
+    tripTimes
+      .findFirstNoneIncreasingStopTime()
+      .ifPresent(invalidStopIndex -> {
+        throw new IllegalStateException(
+          String.format(
+            "Non-increasing triptimes for added trip at stop index %d",
+            invalidStopIndex
+          )
+        );
+      });
 
     return addTripToGraphAndBuffer(
       feedId,

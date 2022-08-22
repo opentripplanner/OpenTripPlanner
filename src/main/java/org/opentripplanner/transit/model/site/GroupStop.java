@@ -14,8 +14,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 /**
  * A group of stopLocations, which can share a common Stoptime
  */
-public class FlexLocationGroup
-  extends AbstractTransitEntity<FlexLocationGroup, FlexLocationGroupBuilder>
+public class GroupStop
+  extends AbstractTransitEntity<GroupStop, GroupStopBuilder>
   implements StopLocation {
 
   private final int index;
@@ -25,7 +25,7 @@ public class FlexLocationGroup
 
   private final WgsCoordinate centroid;
 
-  FlexLocationGroup(FlexLocationGroupBuilder builder) {
+  GroupStop(GroupStopBuilder builder) {
     super(builder.getId());
     this.index = INDEX_COUNTER.getAndIncrement();
     this.name = builder.name();
@@ -34,8 +34,8 @@ public class FlexLocationGroup
     this.stopLocations = builder.stopLocations();
   }
 
-  public static FlexLocationGroupBuilder of(FeedScopedId id) {
-    return new FlexLocationGroupBuilder(id);
+  public static GroupStopBuilder of(FeedScopedId id) {
+    return new GroupStopBuilder(id);
   }
 
   @Override
@@ -101,7 +101,7 @@ public class FlexLocationGroup
   }
 
   @Override
-  public boolean sameAs(@Nonnull FlexLocationGroup other) {
+  public boolean sameAs(@Nonnull GroupStop other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
@@ -111,7 +111,7 @@ public class FlexLocationGroup
 
   @Override
   @Nonnull
-  public FlexLocationGroupBuilder copy() {
-    return new FlexLocationGroupBuilder(this);
+  public GroupStopBuilder copy() {
+    return new GroupStopBuilder(this);
   }
 }

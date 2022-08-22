@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopBuilder;
 
 class GroupByAllSameStationsTest implements PlanTestConstants {
 
@@ -82,7 +82,7 @@ class GroupByAllSameStationsTest implements PlanTestConstants {
   }
 
   static Place place(String name, double lat, double lon, Station parent) {
-    StopBuilder stop = TransitModelForTest.stop(name).withCoordinate(lat, lon);
+    RegularStopBuilder stop = TransitModelForTest.stop(name).withCoordinate(lat, lon);
     if (parent != null) {
       stop.withParentStation(parent);
     }
