@@ -20,7 +20,7 @@ public class FareProductMapper {
 
     Duration duration = null;
     if (fareProduct.getDurationUnit() != NOT_SET) {
-      duration = toTemporalUnit(fareProduct.getDurationUnit(), fareProduct.getDurationAmount());
+      duration = toDuration(fareProduct.getDurationUnit(), fareProduct.getDurationAmount());
     }
     return new FareProduct(
       id,
@@ -46,7 +46,7 @@ public class FareProductMapper {
     }
   }
 
-  private static TemporalAmount toTemporalAmount(int unit, int amount) {
+  private static Duration toDuration(int unit, int amount) {
     return switch (unit) {
       case 0 -> Duration.ofSeconds(amount);
       case 1 -> Duration.ofMinutes(amount);
