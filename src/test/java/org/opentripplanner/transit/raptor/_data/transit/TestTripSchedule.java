@@ -3,9 +3,9 @@ package org.opentripplanner.transit.raptor._data.transit;
 import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
 
 import java.util.Arrays;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
@@ -13,12 +13,12 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
  * <p>
- * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
+ * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
 public class TestTripSchedule implements DefaultTripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
-  private final RaptorTripPattern pattern;
+  private final DefaultTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
@@ -67,7 +67,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
   }
 
   @Override
-  public RaptorTripPattern pattern() {
+  public DefaultTripPattern pattern() {
     return pattern;
   }
 
