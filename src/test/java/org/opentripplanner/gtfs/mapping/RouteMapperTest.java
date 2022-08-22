@@ -143,7 +143,7 @@ public class RouteMapperTest {
 
     assertEquals(
       List.of(NETWORK_ID),
-      result.getGroupsOfRoutes().stream().map(GroupOfRoutes::getPrivateCode).toList()
+      result.getGroupsOfRoutes().stream().map(g -> g.getId().getId()).toList()
     );
   }
 

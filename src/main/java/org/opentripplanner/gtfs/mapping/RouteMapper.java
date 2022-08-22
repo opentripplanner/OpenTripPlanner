@@ -69,8 +69,6 @@ class RouteMapper {
     if (rhs.getNetworkId() != null) {
       var networkId = GroupOfRoutes
         .of(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId()))
-        .withName("Network id %s".formatted(rhs.getNetworkId()))
-        .withPrivateCode(rhs.getNetworkId())
         .build();
       lhs.getGroupsOfRoutes().add(networkId);
     }

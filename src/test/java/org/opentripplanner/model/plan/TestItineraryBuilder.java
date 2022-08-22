@@ -4,6 +4,7 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.time.LocalDate;
@@ -214,11 +215,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Route route = RAIL_ROUTE;
     if (networkId != null) {
       var builder = RAIL_ROUTE.copy();
-      var group = GroupOfRoutes
-        .of(new FeedScopedId("1", networkId))
-        .withPrivateCode(networkId)
-        .withName(networkId)
-        .build();
+      var group = GroupOfRoutes.of(new FeedScopedId(FEED_ID, networkId)).build();
       builder.getGroupsOfRoutes().add(group);
       route = builder.build();
     }

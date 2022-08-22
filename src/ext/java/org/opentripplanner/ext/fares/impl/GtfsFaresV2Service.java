@@ -117,7 +117,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .getRoute()
       .getGroupsOfRoutes()
       .stream()
-      .map(GroupOfRoutes::getPrivateCode)
+      .map(group -> group.getId().getId())
       .filter(Objects::nonNull)
       .toList();
 

@@ -16,7 +16,7 @@ public class FareProductMapper {
     var currency = Currency.getInstance(fareProduct.getCurrency());
     var price = new Money(
       currency,
-      (int) (fareProduct.getAmount() * Math.pow(10,currency.getDefaultFractionDigits()))
+      (int) (fareProduct.getAmount() * Math.pow(10, currency.getDefaultFractionDigits()))
     );
 
     Duration duration = null;
