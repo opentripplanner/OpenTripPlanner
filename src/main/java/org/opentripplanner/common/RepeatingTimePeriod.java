@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.function.Supplier;
 
 /**
  * Represents a repeating time period, used for opening hours etc. For instance: Monday - Friday 8AM
@@ -15,7 +16,6 @@ import java.time.ZonedDateTime;
  */
 public class RepeatingTimePeriod implements Serializable {
 
-  private static final long serialVersionUID = -5977328371879835782L;
   /**
    * The timezone this is represented in.
    */
@@ -32,9 +32,8 @@ public class RepeatingTimePeriod implements Serializable {
   private int[][] saturday;
   private int[][] sunday;
 
-  private RepeatingTimePeriod() {
-    // TODO: Timezone/locale
-    this.timeZone = ZoneId.of("GMT");
+  public RepeatingTimePeriod(ZoneId timeZone) {
+    this.timeZone = timeZone;
   }
 
   /**
@@ -44,8 +43,14 @@ public class RepeatingTimePeriod implements Serializable {
     String day_on,
     String day_off,
     String hour_on,
-    String hour_off
+    String hour_off,
+    Supplier<ZoneId> timeZoneSupplier
   ) {
+    ZoneId timeZone = timeZoneSupplier.get();
+    if (timeZone == null) {
+      return null;
+    }
+
     // first, create the opening and closing times. This is easy because there is the same one
     // every day of the week that this restriction is in force.
     String[] parsedOn = hour_on.split(";");
@@ -61,7 +66,7 @@ public class RepeatingTimePeriod implements Serializable {
     }
 
     boolean active = false;
-    RepeatingTimePeriod ret = new RepeatingTimePeriod();
+    RepeatingTimePeriod ret = new RepeatingTimePeriod(timeZone);
 
     // loop through twice to handle cases like Saturday - Tuesday
     for (String today : new String[] {
