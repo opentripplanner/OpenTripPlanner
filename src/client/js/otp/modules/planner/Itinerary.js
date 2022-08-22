@@ -115,14 +115,15 @@ otp.modules.planner.Itinerary = otp.Class({
             tr.appendChild(nameCell);
             tr.appendChild(catCell);
             tr.appendChild(containerCell);
-
             const decimalPlaces = p.amount.currency.defaultFractionDigits;
-            const fare_info = {
-                'currency': p.amount.currency.symbol,
-                'price': (p.amount.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces),
-            }
-            //TRANSLATORS: Fare Currency Fare price
-            const price = _tr(`%(currency)s %(price)s`, fare_info) + "\n";
+            const amount = (p.amount.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces);
+            const price = new Intl.NumberFormat('en-US',
+                {
+                    style: 'currency',
+                    currency: p.amount.currency.currencyCode,
+                    maximumFractionDigits: p.amount.currency.defaultFractionDigits,
+                }
+            ).format(amount);
             const priceCell = document.createElement("td");
             priceCell.textContent = price;
             tr.appendChild(priceCell);
