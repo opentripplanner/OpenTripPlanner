@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.util.time.ServiceDateUtils.secondsSinceStartOfTime;
 
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -110,7 +111,7 @@ class RaptorRoutingRequestTransitDataCreator {
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
       // Calculate offsets per date
-      List<Integer> offsets = new ArrayList<>();
+      TIntList offsets = new TIntArrayList();
       for (TripPatternForDate tripPatternForDate : patternsSorted) {
         offsets.add(
           secondsSinceStartOfTime(transitSearchTimeZero, tripPatternForDate.getLocalDate())

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import gnu.trove.list.TIntList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
@@ -62,13 +63,13 @@ public class TripPatternForDates
   TripPatternForDates(
     RoutingTripPattern tripPattern,
     List<TripPatternForDate> tripPatternForDates,
-    List<Integer> offsets,
+    TIntList offsets,
     BitSet boardingPossible,
     BitSet alightningPossible
   ) {
     this.tripPattern = tripPattern;
     this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[] {});
-    this.offsets = offsets.stream().mapToInt(i -> i).toArray();
+    this.offsets = offsets.toArray();
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
 
