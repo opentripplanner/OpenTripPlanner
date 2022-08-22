@@ -107,7 +107,7 @@ public class GeocoderResource {
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
     return LuceneIndex
       .forServer(serverContext)
-      .queryStopCollections(query, autocomplete)
+      .findStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(
           sc.getCoordinate().latitude(),

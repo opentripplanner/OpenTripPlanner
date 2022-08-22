@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -92,7 +93,7 @@ public class CsvFileIO {
         for (Result result : tc.actualResults()) {
           write(out, tc.id());
           write(out, result.nTransfers);
-          write(out, time2str(result.duration));
+          write(out, time2str((int) result.duration.toSeconds()));
           write(out, result.cost);
           write(out, result.walkDistance);
           write(out, time2str(result.startTime));
@@ -250,7 +251,7 @@ public class CsvFileIO {
       return new Result(
         csvReader.get("tcId"),
         Integer.parseInt(csvReader.get("nTransfers")),
-        parseTime(csvReader.get("duration")),
+        Duration.ofSeconds(parseTime(csvReader.get("duration"))),
         Integer.parseInt(csvReader.get("cost")),
         Integer.parseInt(csvReader.get("walkDistance")),
         parseTime(csvReader.get("startTime")),

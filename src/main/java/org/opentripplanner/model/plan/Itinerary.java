@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
@@ -20,14 +21,14 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class Itinerary {
 
   /* final primitive properties */
-  private final int durationSeconds;
-  private final int transitTimeSeconds;
+  private final Duration duration;
+  private final Duration transitDuration;
   private final int numberOfTransfers;
-  private final int waitingTimeSeconds;
+  private final Duration waitingDuration;
   private final double nonTransitDistanceMeters;
   private final boolean walkOnly;
   private final boolean streetOnly;
-  private final int nonTransitTimeSeconds;
+  private final Duration nonTransitDuration;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
@@ -54,12 +55,12 @@ public class Itinerary {
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
-    this.durationSeconds = totals.totalDurationSeconds;
+    this.duration = totals.totalDuration;
     this.numberOfTransfers = totals.transfers();
-    this.transitTimeSeconds = totals.transitTimeSeconds;
-    this.nonTransitTimeSeconds = totals.nonTransitTimeSeconds;
+    this.transitDuration = totals.transitDuration;
+    this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingTimeSeconds = totals.waitingTimeSeconds;
+    this.waitingDuration = totals.walkingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
@@ -109,8 +110,8 @@ public class Itinerary {
   /**
    * This is the amount of time used to travel. {@code waitingTime} is NOT included.
    */
-  public int effectiveDurationSeconds() {
-    return getTransitTimeSeconds() + getNonTransitTimeSeconds();
+  public Duration effectiveDuration() {
+    return getTransitDuration().plus(getNonTransitDuration());
   }
 
   /**
@@ -134,9 +135,11 @@ public class Itinerary {
     return isStreetOnly();
   }
 
-  /** TRUE if alt least one leg is a transit leg. */
+  /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
-    return getTransitTimeSeconds() > 0;
+    return legs
+      .stream()
+      .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
   public Leg firstLeg() {
@@ -212,11 +215,11 @@ public class Itinerary {
       .addTime("start", firstLeg().getStartTime())
       .addTime("end", lastLeg().getEndTime())
       .addNum("nTransfers", numberOfTransfers, -1)
-      .addDurationSec("duration", durationSeconds)
+      .addDuration("duration", duration)
       .addNum("generalizedCost", generalizedCost)
-      .addDurationSec("nonTransitTime", nonTransitTimeSeconds)
-      .addDurationSec("transitTime", transitTimeSeconds)
-      .addDurationSec("waitingTime", waitingTimeSeconds)
+      .addDuration("nonTransitTime", nonTransitDuration)
+      .addDuration("transitTime", transitDuration)
+      .addDuration("waitingTime", waitingDuration)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
       .addNum("elevationLost", elevationLost, 0.0)
@@ -247,7 +250,7 @@ public class Itinerary {
     for (Leg leg : legs) {
       buf.sep();
       if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration());
+        buf.walk((int) leg.getDuration().toSeconds());
       } else if (leg.isTransitLeg()) {
         buf.transit(
           leg.getMode().name(),
@@ -269,15 +272,15 @@ public class Itinerary {
   }
 
   /** Total duration of the itinerary in seconds */
-  public int getDurationSeconds() {
-    return durationSeconds;
+  public Duration getDuration() {
+    return duration;
   }
 
   /**
    * How much time is spent on transit, in seconds.
    */
-  public int getTransitTimeSeconds() {
-    return transitTimeSeconds;
+  public Duration getTransitDuration() {
+    return transitDuration;
   }
 
   /**
@@ -290,8 +293,8 @@ public class Itinerary {
   /**
    * How much time is spent waiting for transit to arrive, in seconds.
    */
-  public int getWaitingTimeSeconds() {
-    return waitingTimeSeconds;
+  public Duration getWaitingDuration() {
+    return waitingDuration;
   }
 
   /**
@@ -363,8 +366,8 @@ public class Itinerary {
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
-  public int getNonTransitTimeSeconds() {
-    return nonTransitTimeSeconds;
+  public Duration getNonTransitDuration() {
+    return nonTransitDuration;
   }
 
   /**

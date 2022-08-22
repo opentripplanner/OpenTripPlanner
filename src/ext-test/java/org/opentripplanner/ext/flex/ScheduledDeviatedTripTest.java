@@ -37,7 +37,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -262,7 +262,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var stopLocation = trip
       .getStops()
       .stream()
-      .filter(s -> s instanceof FlexStopLocation)
+      .filter(s -> s instanceof AreaStop)
       .findFirst()
       .orElseThrow();
     var r = new RoutingRequest();

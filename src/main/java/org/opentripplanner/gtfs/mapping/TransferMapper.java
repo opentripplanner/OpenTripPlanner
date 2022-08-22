@@ -22,8 +22,8 @@ import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -219,7 +219,7 @@ class TransferMapper {
   ) {
     Route route = routeMapper.map(rhsRoute);
     Station station = null;
-    Stop stop = null;
+    RegularStop stop = null;
 
     // A transfer is specified using Stops and/or Station, according to the GTFS specification:
     //
@@ -253,7 +253,7 @@ class TransferMapper {
     throw new IllegalStateException("Should not get here!");
   }
 
-  private int stopPosition(Trip trip, Stop stop, Station station, boolean boardTrip) {
+  private int stopPosition(Trip trip, RegularStop stop, Station station, boolean boardTrip) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
     // We can board at the first stop, but not alight.
@@ -262,7 +262,7 @@ class TransferMapper {
     final int lastStopPos = stopTimes.size() - (boardTrip ? 1 : 0);
 
     Predicate<StopLocation> stopMatches = station != null
-      ? s -> (s instanceof Stop && ((Stop) s).getParentStation() == station)
+      ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
       : s -> s == stop;
 
     for (int i = firstStopPos; i < lastStopPos; i++) {

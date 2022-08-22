@@ -14,9 +14,9 @@ import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -24,7 +24,7 @@ import org.rutebanken.netex.model.KeyListStructure;
 import org.rutebanken.netex.model.KeyValueStructure;
 import org.rutebanken.netex.model.MultilingualString;
 
-public class FlexStopLocationMapperTest {
+public class FlexStopsMapperTest {
 
   public static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
   public static final String FLEXIBLE_STOP_PLACE_NAME = "Sauda-HentMeg";
@@ -83,30 +83,20 @@ public class FlexStopLocationMapperTest {
   );
 
   @Test
-  public void mapFlexStopLocation() {
-    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
-      ID_FACTORY,
-      List.of()
-    );
+  public void mapAreaStop() {
+    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(ID_FACTORY, List.of());
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
 
-    FlexStopLocation flexStopLocation = (FlexStopLocation) flexStopLocationMapper.map(
-      flexibleStopPlace
-    );
+    AreaStop areaStop = (AreaStop) flexStopsMapper.map(flexibleStopPlace);
 
-    assertNotNull(flexStopLocation);
+    assertNotNull(areaStop);
   }
 
   @Test
-  public void mapFlexStopLocationGroup() {
-    Stop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    Stop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
-
-    FlexStopLocationMapper flexStopLocationMapper = new FlexStopLocationMapper(
-      ID_FACTORY,
-      List.of(stop1, stop2)
-    );
+  public void mapGroupStop() {
+    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace();
     flexibleStopPlace.setKeyList(
@@ -118,14 +108,14 @@ public class FlexStopLocationMapperTest {
         )
     );
 
-    FlexLocationGroup flexLocationGroup = (FlexLocationGroup) flexStopLocationMapper.map(
-      flexibleStopPlace
-    );
+    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(stop1, stop2));
+
+    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
     // Only one of the stops should be inside the polygon
-    assertEquals(1, flexLocationGroup.getLocations().size());
+    assertEquals(1, groupStop.getLocations().size());
 
-    assertNotNull(flexLocationGroup);
+    assertNotNull(groupStop);
   }
 
   private FlexibleStopPlace getFlexibleStopPlace() {

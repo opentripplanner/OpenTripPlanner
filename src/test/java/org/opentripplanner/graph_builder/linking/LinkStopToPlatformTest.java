@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -35,7 +35,6 @@ public class LinkStopToPlatformTest {
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
   private Graph graph;
-  private TransitModel transitModel;
 
   @BeforeEach
   public void before() {
@@ -43,8 +42,8 @@ public class LinkStopToPlatformTest {
 
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
 
@@ -73,13 +72,15 @@ public class LinkStopToPlatformTest {
     edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
     edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
-    Stop stop = TransitModelForTest.stop("TestStop").withCoordinate(59.13545, 10.22213).build();
-
-    TransitStopVertex stopVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
-      .withStop(stop)
-      .withTransitModel(transitModel)
+    RegularStop stop = TransitModelForTest
+      .stop("TestStop")
+      .withCoordinate(59.13545, 10.22213)
       .build();
+
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
+
+    new TransitStopVertexBuilder().withGraph(graph).withStop(stop).build();
   }
 
   /**

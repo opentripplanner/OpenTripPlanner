@@ -12,8 +12,7 @@ import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
-public class FlexLocationGroupBuilder
-  extends AbstractEntityBuilder<FlexLocationGroup, FlexLocationGroupBuilder> {
+public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStopBuilder> {
 
   private I18NString name;
 
@@ -26,11 +25,11 @@ public class FlexLocationGroupBuilder
 
   private WgsCoordinate centroid;
 
-  FlexLocationGroupBuilder(FeedScopedId id) {
+  GroupStopBuilder(FeedScopedId id) {
     super(id);
   }
 
-  FlexLocationGroupBuilder(@Nonnull FlexLocationGroup original) {
+  GroupStopBuilder(@Nonnull GroupStop original) {
     super(original);
     // Optional fields
     this.name = original.getName();
@@ -40,11 +39,11 @@ public class FlexLocationGroupBuilder
   }
 
   @Override
-  protected FlexLocationGroup buildFromValues() {
-    return new FlexLocationGroup(this);
+  protected GroupStop buildFromValues() {
+    return new GroupStop(this);
   }
 
-  public FlexLocationGroupBuilder withName(I18NString name) {
+  public GroupStopBuilder withName(I18NString name) {
     this.name = name;
     return this;
   }
@@ -53,7 +52,7 @@ public class FlexLocationGroupBuilder
     return name;
   }
 
-  public FlexLocationGroupBuilder addLocation(StopLocation location) {
+  public GroupStopBuilder addLocation(StopLocation location) {
     stopLocations.add(location);
 
     int numGeometries = geometry.getNumGeometries();
@@ -61,13 +60,13 @@ public class FlexLocationGroupBuilder
     for (int i = 0; i < numGeometries; i++) {
       newGeometries[i] = geometry.getGeometryN(i);
     }
-    if (location instanceof Stop) {
+    if (location instanceof RegularStop) {
       WgsCoordinate coordinate = location.getCoordinate();
       Envelope envelope = new Envelope(coordinate.asJtsCoordinate());
       double xscale = Math.cos(coordinate.latitude() * Math.PI / 180);
       envelope.expandBy(100 / xscale, 100);
       newGeometries[numGeometries] = GeometryUtils.getGeometryFactory().toGeometry(envelope);
-    } else if (location instanceof FlexStopLocation) {
+    } else if (location instanceof AreaStop) {
       newGeometries[numGeometries] = location.getGeometry();
     } else {
       throw new RuntimeException("Unknown location type");

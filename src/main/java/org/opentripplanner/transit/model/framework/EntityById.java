@@ -1,12 +1,10 @@
-package org.opentripplanner.model.impl;
+package org.opentripplanner.transit.model.framework;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * The purpose of this class is to provide a map from id to the corresponding entity. It is simply
@@ -47,6 +45,13 @@ public class EntityById<E extends TransitEntity> {
     return map.size();
   }
 
+  /**
+   * Returns {@code true} if there are no entries in the map.
+   */
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
   public boolean containsKey(FeedScopedId id) {
     return map.containsKey(id);
   }
@@ -56,7 +61,17 @@ public class EntityById<E extends TransitEntity> {
     return map.toString();
   }
 
-  int removeIf(Predicate<E> test) {
+  /**
+   * Return a copy of the internal map. Changes in the source are not reflected in the destination
+   * (returned Map), and visa versa.
+   * <p>
+   * The returned map is immutable.
+   */
+  public Map<FeedScopedId, E> asImmutableMap() {
+    return Map.copyOf(map);
+  }
+
+  public int removeIf(Predicate<E> test) {
     Collection<E> newSet = map
       .values()
       .stream()
@@ -70,15 +85,5 @@ public class EntityById<E extends TransitEntity> {
     map.clear();
     addAll(newSet);
     return size - map.size();
-  }
-
-  /**
-   * Return a copy of the internal map. Changes in the source are not reflected in the destination
-   * (returned Map), and visa versa.
-   * <p>
-   * The returned map is immutable.
-   */
-  Map<FeedScopedId, E> asImmutableMap() {
-    return Map.copyOf(map);
   }
 }

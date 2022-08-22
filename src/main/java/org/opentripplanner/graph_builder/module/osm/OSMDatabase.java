@@ -285,10 +285,6 @@ public class OSMDatabase {
     }
 
     waysById.put(wayId, way);
-
-    if (waysById.size() % 10000 == 0) {
-      LOG.debug("ways=" + waysById.size());
-    }
   }
 
   public void addRelation(OSMRelation relation) {
@@ -332,10 +328,6 @@ public class OSMDatabase {
     }
 
     relationsById.put(relation.getId(), relation);
-
-    if (relationsById.size() % 100 == 0) {
-      LOG.debug("relations=" + relationsById.size());
-    }
   }
 
   /**

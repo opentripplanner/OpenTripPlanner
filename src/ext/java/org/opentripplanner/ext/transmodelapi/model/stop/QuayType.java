@@ -26,8 +26,8 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class QuayType {
@@ -292,7 +292,7 @@ public class QuayType {
             );
             Integer timeRangeInput = environment.getArgument("timeRange");
             Duration timeRange = Duration.ofSeconds(timeRangeInput.longValue());
-            Stop stop = environment.getSource();
+            RegularStop stop = environment.getSource();
 
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");

@@ -58,7 +58,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Double> duration() {
-    return environment -> (double) getSource(environment).getDuration();
+    return environment -> (double) getSource(environment).getDuration().toSeconds();
   }
 
   @Override

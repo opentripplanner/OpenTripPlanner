@@ -110,7 +110,7 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopModel.size();
+    return stopModel.stopIndexSize();
   }
 
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {

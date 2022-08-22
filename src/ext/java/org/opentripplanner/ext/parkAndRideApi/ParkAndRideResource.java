@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -26,7 +27,7 @@ import org.opentripplanner.transit.model.basic.I18NString;
 public class ParkAndRideResource {
 
   private final VehicleParkingService vehicleParkingService;
-  private final DirectGraphFinder graphFinder;
+  private final GraphFinder graphFinder;
 
   public ParkAndRideResource(
     @Context OtpServerRequestContext serverContext,
@@ -37,7 +38,12 @@ public class ParkAndRideResource {
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
     this.vehicleParkingService = serverContext.graph().getVehicleParkingService();
-    this.graphFinder = new DirectGraphFinder(serverContext.graph());
+
+    // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
+    //           - serverContext.graphFinder(). This needs at least a comment!
+    //           - This can be replaced with a search done with the StopModel
+    //           - if we have a radius search there.
+    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStop);
   }
 
   /** Envelopes are in latitude, longitude format */

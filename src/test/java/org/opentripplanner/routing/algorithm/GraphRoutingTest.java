@@ -58,7 +58,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayMode;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -84,9 +84,7 @@ public abstract class GraphRoutingTest {
     builder.build();
     Graph graph = builder.graph();
     TransitModel transitModel = builder.transitModel();
-    transitModel.index();
-    graph.index();
-    return new TestOtpModel(graph, transitModel);
+    return new TestOtpModel(graph, transitModel).index();
   }
 
   protected GraphPath routeParkAndRide(
@@ -110,7 +108,7 @@ public abstract class GraphRoutingTest {
     protected Builder() {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
-      graph = new Graph(stopModel, deduplicator);
+      graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
     }
 
@@ -237,15 +235,16 @@ public abstract class GraphRoutingTest {
         .build();
     }
 
-    public Stop stopEntity(String id, double latitude, double longitude) {
-      return TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+    public RegularStop stopEntity(String id, double latitude, double longitude) {
+      var stop = TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+      transitModel.mergeStopModels(StopModel.of().withRegularStop(stop).build());
+      return stop;
     }
 
     public TransitStopVertex stop(String id, double latitude, double longitude) {
       return new TransitStopVertexBuilder()
         .withGraph(graph)
         .withStop(stopEntity(id, latitude, longitude))
-        .withTransitModel(transitModel)
         .build();
     }
 

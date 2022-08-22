@@ -7,31 +7,24 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.util.geometry.GeometryUtils;
 
-class FlexStopLocationTest {
+class GroupStopTest {
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
-  private static final I18NString DESCRIPTION = new NonLocalizedString("description");
 
-  private static final I18NString URL = new NonLocalizedString("url");
-
-  private static final String ZONE_ID = TransitModelForTest.TIME_ZONE_ID;
-
-  private static final LineString GEOMETRY = GeometryUtils.makeLineString(0, 0, 0, 1);
-
-  private static final FlexStopLocation subject = FlexStopLocation
+  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
+    "1:stop",
+    1d,
+    1d
+  );
+  private static final GroupStop subject = GroupStop
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
-    .withDescription(DESCRIPTION)
-    .withUrl(URL)
-    .withZoneId(ZONE_ID)
-    .withGeometry(GEOMETRY)
+    .addLocation(STOP_LOCATION)
     .build();
 
   @Test
@@ -51,10 +44,7 @@ class FlexStopLocationTest {
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
-    assertEquals(DESCRIPTION, copy.getDescription());
-    assertEquals(URL, copy.getUrl());
-    assertEquals(ZONE_ID, copy.getFirstZoneAsString());
-    assertEquals(GEOMETRY, copy.getGeometry());
+    assertEquals(STOP_LOCATION, copy.getLocations().iterator().next());
     assertEquals("v2", copy.getName().toString());
   }
 
@@ -64,12 +54,9 @@ class FlexStopLocationTest {
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
-      subject.sameAs(subject.copy().withDescription(new NonLocalizedString("X")).build())
-    );
-    assertFalse(subject.sameAs(subject.copy().withUrl(new NonLocalizedString("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withZoneId("X").build()));
-    assertFalse(
-      subject.sameAs(subject.copy().withGeometry(GeometryUtils.makeLineString(0, 0, 0, 2)).build())
+      subject.sameAs(
+        subject.copy().addLocation(TransitModelForTest.stopForTest("2:stop", 1d, 2d)).build()
+      )
     );
   }
 }

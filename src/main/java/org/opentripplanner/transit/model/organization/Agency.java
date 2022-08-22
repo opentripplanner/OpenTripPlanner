@@ -7,14 +7,14 @@ import java.time.ZoneId;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.
  */
-public final class Agency extends TransitEntity<Agency, AgencyBuilder> implements LogInfo {
+public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> implements LogInfo {
 
   private final String name;
   private final ZoneId timezone;

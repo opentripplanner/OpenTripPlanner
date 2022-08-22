@@ -8,6 +8,7 @@ import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
@@ -84,4 +85,8 @@ public interface OtpServerRequestContext {
    */
   @HttpRequestScoped
   TraverseVisitor traverseVisitor();
+
+  default GraphFinder graphFinder() {
+    return GraphFinder.getInstance(graph(), transitService()::findRegularStop);
+  }
 }

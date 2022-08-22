@@ -43,7 +43,7 @@ class StopTimesHelperTest {
     // Case 1, should find first departure for each pattern
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       1,
@@ -78,7 +78,7 @@ class StopTimesHelperTest {
   void stopTimesForStop_allDepartures() {
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       10,
@@ -96,7 +96,7 @@ class StopTimesHelperTest {
   void stopTimesForStop_noDepartures() {
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(6),
       2,
@@ -114,7 +114,7 @@ class StopTimesHelperTest {
   void stopTimesForStop_nextDay() {
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
       Duration.ofHours(36),
       10,
@@ -150,7 +150,7 @@ class StopTimesHelperTest {
   void stopTimesForPatternAtStop_oneDayFromMidnight() {
     var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
@@ -175,7 +175,7 @@ class StopTimesHelperTest {
   void stopTimesForPatternAtStop_oneDayFromMidday() {
     var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
       Duration.ofHours(24),
@@ -201,7 +201,7 @@ class StopTimesHelperTest {
   void stopTimesForPatternAtStop_twoDaysFromMidnight() {
     var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(48),
@@ -233,7 +233,7 @@ class StopTimesHelperTest {
   void stopTimesForStopServiceDate() {
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
-      transitService.getStopForId(stopId),
+      transitService.getRegularStop(stopId),
       serviceDate,
       ArrivalDeparture.BOTH
     );

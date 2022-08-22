@@ -145,9 +145,8 @@ public abstract class GtfsTest {
 
     alertsUpdateHandler = new AlertsUpdateHandler();
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    transitModel = new TransitModel(new StopModel(), deduplicator);
 
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,
@@ -158,7 +157,7 @@ public abstract class GtfsTest {
 
     gtfsGraphBuilderImpl.buildGraph();
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
     serverContext = TestServerContext.createServerContext(graph, transitModel);
     timetableSnapshotSource = TimetableSnapshotSource.ofTransitModel(transitModel);
     timetableSnapshotSource.purgeExpiredData = false;

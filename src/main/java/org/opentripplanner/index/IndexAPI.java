@@ -188,7 +188,7 @@ public class IndexAPI {
   ) {
     /* When no parameters are supplied, return all stops. */
     if (uriInfo.getQueryParameters().isEmpty()) {
-      return StopMapper.mapToApiShort(transitService().getAllStops());
+      return StopMapper.mapToApiShort(transitService().listStopLocations());
     }
 
     /* If any of the circle parameters are specified, expect a circle not a box. */
@@ -202,7 +202,7 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return new DirectGraphFinder(serverContext.graph())
+      return new DirectGraphFinder(serverContext.transitService()::findRegularStop)
         .findClosestStops(lat, lon, radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))
@@ -223,7 +223,7 @@ public class IndexAPI {
         new Coordinate(maxLon, maxLat)
       );
 
-      var stops = transitService().queryStopSpatialIndex(envelope);
+      var stops = transitService().findRegularStop(envelope);
       return stops
         .stream()
         .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
@@ -598,7 +598,7 @@ public class IndexAPI {
   }
 
   private StopLocation stop(String stopId) {
-    var stop = transitService().getStopForId(createId("stopId", stopId));
+    var stop = transitService().getRegularStop(createId("stopId", stopId));
     return validateExist("Stop", stop, "stopId", stop);
   }
 

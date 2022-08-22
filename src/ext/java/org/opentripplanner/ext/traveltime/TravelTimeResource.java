@@ -64,8 +64,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -263,20 +262,19 @@ public class TravelTimeResource {
       initialStates.add(new State(vertex, startTime, routingContext, stateData));
     }
 
-    for (int i = 0; i < graph.getStopModel().size(); i++) {
-      if (arrivals.reachedByTransit(i)) {
-        final int arrivalTime = arrivals.bestTransitArrivalTime(i);
-        StopLocation stopLocation = graph.getStopModel().stopByIndex(i);
-        if (stopLocation instanceof Stop stop) {
-          Vertex v = transitService.getStopVertexForStop(stop);
-          if (v != null) {
-            Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-            State s = new State(v, time, routingContext, stateData.clone());
-            s.weight = startTime.until(time, ChronoUnit.SECONDS);
-            // TODO: This shouldn't be overridden in state initialization
-            s.stateData.startTime = stateData.startTime;
-            initialStates.add(s);
-          }
+    // TODO - Add a method to return all Stops, not StopLocations
+    for (RegularStop stop : transitService.listRegularStops()) {
+      int index = stop.getIndex();
+      if (arrivals.reachedByTransit(index)) {
+        final int arrivalTime = arrivals.bestTransitArrivalTime(index);
+        Vertex v = graph.getStopVertexForStopId(stop.getId());
+        if (v != null) {
+          Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
+          State s = new State(v, time, routingContext, stateData.clone());
+          s.weight = startTime.until(time, ChronoUnit.SECONDS);
+          // TODO: This shouldn't be overridden in state initialization
+          s.stateData.startTime = stateData.startTime;
+          initialStates.add(s);
         }
       }
     }

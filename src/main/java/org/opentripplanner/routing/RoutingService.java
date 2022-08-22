@@ -44,7 +44,7 @@ public class RoutingService {
     this.serverContext = serverContext;
     this.graph = serverContext.graph();
     this.timeZone = serverContext.transitService().getTimeZone();
-    this.graphFinder = GraphFinder.getInstance(graph);
+    this.graphFinder = serverContext.graphFinder();
   }
 
   public RoutingResponse route(RoutingRequest request) {

@@ -124,8 +124,7 @@ public class SpeedTest {
 
     TransitModel transitModel = serializedGraphObject.transitModel;
     transitModel.index();
-    graph.index();
-
+    graph.index(transitModel.getStopModel());
     return new LoadModel(graph, transitModel, serializedGraphObject.buildConfig);
   }
 

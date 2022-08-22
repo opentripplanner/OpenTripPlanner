@@ -41,6 +41,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -239,6 +240,8 @@ public class ElevationModule implements GraphBuilderModule {
       }
     }
 
+    LOG.info(progress.completeMessage());
+
     // Iterate again to find edges that had elevation calculated.
     LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
     for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
@@ -249,6 +252,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     if (writeCachedElevations) {
       // write information from edgesWithElevation to a new cache file for subsequent graph builds
+      LOG.info("Writing elevation cache");
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
@@ -279,8 +283,8 @@ public class ElevationModule implements GraphBuilderModule {
     updateElevationMetadata(graph);
 
     LOG.info(
-      "Finished elevation processing in {}s",
-      Duration.between(start, Instant.now()).toSeconds()
+      "Finished elevation processing in {}",
+      DurationUtils.durationToStr(Duration.between(start, Instant.now()))
     );
   }
 

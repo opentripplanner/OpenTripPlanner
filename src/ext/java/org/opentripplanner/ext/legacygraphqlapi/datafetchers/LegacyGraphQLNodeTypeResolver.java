@@ -18,8 +18,8 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
@@ -67,7 +67,7 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     if (o instanceof Route) {
       return schema.getObjectType("Route");
     }
-    if (o instanceof Stop) {
+    if (o instanceof RegularStop) {
       return schema.getObjectType("Stop");
     }
     if (o instanceof Station) {

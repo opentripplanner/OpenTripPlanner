@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
 /**
  * This class is used as a reference to a StopTime wrapping the {@link Trip#getId()} and
@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity;
  * represented by the {@link TripTimes}, but we use this class to map other entities
  * (NoticeAssignment) to StopTimes to be able to decorate itineraries with such data.
  */
-public class StopTimeKey extends TransitEntity<StopTimeKey, StopTimeKeyBuilder> {
+public class StopTimeKey extends AbstractTransitEntity<StopTimeKey, StopTimeKeyBuilder> {
 
   StopTimeKey(StopTimeKeyBuilder builder) {
     super(builder.getId());
