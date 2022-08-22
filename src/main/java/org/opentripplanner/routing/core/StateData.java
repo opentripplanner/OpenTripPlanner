@@ -73,7 +73,10 @@ public class StateData implements Cloneable {
   /**
    * Returns a set of initial StateDatas based on the options from the RoutingRequest
    */
-  public static List<StateData> getInitialStateDatas(NewRouteRequest options, RoutingPreferences preferences) {
+  public static List<StateData> getInitialStateDatas(
+    NewRouteRequest options,
+    RoutingPreferences preferences
+  ) {
     return getInitialStateDatas(options, preferences, false);
   }
 
@@ -81,7 +84,10 @@ public class StateData implements Cloneable {
    * Returns an initial StateData based on the options from the RoutingRequest. This returns always
    * only a single state, which is considered the "base case"
    */
-  public static StateData getInitialStateData(NewRouteRequest options, RoutingPreferences preferences) {
+  public static StateData getInitialStateData(
+    NewRouteRequest options,
+    RoutingPreferences preferences
+  ) {
     var stateDatas = getInitialStateDatas(options, preferences, true);
     if (stateDatas.size() != 1) {
       throw new IllegalStateException("Unable to create only a single state");
@@ -118,7 +124,6 @@ public class StateData implements Cloneable {
       walkingPickupStateData.currentMode = TraverseMode.WALK;
       res.add(walkingPickupStateData);
     }
-
     // Vehicle rental searches may end in four states (see State#isFinal()):
     // When searching forward:
     //   - RENTING_FROM_STATION when allowKeepingRentedVehicleAtDestination is set
@@ -160,7 +165,9 @@ public class StateData implements Cloneable {
       parkAndRideStateData.currentMode =
         parkAndRideStateData.vehicleParked
           ? TraverseMode.WALK
-          : options.journeyRequest().streetSubRequestModes().getBicycle() ? TraverseMode.BICYCLE : TraverseMode.CAR;
+          : options.journeyRequest().streetSubRequestModes().getBicycle()
+            ? TraverseMode.BICYCLE
+            : TraverseMode.CAR;
       res.add(parkAndRideStateData);
     } else {
       res.add(proto.clone());

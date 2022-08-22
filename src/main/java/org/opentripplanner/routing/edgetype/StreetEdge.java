@@ -19,6 +19,8 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -291,7 +293,7 @@ public class StreetEdge
    * Calculate the speed appropriately given the RoutingRequest and traverseMode.
    */
   public double calculateSpeed(
-    RoutingRequest options,
+    RoutingPreferences preferences,
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
@@ -301,8 +303,15 @@ public class StreetEdge
       // NOTE: Automobiles have variable speeds depending on the edge type
       return calculateCarSpeed();
     }
-    final double speed = options.getSpeed(traverseMode, walkingBike);
-    return isStairs() ? (speed / options.stairsTimeFactor) : speed;
+
+    final double speed = switch (traverseMode) {
+      case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
+      case BICYCLE -> preferences.bike().speed();
+      case CAR -> preferences.car().speed();
+      default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
+    };
+
+    return isStairs() ? (speed / preferences.walk().stairsTimeFactor()) : speed;
   }
 
   /**
@@ -393,20 +402,21 @@ public class StreetEdge
 
   @Override
   public State traverse(State s0) {
-    final RoutingRequest options = s0.getOptions();
+    final NewRouteRequest options = s0.getOptions();
+    final RoutingPreferences preferences = s0.getPreferences();
     final StateEditor editor;
 
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
     if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
-        editor = doTraverse(s0, options, TraverseMode.BICYCLE, false);
+        editor = doTraverse(s0, options, preferences, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
-        editor = doTraverse(s0, options, TraverseMode.WALK, true);
+        editor = doTraverse(s0, options, preferences, TraverseMode.WALK, true);
       } else {
         return null;
       }
     } else if (canTraverse(s0.getNonTransitMode())) {
-      editor = doTraverse(s0, options, s0.getNonTransitMode(), false);
+      editor = doTraverse(s0, options, preferences, s0.getNonTransitMode(), false);
     } else {
       editor = null;
     }
@@ -414,7 +424,7 @@ public class StreetEdge
     State state = editor != null ? editor.makeState() : null;
 
     if (canPickupAndDrive(s0)) {
-      StateEditor inCar = doTraverse(s0, options, TraverseMode.CAR, false);
+      StateEditor inCar = doTraverse(s0, options, preferences, TraverseMode.CAR, false);
       if (inCar != null) {
         driveAfterPickup(s0, inCar);
         State forkState = inCar.makeState();
@@ -427,7 +437,7 @@ public class StreetEdge
     }
 
     if (canDropOffAfterDriving(s0) && !getPermission().allows(TraverseMode.CAR)) {
-      StateEditor dropOff = doTraverse(s0, options, TraverseMode.WALK, false);
+      StateEditor dropOff = doTraverse(s0, options, preferences, TraverseMode.WALK, false);
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
@@ -958,7 +968,8 @@ public class StreetEdge
    */
   private StateEditor doTraverse(
     State s0,
-    RoutingRequest options,
+    NewRouteRequest options,
+    RoutingPreferences preferences,
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
@@ -986,13 +997,13 @@ public class StreetEdge
     }
 
     // Automobiles have variable speeds depending on the edge type
-    double speed = calculateSpeed(options, traverseMode, walkingBike);
+    double speed = calculateSpeed(preferences, traverseMode, walkingBike);
 
     var traversalCosts =
       switch (traverseMode) {
-        case BICYCLE, SCOOTER -> bicycleTraversalCost(options, speed);
-        case WALK -> walkingTraversalCosts(options, traverseMode, speed, walkingBike);
-        default -> otherTraversalCosts(options, traverseMode, walkingBike, speed);
+        case BICYCLE, SCOOTER -> bicycleTraversalCost(preferences, speed);
+        case WALK -> walkingTraversalCosts(preferences, traverseMode, speed, walkingBike);
+        default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
       };
 
     var time = traversalCosts.time();
@@ -1010,14 +1021,15 @@ public class StreetEdge
     StreetEdge backPSE;
     if (backEdge instanceof StreetEdge) {
       backPSE = (StreetEdge) backEdge;
-      RoutingRequest backOptions = s0.getOptions();
-      double backSpeed = backPSE.calculateSpeed(backOptions, backMode, backWalkingBike);
+      NewRouteRequest backOptions = s0.getOptions();
+      RoutingPreferences backPreferences = s0.getPreferences();
+      double backSpeed = backPSE.calculateSpeed(backPreferences, backMode, backWalkingBike);
       final double realTurnCost; // Units are seconds.
 
       // Apply turn restrictions
-      if (options.arriveBy && !canTurnOnto(backPSE, s0, backMode)) {
+      if (options.arriveBy() && !canTurnOnto(backPSE, s0, backMode)) {
         return null;
-      } else if (!options.arriveBy && !backPSE.canTurnOnto(this, s0, traverseMode)) {
+      } else if (!options.arriveBy() && !backPSE.canTurnOnto(this, s0, traverseMode)) {
         return null;
       }
 
@@ -1032,7 +1044,7 @@ public class StreetEdge
        * that during reverse traversal, we must also use the speed for the mode of
        * the backEdge, rather than of the current edge.
        */
-      if (options.arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
+      if (options.arriveBy() && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
         realTurnCost =
           s0
             .getRoutingContext()
@@ -1046,7 +1058,7 @@ public class StreetEdge
               (float) speed,
               (float) backSpeed
             );
-      } else if (!options.arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
+      } else if (!options.arriveBy() && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
         realTurnCost =
           s0
             .getRoutingContext()
@@ -1072,7 +1084,7 @@ public class StreetEdge
 
       int turnTime = (int) Math.ceil(realTurnCost);
       roundedTime += turnTime;
-      weight += options.turnReluctance * realTurnCost;
+      weight += preferences.street().turnReluctance() * realTurnCost;
     }
 
     if (!traverseMode.isDriving()) {
@@ -1092,7 +1104,7 @@ public class StreetEdge
 
   @Nonnull
   private TraversalCosts otherTraversalCosts(
-    RoutingRequest options,
+    RoutingPreferences preferences,
     TraverseMode traverseMode,
     boolean walkingBike,
     double speed
@@ -1101,7 +1113,7 @@ public class StreetEdge
     var weight =
       time *
       StreetEdgeReluctanceCalculator.computeReluctance(
-        options,
+        preferences,
         traverseMode,
         walkingBike,
         isStairs()
@@ -1110,10 +1122,10 @@ public class StreetEdge
   }
 
   @Nonnull
-  private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
+  private TraversalCosts bicycleTraversalCost(RoutingPreferences pref, double speed) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
-    switch (req.bicycleOptimizeType) {
+    switch (pref.bike().optimizeType()) {
       case GREENWAYS -> {
         weight = bicycleSafetyFactor * getDistanceMeters() / speed;
         if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
@@ -1131,17 +1143,17 @@ public class StreetEdge
         double slope = getEffectiveBikeDistanceForWorkCost();
         weight =
           quick *
-          req.bikeTriangleTimeFactor +
+            pref.bike().triangleTimeFactor() +
           slope *
-          req.bikeTriangleSlopeFactor +
+            pref.bike().triangleSlopeFactor() +
           safety *
-          req.bikeTriangleSafetyFactor;
+            pref.bike().triangleSafetyFactor();
         weight /= speed;
       }
       default -> weight = getDistanceMeters() / speed;
     }
     var reluctance = StreetEdgeReluctanceCalculator.computeReluctance(
-      req,
+      pref,
       TraverseMode.BICYCLE,
       false,
       isStairs()
@@ -1152,26 +1164,25 @@ public class StreetEdge
 
   @Nonnull
   private TraversalCosts walkingTraversalCosts(
-    RoutingRequest routingRequest,
+    RoutingPreferences preferences,
     TraverseMode traverseMode,
     double speed,
     boolean walkingBike
   ) {
     Supplier<Double> nonWheelchairReluctance = () ->
       StreetEdgeReluctanceCalculator.computeReluctance(
-        routingRequest,
+        preferences,
         traverseMode,
         walkingBike,
         isStairs()
       );
-
     double time, weight;
-    if (routingRequest.wheelchairAccessibility.enabled()) {
+    if (preferences.wheelchair().accessibility().enabled()) {
       time = getEffectiveWalkDistance() / speed;
       weight =
         (getEffectiveBikeDistance() / speed) *
         StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-          routingRequest,
+          preferences,
           getMaxSlope(),
           isWheelchairAccessible(),
           isStairs()
@@ -1185,9 +1196,9 @@ public class StreetEdge
       time = getEffectiveWalkDistance() / speed;
       weight =
         getEffectiveWalkSafetyDistance() *
-        routingRequest.walkSafetyFactor +
+          preferences.walk().safetyFactor() +
         getEffectiveWalkDistance() *
-        (1 - routingRequest.walkSafetyFactor);
+        (1 - preferences.walk().safetyFactor());
       weight /= speed;
       weight *= nonWheelchairReluctance.get();
     }

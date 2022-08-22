@@ -58,7 +58,12 @@ public class State implements Cloneable {
    * Create an initial state, forcing vertex to the specified value. Useful for reusing a
    * RoutingContext in TransitIndex, tests, etc.
    */
-  public State(Vertex vertex, NewRouteRequest opt, RoutingPreferences pref, RoutingContext routingContext) {
+  public State(
+    Vertex vertex,
+    NewRouteRequest opt,
+    RoutingPreferences pref,
+    RoutingContext routingContext
+  ) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
     this(vertex, opt.dateTime(), routingContext, StateData.getInitialStateData(opt, pref));
   }
@@ -189,7 +194,8 @@ public class State implements Cloneable {
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.pref.rental().allow() || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
+        !stateData.pref.rental().allow() ||
+        (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;
