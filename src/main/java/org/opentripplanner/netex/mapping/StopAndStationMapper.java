@@ -22,8 +22,8 @@ import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComp
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -47,7 +47,7 @@ class StopAndStationMapper {
 
   private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
   private final StationMapper stationMapper;
-  private final StopMapper stopMapper;
+  private final QuayMapper quayMapper;
   private final TariffZoneMapper tariffZoneMapper;
   private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
   private final DataImportIssueStore issueStore;
@@ -57,7 +57,7 @@ class StopAndStationMapper {
    */
   private final Set<String> quaysAlreadyProcessed = new HashSet<>();
 
-  final List<Stop> resultStops = new ArrayList<>();
+  final List<RegularStop> resultStops = new ArrayList<>();
   final List<Station> resultStations = new ArrayList<>();
   final Multimap<String, Station> resultStationByMultiModalStationRfs = ArrayListMultimap.create();
 
@@ -68,7 +68,7 @@ class StopAndStationMapper {
     DataImportIssueStore issueStore
   ) {
     this.stationMapper = new StationMapper(issueStore, idFactory);
-    this.stopMapper = new StopMapper(idFactory, issueStore);
+    this.quayMapper = new QuayMapper(idFactory, issueStore);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;
@@ -174,7 +174,7 @@ class StopAndStationMapper {
 
     var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
-    Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
+    RegularStop stop = quayMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
     if (stop == null) {
       return;
     }

@@ -25,7 +25,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -72,7 +72,10 @@ public class LinkStopToPlatformTest {
     edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
     edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
-    Stop stop = TransitModelForTest.stop("TestStop").withCoordinate(59.13545, 10.22213).build();
+    RegularStop stop = TransitModelForTest
+      .stop("TestStop")
+      .withCoordinate(59.13545, 10.22213)
+      .build();
 
     transitModel.index();
     graph.index(transitModel.getStopModel());

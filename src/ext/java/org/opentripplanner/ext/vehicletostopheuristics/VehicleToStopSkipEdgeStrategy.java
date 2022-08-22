@@ -20,7 +20,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * This strategy terminates when enough "important" stops are found.
@@ -47,7 +47,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
     CAR_RENTAL,
     SCOOTER_RENTAL
   );
-  private final Function<Stop, Set<Route>> getRoutesForStop;
+  private final Function<RegularStop, Set<Route>> getRoutesForStop;
   private final int maxScore;
   private final EnumSet<TransitMode> allowedModes;
   private double sumOfScores;
@@ -55,7 +55,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy {
   private final Set<FeedScopedId> stopsCounted = new HashSet<>();
 
   public VehicleToStopSkipEdgeStrategy(
-    Function<Stop, Set<Route>> getRoutesForStop,
+    Function<RegularStop, Set<Route>> getRoutesForStop,
     Collection<TransitMode> allowedModes
   ) {
     this.allowedModes = EnumSet.copyOf(allowedModes);

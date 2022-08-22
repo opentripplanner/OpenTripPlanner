@@ -19,7 +19,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -86,10 +86,10 @@ public abstract class FlexAccessEgressTemplate {
     Graph graph,
     TransitService transitService
   ) {
-    if (transferStop instanceof Stop stop) {
+    if (transferStop instanceof RegularStop stop) {
       TransitStopVertex flexVertex = graph.getStopVertexForStopId(stop.getId());
       return Stream
-        .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop))
+        .of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (RegularStop) transferStop))
         .filter(Objects::nonNull);
     }
     // transferStop is Location Area/Line
@@ -131,7 +131,7 @@ public abstract class FlexAccessEgressTemplate {
   /**
    * Get the {@Link Stop} where the connection to the scheduled transit network is made.
    */
-  protected abstract Stop getFinalStop(PathTransfer transfer);
+  protected abstract RegularStop getFinalStop(PathTransfer transfer);
 
   /**
    * Get the transfers to/from stops in the scheduled transit network from the beginning/end of the
@@ -159,7 +159,7 @@ public abstract class FlexAccessEgressTemplate {
   protected FlexAccessEgress getFlexAccessEgress(
     List<Edge> transferEdges,
     Vertex flexVertex,
-    Stop stop
+    RegularStop stop
   ) {
     FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
 

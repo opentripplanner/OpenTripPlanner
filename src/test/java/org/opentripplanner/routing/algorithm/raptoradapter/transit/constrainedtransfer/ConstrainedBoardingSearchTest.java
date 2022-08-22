@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.util.OTPFeature;
 
@@ -341,7 +341,7 @@ public class ConstrainedBoardingSearchTest {
   }
 
   void testTransferSearch(
-    Stop transferStop,
+    RegularStop transferStop,
     List<ConstrainedTransfer> constraints,
     int expTripIndexFwdSearch,
     int expTripIndexRevSearch,
@@ -352,7 +352,7 @@ public class ConstrainedBoardingSearchTest {
   }
 
   void testTransferSearchForward(
-    Stop transferStop,
+    RegularStop transferStop,
     List<ConstrainedTransfer> txList,
     int expectedTripIndex,
     TransferConstraint expectedConstraint
@@ -382,7 +382,7 @@ public class ConstrainedBoardingSearchTest {
   }
 
   void testTransferSearchReverse(
-    Stop transferStop,
+    RegularStop transferStop,
     List<ConstrainedTransfer> txList,
     int expectedTripIndex,
     TransferConstraint expectedConstraint

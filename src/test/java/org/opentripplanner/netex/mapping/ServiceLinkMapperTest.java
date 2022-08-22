@@ -21,8 +21,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkSequenceProjection;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
@@ -94,10 +94,10 @@ public class ServiceLinkMapperTest {
     quayIdByStopPointRef.add("RUT:StopPoint:2", "NSR:Quay:2");
     quayIdByStopPointRef.add("RUT:StopPoint:3", "NSR:Quay:3");
 
-    EntityById<Stop> stopsById = new EntityById<>();
+    EntityById<RegularStop> stopsById = new EntityById<>();
 
     DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
-    StopMapper stopMapper = new StopMapper(ID_FACTORY, issueStore);
+    QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore);
     StopPattern.StopPatternBuilder stopPatternBuilder = StopPattern.create(3);
 
     Station parentStation = Station
@@ -107,7 +107,7 @@ public class ServiceLinkMapperTest {
       .build();
 
     for (int i = 0; i < quaysById.size(); i++) {
-      Stop stop = stopMapper.mapQuayToStop(
+      RegularStop stop = quayMapper.mapQuayToStop(
         quaysById.get(i),
         parentStation,
         List.of(),

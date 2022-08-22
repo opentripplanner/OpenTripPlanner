@@ -18,8 +18,8 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class PlaceTest {
@@ -77,7 +77,7 @@ public class PlaceTest {
   @ParameterizedTest(name = "Flex stop name of {0} should lead to a place name of {1}")
   @VariableSource("flexStopCases")
   public void flexStop(I18NString stopName, String expectedPlaceName) {
-    var stop = FlexStopLocation
+    var stop = AreaStop
       .of(new FeedScopedId("1", "stop_id"))
       .withGeometry(GEOMETRY)
       .withName(stopName)
@@ -101,7 +101,7 @@ public class PlaceTest {
     assertNull(p.coordinate);
   }
 
-  private static Place place(Stop stop) {
+  private static Place place(RegularStop stop) {
     return Place.forStop(stop);
   }
 }

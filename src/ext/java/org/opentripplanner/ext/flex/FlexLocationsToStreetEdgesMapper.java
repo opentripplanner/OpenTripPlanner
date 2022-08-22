@@ -8,7 +8,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -31,7 +31,7 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
   @Override
   @SuppressWarnings("Convert2MethodRef")
   public void buildGraph() {
-    if (!transitModel.getStopModel().hasFlexLocations()) {
+    if (!transitModel.getStopModel().hasAreaStops()) {
       return;
     }
 
@@ -40,14 +40,14 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      transitModel.getStopModel().getAllFlexLocations().size()
+      transitModel.getStopModel().listAreaStops().size()
     );
 
     LOG.info(progress.startMessage());
     // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
-    for (FlexStopLocation flexStopLocation : transitModel.getStopModel().getAllFlexLocations()) {
+    for (AreaStop areaStop : transitModel.getStopModel().listAreaStops()) {
       for (Vertex vertx : streetIndex.getVerticesForEnvelope(
-        flexStopLocation.getGeometry().getEnvelopeInternal()
+        areaStop.getGeometry().getEnvelopeInternal()
       )) {
         // Check that the vertex is connected to both driveable and walkable edges
         if (!(vertx instanceof StreetVertex streetVertex)) {
@@ -59,15 +59,15 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
-        if (flexStopLocation.getGeometry().disjoint(p)) {
+        if (areaStop.getGeometry().disjoint(p)) {
           continue;
         }
 
-        if (streetVertex.flexStopLocations == null) {
-          streetVertex.flexStopLocations = new HashSet<>();
+        if (streetVertex.areaStops == null) {
+          streetVertex.areaStops = new HashSet<>();
         }
 
-        streetVertex.flexStopLocations.add(flexStopLocation);
+        streetVertex.areaStops.add(areaStop);
       }
       // Keep lambda! A method-ref would cause incorrect class and line number to be logged
       progress.step(m -> LOG.info(m));

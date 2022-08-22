@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -36,7 +36,7 @@ public class RoutingServiceTest extends GtfsTest {
     /* Graph vertices */
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex) {
-        Stop stop = ((TransitStopVertex) vertex).getStop();
+        RegularStop stop = ((TransitStopVertex) vertex).getStop();
         Vertex index_vertex = graph.getStopVertexForStopId(stop.getId());
         assertEquals(index_vertex, vertex);
       }
@@ -105,7 +105,7 @@ public class RoutingServiceTest extends GtfsTest {
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<Stop> stops = transitModel.getStopModel().findRegularStops(env);
+    Collection<RegularStop> stops = transitModel.getStopModel().findRegularStops(env);
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));

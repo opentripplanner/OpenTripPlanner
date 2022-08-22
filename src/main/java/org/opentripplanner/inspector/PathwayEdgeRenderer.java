@@ -7,8 +7,8 @@ import org.opentripplanner.inspector.EdgeVertexTileRenderer.VertexVisualAttribut
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.Stop;
 
 public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
@@ -74,7 +74,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
     sb.append(stationElement.getName());
 
-    if (stationElement instanceof Stop stop && stop.getPlatformCode() != null) {
+    if (stationElement instanceof RegularStop stop && stop.getPlatformCode() != null) {
       sb.append(" [").append(stop.getPlatformCode()).append("]");
     }
 

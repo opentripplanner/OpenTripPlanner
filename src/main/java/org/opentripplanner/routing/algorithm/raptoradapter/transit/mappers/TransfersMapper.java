@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -23,7 +23,7 @@ class TransfersMapper {
       transferByStopIndex.add(list);
 
       for (PathTransfer pathTransfer : transitModel.getTransfersByStop(stop)) {
-        if (pathTransfer.to instanceof Stop) {
+        if (pathTransfer.to instanceof RegularStop) {
           int toStopIndex = pathTransfer.to.getIndex();
           Transfer newTransfer;
           if (pathTransfer.getEdges() != null) {
