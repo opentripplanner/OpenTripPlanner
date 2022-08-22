@@ -5,6 +5,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 
 public class JourneyRequest {
 
+  // TODO: 2022-08-22 maybe move it to transit so that it lies together with main modes?
   // TODO: 2022-08-18 should it be here?
   /**
    * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //

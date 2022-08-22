@@ -159,7 +159,11 @@ public class RaptorRequestMapper {
 
     // Add this last, it depends on generating an alias from the set values
     builder.performanceTimers(
-      new PerformanceTimersForRaptor(builder.generateAlias(), preferences.system().tags(), meterRegistry)
+      new PerformanceTimersForRaptor(
+        builder.generateAlias(),
+        preferences.system().tags(),
+        meterRegistry
+      )
     );
 
     return builder.build();

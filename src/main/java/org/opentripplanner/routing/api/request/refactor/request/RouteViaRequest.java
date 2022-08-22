@@ -16,5 +16,4 @@ public class RouteViaRequest extends NewRouteRequest {
     // ONLY SUPPORT true
     super.timetableView = true;
   }
-
 }

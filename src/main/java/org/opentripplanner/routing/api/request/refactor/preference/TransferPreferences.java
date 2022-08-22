@@ -4,6 +4,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 
 public class TransferPreferences {
+
   /**
    * An extra penalty added on transfers (i.e. all boardings except the first one). Not to be
    * confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a vehicle with
@@ -48,6 +49,7 @@ public class TransferPreferences {
    * problem could disappear.
    */
   private double waitReluctance = 1.0;
+
   /**
    * How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first
    * boarding)
@@ -57,6 +59,7 @@ public class TransferPreferences {
    */
   @Deprecated
   private double waitAtBeginningFactor = 0.4;
+
   /** Configure the transfer optimization */
   private TransferOptimizationParameters optimization = new TransferOptimizationRequest();
   /**

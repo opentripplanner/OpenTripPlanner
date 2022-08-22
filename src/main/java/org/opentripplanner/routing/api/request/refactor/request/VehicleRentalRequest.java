@@ -5,6 +5,7 @@ import java.util.Set;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 
 public class VehicleRentalRequest {
+
   private Set<RentalVehicleType.FormFactor> allowedFormFactors = new HashSet<>();
   private Set<String> allowedNetworks = Set.of();
   private Set<String> bannedNetworks = Set.of();

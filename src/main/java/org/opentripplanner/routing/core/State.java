@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -46,9 +48,9 @@ public class State implements Cloneable {
   public State(RoutingContext rctx) {
     this(
       rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
-      rctx.opt.getDateTime(),
+      rctx.opt.dateTime(),
       rctx,
-      StateData.getInitialStateData(rctx.opt)
+      StateData.getInitialStateData(rctx.opt, rctx.pref)
     );
   }
 
@@ -56,9 +58,9 @@ public class State implements Cloneable {
    * Create an initial state, forcing vertex to the specified value. Useful for reusing a
    * RoutingContext in TransitIndex, tests, etc.
    */
-  public State(Vertex vertex, RoutingRequest opt, RoutingContext routingContext) {
+  public State(Vertex vertex, NewRouteRequest opt, RoutingPreferences pref, RoutingContext routingContext) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.getDateTime(), routingContext, StateData.getInitialStateData(opt));
+    this(vertex, opt.dateTime(), routingContext, StateData.getInitialStateData(opt, pref));
   }
 
   /**
@@ -88,12 +90,13 @@ public class State implements Cloneable {
    * states must be created from a parent and associated with an edge.
    */
   public static Collection<State> getInitialStates(RoutingContext routingContext) {
-    RoutingRequest request = routingContext.opt;
+    NewRouteRequest request = routingContext.opt;
+    RoutingPreferences preferences = routingContext.pref;
     Collection<State> states = new ArrayList<>();
-    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request);
+    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, preferences);
     for (Vertex vertex : routingContext.fromVertices) {
       for (StateData stateData : initialStateDatas) {
-        states.add(new State(vertex, request.getDateTime(), routingContext, stateData));
+        states.add(new State(vertex, request.dateTime(), routingContext, stateData));
       }
     }
     return states;
@@ -154,7 +157,7 @@ public class State implements Cloneable {
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING ||
       (
-        getOptions().allowKeepingRentedVehicleAtDestination &&
+        getPreferences().rental().allowKeepingRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
       )
@@ -178,15 +181,15 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = stateData.opt.parkAndRide;
+    boolean parkAndRide = stateData.pref.car().parkAndRide();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
-    if (stateData.opt.arriveBy) {
-      vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
+    if (stateData.opt.arriveBy()) {
+      vehicleRentingOk = !stateData.pref.rental().allow() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.opt.vehicleRental || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
+        !stateData.pref.rental().allow() || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;
@@ -261,8 +264,12 @@ public class State implements Cloneable {
     return this;
   }
 
-  public RoutingRequest getOptions() {
+  public NewRouteRequest getOptions() {
     return stateData.opt;
+  }
+
+  public RoutingPreferences getPreferences() {
+    return stateData.pref;
   }
 
   public RoutingContext getRoutingContext() {
@@ -408,7 +415,8 @@ public class State implements Cloneable {
   private State reversedClone() {
     // We no longer compensate for schedule slack (minTransferTime) here.
     // It is distributed symmetrically over all preboard and prealight edges.
-    var newStateData = StateData.getInitialStateData(stateData.opt.reversedClone());
+    // TODO: 2022-08-22 should be clone preferences as well here?
+    var newStateData = StateData.getInitialStateData(stateData.opt.reversedClone(), stateData.pref);
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.

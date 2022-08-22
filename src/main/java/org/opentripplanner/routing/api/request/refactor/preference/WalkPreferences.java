@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
 public class WalkPreferences {
+
   /**
    * Human walk speed along streets, in meters per second.
    * <p>

@@ -27,9 +27,16 @@ public class DirectFlexRouter {
     if (!StreetMode.FLEXIBLE.equals(request.journeyRequest().direct().mode())) {
       return Collections.emptyList();
     }
-    NewRouteRequest directRequest = request.getStreetSearchRequest(request.journeyRequest().direct().mode(), preferences);
+    NewRouteRequest directRequest = request.getStreetSearchRequest(
+      request.journeyRequest().direct().mode(),
+      preferences
+    );
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest, preferences)
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        directRequest,
+        preferences
+      )
     ) {
       RoutingContext routingContext = new RoutingContext(
         directRequest,

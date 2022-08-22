@@ -28,9 +28,16 @@ public class DirectStreetRouter {
       return Collections.emptyList();
     }
 
-    NewRouteRequest directRequest = request.getStreetSearchRequest(request.journeyRequest().direct().mode(), preferences);
+    NewRouteRequest directRequest = request.getStreetSearchRequest(
+      request.journeyRequest().direct().mode(),
+      preferences
+    );
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest, preferences)
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        directRequest,
+        preferences
+      )
     ) {
       final RoutingContext routingContext = new RoutingContext(
         directRequest,
@@ -79,11 +86,18 @@ public class DirectStreetRouter {
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RoutingRequest.
    */
-  private static double calculateDistanceMaxLimit(NewRouteRequest request, RoutingPreferences preferences) {
+  private static double calculateDistanceMaxLimit(
+    NewRouteRequest request,
+    RoutingPreferences preferences
+  ) {
     double distanceLimit;
     StreetMode mode = request.journeyRequest().direct().mode();
 
-    double durationLimit = preferences.street().maxDirectStreetDurationForMode().get(mode).toSeconds();
+    double durationLimit = preferences
+      .street()
+      .maxDirectStreetDurationForMode()
+      .get(mode)
+      .toSeconds();
 
     if (mode.includesDriving()) {
       distanceLimit = durationLimit * preferences.car().speed();

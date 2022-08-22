@@ -92,7 +92,9 @@ public class RoutingWorker {
   public RoutingResponse route() {
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
-    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.journeyRequest().direct().mode());
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
+      request.journeyRequest().direct().mode()
+    );
 
     // TODO: 2022-08-18 this was a builder pattern before
     request.journeyRequest().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
@@ -156,7 +158,6 @@ public class RoutingWorker {
     }
 
     this.debugTimingAggregator.finishedFiltering();
-
 
     // TODO: 2022-08-18 this was a builder pattern before
     // Restore original directMode.
@@ -242,7 +243,9 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      itineraries.addAll(DirectFlexRouter.route(serverContext, request, preferences, additionalSearchDays));
+      itineraries.addAll(
+        DirectFlexRouter.route(serverContext, request, preferences, additionalSearchDays)
+      );
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {

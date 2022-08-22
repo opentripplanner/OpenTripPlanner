@@ -5,6 +5,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 public class StreetRequest {
+
   /**
    * This is the maximum duration for a direct street search. This is a performance limit and should
    * therefore be set high. Results close to the limit are not guaranteed to be optimal.

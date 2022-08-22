@@ -399,7 +399,11 @@ public class StreetVertexIndex {
     return temporaryStreetLocation;
   }
 
-  private TraverseMode getTraverseModeForLinker(NewRouteRequest options, RoutingPreferences preferences, boolean endVertex) {
+  private TraverseMode getTraverseModeForLinker(
+    NewRouteRequest options,
+    RoutingPreferences preferences,
+    boolean endVertex
+  ) {
     TraverseMode nonTransitMode = TraverseMode.WALK;
     //It can be null in tests
     if (options != null) {

@@ -33,7 +33,8 @@ import org.opentripplanner.util.WorldEnvelope;
 /**
  * Entry point for requests towards the routing API.
  */
-public class RoutingService implements org.opentripplanner.routing.api.request.refactor.RoutingService {
+public class RoutingService
+  implements org.opentripplanner.routing.api.request.refactor.RoutingService {
 
   private final OtpServerRequestContext serverContext;
   private final Graph graph;
@@ -49,6 +50,7 @@ public class RoutingService implements org.opentripplanner.routing.api.request.r
     this.graphFinder = serverContext.graphFinder();
   }
 
+  @Override
   public RoutingResponse route(NewRouteRequest request, RoutingPreferences preferences) {
     RoutingWorker worker = new RoutingWorker(serverContext, request, preferences, timeZone);
     return worker.route();

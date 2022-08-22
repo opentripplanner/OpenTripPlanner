@@ -23,9 +23,7 @@ public class ItinerariesHelper {
         // was by removing a slope limit.
         OptionalDouble maxSlope = getMaxSlope(it);
         if (maxSlope.isPresent()) {
-          it.setTooSloped(
-            maxSlope.getAsDouble() > preferences.accessibility().maxSlope()
-          );
+          it.setTooSloped(maxSlope.getAsDouble() > preferences.accessibility().maxSlope());
           it.setMaxSlope(maxSlope.getAsDouble());
         }
       }

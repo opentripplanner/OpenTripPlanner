@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
 public class CarPreferences {
+
   /**
    * Max car speed along streets, in meters per second.
    * <p>

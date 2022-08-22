@@ -11,6 +11,7 @@ public class SystemPreferences {
 
   @Nonnull
   private ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
+
   // TODO: 2022-08-17 is this right?
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
@@ -22,12 +23,11 @@ public class SystemPreferences {
    */
   private DataOverlayParameters dataOverlay;
   /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
-  private boolean geoidElevation=false;
+  private boolean geoidElevation = false;
 
   // The REST API should hold onto this, and pass it to the mapper, no need to include it in the
   // request.
   // boolean showIntermediateStops=false;
-
 
   @Nonnull
   public ItineraryFilterParameters itineraryFilters() {

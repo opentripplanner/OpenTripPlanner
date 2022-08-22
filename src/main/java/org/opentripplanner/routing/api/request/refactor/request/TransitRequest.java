@@ -11,6 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 
 public class TransitRequest {
+
   // TODO: 2022-08-17 Should be a set?
   private List<MainAndSubMode> modes = MainAndSubMode.all();
   private Set<FeedScopedId> whiteListedAgencies = Set.of();
@@ -27,9 +28,9 @@ public class TransitRequest {
   public Set<FeedScopedId> bannedRoutes(Collection<Route> routes) {
     if (
       bannedRoutes.isEmpty() &&
-        bannedAgencies.isEmpty() &&
-        whiteListedRoutes.isEmpty() &&
-        whiteListedAgencies.isEmpty()
+      bannedAgencies.isEmpty() &&
+      whiteListedRoutes.isEmpty() &&
+      whiteListedAgencies.isEmpty()
     ) {
       return Set.of();
     }

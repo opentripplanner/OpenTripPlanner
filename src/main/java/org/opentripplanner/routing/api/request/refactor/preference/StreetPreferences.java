@@ -8,6 +8,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 
 // Direct street search
 public class StreetPreferences {
+
   /**
    * This is the maximum duration for access/egress street searches. This is a performance limit and
    * should therefore be set high. Results close to the limit are not guaranteed to be optimal.
@@ -68,7 +69,9 @@ public class StreetPreferences {
     return maxAccessEgressDuration;
   }
 
-  public void setMaxAccessEgressDurationForMode(Map<StreetMode, Duration> maxAccessEgressDurationForMode) {
+  public void setMaxAccessEgressDurationForMode(
+    Map<StreetMode, Duration> maxAccessEgressDurationForMode
+  ) {
     this.maxAccessEgressDurationForMode = maxAccessEgressDurationForMode;
   }
 
@@ -84,7 +87,9 @@ public class StreetPreferences {
     return maxDirectStreetDuration;
   }
 
-  public void setMaxDirectStreetDurationForMode(Map<StreetMode, Duration> maxDirectStreetDurationForMode) {
+  public void setMaxDirectStreetDurationForMode(
+    Map<StreetMode, Duration> maxDirectStreetDurationForMode
+  ) {
     this.maxDirectStreetDurationForMode = maxDirectStreetDurationForMode;
   }
 

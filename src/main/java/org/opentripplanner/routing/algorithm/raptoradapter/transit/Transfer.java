@@ -41,8 +41,14 @@ public class Transfer {
   // Previously it took one instance as an input returned another one
   // Now it has to operate on two instances
   // Maybe we should return a Pair<RoutingRequest,RoutingPreferences> instead?
-  public static NewRouteRequest prepareTransferRoutingRequest(NewRouteRequest request, RoutingPreferences preferences) {
-    NewRouteRequest rr = request.getStreetSearchRequest(request.journeyRequest().transfer().mode(), preferences);
+  public static NewRouteRequest prepareTransferRoutingRequest(
+    NewRouteRequest request,
+    RoutingPreferences preferences
+  ) {
+    NewRouteRequest rr = request.getStreetSearchRequest(
+      request.journeyRequest().transfer().mode(),
+      preferences
+    );
 
     rr.setArriveBy(false);
     rr.setDateTime(Instant.ofEpochSecond(0));
@@ -62,8 +68,7 @@ public class Transfer {
 
     // TODO: 2022-08-19 this now lies within parameter class - figure out what to do with it
     // it's a record (immutable) so can be safely reused
-//    rr.wheelchairAccessibility = request.wheelchairAccessibility;
-
+    //    rr.wheelchairAccessibility = request.wheelchairAccessibility;
 
     wp.setSpeed(roundToHalf(wp.speed()));
     bp.setSpeed(roundToHalf(bp.speed()));

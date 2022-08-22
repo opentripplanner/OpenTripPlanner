@@ -7,6 +7,7 @@ import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitPreferences {
+
   /**
    * When true, realtime updates are ignored during this search.
    */
@@ -32,7 +33,9 @@ public class TransitPreferences {
    * <p>
    * Unit is seconds. Default value is not-set(empty map).
    */
-  private Map<TransitMode, Integer> boardSlackForMode = new EnumMap<TransitMode, Integer>(TransitMode.class);
+  private Map<TransitMode, Integer> boardSlackForMode = new EnumMap<TransitMode, Integer>(
+    TransitMode.class
+  );
   /**
    * The number of seconds to add after alighting a transit leg. It is recommended to use the
    * `alightTimes` in the `router-config.json` to set this for each mode.
@@ -50,7 +53,9 @@ public class TransitPreferences {
    * <p>
    * Unit is seconds. Default value is not-set(empty map).
    */
-  private Map<TransitMode, Integer> alightSlackForMode = new EnumMap<TransitMode, Integer>(TransitMode.class);
+  private Map<TransitMode, Integer> alightSlackForMode = new EnumMap<TransitMode, Integer>(
+    TransitMode.class
+  );
   /**
    * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add a
    * penalty to other modes (> 1.0). The type used here it the internal model {@link TransitMode}
@@ -62,6 +67,7 @@ public class TransitPreferences {
    * is not-set(empty map).
    */
   private Map<TransitMode, Double> reluctanceForMode = new HashMap<>();
+
   /**
    * Penalty added for using every route that is not preferred if user set any route as preferred.
    * We return number of seconds that we are willing to wait for preferred route.
@@ -70,6 +76,7 @@ public class TransitPreferences {
    */
   @Deprecated
   private int otherThanPreferredRoutesPenalty = 300;
+
   /**
    * Penalty added for using every route that is not preferred if user set any route as preferred.
    * We return number of seconds that we are willing to wait for preferred route.
@@ -78,6 +85,7 @@ public class TransitPreferences {
    */
   @Deprecated
   private int useUnpreferredRoutesPenalty = 300;
+
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */

@@ -19,7 +19,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
@@ -208,12 +207,18 @@ public class TransitRouter {
   ) {
     var results = new ArrayList<AccessEgress>();
 
-    var mode = isEgress ? request.journeyRequest().egress().mode() : request.journeyRequest().access().mode();
+    var mode = isEgress
+      ? request.journeyRequest().egress().mode()
+      : request.journeyRequest().access().mode();
 
     // Prepare access/egress lists
     NewRouteRequest accessRequest = request.getStreetSearchRequest(mode, preferences);
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest, preferences)
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        accessRequest,
+        preferences
+      )
     ) {
       var routingContext = new RoutingContext(
         accessRequest,
@@ -224,7 +229,11 @@ public class TransitRouter {
 
       if (!isEgress) {
         // TODO: 2022-08-19 is this right?
-        accessRequest.journeyRequest().access().vehicleRental().setAllowKeepingVehicleAtDestination(true);
+        accessRequest
+          .journeyRequest()
+          .access()
+          .vehicleRental()
+          .setAllowKeepingVehicleAtDestination(true);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(
@@ -242,7 +251,7 @@ public class TransitRouter {
           routingContext,
           serverContext.transitService(),
           additionalSearchDays,
-          serverContext.routerConfig().flexParameters(request),
+          serverContext.routerConfig().flexParameters(preferences),
           isEgress
         );
 
@@ -256,7 +265,10 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    NewRouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request, preferences);
+    NewRouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(
+      request,
+      preferences
+    );
 
     return new RaptorRoutingRequestTransitData(
       transitLayer,
@@ -264,7 +276,13 @@ public class TransitRouter {
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       createRequestTransitDataProviderFilter(serverContext.transitService()),
-      new RoutingContext(transferRoutingRequest, preferences, serverContext.graph(), (Vertex) null, null)
+      new RoutingContext(
+        transferRoutingRequest,
+        preferences,
+        serverContext.graph(),
+        (Vertex) null,
+        null
+      )
     );
   }
 

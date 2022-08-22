@@ -187,7 +187,10 @@ public class NewRouteRequest {
   }
 
   // TODO: 2022-08-18 This should probably not be here
-  public NewRouteRequest getStreetSearchRequest(StreetMode streetMode, RoutingPreferences routingPreferences) {
+  public NewRouteRequest getStreetSearchRequest(
+    StreetMode streetMode,
+    RoutingPreferences routingPreferences
+  ) {
     NewRouteRequest streetRequest = this.clone();
     var journeyRequest = streetRequest.journeyRequest;
     journeyRequest.setStreetSubRequestModes(new TraverseModeSet());
@@ -213,9 +216,21 @@ public class NewRouteRequest {
           );
           routingPreferences.rental().setAllow(true);
           // TODO: 2022-08-18 does it make sense?
-          journeyRequest.direct().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
-          journeyRequest.egress().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
-          journeyRequest.access().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
+          journeyRequest
+            .direct()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.BICYCLE);
+          journeyRequest
+            .egress()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.BICYCLE);
+          journeyRequest
+            .access()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.BICYCLE);
           break;
         case SCOOTER_RENTAL:
           journeyRequest.setStreetSubRequestModes(
@@ -223,9 +238,21 @@ public class NewRouteRequest {
           );
           routingPreferences.rental().setAllow(true);
           // TODO: 2022-08-18 does it make sense?
-          journeyRequest.direct().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
-          journeyRequest.egress().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
-          journeyRequest.access().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
+          journeyRequest
+            .direct()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.SCOOTER);
+          journeyRequest
+            .egress()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.SCOOTER);
+          journeyRequest
+            .access()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.SCOOTER);
           break;
         case CAR:
           journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
@@ -247,13 +274,30 @@ public class NewRouteRequest {
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
           routingPreferences.rental().setAllow(true);
-          journeyRequest.direct().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
-          journeyRequest.egress().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
-          journeyRequest.access().vehicleRental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
+          journeyRequest
+            .direct()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.CAR);
+          journeyRequest
+            .egress()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.CAR);
+          journeyRequest
+            .access()
+            .vehicleRental()
+            .allowedFormFactors()
+            .add(RentalVehicleType.FormFactor.CAR);
       }
     }
 
     return streetRequest;
+  }
+
+  public NewRouteRequest reversedClone() {
+    // TODO: 2022-08-22 Implement it
+    throw new RuntimeException("Not implemented");
   }
 
   // TODO: 2022-08-18 implement
@@ -320,5 +364,4 @@ public class NewRouteRequest {
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
   }
-
 }

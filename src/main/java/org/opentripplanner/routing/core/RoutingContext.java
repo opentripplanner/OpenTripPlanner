@@ -61,7 +61,13 @@ public class RoutingContext {
   /**
    * Constructor that takes to/from vertices as input.
    */
-  public RoutingContext(NewRouteRequest request, RoutingPreferences preferences, Graph graph, Vertex from, Vertex to) {
+  public RoutingContext(
+    NewRouteRequest request,
+    RoutingPreferences preferences,
+    Graph graph,
+    Vertex from,
+    Vertex to
+  ) {
     this(request, preferences, graph, Collections.singleton(from), Collections.singleton(to));
   }
 
@@ -85,7 +91,10 @@ public class RoutingContext {
     this.toVertices = request.arriveBy() ? from : to;
     this.dataOverlayContext =
       OTPFeature.DataOverlay.isOnElseNull(() ->
-        new DataOverlayContext(graph.dataOverlayParameterBindings, preferences.system().dataOverlay())
+        new DataOverlayContext(
+          graph.dataOverlayParameterBindings,
+          preferences.system().dataOverlay()
+        )
       );
   }
 }

@@ -104,13 +104,14 @@ public class RaptorPathToItineraryMapper {
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
-
       // Map transfer leg
       else if (pathLeg.isTransferLeg()) {
         legs.addAll(
           mapTransferLeg(
             pathLeg.asTransferLeg(),
-            request.journeyRequest().transfer().mode() == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+            request.journeyRequest().transfer().mode() == StreetMode.BIKE
+              ? TraverseMode.BICYCLE
+              : TraverseMode.WALK
           )
         );
       }
@@ -267,7 +268,10 @@ public class RaptorPathToItineraryMapper {
     } else {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges
       // may be re-traversed to create the leg(s) from the list of edges.
-      NewRouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request, preferences);
+      NewRouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(
+        request,
+        preferences
+      );
 
       traverseRequest.setArriveBy(false);
       RoutingContext routingContext = new RoutingContext(

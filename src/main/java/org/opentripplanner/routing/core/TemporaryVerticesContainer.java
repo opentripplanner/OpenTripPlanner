@@ -38,14 +38,18 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
 
-  public TemporaryVerticesContainer(Graph graph, NewRouteRequest opt, RoutingPreferences preferences) {
+  public TemporaryVerticesContainer(
+    Graph graph,
+    NewRouteRequest opt,
+    RoutingPreferences preferences
+  ) {
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
     StreetVertexIndex index = this.graph.getStreetIndex();
     this.opt = opt;
     fromVertices = index.getVerticesForLocation(opt.from(), opt, preferences, false, tempEdges);
-    toVertices = index.getVerticesForLocation(opt.to(), opt, preferences,true, tempEdges);
+    toVertices = index.getVerticesForLocation(opt.to(), opt, preferences, true, tempEdges);
 
     checkIfVerticesFound(opt.arriveBy());
 
