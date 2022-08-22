@@ -21,6 +21,8 @@ import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeSt
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -107,7 +109,8 @@ public class NearbyStopFinder {
    */
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
-    RoutingRequest routingRequest,
+    NewRouteRequest routingRequest,
+    RoutingPreferences preferences,
     boolean reverseDirection
   ) {
     /* Track the closest stop on each pattern passing nearby. */
@@ -120,6 +123,8 @@ public class NearbyStopFinder {
     for (NearbyStop nearbyStop : findNearbyStops(
       vertex,
       routingRequest.clone(),
+      // TODO: 2022-08-22 do we need to clone preferences as well?
+      preferences,
       reverseDirection
     )) {
       StopLocation ts1 = nearbyStop.stop;
@@ -152,11 +157,12 @@ public class NearbyStopFinder {
    */
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
-    RoutingRequest routingRequest,
+    NewRouteRequest routingRequest,
+    RoutingPreferences preferences,
     boolean reverseDirection
   ) {
     if (useStreets) {
-      return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest);
+      return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest, preferences);
     } else {
       return findNearbyStopsViaDirectTransfers(vertex);
     }
@@ -173,7 +179,8 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RoutingRequest routingRequest
+    NewRouteRequest routingRequest,
+    RoutingPreferences preferences
   ) {
     List<NearbyStop> stopsFound = new ArrayList<>();
 
@@ -181,9 +188,9 @@ public class NearbyStopFinder {
 
     RoutingContext routingContext;
     if (!reverseDirection) {
-      routingContext = new RoutingContext(routingRequest, graph, originVertices, null);
+      routingContext = new RoutingContext(routingRequest, preferences, graph, originVertices, null);
     } else {
-      routingContext = new RoutingContext(routingRequest, graph, null, originVertices);
+      routingContext = new RoutingContext(routingRequest, preferences, graph, null, originVertices);
     }
 
     /* Add the origin vertices if they are stops */
@@ -194,14 +201,14 @@ public class NearbyStopFinder {
             tsv.getStop(),
             0,
             Collections.emptyList(),
-            new State(vertex, routingRequest, routingContext)
+            new State(vertex, routingRequest, preferences, routingContext)
           )
         );
       }
     }
 
     // Return only the origin vertices if there are no valid street modes
-    if (!routingRequest.streetSubRequestModes.isValid()) {
+    if (!routingRequest.journeyRequest().streetSubRequestModes().isValid()) {
       return stopsFound;
     }
 
@@ -273,7 +280,7 @@ public class NearbyStopFinder {
 
   private SkipEdgeStrategy getSkipEdgeStrategy(
     boolean reverseDirection,
-    RoutingRequest routingRequest
+    NewRouteRequest routingRequest
   ) {
     var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
 
@@ -287,16 +294,16 @@ public class NearbyStopFinder {
     if (
       !reverseDirection &&
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)
+      VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.journeyRequest().access().mode())
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
-        routingRequest.modes.transitModes.stream().map(MainAndSubMode::mainMode).toList()
+        routingRequest.journeyRequest().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
       );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      routingRequest.modes.accessMode == StreetMode.BIKE
+        routingRequest.journeyRequest().access().mode() == StreetMode.BIKE
     ) {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);

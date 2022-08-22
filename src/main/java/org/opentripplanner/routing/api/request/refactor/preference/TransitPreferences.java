@@ -1,9 +1,13 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
+
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.RaptorOptions;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitPreferences {
@@ -87,6 +91,15 @@ public class TransitPreferences {
   private int useUnpreferredRoutesPenalty = 300;
 
   /**
+   * A cost function used to calculate penalty for an unpreferred route. Function should return
+   * number of seconds that we are willing to wait for preferred route.
+   */
+  private DoubleFunction<Double> unpreferredRouteCost = RequestFunctions.createLinearFunction(
+    0.0,
+    DEFAULT_ROUTE_RELUCTANCE
+  );
+
+  /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
   private RaptorOptions raptorOptions = new RaptorOptions();
@@ -129,5 +142,9 @@ public class TransitPreferences {
 
   public RaptorOptions raptorOptions() {
     return raptorOptions;
+  }
+
+  public DoubleFunction<Double> unpreferredRouteCost() {
+    return unpreferredRouteCost;
   }
 }

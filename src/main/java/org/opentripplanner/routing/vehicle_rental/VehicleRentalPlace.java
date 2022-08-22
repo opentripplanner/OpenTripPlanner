@@ -2,6 +2,8 @@ package org.opentripplanner.routing.vehicle_rental;
 
 import java.util.Set;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.refactor.request.VehicleRentalRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -80,25 +82,25 @@ public interface VehicleRentalPlace {
   /** Deep links for this rental station or individual vehicle */
   VehicleRentalStationUris getRentalUris();
 
-  default boolean networkIsNotAllowed(RoutingRequest options) {
+  default boolean networkIsNotAllowed(VehicleRentalRequest request) {
     if (
       getNetwork() == null &&
       (
-        !options.allowedVehicleRentalNetworks.isEmpty() ||
-        !options.bannedVehicleRentalNetworks.isEmpty()
+        !request.allowedNetworks().isEmpty() ||
+        !request.bannedNetworks().isEmpty()
       )
     ) {
       return false;
     }
 
-    if (options.bannedVehicleRentalNetworks.contains(getNetwork())) {
+    if (request.bannedNetworks().contains(getNetwork())) {
       return true;
     }
 
-    if (options.allowedVehicleRentalNetworks.isEmpty()) {
+    if (request.allowedNetworks().isEmpty()) {
       return false;
     }
 
-    return !options.allowedVehicleRentalNetworks.contains(getNetwork());
+    return !request.allowedNetworks().contains(getNetwork());
   }
 }

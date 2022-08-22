@@ -14,6 +14,8 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -41,7 +43,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final Duration radiusByDuration;
 
-  private final List<RoutingRequest> transferRequests;
+  private final List<NewRouteRequest> transferRequests;
+  private final List<RoutingPreferences> transferPreferences;
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
@@ -51,13 +54,22 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransitModel transitModel,
     DataImportIssueStore issueStore,
     Duration radiusByDuration,
-    List<RoutingRequest> transferRequests
+    List<NewRouteRequest> transferRequests,
+    List<RoutingPreferences> transferPreferences
   ) {
+
+    // TODO: 2022-08-22 figure out what to do with it 
+    // TODO: 2022-08-22 maybe link requests and preferences in some way?
+    if (transferRequests.size() != transferPreferences.size()) {
+      throw new RuntimeException("Transfer requests do not match with transfer preferences");
+    }
+    
     this.graph = graph;
     this.transitModel = transitModel;
     this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
+    this.transferPreferences = transferPreferences;
   }
 
   @Override
@@ -107,12 +119,16 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         RegularStop stop = ts0.getStop();
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        for (RoutingRequest transferProfile : transferRequests) {
-          RoutingRequest streetRequest = Transfer.prepareTransferRoutingRequest(transferProfile);
+        for (int i = 0; i < transferRequests.size(); i++) {
+          NewRouteRequest transferProfile = transferRequests.get(i);
+          RoutingPreferences transferPreferences = this.transferPreferences.get(i);
+
+          NewRouteRequest streetRequest = Transfer.prepareTransferRoutingRequest(transferProfile, transferPreferences);
 
           for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
             ts0,
             streetRequest,
+            transferPreferences,
             false
           )) {
             // Skip the origin stop, loop transfers are not needed.
@@ -130,6 +146,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
               ts0,
               streetRequest,
+              transferPreferences,
               true
             )) {
               // Skip the origin stop, loop transfers are not needed.

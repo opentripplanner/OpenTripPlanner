@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -78,19 +79,20 @@ public class StreetVehicleParkingLink extends Edge {
     return 0;
   }
 
-  private boolean hasBannedTags(RoutingRequest options, VehicleParking vehicleParking) {
-    if (options.bannedVehicleParkingTags.isEmpty()) {
+  private boolean hasBannedTags(NewRouteRequest options, VehicleParking vehicleParking) {
+    if (options.journeyRequest().access().vehicleParking().bannedTags().isEmpty()) {
       return false;
     }
 
-    return vehicleParking.getTags().stream().anyMatch(options.bannedVehicleParkingTags::contains);
+    return vehicleParking.getTags().stream().anyMatch(options.journeyRequest().access().vehicleParking().bannedTags()::contains);
   }
 
-  private boolean hasMissingRequiredTags(RoutingRequest options, VehicleParking vehicleParking) {
-    if (options.requiredVehicleParkingTags.isEmpty()) {
+  private boolean hasMissingRequiredTags(NewRouteRequest options, VehicleParking vehicleParking) {
+    // TODO: 2022-08-22 this can't be right
+    if (options.journeyRequest().access().vehicleParking().requiredTags().isEmpty()) {
       return false;
     }
+    return !vehicleParking.getTags().containsAll(options.journeyRequest().access().vehicleParking().requiredTags());
 
-    return !vehicleParking.getTags().containsAll(options.requiredVehicleParkingTags);
   }
 }

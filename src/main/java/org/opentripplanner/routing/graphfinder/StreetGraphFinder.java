@@ -8,7 +8,8 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -75,18 +76,22 @@ public class StreetGraphFinder implements GraphFinder {
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
-    RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-    rr.from = new GenericLocation(null, null, lat, lon);
-    rr.walkSpeed = 1;
+    var rr = new NewRouteRequest(TraverseMode.WALK);
+    var pref = new RoutingPreferences();
+
+    rr.setTo(new GenericLocation(null, null, lat, lon));
+    rr.setFrom(new GenericLocation(null, null, lat, lon));
+
+    pref.walk().setSpeed(1);
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, rr)) {
+    try (var temporaryVertices = new TemporaryVerticesContainer(graph, rr, pref)) {
       AStarBuilder
         .allDirections(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunction.LeastWalk())
-        .setContext(new RoutingContext(rr, graph, temporaryVertices))
+        .setContext(new RoutingContext(rr, pref, graph, temporaryVertices))
         .getShortestPathTree();
     }
   }

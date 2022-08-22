@@ -1,10 +1,14 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.impl.DurationComparator;
+import org.opentripplanner.routing.impl.PathComparator;
+import org.opentripplanner.routing.spt.GraphPath;
 
 // Direct street search
 public class StreetPreferences {
@@ -60,6 +64,22 @@ public class StreetPreferences {
    */
   @Deprecated
   private String pathComparator = null;
+
+  public Duration maxDirectStreetDuration(StreetMode mode) {
+    return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
+  }
+
+  public Duration maxAccessEgressDuration(StreetMode mode) {
+    return maxAccessEgressDurationForMode.getOrDefault(mode, maxAccessEgressDuration);
+  }
+
+  // TODO: 2022-08-22 do we wanna have this method here?
+  public Comparator<GraphPath> pathComparator(boolean compareStartTimes) {
+    if ("duration".equals(pathComparator)) {
+      return new DurationComparator();
+    }
+    return new PathComparator(compareStartTimes);
+  }
 
   public void setMaxAccessEgressDuration(Duration maxAccessEgressDuration) {
     this.maxAccessEgressDuration = maxAccessEgressDuration;
@@ -139,9 +159,5 @@ public class StreetPreferences {
 
   public int elevatorHopCost() {
     return elevatorHopCost;
-  }
-
-  public String pathComparator() {
-    return pathComparator;
   }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -26,30 +27,35 @@ public class VehicleRentalEdge extends Edge {
   }
 
   public State traverse(State s0) {
-    if (!s0.getOptions().vehicleRental) {
+    if (!s0.getPreferences().rental().allow()) {
       return null;
     }
+
+    var options = s0.getOptions();
+    // TODO: 2022-08-22 fix this
+    var vehicleRental = options.journeyRequest().access().vehicleRental();
+    var preferences = s0.getPreferences();
+
     if (
-      !s0.getOptions().allowedRentalFormFactors.isEmpty() &&
-      !s0.getOptions().allowedRentalFormFactors.contains(formFactor)
+      !vehicleRental.allowedFormFactors().isEmpty() &&
+      !vehicleRental.allowedFormFactors().contains(formFactor)
     ) {
       return null;
     }
 
     StateEditor s1 = s0.edit(this);
-    RoutingRequest options = s0.getOptions();
 
     VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
     String network = station.getNetwork();
-    boolean realtimeAvailability = options.useVehicleRentalAvailabilityInformation;
+    boolean realtimeAvailability = vehicleRental.useAvailabilityInformation();
 
-    if (station.networkIsNotAllowed(s0.getOptions())) {
+    if (station.networkIsNotAllowed(vehicleRental)) {
       return null;
     }
 
     boolean pickedUp;
-    if (options.arriveBy) {
+    if (options.arriveBy()) {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING:
           return null;
@@ -123,7 +129,7 @@ public class VehicleRentalEdge extends Edge {
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
-              options.allowKeepingRentedVehicleAtDestination &&
+              vehicleRental.allowKeepingVehicleAtDestination() &&
               station.isKeepingVehicleRentalAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
           }
@@ -146,11 +152,11 @@ public class VehicleRentalEdge extends Edge {
             return null;
           }
           if (
-            !options.allowedRentalFormFactors.isEmpty() &&
+            !vehicleRental.allowedFormFactors().isEmpty() &&
             station
               .getAvailableDropoffFormFactors(realtimeAvailability)
               .stream()
-              .noneMatch(formFactor -> options.allowedRentalFormFactors.contains(formFactor))
+              .noneMatch(formFactor -> vehicleRental.allowedFormFactors().contains(formFactor))
           ) {
             return null;
           }
@@ -163,10 +169,10 @@ public class VehicleRentalEdge extends Edge {
     }
 
     s1.incrementWeight(
-      pickedUp ? options.vehicleRentalPickupCost : options.vehicleRentalDropoffCost
+      pickedUp ? preferences.rental().pickupCost() : preferences.rental().dropoffCost()
     );
     s1.incrementTimeInSeconds(
-      pickedUp ? options.vehicleRentalPickupTime : options.vehicleRentalDropoffTime
+      pickedUp ? preferences.rental().pickupTime() : preferences.rental().dropoffTime()
     );
     s1.setBackMode(null);
     return s1.makeState();

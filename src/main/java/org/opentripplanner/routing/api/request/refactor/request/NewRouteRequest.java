@@ -3,6 +3,9 @@ package org.opentripplanner.routing.api.request.refactor.request;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -11,8 +14,11 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +28,16 @@ public class NewRouteRequest {
 
   private static final Logger LOG = LoggerFactory.getLogger(NewRouteRequest.class);
 
+  // TODO: 2022-08-22 should it be here?
+  /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
+  /**
+   * How close to do you have to be to the start or end to be considered "close".
+   *
+   * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
+   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+   */
+  private static final int MAX_CLOSENESS_METERS = 500;
+
   /**
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
@@ -29,8 +45,16 @@ public class NewRouteRequest {
   protected Instant dateTime;
   /** The start location */
   protected GenericLocation from;
+
+  // TODO: 2022-08-22 should it be here?
+  private Envelope fromEnvelope;
+
   /** The end location */
   protected GenericLocation to;
+
+  // TODO: 2022-08-22 should it be here?
+  private Envelope toEnvelope;
+
   /**
    * This is the time/duration in seconds from the earliest-departure-time(EDT) to
    * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
@@ -135,6 +159,11 @@ public class NewRouteRequest {
   public NewRouteRequest(TraverseMode mode) {
     this();
     this.journeyRequest.setStreetSubRequestModes(new TraverseModeSet(mode));
+  }
+
+  public NewRouteRequest(TraverseModeSet modeSet) {
+    this();
+    this.journeyRequest.setStreetSubRequestModes(modeSet);
   }
 
   /**
@@ -306,13 +335,53 @@ public class NewRouteRequest {
     return streetRequest;
   }
 
+  /**
+   * Returns if the vertex is considered "close" to the start or end point of the request. This is
+   * useful if you want to allow loops in car routes under certain conditions.
+   * <p>
+   * Note: If you are doing Raptor access/egress searches this method does not take the possible
+   * intermediate points (stations) into account. This means that stations might be skipped because
+   * a car route to it cannot be found and a suboptimal route to another station is returned
+   * instead.
+   * <p>
+   * If you encounter a case of this, you can adjust this code to take this into account.
+   *
+   * @see NewRouteRequest#MAX_CLOSENESS_METERS
+   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
+   */
+  public boolean isCloseToStartOrEnd(Vertex vertex) {
+    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
+      return false;
+    }
+    if (fromEnvelope == null) {
+      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
+    }
+    if (toEnvelope == null) {
+      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
+    }
+    return (
+      fromEnvelope.intersects(vertex.getCoordinate()) ||
+        toEnvelope.intersects(vertex.getCoordinate())
+    );
+  }
+
+  private static Envelope getEnvelope(Coordinate c, int meters) {
+    double lat = SphericalDistanceLibrary.metersToDegrees(meters);
+    double lon = SphericalDistanceLibrary.metersToLonDegrees(meters, c.y);
+
+    Envelope env = new Envelope(c);
+    env.expandBy(lon, lat);
+
+    return env;
+  }
+
   public NewRouteRequest reversedClone() {
     // TODO: 2022-08-22 Implement it
     throw new RuntimeException("Not implemented");
   }
 
   // TODO: 2022-08-18 implement
-  protected NewRouteRequest clone() {
+  public NewRouteRequest clone() {
     return this;
   }
 
@@ -362,6 +431,10 @@ public class NewRouteRequest {
 
   public Locale locale() {
     return locale;
+  }
+
+  public void setNumItineraries(int numItineraries) {
+    this.numItineraries = numItineraries;
   }
 
   public int numItineraries() {

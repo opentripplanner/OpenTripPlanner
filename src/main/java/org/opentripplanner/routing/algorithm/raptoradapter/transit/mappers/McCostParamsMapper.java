@@ -5,45 +5,43 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class McCostParamsMapper {
 
-  public static McCostParams map(
-    RoutingRequest request,
-    List<? extends DefaultTripPattern> patternIndex
-  ) {
+  public static McCostParams map(RoutingRequest request, RoutingPreferences preferences, List<? extends DefaultTripPattern> patternIndex) {
     McCostParamsBuilder builder = new McCostParamsBuilder();
 
-    builder.transferCost(request.transferCost).waitReluctanceFactor(request.waitReluctance);
+    builder.transferCost(preferences.transfer().cost()).waitReluctanceFactor(preferences.transfer().waitReluctance());
 
-    if (request.modes.transferMode == StreetMode.BIKE) {
-      builder.boardCost(request.bikeBoardCost);
+    if (request.journeyRequest().transfer().mode() == StreetMode.BIKE) {
+      builder.boardCost(preferences.bike().boardCost());
     } else {
-      builder.boardCost(request.walkBoardCost);
+      builder.boardCost(preferences.walk().boardCost());
     }
-    builder.transitReluctanceFactors(mapTransitReluctance(request.transitReluctanceForMode()));
 
-    builder.wheelchairAccessibility(request.wheelchairAccessibility);
+    builder.transitReluctanceFactors(mapTransitReluctance(preferences.transit().reluctanceForMode()));
+    builder.wheelchairAccessibility(preferences.wheelchair().accessibility());
 
-    final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
-    final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
+    final Set<FeedScopedId> unpreferredRoutes = request.journeyRequest().transit().unpreferredRoutes().getAgencyAndRouteIds();
+    final Set<FeedScopedId> unpreferredAgencies = request.journeyRequest().transit().unpreferredAgencies();
 
     if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
       final BitSet unpreferredPatterns = new BitSet();
       for (var pattern : patternIndex) {
         if (
           pattern != null &&
-          (
-            unpreferredRoutes.contains(pattern.route().getId()) ||
-            unpreferredAgencies.contains(pattern.route().getAgency().getId())
-          )
+            (
+              unpreferredRoutes.contains(pattern.route().getId()) ||
+                unpreferredAgencies.contains(pattern.route().getAgency().getId())
+            )
         ) {
           unpreferredPatterns.set(pattern.patternIndex());
         }

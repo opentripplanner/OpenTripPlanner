@@ -26,9 +26,9 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   @Override
   public void initialize(RoutingContext rctx) {
     Vertex target = rctx.toVertices.iterator().next();
-    maxStreetSpeed = rctx.opt.getStreetSpeedUpperBound();
-    walkingSpeed = rctx.opt.walkSpeed;
-    arriveBy = rctx.opt.arriveBy;
+    maxStreetSpeed = getStreetSpeedUpperBound(rctx);
+    walkingSpeed = rctx.pref.walk().speed();
+    arriveBy = rctx.opt.arriveBy();
 
     if (target.getDegreeIn() == 1) {
       Edge edge = target.getIncoming().iterator().next();
@@ -39,6 +39,23 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
     lat = target.getLat();
     lon = target.getLon();
+  }
+
+  // TODO: 2022-08-22 moved this method here since it was the most logical place for me
+  // open for suggestions
+  /** @return The highest speed for all possible road-modes. */
+  private double getStreetSpeedUpperBound(RoutingContext rctx) {
+    var options = rctx.opt;
+    var preferences = rctx.pref;
+
+    // Assume carSpeed > bikeSpeed > walkSpeed
+    if (options.journeyRequest().streetSubRequestModes().getCar()) {
+      return preferences.car().speed();
+    }
+    if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
+      return preferences.bike().speed();
+    }
+    return preferences.walk().speed();
   }
 
   /**

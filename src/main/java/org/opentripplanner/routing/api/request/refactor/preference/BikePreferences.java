@@ -58,6 +58,10 @@ public class BikePreferences {
   // TODO: 2022-08-18 Is this right?
   private boolean parkAndRide = false;
 
+  public void setOptimizeType(BicycleOptimizeType optimizeType) {
+    this.optimizeType = optimizeType;
+  }
+
   public BicycleOptimizeType optimizeType() {
     return optimizeType;
   }
@@ -68,6 +72,10 @@ public class BikePreferences {
 
   public double speed() {
     return speed;
+  }
+
+  public void setBoardCost(int boardCost) {
+    this.boardCost = boardCost;
   }
 
   public int boardCost() {

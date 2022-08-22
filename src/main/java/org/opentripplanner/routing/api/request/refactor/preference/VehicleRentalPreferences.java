@@ -39,6 +39,8 @@ public class VehicleRentalPreferences {
    */
   private double keepingVehicleAtDestinationCost = 0;
 
+
+
   public int pickupTime() {
     return pickupTime;
   }

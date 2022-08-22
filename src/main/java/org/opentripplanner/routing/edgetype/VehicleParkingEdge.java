@@ -94,9 +94,19 @@ public class VehicleParkingEdge extends Edge {
     }
 
     if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
-      return traverseUnPark(s0, preferences.bike().parkCost(), preferences.bike().parkTime(), TraverseMode.BICYCLE);
+      return traverseUnPark(
+        s0,
+        preferences.bike().parkCost(),
+        preferences.bike().parkTime(),
+        TraverseMode.BICYCLE
+      );
     } else if (options.journeyRequest().streetSubRequestModes().getCar()) {
-      return traverseUnPark(s0, preferences.car().parkCost(), preferences.car().parkTime(), TraverseMode.CAR);
+      return traverseUnPark(
+        s0,
+        preferences.car().parkCost(),
+        preferences.car().parkTime(),
+        TraverseMode.CAR
+      );
     } else {
       return null;
     }
