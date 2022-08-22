@@ -16,7 +16,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * <p>
- * Fare is a set of fares for different classes of users.
+ * ItineraryFares is a set of fares for different classes of users.
  * </p>
  */
 public class ItineraryFares {

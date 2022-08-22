@@ -25,5 +25,21 @@ class FareProductMapperTest {
 
     assertEquals(internal.duration(), Duration.ofDays(31));
     assertEquals(internal.amount(), Money.usDollars(100));
+    assertEquals(internal.amount().cents(), 100);
+  }
+
+  @Test
+  void noFractionDigits() {
+    var gtfs = new FareProduct();
+    gtfs.setFareProductId(new AgencyAndId("1", "1"));
+    gtfs.setAmount(100);
+    gtfs.setName("day pass");
+    gtfs.setCurrency("JPY");
+
+    var mapper = new FareProductMapper();
+    var internal = mapper.map(gtfs);
+
+    assertEquals(internal.amount().toString(), "¥100");
+    assertEquals(internal.amount().cents(), 100);
   }
 }

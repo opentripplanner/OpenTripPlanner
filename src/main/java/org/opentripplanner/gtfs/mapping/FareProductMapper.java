@@ -13,9 +13,10 @@ public class FareProductMapper {
 
   public FareProduct map(org.onebusaway.gtfs.model.FareProduct fareProduct) {
     var id = AgencyAndIdMapper.mapAgencyAndId(fareProduct.getId());
+    var currency = Currency.getInstance(fareProduct.getCurrency());
     var price = new Money(
-      Currency.getInstance(fareProduct.getCurrency()),
-      (int) (fareProduct.getAmount() * 100)
+      currency,
+      (int) (fareProduct.getAmount() * Math.pow(10,currency.getDefaultFractionDigits()))
     );
 
     Duration duration = null;
