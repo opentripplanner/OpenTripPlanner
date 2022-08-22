@@ -122,7 +122,7 @@ public final class RegularStop
   @Override
   @Nonnull
   public Collection<FareZone> getFareZones() {
-    return Collections.unmodifiableCollection(fareZones);
+    return fareZones;
   }
 
   @Nonnull
