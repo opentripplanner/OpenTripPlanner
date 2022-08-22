@@ -1,16 +1,22 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.raptor._data.transit.TestRoute;
+import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 
 class McCostParamsMapperTest {
 
@@ -22,10 +28,16 @@ class McCostParamsMapperTest {
   static FeedScopedId route2 = id("route2");
   static FeedScopedId route3 = id("route3");
   static Multimap<FeedScopedId, FeedScopedId> routesByAgencies = ArrayListMultimap.create();
+  static TestTransitData data;
 
   static {
     routesByAgencies.putAll(regularAgency, List.of(route1));
     routesByAgencies.putAll(unpreferredAgency, List.of(route2, route3));
+    data = new TestTransitData();
+
+    for (var AgencyAndRouteId : routesByAgencies.entries()) {
+      data.withRoute(testTripPattern(AgencyAndRouteId));
+    }
   }
 
   @Test
@@ -33,13 +45,16 @@ class McCostParamsMapperTest {
     var routingRequest = new RoutingRequest();
     routingRequest.setUnpreferredAgencies(List.of(unpreferredAgency));
 
-    assertEquals(
-      //TODO
-      new BitSet(),
-      McCostParamsMapper.map(routingRequest, List.of()).unpreferredPatterns()
-    );
+    BitSet unpreferredPatterns = McCostParamsMapper
+      .map(routingRequest, data.getPatterns())
+      .unpreferredPatterns();
 
-    routingRequest.setUnpreferredAgencies(List.of(agencyWithNoRoutes));
+    for (var pattern : data.getPatterns()) {
+      assertEquals(
+        pattern.route().getAgency().getId().equals(unpreferredAgency),
+        unpreferredPatterns.get(pattern.patternIndex())
+      );
+    }
   }
 
   @Test
@@ -47,10 +62,16 @@ class McCostParamsMapperTest {
     var routingRequest = new RoutingRequest();
     routingRequest.setUnpreferredAgencies(List.of(agencyWithNoRoutes));
 
-    assertEquals(
-      //TODO
-      new BitSet(),
-      McCostParamsMapper.map(routingRequest, List.of()).unpreferredPatterns()
+    assertTrue(
+      McCostParamsMapper.map(routingRequest, data.getPatterns()).unpreferredPatterns().isEmpty()
+    );
+  }
+
+  private static TestRoute testTripPattern(Map.Entry<FeedScopedId, FeedScopedId> entry) {
+    return TestRoute.route(
+      TestTripPattern
+        .pattern(1, 2)
+        .withRoute(route(entry.getValue()).withAgency(agency(entry.getKey().getId())).build())
     );
   }
 }

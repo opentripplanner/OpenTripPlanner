@@ -4,12 +4,10 @@ import static graphql.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.UNPREFERRED_ROUTE_RELUCTANCE;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.TIME_ZONE_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 
-import java.util.BitSet;
 import java.util.List;
 import java.util.function.DoubleFunction;
 import java.util.stream.Stream;
@@ -40,11 +38,7 @@ public class PatternCostCalculatorTest {
   private static final double UNPREFERRED_ROUTE_PENALTY = 300.0;
   private static final FeedScopedId UNPREFERRED_ROUTE_ID = id("999");
   private static final FeedScopedId UNPREFERRED_AGENCY_ID = id("contoso-travels");
-  private static final Agency UNPREFERRED_AGENCY = Agency
-    .of(UNPREFERRED_AGENCY_ID)
-    .withName("contoso")
-    .withTimezone(TIME_ZONE_ID)
-    .build();
+  private static final Agency UNPREFERRED_AGENCY = agency(UNPREFERRED_AGENCY_ID.getId());
   private static final FeedScopedId DEFAULT_ROUTE_ID = id("101");
   // Default cost function: a + bx
   private static final DoubleFunction<Double> unprefCostFn = RequestFunctions.createLinearFunction(
