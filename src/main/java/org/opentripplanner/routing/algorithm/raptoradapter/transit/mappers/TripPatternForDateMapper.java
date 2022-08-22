@@ -99,8 +99,8 @@ public class TripPatternForDateMapper {
 
     return new TripPatternForDate(
       timetable.getPattern().getRoutingTripPattern(),
-      times,
-      frequencies,
+      List.copyOf(times),
+      List.copyOf(frequencies),
       serviceDate
     );
   }
