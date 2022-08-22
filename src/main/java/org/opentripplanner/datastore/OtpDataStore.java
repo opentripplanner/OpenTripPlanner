@@ -25,11 +25,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.LocalDataSourceRepository;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 /**
  * The responsibility of this class is to provide access to all data sources OTP uses like the
@@ -50,7 +50,7 @@ public class OtpDataStore {
   private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
   private static final String GRAPH_FILENAME = "graph.obj";
 
-  private final OtpDataStoreConfig config;
+  private final BuildConfig config;
   private final List<String> repositoryDescriptions = new ArrayList<>();
   private final List<DataSourceRepository> allRepositories;
   private final LocalDataSourceRepository localRepository;
@@ -65,7 +65,7 @@ public class OtpDataStore {
   /**
    * Use the {@link DataStoreModule} to create a new instance of this class.
    */
-  public OtpDataStore(OtpDataStoreConfig config, List<DataSourceRepository> repositories) {
+  public OtpDataStore(BuildConfig config, List<DataSourceRepository> repositories) {
     this.config = config;
     this.repositoryDescriptions.addAll(
         repositories.stream().map(DataSourceRepository::description).toList()
@@ -95,14 +95,14 @@ public class OtpDataStore {
     }
     allRepositories.forEach(DataSourceRepository::open);
     addAll(localRepository.listExistingSources(CONFIG));
-    addAll(findMultipleSources(config.osmFiles(), OSM));
-    addAll(findMultipleSources(config.demFiles(), DEM));
-    addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
-    addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
+    addAll(findMultipleSources(config.osm.osmFiles(), OSM));
+    addAll(findMultipleSources(config.dem, DEM));
+    addAll(findMultipleCompositeSources(config.transitFeeds.gtfsFiles(), GTFS));
+    addAll(findMultipleCompositeSources(config.transitFeeds.netexFiles(), NETEX));
 
-    streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
-    graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
-    buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
+    streetGraph = findSingleSource(config.streetGraph, STREET_GRAPH_FILENAME, GRAPH);
+    graph = findSingleSource(config.graph, GRAPH_FILENAME, GRAPH);
+    buildReportDir = findCompositeSource(config.buildReportDir, BUILD_REPORT_DIR, REPORT);
 
     addAll(Arrays.asList(streetGraph, graph, buildReportDir));
 

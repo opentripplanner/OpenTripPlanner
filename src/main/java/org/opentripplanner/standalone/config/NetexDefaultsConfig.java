@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class NetexConfig {
+public class NetexDefaultsConfig {
 
   private static final String EMPTY_STRING_PATTERN = "$^";
 
@@ -98,7 +98,7 @@ public class NetexConfig {
    */
   public final Set<String> ferryIdsNotAllowedForBicycle;
 
-  NetexConfig(NodeAdapter config) {
+  NetexDefaultsConfig(NodeAdapter config) {
     ignoreFilePattern = config.asPattern("ignoreFilePattern", IGNORE_FILE_PATTERN);
     sharedFilePattern = config.asPattern("sharedFilePattern", SHARED_FILE_PATTERN);
     sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);

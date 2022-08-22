@@ -11,9 +11,9 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
-import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 
 /**
@@ -49,7 +49,7 @@ public abstract class DataStoreModule {
   @Singleton
   public static OtpDataStore provideDataStore(
     @OtpBaseDirectory File baseDirectory,
-    OtpDataStoreConfig config,
+    BuildConfig config,
     @Nullable @GoogleStorageDSRepository DataSourceRepository gsRepository
   ) {
     List<DataSourceRepository> repositories = new ArrayList<>();
@@ -73,14 +73,14 @@ public abstract class DataStoreModule {
 
   private static FileDataSourceRepository createFileDataSourceRepository(
     File baseDirectory,
-    OtpDataStoreConfig config
+    BuildConfig config
   ) {
     return new FileDataSourceRepository(
       baseDirectory,
-      config.gtfsLocalFilePattern(),
-      config.netexLocalFilePattern(),
-      config.osmLocalFilePattern(),
-      config.demLocalFilePattern()
+      config.gtfsLocalFilePattern,
+      config.netexLocalFilePattern,
+      config.osmLocalFilePattern,
+      config.demLocalFilePattern
     );
   }
 }

@@ -13,6 +13,7 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.NetexDefaultsConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -53,7 +54,7 @@ public class NetexConfig {
     }
 
     return new NetexModule(
-      buildParams.netex.netexFeedId,
+      buildParams.netexDefaults.netexFeedId,
       graph,
       transitModel,
       issueStore,
@@ -66,16 +67,16 @@ public class NetexConfig {
   /** public to enable testing */
   private NetexBundle netexBundle(CompositeDataSource source) {
     return new NetexBundle(
-      buildParams.netex.netexFeedId,
+      buildParams.netexDefaults.netexFeedId,
       source,
       hierarchy(source),
-      buildParams.netex.ferryIdsNotAllowedForBicycle,
+      buildParams.netexDefaults.ferryIdsNotAllowedForBicycle,
       buildParams.maxStopToShapeSnapDistance
     );
   }
 
   private NetexDataSourceHierarchy hierarchy(CompositeDataSource source) {
-    org.opentripplanner.standalone.config.NetexConfig c = buildParams.netex;
+    NetexDefaultsConfig c = buildParams.netexDefaults;
     return new NetexDataSourceHierarchy(source)
       .prepare(
         c.ignoreFilePattern,
