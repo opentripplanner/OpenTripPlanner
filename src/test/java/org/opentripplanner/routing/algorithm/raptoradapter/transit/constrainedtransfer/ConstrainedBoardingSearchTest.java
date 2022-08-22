@@ -358,10 +358,10 @@ public class ConstrainedBoardingSearchTest {
     TransferConstraint expectedConstraint
   ) {
     var constrainedTransfers = generateTransfersForPatterns(txList);
-    var subject = new ConstrainedBoardingSearch(
-      true,
-      constrainedTransfers.forward().get(routingPattern2.patternIndex())
-    );
+    TransferForPatternByStopPos transfers = constrainedTransfers
+      .forward()
+      .get(routingPattern2.patternIndex());
+    var subject = new ConstrainedBoardingSearch(true, transfers);
 
     int targetStopPos = route2.stopPosition(transferStop);
     int stopIndex = transferStop.getIndex();
@@ -369,6 +369,9 @@ public class ConstrainedBoardingSearchTest {
 
     // Check that transfer exist
     assertTrue(subject.transferExist(targetStopPos));
+
+    // Check that transfers are sorted
+    assertTransfersAreSorted(transfers, targetStopPos);
 
     var boarding = subject.find(
       route2.getTimetable(),
@@ -379,6 +382,14 @@ public class ConstrainedBoardingSearchTest {
       sourceArrivalTime + ALIGHT_BOARD_SLACK
     );
     assertBoarding(stopIndex, targetStopPos, expectedTripIndex, expectedConstraint, boarding);
+  }
+
+  private void assertTransfersAreSorted(
+    TransferForPatternByStopPos transferForPatternByStopPos,
+    int targetStopPos
+  ) {
+    var transfers = transferForPatternByStopPos.get(targetStopPos);
+    assertEquals(transfers.stream().sorted().toList(), transfers);
   }
 
   void testTransferSearchReverse(
