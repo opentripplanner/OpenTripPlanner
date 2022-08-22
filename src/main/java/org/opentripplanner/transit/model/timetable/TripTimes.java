@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.OptionalInt;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -351,11 +352,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /**
    * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
    * negative running or dwell times. We really don't want those being used in routing. This method
-   * check that all times are increasing, and logs warnings if this is not the case.
+   * checks that all times are increasing.
    *
-   * @return whether the times were found to be increasing.
+   * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public boolean timesIncreasing() {
+  public OptionalInt findFirstNoneIncreasingStopTime() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -363,16 +364,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        LOG.warn("Negative dwell time in TripTimes at stop index {}.", s);
-        return false;
+        return OptionalInt.of(s);
       }
       if (prevDep > arr) {
-        LOG.warn("Negative running time in TripTimes after stop index {}.", s);
-        return false;
+        return OptionalInt.of(s);
       }
       prevDep = dep;
     }
-    return true;
+    return OptionalInt.empty();
   }
 
   /** Cancel this entire trip */

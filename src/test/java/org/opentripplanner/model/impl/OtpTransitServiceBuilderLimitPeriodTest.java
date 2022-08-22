@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -45,8 +45,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
   private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
   private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
-  private static final Stop STOP_1 = TransitModelForTest.stop("Stop-1").build();
-  private static final Stop STOP_2 = TransitModelForTest.stop("Stop-2").build();
+  private static final RegularStop STOP_1 = TransitModelForTest.stop("Stop-1").build();
+  private static final RegularStop STOP_2 = TransitModelForTest.stop("Stop-2").build();
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final List<StopTime> STOP_TIMES = List.of(
     createStopTime(STOP_1, 0),
@@ -165,7 +165,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     return calendar;
   }
 
-  private static StopTime createStopTime(Stop stop, int time) {
+  private static StopTime createStopTime(RegularStop stop, int time) {
     StopTime st = new StopTime();
     st.setStop(stop);
     st.setDepartureTime(time);

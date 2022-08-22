@@ -31,8 +31,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -67,10 +67,10 @@ public class NetexBundleSmokeTest {
     OtpTransitService otpModel = transitBuilder.build();
 
     assertAgencies(otpModel.getAllAgencies());
-    assertMultiModalStations(otpModel.stopModel().getAllMultiModalStations());
+    assertMultiModalStations(otpModel.stopModel().listMultiModalStations());
     assertOperators(otpModel.getAllOperators());
     assertStops(otpModel.stopModel().listRegularStops());
-    assertStations(otpModel.stopModel().getStations());
+    assertStations(otpModel.stopModel().listStations());
     assertTripPatterns(otpModel.getTripPatterns());
     assertTrips(otpModel.getAllTrips());
     assertServiceIds(otpModel.getAllTrips(), otpModel.getAllServiceIds());
@@ -127,10 +127,12 @@ public class NetexBundleSmokeTest {
     assertNull(o.getPhone());
   }
 
-  private void assertStops(Collection<Stop> stops) {
-    Map<FeedScopedId, Stop> map = stops.stream().collect(Collectors.toMap(Stop::getId, s -> s));
+  private void assertStops(Collection<RegularStop> stops) {
+    Map<FeedScopedId, RegularStop> map = stops
+      .stream()
+      .collect(Collectors.toMap(RegularStop::getId, s -> s));
 
-    Stop quay = map.get(fId("NSR:Quay:122003"));
+    RegularStop quay = map.get(fId("NSR:Quay:122003"));
     assertEquals("N/A", quay.getName().toString());
     assertEquals(59.909803, quay.getLat(), 0.000001);
     assertEquals(10.748062, quay.getLon(), 0.000001);
@@ -158,7 +160,7 @@ public class NetexBundleSmokeTest {
     assertEquals("Jernbanetorget", p.getTripHeadsign());
     assertEquals("RB", p.getFeedId());
     assertEquals(
-      "[Stop{RB:NSR:Quay:7203 N/A}, Stop{RB:NSR:Quay:8027 N/A}]",
+      "[RegularStop{RB:NSR:Quay:7203 N/A}, RegularStop{RB:NSR:Quay:8027 N/A}]",
       p.getStops().toString()
     );
     assertEquals(

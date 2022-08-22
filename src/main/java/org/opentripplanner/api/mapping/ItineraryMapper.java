@@ -31,12 +31,12 @@ public class ItineraryMapper {
     }
     ApiItinerary api = new ApiItinerary();
 
-    api.duration = (long) domain.getDurationSeconds();
+    api.duration = domain.getDuration().toSeconds();
     api.startTime = GregorianCalendar.from(domain.startTime());
     api.endTime = GregorianCalendar.from(domain.endTime());
-    api.walkTime = domain.getNonTransitTimeSeconds();
-    api.transitTime = domain.getTransitTimeSeconds();
-    api.waitingTime = domain.getWaitingTimeSeconds();
+    api.walkTime = domain.getNonTransitDuration().toSeconds();
+    api.transitTime = domain.getTransitDuration().toSeconds();
+    api.waitingTime = domain.getWaitingDuration().toSeconds();
     api.walkDistance = domain.getNonTransitDistanceMeters();
     api.generalizedCost = domain.getGeneralizedCost();
     api.elevationLost = domain.getElevationLost();

@@ -9,7 +9,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -18,9 +18,9 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class DirectGraphFinder implements GraphFinder {
 
-  private final Function<Envelope, Collection<Stop>> queryNearbyStops;
+  private final Function<Envelope, Collection<RegularStop>> queryNearbyStops;
 
-  public DirectGraphFinder(Function<Envelope, Collection<Stop>> queryNearbyStops) {
+  public DirectGraphFinder(Function<Envelope, Collection<RegularStop>> queryNearbyStops) {
     this.queryNearbyStops = queryNearbyStops;
   }
 
@@ -37,7 +37,7 @@ public class DirectGraphFinder implements GraphFinder {
       SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),
       SphericalDistanceLibrary.metersToDegrees(radiusMeters)
     );
-    for (Stop it : queryNearbyStops.apply(envelope)) {
+    for (RegularStop it : queryNearbyStops.apply(envelope)) {
       double distance = Math.round(
         SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
       );

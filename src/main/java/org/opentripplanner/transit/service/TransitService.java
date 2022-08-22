@@ -33,10 +33,10 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -90,11 +90,11 @@ public interface TransitService {
 
   Operator getOperatorForId(FeedScopedId id);
 
-  StopLocation getRegularStop(FeedScopedId id);
+  RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();
 
-  Collection<Stop> listRegularStops();
+  Collection<RegularStop> listRegularStops();
 
   StopLocation getStopLocation(FeedScopedId parseId);
 
@@ -102,7 +102,7 @@ public interface TransitService {
 
   StopLocationsGroup getStopLocationsGroup(FeedScopedId id);
 
-  FlexStopLocation getLocationById(FeedScopedId id);
+  AreaStop getAreaStop(FeedScopedId id);
 
   Trip getTripForId(FeedScopedId id);
 
@@ -186,7 +186,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<Stop> queryStopSpatialIndex(Envelope envelope);
+  Collection<RegularStop> findRegularStop(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
 }

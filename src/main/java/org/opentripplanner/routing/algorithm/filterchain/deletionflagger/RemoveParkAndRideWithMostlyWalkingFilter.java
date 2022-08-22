@@ -39,9 +39,9 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
         .getLegs()
         .stream()
         .filter(l -> l.getMode() == TraverseMode.CAR)
-        .mapToDouble(Leg::getDuration)
+        .mapToDouble(l -> l.getDuration().toSeconds())
         .sum();
-      double totalDuration = itinerary.getDurationSeconds();
+      double totalDuration = itinerary.getDuration().toSeconds();
 
       return (
         !containsTransit &&

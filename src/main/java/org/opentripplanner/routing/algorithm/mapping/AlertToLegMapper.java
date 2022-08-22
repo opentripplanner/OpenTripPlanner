@@ -14,8 +14,8 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -60,13 +60,13 @@ public class AlertToLegMapper {
     FeedScopedId tripId = leg.getTrip().getId();
     LocalDate serviceDate = leg.getServiceDate();
 
-    if (fromStop instanceof Stop stop) {
+    if (fromStop instanceof RegularStop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
       addTransitAlertsToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
     }
-    if (toStop instanceof Stop stop) {
+    if (toStop instanceof RegularStop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
@@ -75,7 +75,7 @@ public class AlertToLegMapper {
 
     if (leg.getIntermediateStops() != null) {
       for (StopArrival visit : leg.getIntermediateStops()) {
-        if (visit.place.stop instanceof Stop stop) {
+        if (visit.place.stop instanceof RegularStop stop) {
           Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
           alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
@@ -160,7 +160,10 @@ public class AlertToLegMapper {
     addTransitAlertsToLeg(leg, null, alerts, fromTime, toTime);
   }
 
-  private Collection<TransitAlert> getAlertsForStopAndRoute(Stop stop, FeedScopedId routeId) {
+  private Collection<TransitAlert> getAlertsForStopAndRoute(
+    RegularStop stop,
+    FeedScopedId routeId
+  ) {
     return getAlertsForRelatedStops(
       stop,
       id -> transitAlertService.getStopAndRouteAlerts(id, routeId)
@@ -168,7 +171,7 @@ public class AlertToLegMapper {
   }
 
   private Collection<TransitAlert> getAlertsForStopAndTrip(
-    Stop stop,
+    RegularStop stop,
     FeedScopedId tripId,
     LocalDate serviceDate
   ) {
@@ -195,7 +198,7 @@ public class AlertToLegMapper {
    * only a specific route at that stop.
    */
   private Collection<TransitAlert> getAlertsForRelatedStops(
-    Stop stop,
+    RegularStop stop,
     Function<FeedScopedId, Collection<TransitAlert>> getAlertsForStop
   ) {
     if (stop == null) {

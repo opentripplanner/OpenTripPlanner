@@ -32,17 +32,17 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.FareZone;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
 import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.StopModel;
@@ -140,11 +140,11 @@ public class OtpTransitServiceBuilder {
   }
 
   public EntityById<GroupOfStations> getGroupsOfStationsById() {
-    return stopModelBuilder().groupOfStationsById();
+    return stopModelBuilder().groupOfStationById();
   }
 
   public EntityById<MultiModalStation> getMultiModalStationsById() {
-    return stopModelBuilder().multiModalStationsById();
+    return stopModelBuilder().multiModalStationById();
   }
 
   /**
@@ -172,11 +172,11 @@ public class OtpTransitServiceBuilder {
   }
 
   public EntityById<Station> getStations() {
-    return stopModelBuilder().stationsById();
+    return stopModelBuilder().stationById();
   }
 
-  public EntityById<Stop> getStops() {
-    return stopModelBuilder().stopsById();
+  public EntityById<RegularStop> getStops() {
+    return stopModelBuilder().regularStopsById();
   }
 
   public EntityById<Entrance> getEntrances() {
@@ -191,12 +191,12 @@ public class OtpTransitServiceBuilder {
     return boardingAreasById;
   }
 
-  public EntityById<FlexStopLocation> getLocations() {
-    return stopModelBuilder().flexStopsById();
+  public EntityById<AreaStop> getLocations() {
+    return stopModelBuilder().areaStopById();
   }
 
-  public EntityById<FlexLocationGroup> getLocationGroups() {
-    return stopModelBuilder().flexStopGroupsById();
+  public EntityById<GroupStop> getGroupStops() {
+    return stopModelBuilder().groupStopById();
   }
 
   public TripStopTimes getStopTimesSortedByTrip() {

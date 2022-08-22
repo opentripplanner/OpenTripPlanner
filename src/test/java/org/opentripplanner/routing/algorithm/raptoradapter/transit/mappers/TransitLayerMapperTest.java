@@ -7,8 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.StopModelMock;
@@ -32,20 +32,20 @@ class TransitLayerMapperTest {
     .withPriority(StopTransferPriority.PREFERRED)
     .build();
 
-  private final Stop STOP_0 = TransitModelForTest.stop("ID-" + 1).build();
-  private final Stop STOP_1 = TransitModelForTest
+  private final RegularStop STOP_0 = TransitModelForTest.stop("ID-" + 1).build();
+  private final RegularStop STOP_1 = TransitModelForTest
     .stop("ID-" + 2)
     .withParentStation(STATION_A)
     .build();
-  private final Stop STOP_2 = TransitModelForTest
+  private final RegularStop STOP_2 = TransitModelForTest
     .stop("ID-" + 3)
     .withParentStation(STATION_B)
     .build();
-  private final Stop STOP_3 = TransitModelForTest
+  private final RegularStop STOP_3 = TransitModelForTest
     .stop("ID-" + 4)
     .withParentStation(STATION_C)
     .build();
-  private final Stop STOP_4 = TransitModelForTest
+  private final RegularStop STOP_4 = TransitModelForTest
     .stop("ID-" + 5)
     .withParentStation(STATION_D)
     .build();

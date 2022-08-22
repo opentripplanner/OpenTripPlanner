@@ -98,7 +98,7 @@ public class TripPatternType {
           .name("duration")
           .description("Duration of the trip, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getDurationSeconds())
+          .dataFetcher(env -> itinerary(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -107,7 +107,7 @@ public class TripPatternType {
           .name("directDuration")
           .description("NOT IMPLEMENTED.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getDurationSeconds())
+          .dataFetcher(env -> itinerary(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -116,7 +116,7 @@ public class TripPatternType {
           .name("waitingTime")
           .description("How much time is spent waiting for transit to arrive, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getWaitingTimeSeconds())
+          .dataFetcher(env -> itinerary(env).getWaitingDuration().toSeconds())
           .build()
       )
       .field(
@@ -135,7 +135,7 @@ public class TripPatternType {
           .description("How much time is spent walking, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
           // TODO This unfortunately include BIKE and CAR
-          .dataFetcher(env -> itinerary(env).getNonTransitTimeSeconds())
+          .dataFetcher(env -> itinerary(env).getNonTransitDuration().toSeconds())
           .build()
       )
       .field(

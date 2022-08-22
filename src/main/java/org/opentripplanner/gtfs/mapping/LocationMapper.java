@@ -8,7 +8,7 @@ import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.UnsupportedGeometryException;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
@@ -19,18 +19,18 @@ public class LocationMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
 
-  private final Map<org.onebusaway.gtfs.model.Location, FlexStopLocation> mappedLocations = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Location, AreaStop> mappedLocations = new HashMap<>();
 
-  Collection<FlexStopLocation> map(Collection<org.onebusaway.gtfs.model.Location> allLocations) {
+  Collection<AreaStop> map(Collection<org.onebusaway.gtfs.model.Location> allLocations) {
     return MapUtils.mapToList(allLocations, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  FlexStopLocation map(org.onebusaway.gtfs.model.Location orginal) {
+  AreaStop map(org.onebusaway.gtfs.model.Location orginal) {
     return orginal == null ? null : mappedLocations.computeIfAbsent(orginal, this::doMap);
   }
 
-  private FlexStopLocation doMap(org.onebusaway.gtfs.model.Location gtfsLocation) {
+  private AreaStop doMap(org.onebusaway.gtfs.model.Location gtfsLocation) {
     var name = NonLocalizedString.ofNullable(gtfsLocation.getName());
     Geometry geometry = null;
     try {
@@ -39,7 +39,7 @@ public class LocationMapper {
       LOG.error("Unsupported geometry type for {}", gtfsLocation.getId());
     }
 
-    return FlexStopLocation
+    return AreaStop
       .of(mapAgencyAndId(gtfsLocation.getId()))
       .withName(name)
       .withUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()))
