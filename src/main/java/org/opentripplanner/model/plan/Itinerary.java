@@ -492,7 +492,10 @@ public class Itinerary {
     } else {
       for (int i = 0; i < legs.size() - 1; i++) {
         var currentLeg = legs.get(i);
-        if(currentLeg.getFrom().sameLocation(leg.getFrom()) && currentLeg.getTo().sameLocation(leg.getTo())){
+        if (
+          currentLeg.getFrom().sameLocation(leg.getFrom()) &&
+          currentLeg.getTo().sameLocation(leg.getTo())
+        ) {
           return i;
         }
       }

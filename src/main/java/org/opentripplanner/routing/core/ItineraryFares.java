@@ -38,8 +38,7 @@ public class ItineraryFares {
     }
   }
 
-  public ItineraryFares() {
-  }
+  public ItineraryFares() {}
 
   public static ItineraryFares empty() {
     return new ItineraryFares();
@@ -91,12 +90,15 @@ public class ItineraryFares {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ItineraryFares fare1 = (ItineraryFares) o;
-    return (Objects.equals(details, fare1.details) && Objects.equals(itineraryProducts, fare1.itineraryProducts) && Objects.equals(legProducts, fare1.legProducts));
+    return (
+      Objects.equals(details, fare1.details) &&
+      Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
+      Objects.equals(legProducts, fare1.legProducts)
+    );
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
   }
-
 }

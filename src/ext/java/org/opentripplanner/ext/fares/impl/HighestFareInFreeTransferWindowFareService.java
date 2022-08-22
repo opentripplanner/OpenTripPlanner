@@ -6,8 +6,8 @@ import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 
 /**
  * This calculator is maintained by IBI Group.

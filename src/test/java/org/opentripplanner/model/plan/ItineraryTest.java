@@ -171,7 +171,7 @@ public class ItineraryTest implements PlanTestConstants {
       .build();
 
     var leg = itinerary.getLegs().get(0);
-    var oneHourLater= leg.withTimeShift(Duration.ofHours(1));
+    var oneHourLater = leg.withTimeShift(Duration.ofHours(1));
 
     assertNotSame(leg, oneHourLater);
 

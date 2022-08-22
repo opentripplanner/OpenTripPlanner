@@ -6,10 +6,16 @@ import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 
-public record FareLegRuleMapper(
-  FareProductMapper fareProductMapper,
-  DataImportIssueStore issueStore
-) {
+public final class FareLegRuleMapper {
+
+  private final FareProductMapper fareProductMapper;
+  private final DataImportIssueStore issueStore;
+
+  public FareLegRuleMapper(FareProductMapper fareProductMapper, DataImportIssueStore issueStore) {
+    this.fareProductMapper = fareProductMapper;
+    this.issueStore = issueStore;
+  }
+
   public Collection<FareLegRule> map(
     Collection<org.onebusaway.gtfs.model.FareLegRule> allFareLegRules
   ) {
