@@ -123,7 +123,7 @@ public class McCostParams {
       .addNum("transferCost", transferCost, 0)
       .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
       .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
-      .addNum("routePenaltiesSize", unpreferredPatterns.size(), 0)
+      .addNum("unpreferredPatternsSize", unpreferredPatterns.size(), 0)
       .toString();
   }
 }

@@ -39,8 +39,11 @@ public class McCostParamsMapper {
     if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
       for (var pattern : patternIndex) {
         if (
-          unpreferredRoutes.contains(pattern.route().getId()) ||
-          unpreferredAgencies.contains(pattern.route().getAgency().getId())
+          pattern != null &&
+          (
+            unpreferredRoutes.contains(pattern.route().getId()) ||
+            unpreferredAgencies.contains(pattern.route().getAgency().getId())
+          )
         ) {
           unpreferredPatterns.set(pattern.patternIndex());
         }
