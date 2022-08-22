@@ -9,6 +9,6 @@ public record FareRulesData(
   List<FareLegRule> fareLegRules
 ) {
   public FareRulesData() {
-    this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(0));
+    this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
   }
 }

@@ -46,7 +46,7 @@ public class FareProductMapper {
     }
   }
 
-  private static Duration toTemporalUnit(int unit, int amount) {
+  private static TemporalAmount toTemporalAmount(int unit, int amount) {
     return switch (unit) {
       case 0 -> Duration.ofSeconds(amount);
       case 1 -> Duration.ofMinutes(amount);
