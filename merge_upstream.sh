@@ -210,7 +210,7 @@ function whatDoYouWant() {
     else
       while [[ ! "$ANSWER" =~ [ysx] ]]; do
         echo "Do you want to continue: [y:Yes, s:Skip, x:Exit]"
-        read ANSWER
+        read -r ANSWER
       done
 
       if [[ "${ANSWER}" == "x" ]] ; then
