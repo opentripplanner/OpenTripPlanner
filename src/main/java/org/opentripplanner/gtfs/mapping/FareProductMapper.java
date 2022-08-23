@@ -48,6 +48,8 @@ public class FareProductMapper {
   }
 
   private static Duration toDuration(int unit, int amount) {
+    // TODO: this isn't totally correct since we need to check if we go, for example, past the
+    // end of the business day. the correct solution would be to also take duration_type into account.
     return switch (unit) {
       case 0 -> Duration.ofSeconds(amount);
       case 1 -> Duration.ofMinutes(amount);
