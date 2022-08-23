@@ -50,7 +50,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
           routeObject.put("gtfsType", route.getGtfsType());
           return routeObject;
         })
-        .collect(Collectors.toList())
+        .toList()
     );
     String desc = stop.getDescription() != null ? stop.getDescription().toString() : null;
     return List.of(
