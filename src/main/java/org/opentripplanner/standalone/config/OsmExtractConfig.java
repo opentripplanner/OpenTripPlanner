@@ -28,6 +28,6 @@ public class OsmExtractConfig {
     source = config.asUri("source");
     osmWayPropertySet =
       WayPropertySetSource.fromConfig(config.asText("osmWayPropertySet", "default"));
-    timeZone = config.asZoneId("timeZone", ZoneId.of("UTC"));
+    timeZone = config.asZoneId("timeZone", null);
   }
 }
