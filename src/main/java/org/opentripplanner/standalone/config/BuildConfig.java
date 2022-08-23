@@ -444,7 +444,7 @@ public class BuildConfig {
    * <p>
    * This parameter is optional.
    */
-  public final List<URI> dem = new ArrayList<>();
+  public final DemExtractsConfig dem;
   public TransitFeedsConfig transitFeeds;
 
   /**
@@ -515,7 +515,7 @@ public class BuildConfig {
     buildReportDir = c.asUri("buildReportDir", null);
 
     osm = new OsmExtractsConfig(c.path("osm"));
-    dem.addAll(c.asUris("dem"));
+    dem = new DemExtractsConfig((c.path("dem")));
     transitFeeds = new TransitFeedsConfig(c.path("transitFeeds"));
 
     // List of complex parameters

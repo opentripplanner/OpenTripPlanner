@@ -96,7 +96,7 @@ public class OtpDataStore {
     allRepositories.forEach(DataSourceRepository::open);
     addAll(localRepository.listExistingSources(CONFIG));
     addAll(findMultipleSources(config.osm.osmFiles(), OSM));
-    addAll(findMultipleSources(config.dem, DEM));
+    addAll(findMultipleSources(config.dem.demFiles(), DEM));
     addAll(findMultipleCompositeSources(config.transitFeeds.gtfsFiles(), GTFS));
     addAll(findMultipleCompositeSources(config.transitFeeds.netexFiles(), NETEX));
 
