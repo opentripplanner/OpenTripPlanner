@@ -12,7 +12,7 @@
 #set -euo pipefail
 
 DEVBRANCH=dev-2.x
-REMOTE_REPO=$(git remote -v  | grep "hsldevcom/OpenTripPlanner" | grep "push" | awk '{print $1;}')
+REMOTE_REPO=$(git remote -v  | grep -i "hsldevcom/OpenTripPlanner" | grep "push" | awk '{print $1;}')
 STATUS_FILE=".merge_upstream.tmp"
 STATUS=""
 DRY_RUN=""
