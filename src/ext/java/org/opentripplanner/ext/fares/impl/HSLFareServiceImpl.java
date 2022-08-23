@@ -21,9 +21,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.common.model.P3;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+
+import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 
@@ -38,6 +42,14 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
   @Serial
   private static final long serialVersionUID = 20131259L;
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+
+  public Fare getCost(Itinerary itinerary) {
+   Fare fare =  super.getCost(itinerary);
+   if(fare == null) {
+     itinerary.setFare(null);
+   }
+   return fare;
+  }
 
   @Override
   protected FareAndId getBestFareAndId(FareType fareType, List<Leg> legs, Collection<FareRuleSet> fareRules) {
@@ -56,9 +68,10 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
       float bestSpecialFare = Float.POSITIVE_INFINITY;
       Set<String> ruleZones = null;
       for (FareRuleSet ruleSet : fareRules) {
-        String routeOriginDestination = leg.getRoute() + ", " + leg.getFrom().stop.getFirstZoneAsString()+ ", " + leg.getTo().stop.getFirstZoneAsString();
+        P3<String> routeOriginDestination = new P3<>(leg.getRoute().getId().toString(), leg.getFrom().stop.getFirstZoneAsString(), leg.getTo().stop.getFirstZoneAsString());
         boolean isSpecialRoute = false;
-        if(!ruleSet.getRouteOriginDestinations().isEmpty() && ruleSet.getRouteOriginDestinations().toString().indexOf(routeOriginDestination) != -1) {
+
+        if(!ruleSet.getRouteOriginDestinations().isEmpty() && ruleSet.getRouteOriginDestinations().toString().indexOf(routeOriginDestination.toString()) != -1) {
           isSpecialRoute = true;
         }
         if(isSpecialRoute || (ruleSet.getRoutes().contains(leg.getRoute()) &&
