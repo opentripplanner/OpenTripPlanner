@@ -11,6 +11,7 @@ import com.google.common.collect.Multimap;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -35,8 +36,8 @@ class McCostParamsMapperTest {
     routesByAgencies.putAll(unpreferredAgency, List.of(route2, route3));
     data = new TestTransitData();
 
-    for (var AgencyAndRouteId : routesByAgencies.entries()) {
-      data.withRoute(testTripPattern(AgencyAndRouteId));
+    for (var it : routesByAgencies.entries()) {
+      data.withRoute(testTripPattern(it.getKey(), it.getValue()));
     }
   }
 
@@ -62,16 +63,17 @@ class McCostParamsMapperTest {
     var routingRequest = new RoutingRequest();
     routingRequest.setUnpreferredAgencies(List.of(agencyWithNoRoutes));
 
-    assertTrue(
-      McCostParamsMapper.map(routingRequest, data.getPatterns()).unpreferredPatterns().isEmpty()
+    assertEquals(
+      new BitSet(),
+      McCostParamsMapper.map(routingRequest, data.getPatterns()).unpreferredPatterns()
     );
   }
 
-  private static TestRoute testTripPattern(Map.Entry<FeedScopedId, FeedScopedId> entry) {
+  private static TestRoute testTripPattern(FeedScopedId agencyId, FeedScopedId routeId) {
     return TestRoute.route(
       TestTripPattern
         .pattern(1, 2)
-        .withRoute(route(entry.getValue()).withAgency(agency(entry.getKey().getId())).build())
+        .withRoute(route(routeId).withAgency(agency(agencyId.getId())).build())
     );
   }
 }

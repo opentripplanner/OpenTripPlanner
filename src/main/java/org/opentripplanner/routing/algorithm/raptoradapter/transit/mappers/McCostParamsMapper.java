@@ -32,11 +32,11 @@ public class McCostParamsMapper {
 
     builder.wheelchairAccessibility(request.wheelchairAccessibility);
 
-    final BitSet unpreferredPatterns = new BitSet();
     final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
     final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
 
     if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
+      final BitSet unpreferredPatterns = new BitSet();
       for (var pattern : patternIndex) {
         if (
           pattern != null &&
@@ -48,10 +48,9 @@ public class McCostParamsMapper {
           unpreferredPatterns.set(pattern.patternIndex());
         }
       }
+      builder.unpreferredPatterns(unpreferredPatterns);
+      builder.unpreferredCost(request.unpreferredCost);
     }
-
-    builder.unpreferredPatterns(unpreferredPatterns);
-    builder.unpreferredCost(request.unpreferredCost);
 
     return builder.build();
   }
