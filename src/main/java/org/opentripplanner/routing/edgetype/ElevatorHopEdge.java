@@ -89,13 +89,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     NewRouteRequest request = s0.getOptions();
     RoutingPreferences preferences = s0.getPreferences();
 
-
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
     if (preferences.wheelchair().accessibility().enabled()) {
       if (
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
-          preferences.wheelchair().accessibility().elevator().onlyConsiderAccessible()
+        preferences.wheelchair().accessibility().elevator().onlyConsiderAccessible()
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
@@ -123,7 +122,9 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       this.travelTime > 0 ? this.travelTime : (preferences.street().elevatorHopCost() * this.levels)
     );
     s1.incrementTimeInSeconds(
-      this.travelTime > 0 ? this.travelTime : (int) (preferences.street().elevatorHopTime() * this.levels)
+      this.travelTime > 0
+        ? this.travelTime
+        : (int) (preferences.street().elevatorHopTime() * this.levels)
     );
     return s1.makeState();
   }

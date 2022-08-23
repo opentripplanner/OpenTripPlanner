@@ -2,10 +2,13 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
@@ -15,15 +18,17 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static RoutingRequest mapRoutingRequest(NodeAdapter c) {
-    RoutingRequest dft = new RoutingRequest();
+  public static Pair<NewRouteRequest, RoutingPreferences> mapRoutingRequest(NodeAdapter c) {
+    NewRouteRequest dft = new NewRouteRequest();
+    RoutingPreferences pref = new RoutingPreferences();
 
     if (c.isEmpty()) {
-      return dft;
+      return Pair.of(dft, pref);
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
-    RoutingRequest request = new RoutingRequest();
+    NewRouteRequest request = new NewRouteRequest();
+    RoutingPreferences preferences = new RoutingPreferences();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
@@ -162,7 +167,7 @@ public class RoutingRequestMapper {
       unpreferred.asFeedScopedIdSet("agencies", dft.getUnpreferredAgencies())
     );
 
-    return request;
+    return Pair.of(request, preferences);
   }
 
   private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {

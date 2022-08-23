@@ -15,7 +15,8 @@ import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
@@ -193,7 +194,8 @@ public class BuildConfig {
    * autodetect some file and specify the path to others.
    */
   public final StorageConfig storage;
-  public final List<RoutingRequest> transferRequests;
+  public final List<NewRouteRequest> transferRequests;
+  public final List<RoutingPreferences> transferPreferences;
   /**
    * Visibility calculations for an area will not be done if there are more nodes than this limit.
    */
@@ -389,10 +391,18 @@ public class BuildConfig {
           .path("transferRequests")
           .asList()
           .stream()
-          .map(RoutingRequestMapper::mapRoutingRequest)
+          .map(n -> RoutingRequestMapper.mapRoutingRequest(n).getLeft())
+          .toList();
+      transferPreferences =
+        c
+          .path("transferRequests")
+          .asList()
+          .stream()
+          .map(n -> RoutingRequestMapper.mapRoutingRequest(n).getRight())
           .toList();
     } else {
-      transferRequests = List.of(new RoutingRequest());
+      transferRequests = List.of(new NewRouteRequest());
+      transferPreferences = List.of(new RoutingPreferences());
     }
 
     if (logUnusedParams) {

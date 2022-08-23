@@ -116,7 +116,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
           s0.isRentingVehicleFromStation() &&
           !(
             s0.mayKeepRentedVehicleAtDestination() &&
-              pref.rental().allowKeepingRentedVehicleAtDestination()
+            pref.rental().allowKeepingRentedVehicleAtDestination()
           )
         ) {
           return null;
@@ -148,7 +148,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (
       s0.isRentingVehicleFromStation() &&
       s0.mayKeepRentedVehicleAtDestination() &&
-        pref.rental().allowKeepingRentedVehicleAtDestination()
+      pref.rental().allowKeepingRentedVehicleAtDestination()
     ) {
       s1.incrementWeight(pref.rental().keepingVehicleAtDestinationCost());
     }

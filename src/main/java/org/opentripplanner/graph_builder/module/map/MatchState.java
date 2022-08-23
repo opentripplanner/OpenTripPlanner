@@ -18,7 +18,7 @@ import org.opentripplanner.routing.graph.Vertex;
 public abstract class MatchState {
 
   private static final NewRouteRequest traverseOptions = new NewRouteRequest(TraverseMode.CAR);
-  private static  final RoutingPreferences preferences = new RoutingPreferences();
+  private static final RoutingPreferences preferences = new RoutingPreferences();
 
   protected static final double NEW_SEGMENT_PENALTY = 0.1;
 

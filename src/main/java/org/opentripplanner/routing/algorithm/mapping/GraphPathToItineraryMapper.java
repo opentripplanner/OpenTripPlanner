@@ -343,7 +343,8 @@ public class GraphPathToItineraryMapper {
     } else if (vertex instanceof VehicleParkingEntranceVertex) {
       return Place.forVehicleParkingEntrance(
         (VehicleParkingEntranceVertex) vertex,
-        state.getOptions()
+        state.getOptions(),
+        state.getPreferences()
       );
     } else {
       return Place.normal(vertex, name);
@@ -420,7 +421,7 @@ public class GraphPathToItineraryMapper {
       .withDistanceMeters(distanceMeters)
       .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
       .withGeometry(geometry)
-      .withElevation(makeElevation(edges, firstState.getOptions().geoidElevation))
+      .withElevation(makeElevation(edges, firstState.getPreferences().system().geoidElevation()))
       .withWalkSteps(walkSteps)
       .withRentedVehicle(firstState.isRentingVehicle())
       .withWalkingBike(false);

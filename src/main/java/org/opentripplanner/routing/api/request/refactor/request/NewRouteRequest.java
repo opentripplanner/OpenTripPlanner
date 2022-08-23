@@ -361,7 +361,7 @@ public class NewRouteRequest {
     }
     return (
       fromEnvelope.intersects(vertex.getCoordinate()) ||
-        toEnvelope.intersects(vertex.getCoordinate())
+      toEnvelope.intersects(vertex.getCoordinate())
     );
   }
 

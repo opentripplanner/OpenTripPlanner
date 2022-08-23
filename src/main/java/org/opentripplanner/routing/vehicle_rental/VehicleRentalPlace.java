@@ -85,10 +85,7 @@ public interface VehicleRentalPlace {
   default boolean networkIsNotAllowed(VehicleRentalRequest request) {
     if (
       getNetwork() == null &&
-      (
-        !request.allowedNetworks().isEmpty() ||
-        !request.bannedNetworks().isEmpty()
-      )
+      (!request.allowedNetworks().isEmpty() || !request.bannedNetworks().isEmpty())
     ) {
       return false;
     }

@@ -300,7 +300,6 @@ public class StatesToWalkStepsMapper {
   }
 
   private void updateElevationProfile(State backState, Edge edge) {
-
     List<P2<Double>> s = encodeElevationProfile(
       edge,
       distance,

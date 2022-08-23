@@ -57,13 +57,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     List<NewRouteRequest> transferRequests,
     List<RoutingPreferences> transferPreferences
   ) {
-
-    // TODO: 2022-08-22 figure out what to do with it 
+    // TODO: 2022-08-22 figure out what to do with it
     // TODO: 2022-08-22 maybe link requests and preferences in some way?
     if (transferRequests.size() != transferPreferences.size()) {
       throw new RuntimeException("Transfer requests do not match with transfer preferences");
     }
-    
+
     this.graph = graph;
     this.transitModel = transitModel;
     this.issueStore = issueStore;
@@ -123,7 +122,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           NewRouteRequest transferProfile = transferRequests.get(i);
           RoutingPreferences transferPreferences = this.transferPreferences.get(i);
 
-          NewRouteRequest streetRequest = Transfer.prepareTransferRoutingRequest(transferProfile, transferPreferences);
+          NewRouteRequest streetRequest = Transfer.prepareTransferRoutingRequest(
+            transferProfile,
+            transferPreferences
+          );
 
           for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
             ts0,

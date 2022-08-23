@@ -84,7 +84,10 @@ public class StreetVehicleParkingLink extends Edge {
       return false;
     }
 
-    return vehicleParking.getTags().stream().anyMatch(options.journeyRequest().access().vehicleParking().bannedTags()::contains);
+    return vehicleParking
+      .getTags()
+      .stream()
+      .anyMatch(options.journeyRequest().access().vehicleParking().bannedTags()::contains);
   }
 
   private boolean hasMissingRequiredTags(NewRouteRequest options, VehicleParking vehicleParking) {
@@ -92,7 +95,8 @@ public class StreetVehicleParkingLink extends Edge {
     if (options.journeyRequest().access().vehicleParking().requiredTags().isEmpty()) {
       return false;
     }
-    return !vehicleParking.getTags().containsAll(options.journeyRequest().access().vehicleParking().requiredTags());
-
+    return !vehicleParking
+      .getTags()
+      .containsAll(options.journeyRequest().access().vehicleParking().requiredTags());
   }
 }

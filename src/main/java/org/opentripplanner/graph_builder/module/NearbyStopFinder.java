@@ -294,7 +294,9 @@ public class NearbyStopFinder {
     if (
       !reverseDirection &&
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.journeyRequest().access().mode())
+      VehicleToStopSkipEdgeStrategy.applicableModes.contains(
+        routingRequest.journeyRequest().access().mode()
+      )
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
@@ -303,7 +305,7 @@ public class NearbyStopFinder {
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-        routingRequest.journeyRequest().access().mode() == StreetMode.BIKE
+      routingRequest.journeyRequest().access().mode() == StreetMode.BIKE
     ) {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);

@@ -196,7 +196,8 @@ public class GraphBuilderModules {
       transitModel,
       issueStore,
       maxTransferDuration,
-      config.transferRequests
+      config.transferRequests,
+      config.transferPreferences
     );
   }
 

@@ -3,7 +3,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+import java.util.BitSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
@@ -16,10 +19,12 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class McCostParamsMapper {
 
-  public static McCostParams map(RoutingRequest request, RoutingPreferences preferences, List<? extends DefaultTripPattern> patternIndex) {
+  public static McCostParams map(NewRouteRequest request, RoutingPreferences preferences, List<? extends DefaultTripPattern> patternIndex) {
     McCostParamsBuilder builder = new McCostParamsBuilder();
 
-    builder.transferCost(preferences.transfer().cost()).waitReluctanceFactor(preferences.transfer().waitReluctance());
+    builder
+      .transferCost(preferences.transfer().cost())
+      .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
     if (request.journeyRequest().transfer().mode() == StreetMode.BIKE) {
       builder.boardCost(preferences.bike().boardCost());
@@ -27,7 +32,9 @@ public class McCostParamsMapper {
       builder.boardCost(preferences.walk().boardCost());
     }
 
-    builder.transitReluctanceFactors(mapTransitReluctance(preferences.transit().reluctanceForMode()));
+    builder.transitReluctanceFactors(
+      mapTransitReluctance(preferences.transit().reluctanceForMode())
+    );
     builder.wheelchairAccessibility(preferences.wheelchair().accessibility());
 
     final Set<FeedScopedId> unpreferredRoutes = request.journeyRequest().transit().unpreferredRoutes().getAgencyAndRouteIds();
