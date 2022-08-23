@@ -104,44 +104,88 @@ public class TransitPreferences {
    */
   private RaptorOptions raptorOptions = new RaptorOptions();
 
+  public void setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
+    this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
+  }
+
   public boolean ignoreRealtimeUpdates() {
     return ignoreRealtimeUpdates;
+  }
+
+  public void setIncludePlannedCancellations(boolean includePlannedCancellations) {
+    this.includePlannedCancellations = includePlannedCancellations;
   }
 
   public boolean includePlannedCancellations() {
     return includePlannedCancellations;
   }
 
+  public void setBoardSlack(int boardSlack) {
+    this.boardSlack = boardSlack;
+  }
+
   public int boardSlack() {
     return boardSlack;
+  }
+
+  public void setBoardSlackForMode(Map<TransitMode, Integer> boardSlackForMode) {
+    this.boardSlackForMode = boardSlackForMode;
   }
 
   public Map<TransitMode, Integer> boardSlackForMode() {
     return boardSlackForMode;
   }
 
+  public void setAlightSlack(int alightSlack) {
+    this.alightSlack = alightSlack;
+  }
+
   public int alightSlack() {
     return alightSlack;
+  }
+
+  public void setAlightSlackForMode(Map<TransitMode, Integer> alightSlackForMode) {
+    this.alightSlackForMode = alightSlackForMode;
   }
 
   public Map<TransitMode, Integer> alightSlackForMode() {
     return alightSlackForMode;
   }
 
+  public void setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+    this.reluctanceForMode = reluctanceForMode;
+  }
+
   public Map<TransitMode, Double> reluctanceForMode() {
     return reluctanceForMode;
+  }
+
+  public void setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
+    this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
   }
 
   public int otherThanPreferredRoutesPenalty() {
     return otherThanPreferredRoutesPenalty;
   }
 
+  public void setUseUnpreferredRoutesPenalty(int useUnpreferredRoutesPenalty) {
+    this.useUnpreferredRoutesPenalty = useUnpreferredRoutesPenalty;
+  }
+
   public int useUnpreferredRoutesPenalty() {
     return useUnpreferredRoutesPenalty;
   }
 
+  public void setRaptorOptions(RaptorOptions raptorOptions) {
+    this.raptorOptions = raptorOptions;
+  }
+
   public RaptorOptions raptorOptions() {
     return raptorOptions;
+  }
+
+  public void setUnpreferredRouteCost(DoubleFunction<Double> unpreferredRouteCost) {
+    this.unpreferredRouteCost = unpreferredRouteCost;
   }
 
   public DoubleFunction<Double> unpreferredRouteCost() {

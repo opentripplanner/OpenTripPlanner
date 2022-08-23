@@ -6,7 +6,6 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
@@ -93,11 +92,7 @@ public class DirectStreetRouter {
     double distanceLimit;
     StreetMode mode = request.journeyRequest().direct().mode();
 
-    double durationLimit = preferences
-      .street()
-      .maxDirectStreetDurationForMode()
-      .get(mode)
-      .toSeconds();
+    double durationLimit = preferences.street().maxDirectDurationForMode().get(mode).toSeconds();
 
     if (mode.includesDriving()) {
       distanceLimit = durationLimit * preferences.car().speed();

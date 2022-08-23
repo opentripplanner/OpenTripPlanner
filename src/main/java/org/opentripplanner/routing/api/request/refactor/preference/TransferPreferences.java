@@ -35,6 +35,13 @@ public class TransferPreferences {
    */
   private int slack = 120;
   // TODO: 2022-08-18 which one is it?
+  /**
+   * Penalty for using a non-preferred transfer
+   *
+   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+   * old functionality the same way, but we will try to map this parameter
+   * so it does work similar as before.
+   */
   private int nonpreferredCost = 180;
   /**
    * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
@@ -75,28 +82,56 @@ public class TransferPreferences {
    */
   private Integer maxTransfers = 12;
 
+  public void setCost(int cost) {
+    this.cost = cost;
+  }
+
   public int cost() {
     return cost;
+  }
+
+  public void setSlack(int slack) {
+    this.slack = slack;
   }
 
   public int slack() {
     return slack;
   }
 
+  public void setNonpreferredCost(int nonpreferredCost) {
+    this.nonpreferredCost = nonpreferredCost;
+  }
+
   public int nonpreferredCost() {
     return nonpreferredCost;
+  }
+
+  public void setWaitReluctance(double waitReluctance) {
+    this.waitReluctance = waitReluctance;
   }
 
   public double waitReluctance() {
     return waitReluctance;
   }
 
+  public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
+    this.waitAtBeginningFactor = waitAtBeginningFactor;
+  }
+
   public double waitAtBeginningFactor() {
     return waitAtBeginningFactor;
   }
 
+  public void setOptimization(TransferOptimizationParameters optimization) {
+    this.optimization = optimization;
+  }
+
   public TransferOptimizationParameters optimization() {
     return optimization;
+  }
+
+  public void setMaxTransfers(Integer maxTransfers) {
+    this.maxTransfers = maxTransfers;
   }
 
   public Integer maxTransfers() {

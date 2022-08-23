@@ -25,24 +25,62 @@ public class SystemPreferences {
   /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
   private boolean geoidElevation = false;
 
+  /** Option to disable the default filtering of GTFS-RT alerts by time. */
+  @Deprecated
+  private boolean disableAlertFiltering = false;
+
+  // TODO: 2022-08-23 refactor
   // The REST API should hold onto this, and pass it to the mapper, no need to include it in the
   // request.
-  // boolean showIntermediateStops=false;
+  /** Whether the planner should return intermediate stops lists for transit legs. */
+  private boolean showIntermediateStops = false;
+
+  public void setItineraryFilters(@Nonnull ItineraryFilterParameters itineraryFilters) {
+    this.itineraryFilters = itineraryFilters;
+  }
 
   @Nonnull
   public ItineraryFilterParameters itineraryFilters() {
     return itineraryFilters;
   }
 
+  public void setTags(Set<RoutingTag> tags) {
+    this.tags = tags;
+  }
+
   public Set<RoutingTag> tags() {
     return tags;
+  }
+
+  public void setDataOverlay(DataOverlayParameters dataOverlay) {
+    this.dataOverlay = dataOverlay;
   }
 
   public DataOverlayParameters dataOverlay() {
     return dataOverlay;
   }
 
+  public void setGeoidElevation(boolean geoidElevation) {
+    this.geoidElevation = geoidElevation;
+  }
+
   public boolean geoidElevation() {
     return geoidElevation;
+  }
+
+  public void setDisableAlertFiltering(boolean disableAlertFiltering) {
+    this.disableAlertFiltering = disableAlertFiltering;
+  }
+
+  public boolean disableAlertFiltering() {
+    return disableAlertFiltering;
+  }
+
+  public void setShowIntermediateStops(boolean showIntermediateStops) {
+    this.showIntermediateStops = showIntermediateStops;
+  }
+
+  public boolean showIntermediateStops() {
+    return showIntermediateStops;
   }
 }

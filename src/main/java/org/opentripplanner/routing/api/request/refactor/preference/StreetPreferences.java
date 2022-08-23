@@ -33,12 +33,12 @@ public class StreetPreferences {
    *
    * @see ItineraryListFilter
    */
-  private Duration maxDirectStreetDuration = Duration.ofHours(4);
+  private Duration maxDirectDuration = Duration.ofHours(4);
   /**
    * Override the settings in maxDirectStreetDuration for specific street modes. This is done
    * because some street modes searches are much more resource intensive than others.
    */
-  private Map<StreetMode, Duration> maxDirectStreetDurationForMode = new HashMap<>();
+  private Map<StreetMode, Duration> maxDirectDurationForMode = new HashMap<>();
   /** Multiplicative factor on expected turning time. */
   private double turnReluctance = 1.0;
   /**
@@ -65,8 +65,8 @@ public class StreetPreferences {
   @Deprecated
   private String pathComparator = null;
 
-  public Duration maxDirectStreetDuration(StreetMode mode) {
-    return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
+  public Duration maxDirectDuration(StreetMode mode) {
+    return maxDirectDurationForMode.getOrDefault(mode, maxDirectDuration);
   }
 
   public Duration maxAccessEgressDuration(StreetMode mode) {
@@ -79,6 +79,10 @@ public class StreetPreferences {
       return new DurationComparator();
     }
     return new PathComparator(compareStartTimes);
+  }
+
+  public String pathComparator() {
+    return pathComparator;
   }
 
   public void setMaxAccessEgressDuration(Duration maxAccessEgressDuration) {
@@ -99,22 +103,20 @@ public class StreetPreferences {
     return maxAccessEgressDurationForMode;
   }
 
-  public void setMaxDirectStreetDuration(Duration maxDirectStreetDuration) {
-    this.maxDirectStreetDuration = maxDirectStreetDuration;
+  public void setMaxDirectDuration(Duration maxDirectDuration) {
+    this.maxDirectDuration = maxDirectDuration;
   }
 
-  public Duration maxDirectStreetDuration() {
-    return maxDirectStreetDuration;
+  public Duration maxDirectDuration() {
+    return maxDirectDuration;
   }
 
-  public void setMaxDirectStreetDurationForMode(
-    Map<StreetMode, Duration> maxDirectStreetDurationForMode
-  ) {
-    this.maxDirectStreetDurationForMode = maxDirectStreetDurationForMode;
+  public void setMaxDirectDurationForMode(Map<StreetMode, Duration> maxDirectDurationForMode) {
+    this.maxDirectDurationForMode = maxDirectDurationForMode;
   }
 
-  public Map<StreetMode, Duration> maxDirectStreetDurationForMode() {
-    return maxDirectStreetDurationForMode;
+  public Map<StreetMode, Duration> maxDirectDurationForMode() {
+    return maxDirectDurationForMode;
   }
 
   public void setTurnReluctance(double turnReluctance) {

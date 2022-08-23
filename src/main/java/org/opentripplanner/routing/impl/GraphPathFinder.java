@@ -8,7 +8,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -73,7 +72,7 @@ public class GraphPathFinder {
 
     AStarBuilder aStar = AStarBuilder
       .oneToOneMaxDuration(
-        preferences.street().maxDirectStreetDuration(options.journeyRequest().direct().mode())
+        preferences.street().maxDirectDuration(options.journeyRequest().direct().mode())
       )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())

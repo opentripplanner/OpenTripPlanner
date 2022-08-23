@@ -29,6 +29,8 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.refactor.request.JourneyRequest;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
@@ -204,6 +206,11 @@ public class NodeAdapter {
       : new QualifiedModeSet(node.asText()).getRequestModes();
   }
 
+  // TODO: 2022-08-23 create implementation
+  public JourneyRequest asJourneyRequest(String paramName, JourneyRequest defaultValue) {
+    throw new RuntimeException("Not Implemented");
+  }
+
   /**
    * Get a required parameter as a text String value.
    *
@@ -330,6 +337,16 @@ public class NodeAdapter {
 
   public Set<FeedScopedId> asFeedScopedIdSet(String paramName, Set<FeedScopedId> defaultValues) {
     return Set.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
+  }
+
+  public RouteMatcher asRouteMatcher(String paramName, RouteMatcher defaultValue) {
+    JsonNode array = param(paramName);
+
+    if (array.isMissingNode()) {
+      return defaultValue;
+    }
+
+    return RouteMatcher.idMatcher(asFeedScopedIds(paramName, List.of()));
   }
 
   public Locale asLocale(String paramName, Locale defaultValue) {

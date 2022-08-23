@@ -39,39 +39,71 @@ public class VehicleRentalPreferences {
    */
   private double keepingVehicleAtDestinationCost = 0;
 
+  public void setPickupTime(int pickupTime) {
+    this.pickupTime = pickupTime;
+  }
+
   public int pickupTime() {
     return pickupTime;
+  }
+
+  public void setPickupCost(int pickupCost) {
+    this.pickupCost = pickupCost;
   }
 
   public int pickupCost() {
     return pickupCost;
   }
 
+  public void setDropoffTime(int dropoffTime) {
+    this.dropoffTime = dropoffTime;
+  }
+
   public int dropoffTime() {
     return dropoffTime;
+  }
+
+  public void setDropoffCost(int dropoffCost) {
+    this.dropoffCost = dropoffCost;
   }
 
   public int dropoffCost() {
     return dropoffCost;
   }
 
+  public void setUseVehicleRentalAvailabilityInformation(
+    boolean useVehicleRentalAvailabilityInformation
+  ) {
+    this.useVehicleRentalAvailabilityInformation = useVehicleRentalAvailabilityInformation;
+  }
+
   public boolean useVehicleRentalAvailabilityInformation() {
     return useVehicleRentalAvailabilityInformation;
+  }
+
+  public void setAllowKeepingRentedVehicleAtDestination(
+    boolean allowKeepingRentedVehicleAtDestination
+  ) {
+    this.allowKeepingRentedVehicleAtDestination = allowKeepingRentedVehicleAtDestination;
   }
 
   public boolean allowKeepingRentedVehicleAtDestination() {
     return allowKeepingRentedVehicleAtDestination;
   }
 
+  public void setKeepingVehicleAtDestinationCost(double keepingVehicleAtDestinationCost) {
+    this.keepingVehicleAtDestinationCost = keepingVehicleAtDestinationCost;
+  }
+
   public double keepingVehicleAtDestinationCost() {
     return keepingVehicleAtDestinationCost;
   }
 
-  public boolean allow() {
-    return allow;
-  }
-
   public void setAllow(boolean allow) {
     this.allow = allow;
+  }
+
+  public boolean allow() {
+    return allow;
   }
 }

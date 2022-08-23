@@ -20,6 +20,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,6 +150,25 @@ public class NewRouteRequest {
    * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
    */
   private Duration maxJourneyDuration = Duration.ofHours(24);
+
+  /**
+   * A transit stop that this trip must start from
+   *
+   * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
+   * the fromPlace parameter. Is is used for onBoard routing only?
+   */
+  @Deprecated
+  private FeedScopedId startingTransitStopId;
+
+  /**
+   * A trip where this trip must start from (depart-onboard routing)
+   *
+   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+   * old functionality the same way, but we will try to map this parameter
+   * so it does work similar as before.
+   */
+  @Deprecated
+  private FeedScopedId startingTransitTripId;
 
   public NewRouteRequest() {
     // So that they are never null.
@@ -429,6 +449,10 @@ public class NewRouteRequest {
     return arriveBy;
   }
 
+  public void setLocale(Locale locale) {
+    this.locale = locale;
+  }
+
   public Locale locale() {
     return locale;
   }
@@ -445,7 +469,27 @@ public class NewRouteRequest {
     return journeyRequest;
   }
 
+  public void setMaxJourneyDuration(Duration maxJourneyDuration) {
+    this.maxJourneyDuration = maxJourneyDuration;
+  }
+
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
+  }
+
+  public void setStartingTransitStopId(FeedScopedId startingTransitStopId) {
+    this.startingTransitStopId = startingTransitStopId;
+  }
+
+  public FeedScopedId startingTransitStopId() {
+    return startingTransitStopId;
+  }
+
+  public void setStartingTransitTripId(FeedScopedId startingTransitTripId) {
+    this.startingTransitTripId = startingTransitTripId;
+  }
+
+  public FeedScopedId startingTransitTripId() {
+    return startingTransitTripId;
   }
 }

@@ -38,55 +38,91 @@ public class CarPreferences {
   // TODO: 2022-08-18 should it be here?
   private boolean allowPickup = false;
 
+  public void setSpeed(double speed) {
+    this.speed = speed;
+  }
+
   public double speed() {
     return speed;
+  }
+
+  public void setReluctance(double reluctance) {
+    this.reluctance = reluctance;
   }
 
   public double reluctance() {
     return reluctance;
   }
 
+  public void setParkTime(int parkTime) {
+    this.parkTime = parkTime;
+  }
+
   public int parkTime() {
     return parkTime;
+  }
+
+  public void setParkCost(int parkCost) {
+    this.parkCost = parkCost;
   }
 
   public int parkCost() {
     return parkCost;
   }
 
+  public void setDropoffTime(int dropoffTime) {
+    this.dropoffTime = dropoffTime;
+  }
+
   public int dropoffTime() {
     return dropoffTime;
+  }
+
+  public void setPickupTime(int pickupTime) {
+    this.pickupTime = pickupTime;
   }
 
   public int pickupTime() {
     return pickupTime;
   }
 
+  public void setPickupCost(int pickupCost) {
+    this.pickupCost = pickupCost;
+  }
+
   public int pickupCost() {
     return pickupCost;
+  }
+
+  public void setDecelerationSpeed(double decelerationSpeed) {
+    this.decelerationSpeed = decelerationSpeed;
   }
 
   public double decelerationSpeed() {
     return decelerationSpeed;
   }
 
-  public double accelerationSpeed() {
-    return accelerationSpeed;
+  public void setAccelerationSpeed(double accelerationSpeed) {
+    this.accelerationSpeed = accelerationSpeed;
   }
 
-  public boolean parkAndRide() {
-    return parkAndRide;
+  public double accelerationSpeed() {
+    return accelerationSpeed;
   }
 
   public void setParkAndRide(boolean parkAndRide) {
     this.parkAndRide = parkAndRide;
   }
 
-  public boolean allowPickup() {
-    return allowPickup;
+  public boolean parkAndRide() {
+    return parkAndRide;
   }
 
   public void setAllowPickup(boolean allowPickup) {
     this.allowPickup = allowPickup;
+  }
+
+  public boolean allowPickup() {
+    return allowPickup;
   }
 }

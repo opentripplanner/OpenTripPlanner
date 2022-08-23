@@ -82,12 +82,24 @@ public class BikePreferences {
     return boardCost;
   }
 
+  public void setWalkingSpeed(double walkingSpeed) {
+    this.walkingSpeed = walkingSpeed;
+  }
+
   public double walkingSpeed() {
     return walkingSpeed;
   }
 
+  public void setWalkingReluctance(double walkingReluctance) {
+    this.walkingReluctance = walkingReluctance;
+  }
+
   public double walkingReluctance() {
     return walkingReluctance;
+  }
+
+  public void setReluctance(double reluctance) {
+    this.reluctance = reluctance;
   }
 
   public double reluctance() {
@@ -110,8 +122,16 @@ public class BikePreferences {
     return switchCost;
   }
 
+  public void setParkTime(int parkTime) {
+    this.parkTime = parkTime;
+  }
+
   public int parkTime() {
     return parkTime;
+  }
+
+  public void setParkCost(int parkCost) {
+    this.parkCost = parkCost;
   }
 
   public int parkCost() {

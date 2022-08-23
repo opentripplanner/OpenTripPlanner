@@ -11,6 +11,7 @@ public class RoutingPreferences {
   private BikePreferences bike = new BikePreferences();
   private CarPreferences car = new CarPreferences();
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
+  private VehicleParkingPreferences parking = new VehicleParkingPreferences();
   private SystemPreferences system = new SystemPreferences();
 
   public TransitPreferences transit() {
@@ -43,6 +44,10 @@ public class RoutingPreferences {
 
   public VehicleRentalPreferences rental() {
     return rental;
+  }
+
+  public VehicleParkingPreferences parking() {
+    return parking;
   }
 
   public SystemPreferences system() {

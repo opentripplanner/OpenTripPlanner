@@ -12,16 +12,32 @@ public class VehicleRentalRequest {
   private boolean useAvailabilityInformation = false;
   private boolean allowKeepingVehicleAtDestination = false;
 
+  public void setAllowedFormFactors(Set<RentalVehicleType.FormFactor> allowedFormFactors) {
+    this.allowedFormFactors = allowedFormFactors;
+  }
+
   public Set<RentalVehicleType.FormFactor> allowedFormFactors() {
     return allowedFormFactors;
+  }
+
+  public void setAllowedNetworks(Set<String> allowedNetworks) {
+    this.allowedNetworks = allowedNetworks;
   }
 
   public Set<String> allowedNetworks() {
     return allowedNetworks;
   }
 
+  public void setBannedNetworks(Set<String> bannedNetworks) {
+    this.bannedNetworks = bannedNetworks;
+  }
+
   public Set<String> bannedNetworks() {
     return bannedNetworks;
+  }
+
+  public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
+    this.useAvailabilityInformation = useAvailabilityInformation;
   }
 
   public boolean useAvailabilityInformation() {

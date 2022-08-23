@@ -16,13 +16,25 @@ public class WheelchairPreferences {
   // TODO: 2022-08-18 Is it new?
   private double slopeTooSteepCostFactor = 10.0;
 
+  public void setAccessibility(@Nonnull WheelchairAccessibilityRequest accessibility) {
+    this.accessibility = accessibility;
+  }
+
   @Nonnull
   public WheelchairAccessibilityRequest accessibility() {
     return accessibility;
   }
 
+  public void setMaxSlope(double maxSlope) {
+    this.maxSlope = maxSlope;
+  }
+
   public double maxSlope() {
     return maxSlope;
+  }
+
+  public void setSlopeTooSteepCostFactor(double slopeTooSteepCostFactor) {
+    this.slopeTooSteepCostFactor = slopeTooSteepCostFactor;
   }
 
   public double slopeTooSteepCostFactor() {
