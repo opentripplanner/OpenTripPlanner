@@ -15,6 +15,7 @@
   name [#3648](https://github.com/opentripplanner/OpenTripPlanner/pull/3648)
 - 2022-01-03: Add support for VehicleParking entities
 - 2022-04-27: Read the headsign for frequency-only patterns correctly [#4122](https://github.com/opentripplanner/OpenTripPlanner/pull/4122)
+- 2022-08-23: Remove patterns and add route gtfsTypes to stop layer [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
 
 ## Documentation
 
