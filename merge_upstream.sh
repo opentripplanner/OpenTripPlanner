@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Pulls upstream state (usually this should be opentripplanner/opentripplanner/dev-2.x)
 # Rebases local extension branches on top of pulled upstream and pushes rebased extensions
@@ -12,7 +12,7 @@
 #set -euo pipefail
 
 DEVBRANCH=dev-2.x
-REMOTE_REPO="`git remote -v  | grep "hsldevcom/OpenTripPlanner" | grep "push" | awk '{print $1;}'`"
+REMOTE_REPO=$(git remote -v  | grep "hsldevcom/OpenTripPlanner" | grep "push" | awk '{print $1;}')
 STATUS_FILE=".merge_upstream.tmp"
 STATUS=""
 DRY_RUN=""
@@ -56,7 +56,7 @@ function setup() {
        exit 2
     fi
 
-    git fetch ${REMOTE_REPO}
+    git fetch "${REMOTE_REPO}"
 }
 
 # This script create a status file '.merge_upstream.tmp'. This file is used to resume the
@@ -226,7 +226,7 @@ function setStatus() {
 
 function readStatus() {
     if [[ -f "${STATUS_FILE}" ]] ; then
-        STATUS=`cat $STATUS_FILE`
+        STATUS=$(cat $STATUS_FILE)
         rm "$STATUS_FILE"
     else
          STATUS=""
