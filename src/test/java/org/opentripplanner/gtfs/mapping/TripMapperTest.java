@@ -34,7 +34,7 @@ public class TripMapperTest {
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
 
   private final TripMapper subject = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE),
+    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
     new DirectionMapper(ISSUE_STORE)
   );
 

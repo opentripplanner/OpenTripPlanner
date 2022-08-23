@@ -33,12 +33,6 @@ class RouteMapper {
     this.translationHelper = helper;
   }
 
-  RouteMapper(AgencyMapper agencyMapper, DataImportIssueStore issueStore) {
-    this.agencyMapper = agencyMapper;
-    this.issueStore = issueStore;
-    this.brandingMapper = new BrandingMapper();
-  }
-
   Collection<Route> map(Collection<org.onebusaway.gtfs.model.Route> agencies) {
     return MapUtils.mapToList(agencies, this::map);
   }
@@ -53,14 +47,12 @@ class RouteMapper {
     I18NString longName = null;
     if (rhs.getLongName() != null) {
       longName =
-        this.translationHelper != null
-          ? this.translationHelper.getTranslation(
-              org.onebusaway.gtfs.model.Route.class,
-              "longName",
-              rhs.getId().getId(),
-              rhs.getLongName()
-            )
-          : new NonLocalizedString(rhs.getLongName());
+        translationHelper.getTranslation(
+          org.onebusaway.gtfs.model.Route.class,
+          "longName",
+          rhs.getId().getId(),
+          rhs.getLongName()
+        );
     }
     lhs.withAgency(agencyMapper.map(rhs.getAgency()));
     lhs.withShortName(rhs.getShortName());
