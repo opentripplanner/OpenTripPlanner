@@ -67,7 +67,7 @@ public class RouteMapperTest {
     Route route = routeMapper.mapRoute(line);
 
     assertEquals(MappingSupport.ID_FACTORY.createId(LINE_ID), route.getId());
-    assertEquals("Line 1", route.getLongName());
+    assertEquals("Line 1", route.getLongName().toString());
     assertEquals("L1", route.getShortName());
   }
 
