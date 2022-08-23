@@ -50,15 +50,18 @@ class RouteMapper {
 
   private Route doMap(org.onebusaway.gtfs.model.Route rhs) {
     var lhs = Route.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
-
-    final I18NString longName = this.translationHelper != null
-      ? this.translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Route.class,
-          "longName",
-          rhs.getId().getId(),
-          rhs.getLongName()
-        )
-      : new NonLocalizedString(rhs.getLongName());
+    I18NString longName = null;
+    if (rhs.getLongName() != null) {
+      longName =
+        this.translationHelper != null
+          ? this.translationHelper.getTranslation(
+              org.onebusaway.gtfs.model.Route.class,
+              "longName",
+              rhs.getId().getId(),
+              rhs.getLongName()
+            )
+          : new NonLocalizedString(rhs.getLongName());
+    }
     lhs.withAgency(agencyMapper.map(rhs.getAgency()));
     lhs.withShortName(rhs.getShortName());
     lhs.withLongName(longName);

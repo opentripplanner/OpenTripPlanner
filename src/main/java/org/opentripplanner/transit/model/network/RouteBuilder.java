@@ -2,7 +2,6 @@ package org.opentripplanner.transit.model.network;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
@@ -83,7 +82,7 @@ public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilde
   }
 
   public String getName() {
-    return Objects.requireNonNullElse(shortName, longName.toString());
+    return shortName != null ? shortName : longName.toString();
   }
 
   public String getShortName() {
