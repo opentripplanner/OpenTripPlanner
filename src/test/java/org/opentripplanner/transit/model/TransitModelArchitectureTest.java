@@ -2,10 +2,11 @@ package org.opentripplanner.transit.model;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTIL;
-import static org.opentripplanner.OtpArchitectureModules.GUAVA;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
+import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_TRANSIT;
+import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.UTILS;
 
@@ -26,7 +27,7 @@ public class TransitModelArchitectureTest {
 
   @Test
   void enforcePackageDependencies() {
-    FRAMEWORK.dependsOn(GUAVA, UTILS).verify();
+    FRAMEWORK.dependsOn(UTILS).verify();
     BASIC.dependsOn(UTILS, JTS_GEOM, FRAMEWORK).verify();
     ORGANIZATION.dependsOn(UTILS, FRAMEWORK, BASIC).verify();
     SITE
@@ -36,18 +37,20 @@ public class TransitModelArchitectureTest {
     NETWORK
       .dependsOn(
         UTILS,
-        GUAVA,
         JTS_GEOM,
         FRAMEWORK,
         BASIC,
         ORGANIZATION,
         SITE,
         TIMETABLE,
-        LEGACY_MODEL
+        LEGACY_MODEL,
+        RAPTOR_API,
+        //TODO: Extract an injectable adapter for SlackProvider, and remove this
+        RAPTOR_ADAPTER_TRANSIT
       )
       .verify();
     TIMETABLE
-      .dependsOn(GUAVA, UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
+      .dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
       .verify();
   }
 

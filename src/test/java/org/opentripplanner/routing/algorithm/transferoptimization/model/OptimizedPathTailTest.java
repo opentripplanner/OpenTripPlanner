@@ -96,7 +96,11 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.access(orgPath.accessLeg().access());
 
     var exp =
-      "Walk 3m15s ~ A " + "~ BUS L11 10:04 10:35 ~ B " + "~ Walk 7m45s " + "[$3318 $0pri $3378wtc]";
+      "Walk 3m15s ~ A " +
+      "~ BUS L11 10:04 10:35 ~ B " +
+      "~ Walk 3m45s ~ E " +
+      "~ Flex 7m45s 1x " +
+      "[$3936 $0pri $3996wtc]";
 
     assertEquals(exp, subject.toString());
   }

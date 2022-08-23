@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
@@ -68,13 +68,6 @@ public class SiriTripPatternCache {
         .withRoute(trip.getRoute())
         .withStopPattern(stopPattern);
 
-      // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-      tripPatternBuilder.withServiceCodes(transitModel.getServiceCodes());
-
-      // Create vertices and edges for new TripPattern
-      // TODO: purge these vertices and edges once in a while?
-      //            tripPattern.makePatternVerticesAndEdges(transitModel, transitModel.index.stopVertexForStop);
-
       // TODO - SIRI: Add pattern to transitModel index?
 
       TripPattern originalTripPattern = transitModel
@@ -86,10 +79,6 @@ public class SiriTripPatternCache {
       tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
       tripPattern = tripPatternBuilder.build();
-      // Copy information from the TripPattern this is replacing
-      if (originalTripPattern != null) {
-        tripPattern.setHopGeometriesFromPattern(originalTripPattern);
-      }
 
       // Add pattern to cache
       cache.put(key, tripPattern);
@@ -169,7 +158,7 @@ public class SiriTripPatternCache {
    * @param stop the stop
    * @return list of TripPatterns created by real time sources for the stop.
    */
-  public List<TripPattern> getAddedTripPatternsForStop(Stop stop) {
+  public List<TripPattern> getAddedTripPatternsForStop(RegularStop stop) {
     return patternsForStop.get(stop);
   }
 }

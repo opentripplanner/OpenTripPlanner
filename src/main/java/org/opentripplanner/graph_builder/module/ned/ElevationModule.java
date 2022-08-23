@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 import java.io.BufferedOutputStream;
@@ -30,18 +31,17 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
 import org.opentripplanner.graph_builder.issues.Graphwide;
-import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetElevationExtension;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
+import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * THIS CLASS IS MULTI-THREADED (When configured to do so, it uses parallel streams to distribute
  * elevation calculation tasks for edges.)
  * <p>
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies
+ * {@link GraphBuilderModule} plugin that applies
  * elevation data to street data that has already been loaded into a (@link Graph}, creating
  * elevation profiles for each Street encountered in the Graph. Data sources that could be used
  * include auto-downloaded and cached National Elevation Dataset (NED) raster data or a GeoTIFF
@@ -68,6 +68,7 @@ public class ElevationModule implements GraphBuilderModule {
   private final boolean readCachedElevations;
   /* Whether or not to attempt writing out a file of cached elevations */
   private final boolean writeCachedElevations;
+  private final Graph graph;
   /* The file of cached elevations */
   private final File cachedElevationsFile;
   private final double maxElevationPropagationMeters;
@@ -92,7 +93,7 @@ public class ElevationModule implements GraphBuilderModule {
   /** A concurrent hashmap used for storing geoid difference values at various coordinates */
   private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
   private final ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
-  private DataImportIssueStore issueStore;
+  private final DataImportIssueStore issueStore;
   /**
    * A map of PackedCoordinateSequence values identified by Strings of encoded polylines.
    * <p>
@@ -107,14 +108,32 @@ public class ElevationModule implements GraphBuilderModule {
   private double minElevation = Double.MAX_VALUE;
   private double maxElevation = Double.MIN_VALUE;
 
+  private final Map<Vertex, Double> elevationData;
+
   /** used only for testing purposes */
-  public ElevationModule(ElevationGridCoverageFactory factory) {
-    this(factory, null, false, false, 1, 10, 2000, true, false);
+  public ElevationModule(ElevationGridCoverageFactory factory, Graph graph) {
+    this(
+      factory,
+      graph,
+      noopIssueStore(),
+      null,
+      new HashMap<>(),
+      false,
+      false,
+      1,
+      10,
+      2000,
+      true,
+      false
+    );
   }
 
   public ElevationModule(
     ElevationGridCoverageFactory factory,
+    Graph graph,
+    DataImportIssueStore issueStore,
     File cachedElevationsFile,
+    Map<Vertex, Double> elevationData,
     boolean readCachedElevations,
     boolean writeCachedElevations,
     double elevationUnitMultiplier,
@@ -124,7 +143,10 @@ public class ElevationModule implements GraphBuilderModule {
     boolean multiThreadElevationCalculations
   ) {
     gridCoverageFactory = factory;
+    this.graph = graph;
+    this.issueStore = issueStore;
     this.cachedElevationsFile = cachedElevationsFile;
+    this.elevationData = elevationData;
     this.readCachedElevations = readCachedElevations;
     this.writeCachedElevations = writeCachedElevations;
     this.elevationUnitMultiplier = elevationUnitMultiplier;
@@ -135,14 +157,8 @@ public class ElevationModule implements GraphBuilderModule {
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     Instant start = Instant.now();
-    this.issueStore = issueStore;
     gridCoverageFactory.fetchData(graph);
 
     graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
@@ -224,6 +240,8 @@ public class ElevationModule implements GraphBuilderModule {
       }
     }
 
+    LOG.info(progress.completeMessage());
+
     // Iterate again to find edges that had elevation calculated.
     LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
     for (StreetEdge edgeWithElevation : streetsWithElevationEdges) {
@@ -234,6 +252,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     if (writeCachedElevations) {
       // write information from edgesWithElevation to a new cache file for subsequent graph builds
+      LOG.info("Writing elevation cache");
       HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
       for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
         newCachedElevations.put(
@@ -253,9 +272,8 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     @SuppressWarnings("unchecked")
-    Map<Vertex, Double> extraElevation = (Map<Vertex, Double>) extra.get(ElevationPoint.class);
     var elevationsForVertices = collectKnownElevationsForVertices(
-      extraElevation,
+      elevationData,
       edgesWithCalculatedElevations
     );
 
@@ -265,8 +283,8 @@ public class ElevationModule implements GraphBuilderModule {
     updateElevationMetadata(graph);
 
     LOG.info(
-      "Finished elevation processing in {}s",
-      Duration.between(start, Instant.now()).toSeconds()
+      "Finished elevation processing in {}",
+      DurationUtils.durationToStr(Duration.between(start, Instant.now()))
     );
   }
 

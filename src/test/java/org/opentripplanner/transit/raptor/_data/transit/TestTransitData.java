@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -18,6 +19,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
@@ -124,6 +126,7 @@ public class TestTransitData
     };
   }
 
+  @Nonnull
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     // Index is translated: 1->'A', 2->'B', 3->'C' ...
@@ -150,6 +153,20 @@ public class TestTransitData
       })
       .max()
       .orElseThrow();
+  }
+
+  @Override
+  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch(
+    int routeIndex
+  ) {
+    return getRoute(routeIndex).transferConstraintsForwardSearch();
+  }
+
+  @Override
+  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch(
+    int routeIndex
+  ) {
+    return getRoute(routeIndex).transferConstraintsReverseSearch();
   }
 
   public TestRoute getRoute(int index) {

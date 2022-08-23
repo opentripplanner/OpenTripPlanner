@@ -15,6 +15,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class BoardingAreaMapperTest {
 
@@ -40,9 +41,7 @@ public class BoardingAreaMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final org.opentripplanner.transit.model.site.Stop PARENT_STOP = TransitModelForTest
-    .stop(PARENT)
-    .build();
+  private static final RegularStop PARENT_STOP = TransitModelForTest.stop(PARENT).build();
 
   private static final String ZONE_ID = "Zone Id";
   private static final Stop STOP = new Stop();

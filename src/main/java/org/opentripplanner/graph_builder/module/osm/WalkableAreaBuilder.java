@@ -641,8 +641,11 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      Double safety = wayPropertiesCache.get(areaEntity).getSafetyFeatures().first;
-      namedArea.setBicycleSafetyMultiplier(safety);
+      Double bicycleSafety = wayPropertiesCache.get(areaEntity).getBicycleSafetyFeatures().first;
+      namedArea.setBicycleSafetyMultiplier(bicycleSafety);
+
+      Double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().first;
+      namedArea.setWalkSafetyMultiplier(walkSafety);
 
       namedArea.setOriginalEdges(intersection);
 

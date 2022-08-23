@@ -30,6 +30,9 @@ public class BicycleRoutingTest {
   {
     TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
     herrenbergGraph = model.graph();
+
+    model.transitModel().index();
+    herrenbergGraph.index(model.transitModel().getStopModel());
   }
 
   /**

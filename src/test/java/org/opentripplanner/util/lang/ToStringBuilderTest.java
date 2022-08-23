@@ -3,6 +3,7 @@ package org.opentripplanner.util.lang;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -13,7 +14,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
@@ -96,11 +97,13 @@ public class ToStringBuilderTest {
     var trip = TransitModelForTest.trip("1").build();
     assertEquals(
       "ToStringBuilderTest{tripId: F:1}",
-      subject().addObjOp("tripId", trip, TransitEntity::getId).toString()
+      subject().addObjOp("tripId", trip, AbstractTransitEntity::getId).toString()
     );
     assertEquals(
       "ToStringBuilderTest{}",
-      subject().addObjOp("tripId", null, TransitEntity::getId).toString()
+      subject()
+        .addObjOp("tripId", (AbstractTransitEntity<?, ?>) null, AbstractTransitEntity::getId)
+        .toString()
     );
   }
 
@@ -244,6 +247,12 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{t: [10:10 12:03]}",
       subject().addServiceTimeSchedule("t", times).toString()
     );
+  }
+
+  @Test
+  void addDate() {
+    LocalDate d = LocalDate.of(2012, 1, 28);
+    assertEquals("ToStringBuilderTest{d: 2012-01-28}", subject().addDate("d", d).toString());
   }
 
   @Test

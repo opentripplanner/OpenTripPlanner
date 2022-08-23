@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,11 @@ public class ItineraryFiltersMapper {
         "filterItinerariesWithSameFirstOrLastTrip",
         dft.filterItinerariesWithSameFirstOrLastTrip
       ),
-      c.asBoolean("accessibilityScore", dft.accessibilityScore)
+      c.asBoolean("accessibilityScore", dft.accessibilityScore),
+      c.asBoolean(
+        "removeItinerariesWithSameRoutesAndStops",
+        dft.removeItinerariesWithSameRoutesAndStops
+      )
     );
   }
 
@@ -59,9 +64,6 @@ public class ItineraryFiltersMapper {
       "configuration format. The existing format will cease to work after OTP v2.2"
     );
 
-    return new TransitGeneralizedCostFilterParams(
-      node.asLinearFunction("transitGeneralizedCostLimit", null),
-      0
-    );
+    return new TransitGeneralizedCostFilterParams(RequestFunctions.parse(node.asText()), 0);
   }
 }

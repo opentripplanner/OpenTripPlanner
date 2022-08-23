@@ -1,13 +1,20 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
-import com.azure.messaging.servicebus.*;
+import com.azure.messaging.servicebus.ServiceBusClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusErrorContext;
+import com.azure.messaging.servicebus.ServiceBusException;
+import com.azure.messaging.servicebus.ServiceBusFailureReason;
+import com.azure.messaging.servicebus.ServiceBusProcessorClient;
+import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.*;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -81,9 +88,9 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   @Override
   public void run() throws Exception {
-    Preconditions.checkNotNull(topicName, "'topic' must be set");
-    Preconditions.checkNotNull(serviceBusUrl, "'servicebus-url' must be set");
-    Preconditions.checkNotNull(feedId, "'feedId' must be set");
+    Objects.requireNonNull(topicName, "'topic' must be set");
+    Objects.requireNonNull(serviceBusUrl, "'servicebus-url' must be set");
+    Objects.requireNonNull(feedId, "'feedId' must be set");
     Preconditions.checkState(feedId.length() > 0, "'feedId' must be set");
 
     // In Kubernetes this should be the POD identifier

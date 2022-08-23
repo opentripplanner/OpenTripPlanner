@@ -43,7 +43,7 @@ public class AlertsUpdateHandler {
 
   // TODO: replace this with a runtime solution
   private final DirectionMapper directionMapper = new DirectionMapper(
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   public void update(FeedMessage message) {

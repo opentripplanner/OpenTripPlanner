@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
-import java.util.HashMap;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -38,7 +37,7 @@ public class ElevationModuleTest {
     // create a graph with a StreetWithElevationEdge
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     OsmVertex from = new OsmVertex(graph, "from", -122.6932051, 45.5122964, 40513757);
     OsmVertex to = new OsmVertex(graph, "to", -122.6903532, 45.5115309, 1677595882);
@@ -99,11 +98,11 @@ public class ElevationModuleTest {
     File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());
     DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
     NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
-    ElevationModule elevationModule = new ElevationModule(gcf);
+    ElevationModule elevationModule = new ElevationModule(gcf, graph);
 
     // build to graph to execute the elevation module
     elevationModule.checkInputs();
-    elevationModule.buildGraph(graph, transitModel, new HashMap<>());
+    elevationModule.buildGraph();
 
     // verify that elevation data has been set on the StreetWithElevationEdge
     assertNotNull(edge.getElevationProfile());

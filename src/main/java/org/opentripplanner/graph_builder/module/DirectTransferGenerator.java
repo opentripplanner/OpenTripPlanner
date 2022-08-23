@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -18,18 +18,17 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.transit.service.TransitModelIndex;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the
+ * {@link GraphBuilderModule} module that links up the
  * stops of a transit network among themselves. This is necessary for routing in long-distance
  * mode.
  * <p>
@@ -43,31 +42,29 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final Duration radiusByDuration;
 
   private final List<RoutingRequest> transferRequests;
+  private final Graph graph;
+  private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
 
-  public DirectTransferGenerator(Duration radiusByDuration, List<RoutingRequest> transferRequests) {
+  public DirectTransferGenerator(
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
+    Duration radiusByDuration,
+    List<RoutingRequest> transferRequests
+  ) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
   }
 
-  public List<String> provides() {
-    return List.of("linking");
-  }
-
-  public List<String> getPrerequisites() {
-    return List.of("street to transit");
-  }
-
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     /* Initialize transit model index which is needed by the nearby stop finder. */
     if (transitModel.getTransitModelIndex() == null) {
-      transitModel.setTransitModelIndex(new TransitModelIndex(transitModel));
-      transitModel.getStopModel().index();
+      transitModel.index();
     }
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
@@ -107,7 +104,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         /* Make transfers to each nearby stop that has lowest weight on some trip pattern.
          * Use map based on the list of edges, so that only distinct transfers are stored. */
         Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
-        Stop stop = ts0.getStop();
+        RegularStop stop = ts0.getStop();
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RoutingRequest transferProfile : transferRequests) {
@@ -128,8 +125,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             );
           }
           if (OTPFeature.FlexRouting.isOn()) {
-            // This code is for finding transfers from FlexStopLocations to Stops, transfers
-            // from Stops to FlexStopLocations and between Stops are already covered above.
+            // This code is for finding transfers from AreaStops to Stops, transfers
+            // from Stops to AreaStops and between Stops are already covered above.
             for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
               ts0,
               streetRequest,
@@ -139,7 +136,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
               if (sd.stop == stop) {
                 continue;
               }
-              if (sd.stop instanceof Stop) {
+              if (sd.stop instanceof RegularStop) {
                 continue;
               }
               distinctTransfers.put(

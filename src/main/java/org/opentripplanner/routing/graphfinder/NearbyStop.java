@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -83,7 +82,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
   public String toString() {
     return String.format(
       Locale.ROOT,
-      "stop %s at %.1f meters%s%s%s",
+      "stop %s at %.1f meters%s%s",
       stop,
       distance,
       edges != null ? " (" + edges.size() + " edges)" : "",

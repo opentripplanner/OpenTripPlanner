@@ -7,12 +7,12 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -70,11 +70,11 @@ class NoticeAssignmentMapper {
     }
   }
 
-  Multimap<TransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
+  Multimap<AbstractTransitEntity, Notice> map(NoticeAssignment noticeAssignment) {
     // TODO OTP2 - Idealy this should en up as one key,value pair.
     //             The `StopPointInJourneyPattern` which result in more than one key/valye pair,
     //             can be replaced with a new compound key type.
-    Multimap<TransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
+    Multimap<AbstractTransitEntity, Notice> noticiesByEntity = ArrayListMultimap.create();
 
     String noticedObjectId = noticeAssignment.getNoticedObjectRef().getRef();
     Notice otpNotice = getOrMapNotice(noticeAssignment);
@@ -130,7 +130,7 @@ class NoticeAssignmentMapper {
   }
 
   private void addStopTimeNotice(
-    Multimap<TransitEntity, Notice> map,
+    Multimap<AbstractTransitEntity, Notice> map,
     String stopTimeId,
     Notice notice
   ) {

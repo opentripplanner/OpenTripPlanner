@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -14,8 +15,8 @@ class TripPatternTest {
   private static final String ID = "1";
   private static final String NAME = "short name";
 
-  private static Route ROUTE = TransitModelForTest.route("routeId").build();
-  private static StopPattern STOP_PATTERN = StopPattern.create(10).build();
+  private static final Route ROUTE = TransitModelForTest.route("routeId").build();
+  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(10);
   private static final TripPattern subject = TripPattern
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
@@ -56,7 +57,26 @@ class TripPatternTest {
       )
     );
     assertFalse(
-      subject.sameAs(subject.copy().withStopPattern(StopPattern.create(11).build()).build())
+      subject.sameAs(subject.copy().withStopPattern(TransitModelForTest.stopPattern(11)).build())
     );
+  }
+
+  @Test
+  void initNameShouldThrow() {
+    Assertions.assertThrows(IllegalStateException.class, () -> subject.initName("abc"));
+  }
+
+  @Test
+  void shouldAddName() {
+    var name = "xyz";
+    var noNameYet = TripPattern
+      .of(TransitModelForTest.id(ID))
+      .withRoute(ROUTE)
+      .withStopPattern(STOP_PATTERN)
+      .build();
+
+    noNameYet.initName(name);
+
+    assertEquals(name, noNameYet.getName());
   }
 }

@@ -70,7 +70,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     // Creation of network linker library will not modify the graph
     linker = graph.getLinker();
     // Adding a vehicle parking station service needs a graph writer runnable
-    vehicleParkingService = graph.getService(VehicleParkingService.class, true);
+    vehicleParkingService = graph.getVehicleParkingService();
   }
 
   @Override

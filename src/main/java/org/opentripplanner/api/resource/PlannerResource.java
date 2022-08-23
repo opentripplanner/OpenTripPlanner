@@ -17,10 +17,9 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +110,7 @@ public class PlannerResource extends RoutingResource {
   private void logRequest(
     Request grizzlyRequest,
     RoutingRequest request,
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     RoutingResponse res
   ) {
     if (request != null && serverContext != null && serverContext.requestLogger() != null) {
@@ -136,7 +135,7 @@ public class PlannerResource extends RoutingResource {
       sb.append(' ');
       if (res != null) {
         for (Itinerary it : res.getTripPlan().itineraries) {
-          sb.append(it.getDurationSeconds());
+          sb.append(it.getDuration());
           sb.append(' ');
         }
       }

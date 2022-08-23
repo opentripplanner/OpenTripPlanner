@@ -49,7 +49,7 @@ public class RouteMapperTest {
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
     new AgencyMapper(TransitModelForTest.FEED_ID),
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   static {

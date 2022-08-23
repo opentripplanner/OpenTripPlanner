@@ -38,7 +38,7 @@ public class DeletionFlaggingFilter implements ItineraryListFilter {
       filterInput = itineraries;
     }
 
-    for (Itinerary it : flagger.getFlaggedItineraries(filterInput)) {
+    for (Itinerary it : flagger.flagForRemoval(filterInput)) {
       it.flagForDeletion(
         new SystemNotice(
           flagger.name(),

@@ -10,7 +10,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -32,8 +32,8 @@ public class FlexIndex {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {
-        if (stop instanceof FlexLocationGroup) {
-          for (StopLocation stopElement : ((FlexLocationGroup) stop).getLocations()) {
+        if (stop instanceof GroupStop groupStop) {
+          for (StopLocation stopElement : groupStop.getLocations()) {
             flexTripsByStop.put(stopElement, flexTrip);
           }
         } else {

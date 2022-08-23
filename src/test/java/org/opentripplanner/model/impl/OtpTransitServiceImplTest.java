@@ -24,8 +24,8 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Pathway;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -94,7 +94,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStations() {
-    Collection<Station> stations = subject.getAllStations();
+    Collection<Station> stations = subject.stopModel().listStations();
 
     assertEquals(1, stations.size());
     assertEquals("Station{F:station station}", first(stations).toString());
@@ -102,10 +102,10 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStops() {
-    Collection<Stop> stops = subject.getAllStops();
+    Collection<RegularStop> stops = subject.stopModel().listRegularStops();
 
     assertEquals(22, stops.size());
-    assertEquals("Stop{F:A A}", first(stops).toString());
+    assertEquals("RegularStop{F:A A}", first(stops).toString());
   }
 
   @Test
@@ -132,14 +132,16 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    Stop stop = subject.getStopForId(TransitModelForTest.id("P"));
-    assertEquals("Stop{F:P P}", stop.toString());
+    RegularStop stop = subject.stopModel().getRegularStop(TransitModelForTest.id("P"));
+    assertEquals("RegularStop{F:P P}", stop.toString());
   }
 
   @Test
   public void testGetStopsForStation() {
-    List<StopLocation> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
-    assertEquals("[Stop{F:A A}]", stops.toString());
+    List<StopLocation> stops = new ArrayList<>(
+      subject.stopModel().getStationById(STATION_ID).getChildStops()
+    );
+    assertEquals("[RegularStop{F:A A}]", stops.toString());
   }
 
   @Test
@@ -155,7 +157,7 @@ public class OtpTransitServiceImplTest {
   public void testGetStopTimesForTrip() {
     List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
     assertEquals(
-      "[Stop{F:A A}, Stop{F:B B}, Stop{F:C C}]",
+      "[RegularStop{F:A A}, RegularStop{F:B B}, RegularStop{F:C C}]",
       stopTimes.stream().map(StopTime::getStop).toList().toString()
     );
   }

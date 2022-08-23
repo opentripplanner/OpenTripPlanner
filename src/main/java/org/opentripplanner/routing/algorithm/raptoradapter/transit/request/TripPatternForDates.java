@@ -3,15 +3,13 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -31,7 +29,7 @@ public class TripPatternForDates
     RaptorTripPattern,
     TripSearchTimetable<TripSchedule> {
 
-  private final TripPatternWithRaptorStopIndexes tripPattern;
+  private final RoutingTripPattern tripPattern;
 
   private final TripPatternForDate[] tripPatternForDates;
 
@@ -40,8 +38,6 @@ public class TripPatternForDates
   private final int numberOfTripSchedules;
 
   private final boolean isFrequencyBased;
-
-  private final int slackIndex;
 
   /**
    * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
@@ -58,12 +54,13 @@ public class TripPatternForDates
 
   private final WheelchairAccessibility[] wheelchairBoardings;
 
-  // bit arrays with boarding/alighting information for all stops on trip pattern
+  // bit arrays with boarding/alighting information for all stops on trip pattern,
+  // potentially filtered by wheelchair accessibility
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
 
   TripPatternForDates(
-    TripPatternWithRaptorStopIndexes tripPattern,
+    RoutingTripPattern tripPattern,
     List<TripPatternForDate> tripPatternForDates,
     List<Integer> offsets,
     BitSet boardingPossible,
@@ -74,7 +71,6 @@ public class TripPatternForDates
     this.offsets = offsets.stream().mapToInt(i -> i).toArray();
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
-    this.slackIndex = SlackProvider.slackIndex(tripPattern.getPattern());
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
@@ -89,7 +85,7 @@ public class TripPatternForDates
 
     wheelchairBoardings = new WheelchairAccessibility[numberOfTripSchedules];
 
-    final int nStops = tripPattern.getStopIndexes().length;
+    final int nStops = tripPattern.numberOfStopsInPattern();
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
     this.departureTimes = new int[nStops * numberOfTripSchedules];
     int i = 0;
@@ -106,7 +102,7 @@ public class TripPatternForDates
     }
   }
 
-  public TripPatternWithRaptorStopIndexes getTripPattern() {
+  public RoutingTripPattern getTripPattern() {
     return tripPattern;
   }
 
@@ -142,21 +138,11 @@ public class TripPatternForDates
     return this;
   }
 
-  @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsForwardSearch() {
-    return getTripPattern().constrainedTransferForwardSearch();
-  }
-
-  @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsReverseSearch() {
-    return getTripPattern().constrainedTransferReverseSearch();
-  }
-
   /* Implementing RaptorTripPattern */
 
   @Override
   public int numberOfStopsInPattern() {
-    return tripPattern.getStopIndexes().length;
+    return tripPattern.numberOfStopsInPattern();
   }
 
   @Override
@@ -176,14 +162,12 @@ public class TripPatternForDates
 
   @Override
   public int slackIndex() {
-    return slackIndex;
+    return tripPattern.slackIndex();
   }
 
   @Override
   public String debugInfo() {
-    return (
-      tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().getRoute().getShortName()
-    );
+    return tripPattern.debugInfo();
   }
 
   /*  Implementing RaptorTimeTable */

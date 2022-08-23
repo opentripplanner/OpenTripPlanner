@@ -14,7 +14,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.DlugoszVarLenIntPacker;
-import org.opentripplanner.util.geometry.CompactLineStringUtils;
 
 public class CompactLineStringUtilsTest {
 

@@ -63,8 +63,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -75,7 +75,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   public static <T> boolean hasArgument(Map<String, T> m, String name) {
@@ -538,13 +538,13 @@ public class LegacyGraphQLQueryTypeImpl
         case "Route":
           return transitService.getRouteForId(FeedScopedId.parseId(id));
         case "Stop":
-          return transitService.getStopForId(FeedScopedId.parseId(id));
+          return transitService.getRegularStop(FeedScopedId.parseId(id));
         case "Stoptime":
           return null; //TODO
         case "stopAtDistance":
           {
             String[] parts = id.split(";");
-            var stop = transitService.getStopForId(FeedScopedId.parseId(parts[1]));
+            var stop = transitService.getRegularStop(FeedScopedId.parseId(parts[1]));
 
             // TODO: Add geometry
             return new NearbyStop(stop, Integer.parseInt(parts[0]), null, null);
@@ -617,7 +617,6 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeWalkingReluctance", request::setBikeWalkingReluctance);
       callWith.argument("carReluctance", request::setCarReluctance);
       callWith.argument("walkReluctance", request::setWalkReluctance);
-      // callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
       callWith.argument("waitReluctance", request::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
       callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
@@ -726,7 +725,7 @@ public class LegacyGraphQLQueryTypeImpl
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {
-        // request.allowedFares = Sets.newHashSet();
+        // request.allowedFares = new HashSet();
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
@@ -771,6 +770,7 @@ public class LegacyGraphQLQueryTypeImpl
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
       callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
+      callWith.argument("walkSafetyFactor", request::setWalkSafetyFactor);
 
       callWith.argument(
         "locale",
@@ -983,7 +983,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Object> stop() {
     return environment ->
       getTransitService(environment)
-        .getStopForId(
+        .getRegularStop(
           FeedScopedId.parseId(
             new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopArgs(environment.getArguments())
               .getLegacyGraphQLId()
@@ -996,18 +996,17 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsArgs(environment.getArguments());
 
-      RoutingService routingService = getRoutingService(environment);
       TransitService transitService = getTransitService(environment);
 
       if (args.getLegacyGraphQLIds() != null) {
         return StreamSupport
           .stream(args.getLegacyGraphQLIds().spliterator(), false)
           .map(FeedScopedId::parseId)
-          .map(transitService::getStopForId)
+          .map(transitService::getRegularStop)
           .collect(Collectors.toList());
       }
 
-      var stopStream = transitService.getAllStops().stream();
+      var stopStream = transitService.listStopLocations().stream();
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
@@ -1037,8 +1036,8 @@ public class LegacyGraphQLQueryTypeImpl
         new Coordinate(args.getLegacyGraphQLMaxLon(), args.getLegacyGraphQLMaxLat())
       );
 
-      Stream<Stop> stopStream = getTransitService(environment)
-        .queryStopSpatialIndex(envelope)
+      Stream<RegularStop> stopStream = getTransitService(environment)
+        .findRegularStop(envelope)
         .stream()
         .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()));
 

@@ -8,13 +8,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.TripOnServiceDate;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -146,7 +146,7 @@ public class SiriFuzzyTripMatcher {
   }
 
   public Set<Route> getRoutesForStop(FeedScopedId siriStopId) {
-    var stop = transitService.getStopForId(siriStopId);
+    var stop = transitService.getRegularStop(siriStopId);
     return transitService.getRoutesForStop(stop);
   }
 
@@ -156,7 +156,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     FeedScopedId id = new FeedScopedId(feedId, siriStopId);
-    if (transitService.getStopForId(id) != null) {
+    if (transitService.getRegularStop(id) != null) {
       return id;
     } else if (transitService.getStationById(id) != null) {
       return id;
@@ -251,6 +251,10 @@ public class SiriFuzzyTripMatcher {
       for (Trip trip : index.getAllTrips()) {
         TripPattern tripPattern = index.getPatternForTrip(trip);
 
+        if (tripPattern == null) {
+          continue;
+        }
+
         String currentTripId = getUnpaddedTripId(trip.getId().getId());
 
         if (mappedTripsCache.containsKey(currentTripId)) {
@@ -261,10 +265,7 @@ public class SiriFuzzyTripMatcher {
           mappedTripsCache.put(currentTripId, initialSet);
         }
 
-        if (
-          tripPattern != null &&
-          tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))
-        ) {
+        if (tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))) {
           if (trip.getNetexInternalPlanningCode() != null) {
             String internalPlanningCode = trip.getNetexInternalPlanningCode();
             if (mappedVehicleRefCache.containsKey(internalPlanningCode)) {
@@ -363,7 +364,7 @@ public class SiriFuzzyTripMatcher {
 
     if (trips == null || trips.isEmpty()) {
       //SIRI-data may report other platform, but still on the same Parent-stop
-      var stop = transitService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
+      var stop = transitService.getRegularStop(new FeedScopedId(feedId, lastStopPoint));
       if (stop != null && stop.isPartOfStation()) {
         // TODO OTP2 resolve stop-station split
         var allQuays = stop.getParentStation().getChildStops();

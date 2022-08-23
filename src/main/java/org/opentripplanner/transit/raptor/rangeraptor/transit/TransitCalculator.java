@@ -5,7 +5,6 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -130,7 +129,10 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * target} is the TO pattern/stop, while when searching in reverse the given target is the FROM
    * pattern/stop.
    */
-  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route);
+  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
+    RaptorTransitDataProvider<T> transitData,
+    int routeIndex
+  );
 
   /**
    * Return {@code true} if it is allowed/possible to board at a particular stop index, on a normal

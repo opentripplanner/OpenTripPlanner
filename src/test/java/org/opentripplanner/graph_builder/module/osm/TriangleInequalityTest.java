@@ -4,11 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,10 +44,9 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    HashMap<Class<?>, Object> extra = new HashMap<>();
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
@@ -57,9 +58,15 @@ public class TriangleInequalityTest {
     DataSource source = new FileDataSource(file, FileType.OSM);
     OpenStreetMapProvider provider = new OpenStreetMapProvider(source, true);
 
-    OpenStreetMapModule osmModule = new OpenStreetMapModule(provider);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      graph,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-    osmModule.buildGraph(graph, transitModel, extra);
+    osmModule.buildGraph();
   }
 
   @BeforeEach

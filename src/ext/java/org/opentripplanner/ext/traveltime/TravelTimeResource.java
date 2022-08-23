@@ -50,7 +50,6 @@ import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
@@ -64,9 +63,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -84,7 +82,6 @@ public class TravelTimeResource {
   private static final SimpleFeatureType contourSchema = makeContourSchema();
 
   private final RoutingRequest routingRequest;
-  private final TransitLayer transitLayer;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
   private final Instant startTime;
   private final Instant endTime;
@@ -95,16 +92,14 @@ public class TravelTimeResource {
   private final TransitService transitService;
 
   public TravelTimeResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
     @QueryParam("modes") String modes
   ) {
-    transitLayer = serverContext.transitService().getRealtimeTransitLayer();
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
-    ZoneId zoneId = transitLayer.getTransitDataZoneId();
     routingRequest = serverContext.defaultRoutingRequest();
     routingRequest.from = LocationStringParser.fromOldStyleString(location);
     if (modes != null) {
@@ -124,6 +119,7 @@ public class TravelTimeResource {
 
     endTime = startTime.plus(traveltimeRequest.maxCutoff);
 
+    ZoneId zoneId = transitService.getTimeZone();
     LocalDate startDate = LocalDate.ofInstant(startTime, zoneId);
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
@@ -133,7 +129,7 @@ public class TravelTimeResource {
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
         transitService.getTransferService(),
-        transitLayer,
+        transitService.getRealtimeTransitLayer(),
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
@@ -250,7 +246,7 @@ public class TravelTimeResource {
       routingRequest.modes.accessMode,
       false
     );
-    return new AccessEgressMapper(transitLayer.getStopIndex()).mapNearbyStops(accessStops, false);
+    return new AccessEgressMapper().mapNearbyStops(accessStops, false);
   }
 
   private List<State> getInitialStates(
@@ -266,20 +262,19 @@ public class TravelTimeResource {
       initialStates.add(new State(vertex, startTime, routingContext, stateData));
     }
 
-    for (int i = 0; i < transitLayer.getStopIndex().size(); i++) {
-      if (arrivals.reachedByTransit(i)) {
-        final int arrivalTime = arrivals.bestTransitArrivalTime(i);
-        StopLocation stopLocation = transitLayer.getStopIndex().stopByIndex(i);
-        if (stopLocation instanceof Stop stop) {
-          Vertex v = transitService.getStopVertexForStop(stop);
-          if (v != null) {
-            Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-            State s = new State(v, time, routingContext, stateData.clone());
-            s.weight = startTime.until(time, ChronoUnit.SECONDS);
-            // TODO: This shouldn't be overridden in state initialization
-            s.stateData.startTime = stateData.startTime;
-            initialStates.add(s);
-          }
+    // TODO - Add a method to return all Stops, not StopLocations
+    for (RegularStop stop : transitService.listRegularStops()) {
+      int index = stop.getIndex();
+      if (arrivals.reachedByTransit(index)) {
+        final int arrivalTime = arrivals.bestTransitArrivalTime(index);
+        Vertex v = graph.getStopVertexForStopId(stop.getId());
+        if (v != null) {
+          Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
+          State s = new State(v, time, routingContext, stateData.clone());
+          s.weight = startTime.until(time, ChronoUnit.SECONDS);
+          // TODO: This shouldn't be overridden in state initialization
+          s.stateData.startTime = stateData.startTime;
+          initialStates.add(s);
         }
       }
     }

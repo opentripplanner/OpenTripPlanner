@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class StopsLayerTest {
 
-  private Stop stop;
+  private RegularStop stop;
 
   @BeforeEach
   public void setUp() {
@@ -26,8 +26,7 @@ public class StopsLayerTest {
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
     transitModel.index();
     var transitService = new DefaultTransitService(transitModel);
 
