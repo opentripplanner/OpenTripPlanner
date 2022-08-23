@@ -18,6 +18,29 @@ STATUS=""
 DRY_RUN=""
 OTP_BASE=""
 
+# bash colored output control characters
+BASH_GREEN="\e[32m"
+BASH_YELLOW="\e[33m"
+BASH_RED="\e[31m"
+BASH_ENDFORMAT="\e[0m"
+BOLD="\e[1m"
+
+echo_green () {
+    echo -e "$BASH_GREEN$1$BASH_ENDFORMAT"
+}
+
+echo_yellow () {
+    echo -e "$BASH_YELLOW$1$BASH_ENDFORMAT"
+}
+
+echo_red () {
+    echo -e "$BASH_RED$1$BASH_ENDFORMAT"
+}
+
+echo_bold () {
+    echo -e "$BOLD$1$BASH_ENDFORMAT"
+}
+
 function main() {
     setup "$@"
     resumePreviousExecution
@@ -52,7 +75,8 @@ function setup() {
        echo ""
     else
        echo ""
-       echo "You have local modification, the script will abort. Nothing done!"
+       echo_red "You have local modification, the script will abort. Nothing done!"
+       echo ""
        exit 2
     fi
 
@@ -87,9 +111,9 @@ function resumePreviousExecution() {
 
 function resetDevelop() {
     echo ""
-    echo "## ------------------------------------------------------------------------------------- ##"
-    echo "##   RESET '${DEVBRANCH}' TO '${OTP_BASE}'"
-    echo "## ------------------------------------------------------------------------------------- ##"
+    echo_bold "## ------------------------------------------------------------------------------------- ##"
+    echo_bold "##   RESET '${DEVBRANCH}' TO '${OTP_BASE}'"
+    echo_bold "## ------------------------------------------------------------------------------------- ##"
     echo ""
     echo "Would you like to reset the '${DEVBRANCH}' to '${OTP_BASE}'? "
     echo ""
@@ -114,9 +138,9 @@ function rebaseAndMergeExtBranch() {
     EXT_STATUS_COMPILE="Compile '${EXT_BRANCH}'"
 
     echo ""
-    echo "## ------------------------------------------------------------------------------------- ##"
-    echo "##   REBASE AND MERGE '${EXT_BRANCH}' INTO '${DEVBRANCH}'"
-    echo "## ------------------------------------------------------------------------------------- ##"
+    echo_bold "## ------------------------------------------------------------------------------------- ##"
+    echo_bold "##   REBASE AND MERGE '${EXT_BRANCH}' INTO '${DEVBRANCH}'"
+    echo_bold "## ------------------------------------------------------------------------------------- ##"
     echo ""
     echo "You are about to rebase and merge '${EXT_BRANCH}' into '${DEVBRANCH}'. Any local"
     echo "modification in the '${EXT_BRANCH}' will be lost."
@@ -191,9 +215,9 @@ function configDigitransitCI() {
 
 function logSuccess() {
     echo ""
-    echo "## ------------------------------------------------------------------------------------- ##"
-    echo "##   UPSTREAM MERGE DONE  --  SUCCESS"
-    echo "## ------------------------------------------------------------------------------------- ##"
+    echo_green "## ------------------------------------------------------------------------------------- ##"
+    echo_green "##   UPSTREAM MERGE DONE  --  SUCCESS"
+    echo_green "## ------------------------------------------------------------------------------------- ##"
     echo "   - '${REMOTE_REPO}/${DEVBRANCH}' reset to '${OTP_BASE}'"
     echo "   - 'digitransit_ext_config' CI features added"
     echo ""
@@ -209,7 +233,7 @@ function whatDoYouWant() {
       ANSWER="s"
     else
       while [[ ! "$ANSWER" =~ [ysx] ]]; do
-        echo "Do you want to continue: [y:Yes, s:Skip, x:Exit]"
+        echo_yellow "Do you want to continue: [y:Yes, s:Skip, x:Exit]"
         read -r ANSWER
       done
 
@@ -240,15 +264,17 @@ function clearStatus() {
 
 function printHelp() {
     echo ""
-    echo "This script takes one argument, the base **branch** or **commit** to use for the"
+    echo -e "This script takes one argument, the base **${BOLD}branch${BASH_ENDFORMAT}** or **${BOLD}commit${BASH_ENDFORMAT}** to use for the"
     echo "release. The '${DEVBRANCH}' branch is reset to this commit and then the extension"
     echo "branches are rebased onto that. "
     echo "It tags and pushes all changes to remote git repo."
     echo ""
-    echo "Options:"
+    echo_bold "Options:"
+    echo ""
     echo "   --dryRun : Run script locally, nothing is pushed to remote server."
     echo ""
-    echo "Usage:"
+    echo_bold "Usage:"
+    echo ""
     echo "  $ ./merge_upstream.sh otp/dev-2.x"
     echo "  $ ./merge_upstream.sh --dryRun otp/dev-2.x"
     echo ""
