@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 public class CsvFileIO {
 
   private static final Logger LOG = LoggerFactory.getLogger(CsvFileIO.class);
-  private static final String FEED_ID = "EN";
 
   private static final Charset CHARSET_UTF_8 = StandardCharsets.UTF_8;
   private static final char CSV_DELIMITER = ',';
@@ -41,8 +40,10 @@ public class CsvFileIO {
   private final File testCasesFile;
   private final File expectedResultsFile;
   private final File expectedResultsOutputFile;
+  private final String feedId;
 
-  public CsvFileIO(File dir, String testSetName) {
+  public CsvFileIO(File dir, String testSetName, String feedId) {
+    this.feedId = feedId;
     testCasesFile = new File(dir, testSetName + ".csv");
     expectedResultsFile = new File(dir, testSetName + "-expected-results.csv");
     expectedResultsOutputFile = new File(dir, testSetName + "-results.csv");
@@ -200,13 +201,13 @@ public class CsvFileIO {
           parseDuration(csvReader.get("window")),
           new GenericLocation(
             csvReader.get("origin"),
-            FeedScopedId.ofNullable(FEED_ID, csvReader.get("fromPlace")),
+            FeedScopedId.ofNullable(feedId, csvReader.get("fromPlace")),
             Double.parseDouble(csvReader.get("fromLat")),
             Double.parseDouble(csvReader.get("fromLon"))
           ),
           new GenericLocation(
             csvReader.get("destination"),
-            FeedScopedId.ofNullable(FEED_ID, csvReader.get("toPlace")),
+            FeedScopedId.ofNullable(feedId, csvReader.get("toPlace")),
             Double.parseDouble(csvReader.get("toLat")),
             Double.parseDouble(csvReader.get("toLon"))
           ),
