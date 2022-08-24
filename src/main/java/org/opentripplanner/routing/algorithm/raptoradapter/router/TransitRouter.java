@@ -247,7 +247,6 @@ public class TransitRouter {
     RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
-      serverContext.transitService().getTransferService(),
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),

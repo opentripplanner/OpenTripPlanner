@@ -51,6 +51,11 @@ public class TransitModelForTest {
   }
 
   /** Create a valid Bus Route to use in unit tests */
+  public static RouteBuilder route(FeedScopedId id) {
+    return Route.of(id).withAgency(AGENCY).withShortName("R" + id).withMode(TransitMode.BUS);
+  }
+
+  /** Create a valid Bus Route to use in unit tests */
   public static TripBuilder trip(String id) {
     return Trip.of(id(id)).withRoute(route("R" + id).build());
   }

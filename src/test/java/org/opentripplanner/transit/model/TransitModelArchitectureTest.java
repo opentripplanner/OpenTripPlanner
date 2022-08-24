@@ -5,7 +5,7 @@ import static org.opentripplanner.OtpArchitectureModules.GEO_UTIL;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
 import static org.opentripplanner.OtpArchitectureModules.OTP_ROOT;
-import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_TRANSIT;
+import static org.opentripplanner.OtpArchitectureModules.RAPTOR_ADAPTER_API;
 import static org.opentripplanner.OtpArchitectureModules.RAPTOR_API;
 import static org.opentripplanner.OtpArchitectureModules.TRANSIT_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.UTILS;
@@ -45,8 +45,7 @@ public class TransitModelArchitectureTest {
         TIMETABLE,
         LEGACY_MODEL,
         RAPTOR_API,
-        //TODO: Extract an injectable adapter for SlackProvider, and remove this
-        RAPTOR_ADAPTER_TRANSIT
+        RAPTOR_ADAPTER_API
       )
       .verify();
     TIMETABLE

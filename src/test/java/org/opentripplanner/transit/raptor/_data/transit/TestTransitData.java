@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
@@ -191,6 +192,7 @@ public class TestTransitData
   public TestTransitData withRoute(TestRoute route) {
     this.routes.add(route);
     int routeIndex = this.routes.indexOf(route);
+    ((TestTripPattern) route.pattern()).withPatternIndex(routeIndex);
     var pattern = route.pattern();
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
@@ -305,6 +307,10 @@ public class TestTransitData
         );
       }
     };
+  }
+
+  public List<DefaultTripPattern> getPatterns() {
+    return routes.stream().map(TestRoute::pattern).toList();
   }
 
   /* private methods */
