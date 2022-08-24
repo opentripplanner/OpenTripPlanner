@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import gnu.trove.map.TIntObjectMap;
 import java.time.ZonedDateTime;
 import java.util.BitSet;
 import java.util.Iterator;
@@ -56,9 +55,9 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
    */
   private final RaptorTransferIndex transfers;
 
-  private final TIntObjectMap<TransferForPatternByStopPos> forwardConstrainedTransfers;
+  private final List<TransferForPatternByStopPos> forwardConstrainedTransfers;
 
-  private final TIntObjectMap<TransferForPatternByStopPos> reverseConstrainedTransfers;
+  private final List<TransferForPatternByStopPos> reverseConstrainedTransfers;
 
   private final ZonedDateTime transitSearchTimeZero;
 

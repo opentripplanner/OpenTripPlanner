@@ -2,9 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferPointForPatternFactory.createTransferPointForPattern;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,13 +47,9 @@ public class TransferIndexGenerator {
   }
 
   public ConstrainedTransfersForPatterns generateTransfers() {
-    TIntObjectMap<TransferForPatternByStopPos> forwardTransfers = new TIntObjectHashMap<>(
-      RoutingTripPattern.indexCounter()
-    );
-
-    TIntObjectMap<TransferForPatternByStopPos> reverseTransfers = new TIntObjectHashMap<>(
-      RoutingTripPattern.indexCounter()
-    );
+    int nPatterns = RoutingTripPattern.indexCounter();
+    TransferForPatternByStopPos[] forwardTransfers = new TransferForPatternByStopPos[nPatterns];
+    TransferForPatternByStopPos[] reverseTransfers = new TransferForPatternByStopPos[nPatterns];
 
     for (ConstrainedTransfer tx : constrainedTransfers) {
       var c = tx.getTransferConstraint();
@@ -77,7 +72,13 @@ public class TransferIndexGenerator {
         });
     }
 
-    return new ConstrainedTransfersForPatterns(forwardTransfers, reverseTransfers);
+    sortTransfers(forwardTransfers);
+    sortTransfers(reverseTransfers);
+
+    return new ConstrainedTransfersForPatterns(
+      Arrays.asList(forwardTransfers),
+      Arrays.asList(reverseTransfers)
+    );
   }
 
   /**
@@ -110,6 +111,15 @@ public class TransferIndexGenerator {
       Station station = stop.getParentStation();
       if (station != null) {
         patternsByStation.computeIfAbsent(station, t -> new HashSet<>()).add(pattern);
+      }
+    }
+  }
+
+  /** Sort trips in a TransferForPatternByStopPos, if it is not null */
+  private void sortTransfers(TransferForPatternByStopPos[] transfers) {
+    for (var transfersForStop : transfers) {
+      if (transfersForStop != null) {
+        transfersForStop.sortOnSpecificityRanking();
       }
     }
   }
@@ -283,22 +293,28 @@ public class TransferIndexGenerator {
     void addTransferConstraints(
       ConstrainedTransfer tx,
       TPoint to,
-      TIntObjectMap<TransferForPatternByStopPos> forwardTransfers,
-      TIntObjectMap<TransferForPatternByStopPos> reverseTransfers
+      TransferForPatternByStopPos[] forwardTransfers,
+      TransferForPatternByStopPos[] reverseTransfers
     ) {
       int rank = tx.getSpecificityRanking();
       var c = tx.getTransferConstraint();
 
       // Forward search
-      forwardTransfers.putIfAbsent(to.pattern.patternIndex(), new TransferForPatternByStopPos());
-      forwardTransfers
-        .get(to.pattern.patternIndex())
-        .add(to.stopPosition, new TransferForPattern(sourcePoint, to.trip, rank, c));
+      if (forwardTransfers[to.pattern.patternIndex()] == null) {
+        forwardTransfers[to.pattern.patternIndex()] = new TransferForPatternByStopPos();
+      }
+      forwardTransfers[to.pattern.patternIndex()].add(
+          to.stopPosition,
+          new TransferForPattern(sourcePoint, to.trip, rank, c)
+        );
       // Reverse search
-      reverseTransfers.putIfAbsent(pattern.patternIndex(), new TransferForPatternByStopPos());
-      reverseTransfers
-        .get(pattern.patternIndex())
-        .add(stopPosition, new TransferForPattern(to.sourcePoint, trip, rank, c));
+      if (reverseTransfers[pattern.patternIndex()] == null) {
+        reverseTransfers[pattern.patternIndex()] = new TransferForPatternByStopPos();
+      }
+      reverseTransfers[pattern.patternIndex()].add(
+          stopPosition,
+          new TransferForPattern(to.sourcePoint, trip, rank, c)
+        );
     }
   }
 }

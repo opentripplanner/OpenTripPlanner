@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import gnu.trove.map.TIntObjectMap;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -139,11 +138,11 @@ public class TransitLayer {
     return transferCache;
   }
 
-  public TIntObjectMap<TransferForPatternByStopPos> getForwardConstrainedTransfers() {
+  public List<TransferForPatternByStopPos> getForwardConstrainedTransfers() {
     return constrainedTransfers != null ? constrainedTransfers.forward() : null;
   }
 
-  public TIntObjectMap<TransferForPatternByStopPos> getReverseConstrainedTransfers() {
+  public List<TransferForPatternByStopPos> getReverseConstrainedTransfers() {
     return constrainedTransfers != null ? constrainedTransfers.reverse() : null;
   }
 
