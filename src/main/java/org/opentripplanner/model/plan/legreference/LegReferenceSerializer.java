@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 public class LegReferenceSerializer {
 
   private static final Logger LOG = LoggerFactory.getLogger(LegReferenceSerializer.class);
+
+  // TODO: This is for backwards compatibility. Change to use ISO_LOCAL_DATE after OTP v2.2 is released
   private static final DateTimeFormatter LENIENT_ISO_LOCAL_DATE = new DateTimeFormatterBuilder()
     .appendValue(YEAR, 4)
     .optionalStart()
