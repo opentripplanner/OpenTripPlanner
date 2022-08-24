@@ -106,7 +106,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
 
   @Override
   public int transitReluctanceFactorIndex() {
-    return raptorTripPattern.getTripPattern().getPattern().getMode().ordinal();
+    return raptorTripPattern.transitReluctanceFactorIndex();
   }
 
   /* TripSchedule implementation */

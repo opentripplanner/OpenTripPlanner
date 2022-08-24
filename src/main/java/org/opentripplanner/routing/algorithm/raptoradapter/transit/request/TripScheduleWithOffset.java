@@ -21,7 +21,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   private final TripPatternForDates pattern;
   private final int sortIndex;
-  private final int transitReluctanceIndex;
   private final int tripIndexForDates;
   private final IntUnaryOperator arrivalTimes;
   private final IntUnaryOperator departureTimes;
@@ -34,8 +33,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
     this.tripIndexForDates = tripIndexForDates;
     this.pattern = pattern;
-    // Mode ordinal is used to index the transit factor/reluctance
-    this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
 
     // get arrival/departures lambda
     this.arrivalTimes = pattern.getArrivalTimesForTrip(tripIndexForDates);
@@ -67,7 +64,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   @Override
   public int transitReluctanceFactorIndex() {
-    return transitReluctanceIndex;
+    return pattern.transitReluctanceFactorIndex();
   }
 
   @Override

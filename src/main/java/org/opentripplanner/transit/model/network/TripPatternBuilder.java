@@ -79,6 +79,11 @@ public final class TripPatternBuilder
     return SlackProvider.slackIndex(route.getMode());
   }
 
+  // TODO: Change the calculation to be injectable if required
+  public int transitReluctanceFactorIndex() {
+    return route.getMode().ordinal();
+  }
+
   @Override
   protected TripPattern buildFromValues() {
     return new TripPattern(this);
