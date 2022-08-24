@@ -102,4 +102,8 @@ public class LegacyGraphQLUtils {
   public static Instant getTimeOrNow(long epochSeconds) {
     return epochSeconds != 0 ? Instant.ofEpochSecond(epochSeconds) : Instant.now();
   }
+
+  public static boolean startsWith(String str, String name, Locale locale) {
+    return str.toLowerCase(locale).startsWith(name);
+  }
 }
