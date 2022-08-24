@@ -21,12 +21,12 @@ public class RouteMapper {
     if (domain == null) {
       return null;
     }
-
+    I18NStringMapper stringMapper = new I18NStringMapper(null);
     ApiRoute api = new ApiRoute();
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
     api.agency = AgencyMapper.mapToApi(domain.getAgency());
     api.shortName = domain.getShortName();
-    api.longName = domain.getLongName().toString();
+    api.longName = stringMapper.mapToApi(domain.getLongName());
     api.mode = TraverseModeMapper.mapToApi(domain.getMode());
     api.type =
       domain.getGtfsType() != null
