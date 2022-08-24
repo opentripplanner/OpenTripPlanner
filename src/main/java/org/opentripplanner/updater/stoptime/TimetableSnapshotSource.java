@@ -55,52 +55,63 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Maximum time in seconds since midnight for arrivals and departures
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
+
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
+
   /**
    * Lock to indicate that buffer is in use
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
+
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
    * messages.
    */
-  private final TripPatternCache tripPatternCache = new TripPatternCache();
-  private final ZoneId timeZone;
 
+  private final TripPatternCache tripPatternCache = new TripPatternCache();
+
+  private final ZoneId timeZone;
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
   public int logFrequency = 2000;
   private int totalSuccessfullyApplied = 0;
+
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern → Timetable map and indexing the new Timetables.
    */
   public int maxSnapshotFrequency = 1000; // msec
+
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
    * to more than one routing thread if the maximum snapshot frequency is exceeded.
    */
   private volatile TimetableSnapshot snapshot = null;
+
   /** Should expired realtime data be purged from the graph. */
   public boolean purgeExpiredData = true;
+
   protected LocalDate lastPurgeDate = null;
+
   /** Epoch time in milliseconds at which the last snapshot was generated. */
   protected long lastSnapshotTime = -1;
-  public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+
   /**
    * Defines when delays are propagated to previous stops and if these stops are given
    * the NO_DATA flag.
    */
   BackwardsDelayPropagationType backwardsDelayPropagationType =
     BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+
   private final Deduplicator deduplicator;
+
   private final Map<FeedScopedId, Integer> serviceCodes;
 
   public static TimetableSnapshotSource ofTransitModel(final TransitModel transitModel) {
@@ -165,6 +176,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param updates     GTFS-RT TripUpdate's that should be applied atomically
    */
   public void applyTripUpdates(
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     final boolean fullDataset,
     final List<TripUpdate> updates,
     final String feedId

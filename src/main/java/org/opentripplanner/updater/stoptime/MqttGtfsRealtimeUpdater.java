@@ -51,7 +51,9 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
   private final String configRef;
   private WriteToGraphCallback saveResultOnGraph;
-  MemoryPersistence persistence = new MemoryPersistence();
+  private final MemoryPersistence persistence = new MemoryPersistence();
+
+  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher = null;
 
   private MqttClient client;
 
@@ -79,7 +81,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     // Set properties of realtime data snapshot source
     if (fuzzyTripMatching) {
-      snapshotSource.fuzzyTripMatcher =
+      this.fuzzyTripMatcher =
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
     if (backwardsDelayPropagationType != null) {
@@ -172,7 +174,9 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
       if (updates != null) {
         // Handle trip updates via graph writer runnable
-        saveResultOnGraph.execute(new TripUpdateGraphWriterRunnable(fullDataset, updates, feedId));
+        saveResultOnGraph.execute(
+          new TripUpdateGraphWriterRunnable(fuzzyTripMatcher, fullDataset, updates, feedId)
+        );
       }
     }
 

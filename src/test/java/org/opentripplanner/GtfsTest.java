@@ -175,7 +175,7 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      timetableSnapshotSource.applyTripUpdates(fullDataset, updates, feedId.getId());
+      timetableSnapshotSource.applyTripUpdates(null, fullDataset, updates, feedId.getId());
       alertsUpdateHandler.update(feedMessage);
     } catch (Exception exception) {}
   }

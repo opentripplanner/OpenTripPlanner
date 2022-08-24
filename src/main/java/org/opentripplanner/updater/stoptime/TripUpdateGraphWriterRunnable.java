@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,21 +25,20 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
    */
   private final List<TripUpdate> updates;
 
+  private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+
   private final String feedId;
 
   TripUpdateGraphWriterRunnable(
-    final boolean fullDataset,
-    final List<TripUpdate> updates,
-    final String feedId
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    boolean fullDataset,
+    List<TripUpdate> updates,
+    String feedId
   ) {
-    // Preconditions
-    Objects.requireNonNull(updates);
-    Objects.requireNonNull(feedId);
-
-    // Set fields
+    this.fuzzyTripMatcher = fuzzyTripMatcher;
     this.fullDataset = fullDataset;
-    this.updates = updates;
-    this.feedId = feedId;
+    this.updates = Objects.requireNonNull(updates);
+    this.feedId = Objects.requireNonNull(feedId);
   }
 
   @Override
@@ -48,7 +48,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     // TimetableSnapshotSource should already be set up
     TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(null);
     if (snapshotSource != null) {
-      snapshotSource.applyTripUpdates(fullDataset, updates, feedId);
+      snapshotSource.applyTripUpdates(fuzzyTripMatcher, fullDataset, updates, feedId);
     } else {
       LOG.error(
         "Could not find realtime data snapshot source in graph." +

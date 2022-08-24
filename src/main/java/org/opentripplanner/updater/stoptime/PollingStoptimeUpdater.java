@@ -116,9 +116,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     if (purgeExpiredData != null) {
       snapshotSource.purgeExpiredData = purgeExpiredData;
     }
-    if (fuzzyTripMatcher != null) {
-      snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;
-    }
     if (backwardsDelayPropagationType != null) {
       snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
     }
@@ -140,6 +137,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     if (updates != null) {
       // Handle trip updates via graph writer runnable
       TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
+        fuzzyTripMatcher,
         fullDataset,
         updates,
         feedId
