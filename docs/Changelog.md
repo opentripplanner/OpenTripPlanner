@@ -93,6 +93,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Skip opening hours if no time-zone configured [#4372](https://github.com/opentripplanner/OpenTripPlanner/pull/4372)
 - Rename and clean up RepairStopTimesForEachTripOperation [#4388](https://github.com/opentripplanner/OpenTripPlanner/pull/4388)
 - Digitransit stop vector layer updates [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
+- Re-enable copying of submode to trip from route [#4407](https://github.com/opentripplanner/OpenTripPlanner/pull/4407)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
