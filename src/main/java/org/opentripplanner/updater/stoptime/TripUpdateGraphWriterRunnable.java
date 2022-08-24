@@ -27,15 +27,19 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+
   private final String feedId;
 
   TripUpdateGraphWriterRunnable(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
     boolean fullDataset,
     List<TripUpdate> updates,
     String feedId
   ) {
     this.fuzzyTripMatcher = fuzzyTripMatcher;
+    this.backwardsDelayPropagationType = backwardsDelayPropagationType;
     this.fullDataset = fullDataset;
     this.updates = Objects.requireNonNull(updates);
     this.feedId = Objects.requireNonNull(feedId);
@@ -48,7 +52,13 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     // TimetableSnapshotSource should already be set up
     TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(null);
     if (snapshotSource != null) {
-      snapshotSource.applyTripUpdates(fuzzyTripMatcher, fullDataset, updates, feedId);
+      snapshotSource.applyTripUpdates(
+        fuzzyTripMatcher,
+        backwardsDelayPropagationType,
+        fullDataset,
+        updates,
+        feedId
+      );
     } else {
       LOG.error(
         "Could not find realtime data snapshot source in graph." +

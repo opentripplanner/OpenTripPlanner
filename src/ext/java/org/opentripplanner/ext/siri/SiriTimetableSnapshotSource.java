@@ -98,19 +98,23 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TransitLayerUpdater transitLayerUpdater;
 
   public int logFrequency = 2000;
+
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
    */
-  public int maxSnapshotFrequency = 1000; // msec
+  public int maxSnapshotFrequency = 1000;
+
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
    * to more than one routing thread if the maximum snapshot frequency is exceeded.
    */
   private volatile TimetableSnapshot snapshot = null;
+
   /** Should expired realtime data be purged from the graph. */
   public boolean purgeExpiredData = true;
+
   protected LocalDate lastPurgeDate = null;
   protected long lastSnapshotTime = -1;
 

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -77,6 +78,7 @@ public class TimetableSnapshotSourceTest {
   public void testGetSnapshot() throws InvalidProtocolBufferException {
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
       fullDataset,
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
@@ -88,6 +90,7 @@ public class TimetableSnapshotSourceTest {
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
       fullDataset,
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
@@ -111,6 +114,7 @@ public class TimetableSnapshotSourceTest {
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
       fullDataset,
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
@@ -159,7 +163,13 @@ public class TimetableSnapshotSourceTest {
 
     final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
 
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
     final Timetable forToday = snapshot.resolve(pattern, serviceDate);
@@ -195,7 +205,13 @@ public class TimetableSnapshotSourceTest {
         tripUpdateBuilder.setTrip(tripDescriptorBuilder);
         var tripUpdate = tripUpdateBuilder.build();
 
-        updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+        updater.applyTripUpdates(
+          TRIP_MATCHER_NOOP,
+          REQUIRED_NO_DATA,
+          fullDataset,
+          List.of(tripUpdate),
+          feedId
+        );
 
         var snapshot = updater.getTimetableSnapshot();
         assertNull(snapshot);
@@ -291,7 +307,13 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
 
     // THEN
     // Find new pattern in graph starting from stop A
@@ -433,7 +455,13 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -596,7 +624,13 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -692,7 +726,13 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -852,7 +892,13 @@ public class TimetableSnapshotSourceTest {
     }
 
     // WHEN
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
 
     // THEN
     final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
@@ -935,6 +981,7 @@ public class TimetableSnapshotSourceTest {
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
       fullDataset,
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
@@ -955,7 +1002,13 @@ public class TimetableSnapshotSourceTest {
 
     final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    updater.applyTripUpdates(TRIP_MATCHER_NOOP, fullDataset, List.of(tripUpdate), feedId);
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(tripUpdate),
+      feedId
+    );
     final TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
     assertNotSame(snapshotA, snapshotB);

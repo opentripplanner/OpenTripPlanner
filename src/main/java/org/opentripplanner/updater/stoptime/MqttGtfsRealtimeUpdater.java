@@ -84,9 +84,6 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
       this.fuzzyTripMatcher =
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
-    if (backwardsDelayPropagationType != null) {
-      snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
-    }
   }
 
   @Override
@@ -175,7 +172,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
       if (updates != null) {
         // Handle trip updates via graph writer runnable
         saveResultOnGraph.execute(
-          new TripUpdateGraphWriterRunnable(fuzzyTripMatcher, fullDataset, updates, feedId)
+          new TripUpdateGraphWriterRunnable(fuzzyTripMatcher, backwardsDelayPropagationType, fullDataset, updates, feedId)
         );
       }
     }

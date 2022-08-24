@@ -61,6 +61,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
   private final String configRef;
 
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
@@ -73,6 +75,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     this.url = parameters.getUrl();
     this.feedId = parameters.getFeedId();
     this.reconnectPeriodSec = parameters.getReconnectPeriodSec();
+    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
   }
 
   @Override
@@ -191,6 +194,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         // Handle trip updates via graph writer runnable
         TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
           fuzzyTripMatcher,
+          backwardsDelayPropagationType,
           fullDataset,
           updates,
           feedId

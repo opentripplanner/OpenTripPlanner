@@ -28,36 +28,45 @@ import org.slf4j.LoggerFactory;
 public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
+
   /**
    * Update streamer
    */
   private final TripUpdateSource updateSource;
+
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private final Boolean purgeExpiredData;
+
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
+
   private final boolean fuzzyTripMatching;
+
   /**
    * Defines when delays are propagated to previous stops and if these stops are given
    * the NO_DATA flag.
    */
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
+
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private Integer logFrequency;
+
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private Integer maxSnapshotFrequency;
+
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
@@ -116,9 +125,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     if (purgeExpiredData != null) {
       snapshotSource.purgeExpiredData = purgeExpiredData;
     }
-    if (backwardsDelayPropagationType != null) {
-      snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
-    }
   }
 
   @Override
@@ -138,6 +144,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       // Handle trip updates via graph writer runnable
       TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
         fuzzyTripMatcher,
+        backwardsDelayPropagationType,
         fullDataset,
         updates,
         feedId

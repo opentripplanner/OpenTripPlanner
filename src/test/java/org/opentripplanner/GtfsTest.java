@@ -3,6 +3,7 @@ package org.opentripplanner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -175,7 +176,13 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      timetableSnapshotSource.applyTripUpdates(null, fullDataset, updates, feedId.getId());
+      timetableSnapshotSource.applyTripUpdates(
+        null,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        updates,
+        feedId.getId()
+      );
       alertsUpdateHandler.update(feedMessage);
     } catch (Exception exception) {}
   }

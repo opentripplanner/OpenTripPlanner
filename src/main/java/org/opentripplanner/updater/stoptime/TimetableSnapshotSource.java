@@ -87,7 +87,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern → Timetable map and indexing the new Timetables.
    */
-  public int maxSnapshotFrequency = 1000; // msec
+  public int maxSnapshotFrequency = 1000;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -102,13 +102,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /** Epoch time in milliseconds at which the last snapshot was generated. */
   protected long lastSnapshotTime = -1;
-
-  /**
-   * Defines when delays are propagated to previous stops and if these stops are given
-   * the NO_DATA flag.
-   */
-  BackwardsDelayPropagationType backwardsDelayPropagationType =
-    BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
   private final Deduplicator deduplicator;
 
@@ -171,15 +164,18 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * However, multi-feed support is not completed and we currently assume there is only one static
    * feed when matching IDs.
    *
+   * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
+   *                                     if these stops are given the NO_DATA flag.
    * @param fullDataset true if the list with updates represent all updates that are active right
    *                    now, i.e. all previous updates should be disregarded
    * @param updates     GTFS-RT TripUpdate's that should be applied atomically
    */
   public void applyTripUpdates(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
-    final boolean fullDataset,
-    final List<TripUpdate> updates,
-    final String feedId
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
+    boolean fullDataset,
+    List<TripUpdate> updates,
+    String feedId
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -248,7 +244,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         boolean applied =
           switch (tripScheduleRelationship) {
-            case SCHEDULED -> handleScheduledTrip(tripUpdate, tripId, serviceDate);
+            case SCHEDULED -> handleScheduledTrip(
+              tripUpdate,
+              tripId,
+              serviceDate,
+              backwardsDelayPropagationType
+            );
             case ADDED -> validateAndHandleAddedTrip(
               tripUpdate,
               tripDescriptor,
@@ -320,7 +321,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final long now = System.currentTimeMillis();
     if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
       if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
+        LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
       } else {
         LOG.debug("Buffer was unchanged, keeping old snapshot.");
@@ -354,9 +355,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean handleScheduledTrip(
-    final TripUpdate tripUpdate,
-    final FeedScopedId tripId,
-    final LocalDate serviceDate
+    TripUpdate tripUpdate,
+    FeedScopedId tripId,
+    LocalDate serviceDate,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     final TripPattern pattern = getPatternForTripId(tripId);
 
