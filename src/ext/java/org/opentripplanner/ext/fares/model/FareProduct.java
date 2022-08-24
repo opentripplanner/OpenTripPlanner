@@ -34,7 +34,7 @@ public record FareProduct(
 
   private boolean coversWithTransfers(Itinerary i, List<FareTransferRule> transferRules) {
     var feedId = i
-      .getTransitLegs()
+      .getScheduledTransitLegs()
       .stream()
       .map(l -> l.getAgency().getId().getFeedId())
       .collect(Collectors.toSet());
