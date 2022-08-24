@@ -1,6 +1,8 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
+import java.util.Objects;
+import org.opentripplanner.standalone.config.NodeAdapter;
 
 /**
  * Configuration for a transit data feed.
@@ -22,7 +24,11 @@ public class TransitFeedConfig {
   public final URI source;
 
   public TransitFeedConfig(NodeAdapter config) {
-    this.feedId = config.asText("feedId", null);
-    this.source = config.asUri("source");
+    this(config.asUri("source"), config.asText("feedId", null));
+  }
+
+  public TransitFeedConfig(URI source, String feedId) {
+    this.source = Objects.requireNonNull(source);
+    this.feedId = feedId;
   }
 }

@@ -1,7 +1,8 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.time.ZoneId;
+import java.util.Objects;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 /**
@@ -24,10 +25,12 @@ public class OsmExtractConfig {
    */
   public final ZoneId timeZone;
 
-  OsmExtractConfig(NodeAdapter config) {
-    source = config.asUri("source");
-    osmWayPropertySet =
-      WayPropertySetSource.fromConfig(config.asText("osmWayPropertySet", "default"));
-    timeZone = config.asZoneId("timeZone", null);
+  OsmExtractConfig(OsmExtractConfigBuilder osmExtractConfigBuilder) {
+    this.source = Objects.requireNonNull(osmExtractConfigBuilder.getSource());
+    this.osmWayPropertySet =
+      osmExtractConfigBuilder.getOsmWayPropertySet() != null
+        ? osmExtractConfigBuilder.getOsmWayPropertySet()
+        : WayPropertySetSource.fromConfig("default");
+    this.timeZone = osmExtractConfigBuilder.getTimeZone();
   }
 }

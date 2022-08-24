@@ -18,6 +18,14 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.feed.DemExtractConfig;
+import org.opentripplanner.standalone.config.feed.DemExtractConfigBuilder;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +54,7 @@ public class GraphBuilderDataSources {
   private final Set<FileType> includeTypes = EnumSet.complementOf(EnumSet.of(FileType.UNKNOWN));
   private final File cacheDirectory;
   private final DataSource outputGraph;
+  private final BuildConfig buildConfig;
 
   /**
    * Create a wrapper around the data-store and resolve which files to import and export. Validate
@@ -54,6 +63,7 @@ public class GraphBuilderDataSources {
   @Inject
   public GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
     this.store = store;
+    this.buildConfig = bc;
     this.cacheDirectory = cli.cacheDirectory;
     this.outputGraph = getOutputGraph(cli);
 
@@ -87,6 +97,70 @@ public class GraphBuilderDataSources {
 
   public Iterable<DataSource> get(FileType type) {
     return inputData.get(type);
+  }
+
+  public Iterable<ConfiguredDataSource<OsmExtractConfig>> getOsmConfiguredDatasource() {
+    return inputData
+      .get(OSM)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getOsmExtractConfig(it)))
+      .toList();
+  }
+
+  private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
+    return buildConfig.osm.osmExtractConfigs
+      .stream()
+      .filter(osmExtractConfig -> osmExtractConfig.source.equals(dataSource.uri()))
+      .findFirst()
+      .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  public Iterable<ConfiguredDataSource<DemExtractConfig>> getDemConfiguredDatasource() {
+    return inputData
+      .get(DEM)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getDemExtractConfig(it)))
+      .toList();
+  }
+
+  private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
+    return buildConfig.dem.demExtractConfigs
+      .stream()
+      .filter(demExtractConfig -> demExtractConfig.source.equals(dataSource.uri()))
+      .findFirst()
+      .orElse(new DemExtractConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  public Iterable<ConfiguredDataSource<GtfsFeedConfig>> getGtfsConfiguredDatasource() {
+    return inputData
+      .get(GTFS)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getGtfsFeedConfig(it)))
+      .toList();
+  }
+
+  private GtfsFeedConfig getGtfsFeedConfig(DataSource dataSource) {
+    return buildConfig.transitFeeds.gtfsFeedConfigs
+      .stream()
+      .filter(gtfsFeedConfig -> gtfsFeedConfig.source.equals(dataSource.uri()))
+      .findFirst()
+      .orElse(new GtfsFeedConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  public Iterable<ConfiguredDataSource<NetexFeedConfig>> getNetexConfiguredDatasource() {
+    return inputData
+      .get(NETEX)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getNetexFeedConfig(it)))
+      .toList();
+  }
+
+  private NetexFeedConfig getNetexFeedConfig(DataSource dataSource) {
+    return buildConfig.transitFeeds.netexFeedConfigs
+      .stream()
+      .filter(netexFeedConfig -> netexFeedConfig.source.equals(dataSource.uri()))
+      .findFirst()
+      .orElse(new NetexFeedConfigBuilder().withSource(dataSource.uri()).build());
   }
 
   public CompositeDataSource getBuildReportDir() {

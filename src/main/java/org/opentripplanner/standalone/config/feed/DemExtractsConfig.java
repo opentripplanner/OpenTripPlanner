@@ -1,9 +1,10 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.standalone.config.NodeAdapter;
 
 public class DemExtractsConfig {
 
@@ -11,7 +12,7 @@ public class DemExtractsConfig {
 
   public DemExtractsConfig(NodeAdapter config) {
     for (NodeAdapter nodeAdapter : config.asList()) {
-      demExtractConfigs.add(new DemExtractConfig(nodeAdapter));
+      demExtractConfigs.add(DemExtractConfigBuilder.of(nodeAdapter).build());
     }
   }
 

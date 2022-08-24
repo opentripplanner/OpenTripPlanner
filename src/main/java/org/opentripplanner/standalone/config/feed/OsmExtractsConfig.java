@@ -1,8 +1,9 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.standalone.config.NodeAdapter;
 
 /**
  * Configure the list of OpenStreetMap extracts.
@@ -11,9 +12,9 @@ public class OsmExtractsConfig {
 
   public final List<OsmExtractConfig> osmExtractConfigs = new ArrayList<>();
 
-  OsmExtractsConfig(NodeAdapter config) {
+  public OsmExtractsConfig(NodeAdapter config) {
     for (NodeAdapter nodeAdapter : config.asList()) {
-      osmExtractConfigs.add(new OsmExtractConfig(nodeAdapter));
+      osmExtractConfigs.add(OsmExtractConfigBuilder.of(nodeAdapter).build());
     }
   }
 

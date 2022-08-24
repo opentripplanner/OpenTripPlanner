@@ -3,10 +3,11 @@ package org.opentripplanner.netex.configure;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.opentripplanner.datastore.api.CompositeDataSource;
-import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
@@ -14,6 +15,8 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -36,21 +39,24 @@ public class NetexConfig {
   }
 
   public static NetexBundle netexBundleForTest(BuildConfig builderParams, File netexZipFile) {
-    return new NetexConfig(builderParams)
-      .netexBundle(new ZipFileDataSource(netexZipFile, FileType.NETEX));
+    ZipFileDataSource dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource = new ConfiguredDataSource<>(
+      dataSource,
+      new NetexFeedConfigBuilder().withSource(dataSource.uri()).build()
+    );
+    return new NetexConfig(builderParams).netexBundle(netexConfiguredDataSource);
   }
 
   public NetexModule createNetexModule(
-    Iterable<DataSource> netexSources,
+    Iterable<ConfiguredDataSource<NetexFeedConfig>> netexSources,
     TransitModel transitModel,
     Graph graph,
     DataImportIssueStore issueStore
   ) {
     List<NetexBundle> netexBundles = new ArrayList<>();
 
-    for (DataSource it : netexSources) {
-      NetexBundle netexBundle = netexBundle((CompositeDataSource) it);
-      netexBundles.add(netexBundle);
+    for (ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource : netexSources) {
+      netexBundles.add(netexBundle(netexConfiguredDataSource));
     }
 
     return new NetexModule(
@@ -65,24 +71,42 @@ public class NetexConfig {
   }
 
   /** public to enable testing */
-  private NetexBundle netexBundle(CompositeDataSource source) {
+  private NetexBundle netexBundle(ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource) {
+    String configuredFeedId = netexConfiguredDataSource.config().feedId;
+    if (configuredFeedId == null) {
+      configuredFeedId = buildParams.netexDefaults.netexFeedId;
+    }
+
     return new NetexBundle(
-      buildParams.netexDefaults.netexFeedId,
-      source,
-      hierarchy(source),
+      configuredFeedId,
+      (CompositeDataSource) netexConfiguredDataSource.dataSource(),
+      hierarchy(netexConfiguredDataSource),
       buildParams.netexDefaults.ferryIdsNotAllowedForBicycle,
       buildParams.maxStopToShapeSnapDistance
     );
   }
 
-  private NetexDataSourceHierarchy hierarchy(CompositeDataSource source) {
-    NetexDefaultsConfig c = buildParams.netexDefaults;
-    return new NetexDataSourceHierarchy(source)
-      .prepare(
-        c.ignoreFilePattern,
-        c.sharedFilePattern,
-        c.sharedGroupFilePattern,
-        c.groupFilePattern
-      );
+  private NetexDataSourceHierarchy hierarchy(
+    ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource
+  ) {
+    NetexFeedConfig netexFeedConfig = netexConfiguredDataSource.config();
+    NetexDefaultsConfig netexDefaultsConfig = buildParams.netexDefaults;
+    Pattern ignoreFilePattern = netexFeedConfig
+      .getIgnoreFilePattern()
+      .orElse(netexDefaultsConfig.ignoreFilePattern);
+    Pattern sharedFilePattern = netexFeedConfig
+      .getSharedFilePattern()
+      .orElse(netexDefaultsConfig.sharedFilePattern);
+    Pattern sharedGroupFilePattern = netexFeedConfig
+      .getSharedGroupFilePattern()
+      .orElse(netexDefaultsConfig.sharedGroupFilePattern);
+    Pattern groupFilePattern = netexFeedConfig
+      .getGroupFilePattern()
+      .orElse(netexDefaultsConfig.groupFilePattern);
+
+    return new NetexDataSourceHierarchy(
+      (CompositeDataSource) netexConfiguredDataSource.dataSource()
+    )
+      .prepare(ignoreFilePattern, sharedFilePattern, sharedGroupFilePattern, groupFilePattern);
   }
 }

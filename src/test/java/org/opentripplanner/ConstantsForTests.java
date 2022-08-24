@@ -14,6 +14,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -39,6 +40,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -260,7 +262,12 @@ public class ConstantsForTests {
       {
         new NetexConfig(createNetexBuilderParameters())
           .createNetexModule(
-            List.of(NETEX_MINIMAL_DATA_SOURCE),
+            List.of(
+              new ConfiguredDataSource<>(
+                NETEX_MINIMAL_DATA_SOURCE,
+                new NetexFeedConfigBuilder().withSource(NETEX_MINIMAL_DATA_SOURCE.uri()).build()
+              )
+            ),
             transitModel,
             graph,
             noopIssueStore()

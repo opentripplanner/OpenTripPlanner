@@ -3,6 +3,7 @@ package org.opentripplanner.datastore.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.common.LoggingUtil;
@@ -44,6 +45,8 @@ public interface DataSource {
    * is mainly used for humans to identify the source in logs and error handling.
    */
   String path();
+
+  URI uri();
 
   /**
    * The file type this data source is identified as.
