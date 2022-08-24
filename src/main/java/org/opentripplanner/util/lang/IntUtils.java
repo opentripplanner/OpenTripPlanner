@@ -1,8 +1,9 @@
-package org.opentripplanner.transit.raptor.util;
+package org.opentripplanner.util.lang;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 
 /**
@@ -37,5 +38,16 @@ public final class IntUtils {
     List<Integer> all = new ArrayList<>(a);
     all.addAll(b);
     return all.stream().mapToInt(it -> it).toArray();
+  }
+
+  public static double standardDeviation(List<Integer> v) {
+    double average = v.stream().mapToInt(it -> it).average().orElse(0d);
+
+    double sum = 0.0;
+    for (double num : v) {
+      sum += Math.pow(num - average, 2);
+    }
+
+    return Math.sqrt(sum / v.size());
   }
 }

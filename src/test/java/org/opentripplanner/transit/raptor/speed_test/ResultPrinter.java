@@ -3,13 +3,13 @@ package org.opentripplanner.transit.raptor.speed_test;
 import static org.opentripplanner.util.time.DurationUtils.msToSecondsStr;
 
 import java.util.ArrayList;
-import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
+import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.TableFormatter;
 
 /**
@@ -205,22 +205,14 @@ class ResultPrinter {
         "[ " +
         v.stream().map(it -> String.format("%4d", it)).reduce((a, b) -> a + ", " + b).orElse("") +
         " ]";
-      IntSummaryStatistics statistics = v.stream().mapToInt(it -> it).summaryStatistics();
-      double average = statistics.getAverage();
-      double standardDeviation = 0.0;
-
-      for (double num : v) {
-        standardDeviation += Math.pow(num - average, 2);
-      }
-
-      standardDeviation = Math.sqrt(standardDeviation / v.size());
+      double avg = v.stream().mapToInt(it -> it).average().orElse(0d);
 
       System.err.printf(
         " ==> %-" + labelMaxLen + "s : %s Avg: %4.1f  (σ=%.1f)%n",
         label,
         values,
-        average,
-        standardDeviation
+        avg,
+        IntUtils.standardDeviation(v)
       );
     }
   }

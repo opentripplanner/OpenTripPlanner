@@ -59,8 +59,8 @@ public class TripPatternForDate {
     LocalDate localDate
   ) {
     this.tripPattern = tripPattern;
-    this.tripTimes = tripTimes;
-    this.frequencies = frequencies;
+    this.tripTimes = List.copyOf(tripTimes);
+    this.frequencies = List.copyOf(frequencies);
     this.localDate = localDate;
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge

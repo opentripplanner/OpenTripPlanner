@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
 import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.transit.raptor.util.IntUtils;
+import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
 
