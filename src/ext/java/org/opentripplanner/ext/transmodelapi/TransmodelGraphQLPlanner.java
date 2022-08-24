@@ -11,7 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -25,6 +27,8 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -44,11 +48,14 @@ public class TransmodelGraphQLPlanner {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
     OtpServerRequestContext serverContext = ctx.getServerContext();
-    RoutingRequest request = null;
+    NewRouteRequest request = null;
+    RoutingPreferences preferences = null;
     try {
-      request = createRequest(environment);
+      var requestAndPreferences = createRequest(environment);
+      request = requestAndPreferences.getLeft();
+      preferences = requestAndPreferences.getRight();
 
-      RoutingResponse res = ctx.getRoutingService().route(request);
+      RoutingResponse res = ctx.getRoutingService().route(request, preferences);
 
       response.plan = res.getTripPlan();
       response.metadata = res.getMetadata();
@@ -61,7 +68,7 @@ public class TransmodelGraphQLPlanner {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
-    Locale locale = request == null ? serverContext.defaultLocale() : request.locale;
+    Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult
       .<PlanResponse>newResult()
       .data(response)
@@ -86,10 +93,11 @@ public class TransmodelGraphQLPlanner {
     return new GenericLocation(name, stopId, lat, lon);
   }
 
-  private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+  private Pair<NewRouteRequest, RoutingPreferences> createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
-    RoutingRequest request = serverContext.defaultRoutingRequest();
+    NewRouteRequest request = serverContext.defaultRoutingRequest();
+    RoutingPreferences preferences = serverContext.defaultRoutingPreferences();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
@@ -256,7 +264,7 @@ public class TransmodelGraphQLPlanner {
     );
     //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
-    return request;
+    return Pair.of(request, preferences);
   }
 
   @SuppressWarnings("unchecked")

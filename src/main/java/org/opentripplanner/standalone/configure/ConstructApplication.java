@@ -140,7 +140,8 @@ public class ConstructApplication {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
         transitModel(),
-        routerConfig().routingRequestDefaults()
+        routerConfig().routingRequestDefaults(),
+        routerConfig().routingPreferencesDefaults()
       );
     }
 

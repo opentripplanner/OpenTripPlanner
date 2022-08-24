@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.State;
@@ -93,14 +92,14 @@ public class VehicleParkingEdge extends Edge {
       return null;
     }
 
-    if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
+    if (options.journey().streetSubRequestModes().getBicycle()) {
       return traverseUnPark(
         s0,
         preferences.bike().parkCost(),
         preferences.bike().parkTime(),
         TraverseMode.BICYCLE
       );
-    } else if (options.journeyRequest().streetSubRequestModes().getCar()) {
+    } else if (options.journey().streetSubRequestModes().getCar()) {
       return traverseUnPark(
         s0,
         preferences.car().parkCost(),
@@ -122,7 +121,7 @@ public class VehicleParkingEdge extends Edge {
         preferences.wheelchair().accessibility().enabled(),
         // TODO: 2022-08-22 this can't be right
         // how do we figure out whether it should be access, egress or direct?
-        options.journeyRequest().access().vehicleParking().useAvailabilityInformation()
+        options.journey().access().vehicleParking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -139,18 +138,18 @@ public class VehicleParkingEdge extends Edge {
     NewRouteRequest options = s0.getOptions();
     RoutingPreferences preferences = s0.getPreferences();
 
-    if (!options.journeyRequest().streetSubRequestModes().getWalk() || s0.isVehicleParked()) {
+    if (!options.journey().streetSubRequestModes().getWalk() || s0.isVehicleParked()) {
       return null;
     }
 
-    if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
+    if (options.journey().streetSubRequestModes().getBicycle()) {
       // Parking a rented bike is not allowed
       if (s0.isRentingVehicle()) {
         return null;
       }
 
       return traversePark(s0, preferences.bike().parkCost(), preferences.bike().parkTime());
-    } else if (options.journeyRequest().streetSubRequestModes().getCar()) {
+    } else if (options.journey().streetSubRequestModes().getCar()) {
       return traversePark(s0, preferences.car().parkCost(), preferences.car().parkTime());
     } else {
       return null;
@@ -167,7 +166,7 @@ public class VehicleParkingEdge extends Edge {
         preferences.wheelchair().accessibility().enabled(),
         // TODO: 2022-08-22 this can't be right
         // how do we figure out whether it should be access, egress or direct?
-        options.journeyRequest().access().vehicleParking().useAvailabilityInformation()
+        options.journey().access().vehicleParking().useAvailabilityInformation()
       )
     ) {
       return null;

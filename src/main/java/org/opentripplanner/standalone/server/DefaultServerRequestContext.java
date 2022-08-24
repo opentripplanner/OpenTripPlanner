@@ -8,6 +8,8 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -20,7 +22,8 @@ import org.slf4j.Logger;
 @HttpRequestScoped
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
-  private RoutingRequest routingRequest = null;
+  private NewRouteRequest routingRequest = null;
+  private RoutingPreferences routingPreferences = null;
   private final Graph graph;
   private final TransitService transitService;
   private final RouterConfig routerConfig;
@@ -64,7 +67,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     @Nullable TraverseVisitor traverseVisitor
   ) {
-    var defaultRoutingRequest = routerConfig.routingRequestDefaults();
+    var defaultRoutingPreferences = routerConfig.routingPreferencesDefaults();
 
     return new DefaultServerRequestContext(
       graph,
@@ -73,13 +76,13 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       meterRegistry,
       raptorConfig,
       RequestLoggerFactory.createLogger(routerConfig.requestLogFile()),
-      new TileRendererManager(graph, defaultRoutingRequest),
+      new TileRendererManager(graph, defaultRoutingPreferences),
       traverseVisitor
     );
   }
 
   @Override
-  public RoutingRequest defaultRoutingRequest() {
+  public NewRouteRequest defaultRoutingRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
     if (routingRequest == null) {
       routingRequest = routerConfig.routingRequestDefaults().copyWithDateTimeNow();
@@ -87,12 +90,21 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     return routingRequest;
   }
 
+  @Override
+  public RoutingPreferences defaultRoutingPreferences() {
+    if (routingPreferences == null) {
+      routingPreferences = routerConfig.routingPreferencesDefaults();
+    }
+
+    return routingPreferences;
+  }
+
   /**
    * Return the default routing request locale(without cloning the request).
    */
   @Override
   public Locale defaultLocale() {
-    return routerConfig().routingRequestDefaults().locale;
+    return routerConfig().routingRequestDefaults().locale();
   }
 
   @Override

@@ -1,16 +1,20 @@
 package org.opentripplanner.routing.api.request.refactor.request;
 
+import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
+
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
-import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
@@ -21,6 +25,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +43,8 @@ public class NewRouteRequest {
    * @see DominanceFunction#betterOrEqualAndComparable(State, State)
    */
   private static final int MAX_CLOSENESS_METERS = 500;
+
+  private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
   /**
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
@@ -134,7 +141,7 @@ public class NewRouteRequest {
    */
   protected int numItineraries = 50;
 
-  protected JourneyRequest journeyRequest = new JourneyRequest();
+  protected JourneyRequest journey = new JourneyRequest();
 
   // TODO: 2022-08-18 Should it be here?
   /**
@@ -178,12 +185,12 @@ public class NewRouteRequest {
 
   public NewRouteRequest(TraverseMode mode) {
     this();
-    this.journeyRequest.setStreetSubRequestModes(new TraverseModeSet(mode));
+    this.journey.setStreetSubRequestModes(new TraverseModeSet(mode));
   }
 
   public NewRouteRequest(TraverseModeSet modeSet) {
     this();
-    this.journeyRequest.setStreetSubRequestModes(modeSet);
+    this.journey.setStreetSubRequestModes(modeSet);
   }
 
   /**
@@ -201,7 +208,7 @@ public class NewRouteRequest {
       this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
 
       // TODO: 2022-08-18 this was a builder pattern before
-      journeyRequest.direct().setMode(StreetMode.NOT_SET);
+      journey.direct().setMode(StreetMode.NOT_SET);
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }
@@ -252,7 +259,7 @@ public class NewRouteRequest {
     RoutingPreferences routingPreferences
   ) {
     NewRouteRequest streetRequest = this.clone();
-    var journeyRequest = streetRequest.journeyRequest;
+    var journeyRequest = streetRequest.journey;
     journeyRequest.setStreetSubRequestModes(new TraverseModeSet());
 
     if (streetMode != null) {
@@ -402,15 +409,37 @@ public class NewRouteRequest {
 
   // TODO: 2022-08-18 implement
   public NewRouteRequest clone() {
-    return this;
+    throw new RuntimeException("Not Implemented");
+  }
+
+  public NewRouteRequest copyWithDateTimeNow() {
+    var request = clone();
+    request.setDateTime(Instant.now());
+    return request;
+  }
+
+  /**
+   * Is the trip originally planned withing the previous/next 15h?
+   */
+  public boolean isTripPlannedForNow() {
+    return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
   }
 
   public void setDateTime(Instant dateTime) {
     this.dateTime = dateTime;
   }
 
+  public void setDateTime(String date, String time, ZoneId tz) {
+    ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, tz);
+    setDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
+  }
+
   public Instant dateTime() {
     return dateTime;
+  }
+
+  public void setFromString(String from) {
+    this.from = LocationStringParser.fromOldStyleString(from);
   }
 
   public void setFrom(GenericLocation from) {
@@ -421,6 +450,10 @@ public class NewRouteRequest {
     return from;
   }
 
+  public void setToString(String to) {
+    this.to = LocationStringParser.fromOldStyleString(to);
+  }
+
   public void setTo(GenericLocation to) {
     this.to = to;
   }
@@ -429,12 +462,24 @@ public class NewRouteRequest {
     return to;
   }
 
+  public void setSearchWindow(Duration searchWindow) {
+    this.searchWindow = searchWindow;
+  }
+
   public Duration searchWindow() {
     return searchWindow;
   }
 
+  public void setPageCursor(PageCursor pageCursor) {
+    this.pageCursor = pageCursor;
+  }
+
   public PageCursor pageCursor() {
     return pageCursor;
+  }
+
+  public void setTimetableView(boolean timetableView) {
+    this.timetableView = timetableView;
   }
 
   public boolean timetableView() {
@@ -465,8 +510,8 @@ public class NewRouteRequest {
     return numItineraries;
   }
 
-  public JourneyRequest journeyRequest() {
-    return journeyRequest;
+  public JourneyRequest journey() {
+    return journey;
   }
 
   public void setMaxJourneyDuration(Duration maxJourneyDuration) {

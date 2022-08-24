@@ -43,7 +43,8 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RequestFunctions;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -590,15 +591,16 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RoutingRequest request = context.getServerContext().defaultRoutingRequest();
+      NewRouteRequest request = context.getServerContext().defaultRoutingRequest();
+      RoutingPreferences preferences = context.getServerContext().defaultRoutingPreferences();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
       callWith.argument("fromPlace", request::setFromString);
       callWith.argument("toPlace", request::setToString);
 
-      callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
-      callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
+      callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
+      callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
       request.setDateTime(
         environment.getArgument("date"),
@@ -606,81 +608,105 @@ public class LegacyGraphQLQueryTypeImpl
         context.getServerContext().transitService().getTimeZone()
       );
 
-      callWith.argument("wheelchair", request::setWheelchairAccessible);
+      callWith.argument("wheelchair", preferences.wheelchair()::setAccessibility);
       callWith.argument("numItineraries", request::setNumItineraries);
-      callWith.argument("searchWindow", (Long m) -> request.searchWindow = Duration.ofSeconds(m));
+      callWith.argument("searchWindow", (Long m) -> request.setSearchWindow(Duration.ofSeconds(m)));
       callWith.argument("pageCursor", request::setPageCursor);
       // callWith.argument("maxSlope", request::setMaxSlope);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
-      callWith.argument("bikeReluctance", request::setBikeReluctance);
-      callWith.argument("bikeWalkingReluctance", request::setBikeWalkingReluctance);
-      callWith.argument("carReluctance", request::setCarReluctance);
-      callWith.argument("walkReluctance", request::setWalkReluctance);
-      callWith.argument("waitReluctance", request::setWaitReluctance);
-      callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
-      callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
-      callWith.argument("bikeWalkingSpeed", (Double v) -> request.bikeWalkingSpeed = v);
-      callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
-      callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
-      callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
+      callWith.argument("bikeReluctance", preferences.bike()::setReluctance);
+      callWith.argument("bikeWalkingReluctance", preferences.bike()::setWalkingReluctance);
+      callWith.argument("carReluctance", preferences.car()::setReluctance);
+      callWith.argument("walkReluctance", preferences.walk()::setReluctance);
+      callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
+      callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitReluctance);
+      callWith.argument("walkSpeed", preferences.walk()::setSpeed);
+      callWith.argument("bikeWalkingSpeed", preferences.bike()::setWalkingSpeed);
+      callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
+      callWith.argument("bikeSwitchTime", preferences.bike()::setSwitchTime);
+      callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
       callWith.argument(
         "allowKeepingRentedBicycleAtDestination",
-        (Boolean v) -> request.allowKeepingRentedVehicleAtDestination = v
+        preferences.rental()::setAllowKeepingRentedVehicleAtDestination
       );
       callWith.argument(
         "keepingRentedBicycleAtDestinationCost",
-        (Integer v) -> request.keepingRentedVehicleAtDestinationCost = v
+        preferences.rental()::setKeepingVehicleAtDestinationCost
       );
 
       callWith.argument(
         "modeWeight",
         (Map<String, Object> v) ->
-          request.setTransitReluctanceForMode(
-            v
-              .entrySet()
-              .stream()
-              .collect(
-                Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
-              )
-          )
+          preferences
+            .transit()
+            .setReluctanceForMode(
+              v
+                .entrySet()
+                .stream()
+                .collect(
+                  Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
+                )
+            )
       );
-      callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
-      callWith.argument("arriveBy", request::setArriveBy);
-      request.showIntermediateStops = true;
       callWith.argument(
-        "intermediatePlaces",
-        (List<Map<String, Object>> v) ->
-          request.intermediatePlaces =
-            v
-              .stream()
-              .map(LegacyGraphQLQueryTypeImpl::toGenericLocation)
-              .collect(Collectors.toList())
+        "debugItineraryFilter",
+        (Boolean v) -> preferences.system().itineraryFilters().debug = v
       );
-      callWith.argument("preferred.routes", request::setPreferredRoutesFromString);
+      callWith.argument("arriveBy", request::setArriveBy);
+      // TODO: 2022-08-24 why is this always true?
+      preferences.system().setShowIntermediateStops(true);
+      // TODO: 2022-08-24 I'm just commenting this out since we have to refactor it anyway
+      //      callWith.argument(
+      //        "intermediatePlaces",
+      //        (List<Map<String, Object>> v) ->
+      //          request.intermediatePlaces =
+      //            v
+      //              .stream()
+      //              .map(LegacyGraphQLQueryTypeImpl::toGenericLocation)
+      //              .collect(Collectors.toList())
+      //      );
+      callWith.argument(
+        "preferred.routes",
+        request.journey().transit()::setPreferredRoutesFromString
+      );
       callWith.argument(
         "preferred.otherThanPreferredRoutesPenalty",
-        request::setOtherThanPreferredRoutesPenalty
+        preferences.transit()::setOtherThanPreferredRoutesPenalty
       );
-      callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
-      callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
-      callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
-      callWith.argument("unpreferred.unpreferredRouteCost", request::setUnpreferredCost);
+      callWith.argument(
+        "preferred.agencies",
+        request.journey().transit()::setPreferredAgenciesFromString
+      );
+      callWith.argument(
+        "unpreferred.routes",
+        request.journey().transit()::setUnpreferredRoutesFromString
+      );
+      callWith.argument(
+        "unpreferred.agencies",
+        request.journey().transit()::setUnpreferredAgenciesFromString
+      );
+      callWith.argument(
+        "unpreferred.unpreferredRouteCost",
+        preferences.transit()::setUnpreferredRouteCostString
+      );
       callWith.argument(
         "unpreferred.useUnpreferredRoutesPenalty",
         (Integer v) ->
-          request.setUnpreferredCost(
-            RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
-          )
+          preferences
+            .transit()
+            .setUnpreferredRouteCostString(
+              RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
+            )
       );
-      callWith.argument("walkBoardCost", request::setWalkBoardCost);
-      callWith.argument("bikeBoardCost", request::setBikeBoardCost);
-      callWith.argument("banned.routes", request::setBannedRoutesFromString);
-      callWith.argument("banned.agencies", request::setBannedAgenciesFromSting);
-      callWith.argument("banned.trips", request::setBannedTripsFromString);
+      callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
+      callWith.argument("bikeBoardCost", preferences.bike()::setBoardCost);
+      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
+      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
+      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
-      callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
+      callWith.argument("transferPenalty", preferences.transfer()::setCost);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
@@ -697,12 +723,11 @@ public class LegacyGraphQLQueryTypeImpl
           callWith.argument("triangle.safetyFactor", (Double v) -> args[0] = v);
           callWith.argument("triangle.slopeFactor", (Double v) -> args[1] = v);
           callWith.argument("triangle.timeFactor", (Double v) -> args[2] = v);
-
-          request.setTriangleNormalized(args[0], args[1], args[2]);
+          preferences.bike().setTriangleNormalized(args[0], args[1], args[2]);
         }
 
         if (optimize != null) {
-          request.bicycleOptimizeType = optimize;
+          preferences.bike().setOptimizeType(optimize);
         }
       }
 
@@ -721,7 +746,13 @@ public class LegacyGraphQLQueryTypeImpl
             )
             .collect(Collectors.toSet());
 
-        request.modes = modes.getRequestModes();
+        // TODO: 2022-08-24 ensure taht this is right
+        var requestModes = modes.getRequestModes();
+        request.journey().transit().setModes(requestModes.transitModes);
+        request.journey().transfer().setMode(requestModes.transferMode);
+        request.journey().access().setMode(requestModes.accessMode);
+        request.journey().egress().setMode(requestModes.egressMode);
+        request.journey().direct().setMode(requestModes.directMode);
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {
@@ -729,58 +760,61 @@ public class LegacyGraphQLQueryTypeImpl
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
+      var vehicleRental = request.journey().access().vehicleRental();
+
+      // TODO: 2022-08-24 what happens here?
+      // TODO: 2022-08-24 it will be overwritten by next argument
       callWith.argument(
         "allowedBikeRentalNetworks",
-        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
       );
       callWith.argument(
         "allowedVehicleRentalNetworks",
-        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
       );
       callWith.argument(
         "bannedVehicleRentalNetworks",
-        (Collection<String> v) -> request.bannedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
       );
 
-      if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
+      if (preferences.rental().allow() && !hasArgument(environment, "bikeSpeed")) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.
-        request.bikeSpeed = 4.3;
+        preferences.bike().setSpeed(4.3);
       }
 
-      callWith.argument("boardSlack", (Integer v) -> request.boardSlack = v);
-      callWith.argument("alightSlack", (Integer v) -> request.alightSlack = v);
-      callWith.argument("minTransferTime", (Integer v) -> request.transferSlack = v); // TODO RoutingRequest field should be renamed
-      callWith.argument(
-        "nonpreferredTransferPenalty",
-        (Integer v) -> request.nonpreferredTransferCost = v
-      );
+      callWith.argument("boardSlack", preferences.transit()::setBoardSlack);
+      callWith.argument("alightSlack", preferences.transit()::setAlightSlack);
+      callWith.argument("minTransferTime", preferences.transfer()::setSlack);
+      callWith.argument("nonpreferredTransferPenalty", preferences.transfer()::setNonpreferredCost);
 
-      callWith.argument("maxTransfers", (Integer v) -> request.maxTransfers = v);
+      callWith.argument("maxTransfers", preferences.transfer()::setMaxTransfers);
 
-      request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
+      preferences
+        .rental()
+        .setUseVehicleRentalAvailabilityInformation(request.isTripPlannedForNow());
 
       callWith.argument(
         "startTransitStopId",
-        (String v) -> request.startingTransitStopId = FeedScopedId.parseId(v)
+        (String v) -> request.setStartingTransitStopId(FeedScopedId.parseId(v))
       );
       callWith.argument(
         "startTransitTripId",
-        (String v) -> request.startingTransitTripId = FeedScopedId.parseId(v)
+        (String v) -> request.setStartingTransitTripId(FeedScopedId.parseId(v))
       );
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
-      callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
-      callWith.argument("walkSafetyFactor", request::setWalkSafetyFactor);
+      callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
+      callWith.argument("walkSafetyFactor", preferences.walk()::setSafetyFactor);
 
       callWith.argument(
         "locale",
-        (String v) -> request.locale = LegacyGraphQLUtils.getLocale(environment, v)
+        (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
       );
-      RoutingResponse res = context.getRoutingService().route(request);
+      RoutingResponse res = context.getRoutingService().route(request, preferences);
       return DataFetcherResult
         .<RoutingResponse>newResult()
         .data(res)
-        .localContext(Map.of("locale", request.locale))
+        .localContext(Map.of("locale", request.locale()))
         .build();
     };
   }

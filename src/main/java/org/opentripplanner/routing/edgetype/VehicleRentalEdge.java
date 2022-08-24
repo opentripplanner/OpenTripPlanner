@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -33,7 +31,7 @@ public class VehicleRentalEdge extends Edge {
 
     var options = s0.getOptions();
     // TODO: 2022-08-22 fix this
-    var vehicleRental = options.journeyRequest().access().vehicleRental();
+    var vehicleRental = options.journey().access().vehicleRental();
     var preferences = s0.getPreferences();
 
     if (

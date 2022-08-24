@@ -100,12 +100,24 @@ public class TransitRequest {
     return modes;
   }
 
+  public void setWhiteListedAgenciesFromSting(String s) {
+    if (!s.isEmpty()) {
+      whiteListedAgencies = FeedScopedId.parseSetOfIds(s);
+    }
+  }
+
   public void setWhiteListedAgencies(Set<FeedScopedId> whiteListedAgencies) {
     this.whiteListedAgencies = whiteListedAgencies;
   }
 
   public Set<FeedScopedId> whiteListedAgencies() {
     return whiteListedAgencies;
+  }
+
+  public void setBannedAgenciesFromSting(String s) {
+    if (!s.isEmpty()) {
+      bannedAgencies = FeedScopedId.parseSetOfIds(s);
+    }
   }
 
   public void setBannedAgencies(Set<FeedScopedId> bannedAgencies) {
@@ -116,12 +128,24 @@ public class TransitRequest {
     return bannedAgencies;
   }
 
+  public void setPreferredAgenciesFromString(String s) {
+    if (!s.isEmpty()) {
+      preferredAgencies = FeedScopedId.parseSetOfIds(s);
+    }
+  }
+
   public void setPreferredAgencies(Set<FeedScopedId> preferredAgencies) {
     this.preferredAgencies = preferredAgencies;
   }
 
   public Set<FeedScopedId> preferredAgencies() {
     return preferredAgencies;
+  }
+
+  public void setUnpreferredAgenciesFromString(String s) {
+    if (!s.isEmpty()) {
+      unpreferredAgencies = FeedScopedId.parseSetOfIds(s);
+    }
   }
 
   public void setUnpreferredAgencies(Set<FeedScopedId> unpreferredAgencies) {
@@ -132,12 +156,28 @@ public class TransitRequest {
     return unpreferredAgencies;
   }
 
+  public void setWhiteListedRoutesFromString(String s) {
+    if (!s.isEmpty()) {
+      whiteListedRoutes = RouteMatcher.parse(s);
+    } else {
+      whiteListedRoutes = RouteMatcher.emptyMatcher();
+    }
+  }
+
   public void setWhiteListedRoutes(RouteMatcher whiteListedRoutes) {
     this.whiteListedRoutes = whiteListedRoutes;
   }
 
   public RouteMatcher whiteListedRoutes() {
     return whiteListedRoutes;
+  }
+
+  public void setBannedRoutesFromString(String s) {
+    if (!s.isEmpty()) {
+      bannedRoutes = RouteMatcher.parse(s);
+    } else {
+      bannedRoutes = RouteMatcher.emptyMatcher();
+    }
   }
 
   public void setBannedRoutes(RouteMatcher bannedRoutes) {
@@ -148,6 +188,14 @@ public class TransitRequest {
     return bannedRoutes;
   }
 
+  public void setPreferredRoutesFromString(String s) {
+    if (!s.isEmpty()) {
+      preferredRoutes = RouteMatcher.parse(s);
+    } else {
+      preferredRoutes = RouteMatcher.emptyMatcher();
+    }
+  }
+
   public void setPreferredRoutes(RouteMatcher preferredRoutes) {
     this.preferredRoutes = preferredRoutes;
   }
@@ -156,12 +204,26 @@ public class TransitRequest {
     return preferredRoutes;
   }
 
+  public void setUnpreferredRoutesFromString(String s) {
+    if (!s.isEmpty()) {
+      unpreferredRoutes = RouteMatcher.parse(s);
+    } else {
+      unpreferredRoutes = RouteMatcher.emptyMatcher();
+    }
+  }
+
   public void setUnpreferredRoutes(RouteMatcher unpreferredRoutes) {
     this.unpreferredRoutes = unpreferredRoutes;
   }
 
   public RouteMatcher unpreferredRoutes() {
     return unpreferredRoutes;
+  }
+
+  public void setBannedTripsFromString(String ids) {
+    if (!ids.isEmpty()) {
+      bannedTrips = FeedScopedId.parseSetOfIds(ids);
+    }
   }
 
   public void setBannedTrips(Set<FeedScopedId> bannedTrips) {

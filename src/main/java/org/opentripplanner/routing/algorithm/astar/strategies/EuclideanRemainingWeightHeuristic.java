@@ -49,10 +49,10 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     var preferences = rctx.pref;
 
     // Assume carSpeed > bikeSpeed > walkSpeed
-    if (options.journeyRequest().streetSubRequestModes().getCar()) {
+    if (options.journey().streetSubRequestModes().getCar()) {
       return preferences.car().speed();
     }
-    if (options.journeyRequest().streetSubRequestModes().getBicycle()) {
+    if (options.journey().streetSubRequestModes().getBicycle()) {
       return preferences.bike().speed();
     }
     return preferences.walk().speed();

@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -46,7 +45,7 @@ public class Transfer {
     RoutingPreferences preferences
   ) {
     NewRouteRequest rr = request.getStreetSearchRequest(
-      request.journeyRequest().transfer().mode(),
+      request.journey().transfer().mode(),
       preferences
     );
 

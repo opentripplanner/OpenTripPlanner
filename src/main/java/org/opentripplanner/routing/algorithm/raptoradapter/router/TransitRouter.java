@@ -84,7 +84,7 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.journeyRequest().transit().modes().isEmpty()) {
+    if (request.journey().transit().modes().isEmpty()) {
       return new TransitRouterResult(List.of(), null);
     }
 
@@ -207,9 +207,7 @@ public class TransitRouter {
   ) {
     var results = new ArrayList<AccessEgress>();
 
-    var mode = isEgress
-      ? request.journeyRequest().egress().mode()
-      : request.journeyRequest().access().mode();
+    var mode = isEgress ? request.journey().egress().mode() : request.journey().access().mode();
 
     // Prepare access/egress lists
     NewRouteRequest accessRequest = request.getStreetSearchRequest(mode, preferences);
@@ -229,11 +227,7 @@ public class TransitRouter {
 
       if (!isEgress) {
         // TODO: 2022-08-19 is this right?
-        accessRequest
-          .journeyRequest()
-          .access()
-          .vehicleRental()
-          .setAllowKeepingVehicleAtDestination(true);
+        accessRequest.journey().access().vehicleRental().setAllowKeepingVehicleAtDestination(true);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(

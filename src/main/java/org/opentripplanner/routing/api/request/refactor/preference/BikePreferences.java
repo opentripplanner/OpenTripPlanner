@@ -1,8 +1,13 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BikePreferences {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BikePreferences.class);
 
   /**
    * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
@@ -57,6 +62,42 @@ public class BikePreferences {
 
   // TODO: 2022-08-18 Is this right?
   private boolean parkAndRide = false;
+
+  /**
+   * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
+   * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and
+   * should add up to 1. This setter function accepts any three numbers and will normalize them to
+   * add up to 1.
+   */
+  public void setTriangleNormalized(double safe, double slope, double time) {
+    if (safe == 0 && slope == 0 && time == 0) {
+      var oneThird = 1f / 3;
+      safe = oneThird;
+      slope = oneThird;
+      time = oneThird;
+    }
+    safe = setMinValue(safe);
+    slope = setMinValue(slope);
+    time = setMinValue(time);
+
+    double total = safe + slope + time;
+    if (total != 1) {
+      LOG.warn(
+        "Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other."
+      );
+    }
+
+    safe /= total;
+    slope /= total;
+    time /= total;
+    this.triangleSafetyFactor = safe;
+    this.triangleSlopeFactor = slope;
+    this.triangleTimeFactor = time;
+  }
+
+  private double setMinValue(double value) {
+    return Math.max(0, value);
+  }
 
   public void setOptimizeType(BicycleOptimizeType optimizeType) {
     this.optimizeType = optimizeType;

@@ -3,7 +3,6 @@ package org.opentripplanner.routing.core;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
@@ -58,7 +57,7 @@ public class StateData implements Cloneable {
     this.opt = options;
     this.pref = preferences;
 
-    TraverseModeSet modes = options.journeyRequest().streetSubRequestModes();
+    TraverseModeSet modes = options.journey().streetSubRequestModes();
     if (modes.getCar()) {
       currentMode = TraverseMode.CAR;
     } else if (modes.getWalk()) {
@@ -165,7 +164,7 @@ public class StateData implements Cloneable {
       parkAndRideStateData.currentMode =
         parkAndRideStateData.vehicleParked
           ? TraverseMode.WALK
-          : options.journeyRequest().streetSubRequestModes().getBicycle()
+          : options.journey().streetSubRequestModes().getBicycle()
             ? TraverseMode.BICYCLE
             : TraverseMode.CAR;
       res.add(parkAndRideStateData);

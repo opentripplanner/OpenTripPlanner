@@ -9,7 +9,6 @@ import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
@@ -137,7 +136,7 @@ public class RaptorRequestMapper {
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
 
-    var raptorDebugging = request.journeyRequest().transit().raptorDebugging();
+    var raptorDebugging = request.journey().transit().raptorDebugging();
 
     if (raptorDebugging.isEnabled()) {
       var debug = builder.debug();

@@ -18,7 +18,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
@@ -109,7 +108,7 @@ public class RaptorPathToItineraryMapper {
         legs.addAll(
           mapTransferLeg(
             pathLeg.asTransferLeg(),
-            request.journeyRequest().transfer().mode() == StreetMode.BIKE
+            request.journey().transfer().mode() == StreetMode.BIKE
               ? TraverseMode.BICYCLE
               : TraverseMode.WALK
           )

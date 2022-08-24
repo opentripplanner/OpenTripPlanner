@@ -23,12 +23,12 @@ public class DirectStreetRouter {
     NewRouteRequest request,
     RoutingPreferences preferences
   ) {
-    if (request.journeyRequest().direct().mode() == StreetMode.NOT_SET) {
+    if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
 
     NewRouteRequest directRequest = request.getStreetSearchRequest(
-      request.journeyRequest().direct().mode(),
+      request.journey().direct().mode(),
       preferences
     );
     try (
@@ -90,7 +90,7 @@ public class DirectStreetRouter {
     RoutingPreferences preferences
   ) {
     double distanceLimit;
-    StreetMode mode = request.journeyRequest().direct().mode();
+    StreetMode mode = request.journey().direct().mode();
 
     double durationLimit = preferences.street().maxDirectDurationForMode().get(mode).toSeconds();
 

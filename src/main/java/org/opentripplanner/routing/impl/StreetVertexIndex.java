@@ -18,7 +18,6 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -407,7 +406,7 @@ public class StreetVertexIndex {
     TraverseMode nonTransitMode = TraverseMode.WALK;
     //It can be null in tests
     if (options != null) {
-      TraverseModeSet modes = options.journeyRequest().streetSubRequestModes();
+      TraverseModeSet modes = options.journey().streetSubRequestModes();
       // for park and ride we will start in car mode and walk to the end vertex
       boolean parkAndRideDepart = modes.getCar() && preferences.car().parkAndRide() && !endVertex;
       boolean onlyCarAvailable = modes.getCar() && !(modes.getWalk() || modes.getBicycle());

@@ -66,13 +66,13 @@ public class GraphPathFinder {
     NewRouteRequest options = routingContext.opt;
     RoutingPreferences preferences = routingContext.pref;
 
-    if (options.journeyRequest().streetSubRequestModes().isTransit()) {
+    if (options.journey().streetSubRequestModes().isTransit()) {
       throw new UnsupportedOperationException("Transit search not supported");
     }
 
     AStarBuilder aStar = AStarBuilder
       .oneToOneMaxDuration(
-        preferences.street().maxDirectDuration(options.journeyRequest().direct().mode())
+        preferences.street().maxDirectDuration(options.journey().direct().mode())
       )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())

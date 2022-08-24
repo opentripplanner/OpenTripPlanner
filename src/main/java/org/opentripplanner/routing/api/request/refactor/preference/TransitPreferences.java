@@ -188,6 +188,10 @@ public class TransitPreferences {
     this.unpreferredRouteCost = unpreferredRouteCost;
   }
 
+  public void setUnpreferredRouteCostString(String constFunction) {
+    unpreferredRouteCost = RequestFunctions.parse(constFunction);
+  }
+
   public DoubleFunction<Double> unpreferredRouteCost() {
     return unpreferredRouteCost;
   }

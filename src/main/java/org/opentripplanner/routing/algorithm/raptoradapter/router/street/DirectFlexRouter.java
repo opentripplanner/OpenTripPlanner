@@ -7,7 +7,6 @@ import java.util.List;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
@@ -24,11 +23,11 @@ public class DirectFlexRouter {
     RoutingPreferences preferences,
     AdditionalSearchDays additionalSearchDays
   ) {
-    if (!StreetMode.FLEXIBLE.equals(request.journeyRequest().direct().mode())) {
+    if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
     NewRouteRequest directRequest = request.getStreetSearchRequest(
-      request.journeyRequest().direct().mode(),
+      request.journey().direct().mode(),
       preferences
     );
     try (

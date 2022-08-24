@@ -18,6 +18,8 @@ import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
@@ -61,19 +63,22 @@ public class PlannerResource extends RoutingResource {
 
     // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
     TripPlannerResponse response = new TripPlannerResponse(uriInfo);
-    RoutingRequest request = null;
+    NewRouteRequest request = null;
+    RoutingPreferences preferences = null;
     RoutingResponse res = null;
     try {
       /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
-      request = super.buildRequest(uriInfo.getQueryParameters());
+      var requestAndPreferences = super.buildRequest(uriInfo.getQueryParameters());
+      request = requestAndPreferences.getLeft();
+      preferences = requestAndPreferences.getRight();
 
       // Route
-      res = serverContext.routingService().route(request);
+      res = serverContext.routingService().route(request, preferences);
 
       // Map to API
       TripPlanMapper tripPlanMapper = new TripPlanMapper(
-        request.locale,
-        request.showIntermediateStops
+        request.locale(),
+        preferences.system().showIntermediateStops()
       );
       response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
       if (res.getPreviousPageCursor() != null) {
@@ -92,7 +97,7 @@ public class PlannerResource extends RoutingResource {
       response.elevationMetadata = new ElevationMetadata();
       response.elevationMetadata.ellipsoidToGeoidDifference =
         serverContext.graph().ellipsoidToGeoidDifference;
-      response.elevationMetadata.geoidElevation = request.geoidElevation;
+      response.elevationMetadata.geoidElevation = preferences.system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
     } catch (Exception e) {
@@ -102,14 +107,15 @@ public class PlannerResource extends RoutingResource {
     }
 
     /* Log this request if such logging is enabled. */
-    logRequest(grizzlyRequest, request, serverContext, res);
+    logRequest(grizzlyRequest, request, preferences, serverContext, res);
 
     return response;
   }
 
   private void logRequest(
     Request grizzlyRequest,
-    RoutingRequest request,
+    NewRouteRequest request,
+    RoutingPreferences preferences,
     OtpServerRequestContext serverContext,
     RoutingResponse res
   ) {
@@ -119,19 +125,19 @@ public class PlannerResource extends RoutingResource {
       //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
       sb.append(clientIpAddress);
       sb.append(' ');
-      sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
+      sb.append(request.arriveBy() ? "ARRIVE" : "DEPART");
       sb.append(' ');
-      sb.append(LocalDateTime.ofInstant(request.getDateTime(), ZoneId.systemDefault()));
+      sb.append(LocalDateTime.ofInstant(request.dateTime(), ZoneId.systemDefault()));
       sb.append(' ');
-      sb.append(request.streetSubRequestModes.getAsStr());
+      sb.append(request.journey().streetSubRequestModes().getAsStr());
       sb.append(' ');
-      sb.append(request.from.lat);
+      sb.append(request.from().lat);
       sb.append(' ');
-      sb.append(request.from.lng);
+      sb.append(request.from().lng);
       sb.append(' ');
-      sb.append(request.to.lat);
+      sb.append(request.to().lat);
       sb.append(' ');
-      sb.append(request.to.lng);
+      sb.append(request.to().lng);
       sb.append(' ');
       if (res != null) {
         for (Itinerary it : res.getTripPlan().itineraries) {

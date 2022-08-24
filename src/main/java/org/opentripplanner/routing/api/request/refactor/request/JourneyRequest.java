@@ -12,6 +12,17 @@ public class JourneyRequest {
    * TODO OTP2 Street routing requests should eventually be split into its own request class.
    */
   private TraverseModeSet streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK);
+
+  // TODO: 2022-08-23 is it right place for it?
+  /**
+   * Accept only paths that use transit (no street-only paths).
+   *
+   * @Deprecated TODO OTP2 Regression. Not currently working in OTP2. This is only used in the
+   * deprecated Transmodel GraphQL API.
+   */
+  @Deprecated
+  private boolean onlyTransitTrips = false;
+
   private TransitRequest transit = new TransitRequest();
   private StreetRequest access = new StreetRequest();
   private StreetRequest egress = new StreetRequest();
@@ -44,5 +55,13 @@ public class JourneyRequest {
 
   public TraverseModeSet streetSubRequestModes() {
     return streetSubRequestModes;
+  }
+
+  public void setOnlyTransitTrips(boolean onlyTransitTrips) {
+    this.onlyTransitTrips = onlyTransitTrips;
+  }
+
+  public boolean onlyTransitTrips() {
+    return onlyTransitTrips;
   }
 }

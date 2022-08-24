@@ -1,6 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -133,15 +132,15 @@ public class Place {
     RoutingPreferences preferences
   ) {
     TraverseMode traverseMode = null;
-    if (request.journeyRequest().streetSubRequestModes().getCar()) {
+    if (request.journey().streetSubRequestModes().getCar()) {
       traverseMode = TraverseMode.CAR;
-    } else if (request.journeyRequest().streetSubRequestModes().getBicycle()) {
+    } else if (request.journey().streetSubRequestModes().getBicycle()) {
       traverseMode = TraverseMode.BICYCLE;
     }
 
     // TODO: 2022-08-23 fix it
     boolean realTime =
-      request.journeyRequest().access().vehicleParking().useAvailabilityInformation() &&
+      request.journey().access().vehicleParking().useAvailabilityInformation() &&
       vertex
         .getVehicleParking()
         .hasRealTimeDataForMode(traverseMode, preferences.wheelchair().accessibility().enabled());

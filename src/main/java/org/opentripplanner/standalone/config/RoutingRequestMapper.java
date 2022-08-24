@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
@@ -29,8 +28,8 @@ public class RoutingRequestMapper {
     NewRouteRequest request = new NewRouteRequest();
     RoutingPreferences preferences = new RoutingPreferences();
     // TODO: 2022-08-23 fix it
-    var vehicleRental = request.journeyRequest().access().vehicleRental();
-    var vehicleParking = request.journeyRequest().access().vehicleParking();
+    var vehicleRental = request.journey().access().vehicleRental();
+    var vehicleParking = request.journey().access().vehicleParking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
@@ -182,13 +181,13 @@ public class RoutingRequestMapper {
 
     request.setMaxJourneyDuration(c.asDuration("maxJourneyDuration", dft.maxJourneyDuration()));
     // TODO: 2022-08-23 Verify that this is right
-    var journeyRequest = c.asJourneyRequest("modes", dft.journeyRequest());
-    request.journeyRequest().access().setMode(journeyRequest.access().mode());
-    request.journeyRequest().direct().setMode(journeyRequest.direct().mode());
-    request.journeyRequest().egress().setMode(journeyRequest.egress().mode());
-    request.journeyRequest().setStreetSubRequestModes(journeyRequest.streetSubRequestModes());
-    request.journeyRequest().transfer().setMode(journeyRequest.transfer().mode());
-    request.journeyRequest().transit().setModes(journeyRequest.transit().modes());
+    var journeyRequest = c.asJourneyRequest("modes", dft.journey());
+    request.journey().access().setMode(journeyRequest.access().mode());
+    request.journey().direct().setMode(journeyRequest.direct().mode());
+    request.journey().egress().setMode(journeyRequest.egress().mode());
+    request.journey().setStreetSubRequestModes(journeyRequest.streetSubRequestModes());
+    request.journey().transfer().setMode(journeyRequest.transfer().mode());
+    request.journey().transit().setModes(journeyRequest.transit().modes());
 
     preferences
       .transfer()
@@ -197,10 +196,8 @@ public class RoutingRequestMapper {
       );
     request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
     request
-      .journeyRequest()
-      .setOnlyTransitTrips(
-        c.asBoolean("onlyTransitTrips", request.journeyRequest().onlyTransitTrips())
-      );
+      .journey()
+      .setOnlyTransitTrips(c.asBoolean("onlyTransitTrips", request.journey().onlyTransitTrips()));
     preferences.bike().setOptimizeType(c.asEnum("optimize", preferences.bike().optimizeType()));
     preferences
       .transit()
@@ -293,12 +290,12 @@ public class RoutingRequestMapper {
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
     request
-      .journeyRequest()
+      .journey()
       .transit()
       .setUnpreferredRoutes(
         c
           .path("unpreferred")
-          .asRouteMatcher("routes", request.journeyRequest().transit().unpreferredRoutes())
+          .asRouteMatcher("routes", request.journey().transit().unpreferredRoutes())
       );
 
     request
