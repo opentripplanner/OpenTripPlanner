@@ -59,8 +59,8 @@ public class TripPatternForDate {
     LocalDate localDate
   ) {
     this.tripPattern = tripPattern;
-    this.tripTimes = new ArrayList<>(tripTimes);
-    this.frequencies = frequencies;
+    this.tripTimes = List.copyOf(tripTimes);
+    this.frequencies = List.copyOf(frequencies);
     this.localDate = localDate;
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
@@ -165,25 +165,28 @@ public class TripPatternForDate {
 
   @Nullable
   public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes);
-    filteredTripTimes.removeIf(Predicate.not(filter));
-
-    List<FrequencyEntry> filteredFrequencies = frequencies
-      .stream()
-      .filter(frequencyEntry -> filter.test(frequencyEntry.tripTimes))
-      .collect(Collectors.toList());
-
-    if (filteredTripTimes.isEmpty()) {
-      if (hasFrequencies()) {
-        if (filteredFrequencies.isEmpty()) {
-          return null;
-        }
-      } else {
-        return null;
+    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes.size());
+    for (TripTimes tripTimes : tripTimes) {
+      if (filter.test(tripTimes)) {
+        filteredTripTimes.add(tripTimes);
       }
     }
 
-    if (tripTimes.size() == filteredTripTimes.size()) {
+    List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.size());
+    for (FrequencyEntry frequencyEntry : frequencies) {
+      if (filter.test(frequencyEntry.tripTimes)) {
+        filteredFrequencies.add(frequencyEntry);
+      }
+    }
+
+    if (filteredTripTimes.isEmpty() && filteredFrequencies.isEmpty()) {
+      return null;
+    }
+
+    if (
+      tripTimes.size() == filteredTripTimes.size() &&
+      frequencies.size() == filteredFrequencies.size()
+    ) {
       return this;
     }
 

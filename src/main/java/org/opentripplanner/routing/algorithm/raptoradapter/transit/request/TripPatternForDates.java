@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import gnu.trove.list.TIntList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
@@ -62,19 +63,19 @@ public class TripPatternForDates
   TripPatternForDates(
     RoutingTripPattern tripPattern,
     List<TripPatternForDate> tripPatternForDates,
-    List<Integer> offsets,
+    TIntList offsets,
     BitSet boardingPossible,
     BitSet alightningPossible
   ) {
     this.tripPattern = tripPattern;
     this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[] {});
-    this.offsets = offsets.stream().mapToInt(i -> i).toArray();
+    this.offsets = offsets.toArray();
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
-    for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
+    for (TripPatternForDate tripPatternForDate : this.tripPatternForDates) {
       numberOfTripSchedules += tripPatternForDate.numberOfTripSchedules();
       if (tripPatternForDate.hasFrequencies()) {
         hasFrequencies = true;
@@ -89,9 +90,9 @@ public class TripPatternForDates
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
     this.departureTimes = new int[nStops * numberOfTripSchedules];
     int i = 0;
-    for (int d = 0; d < tripPatternForDates.size(); d++) {
+    for (int d = 0; d < this.tripPatternForDates.length; d++) {
       int offset = this.offsets[d];
-      for (var trip : tripPatternForDates.get(d).tripTimes()) {
+      for (var trip : this.tripPatternForDates[d].tripTimes()) {
         wheelchairBoardings[i] = trip.getWheelchairAccessibility();
         for (int s = 0; s < nStops; s++) {
           this.arrivalTimes[s * numberOfTripSchedules + i] = trip.getArrivalTime(s) + offset;

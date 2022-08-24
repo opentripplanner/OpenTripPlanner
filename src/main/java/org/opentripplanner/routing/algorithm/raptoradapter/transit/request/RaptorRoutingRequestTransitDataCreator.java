@@ -2,7 +2,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import static org.opentripplanner.util.time.ServiceDateUtils.secondsSinceStartOfTime;
 
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -102,6 +105,8 @@ class RaptorRoutingRequestTransitDataCreator {
 
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
+    TObjectIntMap<LocalDate> offsetCache = new TObjectIntHashMap<>();
+
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates
     for (Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
@@ -110,11 +115,17 @@ class RaptorRoutingRequestTransitDataCreator {
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
       // Calculate offsets per date
-      List<Integer> offsets = new ArrayList<>();
+      TIntList offsets = new TIntArrayList();
       for (TripPatternForDate tripPatternForDate : patternsSorted) {
-        offsets.add(
-          secondsSinceStartOfTime(transitSearchTimeZero, tripPatternForDate.getLocalDate())
-        );
+        LocalDate serviceDate = tripPatternForDate.getLocalDate();
+        int offset;
+        if (offsetCache.containsKey(serviceDate)) {
+          offset = offsetCache.get(serviceDate);
+        } else {
+          offset = secondsSinceStartOfTime(transitSearchTimeZero, serviceDate);
+          offsetCache.put(serviceDate, offset);
+        }
+        offsets.add(offset);
       }
 
       // Combine TripPatternForDate objects

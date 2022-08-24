@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.util.CompareIntArrays;
-import org.opentripplanner.transit.raptor.util.IntUtils;
+import org.opentripplanner.util.lang.IntUtils;
 
 /**
  * Utility class to log computed heuristic data.
