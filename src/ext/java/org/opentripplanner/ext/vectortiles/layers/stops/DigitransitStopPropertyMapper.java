@@ -41,18 +41,16 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
       .map(Enum::name)
       .orElse(null);
 
-    String patterns = JSONArray.toJSONString(
-      patternsForStop
+    String routes = JSONArray.toJSONString(
+      transitService
+        .getRoutesForStop(stop)
         .stream()
-        .map(tripPattern -> {
-          String headsign = tripPattern.getStopHeadsign(tripPattern.findStopPosition(stop));
-          JSONObject pattern = new JSONObject();
-          pattern.put("headsign", Optional.ofNullable(headsign).orElse(""));
-          pattern.put("type", tripPattern.getRoute().getMode().name());
-          pattern.put("shortName", tripPattern.getRoute().getShortName());
-          return pattern;
+        .map(route -> {
+          JSONObject routeObject = new JSONObject();
+          routeObject.put("gtfsType", route.getGtfsType());
+          return routeObject;
         })
-        .collect(Collectors.toList())
+        .toList()
     );
     String desc = stop.getDescription() != null ? stop.getDescription().toString() : null;
     return List.of(
@@ -67,7 +65,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
       ),
       new T2<>("type", type),
-      new T2<>("patterns", patterns)
+      new T2<>("routes", routes)
     );
   }
 }
