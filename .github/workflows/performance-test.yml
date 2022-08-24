@@ -24,12 +24,14 @@ jobs:
             osm-url: https://download.geofabrik.de/europe/norway-210101.osm.pbf
             transit-url: https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip
             transit-filename: rb_norway-aggregated-netex.zip
+            iterations: 4
             jfr-delay: "35s"
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             osm-url: https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf
             transit-url: https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip
             transit-filename: baden-wuerttemberg.gtfs.zip
+            iterations: 4
             jfr-delay: "50s"
 
     steps:
