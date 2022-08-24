@@ -68,7 +68,7 @@ public class SpeedTest {
     this.transitModel = model.transitModel();
     this.buildConfig = model.buildConfig();
 
-    this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
+    this.tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME, config.feedId);
 
     // Read Test-case definitions and expected results from file
     this.testCaseInputs = filterTestCases(opts, tcIO.readTestCasesFromFile());

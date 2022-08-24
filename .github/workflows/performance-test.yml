@@ -13,15 +13,25 @@ jobs:
       matrix:
         include:
 
+          - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
+            transit-url: https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip
+            transit-filename: germany.gtfs.zip
+            iterations: 1
+            jfr-delay: "50s"
+
           - location: norway
             osm-url: https://download.geofabrik.de/europe/norway-210101.osm.pbf
             transit-url: https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip
             transit-filename: rb_norway-aggregated-netex.zip
+            iterations: 4
+            jfr-delay: "35s"
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             osm-url: https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf
             transit-url: https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip
             transit-filename: baden-wuerttemberg.gtfs.zip
+            iterations: 4
+            jfr-delay: "50s"
 
     steps:
       - uses: actions/checkout@v2.3.2
@@ -43,8 +53,6 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven
 
       - name: Cache graph input files
         uses: actions/cache@v2
@@ -52,7 +60,7 @@ jobs:
           path: |
             graph/*.pbf
             graph/*.zip
-          key: graph-${{ matrix.location }}
+          key: graph-${{ matrix.transit-url}}-${{ matrix.osm-url}}
 
       - name: Build jar
         run: mvn -DskipTests --batch-mode package -P prettierSkip
@@ -60,7 +68,12 @@ jobs:
       - name: Download OSM & Netex data
         run: |
           mkdir -p graph
-          wget ${{ matrix.osm-url }} -O graph/osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
+          if [ "${{ matrix.osm-url }}" = "" ];
+          then
+            echo "No OSM download specified. Skipping..."
+          else
+            wget ${{ matrix.osm-url }} -O graph/osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
+          fi
           wget ${{ matrix.transit-url }} -O graph/${{ matrix.transit-filename }} --no-clobber -q --show-progress --progress=bar:force || true
 
       - name: Build graph
@@ -74,13 +87,18 @@ jobs:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           MEASUREMENT_ENVIRONMENT: CI
           SPEEDTEST_LOCATION: ${{ matrix.location }}
+          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
         run: |
           mv graph/graph.obj test/performance/${{ matrix.location }}
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n 4 -i 3 -0"
-
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
       - name: Archive travel results file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.location }}-travelSearch-results.csv
-          path: |
-            test/performance/${{ matrix.location }}/travelSearch-results.csv
+          path: test/performance/${{ matrix.location }}/travelSearch-results.csv
+
+      - name: Archive Flight Recorder instrumentation file
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.location }}-flight-recorder
+          path: ${{ matrix.location}}-speed-test.jfr
