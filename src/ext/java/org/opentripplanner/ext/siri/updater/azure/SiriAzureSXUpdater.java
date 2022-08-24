@@ -19,11 +19,9 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
 import org.opentripplanner.util.HttpUtils;
@@ -53,14 +51,12 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   public void setup(Graph graph, TransitModel transitModel) throws Exception {
     super.setup(graph, transitModel);
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
-    SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new DefaultTransitService(transitModel)
-    );
+
     if (updateHandler == null) {
       updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
     }
     updateHandler.setTransitAlertService(transitAlertService);
-    updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
+    updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher());
   }
 
   @Override

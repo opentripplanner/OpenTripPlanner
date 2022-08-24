@@ -43,23 +43,27 @@ public class SiriVMUpdater extends PollingGraphUpdater {
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
-  private final boolean fuzzyTripMatching;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   protected WriteToGraphCallback saveResultOnGraph;
+
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private Integer logFrequency;
+
   /**
    * Property to set on the RealtimeDataSnapshotSource
    */
   private Integer maxSnapshotFrequency;
+
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
   private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
+
   /**
    * The place where we'll record the incoming realtime timetables to make them available to the
    * router in a thread safe way.
@@ -82,7 +86,6 @@ public class SiriVMUpdater extends PollingGraphUpdater {
       this.maxSnapshotFrequency = maxSnapshotFrequency;
     }
     this.purgeExpiredData = config.purgeExpiredData();
-    this.fuzzyTripMatching = config.fuzzyTripMatching();
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
@@ -100,14 +103,13 @@ public class SiriVMUpdater extends PollingGraphUpdater {
 
   @Override
   public void setup(Graph graph, TransitModel transitModel) {
-    if (fuzzyTripMatching) {
-      this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
     // Only create a realtime data snapshot source if none exists already
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
     //           - Ideally we should inject the snapshotSource on this class.
-    snapshotSource =
+    this.snapshotSource =
       transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+
+    this.siriFuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
 
     // Set properties of realtime data snapshot source.
     // TODO OTP2 - this is overwriting these properties if they were specified by other updaters.
@@ -120,9 +122,6 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     }
     if (purgeExpiredData != null) {
       snapshotSource.purgeExpiredData = purgeExpiredData;
-    }
-    if (siriFuzzyTripMatcher != null) {
-      siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
   }
 
@@ -149,7 +148,13 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         List<VehicleMonitoringDeliveryStructure> vmds = serviceDelivery.getVehicleMonitoringDeliveries();
         if (vmds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
-            snapshotSource.applyVehicleMonitoring(transitModel, feedId, fullDataset, vmds);
+            snapshotSource.applyVehicleMonitoring(
+              transitModel,
+              siriFuzzyTripMatcher,
+              feedId,
+              fullDataset,
+              vmds
+            );
             if (markPrimed) primed = true;
           });
         }

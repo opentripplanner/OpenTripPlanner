@@ -25,8 +25,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -62,9 +64,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETGooglePubsubUpdater.class);
 
-  private static final transient AtomicLong messageCounter = new AtomicLong(0);
-  private static final transient AtomicLong updateCounter = new AtomicLong(0);
-  private static final transient AtomicLong sizeCounter = new AtomicLong(0);
+  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
+  private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
+  private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
   /**
    * The URL used to fetch all initial updates
    */
@@ -87,6 +89,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
    */
   private WriteToGraphCallback saveResultOnGraph;
   private SiriTimetableSnapshotSource snapshotSource;
+  private SiriFuzzyTripMatcher fuzzyTripMatcher;
+
   private transient long startTime;
   private boolean primed;
 
@@ -118,10 +122,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null &&
         !System.getenv("GOOGLE_APPLICATION_CREDENTIALS").isEmpty()
       ) {
-        /*
-                  Google libraries expects path to credentials json-file is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
-                  Ref.: https://cloud.google.com/docs/authentication/getting-started
-                 */
+        // Google libraries expects path to credentials json-file is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
+        // Ref.: https://cloud.google.com/docs/authentication/getting-started
 
         subscriptionAdminClient = SubscriptionAdminClient.create();
 
@@ -146,8 +148,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   public void setup(Graph graph, TransitModel transitModel) throws Exception {
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
     //           - Ideally we should inject the snapshotSource on this class.
-    snapshotSource =
+    this.snapshotSource =
       transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
   }
 
   @Override
@@ -306,9 +310,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
             LOG.info(
               "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
               (System.currentTimeMillis() - t2),
-              messageCounter.get(),
-              updateCounter.get(),
-              FileUtils.byteCountToDisplaySize(sizeCounter.get()),
+              MESSAGE_COUNTER.get(),
+              UPDATE_COUNTER.get(),
+              FileUtils.byteCountToDisplaySize(SIZE_COUNTER.get()),
               getTimeSinceStartupString()
             );
           }
@@ -326,7 +330,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     public void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
       Siri siri;
       try {
-        sizeCounter.addAndGet(message.getData().size());
+        SIZE_COUNTER.addAndGet(message.getData().size());
 
         final ByteString data = message.getData();
 
@@ -354,15 +358,15 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         } catch (Throwable t) {
           //ignore
         }
-        long numberOfUpdates = updateCounter.addAndGet(numberOfUpdatedTrips);
-        long numberOfMessages = messageCounter.incrementAndGet();
+        long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
+        long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
 
         if (numberOfMessages % 1000 == 0) {
           LOG.info(
             "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
             numberOfMessages,
             numberOfUpdates,
-            FileUtils.byteCountToDisplaySize(sizeCounter.get()),
+            FileUtils.byteCountToDisplaySize(SIZE_COUNTER.get()),
             (now() - siri.getServiceDelivery().getResponseTimestamp().toInstant().toEpochMilli()),
             getTimeSinceStartupString()
           );
@@ -371,6 +375,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         var f = saveResultOnGraph.execute((graph, transitModel) ->
           snapshotSource.applyEstimatedTimetable(
             transitModel,
+            fuzzyTripMatcher,
             feedId,
             false,
             estimatedTimetableDeliveries

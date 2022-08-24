@@ -79,15 +79,14 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   @Override
   public void setup(Graph graph, TransitModel transitModel) {
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
-    SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new DefaultTransitService(transitModel)
-    );
     if (updateHandler == null) {
       updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
     }
     updateHandler.setEarlyStart(earlyStart);
     updateHandler.setTransitAlertService(transitAlertService);
-    updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
+    updateHandler.setSiriFuzzyTripMatcher(
+      SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+    );
   }
 
   @Override

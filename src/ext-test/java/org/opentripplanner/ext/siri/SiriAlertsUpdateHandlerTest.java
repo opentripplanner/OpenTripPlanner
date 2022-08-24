@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -143,7 +142,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       transitAlertService = new TransitAlertServiceImpl(transitModel);
       alertsUpdateHandler.setTransitAlertService(transitAlertService);
 
-      alertsUpdateHandler.setSiriFuzzyTripMatcher(new SiriFuzzyTripMatcher(transitService));
+      alertsUpdateHandler.setSiriFuzzyTripMatcher(SiriFuzzyTripMatcher.of(transitService));
     }
   }
 

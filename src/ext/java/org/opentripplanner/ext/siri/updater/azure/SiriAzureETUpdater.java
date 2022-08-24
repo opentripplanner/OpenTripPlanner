@@ -28,9 +28,9 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
-  private final Logger LOG = LoggerFactory.getLogger(getClass());
+  private static final Logger LOG = LoggerFactory.getLogger(SiriAzureSXUpdater.class);
 
-  private static final transient AtomicLong messageCounter = new AtomicLong(0);
+  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
   private final LocalDate fromDateTime;
   private long startTime;
@@ -43,10 +43,10 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
   @Override
   protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {
     var message = messageContext.getMessage();
-    messageCounter.incrementAndGet();
+    MESSAGE_COUNTER.incrementAndGet();
 
-    if (messageCounter.get() % 100 == 0) {
-      LOG.info("Total SIRI-ET messages received={}", messageCounter.get());
+    if (MESSAGE_COUNTER.get() % 100 == 0) {
+      LOG.info("Total SIRI-ET messages received={}", MESSAGE_COUNTER.get());
     }
 
     processMessage(message.getBody().toString(), message.getMessageId());
@@ -105,7 +105,13 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       }
 
       super.saveResultOnGraph.execute((graph, transitModel) ->
-        snapshotSource.applyEstimatedTimetable(transitModel, feedId, false, updates)
+        snapshotSource.applyEstimatedTimetable(
+          transitModel,
+          fuzzyTripMatcher(),
+          feedId,
+          false,
+          updates
+        )
       );
     } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -123,7 +129,13 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
       super.saveResultOnGraph.execute((graph, transitModel) -> {
         long t1 = System.currentTimeMillis();
-        snapshotSource.applyEstimatedTimetable(transitModel, feedId, false, updates);
+        snapshotSource.applyEstimatedTimetable(
+          transitModel,
+          fuzzyTripMatcher(),
+          feedId,
+          false,
+          updates
+        );
 
         setPrimed(true);
         LOG.info(

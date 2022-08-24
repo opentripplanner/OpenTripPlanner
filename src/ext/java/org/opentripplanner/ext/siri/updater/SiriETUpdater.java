@@ -2,8 +2,10 @@ package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -59,6 +61,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
    */
   private SiriTimetableSnapshotSource snapshotSource;
 
+  private SiriFuzzyTripMatcher fuzzyTripMatcher;
+
   public SiriETUpdater(SiriETUpdaterParameters config) {
     super(config);
     // Create update streamer from preferences
@@ -95,20 +99,22 @@ public class SiriETUpdater extends PollingGraphUpdater {
     // Only create a realtime data snapshot source if none exists already
     // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
     //           - Ideally we should inject the snapshotSource on this class.
-    snapshotSource =
+    this.snapshotSource =
       transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
 
     // Set properties of realtime data snapshot source.
     // TODO OTP2 - this is overwriting these properties if they were specified by other updaters.
     //           - These should not be specified at a per-updater level, but at a per-router level.
-    if (logFrequency != null) {
-      snapshotSource.logFrequency = logFrequency;
+    if (this.logFrequency != null) {
+      this.snapshotSource.logFrequency = logFrequency;
     }
-    if (maxSnapshotFrequency != null) {
-      snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
+    if (this.maxSnapshotFrequency != null) {
+      this.snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
     }
-    if (purgeExpiredData != null) {
-      snapshotSource.purgeExpiredData = purgeExpiredData;
+    if (this.purgeExpiredData != null) {
+      this.snapshotSource.purgeExpiredData = purgeExpiredData;
     }
   }
 
@@ -134,7 +140,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
-            snapshotSource.applyEstimatedTimetable(transitModel, feedId, fullDataset, etds);
+            snapshotSource.applyEstimatedTimetable(
+              transitModel,
+              fuzzyTripMatcher,
+              feedId,
+              fullDataset,
+              etds
+            );
             if (markPrimed) primed = true;
           });
         }

@@ -18,8 +18,10 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -32,6 +34,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private boolean isPrimed = false;
   protected WriteToGraphCallback saveResultOnGraph;
   protected SiriTimetableSnapshotSource snapshotSource;
+
+  private SiriFuzzyTripMatcher fuzzyTripMatcher;
   private final String configRef;
 
   private ServiceBusProcessorClient eventProcessor;
@@ -84,6 +88,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   public void setup(Graph graph, TransitModel transitModel) throws Exception {
     snapshotSource =
       transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
   }
 
   @Override
@@ -170,6 +175,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   @Override
   public String getConfigRef() {
     return this.configRef;
+  }
+
+  SiriFuzzyTripMatcher fuzzyTripMatcher() {
+    return fuzzyTripMatcher;
   }
 
   /**

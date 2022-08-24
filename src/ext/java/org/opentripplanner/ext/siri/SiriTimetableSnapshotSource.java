@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri;
 
-import static com.google.common.base.Strings.lenientFormat;
 import static org.opentripplanner.ext.siri.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStopTimes;
 import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -97,7 +95,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private final ZoneId timeZone;
 
   private final TransitService transitService;
-  private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
   private final TransitLayerUpdater transitLayerUpdater;
 
   public int logFrequency = 2000;
@@ -121,7 +118,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     timeZone = transitModel.getTimeZone();
     transitService = new DefaultTransitService(transitModel);
     transitLayerUpdater = transitModel.getTransitLayerUpdater();
-    siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(transitService);
   }
 
   /**
@@ -160,6 +156,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   public void applyVehicleMonitoring(
     final TransitModel transitModel,
+    final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
     final boolean fullDataset,
     final List<VehicleMonitoringDeliveryStructure> updates
@@ -188,7 +185,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           int handledCounter = 0;
           int skippedCounter = 0;
           for (VehicleActivityStructure activity : activities) {
-            boolean handled = handleModifiedTrip(transitModel, activity, serviceDate, feedId);
+            boolean handled = handleModifiedTrip(
+              transitModel,
+              fuzzyTripMatcher,
+              activity,
+              serviceDate,
+              feedId
+            );
             if (handled) {
               handledCounter++;
             } else {
@@ -239,6 +242,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   public void applyEstimatedTimetable(
     final TransitModel transitModel,
+    final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
     final boolean fullDataset,
     final List<EstimatedTimetableDeliveryStructure> updates
@@ -288,7 +292,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 }
               } else {
                 // Updated trip
-                if (handleModifiedTrip(transitModel, feedId, journey)) {
+                if (handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey)) {
                   handledCounter++;
                 } else {
                   if (journey.isMonitored() != null && !journey.isMonitored()) {
@@ -346,6 +350,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private boolean handleModifiedTrip(
     TransitModel transitModel,
+    SiriFuzzyTripMatcher fuzzyTripMatcher,
     VehicleActivityStructure activity,
     LocalDate serviceDate,
     String feedId
@@ -370,7 +375,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    Set<Trip> trips = siriFuzzyTripMatcher.match(activity, feedId);
+    Set<Trip> trips = fuzzyTripMatcher.match(activity, feedId);
 
     if (trips == null || trips.isEmpty()) {
       if (keepLogging) {
@@ -813,6 +818,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private boolean handleModifiedTrip(
     TransitModel transitModel,
+    SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
@@ -852,7 +858,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Set<TripTimes> times = new HashSet<>();
     Set<TripPattern> patterns = new HashSet<>();
 
-    Trip tripMatchedByServiceJourneyId = siriFuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
+    Trip tripMatchedByServiceJourneyId = fuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
       estimatedVehicleJourney,
       feedId
     );
@@ -885,10 +891,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
       }
     } else {
-      /*
-                No exact match found - search for trips based on arrival-times/stop-patterns
-             */
-      Set<Trip> trips = siriFuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
+      // No exact match found - search for trips based on arrival-times/stop-patterns
+      Set<Trip> trips = fuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
 
       if (trips == null || trips.isEmpty()) {
         LOG.debug(
