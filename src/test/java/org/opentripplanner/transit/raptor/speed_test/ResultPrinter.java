@@ -216,12 +216,10 @@ class ResultPrinter {
       standardDeviation = Math.sqrt(standardDeviation / v.size());
 
       System.err.printf(
-        " ==> %-" + labelMaxLen + "s : %s Avg: %4.1f Min: %4d Max: %4d Std dev: %4.1f%n",
+        " ==> %-" + labelMaxLen + "s : %s Avg: %4.1f  (σ=%.1f)%n",
         label,
         values,
         average,
-        statistics.getMin(),
-        statistics.getMax(),
         standardDeviation
       );
     }
