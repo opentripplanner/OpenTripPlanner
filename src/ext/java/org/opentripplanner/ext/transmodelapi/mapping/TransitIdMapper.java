@@ -2,8 +2,10 @@ package org.opentripplanner.ext.transmodelapi.mapping;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -32,19 +34,19 @@ public class TransitIdMapper {
     return id.toString();
   }
 
-  public static List<FeedScopedId> mapIDsToDomainNullSafe(Collection<String> ids) {
-    return (ids == null) ? List.of() : mapIDsToDomain(ids);
+  public static Set<FeedScopedId> mapIDsToDomainNullSafe(Collection<String> ids) {
+    return (ids == null) ? Set.of() : mapIDsToDomain(ids);
   }
 
-  public static List<FeedScopedId> mapIDsToDomain(Collection<String> ids) {
+  public static Set<FeedScopedId> mapIDsToDomain(Collection<String> ids) {
     if (ids == null) {
       return null;
     }
-    List<FeedScopedId> list = new ArrayList<>();
+    Set<FeedScopedId> set = new HashSet<>();
     for (String id : ids) {
-      list.add(mapIDToDomain(id));
+      set.add(mapIDToDomain(id));
     }
-    return list;
+    return set;
   }
 
   public static FeedScopedId mapIDToDomain(String id) {

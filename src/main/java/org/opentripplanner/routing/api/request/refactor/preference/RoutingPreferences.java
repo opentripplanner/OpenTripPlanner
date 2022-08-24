@@ -14,6 +14,15 @@ public class RoutingPreferences {
   private VehicleParkingPreferences parking = new VehicleParkingPreferences();
   private SystemPreferences system = new SystemPreferences();
 
+  public void setNonTransitReluctance(double nonTransitReluctance) {
+    if (nonTransitReluctance > 0) {
+      this.bike.setReluctance(nonTransitReluctance);
+      this.walk.setReluctance(nonTransitReluctance);
+      this.car.setReluctance(nonTransitReluctance);
+      this.bike.setWalkingReluctance(nonTransitReluctance * 2.7);
+    }
+  }
+
   public TransitPreferences transit() {
     return transit;
   }
