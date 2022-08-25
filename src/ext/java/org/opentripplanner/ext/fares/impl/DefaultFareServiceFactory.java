@@ -92,9 +92,6 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
       if (route != null) {
         FeedScopedId routeId = route.getId();
         fareRule.addRoute(routeId);
-        if(origin != null && destination != null) {
-          fareRule.addRouteOriginDestination(routeId.toString(), origin, destination);
-        }
       }
     }
   }
