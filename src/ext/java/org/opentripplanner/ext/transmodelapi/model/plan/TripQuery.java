@@ -309,7 +309,7 @@ public class TripQuery {
             "rental trips."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.preferences.rental().useVehicleRentalAvailabilityInformation())
+          .defaultValue(routing.preferences.rental().useAvailabilityInformation())
           .build()
       )
       .argument(

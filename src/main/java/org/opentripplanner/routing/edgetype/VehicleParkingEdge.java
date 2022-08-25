@@ -112,16 +112,13 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
-    NewRouteRequest options = s0.getOptions();
     RoutingPreferences preferences = s0.getPreferences();
 
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
         preferences.wheelchair().accessibility().enabled(),
-        // TODO: 2022-08-22 this can't be right
-        // how do we figure out whether it should be access, egress or direct?
-        options.journey().access().vehicleParking().useAvailabilityInformation()
+        preferences.parking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -157,16 +154,13 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0, int parkingCost, int parkingTime) {
-    NewRouteRequest options = s0.getOptions();
     RoutingPreferences preferences = s0.getPreferences();
 
     if (
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
         preferences.wheelchair().accessibility().enabled(),
-        // TODO: 2022-08-22 this can't be right
-        // how do we figure out whether it should be access, egress or direct?
-        options.journey().access().vehicleParking().useAvailabilityInformation()
+        preferences.parking().useAvailabilityInformation()
       )
     ) {
       return null;

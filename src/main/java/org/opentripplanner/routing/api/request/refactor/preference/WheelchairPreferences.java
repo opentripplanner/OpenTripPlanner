@@ -13,7 +13,9 @@ public class WheelchairPreferences {
 
   // TODO: 2022-08-18 Is it new?
   private double maxSlope = 0.0833333333333;
-  // TODO: 2022-08-18 Is it new?
+
+  // TODO: 2022-08-25 this was in specification but we never use it
+  // TODO: 2022-08-25 do we need it?
   private double slopeTooSteepCostFactor = 10.0;
 
   public void setAccessible(boolean wheelchair) {
@@ -35,13 +37,5 @@ public class WheelchairPreferences {
 
   public double maxSlope() {
     return maxSlope;
-  }
-
-  public void setSlopeTooSteepCostFactor(double slopeTooSteepCostFactor) {
-    this.slopeTooSteepCostFactor = slopeTooSteepCostFactor;
-  }
-
-  public double slopeTooSteepCostFactor() {
-    return slopeTooSteepCostFactor;
   }
 }

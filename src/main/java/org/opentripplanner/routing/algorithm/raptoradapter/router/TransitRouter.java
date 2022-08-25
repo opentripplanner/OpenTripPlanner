@@ -227,7 +227,7 @@ public class TransitRouter {
 
       if (!isEgress) {
         // TODO: 2022-08-19 is this right?
-        accessRequest.journey().access().vehicleRental().setAllowKeepingVehicleAtDestination(true);
+        accessRequest.journey().rental().setAllowKeepingVehicleAtDestination(true);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(

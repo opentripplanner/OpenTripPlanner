@@ -6,7 +6,6 @@ public class VehicleParkingRequest {
 
   private Set<String> requiredTags = Set.of();
   private Set<String> bannedTags = Set.of();
-  private boolean useAvailabilityInformation = false;
 
   public void setRequiredTags(Set<String> requiredTags) {
     this.requiredTags = requiredTags;
@@ -22,13 +21,5 @@ public class VehicleParkingRequest {
 
   public Set<String> bannedTags() {
     return bannedTags;
-  }
-
-  public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
-    this.useAvailabilityInformation = useAvailabilityInformation;
-  }
-
-  public boolean useAvailabilityInformation() {
-    return useAvailabilityInformation;
   }
 }

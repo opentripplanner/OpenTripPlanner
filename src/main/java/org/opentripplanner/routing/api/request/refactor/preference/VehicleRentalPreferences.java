@@ -22,7 +22,7 @@ public class VehicleRentalPreferences {
    * Whether or not vehicle rental availability information will be used to plan vehicle rental
    * trips
    */
-  private boolean useVehicleRentalAvailabilityInformation = false;
+  private boolean useAvailabilityInformation = false;
   // TODO: 2022-08-18 fix documentation
   /**
    * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
@@ -71,14 +71,14 @@ public class VehicleRentalPreferences {
     return dropoffCost;
   }
 
-  public void setUseVehicleRentalAvailabilityInformation(
-    boolean useVehicleRentalAvailabilityInformation
+  public void setUseAvailabilityInformation(
+    boolean useAvailabilityInformation
   ) {
-    this.useVehicleRentalAvailabilityInformation = useVehicleRentalAvailabilityInformation;
+    this.useAvailabilityInformation = useAvailabilityInformation;
   }
 
-  public boolean useVehicleRentalAvailabilityInformation() {
-    return useVehicleRentalAvailabilityInformation;
+  public boolean useAvailabilityInformation() {
+    return useAvailabilityInformation;
   }
 
   public void setAllowKeepingRentedVehicleAtDestination(

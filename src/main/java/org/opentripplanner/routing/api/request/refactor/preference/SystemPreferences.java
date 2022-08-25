@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
-import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;

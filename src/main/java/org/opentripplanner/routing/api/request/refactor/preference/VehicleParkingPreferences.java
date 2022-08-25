@@ -6,15 +6,15 @@ public class VehicleParkingPreferences {
    * If true vehicle parking availability information will be used to plan park and ride trips where
    * it exists.
    */
-  private boolean useVehicleParkingAvailabilityInformation = false;
+  private boolean useAvailabilityInformation = false;
 
-  public void setUseVehicleParkingAvailabilityInformation(
-    boolean useVehicleParkingAvailabilityInformation
+  public void setUseAvailabilityInformation(
+    boolean useAvailabilityInformation
   ) {
-    this.useVehicleParkingAvailabilityInformation = useVehicleParkingAvailabilityInformation;
+    this.useAvailabilityInformation = useAvailabilityInformation;
   }
 
-  public boolean useVehicleParkingAvailabilityInformation() {
-    return useVehicleParkingAvailabilityInformation;
+  public boolean useAvailabilityInformation() {
+    return useAvailabilityInformation;
   }
 }

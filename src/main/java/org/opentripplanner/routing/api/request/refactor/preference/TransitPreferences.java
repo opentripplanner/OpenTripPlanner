@@ -82,15 +82,6 @@ public class TransitPreferences {
   private int otherThanPreferredRoutesPenalty = 300;
 
   /**
-   * Penalty added for using every route that is not preferred if user set any route as preferred.
-   * We return number of seconds that we are willing to wait for preferred route.
-   *
-   * @deprecated TODO OTP2 Needs to be implemented
-   */
-  @Deprecated
-  private int useUnpreferredRoutesPenalty = 300;
-
-  /**
    * A cost function used to calculate penalty for an unpreferred route. Function should return
    * number of seconds that we are willing to wait for preferred route.
    */
@@ -166,18 +157,6 @@ public class TransitPreferences {
 
   public int otherThanPreferredRoutesPenalty() {
     return otherThanPreferredRoutesPenalty;
-  }
-
-  public void setUseUnpreferredRoutesPenalty(int useUnpreferredRoutesPenalty) {
-    this.useUnpreferredRoutesPenalty = useUnpreferredRoutesPenalty;
-  }
-
-  public int useUnpreferredRoutesPenalty() {
-    return useUnpreferredRoutesPenalty;
-  }
-
-  public void setRaptorOptions(RaptorOptions raptorOptions) {
-    this.raptorOptions = raptorOptions;
   }
 
   public RaptorOptions raptorOptions() {

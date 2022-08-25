@@ -12,7 +12,6 @@ import org.opentripplanner.transit.model.network.Route;
 
 public class TransitRequest {
 
-  // TODO: 2022-08-17 Should be a set?
   private List<MainAndSubMode> modes = MainAndSubMode.all();
   private Set<FeedScopedId> whiteListedAgencies = Set.of();
   private Set<FeedScopedId> bannedAgencies = Set.of();
@@ -21,7 +20,6 @@ public class TransitRequest {
   private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
   private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
   private RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
-  // TODO: 2022-08-23 isn't it the same thing as banned routes?
   private RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
   private Set<FeedScopedId> bannedTrips = Set.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();

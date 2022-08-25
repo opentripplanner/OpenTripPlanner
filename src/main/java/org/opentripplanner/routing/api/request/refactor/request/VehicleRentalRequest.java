@@ -6,15 +6,10 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 
 public class VehicleRentalRequest {
 
-  private Set<RentalVehicleType.FormFactor> allowedFormFactors = new HashSet<>();
+  private final Set<RentalVehicleType.FormFactor> allowedFormFactors = new HashSet<>();
   private Set<String> allowedNetworks = Set.of();
   private Set<String> bannedNetworks = Set.of();
-  private boolean useAvailabilityInformation = false;
   private boolean allowKeepingVehicleAtDestination = false;
-
-  public void setAllowedFormFactors(Set<RentalVehicleType.FormFactor> allowedFormFactors) {
-    this.allowedFormFactors = allowedFormFactors;
-  }
 
   public Set<RentalVehicleType.FormFactor> allowedFormFactors() {
     return allowedFormFactors;
@@ -34,14 +29,6 @@ public class VehicleRentalRequest {
 
   public Set<String> bannedNetworks() {
     return bannedNetworks;
-  }
-
-  public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
-    this.useAvailabilityInformation = useAvailabilityInformation;
-  }
-
-  public boolean useAvailabilityInformation() {
-    return useAvailabilityInformation;
   }
 
   public void setAllowKeepingVehicleAtDestination(boolean allowKeepingVehicleAtDestination) {
