@@ -208,13 +208,21 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsForwardSearch(
     int routeIndex
   ) {
-    return new ConstrainedBoardingSearch(true, forwardConstrainedTransfers.get(routeIndex));
+    TransferForPatternByStopPos transfers = forwardConstrainedTransfers.get(routeIndex);
+    if (transfers == null) {
+      return null;
+    }
+    return new ConstrainedBoardingSearch(true, transfers);
   }
 
   @Override
   public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsReverseSearch(
     int routeIndex
   ) {
-    return new ConstrainedBoardingSearch(false, reverseConstrainedTransfers.get(routeIndex));
+    TransferForPatternByStopPos transfers = reverseConstrainedTransfers.get(routeIndex);
+    if (transfers == null) {
+      return null;
+    }
+    return new ConstrainedBoardingSearch(false, transfers);
   }
 }
