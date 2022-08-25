@@ -242,8 +242,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             transitWorker.forEachBoarding(
               stopIndex,
               (int prevArrivalTime) -> {
-                boolean handled =
-                  txSearch != null &&
+                boolean boardedUsingConstrainedTransfer =
+                  enableTransferConstraints &&
                   boardWithConstrainedTransfer(
                     txSearch,
                     route.timetable(),
@@ -254,7 +254,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
                   );
 
                 // Find the best trip and board [no guaranteed transfer exist]
-                if (!handled) {
+                if (!boardedUsingConstrainedTransfer) {
                   boardWithRegularTransfer(
                     tripSearch,
                     stopIndex,

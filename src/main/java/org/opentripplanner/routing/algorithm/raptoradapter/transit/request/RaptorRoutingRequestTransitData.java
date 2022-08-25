@@ -210,7 +210,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   ) {
     TransferForPatternByStopPos transfers = forwardConstrainedTransfers.get(routeIndex);
     if (transfers == null) {
-      return null;
+      return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
     return new ConstrainedBoardingSearch(true, transfers);
   }
@@ -221,7 +221,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   ) {
     TransferForPatternByStopPos transfers = reverseConstrainedTransfers.get(routeIndex);
     if (transfers == null) {
-      return null;
+      return ConstrainedBoardingSearch.NOOP_SEARCH;
     }
     return new ConstrainedBoardingSearch(false, transfers);
   }
