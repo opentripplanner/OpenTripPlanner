@@ -11,7 +11,7 @@ public class WheelchairPreferences {
   @Nonnull
   private WheelchairAccessibilityRequest accessibility = WheelchairAccessibilityRequest.DEFAULT;
 
-  // TODO: 2022-08-18 Is it new?
+  // TODO: 2022-08-18 Is it new? never used
   private double maxSlope = 0.0833333333333;
 
   // TODO: 2022-08-25 this was in specification but we never use it
