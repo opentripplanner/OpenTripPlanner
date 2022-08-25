@@ -63,13 +63,13 @@ public interface PlanTestConstants {
   Place G = place("G", 9.5, 11.0);
   Place H = place("H", 10.0, 11.5);
 
-
   static Place place(String name, double lat, double lon) {
     return Place.forStop(TransitModelForTest.stop(name).withCoordinate(lat, lon).build());
   }
 
   static Place place(String name, double lat, double lon, FareZone zone) {
-    return Place.forStop(TransitModelForTest.stop(name).withCoordinate(lat, lon).addFareZones(zone).build());
+    return Place.forStop(
+      TransitModelForTest.stop(name).withCoordinate(lat, lon).addFareZones(zone).build()
+    );
   }
-
 }

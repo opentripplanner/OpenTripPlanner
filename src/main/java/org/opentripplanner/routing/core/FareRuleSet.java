@@ -48,6 +48,7 @@ public class FareRuleSet implements Serializable {
   public void addContains(String containsId) {
     contains.add(containsId);
   }
+
   public Set<String> getContains() {
     return contains;
   }

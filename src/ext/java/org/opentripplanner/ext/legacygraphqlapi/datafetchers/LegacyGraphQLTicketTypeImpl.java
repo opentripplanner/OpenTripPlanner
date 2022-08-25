@@ -5,7 +5,9 @@ import graphql.schema.DataFetcher;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.core.TicketType;
 
-public class LegacyGraphQLTicketTypeImpl  implements LegacyGraphQLDataFetchers.LegacyGraphQLTicketType {
+public class LegacyGraphQLTicketTypeImpl
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLTicketType {
+
   @Override
   public DataFetcher<String> currency() {
     return environment -> ((TicketType) environment.getSource()).getCurrency();
@@ -18,7 +20,8 @@ public class LegacyGraphQLTicketTypeImpl  implements LegacyGraphQLDataFetchers.L
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment -> new Relay.ResolvedGlobalId("TicketType", ((TicketType) environment.getSource()).getFareId());
+    return environment ->
+      new Relay.ResolvedGlobalId("TicketType", ((TicketType) environment.getSource()).getFareId());
   }
 
   @Override
@@ -28,6 +31,6 @@ public class LegacyGraphQLTicketTypeImpl  implements LegacyGraphQLDataFetchers.L
 
   @Override
   public DataFetcher<Iterable<String>> zones() {
-    return  environment -> ((TicketType) environment.getSource()).getZones();
+    return environment -> ((TicketType) environment.getSource()).getZones();
   }
 }

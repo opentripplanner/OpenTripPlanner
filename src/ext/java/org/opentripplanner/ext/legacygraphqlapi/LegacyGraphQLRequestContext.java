@@ -37,6 +37,6 @@ public class LegacyGraphQLRequestContext {
   }
 
   public FareService getFareService() {
-    return  fareService;
+    return fareService;
   }
 }

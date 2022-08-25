@@ -1080,12 +1080,17 @@ public class LegacyGraphQLQueryTypeImpl
       Map<Fare.FareType, Collection<FareRuleSet>> fareRules =
         ((DefaultFareServiceImpl) getFareService(environment)).getFareRulesPerType();
 
-      return fareRules.entrySet().stream().filter(entry -> entry.getKey() == Fare.FareType.regular)
+      return fareRules
+        .entrySet()
+        .stream()
+        .filter(entry -> entry.getKey() == Fare.FareType.regular)
         .map(e -> e.getValue())
-        .map(frs -> frs.stream().map(fr -> new TicketType(fr)).toList()).toList()
-        .stream().flatMap(rs -> rs.stream()).collect(Collectors.toList());
+        .map(frs -> frs.stream().map(fr -> new TicketType(fr)).toList())
+        .toList()
+        .stream()
+        .flatMap(rs -> rs.stream())
+        .collect(Collectors.toList());
     };
-
   }
 
   @Override
@@ -1296,6 +1301,7 @@ public class LegacyGraphQLQueryTypeImpl
   private FareService getFareService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getFareService();
   }
+
   private static class CallerWithEnvironment {
 
     private final DataFetchingEnvironment environment;

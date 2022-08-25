@@ -17,19 +17,18 @@ import java.util.Collection;
 import java.util.Map;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRule;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class HSLFareServiceFactory extends DefaultFareServiceFactory {
 
-
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+
   @Override
   protected void fillFareRules(
     Collection<FareAttribute> fareAttributes,

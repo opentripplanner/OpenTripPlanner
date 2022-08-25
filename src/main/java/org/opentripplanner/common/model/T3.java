@@ -6,6 +6,7 @@ import java.io.Serializable;
  * An ordered object of three (potentially different types)
  */
 public class T3<E1, E2, E3> implements Serializable {
+
   private static final long serialVersionUID = 1L;
 
   public final E1 first;
@@ -22,7 +23,11 @@ public class T3<E1, E2, E3> implements Serializable {
 
   @Override
   public int hashCode() {
-    return (first != null ? first.hashCode() : 0) + (second != null ? second.hashCode() : 0) + (third != null ? third.hashCode() : 0);
+    return (
+      (first != null ? first.hashCode() : 0) +
+      (second != null ? second.hashCode() : 0) +
+      (third != null ? third.hashCode() : 0)
+    );
   }
 
   @Override
