@@ -412,7 +412,7 @@ public class StreetEdge
 
     State state = editor != null ? editor.makeState() : null;
 
-    if (canPickupAndDrive(s0)) {
+    if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
       StateEditor inCar = doTraverse(s0, options, TraverseMode.CAR, false);
       if (inCar != null) {
         driveAfterPickup(s0, inCar);
@@ -425,7 +425,11 @@ public class StreetEdge
       }
     }
 
-    if (canDropOffAfterDriving(s0) && !getPermission().allows(TraverseMode.CAR)) {
+    if (
+      canDropOffAfterDriving(s0) &&
+      !getPermission().allows(TraverseMode.CAR) &&
+      canTraverse(TraverseMode.WALK)
+    ) {
       StateEditor dropOff = doTraverse(s0, options, TraverseMode.WALK, false);
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
@@ -484,7 +488,7 @@ public class StreetEdge
         fromv.getLat(),
         tov.getLon(),
         tov.getLat(),
-        isBack() ? (LineString) geometry.reverse() : geometry,
+        isBack() ? geometry.reverse() : geometry,
         isBack()
       );
   }
@@ -961,9 +965,6 @@ public class StreetEdge
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
-    if (traverseMode == null) {
-      return null;
-    }
     boolean backWalkingBike = s0.isBackWalkingBike();
     TraverseMode backMode = s0.getBackMode();
     Edge backEdge = s0.getBackEdge();
@@ -977,11 +978,6 @@ public class StreetEdge
       if (this.isReverseOf(backEdge) || backEdge.isReverseOf(this)) {
         return null;
       }
-    }
-
-    /* Check whether this street allows the current mode. */
-    if (!canTraverse(traverseMode)) {
-      return null;
     }
 
     // Automobiles have variable speeds depending on the edge type
