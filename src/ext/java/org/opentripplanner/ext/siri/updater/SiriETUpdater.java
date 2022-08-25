@@ -4,7 +4,6 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -51,10 +50,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
    */
   private final SiriTimetableSnapshotSource snapshotSource;
 
-  private SiriFuzzyTripMatcher fuzzyTripMatcher;
+  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
 
   public SiriETUpdater(
     SiriETUpdaterParameters config,
+    TransitModel transitModel,
     SiriTimetableSnapshotSource timetableSnapshot
   ) {
     super(config);
@@ -65,7 +65,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     this.snapshotSource = timetableSnapshot;
 
-    blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+    this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
@@ -78,14 +79,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
-  }
-
-  @Override
-  public void teardown() {}
 
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and

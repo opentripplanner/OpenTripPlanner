@@ -2,7 +2,6 @@ package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -37,8 +36,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
    */
   private final String feedId;
 
-  private final boolean fuzzyTripMatching;
-
   /**
    * Defines when delays are propagated to previous stops and if these stops are given
    * the NO_DATA flag.
@@ -57,6 +54,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   public PollingStoptimeUpdater(
     PollingStoptimeUpdaterParameters parameters,
+    TransitModel transitModel,
     TimetableSnapshotSource snapshotSource
   ) {
     super(parameters);
@@ -64,9 +62,12 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     this.feedId = parameters.getFeedId();
     this.updateSource = createSource(parameters);
 
-    this.fuzzyTripMatching = parameters.fuzzyTripMatching();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
+    if (parameters.fuzzyTripMatching()) {
+      this.fuzzyTripMatcher =
+        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
+    }
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -79,17 +80,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    if (fuzzyTripMatching) {
-      this.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
-  }
-
-  @Override
-  public void teardown() {}
 
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
@@ -121,7 +111,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       .of(this.getClass())
       .addObj("updateSource", updateSource)
       .addStr("feedId", feedId)
-      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
+      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatcher != null)
       .toString();
   }
 

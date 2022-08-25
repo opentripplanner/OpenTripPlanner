@@ -79,7 +79,6 @@ public class UpdaterConfigurator {
       )
     );
 
-    setupUpdaters(graph, transitModel, updaters);
     GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, transitModel, updaters);
     updaterManager.startUpdaters();
 
@@ -101,28 +100,22 @@ public class UpdaterConfigurator {
     }
   }
 
-  private void setupUpdaters(Graph graph, TransitModel transitModel, List<GraphUpdater> updaters) {
-    for (GraphUpdater updater : updaters) {
-      try {
-        updater.setup(graph, transitModel);
-      } catch (Exception e) {
-        LOG.warn("Failed to setup updater {}", updater.getConfigRef(), e);
-      }
-    }
-  }
-
   /* private methods */
 
   /**
    * Use the online UpdaterDirectoryService to fetch VehicleRental updaters.
    */
-  private static List<GraphUpdater> fetchVehicleRentalServicesFromOnlineDirectory(
+  private List<GraphUpdater> fetchVehicleRentalServicesFromOnlineDirectory(
     VehicleRentalServiceDirectoryFetcherParameters parameters
   ) {
     if (parameters == null) {
       return List.of();
     }
-    return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(parameters);
+    return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
+      parameters,
+      graph.getLinker(),
+      graph.getVehicleRentalStationService()
+    );
   }
 
   /**
@@ -136,34 +129,55 @@ public class UpdaterConfigurator {
 
     for (var configItem : updatersParameters.getVehicleRentalParameters()) {
       var source = VehicleRentalDataSourceFactory.create(configItem.sourceParameters());
-      updaters.add(new VehicleRentalUpdater(configItem, source));
+      updaters.add(
+        new VehicleRentalUpdater(
+          configItem,
+          source,
+          graph.getLinker(),
+          graph.getVehicleRentalStationService()
+        )
+      );
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
-      updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
+      updaters.add(new GtfsRealtimeAlertsUpdater(configItem, transitModel));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
-      updaters.add(new PollingStoptimeUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(
+        new PollingStoptimeUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
+      );
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
-      updaters.add(new PollingVehiclePositionUpdater(configItem));
+      updaters.add(
+        new PollingVehiclePositionUpdater(
+          configItem,
+          graph.getVehiclePositionService(),
+          transitModel
+        )
+      );
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(new SiriETUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(new SiriETUpdater(configItem, transitModel, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
-      updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(
+        new SiriETGooglePubsubUpdater(configItem, transitModel, provideSiriTimetableSnapshot())
+      );
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(new SiriSXUpdater(configItem));
+      updaters.add(new SiriSXUpdater(configItem, transitModel));
     }
     for (var configItem : updatersParameters.getSiriVMUpdaterParameters()) {
-      updaters.add(new SiriVMUpdater(provideSiriTimetableSnapshot(), configItem));
+      updaters.add(new SiriVMUpdater(provideSiriTimetableSnapshot(), configItem, transitModel));
     }
     for (var configItem : updatersParameters.getWebsocketGtfsRealtimeUpdaterParameters()) {
-      updaters.add(new WebsocketGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(
+        new WebsocketGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot(), transitModel)
+      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
-      updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(
+        new MqttGtfsRealtimeUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
+      );
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
       var source = VehicleParkingDataSourceFactory.create(
@@ -171,10 +185,17 @@ public class UpdaterConfigurator {
         openingHoursCalendarService,
         zoneId
       );
-      updaters.add(new VehicleParkingUpdater(configItem, source));
+      updaters.add(
+        new VehicleParkingUpdater(
+          configItem,
+          source,
+          graph.getLinker(),
+          graph.getVehicleParkingService()
+        )
+      );
     }
     for (var configItem : updatersParameters.getWinkkiPollingGraphUpdaterParameters()) {
-      updaters.add(new WinkkiPollingGraphUpdater(configItem));
+      updaters.add(new WinkkiPollingGraphUpdater(configItem, graph));
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
       updaters.add(
@@ -182,9 +203,7 @@ public class UpdaterConfigurator {
       );
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
-      updaters.add(
-        new SiriAzureSXUpdater(configItem, transitModel, provideSiriTimetableSnapshot())
-      );
+      updaters.add(new SiriAzureSXUpdater(configItem, transitModel));
     }
 
     return updaters;

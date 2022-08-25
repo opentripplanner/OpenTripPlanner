@@ -19,8 +19,6 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
-import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -34,34 +32,22 @@ import uk.org.siri.siri20.Siri;
 public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements TransitAlertProvider {
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
-  private SiriAlertsUpdateHandler updateHandler;
-  private TransitAlertService transitAlertService;
+  private final SiriAlertsUpdateHandler updateHandler;
+  private final TransitAlertService transitAlertService;
 
   private static final transient AtomicLong messageCounter = new AtomicLong(0);
   private final LocalDate fromDateTime;
   private final LocalDate toDateTime;
   private long startTime;
 
-  public SiriAzureSXUpdater(
-    SiriAzureSXUpdaterParameters config,
-    TransitModel transitModel,
-    SiriTimetableSnapshotSource snapshotSource
-  ) {
-    super(config, transitModel, snapshotSource);
+  public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config, TransitModel transitModel) {
+    super(config, transitModel);
     this.fromDateTime = config.getFromDateTime();
     this.toDateTime = config.getToDateTime();
-  }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) throws Exception {
-    super.setup(graph, transitModel);
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
-
-    if (updateHandler == null) {
-      updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
-    }
-    updateHandler.setTransitAlertService(transitAlertService);
-    updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher());
+    this.updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
+    this.updateHandler.setTransitAlertService(transitAlertService);
+    this.updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher());
   }
 
   @Override

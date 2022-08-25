@@ -15,7 +15,6 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
@@ -74,7 +73,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
   public WebsocketGtfsRealtimeUpdater(
     WebsocketGtfsRealtimeUpdaterParameters parameters,
-    TimetableSnapshotSource snapshotSource
+    TimetableSnapshotSource snapshotSource,
+    TransitModel transitModel
   ) {
     this.configRef = parameters.getConfigRef();
     this.url = parameters.getUrl();
@@ -82,17 +82,13 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     this.reconnectPeriodSec = parameters.getReconnectPeriodSec();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
+    this.fuzzyTripMatcher =
+      new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
   }
 
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    this.fuzzyTripMatcher =
-      new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
   }
 
   @Override
@@ -137,9 +133,6 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
       client.close();
     }
   }
-
-  @Override
-  public void teardown() {}
 
   @Override
   public String getConfigRef() {

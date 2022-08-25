@@ -35,6 +35,8 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
   private final LocalDate fromDateTime;
+  private final SiriTimetableSnapshotSource snapshotSource;
+
   private long startTime;
 
   public SiriAzureETUpdater(
@@ -42,8 +44,9 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
     TransitModel transitModel,
     SiriTimetableSnapshotSource snapshotSource
   ) {
-    super(config, transitModel, snapshotSource);
+    super(config, transitModel);
     this.fromDateTime = config.getFromDateTime();
+    this.snapshotSource = snapshotSource;
   }
 
   @Override

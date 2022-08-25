@@ -27,7 +27,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
@@ -84,18 +83,20 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private final ProjectTopicName topic;
   private final PushConfig pushConfig;
   private final String configRef;
+  private final SiriTimetableSnapshotSource snapshotSource;
+  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
-  private SiriTimetableSnapshotSource snapshotSource;
-  private SiriFuzzyTripMatcher fuzzyTripMatcher;
 
   private transient long startTime;
   private boolean primed;
 
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
+    TransitModel transitModel,
     SiriTimetableSnapshotSource timetableSnapshot
   ) {
     this.configRef = config.getConfigRef();
@@ -120,6 +121,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
     this.topic = ProjectTopicName.of(projectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
 
     try {
       if (
@@ -146,11 +148,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) throws Exception {
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
   }
 
   @Override

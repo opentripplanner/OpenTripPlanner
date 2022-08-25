@@ -4,7 +4,6 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -49,7 +48,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
-  private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
+  private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
   /**
    * The place where we'll record the incoming realtime timetables to make them available to the
@@ -57,7 +56,11 @@ public class SiriVMUpdater extends PollingGraphUpdater {
    */
   private final SiriTimetableSnapshotSource snapshotSource;
 
-  public SiriVMUpdater(SiriTimetableSnapshotSource snapshotSource, SiriVMUpdaterParameters config) {
+  public SiriVMUpdater(
+    SiriTimetableSnapshotSource snapshotSource,
+    SiriVMUpdaterParameters config,
+    TransitModel transitModel
+  ) {
     super(config);
     // Create update streamer from preferences
     this.feedId = config.getFeedId();
@@ -67,6 +70,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     this.snapshotSource = snapshotSource;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+
+    this.siriFuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
 
     LOG.info(
       "Creating stop time updater (SIRI VM) running every {} seconds : {}",
@@ -79,14 +84,6 @@ public class SiriVMUpdater extends PollingGraphUpdater {
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    this.siriFuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
-  }
-
-  @Override
-  public void teardown() {}
 
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
