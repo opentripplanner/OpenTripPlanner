@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
 /**
@@ -37,7 +38,7 @@ public class TransitFeedConfig implements DataSourceConfig {
     return source;
   }
 
-  public String feedId() {
-    return feedId;
+  public Optional<String> feedId() {
+    return Optional.ofNullable(feedId);
   }
 }

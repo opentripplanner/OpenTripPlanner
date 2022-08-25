@@ -72,10 +72,10 @@ public class NetexConfig {
 
   /** public to enable testing */
   private NetexBundle netexBundle(ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource) {
-    String configuredFeedId = netexConfiguredDataSource.config().feedId();
-    if (configuredFeedId == null) {
-      configuredFeedId = buildParams.netexDefaults.netexFeedId;
-    }
+    String configuredFeedId = netexConfiguredDataSource
+      .config()
+      .feedId()
+      .orElse(buildParams.netexDefaults.netexFeedId);
 
     return new NetexBundle(
       configuredFeedId,

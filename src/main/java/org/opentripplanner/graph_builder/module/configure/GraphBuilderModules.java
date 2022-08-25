@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Singleton;
-import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
@@ -83,7 +82,7 @@ public class GraphBuilderModules {
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
     for (ConfiguredDataSource<GtfsFeedConfig> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
-      GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData.dataSource());
+      GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
 
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
       gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
