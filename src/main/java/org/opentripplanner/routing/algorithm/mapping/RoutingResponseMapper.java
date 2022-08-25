@@ -77,10 +77,12 @@ public class RoutingResponseMapper {
 
     if (searchParams != null) {
       if (!searchParams.isSearchWindowSet()) {
-        throw new IllegalArgumentException("SearchWindow not set");
+        LOG.debug("SearchWindow not set");
+        return factory;
       }
       if (!searchParams.isEarliestDepartureTimeSet()) {
-        throw new IllegalArgumentException("Earliest departure time not set");
+        LOG.debug("Earliest departure time not set");
+        return factory;
       }
 
       long t0 = transitSearchTimeZero.toEpochSecond();
