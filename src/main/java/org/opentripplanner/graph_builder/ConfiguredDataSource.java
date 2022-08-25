@@ -2,8 +2,13 @@ package org.opentripplanner.graph_builder;
 
 import java.util.Objects;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.standalone.config.feed.DataSourceConfig;
 
-public record ConfiguredDataSource<T>(DataSource dataSource, T config) {
+/**
+ *
+ * A pair linking together a data source and its custom configuration.
+ */
+public record ConfiguredDataSource<T extends DataSourceConfig>(DataSource dataSource, T config) {
   public ConfiguredDataSource {
     Objects.requireNonNull(dataSource, "'dataSource' is required");
     Objects.requireNonNull(config, "'config' is required");

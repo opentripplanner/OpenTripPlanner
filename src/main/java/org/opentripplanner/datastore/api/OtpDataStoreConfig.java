@@ -68,11 +68,24 @@ public interface OtpDataStoreConfig {
    */
   URI streetGraph();
 
+  /**
+   *
+   * A pattern to lookup local GTFS files
+   */
   Pattern gtfsLocalFilePattern();
 
+  /**
+   * A pattern to lookup local NeTEx files.
+   */
   Pattern netexLocalFilePattern();
 
+  /**
+   * A pattern to lookup local Open Street Map extracts.
+   */
   Pattern osmLocalFilePattern();
 
+  /**
+   * A pattern to lookup local DEM files.
+   */
   Pattern demLocalFilePattern();
 }

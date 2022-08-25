@@ -110,7 +110,7 @@ public class GraphBuilderDataSources {
   private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
     return buildConfig.osm.osmExtractConfigs
       .stream()
-      .filter(osmExtractConfig -> osmExtractConfig.source.equals(dataSource.uri()))
+      .filter(osmExtractConfig -> osmExtractConfig.source().equals(dataSource.uri()))
       .findFirst()
       .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
   }
@@ -126,7 +126,7 @@ public class GraphBuilderDataSources {
   private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
     return buildConfig.dem.demExtractConfigs
       .stream()
-      .filter(demExtractConfig -> demExtractConfig.source.equals(dataSource.uri()))
+      .filter(demExtractConfig -> demExtractConfig.source().equals(dataSource.uri()))
       .findFirst()
       .orElse(new DemExtractConfigBuilder().withSource(dataSource.uri()).build());
   }
@@ -142,7 +142,7 @@ public class GraphBuilderDataSources {
   private GtfsFeedConfig getGtfsFeedConfig(DataSource dataSource) {
     return buildConfig.transitFeeds.gtfsFeedConfigs
       .stream()
-      .filter(gtfsFeedConfig -> gtfsFeedConfig.source.equals(dataSource.uri()))
+      .filter(gtfsFeedConfig -> gtfsFeedConfig.source().equals(dataSource.uri()))
       .findFirst()
       .orElse(new GtfsFeedConfigBuilder().withSource(dataSource.uri()).build());
   }
@@ -158,7 +158,7 @@ public class GraphBuilderDataSources {
   private NetexFeedConfig getNetexFeedConfig(DataSource dataSource) {
     return buildConfig.transitFeeds.netexFeedConfigs
       .stream()
-      .filter(netexFeedConfig -> netexFeedConfig.source.equals(dataSource.uri()))
+      .filter(netexFeedConfig -> netexFeedConfig.source().equals(dataSource.uri()))
       .findFirst()
       .orElse(new NetexFeedConfigBuilder().withSource(dataSource.uri()).build());
   }

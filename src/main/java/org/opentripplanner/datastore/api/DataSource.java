@@ -46,6 +46,9 @@ public interface DataSource {
    */
   String path();
 
+  /**
+   * @return the URI of the datasource. The URI can be used to identify uniquely the data source.
+   */
   URI uri();
 
   /**

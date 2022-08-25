@@ -51,7 +51,7 @@ public class OpenStreetMapProvider {
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.timeZone = osmExtractConfigConfiguredDataSource.config().timeZone;
+    this.timeZone = osmExtractConfigConfiguredDataSource.config().timeZone();
     this.cacheDataInMem = cacheDataInMem;
   }
 

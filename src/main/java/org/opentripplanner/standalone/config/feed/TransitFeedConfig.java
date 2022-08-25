@@ -7,12 +7,12 @@ import org.opentripplanner.standalone.config.NodeAdapter;
 /**
  * Configuration for a transit data feed.
  */
-public class TransitFeedConfig {
+public class TransitFeedConfig implements DataSourceConfig {
 
   /**
    * The unique ID for this feed.
    */
-  public final String feedId;
+  private final String feedId;
 
   /**
    * URI to data files.
@@ -21,7 +21,7 @@ public class TransitFeedConfig {
    * {@code "file:///Users/kelvin/otp/netex.zip", "gs://my-bucket/netex.zip"  }
    * <p>
    */
-  public final URI source;
+  private final URI source;
 
   public TransitFeedConfig(NodeAdapter config) {
     this(config.asUri("source"), config.asText("feedId", null));
@@ -30,5 +30,14 @@ public class TransitFeedConfig {
   public TransitFeedConfig(URI source, String feedId) {
     this.source = Objects.requireNonNull(source);
     this.feedId = feedId;
+  }
+
+  @Override
+  public URI source() {
+    return source;
+  }
+
+  public String feedId() {
+    return feedId;
   }
 }

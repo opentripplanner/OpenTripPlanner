@@ -8,22 +8,13 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 /**
  * Configure an OpenStreetMap extract.
  */
-public class OsmExtractConfig {
+public class OsmExtractConfig implements DataSourceConfig {
 
-  /**
-   * URI to the source file.
-   */
-  public final URI source;
+  private final URI source;
 
-  /**
-   * Custom OSM way properties for this extract.
-   */
-  public final WayPropertySetSource osmWayPropertySet;
+  private final WayPropertySetSource osmWayPropertySet;
 
-  /**
-   * The timezone to use to resolve open hours in this extract.
-   */
-  public final ZoneId timeZone;
+  private final ZoneId timeZone;
 
   OsmExtractConfig(OsmExtractConfigBuilder osmExtractConfigBuilder) {
     this.source = Objects.requireNonNull(osmExtractConfigBuilder.getSource());
@@ -32,5 +23,26 @@ public class OsmExtractConfig {
         ? osmExtractConfigBuilder.getOsmWayPropertySet()
         : WayPropertySetSource.fromConfig("default");
     this.timeZone = osmExtractConfigBuilder.getTimeZone();
+  }
+
+  @Override
+  public URI source() {
+    return source;
+  }
+
+  /**
+   *
+   * @return the custom OSM way properties for this OSM extract.
+   */
+  public WayPropertySetSource getOsmWayPropertySet() {
+    return osmWayPropertySet;
+  }
+
+  /**
+   *
+   * @return the timezone to use to resolve open hours in this extract.
+   */
+  public ZoneId timeZone() {
+    return timeZone;
   }
 }

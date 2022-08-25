@@ -21,6 +21,6 @@ public class OsmExtractsConfig {
   }
 
   public List<URI> osmFiles() {
-    return osmExtractConfigs.stream().map(osmFeedConfig -> osmFeedConfig.source).toList();
+    return osmExtractConfigs.stream().map(OsmExtractConfig::source).toList();
   }
 }

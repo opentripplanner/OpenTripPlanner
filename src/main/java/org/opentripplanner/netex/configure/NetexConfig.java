@@ -72,7 +72,7 @@ public class NetexConfig {
 
   /** public to enable testing */
   private NetexBundle netexBundle(ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource) {
-    String configuredFeedId = netexConfiguredDataSource.config().feedId;
+    String configuredFeedId = netexConfiguredDataSource.config().feedId();
     if (configuredFeedId == null) {
       configuredFeedId = buildParams.netexDefaults.netexFeedId;
     }
@@ -92,16 +92,16 @@ public class NetexConfig {
     NetexFeedConfig netexFeedConfig = netexConfiguredDataSource.config();
     NetexDefaultsConfig netexDefaultsConfig = buildParams.netexDefaults;
     Pattern ignoreFilePattern = netexFeedConfig
-      .getIgnoreFilePattern()
+      .ignoreFilePattern()
       .orElse(netexDefaultsConfig.ignoreFilePattern);
     Pattern sharedFilePattern = netexFeedConfig
-      .getSharedFilePattern()
+      .sharedFilePattern()
       .orElse(netexDefaultsConfig.sharedFilePattern);
     Pattern sharedGroupFilePattern = netexFeedConfig
-      .getSharedGroupFilePattern()
+      .sharedGroupFilePattern()
       .orElse(netexDefaultsConfig.sharedGroupFilePattern);
     Pattern groupFilePattern = netexFeedConfig
-      .getGroupFilePattern()
+      .groupFilePattern()
       .orElse(netexDefaultsConfig.groupFilePattern);
 
     return new NetexDataSourceHierarchy(

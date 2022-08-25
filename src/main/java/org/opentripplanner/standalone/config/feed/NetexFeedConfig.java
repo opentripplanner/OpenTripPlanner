@@ -10,7 +10,7 @@ import org.opentripplanner.standalone.config.NetexDefaultsConfig;
 public class NetexFeedConfig extends TransitFeedConfig {
 
   /**
-   * Overrides {@link NetexDefaultsConfig#sharedFilePattern}
+   *
    */
   private final Pattern sharedFilePattern;
 
@@ -37,19 +37,39 @@ public class NetexFeedConfig extends TransitFeedConfig {
     this.groupFilePattern = netexFeedConfigBuilder.getGroupFilePattern();
   }
 
-  public Optional<Pattern> getSharedFilePattern() {
+  /**
+   *
+   * @return an optional custom shared file pattern
+   * that overrides {@link NetexDefaultsConfig#sharedFilePattern}
+   */
+  public Optional<Pattern> sharedFilePattern() {
     return Optional.ofNullable(sharedFilePattern);
   }
 
-  public Optional<Pattern> getSharedGroupFilePattern() {
+  /**
+   *
+   * @return an optional custom shared group file pattern
+   * that overrides {@link NetexDefaultsConfig#sharedGroupFilePattern}
+   */
+  public Optional<Pattern> sharedGroupFilePattern() {
     return Optional.ofNullable(sharedGroupFilePattern);
   }
 
-  public Optional<Pattern> getIgnoreFilePattern() {
+  /**
+   *
+   * @return an optional custom ignored file pattern
+   * that overrides {@link NetexDefaultsConfig#ignoreFilePattern}
+   */
+  public Optional<Pattern> ignoreFilePattern() {
     return Optional.ofNullable(ignoreFilePattern);
   }
 
-  public Optional<Pattern> getGroupFilePattern() {
+  /**
+   *
+   * @return an optional custom group file pattern
+   * that overrides {@link NetexDefaultsConfig#groupFilePattern}
+   */
+  public Optional<Pattern> groupFilePattern() {
     return Optional.ofNullable(groupFilePattern);
   }
 }

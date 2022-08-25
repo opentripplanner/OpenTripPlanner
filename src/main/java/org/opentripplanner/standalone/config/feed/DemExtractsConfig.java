@@ -18,6 +18,6 @@ public class DemExtractsConfig {
   }
 
   public List<URI> demFiles() {
-    return demExtractConfigs.stream().map(demExtractConfig -> demExtractConfig.source).toList();
+    return demExtractConfigs.stream().map(DemExtractConfig::source).toList();
   }
 }

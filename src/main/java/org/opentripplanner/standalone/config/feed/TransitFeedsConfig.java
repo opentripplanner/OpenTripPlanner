@@ -35,10 +35,10 @@ public class TransitFeedsConfig {
   }
 
   public List<URI> gtfsFiles() {
-    return gtfsFeedConfigs.stream().map(gtfsFeedConfig -> gtfsFeedConfig.source).toList();
+    return gtfsFeedConfigs.stream().map(TransitFeedConfig::source).toList();
   }
 
   public List<URI> netexFiles() {
-    return netexFeedConfigs.stream().map(netexFeedConfig -> netexFeedConfig.source).toList();
+    return netexFeedConfigs.stream().map(TransitFeedConfig::source).toList();
   }
 }
