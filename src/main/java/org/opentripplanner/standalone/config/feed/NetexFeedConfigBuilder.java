@@ -64,13 +64,15 @@ public class NetexFeedConfigBuilder {
     return this;
   }
 
-  public static NetexFeedConfigBuilder of(NodeAdapter nodeAdapter) {
+  public static NetexFeedConfigBuilder of(NodeAdapter config) {
     NetexFeedConfigBuilder netexFeedConfigBuilder = new NetexFeedConfigBuilder();
-    netexFeedConfigBuilder.sharedFilePattern = nodeAdapter.asPattern("sharedFilePattern", null);
+    netexFeedConfigBuilder.source = config.asUri("source");
+    netexFeedConfigBuilder.feedId = config.asText("feedId", null);
+    netexFeedConfigBuilder.sharedFilePattern = config.asPattern("sharedFilePattern", null);
     netexFeedConfigBuilder.sharedGroupFilePattern =
-      nodeAdapter.asPattern("sharedGroupFilePattern", null);
-    netexFeedConfigBuilder.ignoreFilePattern = nodeAdapter.asPattern("ignoreFilePattern", null);
-    netexFeedConfigBuilder.groupFilePattern = nodeAdapter.asPattern("groupFilePattern", null);
+      config.asPattern("sharedGroupFilePattern", null);
+    netexFeedConfigBuilder.ignoreFilePattern = config.asPattern("ignoreFilePattern", null);
+    netexFeedConfigBuilder.groupFilePattern = config.asPattern("groupFilePattern", null);
     return netexFeedConfigBuilder;
   }
 

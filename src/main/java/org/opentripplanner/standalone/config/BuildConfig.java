@@ -507,13 +507,11 @@ public class BuildConfig implements OtpDataStoreConfig {
     discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
     timeZone = c.asZoneId("timeZone", null);
 
-    {
-      var localFileNamePatternsConfig = c.path("localFileNamePatterns");
-      gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
-      netexLocalFilePattern = localFileNamePatternsConfig.asPattern("netex", DEFAULT_NETEX_PATTERN);
-      osmLocalFilePattern = localFileNamePatternsConfig.asPattern("osm", DEFAULT_OSM_PATTERN);
-      demLocalFilePattern = localFileNamePatternsConfig.asPattern("dem", DEFAULT_DEM_PATTERN);
-    }
+    var localFileNamePatternsConfig = c.path("localFileNamePatterns");
+    gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
+    netexLocalFilePattern = localFileNamePatternsConfig.asPattern("netex", DEFAULT_NETEX_PATTERN);
+    osmLocalFilePattern = localFileNamePatternsConfig.asPattern("osm", DEFAULT_OSM_PATTERN);
+    demLocalFilePattern = localFileNamePatternsConfig.asPattern("dem", DEFAULT_DEM_PATTERN);
 
     gsCredentials = c.asText("gsCredentials", null);
     graph = c.asUri("graph", null);
