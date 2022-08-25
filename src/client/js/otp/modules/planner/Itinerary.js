@@ -117,7 +117,7 @@ otp.modules.planner.Itinerary = otp.Class({
             tr.appendChild(containerCell);
             const decimalPlaces = p.amount.currency.defaultFractionDigits;
             const amount = (p.amount.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces);
-            const price = new Intl.NumberFormat('en-US',
+            const price = new Intl.NumberFormat(otp.config.locale.config.locale_short,
                 {
                     style: 'currency',
                     currency: p.amount.currency.currencyCode,
