@@ -36,7 +36,7 @@ public abstract class AbstractFileDataSource implements DataSource {
 
   @Override
   public URI uri() {
-    return URI.create(path());
+    return file.toURI();
   }
 
   @Override
