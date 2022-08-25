@@ -53,7 +53,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   /**
    * Transfers by stop index
    */
-  private final RaptorTransferIndex transfers;
+  private final RaptorTransferIndex transferIndex;
 
   private final List<TransferForPatternByStopPos> forwardConstrainedTransfers;
 
@@ -93,7 +93,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
-    this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
+    this.transferIndex = transitLayer.getRaptorTransfersForRequest(routingContext);
 
     this.forwardConstrainedTransfers = transitLayer.getForwardConstrainedTransfers();
     this.reverseConstrainedTransfers = transitLayer.getReverseConstrainedTransfers();
@@ -121,12 +121,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   @Override
   public Iterator<RaptorTransfer> getTransfersFromStop(int stopIndex) {
-    return transfers.getForwardTransfers().get(stopIndex).iterator();
+    return transferIndex.getForwardTransfers(stopIndex).iterator();
   }
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersToStop(int stopIndex) {
-    return transfers.getReversedTransfers().get(stopIndex).iterator();
+    return transferIndex.getReversedTransfers(stopIndex).iterator();
   }
 
   @Override
