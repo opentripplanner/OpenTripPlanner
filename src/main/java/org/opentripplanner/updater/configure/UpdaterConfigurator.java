@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * GraphUpdaterManager.
  */
 public class UpdaterConfigurator {
+
   private static final Logger LOG = LoggerFactory.getLogger(UpdaterConfigurator.class);
 
   private final Graph graph;
