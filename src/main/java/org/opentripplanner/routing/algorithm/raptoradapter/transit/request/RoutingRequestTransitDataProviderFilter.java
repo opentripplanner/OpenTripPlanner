@@ -71,7 +71,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   @Override
   public boolean tripPatternPredicate(TripPatternForDate tripPatternForDate) {
-    return routeIsNotBanned(tripPatternForDate);
+    return bannedRoutes.isEmpty() || routeIsNotBanned(tripPatternForDate);
   }
 
   @Override
@@ -81,7 +81,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       return false;
     }
 
-    if (bannedTrips.contains(trip.getId())) {
+    if (!bannedTrips.isEmpty() && bannedTrips.contains(trip.getId())) {
       return false;
     }
 
@@ -128,7 +128,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   }
 
   private boolean routeIsNotBanned(TripPatternForDate tripPatternForDate) {
-    FeedScopedId routeId = tripPatternForDate.getTripPattern().getPattern().getRoute().getId();
+    FeedScopedId routeId = tripPatternForDate.getTripPattern().route().getId();
     return !bannedRoutes.contains(routeId);
   }
 }

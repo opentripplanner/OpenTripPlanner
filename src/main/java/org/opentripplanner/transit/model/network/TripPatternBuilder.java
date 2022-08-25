@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.CompactLineStringUtils;
@@ -77,6 +77,11 @@ public final class TripPatternBuilder
   // TODO: This uses a static SlackProvider. Change it to be injectable if required
   public int slackIndex() {
     return SlackProvider.slackIndex(route.getMode());
+  }
+
+  // TODO: Change the calculation to be injectable if required
+  public int transitReluctanceFactorIndex() {
+    return route.getMode().ordinal();
   }
 
   @Override

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.util.BitSet;
 import java.util.Set;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
@@ -16,7 +17,7 @@ public class McCostParamsBuilder {
   private double[] transitReluctanceFactors;
   private double waitReluctanceFactor;
   private WheelchairAccessibilityRequest accessibilityRequest;
-  private Set<FeedScopedId> unpreferredRoutes;
+  private BitSet unpreferredPatterns;
   private DoubleFunction<Double> unpreferredCost;
 
   public McCostParamsBuilder() {
@@ -29,7 +30,7 @@ public class McCostParamsBuilder {
     this.transitReluctanceFactors = other.transitReluctanceFactors();
     this.waitReluctanceFactor = other.waitReluctanceFactor();
     this.accessibilityRequest = other.accessibilityRequirements();
-    this.unpreferredRoutes = other.unpreferredRoutes();
+    this.unpreferredPatterns = other.unpreferredPatterns();
   }
 
   public int boardCost() {
@@ -77,12 +78,12 @@ public class McCostParamsBuilder {
     return this;
   }
 
-  public Set<FeedScopedId> unpreferredRoutes() {
-    return unpreferredRoutes;
+  public BitSet unpreferredPatterns() {
+    return unpreferredPatterns;
   }
 
-  public McCostParamsBuilder unpreferredRoutes(Set<FeedScopedId> routes) {
-    this.unpreferredRoutes = routes;
+  public McCostParamsBuilder unpreferredPatterns(BitSet patterns) {
+    this.unpreferredPatterns = patterns;
     return this;
   }
 

@@ -207,7 +207,7 @@ public class StreetVertexIndex {
       // Check if Stop/StopCollection is found by FeedScopeId
       if (location.stopId != null) {
         Set<Vertex> transitStopVertices = getStopVerticesById(location.stopId);
-        if (transitStopVertices != null) {
+        if (transitStopVertices != null && !transitStopVertices.isEmpty()) {
           return transitStopVertices;
         }
       }

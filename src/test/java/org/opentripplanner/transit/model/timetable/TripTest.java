@@ -57,6 +57,22 @@ class TripTest {
     .build();
 
   @Test
+  void shouldCopyFieldsFromRoute() {
+    var routeWithModes = ROUTE
+      .copy()
+      .withMode(TRANSIT_MODE)
+      .withNetexSubmode(NETEX_SUBMODE_NAME)
+      .withBikesAllowed(BIKE_ACCESS)
+      .build();
+
+    var subject = Trip.of(TransitModelForTest.id(ID)).withRoute(routeWithModes).build();
+
+    assertEquals(TRANSIT_MODE, subject.getMode());
+    assertEquals(NETEX_SUBMODE, subject.getNetexSubMode());
+    assertEquals(BIKE_ACCESS, subject.getBikesAllowed());
+  }
+
+  @Test
   void copy() {
     assertEquals(ID, subject.getId().getId());
 

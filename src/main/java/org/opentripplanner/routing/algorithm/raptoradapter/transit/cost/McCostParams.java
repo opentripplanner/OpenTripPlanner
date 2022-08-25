@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.util.BitSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.DoubleFunction;
@@ -26,7 +27,7 @@ public class McCostParams {
   private final double[] transitReluctanceFactors;
   private final double waitReluctanceFactor;
   private final WheelchairAccessibilityRequest accessibilityRequest;
-  private final Set<FeedScopedId> unpreferredRoutes;
+  private final BitSet unpreferredPatterns;
   private final DoubleFunction<Double> unpreferredCost;
 
   /**
@@ -39,7 +40,7 @@ public class McCostParams {
     this.transitReluctanceFactors = null;
     this.waitReluctanceFactor = 1.0;
     this.accessibilityRequest = WheelchairAccessibilityRequest.DEFAULT;
-    this.unpreferredRoutes = Set.of();
+    this.unpreferredPatterns = new BitSet();
     this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
@@ -49,7 +50,7 @@ public class McCostParams {
     this.transitReluctanceFactors = builder.transitReluctanceFactors();
     this.waitReluctanceFactor = builder.waitReluctanceFactor();
     this.accessibilityRequest = builder.wheelchairAccessibility();
-    this.unpreferredRoutes = builder.unpreferredRoutes();
+    this.unpreferredPatterns = builder.unpreferredPatterns();
     this.unpreferredCost = builder.unpreferredCost();
   }
 
@@ -85,8 +86,8 @@ public class McCostParams {
     return accessibilityRequest;
   }
 
-  public Set<FeedScopedId> unpreferredRoutes() {
-    return unpreferredRoutes;
+  public BitSet unpreferredPatterns() {
+    return unpreferredPatterns;
   }
 
   public DoubleFunction<Double> unnpreferredCost() {
@@ -122,7 +123,7 @@ public class McCostParams {
       .addNum("transferCost", transferCost, 0)
       .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
       .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
-      .addNum("routePenaltiesSize", unpreferredRoutes.size(), 0)
+      .addNum("unpreferredPatternsSize", unpreferredPatterns.size(), 0)
       .toString();
   }
 }

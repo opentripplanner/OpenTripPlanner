@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
+import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.OtpTransitService;
@@ -132,7 +133,11 @@ public class GtfsContextBuilder {
   }
 
   private void repairStopTimesForEachTrip() {
-    new RepairStopTimesForEachTripOperation(transitBuilder.getStopTimesSortedByTrip(), issueStore)
+    new ValidateAndInterpolateStopTimesForEachTrip(
+      transitBuilder.getStopTimesSortedByTrip(),
+      true,
+      issueStore
+    )
       .run();
   }
 

@@ -191,7 +191,7 @@ public class OtpTransitServiceBuilder {
     return boardingAreasById;
   }
 
-  public EntityById<AreaStop> getLocations() {
+  public EntityById<AreaStop> getAreaStops() {
     return stopModelBuilder().areaStopById();
   }
 

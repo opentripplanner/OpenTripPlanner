@@ -1,0 +1,31 @@
+testCaseId,description,departure,fromPlace,toPlace,fromLat,fromLon,toLat,toLon,origin,destination,modes,category
+2,"Bingerbrück, Abzw. Hbf to Recklinghausen Hbf",08:00,de:07339:34003,de:05562:3581_G,49.96829,7.888645,51.61598,7.201371,"Bingerbrück, Abzw. Hbf",Recklinghausen Hbf,TRANSIT|WALK,transit
+3,"Darmstadt Hauptbahnhof to Hamm (Westf), Hauptbahnhof",08:00,de:06411:4734,de:05915:7756_G,49.872517,8.629379,51.678547,7.809172,Darmstadt Hauptbahnhof,"Hamm (Westf), Hauptbahnhof",TRANSIT|WALK,transit
+5,"Münster Hauptbahnhof to Mannheim, Hauptbahnhof",08:00,de:05515:41000_G_G,de:08222:2417_G,51.956566,7.635715,49.479748,8.469936,Münster Hauptbahnhof,"Mannheim, Hauptbahnhof",TRANSIT|WALK,transit
+6,"Gera Hbf to Hauptbahnhof (S, U, Bus, Tram)",08:00,de:16052:8010125,de:09162:6,50.883423,12.077092,48.140026,11.561066,Gera Hbf,"Hauptbahnhof (S, U, Bus, Tram)",TRANSIT|WALK,transit
+14,"Stolberg, Hbf to Trier, Hauptbahnhof",08:00,de:05334:5766_G,de:07211:1318_G,50.7948,6.218439,49.758198,6.653131,"Stolberg, Hbf","Trier, Hauptbahnhof",TRANSIT|WALK,transit
+19,München Hbf to Bernburg Hbf,08:00,de:09162:100_G_G,de:15089:8010043,48.14029,11.559602,51.79612,11.751455,München Hbf,Bernburg Hbf,TRANSIT|WALK,transit
+22,Neustrelitz Hauptbahnhof to Bad Ems Hauptbahnhof,08:00,de:13071:80001_G,de:07141:050060,53.359474,13.07435,50.327652,7.728637,Neustrelitz Hauptbahnhof,Bad Ems Hauptbahnhof,TRANSIT|WALK,transit
+23,"Hannover Hauptbahnhof/E.-A.-Pl to Stolberg, Hbf",08:00,de:03241:33,de:05334:5766,52.375694,9.741277,50.79448,6.217478,Hannover Hauptbahnhof/E.-A.-Pl,"Stolberg, Hbf",TRANSIT|WALK,transit
+25,"Cottbus, Hauptbahnhof to Osnabrück Hauptbahnhof/ZOB",08:00,de:12052:900470000_G_G,de:03404:71609,51.749687,14.324814,52.27396,8.057886,"Cottbus, Hauptbahnhof",Osnabrück Hauptbahnhof/ZOB,TRANSIT|WALK,transit
+26,"Mannheim, Hauptbahnhof to Regensburg Hbf",08:00,de:08222:2417,de:09362:11090_G_G,49.479355,8.468921,49.011673,12.099617,"Mannheim, Hauptbahnhof",Regensburg Hbf,TRANSIT|WALK,transit
+32,"Heidelberg, Hbf (West) to FDS Hbf.",08:00,de:08221:1214,de:08237:1050,49.40605,8.673417,48.460663,8.429279,"Heidelberg, Hbf (West)",FDS Hbf.,TRANSIT|WALK,transit
+34,Remscheid Hbf to Offenbach (Main)-Zentrum Hauptbahnhof,08:00,de:05120:12077,de:06413:2501_G,51.177235,7.199983,50.09889,8.758983,Remscheid Hbf,Offenbach (Main)-Zentrum Hauptbahnhof,TRANSIT|WALK,transit
+40,MG Rheydt Hbf to München Hbf,08:00,de:05116:23023,de:09162:100_G_G,51.162895,6.440256,48.14029,11.559602,MG Rheydt Hbf,München Hbf,TRANSIT|WALK,transit
+49,Neustrelitz Hauptbahnhof to Hannover Hauptbahnhof,08:00,de:13071:80001_G,de:03241:31,53.359474,13.07435,52.37649,9.74107,Neustrelitz Hauptbahnhof,Hannover Hauptbahnhof,TRANSIT|WALK,transit
+52,Hannover Hauptbahnhof/Rosenstraße to Würzburg Hbf,08:00,de:03241:57,de:09663:177_G,52.37696,9.738034,49.801796,9.93578,Hannover Hauptbahnhof/Rosenstraße,Würzburg Hbf,TRANSIT|WALK,transit
+53,Dortmund Hbf to Bonn Hbf,08:00,de:05913:131,de:05314:61101_G,51.517887,7.458226,50.732014,7.096933,Dortmund Hbf,Bonn Hbf,TRANSIT|WALK,transit
+55,"Wuppertal Hbf to Zwickau, Hauptbahnhof",08:00,de:05124:11376,de:14524:41032_G,51.25508,7.149323,50.71554,12.477447,Wuppertal Hbf,"Zwickau, Hauptbahnhof",TRANSIT|WALK,transit
+62,Darmstadt Hauptbahnhof to Tübingen Hauptbahnhof,08:00,de:06411:4734,de:08416:11000_G,49.872517,8.629379,48.516148,9.055575,Darmstadt Hauptbahnhof,Tübingen Hauptbahnhof,TRANSIT|WALK,transit
+65,"Berchtesgaden Hbf to Stolberg, Hbf",08:00,de:09172:90194,de:05334:5766,47.626686,12.999058,50.79448,6.217478,Berchtesgaden Hbf,"Stolberg, Hbf",TRANSIT|WALK,transit
+67,"Stolberg, Hbf to Bochum Hbf",08:00,de:05334:5766_G,de:05911:5194_G_G,50.7948,6.218439,51.479465,7.223335,"Stolberg, Hbf",Bochum Hbf,TRANSIT|WALK,transit
+75,Neustrelitz Hauptbahnhof to Bottrop Hbf,08:00,de:13071:80001_G,de:05512:3335_G,53.359474,13.07435,51.509968,6.936692,Neustrelitz Hauptbahnhof,Bottrop Hbf,TRANSIT|WALK,transit
+77,"Eschweiler, Hbf to Gera Hbf",08:00,de:05334:2828,de:16052:8010125,50.813534,6.251937,50.883423,12.077092,"Eschweiler, Hbf",Gera Hbf,TRANSIT|WALK,transit
+78,"Hildesheim Hauptbahnhof to Sinsheim, Hauptbahnhof",08:00,de:03254:9922_G,de:08226:3550,52.160625,9.953497,49.250355,8.8751,Hildesheim Hauptbahnhof,"Sinsheim, Hauptbahnhof",TRANSIT|WALK,transit
+80,Bochum Hbf to Magdeburg Hbf,08:00,de:05911:5194,de:15003:8010224,51.47931,7.22485,52.13035,11.626891,Bochum Hbf,Magdeburg Hbf,TRANSIT|WALK,transit
+83,"Boppard Hauptbahnhof to Hamm (Westf), Hauptbahnhof",08:00,de:07140:060039,de:05915:7756_G,50.231415,7.586102,51.678547,7.809172,Boppard Hauptbahnhof,"Hamm (Westf), Hauptbahnhof",TRANSIT|WALK,transit
+85,Darmstadt Hauptbahnhof to Leipzig Hbf,08:00,de:06411:4734_G,de:14713:8010205_G,49.871937,8.631143,51.34547,12.382064,Darmstadt Hauptbahnhof,Leipzig Hbf,TRANSIT|WALK,transit
+87,Reutlingen Hauptbahnhof to Pforzheim Hauptbahnhof,08:00,de:08415:22006_G,de:08231:50,48.49643,9.20951,48.89365,8.703453,Reutlingen Hauptbahnhof,Pforzheim Hauptbahnhof,TRANSIT|WALK,transit
+88,Ulm Hauptbahnhof to Witten Hbf,08:00,de:08421:1008,de:05954:5469_G,48.399364,9.984149,51.43542,7.330217,Ulm Hauptbahnhof,Witten Hbf,TRANSIT|WALK,transit
+89,"Lünen, ZOB - Hbf to Bad Friedrichshall Hbf",08:00,de:05978:16135,de:08125:519,51.61721,7.528906,49.231953,9.199979,"Lünen, ZOB - Hbf",Bad Friedrichshall Hbf,TRANSIT|WALK,transit
+94,"Hamm (Westf), Hauptbahnhof to Heidelberg, Hauptbahnhof",08:00,de:05915:7756,de:08221:1160,51.67829,7.808612,49.4039,8.675808,"Hamm (Westf), Hauptbahnhof","Heidelberg, Hauptbahnhof",TRANSIT|WALK,transit

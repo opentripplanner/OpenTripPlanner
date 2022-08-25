@@ -128,7 +128,6 @@ public class TravelTimeResource {
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
-        transitService.getTransferService(),
         transitService.getRealtimeTransitLayer(),
         startOfTime,
         0,

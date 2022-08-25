@@ -5,7 +5,6 @@ import java.util.function.IntUnaryOperator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -22,23 +21,18 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   private final TripPatternForDates pattern;
   private final int sortIndex;
-  private final int transitReluctanceIndex;
   private final int tripIndexForDates;
   private final IntUnaryOperator arrivalTimes;
   private final IntUnaryOperator departureTimes;
 
   // Computed when needed later for RaptorPathToItineraryMapper
-  private int index;
   private TripTimes tripTimes = null;
   private LocalDate serviceDate = null;
   private int secondsOffset;
-  private final FeedScopedId routeId;
 
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
     this.tripIndexForDates = tripIndexForDates;
     this.pattern = pattern;
-    // Mode ordinal is used to index the transit factor/reluctance
-    this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
 
     // get arrival/departures lambda
     this.arrivalTimes = pattern.getArrivalTimesForTrip(tripIndexForDates);
@@ -46,7 +40,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
     // Trip times are sorted based on the arrival times at stop 0,
     this.sortIndex = arrivalTimes.applyAsInt(0);
-    this.routeId = pattern.getTripPattern().getPattern().getRoute().getId();
   }
 
   @Override
@@ -71,17 +64,12 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   @Override
   public int transitReluctanceFactorIndex() {
-    return transitReluctanceIndex;
+    return pattern.transitReluctanceFactorIndex();
   }
 
   @Override
   public WheelchairAccessibility wheelchairBoarding() {
     return pattern.wheelchairBoardingForTrip(tripIndexForDates);
-  }
-
-  @Override
-  public FeedScopedId routeId() {
-    return routeId;
   }
 
   /*
@@ -125,7 +113,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   }
 
   private void findTripTimes() {
-    index = tripIndexForDates;
+    int index = tripIndexForDates;
     IntIterator indexIterator = pattern.tripPatternForDatesIndexIterator(true);
     while (indexIterator.hasNext()) {
       int i = indexIterator.next();

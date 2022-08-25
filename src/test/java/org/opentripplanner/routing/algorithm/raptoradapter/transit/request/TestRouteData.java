@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.DATE;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.OFFSET;
 
+import gnu.trove.list.array.TIntArrayList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class TestRouteData {
     var patternForDates = new TripPatternForDates(
       routingTripPattern,
       listOfTripPatternForDates,
-      List.of(OFFSET),
+      new TIntArrayList(new int[] { OFFSET }),
       null,
       null
     );

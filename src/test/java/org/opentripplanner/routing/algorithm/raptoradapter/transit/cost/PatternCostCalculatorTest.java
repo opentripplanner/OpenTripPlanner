@@ -3,12 +3,12 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static graphql.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.UNPREFERRED_ROUTE_RELUCTANCE;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.UNPREFERRED_ROUTE_RELUCTANCE;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.DoubleFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -19,12 +19,17 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCos
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.RouteBuilder;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
+import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
-public class RouteCostCalculatorTest {
+public class PatternCostCalculatorTest {
 
   private static final int BOARD_COST_SEC = 5;
   private static final int TRANSFER_COST_SEC = 2;
@@ -32,16 +37,16 @@ public class RouteCostCalculatorTest {
   private static final int TRANSIT_TIME = 1000;
   private static final double UNPREFERRED_ROUTE_PENALTY = 300.0;
   private static final FeedScopedId UNPREFERRED_ROUTE_ID = id("999");
-  private static final FeedScopedId OTHER_ROUTE_ID = id("X");
+  private static final FeedScopedId UNPREFERRED_AGENCY_ID = id("contoso-travels");
+  private static final Agency UNPREFERRED_AGENCY = agency(UNPREFERRED_AGENCY_ID.getId());
   private static final FeedScopedId DEFAULT_ROUTE_ID = id("101");
-  private static final FeedScopedId AGENCY_ID = id("A1");
   // Default cost function: a + bx
   private static final DoubleFunction<Double> unprefCostFn = RequestFunctions.createLinearFunction(
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_PENALTY),
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_RELUCTANCE)
   );
 
-  protected static final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator = new DefaultCostCalculator(
+  protected static final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE_FACTOR,
@@ -49,7 +54,7 @@ public class RouteCostCalculatorTest {
     null
   );
 
-  static Stream<Arguments> testCases = List
+  static Stream<Arguments> testCases = Stream
     .of(
       // !prefAgency | !prefRoute | unPrefA | unPrefR | expected cost
       "       -      |      -     |    -    |    -    |     0",
@@ -63,7 +68,6 @@ public class RouteCostCalculatorTest {
       "       -      |      x     |    x    |    -    |   600",
       "       x      |      x     |    x    |    x    |   600"
     )
-    .stream()
     .map(Arguments::of);
 
   @Test
@@ -71,16 +75,32 @@ public class RouteCostCalculatorTest {
   public void testMcCostParameterMapping() {
     RoutingRequest routingRequest = new RoutingRequest();
     routingRequest.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-    routingRequest.setUnpreferredRouteCost("300 + 1.0 x");
+    routingRequest.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+    routingRequest.setUnpreferredCost("300 + 1.0 x");
 
-    McCostParams costParams = McCostParamsMapper.map(routingRequest);
-    var routes = costParams.unpreferredRoutes();
+    var data = new TestTransitData();
+    final TestTripPattern unpreferredRoutePattern = pattern(true, false);
+    final TestTripPattern unpreferredAgencyPattern = pattern(false, true);
+    final TestTripPattern unpreferredRouteAgencyPattern = pattern(false, true);
+    final TestTripPattern defaultPattern = pattern(false, false);
 
-    assertTrue(routes.contains(UNPREFERRED_ROUTE_ID));
-    assertFalse(routes.contains(DEFAULT_ROUTE_ID));
+    data.withRoutes(
+      route(unpreferredRoutePattern),
+      route(unpreferredAgencyPattern),
+      route(unpreferredRouteAgencyPattern),
+      route(defaultPattern)
+    );
+
+    McCostParams costParams = McCostParamsMapper.map(routingRequest, data.getPatterns());
+    var unpreferredPatterns = costParams.unpreferredPatterns();
+
+    assertTrue(unpreferredPatterns.get(unpreferredRoutePattern.patternIndex()));
+    assertTrue(unpreferredPatterns.get(unpreferredAgencyPattern.patternIndex()));
+    assertTrue(unpreferredPatterns.get(unpreferredRouteAgencyPattern.patternIndex()));
+    assertFalse(unpreferredPatterns.get(defaultPattern.patternIndex()));
 
     // test creation of linear cost function
-    double expected = (double) 300 + 1.0 * TRANSIT_TIME;
+    double expected = 300 + 1.0 * TRANSIT_TIME;
     double actual = costParams.unnpreferredCost().apply(TRANSIT_TIME);
 
     assertEquals(expected, actual);
@@ -92,14 +112,15 @@ public class RouteCostCalculatorTest {
     RoutePenaltyTC tc = new RoutePenaltyTC(testCaseDescription);
 
     var schedule = tc.createSchedule();
-    var routeCostCalculator = tc.createRouteCostCalculator();
+    var costCalculator = tc.createCostCalculator(schedule);
 
     int defaultArrCost = transitArrivalCost(schedule, defaultCostCalculator);
     int defaultBoardCost = boardingCost(schedule, defaultCostCalculator);
-    int arrCost = transitArrivalCost(schedule, routeCostCalculator);
-    int boardCost = boardingCost(schedule, routeCostCalculator);
+    int arrCost = transitArrivalCost(schedule, costCalculator);
+    int boardCost = boardingCost(schedule, costCalculator);
 
-    if (tc.unPrefRoute) {
+    // if we either have just unpreferred routes or just unpreferred agencies
+    if (tc.unPrefRoute || tc.unPrefAgency) {
       var expectedArr = unprefCostFn.apply(TRANSIT_TIME);
       var errorMessageArr = String.format("Invalid arrival cost: %s", tc);
       assertEquals(expectedArr, arrCost - defaultArrCost, errorMessageArr);
@@ -117,17 +138,16 @@ public class RouteCostCalculatorTest {
       assertEquals(defaultArrCost, arrCost);
       assertEquals(defaultBoardCost, boardCost);
     }
-    // TODO: unpreferred agency
     // TODO: preferred route
     // TODO: preferred agency
   }
 
-  private int transitArrivalCost(DefaultTripSchedule schedule, CostCalculator calc) {
+  private int transitArrivalCost(TestTripSchedule schedule, CostCalculator<TestTripSchedule> calc) {
     int boardCost = boardingCost(schedule, calc);
     return calc.transitArrivalCost(boardCost, 0, TRANSIT_TIME, schedule, 6);
   }
 
-  private int boardingCost(DefaultTripSchedule schedule, CostCalculator calc) {
+  private int boardingCost(TestTripSchedule schedule, CostCalculator<TestTripSchedule> calc) {
     return calc.boardingCost(true, 0, 5, 100, schedule, RaptorTransferConstraint.REGULAR_TRANSFER);
   }
 
@@ -164,25 +184,20 @@ public class RouteCostCalculatorTest {
         sb.append(", unPrefRoute=X");
       }
 
-      return "RoutePenaltyTC {" + sb.substring(sb.length() == 0 ? 0 : 2) + "}";
+      return "RoutePenaltyTC {" + sb.substring(sb.isEmpty() ? 0 : 2) + "}";
     }
 
     boolean isDefault() {
       return !(prefAgency || prefRoute || unPrefAgency || unPrefRoute);
     }
 
-    RouteCostCalculator createRouteCostCalculator() {
-      var unprefCostFn = RequestFunctions.createLinearFunction(
-        UNPREFERRED_ROUTE_PENALTY,
-        UNPREFERRED_ROUTE_RELUCTANCE
+    CostCalculator<TestTripSchedule> createCostCalculator(TestTripSchedule schedule) {
+      McCostParams costParams = McCostParamsMapper.map(
+        createRoutingRequest(),
+        List.of(schedule.pattern())
       );
-      Set<FeedScopedId> unprefRouteIds = new HashSet();
 
-      if (unPrefRoute) {
-        unprefRouteIds.add(UNPREFERRED_ROUTE_ID);
-      }
-
-      return new RouteCostCalculator<>(defaultCostCalculator, unprefRouteIds, unprefCostFn);
+      return CostCalculatorFactory.createCostCalculator(costParams, null);
     }
 
     /**
@@ -192,30 +207,51 @@ public class RouteCostCalculatorTest {
      * @return Test schedule
      */
     TestTripSchedule createSchedule() {
-      var scheduleBuilder = TestTripSchedule.schedule("12:00 12:01");
-
-      if (unPrefRoute) {
-        return scheduleBuilder.routeId(UNPREFERRED_ROUTE_ID).build();
-      }
-
-      return scheduleBuilder.build();
+      return TestTripSchedule
+        .schedule("12:00 12:01")
+        .pattern(pattern(unPrefRoute, unPrefAgency))
+        .build();
     }
 
     RoutingRequest createRoutingRequest() {
       RoutingRequest request = new RoutingRequest();
+
+      request.unpreferredCost =
+        RequestFunctions.createLinearFunction(
+          UNPREFERRED_ROUTE_PENALTY,
+          UNPREFERRED_ROUTE_RELUCTANCE
+        );
+      request.walkBoardCost = BOARD_COST_SEC;
+      request.transferCost = TRANSFER_COST_SEC;
+      request.waitReluctance = WAIT_RELUCTANCE_FACTOR;
+
       if (prefAgency) {
-        request.setPreferredAgencies(List.of(OTHER_ROUTE_ID));
+        // TODO
+        request.setPreferredAgencies(List.of());
       }
       if (prefRoute) {
-        request.setPreferredRoutes(List.of(OTHER_ROUTE_ID));
+        // TODO
+        request.setPreferredRoutes(List.of());
       }
       if (unPrefAgency) {
-        request.setUnpreferredAgencies(List.of(AGENCY_ID));
+        request.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
       }
       if (unPrefRoute) {
         request.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
       }
       return request;
     }
+  }
+
+  private static TestTripPattern pattern(boolean unpreferredRoute, boolean unpreferredAgency) {
+    RouteBuilder builder = TransitModelForTest.route(
+      unpreferredRoute ? UNPREFERRED_ROUTE_ID : DEFAULT_ROUTE_ID
+    );
+
+    if (unpreferredAgency) {
+      builder.withAgency(UNPREFERRED_AGENCY);
+    }
+
+    return TestTripPattern.pattern(1, 2).withRoute(builder.build());
   }
 }

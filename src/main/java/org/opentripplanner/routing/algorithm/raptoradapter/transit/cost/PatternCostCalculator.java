@@ -1,30 +1,29 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
-import java.util.Set;
+import java.util.BitSet;
 import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
-public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
+public class PatternCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
 
   public static final double DEFAULT_ROUTE_RELUCTANCE = 1.0;
   public static final double UNPREFERRED_ROUTE_RELUCTANCE = 2.0;
 
-  private final CostCalculator delegate;
-  private final Set<FeedScopedId> unpreferredRoutes;
-  private final DoubleFunction<Double> unpreferredRouteCost;
+  private final CostCalculator<T> delegate;
+  private final BitSet unpreferredPatterns;
+  private final DoubleFunction<Double> unpreferredCost;
 
-  public RouteCostCalculator(
+  public PatternCostCalculator(
     @Nonnull CostCalculator<T> delegate,
-    @Nonnull Set<FeedScopedId> routePenalties,
-    @Nonnull DoubleFunction<Double> unpreferredRouteCost
+    @Nonnull BitSet unpreferredPatterns,
+    @Nonnull DoubleFunction<Double> unpreferredCost
   ) {
-    this.unpreferredRoutes = routePenalties;
+    this.unpreferredPatterns = unpreferredPatterns;
     this.delegate = delegate;
-    this.unpreferredRouteCost = unpreferredRouteCost;
+    this.unpreferredCost = unpreferredCost;
   }
 
   @Override
@@ -60,9 +59,9 @@ public class RouteCostCalculator<T extends DefaultTripSchedule> implements CostC
     int toStop
   ) {
     int unpreferCost = 0;
-    if (unpreferredRoutes.contains(trip.routeId())) {
+    if (unpreferredPatterns.get(trip.pattern().patternIndex())) {
       // calculate cost with linear function: fixed + reluctance * transitTime
-      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredRouteCost.apply(transitTime));
+      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredCost.apply(transitTime));
     }
     int defaultCost = delegate.transitArrivalCost(
       boardCost,

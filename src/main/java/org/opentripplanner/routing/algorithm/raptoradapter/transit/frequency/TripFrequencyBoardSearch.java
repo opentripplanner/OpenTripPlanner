@@ -49,7 +49,6 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
           return new FrequencyBoardingEvent<>(
             patternForDates,
             tripTimes,
-            pattern.getTripPattern().getPattern(),
             stopPositionInPattern,
             departureTime - headway,
             headway,

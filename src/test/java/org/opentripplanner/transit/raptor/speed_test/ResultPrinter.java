@@ -9,6 +9,7 @@ import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
+import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.TableFormatter;
 
 /**
@@ -205,7 +206,14 @@ class ResultPrinter {
         v.stream().map(it -> String.format("%4d", it)).reduce((a, b) -> a + ", " + b).orElse("") +
         " ]";
       double avg = v.stream().mapToInt(it -> it).average().orElse(0d);
-      System.err.printf(" ==> %-" + labelMaxLen + "s : %s Avg: %4.1f%n", label, values, avg);
+
+      System.err.printf(
+        " ==> %-" + labelMaxLen + "s : %s Avg: %4.1f  (σ=%.1f)%n",
+        label,
+        values,
+        avg,
+        IntUtils.standardDeviation(v)
+      );
     }
   }
 

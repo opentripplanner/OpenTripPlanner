@@ -28,6 +28,8 @@ public class SpeedTestConfig {
   /** The speed test run all its test on an existing pre-build graph. */
   public final URI graph;
 
+  public final String feedId;
+
   public final TransitRoutingConfig transitRoutingParams;
   public final RoutingRequest request;
 
@@ -36,6 +38,7 @@ public class SpeedTestConfig {
     this.rawNode = node;
     testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
     graph = adapter.asUri("graph", null);
+    feedId = adapter.asText("feedId", null);
     transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
     request = mapRoutingRequest(adapter.path("routingDefaults"));
   }
