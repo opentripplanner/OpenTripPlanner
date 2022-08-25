@@ -345,7 +345,7 @@ public class NetexMapper {
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
       StopLocation stopLocation = flexStopsMapper.map(flexibleStopPlace);
       if (stopLocation instanceof AreaStop) {
-        transitBuilder.getLocations().add((AreaStop) stopLocation);
+        transitBuilder.getAreaStops().add((AreaStop) stopLocation);
       } else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.getGroupStops().add(groupStop);
       }
@@ -407,7 +407,7 @@ public class NetexMapper {
       idFactory,
       transitBuilder.getOperatorsById(),
       transitBuilder.getStops(),
-      transitBuilder.getLocations(),
+      transitBuilder.getAreaStops(),
       transitBuilder.getGroupStops(),
       transitBuilder.getRoutes(),
       currentNetexIndex.getRouteById(),
