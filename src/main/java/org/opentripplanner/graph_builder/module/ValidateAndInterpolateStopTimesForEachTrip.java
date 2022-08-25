@@ -234,7 +234,7 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       // 250 km/h
       case RAIL -> 70;
       // max in the world is 9 m/s for gondolas, 6 m/s for funiculars
-      case GONDOLA, FUNICULAR -> 10; 
+      case GONDOLA, FUNICULAR -> 10;
       // 108km/h
       default -> 30;
     };
