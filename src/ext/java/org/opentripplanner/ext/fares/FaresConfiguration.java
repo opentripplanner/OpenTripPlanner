@@ -2,7 +2,6 @@ package org.opentripplanner.ext.fares;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.DutchFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HSLFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.MultipleFareServiceFactory;

@@ -2,7 +2,6 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.standalone.api.OtpServerContext;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 

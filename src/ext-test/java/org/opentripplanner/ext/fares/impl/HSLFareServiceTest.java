@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.Fare;
@@ -73,41 +74,52 @@ public class HSLFareServiceTest implements PlanTestConstants{
 
 
     HSLFareServiceImpl hslFareService = new HSLFareServiceImpl();
+    int fiveMinutes = 60 * 5;
 
     // Fare attributes
-    FareAttribute fareAttributeAB = new FareAttribute(new FeedScopedId(FEED_ID, "AB"));
-    FareAttribute fareAttributeBC = new FareAttribute(new FeedScopedId(FEED_ID, "BC"));
-    FareAttribute fareAttributeCD = new FareAttribute(new FeedScopedId(FEED_ID, "CD"));
-    FareAttribute fareAttributeABC = new FareAttribute(new FeedScopedId(FEED_ID, "ABC"));
-    FareAttribute fareAttributeBCD = new FareAttribute(new FeedScopedId(FEED_ID, "BCD"));
-    FareAttribute fareAttributeABCD = new FareAttribute(new FeedScopedId(FEED_ID, "ABCD"));
-    FareAttribute fareAttributeD = new FareAttribute(new FeedScopedId(FEED_ID, "D"));
 
-    // Currencies and prices
-    fareAttributeAB.setCurrencyType("EUR");
-    fareAttributeBC.setCurrencyType("EUR");
-    fareAttributeCD.setCurrencyType("EUR");
-    fareAttributeABC.setCurrencyType("EUR");
-    fareAttributeBCD.setCurrencyType("EUR");
-    fareAttributeABCD.setCurrencyType("EUR");
-    fareAttributeD.setCurrencyType("EUR");
+    FareAttribute fareAttributeAB = FareAttribute.of(new FeedScopedId(FEED_ID, "AB"))
+      .setCurrencyType("EUR")
+      .setPrice(AB_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
 
-    fareAttributeAB.setPrice(AB_PRICE);
-    fareAttributeBC.setPrice(BC_PRICE);
-    fareAttributeCD.setPrice(CD_PRICE);
-    fareAttributeABC.setPrice(ABC_PRICE);
-    fareAttributeBCD.setPrice(BCD_PRICE);
-    fareAttributeABCD.setPrice(ABCD_PRICE);
-    fareAttributeD.setPrice(D_PRICE);
+    FareAttribute fareAttributeBC = FareAttribute.of(new FeedScopedId(FEED_ID, "BC"))
+      .setCurrencyType("EUR")
+      .setPrice(BC_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
 
-    // Transfer times to test multiple tickets for itinerary
-    fareAttributeAB.setTransferDuration(60*5);
-    fareAttributeBC.setTransferDuration(60*5);
-    fareAttributeCD.setTransferDuration(60*5);
-    fareAttributeABC.setTransferDuration(60*5);
-    fareAttributeBCD.setTransferDuration(60*5);
-    fareAttributeABCD.setTransferDuration(60*5);
-    fareAttributeD.setTransferDuration(60*5);
+    FareAttribute fareAttributeCD = FareAttribute.of(new FeedScopedId(FEED_ID, "CD"))
+      .setCurrencyType("EUR")
+      .setPrice(CD_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
+
+    FareAttribute fareAttributeD = FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
+      .setCurrencyType("EUR")
+      .setPrice(D_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
+
+    FareAttribute fareAttributeABC = FareAttribute.of(new FeedScopedId(FEED_ID, "ABC"))
+      .setCurrencyType("EUR")
+      .setPrice(ABC_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
+
+    FareAttribute fareAttributeBCD = FareAttribute.of(new FeedScopedId(FEED_ID, "BCD"))
+      .setCurrencyType("EUR")
+      .setPrice(BCD_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
+
+    FareAttribute fareAttributeABCD = FareAttribute.of(new FeedScopedId(FEED_ID, "ABCD"))
+      .setCurrencyType("EUR")
+      .setPrice(ABCD_PRICE)
+      .setTransferDuration(fiveMinutes).
+      build();
+
 
     // Fare rule sets
     FareRuleSet ruleSetAB = new FareRuleSet(fareAttributeAB);

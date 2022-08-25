@@ -79,10 +79,6 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLservic
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,7 +194,7 @@ class LegacyGraphQLIndex {
       serverContext,
       serverContext.routingService(),
       serverContext.transitService(),
-      serverContext.graph().getService(FareService.class)
+      serverContext.graph().getFareService()
     );
 
     ExecutionInput executionInput = ExecutionInput
