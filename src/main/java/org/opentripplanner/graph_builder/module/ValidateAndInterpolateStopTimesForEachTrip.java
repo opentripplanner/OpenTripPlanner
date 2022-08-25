@@ -229,10 +229,14 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
 
   private double getMaxSpeedForMode(TransitMode mode) {
     return switch (mode) {
-      case AIRPLANE -> 280; // 1000 km/h
-      case RAIL -> 70; // 250 km/h
-      case GONDOLA, FUNICULAR -> 10; // max in the world is 9 m/s for gondolas, 6 m/s for funiculars
-      default -> 30; // 108km/h
+      // 1000 km/h
+      case AIRPLANE -> 280;
+      // 250 km/h
+      case RAIL -> 70;
+      // max in the world is 9 m/s for gondolas, 6 m/s for funiculars
+      case GONDOLA, FUNICULAR -> 10; 
+      // 108km/h
+      default -> 30;
     };
   }
 
