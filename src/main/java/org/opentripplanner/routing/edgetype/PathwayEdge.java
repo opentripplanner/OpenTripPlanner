@@ -77,10 +77,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
-  public String getDirection() {
-    return null;
-  }
-
   public State traverse(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
     if (s1 == null) {

@@ -54,14 +54,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   }
 
   /**
-   * Partial edges are always partial.
-   */
-  @Override
-  public boolean isPartial() {
-    return true;
-  }
-
-  /**
    * This implementation makes it so that TurnRestrictions on the parent edge are applied to this
    * edge as well.
    */

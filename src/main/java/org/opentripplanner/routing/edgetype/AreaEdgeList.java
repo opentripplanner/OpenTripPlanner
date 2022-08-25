@@ -117,7 +117,7 @@ public class AreaEdgeList implements Serializable {
         intersects.add(area);
       }
     }
-    if (intersects.size() > 0) {
+    if (!intersects.isEmpty()) {
       // If more than one area intersects, we pick one by random for the name & properties
       NamedArea area = intersects.get(0);
 

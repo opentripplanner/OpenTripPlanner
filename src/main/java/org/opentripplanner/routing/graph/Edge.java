@@ -35,19 +35,12 @@ public abstract class Edge implements Serializable {
     tov.addIncoming(this);
   }
 
-  public Vertex getFromVertex() {
+  public final Vertex getFromVertex() {
     return fromv;
   }
 
-  public Vertex getToVertex() {
+  public final Vertex getToVertex() {
     return tov;
-  }
-
-  /**
-   * Returns true if this edge is partial - overriden by subclasses.
-   */
-  public boolean isPartial() {
-    return false;
   }
 
   /**
@@ -63,13 +56,6 @@ public abstract class Edge implements Serializable {
    */
   public boolean isReverseOf(Edge e) {
     return (this.getFromVertex() == e.getToVertex() && this.getToVertex() == e.getFromVertex());
-  }
-
-  /**
-   * Get a direction on paths where it matters, or null
-   */
-  public String getDirection() {
-    return null;
   }
 
   @Override

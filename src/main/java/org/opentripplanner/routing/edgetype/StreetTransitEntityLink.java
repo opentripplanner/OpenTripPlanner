@@ -46,18 +46,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public Vertex getFromVertex() {
-    return fromv;
-  }
-
-  public Vertex getToVertex() {
-    return tov;
-  }
-
-  public String getDirection() {
-    return null;
-  }
-
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
