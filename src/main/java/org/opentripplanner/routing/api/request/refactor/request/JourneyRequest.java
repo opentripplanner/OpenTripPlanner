@@ -1,9 +1,17 @@
 package org.opentripplanner.routing.api.request.refactor.request;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.opentripplanner.routing.api.request.DebugRaptor;
+import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.RaptorOptions;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
-public class JourneyRequest {
+public class JourneyRequest implements Cloneable, Serializable {
 
   // TODO: 2022-08-22 maybe move it to transit so that it lies together with main modes?
   // TODO: 2022-08-18 should it be here?
@@ -23,9 +31,13 @@ public class JourneyRequest {
   @Deprecated
   private boolean onlyTransitTrips = false;
 
-  private VehicleRentalRequest rental;
-
-  private VehicleParkingRequest parking;
+  private VehicleRentalRequest rental = new VehicleRentalRequest();
+  private VehicleParkingRequest parking = new VehicleParkingRequest();
+  private TransitRequest transit = new TransitRequest();
+  private StreetRequest access = new StreetRequest();
+  private StreetRequest egress = new StreetRequest();
+  private StreetRequest transfer = new StreetRequest();
+  private StreetRequest direct = new StreetRequest();
 
   public VehicleRentalRequest rental() {
     return rental;
@@ -34,12 +46,6 @@ public class JourneyRequest {
   public VehicleParkingRequest parking() {
     return parking;
   }
-
-  private final TransitRequest transit = new TransitRequest();
-  private final StreetRequest access = new StreetRequest();
-  private final StreetRequest egress = new StreetRequest();
-  private final StreetRequest transfer = new StreetRequest();
-  private final StreetRequest direct = new StreetRequest();
 
   public TransitRequest transit() {
     return transit;
@@ -75,5 +81,24 @@ public class JourneyRequest {
 
   public boolean onlyTransitTrips() {
     return onlyTransitTrips;
+  }
+
+  public JourneyRequest clone() {
+    try {
+      var clone = (JourneyRequest) super.clone();
+      clone.rental = this.rental.clone();
+      clone.parking = this.parking.clone();
+      clone.transit = this.transit.clone();
+      clone.access = this.access.clone();
+      clone.egress = this.egress.clone();
+      clone.transfer = this.transfer.clone();
+      clone.direct = this.direct.clone();
+      clone.streetSubRequestModes = this.streetSubRequestModes.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
   }
 }

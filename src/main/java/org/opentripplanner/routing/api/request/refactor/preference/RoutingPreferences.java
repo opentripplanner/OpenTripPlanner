@@ -1,18 +1,20 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
-// * User/trip cost/time/slack/reluctance search config.
-public class RoutingPreferences {
+import java.io.Serializable;
 
-  private final TransitPreferences transit = new TransitPreferences();
-  private final TransferPreferences transfer = new TransferPreferences();
-  private final WalkPreferences walk = new WalkPreferences();
-  private final StreetPreferences street = new StreetPreferences();
-  private final WheelchairPreferences wheelchair = new WheelchairPreferences();
-  private final BikePreferences bike = new BikePreferences();
-  private final CarPreferences car = new CarPreferences();
-  private final VehicleRentalPreferences rental = new VehicleRentalPreferences();
-  private final VehicleParkingPreferences parking = new VehicleParkingPreferences();
-  private final SystemPreferences system = new SystemPreferences();
+// * User/trip cost/time/slack/reluctance search config.
+public class RoutingPreferences implements Cloneable, Serializable {
+
+  private TransitPreferences transit = new TransitPreferences();
+  private TransferPreferences transfer = new TransferPreferences();
+  private WalkPreferences walk = new WalkPreferences();
+  private StreetPreferences street = new StreetPreferences();
+  private WheelchairPreferences wheelchair = new WheelchairPreferences();
+  private BikePreferences bike = new BikePreferences();
+  private CarPreferences car = new CarPreferences();
+  private VehicleRentalPreferences rental = new VehicleRentalPreferences();
+  private VehicleParkingPreferences parking = new VehicleParkingPreferences();
+  private SystemPreferences system = new SystemPreferences();
 
   public void setNonTransitReluctance(double nonTransitReluctance) {
     if (nonTransitReluctance > 0) {
@@ -61,5 +63,27 @@ public class RoutingPreferences {
 
   public SystemPreferences system() {
     return system;
+  }
+
+  public RoutingPreferences clone() {
+    try {
+      var clone = (RoutingPreferences) super.clone();
+
+      clone.transit = transit.clone();
+      clone.transfer = transfer.clone();
+      clone.walk = walk.clone();
+      clone.street = street.clone();
+      clone.wheelchair = wheelchair.clone();
+      clone.bike = bike.clone();
+      clone.car = car.clone();
+      clone.rental = rental.clone();
+      clone.parking = parking.clone();
+      clone.system = system.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -178,7 +178,12 @@ public class RoutingRequestMapper {
         c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
 
-    request.setMaxJourneyDuration(c.asDuration("maxJourneyDuration", dft.maxJourneyDuration()));
+    preferences
+      .system()
+      .setMaxJourneyDuration(
+        c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
+      );
+
     // TODO: 2022-08-23 Verify that this is right
     var journeyRequest = c.asJourneyRequest("modes", dft.journey());
     request.journey().access().setMode(journeyRequest.access().mode());

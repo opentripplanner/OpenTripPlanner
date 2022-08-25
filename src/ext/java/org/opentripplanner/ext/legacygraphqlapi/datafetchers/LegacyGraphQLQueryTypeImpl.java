@@ -789,9 +789,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument("maxTransfers", preferences.transfer()::setMaxTransfers);
 
-      preferences
-        .rental()
-        .setUseAvailabilityInformation(request.isTripPlannedForNow());
+      preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
       callWith.argument(
         "startTransitTripId",

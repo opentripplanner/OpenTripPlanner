@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import org.opentripplanner.routing.impl.PathComparator;
 import org.opentripplanner.routing.spt.GraphPath;
 
 // Direct street search
-public class StreetPreferences {
+public class StreetPreferences implements Cloneable, Serializable {
 
   /**
    * This is the maximum duration for access/egress street searches. This is a performance limit and

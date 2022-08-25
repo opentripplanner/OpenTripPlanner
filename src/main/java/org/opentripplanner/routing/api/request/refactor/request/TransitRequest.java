@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request.refactor.request;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +11,7 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 
-public class TransitRequest {
+public class TransitRequest implements Cloneable, Serializable {
 
   private List<MainAndSubMode> modes = MainAndSubMode.all();
   private Set<FeedScopedId> whiteListedAgencies = Set.of();
@@ -238,5 +239,29 @@ public class TransitRequest {
 
   public DebugRaptor raptorDebugging() {
     return raptorDebugging;
+  }
+
+  public TransitRequest clone() {
+    // TODO: 2022-08-25 is skipping modes right?
+
+    try {
+      var clone = (TransitRequest) super.clone();
+
+      clone.whiteListedAgencies = new HashSet<>(this.whiteListedAgencies);
+      clone.bannedAgencies = new HashSet<>(this.bannedAgencies);
+      clone.preferredAgencies = new HashSet<>(this.preferredAgencies);
+      clone.unpreferredAgencies = new HashSet<>(this.unpreferredAgencies);
+      clone.whiteListedRoutes = this.whiteListedRoutes.clone();
+      clone.bannedRoutes = this.bannedRoutes.clone();
+      clone.preferredRoutes = this.preferredRoutes.clone();
+      clone.unpreferredRoutes = this.unpreferredRoutes.clone();
+      clone.bannedTrips = new HashSet<>(this.bannedTrips);
+      clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
-public class VehicleParkingPreferences {
+import java.io.Serializable;
+
+public class VehicleParkingPreferences implements Cloneable, Serializable {
 
   /**
    * If true vehicle parking availability information will be used to plan park and ride trips where
@@ -8,9 +10,7 @@ public class VehicleParkingPreferences {
    */
   private boolean useAvailabilityInformation = false;
 
-  public void setUseAvailabilityInformation(
-    boolean useAvailabilityInformation
-  ) {
+  public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
     this.useAvailabilityInformation = useAvailabilityInformation;
   }
 

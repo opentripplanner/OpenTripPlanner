@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.api.request.refactor.request;
 
+import java.io.Serializable;
 import java.time.Duration;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.StreetMode;
 
-public class StreetRequest {
+public class StreetRequest implements Cloneable, Serializable {
 
   // TODO: 2022-08-25 why isn't it used?
   /**
@@ -27,5 +28,14 @@ public class StreetRequest {
 
   public StreetMode mode() {
     return mode;
+  }
+
+  public StreetRequest clone() {
+    try {
+      return (StreetRequest) super.clone();
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
   }
 }

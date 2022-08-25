@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
+import java.io.Serializable;
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 
-public class WheelchairPreferences {
+public class WheelchairPreferences implements Cloneable, Serializable {
 
   /**
    * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.

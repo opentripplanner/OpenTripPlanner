@@ -1003,9 +1003,7 @@ public abstract class RoutingResource {
       .withPath(debugRaptorPath);
 
     if (useVehicleParkingAvailabilityInformation != null) {
-      preferences
-        .parking()
-        .setUseAvailabilityInformation(useVehicleParkingAvailabilityInformation);
+      preferences.parking().setUseAvailabilityInformation(useVehicleParkingAvailabilityInformation);
     }
 
     if (locale != null) {

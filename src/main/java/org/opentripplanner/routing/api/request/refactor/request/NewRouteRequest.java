@@ -2,11 +2,15 @@ package org.opentripplanner.routing.api.request.refactor.request;
 
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -15,6 +19,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
+import org.opentripplanner.routing.api.request.DebugRaptor;
+import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
@@ -30,11 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TODO: 2022-08-18 rename class when done
-public class NewRouteRequest {
+public class NewRouteRequest implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(NewRouteRequest.class);
 
-  // TODO: 2022-08-22 should it be here?
   /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
   /**
    * How close to do you have to be to the start or end to be considered "close".
@@ -54,13 +60,11 @@ public class NewRouteRequest {
   /** The start location */
   private GenericLocation from;
 
-  // TODO: 2022-08-22 should it be here?
   private Envelope fromEnvelope;
 
   /** The end location */
   private GenericLocation to;
 
-  // TODO: 2022-08-22 should it be here?
   private Envelope toEnvelope;
 
   /**
@@ -141,22 +145,7 @@ public class NewRouteRequest {
    */
   private int numItineraries = 50;
 
-  private final JourneyRequest journey = new JourneyRequest();
-
-  // TODO: 2022-08-18 Should it be here?
-  /**
-   * The expected maximum time a journey can last across all possible journeys for the current
-   * deployment. Normally you would just do an estimate and add enough slack, so you are sure that
-   * there is no journeys that falls outside this window. The parameter is used find all possible
-   * dates for the journey and then search only the services which run on those dates. The duration
-   * must include access, egress, wait-time and transit time for the whole journey. It should also
-   * take low frequency days/periods like holidays into account. In other words, pick the two points
-   * within your area that has the worst connection and then try to travel on the worst possible
-   * day, and find the maximum journey duration. Using a value that is too high has the effect of
-   * including more patterns in the search, hence, making it a bit slower. Recommended values would
-   * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
-   */
-  private Duration maxJourneyDuration = Duration.ofHours(24);
+  private JourneyRequest journey = new JourneyRequest();
 
   /**
    * A trip where this trip must start from (depart-onboard routing)
@@ -353,9 +342,24 @@ public class NewRouteRequest {
     throw new RuntimeException("Not implemented");
   }
 
+  private void setJourney(JourneyRequest journey) {
+    this.journey = journey;
+  }
+
   // TODO: 2022-08-18 implement
   public NewRouteRequest clone() {
-    throw new RuntimeException("Not Implemented");
+    try {
+      // TODO: 2022-08-25 there are some fields which will not be cloned in proper way
+      // but that's how it was implemented before so I'm leaving it like that
+
+      var clone = (NewRouteRequest) super.clone();
+      clone.setJourney(this.journey().clone());
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
   }
 
   public NewRouteRequest copyWithDateTimeNow() {
@@ -458,14 +462,6 @@ public class NewRouteRequest {
 
   public JourneyRequest journey() {
     return journey;
-  }
-
-  public void setMaxJourneyDuration(Duration maxJourneyDuration) {
-    this.maxJourneyDuration = maxJourneyDuration;
-  }
-
-  public Duration maxJourneyDuration() {
-    return maxJourneyDuration;
   }
 
   public void setStartingTransitTripId(FeedScopedId startingTransitTripId) {

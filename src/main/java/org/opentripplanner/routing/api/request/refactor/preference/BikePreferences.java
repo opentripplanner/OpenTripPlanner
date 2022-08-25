@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
+import java.io.Serializable;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BikePreferences {
+public class BikePreferences implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(BikePreferences.class);
 

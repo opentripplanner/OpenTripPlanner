@@ -85,7 +85,8 @@ public class RoutingWorker {
       createAdditionalSearchDays(
         serverContext.routerConfig().raptorTuningParameters(),
         zoneId,
-        request
+        request,
+        preferences
       );
   }
 
@@ -182,7 +183,8 @@ public class RoutingWorker {
   private static AdditionalSearchDays createAdditionalSearchDays(
     RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,
-    NewRouteRequest request
+    NewRouteRequest request,
+    RoutingPreferences preferences
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
     var maxWindow = Duration.ofMinutes(
@@ -194,7 +196,7 @@ public class RoutingWorker {
       searchDateTime,
       request.searchWindow(),
       maxWindow,
-      request.maxJourneyDuration()
+      preferences.system().maxJourneyDuration()
     );
   }
 

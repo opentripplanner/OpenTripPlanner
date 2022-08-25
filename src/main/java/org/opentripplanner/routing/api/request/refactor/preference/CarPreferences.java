@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
-public class CarPreferences {
+import java.io.Serializable;
+
+public class CarPreferences implements Cloneable, Serializable {
 
   /**
    * Max car speed along streets, in meters per second.

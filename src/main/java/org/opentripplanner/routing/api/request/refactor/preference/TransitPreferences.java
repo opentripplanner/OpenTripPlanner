@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.refactor.preference;
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 
+import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public class TransitPreferences {
+public class TransitPreferences implements Cloneable, Serializable {
 
   /**
    * When true, realtime updates are ignored during this search.

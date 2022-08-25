@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
-public class WalkPreferences {
+import java.io.Serializable;
+
+public class WalkPreferences implements Cloneable, Serializable {
 
   /**
    * Human walk speed along streets, in meters per second.

@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
+import java.io.Serializable;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 
-public class TransferPreferences {
+public class TransferPreferences implements Cloneable, Serializable {
 
   /**
    * An extra penalty added on transfers (i.e. all boardings except the first one). Not to be
