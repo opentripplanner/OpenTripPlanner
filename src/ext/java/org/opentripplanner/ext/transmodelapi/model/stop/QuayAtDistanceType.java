@@ -8,7 +8,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 public class QuayAtDistanceType {
 
@@ -27,7 +27,7 @@ public class QuayAtDistanceType {
               ((NearbyStop) environment.getSource()).distance +
               ";" +
               TransitIdMapper.mapEntityIDToApi(
-                (TransitEntity) ((NearbyStop) environment.getSource()).stop
+                (AbstractTransitEntity) ((NearbyStop) environment.getSource()).stop
               )
             )
           )

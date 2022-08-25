@@ -26,8 +26,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.TransitBuilder;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -66,7 +66,7 @@ public class ScheduledDeviatedTrip
   }
 
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
+    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof RegularStop);
     Predicate<StopTime> notContinuousStop = stopTime ->
       stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
     return (
@@ -240,8 +240,8 @@ public class ScheduledDeviatedTrip
   }
 
   private Collection<StopLocation> expandStops(StopLocation stop) {
-    return stop instanceof FlexLocationGroup
-      ? ((FlexLocationGroup) stop).getLocations()
+    return stop instanceof GroupStop groupStop
+      ? groupStop.getLocations()
       : Collections.singleton(stop);
   }
 
@@ -251,8 +251,8 @@ public class ScheduledDeviatedTrip
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
-      if (stop instanceof FlexLocationGroup) {
-        if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
+      if (stop instanceof GroupStop groupStop) {
+        if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {
@@ -270,8 +270,8 @@ public class ScheduledDeviatedTrip
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
-      if (stop instanceof FlexLocationGroup) {
-        if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
+      if (stop instanceof GroupStop groupStop) {
+        if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {

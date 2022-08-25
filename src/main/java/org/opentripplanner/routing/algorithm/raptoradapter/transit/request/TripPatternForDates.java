@@ -1,17 +1,18 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import gnu.trove.list.TIntList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -28,10 +29,10 @@ public class TripPatternForDates
   implements
     RaptorRoute<TripSchedule>,
     RaptorTimeTable<TripSchedule>,
-    RaptorTripPattern,
+    DefaultTripPattern,
     TripSearchTimetable<TripSchedule> {
 
-  private final TripPatternWithRaptorStopIndexes tripPattern;
+  private final RoutingTripPattern tripPattern;
 
   private final TripPatternForDate[] tripPatternForDates;
 
@@ -40,8 +41,6 @@ public class TripPatternForDates
   private final int numberOfTripSchedules;
 
   private final boolean isFrequencyBased;
-
-  private final int slackIndex;
 
   /**
    * The arrival times in a nStops * numberOfTripSchedules sized array. The trips are stored first
@@ -58,27 +57,27 @@ public class TripPatternForDates
 
   private final WheelchairAccessibility[] wheelchairBoardings;
 
-  // bit arrays with boarding/alighting information for all stops on trip pattern
+  // bit arrays with boarding/alighting information for all stops on trip pattern,
+  // potentially filtered by wheelchair accessibility
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
 
   TripPatternForDates(
-    TripPatternWithRaptorStopIndexes tripPattern,
+    RoutingTripPattern tripPattern,
     List<TripPatternForDate> tripPatternForDates,
-    List<Integer> offsets,
+    TIntList offsets,
     BitSet boardingPossible,
     BitSet alightningPossible
   ) {
     this.tripPattern = tripPattern;
     this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[] {});
-    this.offsets = offsets.stream().mapToInt(i -> i).toArray();
+    this.offsets = offsets.toArray();
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
-    this.slackIndex = SlackProvider.slackIndex(tripPattern.getPattern());
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
-    for (TripPatternForDate tripPatternForDate : tripPatternForDates) {
+    for (TripPatternForDate tripPatternForDate : this.tripPatternForDates) {
       numberOfTripSchedules += tripPatternForDate.numberOfTripSchedules();
       if (tripPatternForDate.hasFrequencies()) {
         hasFrequencies = true;
@@ -89,13 +88,13 @@ public class TripPatternForDates
 
     wheelchairBoardings = new WheelchairAccessibility[numberOfTripSchedules];
 
-    final int nStops = tripPattern.getStopIndexes().length;
+    final int nStops = tripPattern.numberOfStopsInPattern();
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
     this.departureTimes = new int[nStops * numberOfTripSchedules];
     int i = 0;
-    for (int d = 0; d < tripPatternForDates.size(); d++) {
+    for (int d = 0; d < this.tripPatternForDates.length; d++) {
       int offset = this.offsets[d];
-      for (var trip : tripPatternForDates.get(d).tripTimes()) {
+      for (var trip : this.tripPatternForDates[d].tripTimes()) {
         wheelchairBoardings[i] = trip.getWheelchairAccessibility();
         for (int s = 0; s < nStops; s++) {
           this.arrivalTimes[s * numberOfTripSchedules + i] = trip.getArrivalTime(s) + offset;
@@ -106,7 +105,7 @@ public class TripPatternForDates
     }
   }
 
-  public TripPatternWithRaptorStopIndexes getTripPattern() {
+  public RoutingTripPattern getTripPattern() {
     return tripPattern;
   }
 
@@ -142,21 +141,16 @@ public class TripPatternForDates
     return this;
   }
 
-  @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsForwardSearch() {
-    return getTripPattern().constrainedTransferForwardSearch();
-  }
-
-  @Override
-  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsReverseSearch() {
-    return getTripPattern().constrainedTransferReverseSearch();
-  }
-
   /* Implementing RaptorTripPattern */
 
   @Override
+  public int patternIndex() {
+    return tripPattern.patternIndex();
+  }
+
+  @Override
   public int numberOfStopsInPattern() {
-    return tripPattern.getStopIndexes().length;
+    return tripPattern.numberOfStopsInPattern();
   }
 
   @Override
@@ -176,14 +170,16 @@ public class TripPatternForDates
 
   @Override
   public int slackIndex() {
-    return slackIndex;
+    return tripPattern.slackIndex();
+  }
+
+  public int transitReluctanceFactorIndex() {
+    return tripPattern.transitReluctanceFactorIndex();
   }
 
   @Override
   public String debugInfo() {
-    return (
-      tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().getRoute().getShortName()
-    );
+    return tripPattern.debugInfo();
   }
 
   /*  Implementing RaptorTimeTable */
@@ -226,6 +222,11 @@ public class TripPatternForDates
   @Override
   public int numberOfTripSchedules() {
     return numberOfTripSchedules;
+  }
+
+  @Override
+  public Route route() {
+    return tripPattern.route();
   }
 
   /**

@@ -71,6 +71,8 @@ public class RoutingRequestMapper {
     request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
     request.boardSlackForMode =
       c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt);
+    request.maxAccessEgressDuration =
+      c.asDuration("maxAccessEgressDuration", dft.maxAccessEgressDuration);
     request.maxAccessEgressDurationForMode =
       c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration);
     request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
@@ -108,6 +110,7 @@ public class RoutingRequestMapper {
       c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
     request.pathComparator = c.asText("pathComparator", dft.pathComparator);
+    request.searchWindow = c.asDuration("searchWindow", dft.searchWindow);
     request.requiredVehicleParkingTags =
       c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
     request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
@@ -115,6 +118,7 @@ public class RoutingRequestMapper {
     request.stairsTimeFactor = c.asDouble("stairsTimeFactor", dft.stairsTimeFactor);
     request.startingTransitTripId =
       c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
+    request.timetableView = c.asBoolean("timetableView", dft.timetableView);
     request.transferCost = c.asInt("transferPenalty", dft.transferCost);
     request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
     request.setTransitReluctanceForMode(
@@ -131,14 +135,14 @@ public class RoutingRequestMapper {
         "useVehicleParkingAvailabilityInformation",
         dft.useVehicleParkingAvailabilityInformation
       );
-    request.unpreferredRouteCost =
-      c.asLinearFunction("unpreferredRouteCost", dft.unpreferredRouteCost);
+    request.unpreferredCost = c.asLinearFunction("unpreferredCost", dft.unpreferredCost);
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
     request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
     request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
     request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
     request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
+    request.walkSafetyFactor = c.asDouble("walkSafetyFactor", dft.walkSafetyFactor);
 
     request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
 
@@ -149,8 +153,14 @@ public class RoutingRequestMapper {
 
     request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
 
-    request.unpreferredRoutes =
-      c.path("unpreferred").asFeedScopedIds("routes", dft.unpreferredRoutes);
+    var unpreferred = c.path("unpreferred");
+    request.setUnpreferredRoutes(
+      unpreferred.asFeedScopedIdSet("routes", dft.getUnpreferredRoutes())
+    );
+
+    request.setUnpreferredAgencies(
+      unpreferred.asFeedScopedIdSet("agencies", dft.getUnpreferredAgencies())
+    );
 
     return request;
   }

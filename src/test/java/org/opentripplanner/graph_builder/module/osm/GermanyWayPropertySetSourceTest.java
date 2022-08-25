@@ -32,7 +32,7 @@ public class GermanyWayPropertySetSourceTest {
     way.addTag("lit", "yes");
     way.addTag("oneway", "no");
     way.addTag("traffic_sign", "DE:239,1022-10");
-    assertEquals(1.2, wps.getDataForWay(way).getSafetyFeatures().first, epsilon);
+    assertEquals(1.2, wps.getDataForWay(way).getBicycleSafetyFeatures().first, epsilon);
 
     way = new OSMWithTags();
     way.addTag("cycleway", "opposite");
@@ -49,7 +49,9 @@ public class GermanyWayPropertySetSourceTest {
     way.addTag("surface", "asphalt");
     way.addTag("width", "6.5");
     way.addTag("zone:traffic", "DE:urban");
-    assertEquals(0.9, wps.getDataForWay(way).getSafetyFeatures().first, epsilon);
+    assertEquals(0.9, wps.getDataForWay(way).getBicycleSafetyFeatures().first, epsilon);
+    // walk safety should be default
+    assertEquals(1, wps.getDataForWay(way).getWalkSafetyFeatures().first, epsilon);
 
     // way332589799 (Radschnellweg BW1)
     way = new OSMWithTags();
@@ -67,7 +69,7 @@ public class GermanyWayPropertySetSourceTest {
     way.addTag("source:maxspeed", "sign");
     way.addTag("surface", "asphalt");
     way.addTag("tracktype", "grade1");
-    assertEquals(0.693, wps.getDataForWay(way).getSafetyFeatures().first, epsilon);
+    assertEquals(0.693, wps.getDataForWay(way).getBicycleSafetyFeatures().first, epsilon);
 
     way = new OSMWithTags();
     way.addTag("highway", "track");
@@ -76,7 +78,7 @@ public class GermanyWayPropertySetSourceTest {
     way.addTag("tracktype", "grade1");
     way.addTag("traffic_sign", "DE:260,1026-36");
     way.addTag("width", "2.5");
-    assertEquals(1.0, wps.getDataForWay(way).getSafetyFeatures().first, epsilon);
+    assertEquals(1.0, wps.getDataForWay(way).getBicycleSafetyFeatures().first, epsilon);
   }
 
   @Test
@@ -135,14 +137,14 @@ public class GermanyWayPropertySetSourceTest {
     residential.addTag("highway", "residential");
 
     assertEquals(
-      wps.getDataForWay(both).getSafetyFeatures().first,
-      wps.getDataForWay(justLcn).getSafetyFeatures().first,
+      wps.getDataForWay(both).getBicycleSafetyFeatures().first,
+      wps.getDataForWay(justLcn).getBicycleSafetyFeatures().first,
       epsilon
     );
 
-    assertEquals(wps.getDataForWay(both).getSafetyFeatures().first, 0.6859, epsilon);
+    assertEquals(wps.getDataForWay(both).getBicycleSafetyFeatures().first, 0.6859, epsilon);
 
-    assertEquals(wps.getDataForWay(residential).getSafetyFeatures().first, 0.98, epsilon);
+    assertEquals(wps.getDataForWay(residential).getBicycleSafetyFeatures().first, 0.98, epsilon);
   }
 
   @Test
@@ -173,8 +175,8 @@ public class GermanyWayPropertySetSourceTest {
     residential.addTag("name", "Auf der Heide");
     residential.addTag("surface", "asphalt");
     assertEquals(
-      wps.getDataForWay(residential).getSafetyFeatures().first,
-      wps.getDataForWay(residential).getSafetyFeatures().second,
+      wps.getDataForWay(residential).getBicycleSafetyFeatures().first,
+      wps.getDataForWay(residential).getBicycleSafetyFeatures().second,
       epsilon
     );
   }

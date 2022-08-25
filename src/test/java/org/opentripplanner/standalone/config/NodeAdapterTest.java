@@ -108,6 +108,12 @@ public class NodeAdapterTest {
   }
 
   @Test
+  public void rawAsText() {
+    NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
+    assertEquals("TEXT", subject.path("aText").asText());
+  }
+
+  @Test
   public void asEnum() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A' }");
@@ -210,6 +216,15 @@ public class NodeAdapterTest {
     assertEquals(
       "[C:12]",
       subject.asFeedScopedIds("missing-key", List.of(new FeedScopedId("C", "12"))).toString()
+    );
+  }
+
+  @Test
+  public void asFeedScopedIdSet() {
+    NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12', 'A:23']}");
+    assertEquals(
+      Set.of(new FeedScopedId("A", "23"), new FeedScopedId("B", "12")),
+      subject.asFeedScopedIdSet("routes", Set.of())
     );
   }
 

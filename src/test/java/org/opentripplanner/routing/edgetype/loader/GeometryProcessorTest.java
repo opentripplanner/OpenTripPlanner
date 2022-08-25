@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -60,16 +58,14 @@ public class GeometryProcessorTest {
   public void setUp() throws Exception {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
-    this.issueStore = new DataImportIssueStore(true);
+    this.issueStore = new DataImportIssueStore();
 
     context =
       contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
 
     feedId = context.getFeedId().getId();
-    GeometryProcessor factory = new GeometryProcessor(context);
-    factory.run(transitModel);
     transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
 
     String[] stops = {
@@ -127,10 +123,9 @@ public class GeometryProcessorTest {
       );
     }
 
-    StreetLinkerModule ttsnm = new StreetLinkerModule();
     //Linkers aren't run otherwise
     graph.hasStreets = true;
-    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
   }
 
   @Test

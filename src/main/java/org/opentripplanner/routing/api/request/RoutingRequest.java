@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
 import java.io.Serializable;
@@ -425,6 +425,11 @@ public class RoutingRequest implements Cloneable, Serializable {
    */
   public int bikeBoardCost = 60 * 10;
   /**
+   * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+   * If the value is set to be 0, safety is ignored.
+   */
+  public double walkSafetyFactor = 1.0;
+  /**
    * Do not use certain named agencies
    */
   private Set<FeedScopedId> bannedAgencies = Set.of();
@@ -442,7 +447,6 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * Set of unpreferred agencies for given user.
    */
-  @Deprecated
   private Set<FeedScopedId> unpreferredAgencies = Set.of();
 
   /**
@@ -476,13 +480,13 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * Set of unpreferred routes for given user and configuration.
    */
-  public List<FeedScopedId> unpreferredRoutes = List.of();
+  private Set<FeedScopedId> unpreferredRoutes = Set.of();
 
   /**
-   * A cost function used to calculate penalty for an unpreferred route. Function should return
-   * number of seconds that we are willing to wait for preferred route.
+   * A cost function used to calculate penalty for an unpreferred route or agency. Function should
+   * return number of seconds that we are willing to wait for preferred route.
    */
-  public DoubleFunction<Double> unpreferredRouteCost = RequestFunctions.createLinearFunction(
+  public DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
     0.0,
     DEFAULT_ROUTE_RELUCTANCE
   );
@@ -764,6 +768,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
+  public void setWalkSafetyFactor(double walkSafetyFactor) {
+    if (walkSafetyFactor < 0) {
+      this.walkSafetyFactor = 0;
+    } else if (walkSafetyFactor > 1) {
+      this.walkSafetyFactor = 1;
+    } else {
+      this.walkSafetyFactor = walkSafetyFactor;
+    }
+  }
+
   public void setPreferredAgencies(Collection<FeedScopedId> ids) {
     if (ids != null) {
       preferredAgencies = Set.copyOf(ids);
@@ -788,8 +802,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
   }
 
-  public void setUnpreferredRouteCost(String constFunction) {
-    unpreferredRouteCost = RequestFunctions.parse(constFunction);
+  public void setUnpreferredCost(String constFunction) {
+    unpreferredCost = RequestFunctions.parse(constFunction);
   }
 
   public void setBannedAgencies(Collection<FeedScopedId> ids) {
@@ -834,14 +848,14 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   public void setUnpreferredRoutes(Collection<FeedScopedId> routeIds) {
-    unpreferredRoutes = routeIds.stream().toList();
+    unpreferredRoutes = Set.copyOf(routeIds);
   }
 
   public void setUnpreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      unpreferredRoutes = FeedScopedId.parseListOfIds(s);
+      unpreferredRoutes = Set.copyOf(FeedScopedId.parseListOfIds(s));
     } else {
-      unpreferredRoutes = List.of();
+      unpreferredRoutes = Set.of();
     }
   }
 
@@ -1135,7 +1149,7 @@ public class RoutingRequest implements Cloneable, Serializable {
       clone.bannedRoutes = bannedRoutes.clone();
       clone.whiteListedRoutes = whiteListedRoutes.clone();
       clone.preferredRoutes = List.copyOf(preferredRoutes);
-      clone.unpreferredRoutes = List.copyOf(unpreferredRoutes);
+      clone.unpreferredRoutes = Set.copyOf(unpreferredRoutes);
 
       clone.bannedTrips = Set.copyOf(bannedTrips);
 
@@ -1257,6 +1271,14 @@ public class RoutingRequest implements Cloneable, Serializable {
 
   public Duration getMaxDirectStreetDuration(StreetMode mode) {
     return maxDirectStreetDurationForMode.getOrDefault(mode, maxDirectStreetDuration);
+  }
+
+  public Set<FeedScopedId> getUnpreferredAgencies() {
+    return unpreferredAgencies;
+  }
+
+  public Set<FeedScopedId> getUnpreferredRoutes() {
+    return unpreferredRoutes;
   }
 
   /**

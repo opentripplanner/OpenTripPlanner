@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.routing.core.TraverseMode.BUS;
@@ -13,7 +14,6 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
@@ -68,7 +68,12 @@ public class FlexIntegrationTest {
   }
 
   @Test
-  public void shouldReturnARouteTransferringFromBusToFlex() {
+  void addFlexTripsAndPatternsToGraph() {
+    assertFalse(transitModel.getAllTripPatterns().isEmpty());
+  }
+
+  @Test
+  void shouldReturnARouteTransferringFromBusToFlex() {
     var from = new GenericLocation(33.84329482265106, -84.583740234375);
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
@@ -98,7 +103,7 @@ public class FlexIntegrationTest {
   }
 
   @Test
-  public void shouldReturnARouteWithTwoTransfers() {
+  void shouldReturnARouteWithTwoTransfers() {
     var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
@@ -127,7 +132,7 @@ public class FlexIntegrationTest {
   }
 
   @Test
-  public void flexDirect() {
+  void flexDirect() {
     // near flex zone
     var from = new GenericLocation(33.85281, -84.60271);
     // in the middle of flex zone
@@ -172,30 +177,37 @@ public class FlexIntegrationTest {
     TransitModel transitModel,
     List<String> gtfsFiles
   ) {
-    var extra = new HashMap<Class<?>, Object>();
-
     // GTFS
     var gtfsBundles = gtfsFiles.stream().map(f -> new GtfsBundle(new File(f))).toList();
-    GtfsModule gtfsModule = new GtfsModule(gtfsBundles, ServiceDateInterval.unbounded());
-    gtfsModule.buildGraph(graph, transitModel, extra);
+    GtfsModule gtfsModule = new GtfsModule(
+      gtfsBundles,
+      transitModel,
+      graph,
+      ServiceDateInterval.unbounded()
+    );
+    gtfsModule.buildGraph();
 
     // link stations to streets
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, transitModel, extra);
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     // link flex locations to streets
-    var flexMapper = new FlexLocationsToStreetEdgesMapper();
-    flexMapper.buildGraph(graph, transitModel, new HashMap<>());
+    new FlexLocationsToStreetEdgesMapper(graph, transitModel).buildGraph();
 
     // generate direct transfers
     var req = new RoutingRequest();
 
     // we don't have a complete coverage of the entire area so use straight lines for transfers
-    var transfers = new DirectTransferGenerator(Duration.ofMinutes(10), List.of(req));
-    transfers.buildGraph(graph, transitModel, extra);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      Duration.ofMinutes(10),
+      List.of(req)
+    )
+      .buildGraph();
 
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
   }
 
   private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {

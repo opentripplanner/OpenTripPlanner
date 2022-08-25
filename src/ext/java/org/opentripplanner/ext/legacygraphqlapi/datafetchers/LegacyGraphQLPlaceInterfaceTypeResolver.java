@@ -10,7 +10,7 @@ import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class LegacyGraphQLPlaceInterfaceTypeResolver implements TypeResolver {
 
@@ -41,7 +41,7 @@ public class LegacyGraphQLPlaceInterfaceTypeResolver implements TypeResolver {
     if (o instanceof PatternAtStop) {
       return schema.getObjectType("DepartureRow");
     }
-    if (o instanceof Stop) {
+    if (o instanceof RegularStop) {
       return schema.getObjectType("Stop");
     }
 

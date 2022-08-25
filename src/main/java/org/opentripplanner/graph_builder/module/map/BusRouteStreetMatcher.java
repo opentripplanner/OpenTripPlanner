@@ -3,12 +3,11 @@ package org.opentripplanner.graph_builder.module.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.network.Route;
@@ -30,23 +29,19 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
 
   private static final Logger log = LoggerFactory.getLogger(BusRouteStreetMatcher.class);
 
-  public List<String> provides() {
-    return List.of("edge matching");
+  private final Graph graph;
+  private final TransitModel transitModel;
+
+  @Inject
+  public BusRouteStreetMatcher(Graph graph, TransitModel transitModel) {
+    this.graph = graph;
+    this.transitModel = transitModel;
   }
 
-  public List<String> getPrerequisites() {
-    return Arrays.asList("streets", "transit");
-  }
-
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     // Mapbuilder needs transit index
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
 
     StreetMatcher matcher = new StreetMatcher(graph);
     log.info("Finding corresponding street edges for trip patterns...");

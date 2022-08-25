@@ -1,133 +1,111 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.ext.fares.model;
 
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 
-public final class FareAttribute extends TransitEntity {
+public final class FareAttribute
+  extends AbstractTransitEntity<FareAttribute, FareAttributeBuilder> {
 
-  private static final long serialVersionUID = 1L;
+  private final float price;
 
-  private static final int MISSING_VALUE = -999;
+  private final String currencyType;
 
-  private float price;
+  private final int paymentMethod;
 
-  private String currencyType;
+  private final Integer transfers;
 
-  private int paymentMethod;
-
-  private int transfers = MISSING_VALUE;
-
-  private int transferDuration = MISSING_VALUE;
+  private final Integer transferDuration;
 
   /** youthPrice is an extension to the GTFS spec to support Seattle fare types. */
-  private float youthPrice;
+  private final float youthPrice;
 
   /** seniorPrice is an extension to the GTFS spec to support Seattle fare types. */
-  private float seniorPrice;
+  private final float seniorPrice;
 
   /** This is a proposed extension to the GTFS spec */
-  private int journeyDuration = MISSING_VALUE;
+  private final Integer journeyDuration;
 
-  public FareAttribute(FeedScopedId id) {
-    super(id);
+  FareAttribute(FareAttributeBuilder builder) {
+    super(builder.getId());
+    this.price = builder.price();
+    this.currencyType = builder.currencyType();
+    this.paymentMethod = builder.paymentMethod();
+    this.transfers = builder.transfers();
+    this.transferDuration = builder.transferDuration();
+    this.youthPrice = builder.youthPrice();
+    this.seniorPrice = builder.seniorPrice();
+    this.journeyDuration = builder.journeyDuration();
   }
 
-  public FareAttribute(FareAttribute fa) {
-    super(fa.getId());
-    this.price = fa.price;
-    this.currencyType = fa.currencyType;
-    this.paymentMethod = fa.paymentMethod;
-    this.transfers = fa.transfers;
-    this.transferDuration = fa.transferDuration;
-    this.journeyDuration = fa.journeyDuration;
+  public static FareAttributeBuilder of(FeedScopedId id) {
+    return new FareAttributeBuilder(id);
   }
 
   public float getPrice() {
     return price;
   }
 
-  public void setPrice(float price) {
-    this.price = price;
-  }
-
   public String getCurrencyType() {
     return currencyType;
-  }
-
-  public void setCurrencyType(String currencyType) {
-    this.currencyType = currencyType;
   }
 
   public int getPaymentMethod() {
     return paymentMethod;
   }
 
-  public void setPaymentMethod(int paymentMethod) {
-    this.paymentMethod = paymentMethod;
-  }
-
   public boolean isTransfersSet() {
-    return transfers != MISSING_VALUE;
+    return transfers != null;
   }
 
-  public int getTransfers() {
+  public Integer getTransfers() {
     return transfers;
   }
 
-  public void setTransfers(int transfers) {
-    this.transfers = transfers;
-  }
-
-  public void clearTransfers() {
-    this.transfers = MISSING_VALUE;
-  }
-
   public boolean isTransferDurationSet() {
-    return transferDuration != MISSING_VALUE;
+    return transferDuration != null;
   }
 
-  public int getTransferDuration() {
+  public Integer getTransferDuration() {
     return transferDuration;
   }
 
-  public void setTransferDuration(int transferDuration) {
-    this.transferDuration = transferDuration;
-  }
-
-  public void clearTransferDuration() {
-    this.transferDuration = MISSING_VALUE;
-  }
-
   public boolean isJourneyDurationSet() {
-    return journeyDuration != MISSING_VALUE;
+    return journeyDuration != null;
   }
 
-  public int getJourneyDuration() {
+  public Integer getJourneyDuration() {
     return journeyDuration;
-  }
-
-  public void setJourneyDuration(int journeyDuration) {
-    this.journeyDuration = journeyDuration;
-  }
-
-  public void clearJourneyDuration() {
-    this.journeyDuration = MISSING_VALUE;
   }
 
   public float getYouthPrice() {
     return youthPrice;
   }
 
-  public void setYouthPrice(float youthPrice) {
-    this.youthPrice = youthPrice;
-  }
-
   public float getSeniorPrice() {
     return seniorPrice;
   }
 
-  public void setSeniorPrice(float seniorPrice) {
-    this.seniorPrice = seniorPrice;
+  @Override
+  public boolean sameAs(@Nonnull FareAttribute other) {
+    return (
+      getId().equals(other.getId()) &&
+      price == other.getPrice() &&
+      Objects.equals(currencyType, other.getCurrencyType()) &&
+      paymentMethod == other.getPaymentMethod() &&
+      Objects.equals(transfers, other.getTransfers()) &&
+      Objects.equals(transferDuration, other.getTransferDuration()) &&
+      youthPrice == other.getYouthPrice() &&
+      seniorPrice == other.getSeniorPrice() &&
+      Objects.equals(journeyDuration, other.getJourneyDuration())
+    );
+  }
+
+  @Nonnull
+  @Override
+  public FareAttributeBuilder copy() {
+    return new FareAttributeBuilder(this);
   }
 }

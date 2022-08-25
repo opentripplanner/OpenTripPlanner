@@ -18,7 +18,7 @@ public class VehicleParkingTestGraphData {
   public void initGraph() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
     transitModel = new TransitModel(stopModel, deduplicator);
     graph.hasStreets = true;
 

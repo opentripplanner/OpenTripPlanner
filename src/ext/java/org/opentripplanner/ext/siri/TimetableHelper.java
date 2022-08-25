@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -372,11 +373,13 @@ public class TimetableHelper {
       newTimes.cancelTrip();
     }
 
-    if (!newTimes.timesIncreasing()) {
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
+    if (invalidStopIndex.isPresent()) {
       LOG.info(
-        "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}.",
+        "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         journey.getLineRef().getValue(),
-        tripId
+        tripId,
+        invalidStopIndex.getAsInt()
       );
       return null;
     }
@@ -763,10 +766,13 @@ public class TimetableHelper {
       }
     }
 
-    if (!newTimes.timesIncreasing()) {
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
+    if (invalidStopIndex.isPresent()) {
       LOG.info(
-        "TripTimes are non-increasing after applying SIRI delay propagation - delay: {}",
-        delay
+        "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
+        timetable.getPattern().getRoute().getId(),
+        tripId,
+        invalidStopIndex.getAsInt()
       );
       return null;
     }

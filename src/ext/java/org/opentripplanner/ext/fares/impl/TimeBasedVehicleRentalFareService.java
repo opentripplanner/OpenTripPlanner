@@ -47,7 +47,7 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
 
   private int getLegCost(Leg pathLeg) {
     int rideCost = 0;
-    long rideTime = pathLeg.getDuration();
+    long rideTime = pathLeg.getDuration().toSeconds();
     for (P2<Integer> bracket : pricing_by_second) {
       int time = bracket.first;
       if (rideTime < time) {

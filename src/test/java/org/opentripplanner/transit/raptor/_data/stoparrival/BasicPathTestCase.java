@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor._data.stoparrival;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexWithOnBoard;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
@@ -152,7 +153,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final RaptorTransfer ACCESS = walk(STOP_A, ACCESS_DURATION, ACCESS_COST);
   private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
   // this is of course not a real flex egress
-  private static final RaptorTransfer FLEX = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
+  private static final RaptorTransfer FLEX = flexWithOnBoard(STOP_E, EGRESS_DURATION, EGRESS_COST);
 
   public static final String LINE_11 = "L11";
   public static final String LINE_21 = "L21";
@@ -297,7 +298,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       EGRESS_END,
       EGRESS_COST
     );
-    var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
+    var transfer = TestTransfer.walk(STOP_E, TX_END - TX_START);
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,

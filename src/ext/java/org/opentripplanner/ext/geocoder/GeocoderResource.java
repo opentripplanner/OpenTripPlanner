@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 @Produces(MediaType.APPLICATION_JSON)
 public class GeocoderResource {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
 
   /**
    * @deprecated The support for multiple routers are removed from OTP2. See
@@ -36,8 +36,8 @@ public class GeocoderResource {
   @PathParam("ignoreRouterId")
   private String ignoreRouterId;
 
-  public GeocoderResource(@Context OtpServerContext otpServerContext) {
-    serverContext = otpServerContext;
+  public GeocoderResource(@Context OtpServerRequestContext requestContext) {
+    serverContext = requestContext;
   }
 
   /**
@@ -107,7 +107,7 @@ public class GeocoderResource {
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
     return LuceneIndex
       .forServer(serverContext)
-      .queryStopCollections(query, autocomplete)
+      .findStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(
           sc.getCoordinate().latitude(),

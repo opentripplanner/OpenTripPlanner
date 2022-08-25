@@ -1,6 +1,5 @@
 package org.opentripplanner.model;
 
-import com.google.common.collect.Lists;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -13,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -41,9 +41,9 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private final List<TripTimes> tripTimes = Lists.newArrayList();
+  private final List<TripTimes> tripTimes = new ArrayList<>();
 
-  private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+  private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
 
   private final LocalDate serviceDate;
 
@@ -312,10 +312,13 @@ public class Timetable implements Serializable {
         );
       }
     }
-    if (!newTimes.timesIncreasing()) {
+
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
+    if (invalidStopIndex.isPresent()) {
       LOG.error(
-        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {}.",
-        tripId
+        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
+        tripId,
+        invalidStopIndex.getAsInt()
       );
       return null;
     }

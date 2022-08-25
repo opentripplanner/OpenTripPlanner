@@ -188,6 +188,10 @@ public class NodeAdapter {
     return param(paramName).asText(defaultValue);
   }
 
+  public String asText() {
+    return json.asText();
+  }
+
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
     if (!exist(paramName)) return defaultValue;
     return new HashSet<>(arrayAsList(paramName, JsonNode::asText));
@@ -322,6 +326,10 @@ public class NodeAdapter {
       ids.add(FeedScopedId.parseId(it.asText()));
     }
     return ids;
+  }
+
+  public Set<FeedScopedId> asFeedScopedIdSet(String paramName, Set<FeedScopedId> defaultValues) {
+    return Set.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
   }
 
   public Locale asLocale(String paramName, Locale defaultValue) {

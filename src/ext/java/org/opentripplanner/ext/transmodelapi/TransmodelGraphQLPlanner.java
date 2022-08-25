@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
@@ -30,7 +29,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -44,7 +43,7 @@ public class TransmodelGraphQLPlanner {
   public DataFetcherResult<PlanResponse> plan(DataFetchingEnvironment environment) {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
-    OtpServerContext serverContext = ctx.getServerContext();
+    OtpServerRequestContext serverContext = ctx.getServerContext();
     RoutingRequest request = null;
     try {
       request = createRequest(environment);
@@ -89,7 +88,7 @@ public class TransmodelGraphQLPlanner {
 
   private RoutingRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
-    OtpServerContext serverContext = context.getServerContext();
+    OtpServerRequestContext serverContext = context.getServerContext();
     RoutingRequest request = serverContext.defaultRoutingRequest();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
@@ -115,7 +114,6 @@ public class TransmodelGraphQLPlanner {
     callWith.argument("walkReluctance", request::setNonTransitReluctance);
     callWith.argument("waitReluctance", request::setWaitReluctance);
     callWith.argument("walkBoardCost", request::setWalkBoardCost);
-    //        callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
     callWith.argument("waitReluctance", request::setWaitReluctance);
     callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
     callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);

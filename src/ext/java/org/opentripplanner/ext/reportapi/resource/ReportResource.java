@@ -13,8 +13,7 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.ext.reportapi.model.BicyleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.service.TransitModelIndex;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
 @Path("/report")
@@ -25,9 +24,9 @@ public class ReportResource {
   private final TransitService transitService;
 
   @SuppressWarnings("unused")
-  public ReportResource(@Context OtpServerContext otpServerContext) {
-    this.transferService = otpServerContext.transitService().getTransferService();
-    this.transitService = otpServerContext.transitService();
+  public ReportResource(@Context OtpServerRequestContext requestContext) {
+    this.transferService = requestContext.transitService().getTransferService();
+    this.transitService = requestContext.transitService();
   }
 
   @GET

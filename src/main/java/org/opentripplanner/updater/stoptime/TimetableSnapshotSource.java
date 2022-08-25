@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import org.opentripplanner.model.StopTime;
@@ -390,13 +391,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
         trip,
-        serviceCodes,
         pattern
       );
-
-      // Add service code to bitset of pattern if needed (using copy on write)
-      final int serviceCode = serviceCodes.get(trip.getServiceId());
-      newPattern.setServiceCode(serviceCode);
 
       cancelScheduledTrip(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
@@ -420,8 +416,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(tripUpdate);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(tripUpdate);
+    Objects.requireNonNull(serviceDate);
 
     //
     // Validate added trip
@@ -570,7 +566,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -664,7 +660,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final RealTimeState realTimeState
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -732,13 +728,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      serviceCodes,
       originalTripPattern
     );
-
-    // Add service code to bitset of pattern if needed (using copy on write)
-    final int serviceCode = serviceCodes.get(trip.getServiceId());
-    pattern.setServiceCode(serviceCode);
 
     // Create new trip times
     final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
@@ -754,6 +745,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     // Set service code of new trip times
+    final int serviceCode = serviceCodes.get(trip.getServiceId());
     newTripTimes.setServiceCode(serviceCode);
 
     // Make sure that updated trip times have the correct real time state
@@ -819,7 +811,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     boolean success = false;
 
-    final TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
     if (pattern != null) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = buffer.resolve(pattern, serviceDate);
@@ -857,8 +849,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(tripUpdate);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(tripUpdate);
+    Objects.requireNonNull(serviceDate);
 
     //
     // Validate modified trip
@@ -925,7 +917,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -1009,7 +1001,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return stop or null if stop doesn't exist
    */
   private StopLocation getStopForStopId(FeedScopedId stopId) {
-    return transitService.getStopForId(stopId);
+    return transitService.getRegularStop(stopId);
   }
 
   private static void warn(FeedScopedId id, String message, Object... params) {

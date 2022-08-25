@@ -34,16 +34,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
-import org.opentripplanner.transit.model.site.GroupOfStations;
-import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -89,20 +84,15 @@ public class AddTransitModelEntitiesToGraph {
   }
 
   private void applyToGraph(Graph graph, TransitModel transitModel) {
+    transitModel.mergeStopModels(otpTransitService.stopModel());
+
     addStopsToGraphAndGenerateStopVertexes(graph, transitModel);
-    addStationsToGraph(transitModel);
-    addMultiModalStationsToGraph(transitModel);
-    addGroupsOfStationsToGraph(transitModel);
     addEntrancesToGraph(graph);
     addPathwayNodesToGraph(graph);
     addBoardingAreasToGraph(graph);
 
     // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
     createPathwayEdgesAndAddThemToGraph(graph);
-    if (OTPFeature.FlexRouting.isOn()) {
-      addLocationsToGraph(transitModel);
-      addLocationGroupsToGraph(transitModel);
-    }
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);
     addServicesToTransitModel(transitModel);
@@ -131,38 +121,20 @@ public class AddTransitModelEntitiesToGraph {
 
     // Add a vertex representing the stop.
     // It is now possible for these vertices to not be connected to any edges.
-    for (Stop stop : otpTransitService.getAllStops()) {
+    for (RegularStop stop : otpTransitService.stopModel().listRegularStops()) {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = new TransitStopVertexBuilder()
         .withStop(stop)
         .withGraph(graph)
-        .withTransitModel(transitModel)
         .withModes(modes)
         .build();
+
       if (modes != null && modes.contains(TransitMode.SUBWAY)) {
         stopVertex.setStreetToStopTime(subwayAccessTime);
       }
 
       // Add stops to internal index for Pathways to be created from this map
       stationElementNodes.put(stop, stopVertex);
-    }
-  }
-
-  private void addStationsToGraph(TransitModel transitModel) {
-    for (Station station : otpTransitService.getAllStations()) {
-      transitModel.getStopModel().addStation(station);
-    }
-  }
-
-  private void addMultiModalStationsToGraph(TransitModel transitModel) {
-    for (MultiModalStation multiModalStation : otpTransitService.getAllMultiModalStations()) {
-      transitModel.getStopModel().addMultiModalStation(multiModalStation);
-    }
-  }
-
-  private void addGroupsOfStationsToGraph(TransitModel transitModel) {
-    for (GroupOfStations groupOfStation : otpTransitService.getAllGroupsOfStations()) {
-      transitModel.getStopModel().addGroupsOfStations(groupOfStation);
     }
   }
 
@@ -368,20 +340,6 @@ public class AddTransitModelEntitiesToGraph {
     }
   }
 
-  private void addLocationsToGraph(TransitModel transitModel) {
-    for (FlexStopLocation flexStopLocation : otpTransitService.getAllLocations()) {
-      transitModel.getStopModel().addFlexLocation(flexStopLocation.getId(), flexStopLocation);
-    }
-  }
-
-  private void addLocationGroupsToGraph(TransitModel transitModel) {
-    for (FlexLocationGroup flexLocationGroup : otpTransitService.getAllLocationGroups()) {
-      transitModel
-        .getStopModel()
-        .addFlexLocationGroup(flexLocationGroup.getId(), flexLocationGroup);
-    }
-  }
-
   private void addFeedInfoToGraph(TransitModel transitModel) {
     for (FeedInfo info : otpTransitService.getAllFeedInfos()) {
       transitModel.addFeedInfo(info);
@@ -408,12 +366,10 @@ public class AddTransitModelEntitiesToGraph {
   private void addTripPatternsToTransitModel(TransitModel transitModel) {
     Collection<TripPattern> tripPatterns = otpTransitService.getTripPatterns();
 
-    /* Generate unique human-readable names for all the TableTripPatterns. */
-    TripPattern.generateUniqueNames(tripPatterns);
-
     /* Loop over all new TripPatterns setting the service codes. */
     for (TripPattern tripPattern : tripPatterns) {
-      tripPattern.setServiceCodes(transitModel.getServiceCodes()); // TODO this could be more elegant
+      // TODO this could be more elegant
+      tripPattern.getScheduledTimetable().setServiceCodes(transitModel.getServiceCodes());
 
       // Store the tripPattern in the Graph so it will be serialized and usable in routing.
       transitModel.addTripPattern(tripPattern.getId(), tripPattern);

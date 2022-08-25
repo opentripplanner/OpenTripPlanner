@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.model.timetable;
 
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hasher;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -10,6 +7,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.OptionalInt;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -354,11 +352,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /**
    * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
    * negative running or dwell times. We really don't want those being used in routing. This method
-   * check that all times are increasing, and logs warnings if this is not the case.
+   * checks that all times are increasing.
    *
-   * @return whether the times were found to be increasing.
+   * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public boolean timesIncreasing() {
+  public OptionalInt findFirstNoneIncreasingStopTime() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -366,16 +364,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        LOG.warn("Negative dwell time in TripTimes at stop index {}.", s);
-        return false;
+        return OptionalInt.of(s);
       }
       if (prevDep > arr) {
-        LOG.warn("Negative running time in TripTimes after stop index {}.", s);
-        return false;
+        return OptionalInt.of(s);
       }
       prevDep = dep;
     }
-    return true;
+    return OptionalInt.empty();
   }
 
   /** Cancel this entire trip */
@@ -452,23 +448,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */
   public boolean isTimepoint(final int stopIndex) {
     return timepoints.get(stopIndex);
-  }
-
-  /**
-   * Hash the scheduled arrival/departure times. Used in creating stable IDs for trips across GTFS
-   * feed versions. Use hops rather than stops because:
-   * <ol>
-   * <li>arrival at stop zero and departure from last stop are irrelevant</li>
-   * <li>this hash function needs to stay stable when users switch from 0.10.x to 1.0</li>
-   * </ol>
-   */
-  public HashCode semanticHash(final HashFunction hashFunction) {
-    final Hasher hasher = hashFunction.newHasher();
-    for (int hop = 0; hop < getNumStops() - 1; hop++) {
-      hasher.putInt(getScheduledDepartureTime(hop));
-      hasher.putInt(getScheduledArrivalTime(hop + 1));
-    }
-    return hasher.hash();
   }
 
   /** The code for the service on which this trip runs. For departure search optimizations. */

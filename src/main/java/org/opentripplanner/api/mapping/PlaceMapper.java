@@ -15,7 +15,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlaceMapper {
 
@@ -62,8 +62,11 @@ public class PlaceMapper {
       api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());
       api.stopCode = domain.stop.getCode();
       api.platformCode =
-        domain.stop instanceof Stop ? ((Stop) domain.stop).getPlatformCode() : null;
-      api.zoneId = domain.stop instanceof Stop ? ((Stop) domain.stop).getFirstZoneAsString() : null;
+        domain.stop instanceof RegularStop ? ((RegularStop) domain.stop).getPlatformCode() : null;
+      api.zoneId =
+        domain.stop instanceof RegularStop
+          ? ((RegularStop) domain.stop).getFirstZoneAsString()
+          : null;
     }
 
     if (domain.coordinate != null) {

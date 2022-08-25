@@ -121,33 +121,14 @@ public class GbfsFeedLoader {
   /* private static methods */
 
   private static <T> T fetchFeed(URI uri, Map<String, String> httpHeaders, Class<T> clazz) {
-    try {
-      InputStream is;
-
-      String proto = uri.getScheme();
-      if (proto.equals("http") || proto.equals("https")) {
-        is = HttpUtils.getData(uri, httpHeaders);
-      } else {
-        // Local file probably, try standard java
-        is = uri.toURL().openStream();
-      }
+    try (InputStream is = HttpUtils.openInputStream(uri, httpHeaders);) {
       if (is == null) {
         LOG.warn("Failed to get data from url {}", uri);
         return null;
       }
-      T data = objectMapper.readValue(is, clazz);
-      is.close();
-      return data;
-    } catch (IllegalArgumentException e) {
-      LOG.warn("Error parsing vehicle rental feed from " + uri, e);
-      return null;
-    } catch (JsonProcessingException e) {
-      LOG.warn("Error parsing vehicle rental feed from (bad JSON of some sort)" + uri);
-      LOG.warn(e.getMessage());
-      return null;
-    } catch (IOException e) {
-      LOG.warn("Error reading vehicle rental feed from (connection error)" + uri);
-      LOG.warn(e.getMessage());
+      return objectMapper.readValue(is, clazz);
+    } catch (IllegalArgumentException | IOException e) {
+      LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
       return null;
     }
   }

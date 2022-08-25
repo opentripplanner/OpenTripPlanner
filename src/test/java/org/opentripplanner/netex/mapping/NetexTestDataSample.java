@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
@@ -61,7 +61,7 @@ class NetexTestDataSample {
   private final JourneyPattern journeyPattern;
   private final HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
   private final HierarchicalMapById<DestinationDisplay> destinationDisplayById = new HierarchicalMapById<>();
-  private final EntityById<Stop> stopsById = new EntityById<>();
+  private final EntityById<RegularStop> stopsById = new EntityById<>();
   private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
   private final List<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
   private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
@@ -194,7 +194,7 @@ class NetexTestDataSample {
     return destinationDisplayById;
   }
 
-  EntityById<Stop> getStopsById() {
+  EntityById<RegularStop> getStopsById() {
     return stopsById;
   }
 

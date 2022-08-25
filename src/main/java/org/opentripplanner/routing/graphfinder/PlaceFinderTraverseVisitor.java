@@ -17,7 +17,7 @@ import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -92,7 +92,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     Vertex vertex = state.getVertex();
     double distance = state.getWalkDistance();
     if (vertex instanceof TransitStopVertex transitVertex) {
-      Stop stop = transitVertex.getStop();
+      RegularStop stop = transitVertex.getStop();
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
     } else if (vertex instanceof VehicleRentalPlaceVertex rentalVertex) {
@@ -159,7 +159,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     return filterByPlaceTypes == null || filterByPlaceTypes.contains(type);
   }
 
-  private boolean stopHasRoutesWithMode(Stop stop, Set<TransitMode> modes) {
+  private boolean stopHasRoutesWithMode(RegularStop stop, Set<TransitMode> modes) {
     return transitService
       .getPatternsForStop(stop)
       .stream()
@@ -167,7 +167,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       .anyMatch(modes::contains);
   }
 
-  private void handleStop(Stop stop, double distance) {
+  private void handleStop(RegularStop stop, double distance) {
     if (filterByStops != null && !filterByStops.contains(stop.getId())) {
       return;
     }
@@ -181,7 +181,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handlePatternsAtStop(Stop stop, double distance) {
+  private void handlePatternsAtStop(RegularStop stop, double distance) {
     if (includePatternAtStops) {
       List<TripPattern> patterns = transitService
         .getPatternsForStop(stop)

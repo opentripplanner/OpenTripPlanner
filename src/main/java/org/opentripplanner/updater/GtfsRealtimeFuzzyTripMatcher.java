@@ -29,7 +29,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
   // TODO: replace this with a runtime solution
   private final DirectionMapper directionMapper = new DirectionMapper(
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
@@ -86,7 +86,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
     int startTime,
     LocalDate date
   ) {
-    TIntSet servicesRunningForDate = transitService.getServicesRunningForDate(date);
+    TIntSet servicesRunningForDate = transitService.getServiceCodesRunningForDate(date);
     for (TripPattern pattern : transitService.getPatternsForRoute(route)) {
       if (pattern.getDirection() != direction) continue;
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {

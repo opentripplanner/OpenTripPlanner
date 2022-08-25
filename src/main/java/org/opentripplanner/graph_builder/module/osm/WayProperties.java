@@ -9,57 +9,54 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  *
  * @author novalis
  */
-public class WayProperties implements Cloneable {
+public class WayProperties {
 
   /**
    * A multiplicative parameter expressing how much less safe this way is than the default, in terms
    * of something like DALYs lost per meter. The first element safety in the direction of the way
    * and the second is safety in the opposite direction.
-   * TODO change all these identifiers so it's clear that this only applies to bicycles.
    * TODO change the identifiers to make it clear that this reflects danger, not safety.
-   * TODO I believe the weights are rescaled later in graph building to be >= 1, but verify.
    */
   private static final P2<Double> defaultSafetyFeatures = new P2<>(1.0, 1.0);
-  private StreetTraversalPermission permission;
-  private P2<Double> safetyFeatures = defaultSafetyFeatures;
+  private final StreetTraversalPermission permission;
+  private final P2<Double> bicycleSafetyFeatures;
+  private final P2<Double> walkSafetyFeatures;
 
-  public P2<Double> getSafetyFeatures() {
-    return safetyFeatures;
+  public WayProperties(WayPropertiesBuilder wayPropertiesBuilder) {
+    permission = wayPropertiesBuilder.getPermission();
+    bicycleSafetyFeatures = wayPropertiesBuilder.getBicycleSafetyFeatures();
+    walkSafetyFeatures = wayPropertiesBuilder.getWalkSafetyFeatures();
   }
 
-  public void setSafetyFeatures(P2<Double> safetyFeatures) {
-    this.safetyFeatures = safetyFeatures;
+  public P2<Double> getBicycleSafetyFeatures() {
+    return bicycleSafetyFeatures;
+  }
+
+  public P2<Double> getWalkSafetyFeatures() {
+    return walkSafetyFeatures;
   }
 
   public StreetTraversalPermission getPermission() {
     return permission;
   }
 
-  public void setPermission(StreetTraversalPermission permission) {
-    this.permission = permission;
-  }
-
   public int hashCode() {
-    return safetyFeatures.hashCode() + permission.hashCode();
+    return bicycleSafetyFeatures.hashCode() + walkSafetyFeatures.hashCode() + permission.hashCode();
   }
 
   public boolean equals(Object o) {
     if (o instanceof WayProperties) {
       WayProperties other = (WayProperties) o;
-      return safetyFeatures.equals(other.safetyFeatures) && permission == other.permission;
+      return (
+        bicycleSafetyFeatures.equals(other.bicycleSafetyFeatures) &&
+        walkSafetyFeatures.equals(other.walkSafetyFeatures) &&
+        permission == other.permission
+      );
     }
     return false;
   }
 
-  public WayProperties clone() {
-    WayProperties result;
-    try {
-      result = (WayProperties) super.clone();
-      result.setSafetyFeatures(new P2<>(safetyFeatures.first, safetyFeatures.second));
-      return result;
-    } catch (CloneNotSupportedException e) {
-      // unreached
-      throw new RuntimeException(e);
-    }
+  public WayPropertiesBuilder mutate() {
+    return new WayPropertiesBuilder(this);
   }
 }

@@ -32,8 +32,7 @@ public class CarRoutingTest {
   @BeforeAll
   public static void setup() {
     TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
-    herrenbergGraph = model.graph();
-    herrenbergGraph.index();
+    herrenbergGraph = model.index().graph();
   }
 
   /**
@@ -56,7 +55,7 @@ public class CarRoutingTest {
     TestOtpModel model = ConstantsForTests.buildOsmGraph(
       ConstantsForTests.HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM
     );
-    var hindenburgStrUnderConstruction = model.graph();
+    var hindenburgStrUnderConstruction = model.index().graph();
 
     var gueltsteinerStr = new GenericLocation(48.59240, 8.87024);
     var aufDemGraben = new GenericLocation(48.59487, 8.87133);

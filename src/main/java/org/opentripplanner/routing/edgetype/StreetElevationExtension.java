@@ -26,6 +26,8 @@ public class StreetElevationExtension implements Serializable {
 
   private final double effectiveWalkDistance;
 
+  private final double effectiveWalkSafetyDistance;
+
   private final double distanceWithElevation;
 
   private final float maxSlope;
@@ -40,6 +42,7 @@ public class StreetElevationExtension implements Serializable {
     double effectiveBikeDistanceFactor,
     double effectiveBikeWorkFactor,
     double effectiveWalkDistanceFactor,
+    double effectiveWalkSafetyFactor,
     double lengthMultiplier,
     float maxSlope,
     boolean flattened
@@ -49,6 +52,7 @@ public class StreetElevationExtension implements Serializable {
     this.effectiveBikeDistance = effectiveBikeDistanceFactor * distanceMeters;
     this.effectiveBikeDistanceForWorkCost = effectiveBikeWorkFactor * distanceMeters;
     this.effectiveWalkDistance = effectiveWalkDistanceFactor * distanceMeters;
+    this.effectiveWalkSafetyDistance = effectiveWalkSafetyFactor * distanceMeters;
     this.distanceWithElevation = lengthMultiplier * distanceMeters;
     this.maxSlope = maxSlope;
     this.flattened = flattened;
@@ -120,6 +124,14 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
+   * The distance multiplied by the {@link StreetEdge#walkSafetyFactor}, but also considering the
+   * increased length caused by the slope.
+   */
+  public double getEffectiveWalkSafetyDistance() {
+    return effectiveWalkSafetyDistance;
+  }
+
+  /**
    * Physical distance which takes the elevation into account. The distanceMeters is a 2d distance.
    */
   public double getDistanceWithElevation() {
@@ -176,6 +188,16 @@ public class StreetElevationExtension implements Serializable {
       );
     }
 
+    float effectiveWalkSafetyFactor = (float) (
+      streetEdge.getWalkSafetyFactor() * effectiveWalkDistanceFactor
+    );
+
+    if (Double.isInfinite(effectiveWalkSafetyFactor) || Double.isNaN(effectiveWalkSafetyFactor)) {
+      throw new IllegalStateException(
+        "Elevation updated walkSafetyFactor is " + effectiveWalkSafetyFactor
+      );
+    }
+
     if (streetEdge.isStairs()) {
       // Ignore elevation related costs for stairs, RoutingRequest#stairsTimeFactor is used instead.
       effectiveBikeDistanceFactor = 1.0;
@@ -190,6 +212,7 @@ public class StreetElevationExtension implements Serializable {
       effectiveBikeDistanceFactor,
       effectiveBikeWorkFactor,
       effectiveWalkDistanceFactor,
+      effectiveWalkSafetyFactor,
       costs.lengthMultiplier,
       maxSlope,
       flattened

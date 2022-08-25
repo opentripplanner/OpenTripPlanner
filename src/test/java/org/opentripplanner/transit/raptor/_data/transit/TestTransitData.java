@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
@@ -18,6 +20,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
@@ -124,6 +127,7 @@ public class TestTransitData
     };
   }
 
+  @Nonnull
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     // Index is translated: 1->'A', 2->'B', 3->'C' ...
@@ -152,6 +156,20 @@ public class TestTransitData
       .orElseThrow();
   }
 
+  @Override
+  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsForwardSearch(
+    int routeIndex
+  ) {
+    return getRoute(routeIndex).transferConstraintsForwardSearch();
+  }
+
+  @Override
+  public RaptorConstrainedTripScheduleBoardingSearch<TestTripSchedule> transferConstraintsReverseSearch(
+    int routeIndex
+  ) {
+    return getRoute(routeIndex).transferConstraintsReverseSearch();
+  }
+
   public TestRoute getRoute(int index) {
     return routes.get(index);
   }
@@ -174,6 +192,7 @@ public class TestTransitData
   public TestTransitData withRoute(TestRoute route) {
     this.routes.add(route);
     int routeIndex = this.routes.indexOf(route);
+    ((TestTripPattern) route.pattern()).withPatternIndex(routeIndex);
     var pattern = route.pattern();
     for (int i = 0; i < pattern.numberOfStopsInPattern(); ++i) {
       int stopIndex = pattern.stopIndex(i);
@@ -288,6 +307,10 @@ public class TestTransitData
         );
       }
     };
+  }
+
+  public List<DefaultTripPattern> getPatterns() {
+    return routes.stream().map(TestRoute::pattern).toList();
   }
 
   /* private methods */

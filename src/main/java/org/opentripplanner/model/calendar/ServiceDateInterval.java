@@ -4,12 +4,13 @@ import static java.time.LocalDate.MAX;
 import static java.time.LocalDate.MIN;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
- * Value object which represent an service date interval from a starting date until an end date.
+ * Value object which represent a service date interval from a starting date until an end date.
  * Both start and end is inclusive.
  * <p>
  * The {@code start} must be equals or before the {@code end} to form a valid period.
@@ -118,5 +119,12 @@ public final class ServiceDateInterval {
   @Override
   public String toString() {
     return "[" + ServiceDateUtils.toString(start) + ", " + ServiceDateUtils.toString(end) + "]";
+  }
+
+  /**
+   * Number of days in a period from start to end, both stat and end is included.
+   */
+  public int daysInPeriod() {
+    return (int) ChronoUnit.DAYS.between(start, end) + 1;
   }
 }
