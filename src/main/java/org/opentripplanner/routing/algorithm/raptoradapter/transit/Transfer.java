@@ -36,6 +36,7 @@ public class Transfer {
     this.edges = null;
   }
 
+  // TODO: 2022-08-25 return pair
   // TODO: 2022-08-19 We should think about what we should about this and smilar methods
   // Previously it took one instance as an input returned another one
   // Now it has to operate on two instances

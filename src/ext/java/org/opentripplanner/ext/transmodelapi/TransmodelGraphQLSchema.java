@@ -1285,7 +1285,7 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            List<FeedScopedId> lineIds = mapIDsToDomain(environment.getArgument("lines"));
+            Set<FeedScopedId> lineIds = mapIDsToDomain(environment.getArgument("lines"));
             List<String> privateCodes = environment.getArgument("privateCodes");
             List<LocalDate> activeDates = environment.getArgument("activeDates");
 

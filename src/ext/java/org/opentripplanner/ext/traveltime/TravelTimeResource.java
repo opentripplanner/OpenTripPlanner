@@ -55,6 +55,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Acces
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
@@ -81,7 +83,9 @@ public class TravelTimeResource {
 
   private static final SimpleFeatureType contourSchema = makeContourSchema();
 
-  private final RoutingRequest routingRequest;
+  private final NewRouteRequest routingRequest;
+
+  private final RoutingPreferences routingPreferences;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
   private final Instant startTime;
   private final Instant endTime;
@@ -101,14 +105,23 @@ public class TravelTimeResource {
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
     routingRequest = serverContext.defaultRoutingRequest();
-    routingRequest.from = LocationStringParser.fromOldStyleString(location);
+    routingPreferences = serverContext.defaultRoutingPreferences();
+    routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
     if (modes != null) {
-      routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();
+      var requestModes = new QualifiedModeSet(modes).getRequestModes();
+      routingRequest.journey().transit().setModes(requestModes.transitModes);
+      routingRequest.journey().transfer().setMode(requestModes.transferMode);
+      routingRequest.journey().access().setMode(requestModes.accessMode);
+      routingRequest.journey().egress().setMode(requestModes.egressMode);
+      routingRequest.journey().direct().setMode(requestModes.directMode);
     }
+
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
-        routingRequest.getMaxAccessEgressDuration(routingRequest.modes.accessMode)
+        routingPreferences
+          .street()
+          .maxAccessEgressDuration(routingRequest.journey().access().mode())
       );
 
     if (time != null) {
@@ -124,7 +137,10 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
+    NewRouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(
+      routingRequest,
+      routingPreferences
+    );
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
@@ -132,8 +148,12 @@ public class TravelTimeResource {
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
-        new RoutingRequestTransitDataProviderFilter(routingRequest, transitService),
-        new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+        new RoutingRequestTransitDataProviderFilter(
+          routingRequest,
+          routingPreferences,
+          transitService
+        ),
+        new RoutingContext(transferRoutingRequest, routingPreferences, graph, (Vertex) null, null)
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());
@@ -213,16 +233,33 @@ public class TravelTimeResource {
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    final RoutingRequest accessRequest = routingRequest.clone();
+    final NewRouteRequest accessRequest = routingRequest.clone();
+    // TODO: 2022-08-25 clone
+    final RoutingPreferences accessPreferences = routingPreferences;
 
-    accessRequest.maxAccessEgressDuration = traveltimeRequest.maxAccessDuration;
+    accessPreferences.street().setMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration);
 
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
-      final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        accessRequest,
+        routingPreferences
+      )
+    ) {
+      final Collection<AccessEgress> accessList = getAccess(
+        accessRequest,
+        accessPreferences,
+        temporaryVertices
+      );
 
       var arrivals = route(accessList).getArrivals();
 
-      RoutingContext routingContext = new RoutingContext(routingRequest, graph, temporaryVertices);
+      RoutingContext routingContext = new RoutingContext(
+        routingRequest,
+        routingPreferences,
+        graph,
+        temporaryVertices
+      );
 
       var spt = AStarBuilder
         .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
@@ -236,13 +273,14 @@ public class TravelTimeResource {
   }
 
   private Collection<AccessEgress> getAccess(
-    RoutingRequest accessRequest,
+    NewRouteRequest accessRequest,
+    RoutingPreferences accessPreferences,
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      new RoutingContext(accessRequest, graph, temporaryVertices),
+      new RoutingContext(accessRequest, accessPreferences, graph, temporaryVertices),
       transitService,
-      routingRequest.modes.accessMode,
+      routingRequest.journey().access().mode(),
       false
     );
     return new AccessEgressMapper().mapNearbyStops(accessStops, false);
@@ -255,7 +293,7 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StateData stateData = StateData.getInitialStateData(routingRequest);
+    StateData stateData = StateData.getInitialStateData(routingRequest, routingPreferences);
 
     for (var vertex : temporaryVertices.getFromVertices()) {
       initialStates.add(new State(vertex, startTime, routingContext, stateData));

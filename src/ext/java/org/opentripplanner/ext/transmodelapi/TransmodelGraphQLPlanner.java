@@ -222,7 +222,7 @@ public class TransmodelGraphQLPlanner {
     callWith.argument(
       "banned.serviceJourneys",
       (Collection<String> serviceJourneys) ->
-        request.setBannedTrips(mapIDsToDomain(serviceJourneys))
+        request.journey().transit().setBannedTrips(mapIDsToDomain(serviceJourneys))
     );
 
     //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
@@ -231,9 +231,12 @@ public class TransmodelGraphQLPlanner {
     //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
     // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
     //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-    callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
+    callWith.argument(
+      "debugItineraryFilter",
+      (Boolean v) -> preferences.system().itineraryFilters().debug = v
+    );
 
-    callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
+    callWith.argument("transferPenalty", (Integer v) -> preferences.transfer().setCost(v));
 
     //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
     //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
@@ -241,9 +244,17 @@ public class TransmodelGraphQLPlanner {
     RequestModes modes = getModes(environment, callWith);
 
     if (modes != null) {
-      request.modes = modes;
+      request.journey().transit().setModes(modes.transitModes);
+      request.journey().transfer().setMode(modes.transferMode);
+      request.journey().access().setMode(modes.accessMode);
+      request.journey().egress().setMode(modes.egressMode);
+      request.journey().direct().setMode(modes.directMode);
     }
-    ItineraryFiltersInputType.mapToRequest(environment, callWith, request.itineraryFilters);
+    ItineraryFiltersInputType.mapToRequest(
+      environment,
+      callWith,
+      preferences.system().itineraryFilters()
+    );
 
     /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
@@ -258,33 +269,34 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-    if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
+    if (preferences.rental().allow() && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
-      request.bikeSpeed = 4.3;
+      preferences.bike().setSpeed(4.3);
     }
 
-    callWith.argument("minimumTransferTime", (Integer v) -> request.transferSlack = v);
+    // TODO: 2022-08-25 same field mapped from two different arguments, why?
+    callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
 
-    callWith.argument("transferSlack", (Integer v) -> request.transferSlack = v);
-    callWith.argument("boardSlackDefault", (Integer v) -> request.boardSlack = v);
+    callWith.argument("transferSlack", preferences.transfer()::setSlack);
+    callWith.argument("boardSlackDefault", preferences.transit()::setBoardSlack);
     callWith.argument(
       "boardSlackList",
-      (Object v) -> request.boardSlackForMode = TransportModeSlack.mapToDomain(v)
+      (Object v) -> preferences.transit().setBoardSlackForMode(TransportModeSlack.mapToDomain(v))
     );
-    callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
+    callWith.argument("alightSlackDefault", (Integer v) -> preferences.transit().setAlightSlack(v));
     callWith.argument(
       "alightSlackList",
-      (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v)
+      (Object v) -> preferences.transit().setAlightSlackForMode(TransportModeSlack.mapToDomain(v))
     );
-    callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
+    callWith.argument("maximumTransfers", preferences.transfer()::setMaxTransfers);
     callWith.argument(
       "useBikeRentalAvailabilityInformation",
-      (Boolean v) -> request.useVehicleRentalAvailabilityInformation = v
+      preferences.rental()::setUseVehicleRentalAvailabilityInformation
     );
-    callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
+    callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
     callWith.argument(
       "includePlannedCancellations",
-      (Boolean v) -> request.includePlannedCancellations = v
+      preferences.transit()::setIncludePlannedCancellations
     );
     //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
