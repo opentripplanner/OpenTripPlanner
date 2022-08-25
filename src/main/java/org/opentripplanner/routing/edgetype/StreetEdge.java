@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -130,7 +131,7 @@ public class StreetEdge
    * Why not use a concurrent collection? That would mean that every StreetEdge has its own empty
    * instance which would increase memory significantly.
    */
-  private List<TurnRestriction> turnRestrictions = List.of();
+  private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
   public StreetEdge(
     StreetVertex v1,
@@ -839,7 +840,7 @@ public class StreetEdge
     synchronized (this) {
       if (turnRestrictions.contains(turnRestriction)) {
         if (turnRestrictions.size() == 1) {
-          turnRestrictions = List.of();
+          turnRestrictions = Collections.emptyList();
         } else {
           // in order to guarantee fast access without extra allocations
           // we make the turn restrictions unmodifiable after a copy-on-write modification
@@ -856,7 +857,7 @@ public class StreetEdge
       return;
     }
     synchronized (this) {
-      turnRestrictions = List.of();
+      turnRestrictions = Collections.emptyList();
     }
   }
 
