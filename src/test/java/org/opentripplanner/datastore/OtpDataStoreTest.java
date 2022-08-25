@@ -31,8 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
 
 public class OtpDataStoreTest {
@@ -271,7 +271,7 @@ public class OtpDataStoreTest {
     return files;
   }
 
-  private BuildConfig config() {
+  private OtpDataStoreConfig config() {
     var confLoader = new ConfigLoader(baseDir);
     return confLoader.loadBuildConfig();
   }

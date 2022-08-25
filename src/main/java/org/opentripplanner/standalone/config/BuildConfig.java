@@ -10,8 +10,10 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
+import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
  * is the build configuration and the other is the router configuration.
  */
-public class BuildConfig {
+public class BuildConfig implements OtpDataStoreConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(BuildConfig.class);
 
@@ -168,7 +170,7 @@ public class BuildConfig {
    * Default: {@code (?i)netex} - Match all filenames that contain "netex". The default pattern is
    * NOT case sensitive.
    */
-  public final Pattern netexLocalFilePattern;
+  private final Pattern netexLocalFilePattern;
 
   /**
    * Patterns for matching GTFS zip-files or directories. If the filename contains the given
@@ -179,7 +181,7 @@ public class BuildConfig {
    * Default: {@code (?i)gtfs} - Match all filenames that contain "gtfs". The default pattern is
    * NOT case sensitive.
    */
-  public final Pattern gtfsLocalFilePattern;
+  private final Pattern gtfsLocalFilePattern;
 
   /**
    * Pattern for matching Open Street Map input files. If the filename contains the given pattern
@@ -190,7 +192,7 @@ public class BuildConfig {
    * Default: {@code (?i)(.pbf|.osm|.osm.xml)$} - Match all filenames that ends with suffix {@code
    * .pbf}, {@code .osm} or {@code .osm.xml}. The default pattern is NOT case sensitive.
    */
-  public final Pattern osmLocalFilePattern;
+  private final Pattern osmLocalFilePattern;
 
   /**
    * Pattern for matching elevation DEM files. If the filename contains the given pattern it is
@@ -201,7 +203,7 @@ public class BuildConfig {
    * Default: {@code (?i).tiff?$} - Match all filenames that ends with suffix {@code .tif} or
    * {@code .tiff}. The default pattern is NOT case sensitive.
    */
-  public final Pattern demLocalFilePattern;
+  private final Pattern demLocalFilePattern;
 
   /**
    * Local file system path to Google Cloud Platform service accounts credentials file. The
@@ -216,7 +218,7 @@ public class BuildConfig {
    * <p>
    * This parameter is optional. Default is {@code null}.
    */
-  public final String gsCredentials;
+  private final String gsCredentials;
 
   /**
    * URI to the street graph object file for reading and writing. The file is created or overwritten
@@ -226,7 +228,7 @@ public class BuildConfig {
    * <p>
    * This parameter is optional. Default is {@code null}.
    */
-  public final URI streetGraph;
+  private final URI streetGraph;
 
   /**
    * URI to the graph object file for reading and writing. The file is created or overwritten if OTP
@@ -236,7 +238,7 @@ public class BuildConfig {
    * <p>
    * This parameter is optional. Default is {@code null}.
    */
-  public final URI graph;
+  private final URI graph;
 
   /**
    * URI to the directory where the graph build report should be written to. The html report is
@@ -247,7 +249,7 @@ public class BuildConfig {
    * <p>
    * This parameter is optional. Default is {@code null} in which case the report is skipped.
    */
-  public final URI buildReportDir;
+  private final URI buildReportDir;
 
   /**
    * A custom OSM namer to use.
@@ -325,7 +327,7 @@ public class BuildConfig {
    * default to simple stop-to-stop geometry instead.
    */
   public final double maxStopToShapeSnapDistance;
-  public final OsmExtractsConfig osm;
+
   /**
    * Whether we should create car P+R stations from OSM data.
    */
@@ -447,7 +449,9 @@ public class BuildConfig {
    * This parameter is optional.
    */
   public final DemExtractsConfig dem;
-  public TransitFeedsConfig transitFeeds;
+
+  public final OsmExtractsConfig osm;
+  public final TransitFeedsConfig transitFeeds;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -541,6 +545,68 @@ public class BuildConfig {
     if (logUnusedParams) {
       c.logAllUnusedParameters(LOG);
     }
+  }
+
+  @Override
+  public URI reportDirectory() {
+    return buildReportDir;
+  }
+
+  @Override
+  public String gsCredentials() {
+    return gsCredentials;
+  }
+
+  @Override
+  public List<URI> osmFiles() {
+    return osm.osmFiles();
+  }
+
+  @Override
+  public List<URI> demFiles() {
+    return dem.demFiles();
+  }
+
+  @Nonnull
+  @Override
+  public List<URI> gtfsFiles() {
+    return transitFeeds.gtfsFiles();
+  }
+
+  @Nonnull
+  @Override
+  public List<URI> netexFiles() {
+    return transitFeeds.netexFiles();
+  }
+
+  @Override
+  public URI graph() {
+    return graph;
+  }
+
+  @Override
+  public URI streetGraph() {
+    return streetGraph;
+  }
+
+  @Override
+  public Pattern gtfsLocalFilePattern() {
+    return gtfsLocalFilePattern;
+  }
+
+  @Override
+  public Pattern netexLocalFilePattern() {
+    return netexLocalFilePattern;
+  }
+
+  @Override
+  public Pattern osmLocalFilePattern() {
+    return osmLocalFilePattern;
+  }
+
+  @Override
+  public Pattern demLocalFilePattern() {
+    return demLocalFilePattern;
   }
 
   /**

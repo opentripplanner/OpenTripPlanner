@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
@@ -10,12 +9,15 @@ import org.opentripplanner.standalone.config.NodeAdapter;
  */
 public class OsmExtractsConfig {
 
-  public final List<OsmExtractConfig> osmExtractConfigs = new ArrayList<>();
+  public final List<OsmExtractConfig> osmExtractConfigs;
 
   public OsmExtractsConfig(NodeAdapter config) {
-    for (NodeAdapter nodeAdapter : config.asList()) {
-      osmExtractConfigs.add(OsmExtractConfigBuilder.of(nodeAdapter).build());
-    }
+    osmExtractConfigs =
+      config
+        .asList()
+        .stream()
+        .map(osmConfig -> OsmExtractConfigBuilder.of(osmConfig).build())
+        .toList();
   }
 
   public List<URI> osmFiles() {

@@ -2,6 +2,7 @@ package org.opentripplanner.datastore.api;
 
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.OtpDataStore;
 
@@ -66,4 +67,12 @@ public interface OtpDataStoreConfig {
    * The URI to the street graph object file to load and/or save.
    */
   URI streetGraph();
+
+  Pattern gtfsLocalFilePattern();
+
+  Pattern netexLocalFilePattern();
+
+  Pattern osmLocalFilePattern();
+
+  Pattern demLocalFilePattern();
 }

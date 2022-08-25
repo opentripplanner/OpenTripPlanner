@@ -40,6 +40,11 @@ public class LoadConfigModule {
   }
 
   @Provides
+  static OtpDataStoreConfig providesDataStoreConfig(BuildConfig buildConfig) {
+    return buildConfig;
+  }
+
+  @Provides
   @TransitServicePeriod
   static ServiceDateInterval providesTransitServicePeriod(BuildConfig buildConfig) {
     return buildConfig.getTransitServicePeriod();
