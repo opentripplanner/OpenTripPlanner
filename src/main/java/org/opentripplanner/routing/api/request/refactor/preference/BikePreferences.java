@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request.refactor.preference;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

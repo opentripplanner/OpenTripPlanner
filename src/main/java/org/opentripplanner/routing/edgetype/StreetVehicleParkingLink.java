@@ -79,23 +79,20 @@ public class StreetVehicleParkingLink extends Edge {
   }
 
   private boolean hasBannedTags(NewRouteRequest options, VehicleParking vehicleParking) {
-    if (options.journey().access().vehicleParking().bannedTags().isEmpty()) {
+    if (options.journey().parking().bannedTags().isEmpty()) {
       return false;
     }
 
     return vehicleParking
       .getTags()
       .stream()
-      .anyMatch(options.journey().access().vehicleParking().bannedTags()::contains);
+      .anyMatch(options.journey().parking().bannedTags()::contains);
   }
 
   private boolean hasMissingRequiredTags(NewRouteRequest options, VehicleParking vehicleParking) {
-    // TODO: 2022-08-22 this can't be right
-    if (options.journey().access().vehicleParking().requiredTags().isEmpty()) {
+    if (options.journey().parking().requiredTags().isEmpty()) {
       return false;
     }
-    return !vehicleParking
-      .getTags()
-      .containsAll(options.journey().access().vehicleParking().requiredTags());
+    return !vehicleParking.getTags().containsAll(options.journey().parking().requiredTags());
   }
 }

@@ -17,7 +17,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -825,12 +824,11 @@ public abstract class RoutingResource {
     }
 
     if (allowedVehicleRentalNetworks != null) {
-      // TODO: 2022-08-24 fix
-      request.journey().access().vehicleRental().setAllowedNetworks(allowedVehicleRentalNetworks);
+      request.journey().rental().setAllowedNetworks(allowedVehicleRentalNetworks);
     }
 
     if (bannedVehicleRentalNetworks != null) {
-      request.journey().access().vehicleRental().setBannedNetworks(bannedVehicleRentalNetworks);
+      request.journey().rental().setBannedNetworks(bannedVehicleRentalNetworks);
     }
 
     if (bikeParkCost != null) {
@@ -850,11 +848,11 @@ public abstract class RoutingResource {
     }
 
     if (bannedVehicleParkingTags != null) {
-      request.journey().access().vehicleParking().setBannedTags(bannedVehicleParkingTags);
+      request.journey().parking().setBannedTags(bannedVehicleParkingTags);
     }
 
     if (requiredVehicleParkingTags != null) {
-      request.journey().access().vehicleParking().setRequiredTags(requiredVehicleParkingTags);
+      request.journey().parking().setRequiredTags(requiredVehicleParkingTags);
     }
 
     if (optimize != null) {
@@ -971,11 +969,7 @@ public abstract class RoutingResource {
       preferences.transfer().setMaxTransfers(maxTransfers);
     }
 
-    preferences.rental().setUseVehicleRentalAvailabilityInformation(request.isTripPlannedForNow());
-
-    if (startTransitStopId != null && !startTransitStopId.isEmpty()) {
-      request.setStartingTransitStopId(FeedScopedId.parseId(startTransitStopId));
-    }
+    preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
     if (startTransitTripId != null && !startTransitTripId.isEmpty()) {
       request.setStartingTransitTripId(FeedScopedId.parseId(startTransitTripId));
@@ -1011,7 +1005,7 @@ public abstract class RoutingResource {
     if (useVehicleParkingAvailabilityInformation != null) {
       preferences
         .parking()
-        .setUseVehicleParkingAvailabilityInformation(useVehicleParkingAvailabilityInformation);
+        .setUseAvailabilityInformation(useVehicleParkingAvailabilityInformation);
     }
 
     if (locale != null) {

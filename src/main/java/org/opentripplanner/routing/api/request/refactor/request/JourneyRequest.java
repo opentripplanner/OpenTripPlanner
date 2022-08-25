@@ -23,11 +23,23 @@ public class JourneyRequest {
   @Deprecated
   private boolean onlyTransitTrips = false;
 
-  private TransitRequest transit = new TransitRequest();
-  private StreetRequest access = new StreetRequest();
-  private StreetRequest egress = new StreetRequest();
-  private StreetRequest transfer = new StreetRequest();
-  private StreetRequest direct = new StreetRequest();
+  private VehicleRentalRequest rental;
+
+  private VehicleParkingRequest parking;
+
+  public VehicleRentalRequest rental() {
+    return rental;
+  }
+
+  public VehicleParkingRequest parking() {
+    return parking;
+  }
+
+  private final TransitRequest transit = new TransitRequest();
+  private final StreetRequest access = new StreetRequest();
+  private final StreetRequest egress = new StreetRequest();
+  private final StreetRequest transfer = new StreetRequest();
+  private final StreetRequest direct = new StreetRequest();
 
   public TransitRequest transit() {
     return transit;

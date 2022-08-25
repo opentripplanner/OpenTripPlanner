@@ -20,6 +20,7 @@ public class StreetPreferences {
    *
    * @see ItineraryListFilter
    */
+  // TODO: 2022-08-25 why do we have this field if it's never used?
   private Duration maxAccessEgressDuration = Duration.ofMinutes(45);
   /**
    * Override the settings in maxAccessEgressDuration for specific street modes. This is done
@@ -89,18 +90,10 @@ public class StreetPreferences {
     this.maxAccessEgressDuration = maxAccessEgressDuration;
   }
 
-  public Duration maxAccessEgressDuration() {
-    return maxAccessEgressDuration;
-  }
-
   public void setMaxAccessEgressDurationForMode(
     Map<StreetMode, Duration> maxAccessEgressDurationForMode
   ) {
     this.maxAccessEgressDurationForMode = maxAccessEgressDurationForMode;
-  }
-
-  public Map<StreetMode, Duration> maxAccessEgressDurationForMode() {
-    return maxAccessEgressDurationForMode;
   }
 
   public void setMaxDirectDuration(Duration maxDirectDuration) {

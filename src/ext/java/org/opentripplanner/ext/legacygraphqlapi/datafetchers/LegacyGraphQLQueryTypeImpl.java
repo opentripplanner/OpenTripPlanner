@@ -760,7 +760,7 @@ public class LegacyGraphQLQueryTypeImpl
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
-      var vehicleRental = request.journey().access().vehicleRental();
+      var vehicleRental = request.journey().rental();
 
       // TODO: 2022-08-24 what happens here?
       // TODO: 2022-08-24 it will be overwritten by next argument
@@ -791,12 +791,8 @@ public class LegacyGraphQLQueryTypeImpl
 
       preferences
         .rental()
-        .setUseVehicleRentalAvailabilityInformation(request.isTripPlannedForNow());
+        .setUseAvailabilityInformation(request.isTripPlannedForNow());
 
-      callWith.argument(
-        "startTransitStopId",
-        (String v) -> request.setStartingTransitStopId(FeedScopedId.parseId(v))
-      );
       callWith.argument(
         "startTransitTripId",
         (String v) -> request.setStartingTransitTripId(FeedScopedId.parseId(v))

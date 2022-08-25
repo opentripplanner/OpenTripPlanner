@@ -54,9 +54,7 @@ public class StreetVehicleRentalLink extends Edge {
 
     // TODO: 2022-08-22 fix this
     if (
-      vehicleRentalPlaceVertex
-        .getStation()
-        .networkIsNotAllowed(s0.getOptions().journey().access().vehicleRental())
+      vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(s0.getOptions().journey().rental())
     ) {
       return null;
     }

@@ -50,15 +50,15 @@ public class NewRouteRequest {
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
    */
-  protected Instant dateTime;
+  private Instant dateTime;
   /** The start location */
-  protected GenericLocation from;
+  private GenericLocation from;
 
   // TODO: 2022-08-22 should it be here?
   private Envelope fromEnvelope;
 
   /** The end location */
-  protected GenericLocation to;
+  private GenericLocation to;
 
   // TODO: 2022-08-22 should it be here?
   private Envelope toEnvelope;
@@ -82,7 +82,7 @@ public class NewRouteRequest {
    * <p>
    * There is no need to set this when going to the next/previous page any more.
    */
-  protected Duration searchWindow;
+  private Duration searchWindow;
   /**
    * Use the cursor to go to the next or previous "page" of trips. You should pass in the original
    * request as is.
@@ -93,7 +93,7 @@ public class NewRouteRequest {
    * The paging does not support timeTableView=false and arriveBy=true, this will result in none
    * pareto-optimal results.
    */
-  protected PageCursor pageCursor;
+  private PageCursor pageCursor;
   /**
    * Search for the best trip options within a time window. If {@code true} two itineraries are
    * considered optimal if one is better on arrival time(earliest wins) and the other is better on
@@ -123,12 +123,12 @@ public class NewRouteRequest {
    * </ul>
    * Default: true
    */
-  protected boolean timetableView;
+  private boolean timetableView;
   /**
    * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
    */
-  protected boolean arriveBy = false;
-  protected Locale locale = new Locale("en", "US");
+  private boolean arriveBy = false;
+  private Locale locale = new Locale("en", "US");
   /**
    * The maximum number of itineraries to return. In OTP1 this parameter terminates the search, but
    * in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is a post
@@ -139,9 +139,9 @@ public class NewRouteRequest {
    * The default value is 50. This is a reasonably high threshold to prevent large amount of data to
    * be returned. Consider tuning the search-window instead of setting this to a small value.
    */
-  protected int numItineraries = 50;
+  private int numItineraries = 50;
 
-  protected JourneyRequest journey = new JourneyRequest();
+  private final JourneyRequest journey = new JourneyRequest();
 
   // TODO: 2022-08-18 Should it be here?
   /**
@@ -157,15 +157,6 @@ public class NewRouteRequest {
    * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
    */
   private Duration maxJourneyDuration = Duration.ofHours(24);
-
-  /**
-   * A transit stop that this trip must start from
-   *
-   * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
-   * the fromPlace parameter. Is is used for onBoard routing only?
-   */
-  @Deprecated
-  private FeedScopedId startingTransitStopId;
 
   /**
    * A trip where this trip must start from (depart-onboard routing)
@@ -264,98 +255,53 @@ public class NewRouteRequest {
 
     if (streetMode != null) {
       switch (streetMode) {
-        case WALK:
-        case FLEXIBLE:
-          journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK));
-          break;
-        case BIKE:
-          journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE));
-          break;
-        case BIKE_TO_PARK:
+        case WALK, FLEXIBLE -> journeyRequest.setStreetSubRequestModes(
+          new TraverseModeSet(TraverseMode.WALK)
+        );
+        case BIKE -> journeyRequest.setStreetSubRequestModes(
+          new TraverseModeSet(TraverseMode.BICYCLE)
+        );
+        case BIKE_TO_PARK -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
           );
           routingPreferences.bike().setParkAndRide(true);
-          break;
-        case BIKE_RENTAL:
+        }
+        case BIKE_RENTAL -> {
+          journeyRequest.setStreetSubRequestModes(
+            new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
+          );
+          routingPreferences.rental().setAllow(true);
+          journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
+        }
+        case SCOOTER_RENTAL -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
           );
           routingPreferences.rental().setAllow(true);
           // TODO: 2022-08-18 does it make sense?
-          journeyRequest
-            .direct()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.BICYCLE);
-          journeyRequest
-            .egress()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.BICYCLE);
-          journeyRequest
-            .access()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.BICYCLE);
-          break;
-        case SCOOTER_RENTAL:
-          journeyRequest.setStreetSubRequestModes(
-            new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
-          );
-          routingPreferences.rental().setAllow(true);
-          // TODO: 2022-08-18 does it make sense?
-          journeyRequest
-            .direct()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.SCOOTER);
-          journeyRequest
-            .egress()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.SCOOTER);
-          journeyRequest
-            .access()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.SCOOTER);
-          break;
-        case CAR:
-          journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
-          break;
-        case CAR_TO_PARK:
+          journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
+        }
+        case CAR -> journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
+        case CAR_TO_PARK -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
           routingPreferences.car().setParkAndRide(true);
-          break;
-        case CAR_PICKUP:
+        }
+        case CAR_PICKUP -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
           routingPreferences.car().allowPickup();
-          break;
-        case CAR_RENTAL:
+        }
+        case CAR_RENTAL -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
           routingPreferences.rental().setAllow(true);
-          journeyRequest
-            .direct()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.CAR);
-          journeyRequest
-            .egress()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.CAR);
-          journeyRequest
-            .access()
-            .vehicleRental()
-            .allowedFormFactors()
-            .add(RentalVehicleType.FormFactor.CAR);
+          journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
+        }
       }
     }
 
@@ -520,14 +466,6 @@ public class NewRouteRequest {
 
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
-  }
-
-  public void setStartingTransitStopId(FeedScopedId startingTransitStopId) {
-    this.startingTransitStopId = startingTransitStopId;
-  }
-
-  public FeedScopedId startingTransitStopId() {
-    return startingTransitStopId;
   }
 
   public void setStartingTransitTripId(FeedScopedId startingTransitTripId) {

@@ -17,19 +17,18 @@ public class RoutingRequestMapper {
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
   public static Pair<NewRouteRequest, RoutingPreferences> mapRoutingRequest(NodeAdapter c) {
-    NewRouteRequest dft = new NewRouteRequest();
-    RoutingPreferences pref = new RoutingPreferences();
+    var dft = new NewRouteRequest();
+    var pref = new RoutingPreferences();
 
     if (c.isEmpty()) {
       return Pair.of(dft, pref);
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
-    NewRouteRequest request = new NewRouteRequest();
-    RoutingPreferences preferences = new RoutingPreferences();
-    // TODO: 2022-08-23 fix it
-    var vehicleRental = request.journey().access().vehicleRental();
-    var vehicleParking = request.journey().access().vehicleParking();
+    var request = new NewRouteRequest();
+    var preferences = new RoutingPreferences();
+    var vehicleRental = request.journey().rental();
+    var vehicleParking = request.journey().parking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
@@ -241,18 +240,18 @@ public class RoutingRequestMapper {
       .setTurnReluctance(c.asDouble("turnReluctance", preferences.street().turnReluctance()));
     preferences
       .rental()
-      .setUseVehicleRentalAvailabilityInformation(
+      .setUseAvailabilityInformation(
         c.asBoolean(
           "useBikeRentalAvailabilityInformation",
-          preferences.rental().useVehicleRentalAvailabilityInformation()
+          preferences.rental().useAvailabilityInformation()
         )
       );
     preferences
       .parking()
-      .setUseVehicleParkingAvailabilityInformation(
+      .setUseAvailabilityInformation(
         c.asBoolean(
           "useVehicleParkingAvailabilityInformation",
-          preferences.parking().useVehicleParkingAvailabilityInformation()
+          preferences.parking().useAvailabilityInformation()
         )
       );
     preferences
