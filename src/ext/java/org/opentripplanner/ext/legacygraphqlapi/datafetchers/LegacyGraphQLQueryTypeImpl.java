@@ -918,11 +918,7 @@ public class LegacyGraphQLQueryTypeImpl
             }
             return (
               route.getLongName() != null &&
-              LegacyGraphQLUtils.startsWith(
-                route.getLongName().toString(environment.getLocale()),
-                name,
-                environment.getLocale()
-              )
+              LegacyGraphQLUtils.startsWith(route.getLongName(), name, environment.getLocale())
             );
           });
       }
@@ -971,11 +967,7 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stationStream =
           stationStream.filter(station ->
-            LegacyGraphQLUtils.startsWith(
-              station.getName().toString(environment.getLocale()),
-              name,
-              environment.getLocale()
-            )
+            LegacyGraphQLUtils.startsWith(station.getName(), name, environment.getLocale())
           );
       }
 
@@ -1016,11 +1008,7 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stopStream =
           stopStream.filter(stop ->
-            LegacyGraphQLUtils.startsWith(
-              stop.getName().toString(environment.getLocale()),
-              name,
-              environment.getLocale()
-            )
+            LegacyGraphQLUtils.startsWith(stop.getName(), name, environment.getLocale())
           );
       }
 
