@@ -46,11 +46,6 @@ public interface Heuristics {
   int bestOverallJourneyTravelDuration();
 
   /**
-   * Return the best/minimum required number of transfers from origin to destination.
-   */
-  int bestOverallJourneyNumOfTransfers();
-
-  /**
    * Return an estimate for the shortest possible wait-time needed across all journeys reaching the
    * destination given the iteration-start-time. Note! This can NOT be used for destination pruning,
    * because there most likely exist journeys with a lower wait-time. The access is NOT time-shift

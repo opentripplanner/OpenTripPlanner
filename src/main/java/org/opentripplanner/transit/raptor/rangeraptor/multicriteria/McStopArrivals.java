@@ -14,7 +14,7 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 /**
  * This class serve as a wrapper for all stop arrival pareto set, one set for each stop. It also
- * keep track of stops visited since "last mark".
+ * keeps track of stops visited since "last mark".
  * <p>
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -51,14 +51,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
   }
 
   @Override
-  public int bestArrivalTime(int stopIndex) {
-    return arrivals[stopIndex].stream()
-      .mapToInt(AbstractStopArrival::arrivalTime)
-      .min()
-      .orElseThrow();
-  }
-
-  @Override
   public boolean reachedByTransit(int stopIndex) {
     return (
       arrivals[stopIndex] != null &&
@@ -71,15 +63,6 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
     return arrivals[stopIndex].stream()
       .filter(ArrivalView::arrivedByTransit)
       .mapToInt(AbstractStopArrival::arrivalTime)
-      .min()
-      .orElseThrow();
-  }
-
-  @Override
-  public int smallestNumberOfTransfers(int stopIndex) {
-    return arrivals[stopIndex].stream()
-      .filter(ArrivalView::arrivedByTransit)
-      .mapToInt(AbstractStopArrival::numberOfTransfers)
       .min()
       .orElseThrow();
   }

@@ -88,12 +88,6 @@ public class HeuristicsAdapter implements Heuristics {
   }
 
   @Override
-  public int bestOverallJourneyNumOfTransfers() {
-    calculateAggregatedResults();
-    return minJourneyNumOfTransfers;
-  }
-
-  @Override
   public int minWaitTimeForJourneysReachingDestination() {
     calculateAggregatedResults();
     return Math.abs(earliestArrivalTime - originDepartureTime) - minJourneyTravelDuration;

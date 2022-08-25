@@ -23,7 +23,7 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
  * This is grouped into a separate class (rather than just having the fields in the raptor worker
  * class) because we want to separate the logic of maintaining stop arrival state and performing the
  * steps of the algorithm. This also make it possible to have more than one state implementation,
- * which have ben used in the past to test different memory optimizations.
+ * which have been used in the past to test different memory optimizations.
  * <p>
  * Note that this represents the entire state of the Range Raptor search for all rounds. The {@code
  * stopArrivalsState} implementation can be swapped to achieve different results.
@@ -189,7 +189,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   @Override
   public StopArrivals extractStopArrivals() {
-    return new StopArrivalsAdaptor(bestTimes, stopArrivalsState);
+    return new StopArrivalsAdaptor(bestTimes);
   }
 
   private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transfer) {
