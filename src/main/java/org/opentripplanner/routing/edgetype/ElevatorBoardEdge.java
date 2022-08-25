@@ -21,8 +21,6 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
-  private static final long serialVersionUID = 3925814840369402222L;
-
   /**
    * The polyline geometry of this edge. It's generally a polyline with two coincident points, but
    * some elevators have horizontal dimension, e.g. the ones on the Eiffel Tower.

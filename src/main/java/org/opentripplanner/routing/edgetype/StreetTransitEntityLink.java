@@ -20,7 +20,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   extends Edge
   implements CarPickupableEdge {
 
-  private static final long serialVersionUID = -3311099256178798981L;
   static final int STEL_TRAVERSE_COST = 1;
 
   private final T transitEntityVertex;

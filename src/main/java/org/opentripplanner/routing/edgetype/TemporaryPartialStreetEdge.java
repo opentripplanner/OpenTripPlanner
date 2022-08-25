@@ -8,8 +8,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
 
 public final class TemporaryPartialStreetEdge extends StreetEdge implements TemporaryEdge {
 
-  private static final long serialVersionUID = 1L;
-
   /**
    * The edge on which this lies.
    */

@@ -15,8 +15,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public abstract class Edge implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-
   protected Vertex fromv;
 
   protected Vertex tov;

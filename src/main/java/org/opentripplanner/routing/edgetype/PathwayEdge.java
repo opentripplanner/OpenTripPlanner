@@ -21,7 +21,6 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
-  private static final long serialVersionUID = -3311099256178798982L;
   private final I18NString name;
   private final int traversalTime;
   private final double distance;

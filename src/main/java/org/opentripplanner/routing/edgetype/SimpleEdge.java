@@ -6,8 +6,6 @@ import org.opentripplanner.routing.graph.Vertex;
 
 /** Appears to be used only in tests. */
 public class SimpleEdge extends FreeEdge {
-
-  private static final long serialVersionUID = 1L;
   private final double weight;
   private final int seconds;
 

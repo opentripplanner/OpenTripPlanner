@@ -14,8 +14,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class StreetVehicleRentalLink extends Edge {
 
-  private static final long serialVersionUID = 1L;
-
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
   public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {

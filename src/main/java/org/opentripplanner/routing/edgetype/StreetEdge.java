@@ -47,7 +47,6 @@ public class StreetEdge
   implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
-  private static final long serialVersionUID = 1L;
   /* TODO combine these with OSM highway= flags? */
   public static final int CLASS_STREET = 3;
   public static final int CLASS_CROSSING = 4;
