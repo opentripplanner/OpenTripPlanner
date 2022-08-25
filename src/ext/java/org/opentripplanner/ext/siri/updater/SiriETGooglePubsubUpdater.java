@@ -94,7 +94,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private transient long startTime;
   private boolean primed;
 
-  public SiriETGooglePubsubUpdater(SiriETGooglePubsubUpdaterParameters config) {
+  public SiriETGooglePubsubUpdater(
+    SiriETGooglePubsubUpdaterParameters config,
+    SiriTimetableSnapshotSource timetableSnapshot
+  ) {
     this.configRef = config.getConfigRef();
     /*
            URL that responds to HTTP GET which returns all initial data in protobuf-format.
@@ -103,6 +106,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.dataInitializationUrl = URI.create(config.getDataInitializationUrl());
     this.feedId = config.getFeedId();
     this.reconnectPeriodSec = config.getReconnectPeriodSec();
+    this.snapshotSource = timetableSnapshot;
 
     // set subscriber
     String subscriptionId = System.getenv("HOSTNAME");
@@ -146,11 +150,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   @Override
   public void setup(Graph graph, TransitModel transitModel) throws Exception {
-    // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
-    //           - Ideally we should inject the snapshotSource on this class.
-    this.snapshotSource =
-      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
-
     this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
   }
 

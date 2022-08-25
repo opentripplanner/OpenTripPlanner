@@ -52,12 +52,16 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String configRef;
   private WriteToGraphCallback saveResultOnGraph;
   private final MemoryPersistence persistence = new MemoryPersistence();
+  private final TimetableSnapshotSource snapshotSource;
 
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher = null;
 
   private MqttClient client;
 
-  public MqttGtfsRealtimeUpdater(MqttGtfsRealtimeUpdaterParameters parameters) {
+  public MqttGtfsRealtimeUpdater(
+    MqttGtfsRealtimeUpdaterParameters parameters,
+    TimetableSnapshotSource snapshotSource
+  ) {
     this.configRef = parameters.getConfigRef();
     this.url = parameters.getUrl();
     this.topic = parameters.getTopic();
@@ -65,6 +69,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     this.qos = parameters.getQos();
     this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.snapshotSource = snapshotSource;
   }
 
   @Override
@@ -74,11 +79,6 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
   @Override
   public void setup(Graph graph, TransitModel transitModel) {
-    // Only create a realtime data snapshot source if none exists already
-    TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(
-      TimetableSnapshotSource::ofTransitModel
-    );
-
     // Set properties of realtime data snapshot source
     if (fuzzyTripMatching) {
       this.fuzzyTripMatcher =
@@ -172,7 +172,14 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
       if (updates != null) {
         // Handle trip updates via graph writer runnable
         saveResultOnGraph.execute(
-          new TripUpdateGraphWriterRunnable(fuzzyTripMatcher, backwardsDelayPropagationType, fullDataset, updates, feedId)
+          new TripUpdateGraphWriterRunnable(
+            snapshotSource,
+            fuzzyTripMatcher,
+            backwardsDelayPropagationType,
+            fullDataset,
+            updates,
+            feedId
+          )
         );
       }
     }

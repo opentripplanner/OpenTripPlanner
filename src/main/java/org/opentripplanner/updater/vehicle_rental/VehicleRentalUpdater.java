@@ -55,12 +55,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     LOG.info("Setting up vehicle rental updater.");
 
     this.source = source;
-    if (pollingPeriodSeconds <= 0) {
+    if (pollingPeriodSeconds() <= 0) {
       LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
     } else {
       LOG.info(
         "Creating vehicle-rental updater running every {} seconds: {}",
-        pollingPeriodSeconds,
+        pollingPeriodSeconds(),
         source
       );
     }

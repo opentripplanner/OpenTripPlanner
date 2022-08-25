@@ -20,6 +20,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -35,8 +37,12 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
   private final LocalDate fromDateTime;
   private long startTime;
 
-  public SiriAzureETUpdater(SiriAzureETUpdaterParameters config) {
-    super(config);
+  public SiriAzureETUpdater(
+    SiriAzureETUpdaterParameters config,
+    TransitModel transitModel,
+    SiriTimetableSnapshotSource snapshotSource
+  ) {
+    super(config, transitModel, snapshotSource);
     this.fromDateTime = config.getFromDateTime();
   }
 

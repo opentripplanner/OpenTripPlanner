@@ -35,10 +35,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
    * Update streamer
    */
   private final EstimatedTimetableSource updateSource;
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private final Boolean purgeExpiredData;
+
   /**
    * Feed id that is used for the trip ids in the TripUpdates
    */
@@ -47,44 +44,32 @@ public class SiriETUpdater extends PollingGraphUpdater {
    * Parent update manager. Is used to execute graph writer runnables.
    */
   protected WriteToGraphCallback saveResultOnGraph;
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer logFrequency;
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer maxSnapshotFrequency;
+
   /**
    * The place where we'll record the incoming realtime timetables to make them available to the
    * router in a thread safe way.
    */
-  private SiriTimetableSnapshotSource snapshotSource;
+  private final SiriTimetableSnapshotSource snapshotSource;
 
   private SiriFuzzyTripMatcher fuzzyTripMatcher;
 
-  public SiriETUpdater(SiriETUpdaterParameters config) {
+  public SiriETUpdater(
+    SiriETUpdaterParameters config,
+    SiriTimetableSnapshotSource timetableSnapshot
+  ) {
     super(config);
     // Create update streamer from preferences
-    feedId = config.getFeedId();
+    this.feedId = config.getFeedId();
 
-    updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
+    this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
 
-    int logFrequency = config.getLogFrequency();
-    if (logFrequency >= 0) {
-      this.logFrequency = logFrequency;
-    }
-    int maxSnapshotFrequency = config.getMaxSnapshotFrequencyMs();
-    if (maxSnapshotFrequency >= 0) {
-      this.maxSnapshotFrequency = maxSnapshotFrequency;
-    }
-    this.purgeExpiredData = config.purgeExpiredData();
+    this.snapshotSource = timetableSnapshot;
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       updateSource
     );
   }
@@ -96,26 +81,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   @Override
   public void setup(Graph graph, TransitModel transitModel) {
-    // Only create a realtime data snapshot source if none exists already
-    // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
-    //           - Ideally we should inject the snapshotSource on this class.
-    this.snapshotSource =
-      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
-
     this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
-
-    // Set properties of realtime data snapshot source.
-    // TODO OTP2 - this is overwriting these properties if they were specified by other updaters.
-    //           - These should not be specified at a per-updater level, but at a per-router level.
-    if (this.logFrequency != null) {
-      this.snapshotSource.logFrequency = logFrequency;
-    }
-    if (this.maxSnapshotFrequency != null) {
-      this.snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
-    }
-    if (this.purgeExpiredData != null) {
-      this.snapshotSource.purgeExpiredData = purgeExpiredData;
-    }
   }
 
   @Override

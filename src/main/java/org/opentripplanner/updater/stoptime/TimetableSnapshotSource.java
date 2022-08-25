@@ -38,6 +38,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
-  public int logFrequency = 2000;
+  private final int logFrequency;
   private int totalSuccessfullyApplied = 0;
 
   /**
@@ -87,7 +88,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern → Timetable map and indexing the new Timetables.
    */
-  public int maxSnapshotFrequency = 1000;
+  private final int maxSnapshotFrequencyMs;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -96,7 +97,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private volatile TimetableSnapshot snapshot = null;
 
   /** Should expired realtime data be purged from the graph. */
-  public boolean purgeExpiredData = true;
+  private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
 
@@ -107,14 +108,21 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private final Map<FeedScopedId, Integer> serviceCodes;
 
-  public static TimetableSnapshotSource ofTransitModel(final TransitModel transitModel) {
-    return new TimetableSnapshotSource(
-      transitModel.getTimeZone(),
-      new DefaultTransitService(transitModel),
-      transitModel.getTransitLayerUpdater(),
-      transitModel.getDeduplicator(),
-      transitModel.getServiceCodes()
-    );
+  public TimetableSnapshotSource(
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel
+  ) {
+    this.timeZone = transitModel.getTimeZone();
+    this.transitService = new DefaultTransitService(transitModel);
+    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
+    this.deduplicator = transitModel.getDeduplicator();
+    this.serviceCodes = transitModel.getServiceCodes();
+    this.logFrequency = parameters.logFrequency();
+    this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
+    this.purgeExpiredData = parameters.purgeExpiredData();
+
+    // Inject this into the transit model
+    transitModel.initTimetableSnapshotProvider(this);
   }
 
   public TimetableSnapshotSource(
@@ -122,13 +130,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     TransitService transitService,
     TransitLayerUpdater transitLayerUpdater,
     Deduplicator deduplicator,
-    Map<FeedScopedId, Integer> serviceCodes
+    Map<FeedScopedId, Integer> serviceCodes,
+    TimetableSnapshotSourceParameters parameters
   ) {
     this.timeZone = timeZone;
     this.transitService = transitService;
     this.transitLayerUpdater = transitLayerUpdater;
     this.deduplicator = deduplicator;
     this.serviceCodes = serviceCodes;
+    this.logFrequency = parameters.logFrequency();
+    this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
+    this.purgeExpiredData = parameters.purgeExpiredData();
   }
 
   /**
@@ -319,7 +331,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
     final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+    if (force || now - lastSnapshotTime > maxSnapshotFrequencyMs) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);

@@ -40,6 +40,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
@@ -97,14 +98,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
-  public int logFrequency = 2000;
-
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
    */
-  public int maxSnapshotFrequency = 1000;
+  private final int maxSnapshotFrequency;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -113,15 +112,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private volatile TimetableSnapshot snapshot = null;
 
   /** Should expired realtime data be purged from the graph. */
-  public boolean purgeExpiredData = true;
+  private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
   protected long lastSnapshotTime = -1;
 
-  public SiriTimetableSnapshotSource(final TransitModel transitModel) {
-    timeZone = transitModel.getTimeZone();
-    transitService = new DefaultTransitService(transitModel);
-    transitLayerUpdater = transitModel.getTransitLayerUpdater();
+  public SiriTimetableSnapshotSource(
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel
+  ) {
+    this.timeZone = transitModel.getTimeZone();
+    this.transitService = new DefaultTransitService(transitModel);
+    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
+    this.maxSnapshotFrequency = parameters.maxSnapshotFrequencyMs();
+    this.purgeExpiredData = parameters.purgeExpiredData();
+
+    transitModel.initTimetableSnapshotProvider(this);
   }
 
   /**

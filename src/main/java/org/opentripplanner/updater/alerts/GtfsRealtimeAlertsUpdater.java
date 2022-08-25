@@ -51,7 +51,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
     LOG.info(
       "Creating real-time alert updater running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       url
     );
   }

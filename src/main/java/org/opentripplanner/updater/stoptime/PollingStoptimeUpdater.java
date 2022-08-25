@@ -29,15 +29,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
 
-  /**
-   * Update streamer
-   */
   private final TripUpdateSource updateSource;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private final Boolean purgeExpiredData;
+  private final TimetableSnapshotSource snapshotSource;
 
   /**
    * Feed id that is used for the trip ids in the TripUpdates
@@ -58,42 +51,26 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   private WriteToGraphCallback saveResultOnGraph;
 
   /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer logFrequency;
-
-  /**
-   * Property to set on the RealtimeDataSnapshotSource
-   */
-  private Integer maxSnapshotFrequency;
-
-  /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-  public PollingStoptimeUpdater(PollingStoptimeUpdaterParameters parameters) {
+  public PollingStoptimeUpdater(
+    PollingStoptimeUpdaterParameters parameters,
+    TimetableSnapshotSource snapshotSource
+  ) {
     super(parameters);
     // Create update streamer from preferences
     this.feedId = parameters.getFeedId();
     this.updateSource = createSource(parameters);
 
-    // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
-    int logFrequency = parameters.getLogFrequency();
-    if (logFrequency >= 0) {
-      this.logFrequency = logFrequency;
-    }
-    int maxSnapshotFrequency = parameters.getMaxSnapshotFrequencyMs();
-    if (maxSnapshotFrequency >= 0) {
-      this.maxSnapshotFrequency = maxSnapshotFrequency;
-    }
-    this.purgeExpiredData = parameters.purgeExpiredData();
     this.fuzzyTripMatching = parameters.fuzzyTripMatching();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.snapshotSource = snapshotSource;
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       updateSource
     );
   }
@@ -108,22 +85,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     if (fuzzyTripMatching) {
       this.fuzzyTripMatcher =
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
-
-    // Only create a realtime data snapshot source if none exists already
-    TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(
-      TimetableSnapshotSource::ofTransitModel
-    );
-
-    // Set properties of realtime data snapshot source
-    if (logFrequency != null) {
-      snapshotSource.logFrequency = logFrequency;
-    }
-    if (maxSnapshotFrequency != null) {
-      snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
-    }
-    if (purgeExpiredData != null) {
-      snapshotSource.purgeExpiredData = purgeExpiredData;
     }
   }
 
@@ -143,6 +104,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     if (updates != null) {
       // Handle trip updates via graph writer runnable
       TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
+        snapshotSource,
         fuzzyTripMatcher,
         backwardsDelayPropagationType,
         fullDataset,

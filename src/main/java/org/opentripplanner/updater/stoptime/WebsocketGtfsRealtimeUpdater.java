@@ -63,6 +63,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
+  private final TimetableSnapshotSource snapshotSource;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
@@ -70,12 +72,16 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-  public WebsocketGtfsRealtimeUpdater(WebsocketGtfsRealtimeUpdaterParameters parameters) {
+  public WebsocketGtfsRealtimeUpdater(
+    WebsocketGtfsRealtimeUpdaterParameters parameters,
+    TimetableSnapshotSource snapshotSource
+  ) {
     this.configRef = parameters.getConfigRef();
     this.url = parameters.getUrl();
     this.feedId = parameters.getFeedId();
     this.reconnectPeriodSec = parameters.getReconnectPeriodSec();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.snapshotSource = snapshotSource;
   }
 
   @Override
@@ -85,8 +91,6 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
   @Override
   public void setup(Graph graph, TransitModel transitModel) {
-    // Only create a realtime data snapshot source if none exists already
-    transitModel.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::ofTransitModel);
     this.fuzzyTripMatcher =
       new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
   }
@@ -193,6 +197,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
       if (updates != null) {
         // Handle trip updates via graph writer runnable
         TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
+          snapshotSource,
           fuzzyTripMatcher,
           backwardsDelayPropagationType,
           fullDataset,

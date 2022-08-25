@@ -8,7 +8,6 @@ public class WebsocketGtfsRealtimeUpdaterParameters {
   private final int reconnectPeriodSec;
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
-
   public WebsocketGtfsRealtimeUpdaterParameters(
     String configRef,
     String feedId,

@@ -20,7 +20,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(PollingGraphUpdater.class);
   private final String configRef;
   /** How long to wait after polling to poll again. */
-  protected Integer pollingPeriodSeconds;
+  private Integer pollingPeriodSeconds;
 
   // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a clear term.
   protected boolean blockReadinessUntilInitialized;
@@ -37,6 +37,10 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
     this.pollingPeriodSeconds = config.getFrequencySec();
     this.configRef = config.getConfigRef();
+  }
+
+  public Integer pollingPeriodSeconds() {
+    return pollingPeriodSeconds;
   }
 
   @Override

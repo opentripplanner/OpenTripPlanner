@@ -24,7 +24,7 @@ public class VilkkuBikeRentalDataSource extends GenericXmlDataSource<VehicleRent
     "longitude"
   );
 
-  private String network;
+  private final String network;
 
   /**
    * Initialize VilkkuBikeRentalDataSource.

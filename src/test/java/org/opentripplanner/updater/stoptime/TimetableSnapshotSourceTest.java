@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+import static org.opentripplanner.updater.stoptime.TimetableSnapshotSourceTest.SameAssert.NotSame;
+import static org.opentripplanner.updater.stoptime.TimetableSnapshotSourceTest.SameAssert.Same;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -18,13 +20,15 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -32,23 +36,22 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class TimetableSnapshotSourceTest {
 
-  private static TransitModel transitModel;
+  private TransitModel transitModel;
 
-  private static final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
+  private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
-  private static final boolean fullDataset = false;
-  private static LocalDate serviceDate;
-  private static byte[] cancellation;
-  private static String feedId;
+  private final boolean fullDataset = false;
+  private LocalDate serviceDate;
+  private byte[] cancellation;
+  private String feedId;
 
-  private TimetableSnapshotSource updater;
-
-  @BeforeAll
-  public static void setUpClass() {
+  @BeforeEach
+  public void setUp() {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
     transitModel = model.transitModel();
     // fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
@@ -69,13 +72,13 @@ public class TimetableSnapshotSourceTest {
     cancellation = tripUpdateBuilder.build().toByteArray();
   }
 
-  @BeforeEach
-  public void setUp() {
-    updater = TimetableSnapshotSource.ofTransitModel(transitModel);
-  }
-
   @Test
   public void testGetSnapshot() throws InvalidProtocolBufferException {
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
@@ -96,8 +99,26 @@ public class TimetableSnapshotSourceTest {
       feedId
     );
     assertSame(snapshot, updater.getTimetableSnapshot());
+  }
 
-    updater.maxSnapshotFrequency = (-1);
+  @Test
+  public void testGetSnapshotWithMaxSnapshotFrequencyCleared()
+    throws InvalidProtocolBufferException {
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequencyMs(-1),
+      transitModel
+    );
+
+    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+
+    updater.applyTripUpdates(
+      TRIP_MATCHER_NOOP,
+      REQUIRED_NO_DATA,
+      fullDataset,
+      List.of(TripUpdate.parseFrom(cancellation)),
+      feedId
+    );
+
     final TimetableSnapshot newSnapshot = updater.getTimetableSnapshot();
     assertNotNull(newSnapshot);
     assertNotSame(snapshot, newSnapshot);
@@ -111,6 +132,11 @@ public class TimetableSnapshotSourceTest {
     final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
     final int tripIndex = pattern.getScheduledTimetable().getTripIndex(tripId);
     final int tripIndex2 = pattern.getScheduledTimetable().getTripIndex(tripId2);
+
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -163,6 +189,11 @@ public class TimetableSnapshotSourceTest {
 
     final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
@@ -192,6 +223,11 @@ public class TimetableSnapshotSourceTest {
    */
   @Test
   public void invalidTripId() {
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
     Stream
       .of("", null)
       .forEach(id -> {
@@ -305,6 +341,11 @@ public class TimetableSnapshotSourceTest {
 
       tripUpdate = tripUpdateBuilder.build();
     }
+
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
 
     // WHEN
     updater.applyTripUpdates(
@@ -453,6 +494,11 @@ public class TimetableSnapshotSourceTest {
 
       tripUpdate = tripUpdateBuilder.build();
     }
+
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
 
     // WHEN
     updater.applyTripUpdates(
@@ -623,6 +669,11 @@ public class TimetableSnapshotSourceTest {
       tripUpdate = tripUpdateBuilder.build();
     }
 
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
     // WHEN
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -724,6 +775,11 @@ public class TimetableSnapshotSourceTest {
 
       tripUpdate = tripUpdateBuilder.build();
     }
+
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
 
     // WHEN
     updater.applyTripUpdates(
@@ -891,6 +947,11 @@ public class TimetableSnapshotSourceTest {
       tripUpdate = tripUpdateBuilder.build();
     }
 
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT,
+      transitModel
+    );
+
     // WHEN
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -969,15 +1030,50 @@ public class TimetableSnapshotSourceTest {
     }
   }
 
-  @Test
-  public void testPurgeExpiredData() throws InvalidProtocolBufferException {
+  enum SameAssert {
+    Same {
+      public void doAssert(Object a, Object b) {
+        assertSame(a, b);
+      }
+    },
+    NotSame {
+      public void doAssert(Object a, Object b) {
+        assertNotSame(a, b);
+      }
+    };
+
+    public abstract void doAssert(Object a, Object b);
+  }
+
+  static Stream<Arguments> purgeExpiredDataTestCases = Stream.of(
+    Arguments.of(Boolean.TRUE, -1, NotSame, Same, Same, NotSame, NotSame),
+    Arguments.of(Boolean.FALSE, -1, NotSame, Same, Same, NotSame, NotSame),
+    Arguments.of(Boolean.TRUE, 1000, Same, Same, Same, NotSame, Same),
+    Arguments.of(Boolean.FALSE, 1000, Same, Same, Same, NotSame, Same)
+  );
+
+  @ParameterizedTest(name = "purgeExpiredData: {0}, maxSnapshotFrequency: {1}")
+  @VariableSource("purgeExpiredDataTestCases")
+  public void testPurgeExpiredData(
+    boolean purgeExpiredData,
+    int maxSnapshotFrequency,
+    SameAssert expSnapshot,
+    SameAssert expPattern,
+    SameAssert expPatternOnDate,
+    SameAssert expPatternSnapshotA,
+    SameAssert expPatternSnapshotB
+  ) throws InvalidProtocolBufferException {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
     final LocalDate previously = LocalDate.now(transitModel.getTimeZone()).minusDays(2); // Just to be safe...
     final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
     final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
 
-    updater.maxSnapshotFrequency = 0;
-    updater.purgeExpiredData = false;
+    var updater = new TimetableSnapshotSource(
+      TimetableSnapshotSourceParameters.DEFAULT
+        .withPurgeExpiredData(purgeExpiredData)
+        .withMaxSnapshotFrequencyMs(maxSnapshotFrequency),
+      transitModel
+    );
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
@@ -986,14 +1082,13 @@ public class TimetableSnapshotSourceTest {
       List.of(TripUpdate.parseFrom(cancellation)),
       feedId
     );
-    final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
-    updater.purgeExpiredData = true;
+    final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
     final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
     tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
     tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(previously));
 
     final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
@@ -1011,11 +1106,19 @@ public class TimetableSnapshotSourceTest {
     );
     final TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
-    assertNotSame(snapshotA, snapshotB);
-
-    assertSame(snapshotA.resolve(pattern, null), snapshotB.resolve(pattern, null));
-    assertSame(snapshotA.resolve(pattern, serviceDate), snapshotB.resolve(pattern, serviceDate));
-    assertNotSame(snapshotA.resolve(pattern, null), snapshotA.resolve(pattern, serviceDate));
-    assertSame(snapshotB.resolve(pattern, null), snapshotB.resolve(pattern, previously));
+    expSnapshot.doAssert(snapshotA, snapshotB);
+    expPattern.doAssert(snapshotA.resolve(pattern, null), snapshotB.resolve(pattern, null));
+    expPatternOnDate.doAssert(
+      snapshotA.resolve(pattern, serviceDate),
+      snapshotB.resolve(pattern, serviceDate)
+    );
+    expPatternSnapshotA.doAssert(
+      snapshotA.resolve(pattern, null),
+      snapshotA.resolve(pattern, serviceDate)
+    );
+    expPatternSnapshotB.doAssert(
+      snapshotB.resolve(pattern, null),
+      snapshotB.resolve(pattern, previously)
+    );
   }
 }

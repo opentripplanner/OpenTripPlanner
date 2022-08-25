@@ -80,7 +80,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
       featureType = config.getFeatureType();
       LOG.info(
         "Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
-        pollingPeriodSeconds,
+        pollingPeriodSeconds(),
         url.toString(),
         featureType
       );

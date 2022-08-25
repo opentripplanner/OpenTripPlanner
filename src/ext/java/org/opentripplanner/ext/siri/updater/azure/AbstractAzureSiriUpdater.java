@@ -33,7 +33,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private final Logger LOG = LoggerFactory.getLogger(getClass());
   private boolean isPrimed = false;
   protected WriteToGraphCallback saveResultOnGraph;
-  protected SiriTimetableSnapshotSource snapshotSource;
+  protected final SiriTimetableSnapshotSource snapshotSource;
 
   private SiriFuzzyTripMatcher fuzzyTripMatcher;
   private final String configRef;
@@ -56,15 +56,19 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
    */
   protected int timeout;
 
-  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config) {
+  public AbstractAzureSiriUpdater(
+    SiriAzureUpdaterParameters config,
+    TransitModel transitModel,
+    SiriTimetableSnapshotSource snapshotSource
+  ) {
     this.configRef = config.getConfigRef();
-
     this.serviceBusUrl = config.getServiceBusUrl();
     this.topicName = config.getTopicName();
-
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
     this.feedId = config.getFeedId();
+    this.snapshotSource = snapshotSource;
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
   }
 
   /**
@@ -85,11 +89,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph, TransitModel transitModel) throws Exception {
-    snapshotSource =
-      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
-  }
+  public void setup(Graph graph, TransitModel transitModel) throws Exception {}
 
   @Override
   public void run() throws Exception {

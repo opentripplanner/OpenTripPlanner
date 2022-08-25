@@ -66,7 +66,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       url
     );
   }

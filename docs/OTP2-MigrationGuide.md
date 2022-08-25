@@ -286,4 +286,6 @@ The scripting API endpoint has been removed.
   citi-bike-nyc*, *jcdecaux*, *keolis-rennes*, *kml*, *next-bike*, *ov-fiets*, *sf-bay-area*, *
   share-bike*, *smoove*, *uip-bike*, and *vcub*. Use the standard *gtfs* updater instead, or
   reintroduce your custom updater as a Sandbox module.
+- The `logFrequency`, `maxSnapshotFrequency`, `purgeExpiredData` updater parameters are moved from 
+  the individual updaters to `timetableUpdates`(root level in the router config).  
 
