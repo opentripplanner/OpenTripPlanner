@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public final class GtfsFaresV2Service implements Serializable {
 
   private final List<FareLegRule> legRules;
-  private List<FareTransferRule> transferRules;
+  private final List<FareTransferRule> transferRules;
   private final Multimap<FeedScopedId, String> stopAreas;
   private final Set<String> networksWithRules;
   private final Set<String> fromAreasWithRules;
@@ -175,5 +175,3 @@ record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legPro
       .orElse(Set.of());
   }
 }
-
-record TransferCost(Leg fromLeg, Leg toLeg, FareProduct product) {}
