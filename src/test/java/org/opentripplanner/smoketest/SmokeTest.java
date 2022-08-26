@@ -132,7 +132,7 @@ public class SmokeTest {
   ) {
     var itineraryModes = itineraries
       .stream()
-      .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
+      .map(i -> i.legs.stream().map(l -> l.mode).toList())
       .toList();
     assertTrue(
       itineraryModes.contains(expectedModes),
