@@ -51,8 +51,7 @@ public class SmokeTest {
   static class FareDeserializer extends JsonDeserializer<Fare> {
 
     @Override
-    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-      throws IOException, JsonProcessingException {
+    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
       return null;
     }
   }
@@ -101,8 +100,8 @@ public class SmokeTest {
   /**
    * Sends an HTTP request to the OTP plan endpoint and deserializes the response.
    */
-  static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
-    var request = SmokeTest.buildPlanRequest(params);
+  static TripPlannerResponse sendPlanRequest(SmokeTestRequest req) {
+    var request = SmokeTest.buildPlanRequest(req.toMap());
     LOG.info("Sending request to {}", request.uri());
     TripPlannerResponse otpResponse;
     try {
@@ -134,7 +133,7 @@ public class SmokeTest {
     var itineraryModes = itineraries
       .stream()
       .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
-      .collect(Collectors.toList());
+      .toList();
     assertTrue(
       itineraryModes.contains(expectedModes),
       String.format(
