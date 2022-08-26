@@ -95,11 +95,13 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
     this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
 
-    var mcCostParams = McCostParamsMapper.map(routingContext.opt, routingContext.pref);
+    var mcCostParams = McCostParamsMapper.map(
+      routingContext.opt,
+      routingContext.pref,
+      patternIndex
+    );
     this.forwardConstrainedTransfers = transitLayer.getForwardConstrainedTransfers();
     this.reverseConstrainedTransfers = transitLayer.getReverseConstrainedTransfers();
-
-    var mcCostParams = McCostParamsMapper.map(routingContext.opt, patternIndex);
 
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(

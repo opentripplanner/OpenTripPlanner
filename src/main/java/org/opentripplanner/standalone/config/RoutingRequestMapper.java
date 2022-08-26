@@ -303,12 +303,13 @@ public class RoutingRequestMapper {
       );
 
     request
-      .journeyRequest()
+      .journey()
       .transit()
       .setUnpreferredAgencies(
         c
           .path("unpreferred")
-          .asRouteMatcher("agencies", request.journeyRequest().transit().unpreferredRoutes())
+          .asRouteMatcher("agencies", request.journey().transit().unpreferredRoutes())
+          .getAgencyAndRouteIds()
       );
 
     return Pair.of(request, preferences);

@@ -162,7 +162,12 @@ public class NearbyStopFinder {
     boolean reverseDirection
   ) {
     if (useStreets) {
-      return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest, preferences);
+      return findNearbyStopsViaStreets(
+        Set.of(vertex),
+        reverseDirection,
+        routingRequest,
+        preferences
+      );
     } else {
       return findNearbyStopsViaDirectTransfers(vertex);
     }
@@ -300,7 +305,7 @@ public class NearbyStopFinder {
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
-        routingRequest.journeyRequest().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
+        routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
       );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
