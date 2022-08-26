@@ -15,8 +15,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class VehicleParkingEdge extends Edge {
 
-  private static final long serialVersionUID = 1L;
-
   private final VehicleParking vehicleParking;
 
   public VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,6 @@ public class StreetEdge
   implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
-  private static final long serialVersionUID = 1L;
   /* TODO combine these with OSM highway= flags? */
   public static final int CLASS_STREET = 3;
   public static final int CLASS_CROSSING = 4;
@@ -130,8 +130,11 @@ public class StreetEdge
    * <p>
    * Why not use a concurrent collection? That would mean that every StreetEdge has its own empty
    * instance which would increase memory significantly.
+   * <p>
+   * We use specifically an EmptyList here, in order to get very fast iteration, since it has a
+   * static iterator instance, which always returns false in hasNext
    */
-  private List<TurnRestriction> turnRestrictions = List.of();
+  private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
   public StreetEdge(
     StreetVertex v1,
@@ -413,7 +416,7 @@ public class StreetEdge
 
     State state = editor != null ? editor.makeState() : null;
 
-    if (canPickupAndDrive(s0)) {
+    if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
       StateEditor inCar = doTraverse(s0, options, TraverseMode.CAR, false);
       if (inCar != null) {
         driveAfterPickup(s0, inCar);
@@ -426,7 +429,11 @@ public class StreetEdge
       }
     }
 
-    if (canDropOffAfterDriving(s0) && !getPermission().allows(TraverseMode.CAR)) {
+    if (
+      canDropOffAfterDriving(s0) &&
+      !getPermission().allows(TraverseMode.CAR) &&
+      canTraverse(TraverseMode.WALK)
+    ) {
       StateEditor dropOff = doTraverse(s0, options, TraverseMode.WALK, false);
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
@@ -485,7 +492,7 @@ public class StreetEdge
         fromv.getLat(),
         tov.getLon(),
         tov.getLat(),
-        isBack() ? (LineString) geometry.reverse() : geometry,
+        isBack() ? geometry.reverse() : geometry,
         isBack()
       );
   }
@@ -836,7 +843,7 @@ public class StreetEdge
     synchronized (this) {
       if (turnRestrictions.contains(turnRestriction)) {
         if (turnRestrictions.size() == 1) {
-          turnRestrictions = List.of();
+          turnRestrictions = Collections.emptyList();
         } else {
           // in order to guarantee fast access without extra allocations
           // we make the turn restrictions unmodifiable after a copy-on-write modification
@@ -853,7 +860,7 @@ public class StreetEdge
       return;
     }
     synchronized (this) {
-      turnRestrictions = List.of();
+      turnRestrictions = Collections.emptyList();
     }
   }
 
@@ -962,9 +969,6 @@ public class StreetEdge
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
-    if (traverseMode == null) {
-      return null;
-    }
     boolean backWalkingBike = s0.isBackWalkingBike();
     TraverseMode backMode = s0.getBackMode();
     Edge backEdge = s0.getBackEdge();
@@ -978,11 +982,6 @@ public class StreetEdge
       if (this.isReverseOf(backEdge) || backEdge.isReverseOf(this)) {
         return null;
       }
-    }
-
-    /* Check whether this street allows the current mode. */
-    if (!canTraverse(traverseMode)) {
-      return null;
     }
 
     // Automobiles have variable speeds depending on the edge type
