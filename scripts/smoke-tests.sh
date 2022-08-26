@@ -5,10 +5,7 @@ LOCATION=$1
 cd smoke-tests
 make build-"${LOCATION}"
 
-eval "(make run-${LOCATION} &)"
-pid=$!
-
-echo "Pid is $pid"
+make run-"${LOCATION}" &
 
 # OTP needs a little while to start up so we sleep
 sleep 15

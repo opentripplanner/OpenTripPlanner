@@ -18,13 +18,13 @@ public class HoustonSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
-    var params = new SmokeTestRequest(galvestonRoad, northLindale, Set.of("TRANSIT", "WALK"));
-    var otpResponse = SmokeTest.sendPlanRequest(params);
+    var request = new SmokeTestRequest(galvestonRoad, northLindale, Set.of("TRANSIT", "WALK"));
+    var otpResponse = SmokeTest.sendPlanRequest(request);
     var itineraries = otpResponse.getPlan().itineraries;
 
     assertTrue(itineraries.size() > 1);
 
-    var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK");
+    var expectedModes = List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK");
     assertThatItineraryHasModes(itineraries, expectedModes);
   }
 }
