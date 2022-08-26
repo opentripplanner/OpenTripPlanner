@@ -32,7 +32,6 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
@@ -164,12 +163,8 @@ public abstract class GtfsTest {
     serverContext = TestServerContext.createServerContext(graph, transitModel);
     timetableSnapshotSource =
       new TimetableSnapshotSource(
-        transitModel.getTimeZone(),
-        new DefaultTransitService(transitModel),
-        transitModel.getTransitLayerUpdater(),
-        transitModel.getDeduplicator(),
-        transitModel.getServiceCodes(),
-        TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(false)
+        TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(false),
+        transitModel
       );
     alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);

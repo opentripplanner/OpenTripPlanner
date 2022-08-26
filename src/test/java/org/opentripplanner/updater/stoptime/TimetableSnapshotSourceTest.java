@@ -19,6 +19,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -1032,93 +1033,102 @@ public class TimetableSnapshotSourceTest {
 
   enum SameAssert {
     Same {
-      public void doAssert(Object a, Object b) {
+      public void test(Object a, Object b) {
         assertSame(a, b);
       }
     },
     NotSame {
-      public void doAssert(Object a, Object b) {
+      public void test(Object a, Object b) {
         assertNotSame(a, b);
       }
     };
 
-    public abstract void doAssert(Object a, Object b);
+    abstract void test(Object a, Object b);
+
+    SameAssert not() {
+      return this == Same ? NotSame : Same;
+    }
   }
 
   static Stream<Arguments> purgeExpiredDataTestCases = Stream.of(
-    Arguments.of(Boolean.TRUE, -1, NotSame, Same, Same, NotSame, NotSame),
-    Arguments.of(Boolean.FALSE, -1, NotSame, Same, Same, NotSame, NotSame),
-    Arguments.of(Boolean.TRUE, 1000, Same, Same, Same, NotSame, Same),
-    Arguments.of(Boolean.FALSE, 1000, Same, Same, Same, NotSame, Same)
+    // purgeExpiredData   maxSnapshotFrequency || snapshots PatternSnapshotA  PatternSnapshotB
+    Arguments.of(Boolean.TRUE, -1, NotSame, NotSame),
+    Arguments.of(Boolean.FALSE, -1, NotSame, Same),
+    Arguments.of(Boolean.TRUE, 1000, NotSame, NotSame),
+    Arguments.of(Boolean.FALSE, 1000, Same, Same)
   );
 
-  @ParameterizedTest(name = "purgeExpiredData: {0}, maxSnapshotFrequency: {1}")
+  @ParameterizedTest(name = "purgeExpired: {0}, maxFrequency: {1}  ||  {2}  {3}")
   @VariableSource("purgeExpiredDataTestCases")
   public void testPurgeExpiredData(
     boolean purgeExpiredData,
     int maxSnapshotFrequency,
-    SameAssert expSnapshot,
-    SameAssert expPattern,
-    SameAssert expPatternOnDate,
-    SameAssert expPatternSnapshotA,
-    SameAssert expPatternSnapshotB
-  ) throws InvalidProtocolBufferException {
+    SameAssert expSnapshots,
+    SameAssert expPatternAeqB
+  ) {
     final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
-    final LocalDate previously = LocalDate.now(transitModel.getTimeZone()).minusDays(2); // Just to be safe...
     final Trip trip = transitModel.getTransitModelIndex().getTripForId().get(tripId);
     final TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
+
+    // We will simulate the clock turning midnight into tomorrow, data on
+    // yesterday is candidate to expire
+    final LocalDate yesterday = serviceDate.minusDays(1);
+    final LocalDate tomorrow = serviceDate.plusDays(1);
+    final AtomicReference<LocalDate> clock = new AtomicReference<>(yesterday);
+
+    var tripDescriptorBuilder = TripDescriptor.newBuilder();
+    tripDescriptorBuilder.setTripId("1.1");
+    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
+
+    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(yesterday));
+    var tripUpdateYesterday = TripUpdate.newBuilder().setTrip(tripDescriptorBuilder).build();
+
+    // Update pattern on today, even if the time the update is performed is tomorrow
+    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(serviceDate));
+    var tripUpdateToday = TripUpdate.newBuilder().setTrip(tripDescriptorBuilder).build();
 
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT
         .withPurgeExpiredData(purgeExpiredData)
         .withMaxSnapshotFrequencyMs(maxSnapshotFrequency),
-      transitModel
+      transitModel,
+      clock::get
     );
 
+    // Apply update when clock is yesterday
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
       fullDataset,
-      List.of(TripUpdate.parseFrom(cancellation)),
+      List.of(tripUpdateYesterday),
       feedId
     );
 
     final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
-    final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
-
-    tripDescriptorBuilder.setTripId("1.1");
-    tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.CANCELED);
-    tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(previously));
-
-    final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-
-    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-    final TripUpdate tripUpdate = tripUpdateBuilder.build();
+    // Turn the clock to tomorrow
+    clock.set(tomorrow);
 
     updater.applyTripUpdates(
       TRIP_MATCHER_NOOP,
       REQUIRED_NO_DATA,
       fullDataset,
-      List.of(tripUpdate),
+      List.of(tripUpdateToday),
       feedId
     );
     final TimetableSnapshot snapshotB = updater.getTimetableSnapshot();
 
-    expSnapshot.doAssert(snapshotA, snapshotB);
-    expPattern.doAssert(snapshotA.resolve(pattern, null), snapshotB.resolve(pattern, null));
-    expPatternOnDate.doAssert(
-      snapshotA.resolve(pattern, serviceDate),
-      snapshotB.resolve(pattern, serviceDate)
+    expSnapshots.test(snapshotA, snapshotB);
+    expPatternAeqB.test(
+      snapshotA.resolve(pattern, yesterday),
+      snapshotB.resolve(pattern, yesterday)
     );
-    expPatternSnapshotA.doAssert(
-      snapshotA.resolve(pattern, null),
-      snapshotA.resolve(pattern, serviceDate)
-    );
-    expPatternSnapshotB.doAssert(
-      snapshotB.resolve(pattern, null),
-      snapshotB.resolve(pattern, previously)
-    );
+    expPatternAeqB
+      .not()
+      .test(snapshotB.resolve(pattern, null), snapshotB.resolve(pattern, yesterday));
+
+    // Expect the same results regardless of the config for these
+    assertNotSame(snapshotA.resolve(pattern, null), snapshotA.resolve(pattern, yesterday));
+    assertSame(snapshotA.resolve(pattern, null), snapshotB.resolve(pattern, null));
   }
 }

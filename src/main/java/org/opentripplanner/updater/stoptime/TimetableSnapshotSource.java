@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -108,9 +109,27 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private final Map<FeedScopedId, Integer> serviceCodes;
 
+  /**
+   * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
+   * the purgeExpiredData feature.
+   */
+  private final Supplier<LocalDate> localDateNow;
+
   public TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
+  ) {
+    this(parameters, transitModel, () -> LocalDate.now(transitModel.getTimeZone()));
+  }
+
+  /**
+   * Constructor is package local to allow unit-tests to provide their own clock, not using
+   * system time.
+   */
+  TimetableSnapshotSource(
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel,
+    Supplier<LocalDate> localDateNow
   ) {
     this.timeZone = transitModel.getTimeZone();
     this.transitService = new DefaultTransitService(transitModel);
@@ -120,27 +139,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     this.logFrequency = parameters.logFrequency();
     this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
     this.purgeExpiredData = parameters.purgeExpiredData();
+    this.localDateNow = localDateNow;
 
     // Inject this into the transit model
     transitModel.initTimetableSnapshotProvider(this);
-  }
-
-  public TimetableSnapshotSource(
-    ZoneId timeZone,
-    TransitService transitService,
-    TransitLayerUpdater transitLayerUpdater,
-    Deduplicator deduplicator,
-    Map<FeedScopedId, Integer> serviceCodes,
-    TimetableSnapshotSourceParameters parameters
-  ) {
-    this.timeZone = timeZone;
-    this.transitService = transitService;
-    this.transitLayerUpdater = transitLayerUpdater;
-    this.deduplicator = deduplicator;
-    this.serviceCodes = serviceCodes;
-    this.logFrequency = parameters.logFrequency();
-    this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
-    this.purgeExpiredData = parameters.purgeExpiredData();
   }
 
   /**
@@ -976,7 +978,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final LocalDate today = LocalDate.now(timeZone);
+    final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
     final LocalDate previously = today.minusDays(2); // Just to be safe...
 
