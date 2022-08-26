@@ -40,6 +40,17 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
    */
   private double keepingVehicleAtDestinationCost = 0;
 
+  public VehicleRentalPreferences clone() {
+    try {
+      var clone = (VehicleRentalPreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setPickupTime(int pickupTime) {
     this.pickupTime = pickupTime;
   }

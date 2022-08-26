@@ -45,6 +45,17 @@ public class WalkPreferences implements Cloneable, Serializable {
    */
   private double safetyFactor = 1.0;
 
+  public WalkPreferences clone() {
+    try {
+      var clone = (WalkPreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setSpeed(double speed) {
     this.speed = speed;
   }

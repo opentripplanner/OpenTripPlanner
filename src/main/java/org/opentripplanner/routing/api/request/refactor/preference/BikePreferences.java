@@ -63,6 +63,17 @@ public class BikePreferences implements Cloneable, Serializable {
   // TODO: 2022-08-18 Is this right?
   private boolean parkAndRide = false;
 
+  public BikePreferences clone() {
+    try {
+      var clone = (BikePreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   /**
    * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
    * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and

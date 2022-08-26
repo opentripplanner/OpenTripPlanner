@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.refactor.preference;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
@@ -50,6 +51,23 @@ public class SystemPreferences implements Cloneable, Serializable {
    * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
    */
   private Duration maxJourneyDuration = Duration.ofHours(24);
+
+  public SystemPreferences clone() {
+    try {
+      // TODO: 2022-08-26 leaving out dataOverlay (that's how it was before)
+
+      var clone = (SystemPreferences) super.clone();
+
+      clone.itineraryFilters = new ItineraryFilterParameters(this.itineraryFilters);
+      clone.tags = new HashSet<>(this.tags);
+      clone.maxJourneyDuration = Duration.ofNanos(this.maxJourneyDuration.toNanos());
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
 
   public void setItineraryFilters(@Nonnull ItineraryFilterParameters itineraryFilters) {
     this.itineraryFilters = itineraryFilters;

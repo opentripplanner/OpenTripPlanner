@@ -40,6 +40,17 @@ public class CarPreferences implements Cloneable, Serializable {
   // TODO: 2022-08-18 should it be here?
   private boolean allowPickup = false;
 
+  public CarPreferences clone() {
+    try {
+      var clone = (CarPreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setSpeed(double speed) {
     this.speed = speed;
   }

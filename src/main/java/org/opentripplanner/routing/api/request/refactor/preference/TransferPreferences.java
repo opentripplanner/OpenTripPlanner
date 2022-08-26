@@ -83,6 +83,19 @@ public class TransferPreferences implements Cloneable, Serializable {
    */
   private Integer maxTransfers = 12;
 
+  public TransferPreferences clone() {
+    try {
+      // TODO: 2022-08-26 not cloning TransferOptimizationParameters (that's how it was before)
+
+      var clone = (TransferPreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setCost(int cost) {
     this.cost = cost;
   }

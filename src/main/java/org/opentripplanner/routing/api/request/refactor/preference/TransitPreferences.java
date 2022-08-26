@@ -96,6 +96,22 @@ public class TransitPreferences implements Cloneable, Serializable {
    */
   private RaptorOptions raptorOptions = new RaptorOptions();
 
+  public TransitPreferences clone() {
+    try {
+      // TODO: 2022-08-26 skipping unpreferredRouteCost (that's how it was before)
+      var clone = (TransitPreferences) super.clone();
+
+      clone.boardSlackForMode = new EnumMap<>(boardSlackForMode);
+      clone.alightSlackForMode = new EnumMap<>(alightSlackForMode);
+      clone.reluctanceForMode = new HashMap<>(reluctanceForMode);
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
     this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
   }

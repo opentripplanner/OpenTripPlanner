@@ -10,6 +10,17 @@ public class VehicleParkingPreferences implements Cloneable, Serializable {
    */
   private boolean useAvailabilityInformation = false;
 
+  public VehicleParkingPreferences clone() {
+    try {
+      var clone = (VehicleParkingPreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
     this.useAvailabilityInformation = useAvailabilityInformation;
   }

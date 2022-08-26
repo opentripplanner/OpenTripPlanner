@@ -19,6 +19,19 @@ public class WheelchairPreferences implements Cloneable, Serializable {
   // TODO: 2022-08-25 do we need it?
   private double slopeTooSteepCostFactor = 10.0;
 
+  public WheelchairPreferences clone() {
+    try {
+      // TODO: 2022-08-26 Skipping WheelchairAccessibilityRequest (that's how it was before)
+
+      var clone = (WheelchairPreferences) super.clone();
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
+
   public void setAccessible(boolean wheelchair) {
     this.accessibility = this.accessibility.withEnabled(wheelchair);
   }

@@ -16,8 +16,8 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   /**
    * This is the maximum duration for access/egress street searches. This is a performance limit and
-   * should therefore be set high. Results close to the limit are not guaranteed to be optimal.
-   * Use filters to limit what is presented to the client.
+   * should therefore be set high. Results close to the limit are not guaranteed to be optimal. Use
+   * filters to limit what is presented to the client.
    *
    * @see ItineraryListFilter
    */
@@ -30,8 +30,8 @@ public class StreetPreferences implements Cloneable, Serializable {
   private Map<StreetMode, Duration> maxAccessEgressDurationForMode = new HashMap<>();
   /**
    * This is the maximum duration for a direct street search. This is a performance limit and should
-   * therefore be set high. Results close to the limit are not guaranteed to be optimal.
-   * Use filters to limit what is presented to the client.
+   * therefore be set high. Results close to the limit are not guaranteed to be optimal. Use filters
+   * to limit what is presented to the client.
    *
    * @see ItineraryListFilter
    */
@@ -44,9 +44,9 @@ public class StreetPreferences implements Cloneable, Serializable {
   /** Multiplicative factor on expected turning time. */
   private double turnReluctance = 1.0;
   /**
-   * How long does it take to  an elevator, on average (actually, it probably should be a bit
-   * *more* than average, to prevent optimistic trips)? Setting it to "seems like forever," while
-   * accurate, will probably prevent OTP from working correctly.
+   * How long does it take to  an elevator, on average (actually, it probably should be a bit *more*
+   * than average, to prevent optimistic trips)? Setting it to "seems like forever," while accurate,
+   * will probably prevent OTP from working correctly.
    */
   // TODO: how long does it /really/ take to  an elevator?
   private int elevatorBoardTime = 90;
@@ -66,6 +66,22 @@ public class StreetPreferences implements Cloneable, Serializable {
    */
   @Deprecated
   private String pathComparator = null;
+
+  public StreetPreferences clone() {
+    try {
+      var clone = (StreetPreferences) super.clone();
+
+      clone.maxAccessEgressDuration = Duration.ofNanos(maxAccessEgressDuration.getNano());
+      clone.maxAccessEgressDurationForMode = new HashMap<>(maxAccessEgressDurationForMode);
+      clone.maxDirectDuration = Duration.ofNanos(maxDirectDuration.toNanos());
+      clone.maxDirectDurationForMode = new HashMap<>(maxDirectDurationForMode);
+
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
+  }
 
   public Duration maxDirectDuration(StreetMode mode) {
     return maxDirectDurationForMode.getOrDefault(mode, maxDirectDuration);
