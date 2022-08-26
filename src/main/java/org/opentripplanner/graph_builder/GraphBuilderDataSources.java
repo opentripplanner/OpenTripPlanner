@@ -8,6 +8,7 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.io.File;
+import java.net.URI;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 import org.opentripplanner.standalone.config.feed.DemExtractConfig;
 import org.opentripplanner.standalone.config.feed.DemExtractConfigBuilder;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
@@ -55,17 +57,24 @@ public class GraphBuilderDataSources {
   private final File cacheDirectory;
   private final DataSource outputGraph;
   private final BuildConfig buildConfig;
+  private final File baseDirectory;
 
   /**
    * Create a wrapper around the data-store and resolve which files to import and export. Validate
    * these files against the given command line arguments and the graph build parameters.
    */
   @Inject
-  public GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
+  public GraphBuilderDataSources(
+    CommandLineParameters cli,
+    BuildConfig bc,
+    OtpDataStore store,
+    @OtpBaseDirectory File baseDirectory
+  ) {
     this.store = store;
     this.buildConfig = bc;
     this.cacheDirectory = cli.cacheDirectory;
     this.outputGraph = getOutputGraph(cli);
+    this.baseDirectory = baseDirectory;
 
     // Select which files to import
     include(cli.doBuildStreet() && bc.streets, OSM);
@@ -110,7 +119,7 @@ public class GraphBuilderDataSources {
   private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
     return buildConfig.osm.osmExtractConfigs
       .stream()
-      .filter(osmExtractConfig -> osmExtractConfig.source().equals(dataSource.uri()))
+      .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
   }
@@ -126,7 +135,7 @@ public class GraphBuilderDataSources {
   private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
     return buildConfig.dem.demExtractConfigs
       .stream()
-      .filter(demExtractConfig -> demExtractConfig.source().equals(dataSource.uri()))
+      .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(new DemExtractConfigBuilder().withSource(dataSource.uri()).build());
   }
@@ -142,7 +151,7 @@ public class GraphBuilderDataSources {
   private GtfsFeedConfig getGtfsFeedConfig(DataSource dataSource) {
     return buildConfig.transitFeeds.gtfsFeedConfigs
       .stream()
-      .filter(gtfsFeedConfig -> gtfsFeedConfig.source().equals(dataSource.uri()))
+      .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(new GtfsFeedConfigBuilder().withSource(dataSource.uri()).build());
   }
@@ -158,9 +167,26 @@ public class GraphBuilderDataSources {
   private NetexFeedConfig getNetexFeedConfig(DataSource dataSource) {
     return buildConfig.transitFeeds.netexFeedConfigs
       .stream()
-      .filter(netexFeedConfig -> netexFeedConfig.source().equals(dataSource.uri()))
+      .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(new NetexFeedConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  /**
+   * Match the URI provided in the configuration with the URI of a datasource,
+   * either by comparing directly the two URIs or by first prepending the OTP base directory
+   * to the URI provided in the configuration.
+   * This covers the case where the source parameter provided in the configuration is relative to
+   * the base directory.
+   */
+  private boolean uriMatch(URI configURI, URI datasourceURI) {
+    return (
+      configURI.equals(datasourceURI) ||
+      (
+        !configURI.isAbsolute() &&
+        baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI)
+      )
+    );
   }
 
   public CompositeDataSource getBuildReportDir() {
