@@ -7,10 +7,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -19,9 +17,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
-import org.opentripplanner.routing.api.request.DebugRaptor;
-import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
-import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
@@ -233,12 +228,13 @@ public class NewRouteRequest implements Cloneable, Serializable {
     return pageCursor.type == PageType.NEXT_PAGE;
   }
 
-  // TODO: 2022-08-18 This should probably not be here
-  public NewRouteRequest getStreetSearchRequest(
+  // TODO: 2022-08-18 This probably should not be here
+  public Pair<NewRouteRequest, RoutingPreferences> getStreetSearchRequestAndPreferences(
     StreetMode streetMode,
     RoutingPreferences routingPreferences
   ) {
-    NewRouteRequest streetRequest = this.clone();
+    var streetRequest = this.clone();
+    var streetPreferences = routingPreferences.clone();
     var journeyRequest = streetRequest.journey;
     journeyRequest.setStreetSubRequestModes(new TraverseModeSet());
 
@@ -268,7 +264,6 @@ public class NewRouteRequest implements Cloneable, Serializable {
             new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
           );
           routingPreferences.rental().setAllow(true);
-          // TODO: 2022-08-18 does it make sense?
           journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
         }
         case CAR -> journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
@@ -294,7 +289,7 @@ public class NewRouteRequest implements Cloneable, Serializable {
       }
     }
 
-    return streetRequest;
+    return Pair.of(streetRequest, streetPreferences);
   }
 
   /**
@@ -338,15 +333,16 @@ public class NewRouteRequest implements Cloneable, Serializable {
   }
 
   public NewRouteRequest reversedClone() {
-    // TODO: 2022-08-22 Implement it
-    throw new RuntimeException("Not implemented");
+    var request = this.clone();
+    request.setArriveBy(!request.arriveBy);
+
+    return request;
   }
 
   private void setJourney(JourneyRequest journey) {
     this.journey = journey;
   }
 
-  // TODO: 2022-08-18 implement
   public NewRouteRequest clone() {
     try {
       // TODO: 2022-08-25 there are some fields which will not be cloned in proper way

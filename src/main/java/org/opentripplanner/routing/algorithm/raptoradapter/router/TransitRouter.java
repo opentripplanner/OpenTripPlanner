@@ -210,17 +210,19 @@ public class TransitRouter {
     var mode = isEgress ? request.journey().egress().mode() : request.journey().access().mode();
 
     // Prepare access/egress lists
-    NewRouteRequest accessRequest = request.getStreetSearchRequest(mode, preferences);
+    var requestAndPreferences = request.getStreetSearchRequestAndPreferences(mode, preferences);
+    var accessRequest = requestAndPreferences.getLeft();
+    var accessPreferences = requestAndPreferences.getRight();
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
         accessRequest,
-        preferences
+        accessPreferences
       )
     ) {
       var routingContext = new RoutingContext(
         accessRequest,
-        preferences,
+        accessPreferences,
         serverContext.graph(),
         temporaryVertices
       );
@@ -245,7 +247,7 @@ public class TransitRouter {
           routingContext,
           serverContext.transitService(),
           additionalSearchDays,
-          serverContext.routerConfig().flexParameters(preferences),
+          serverContext.routerConfig().flexParameters(accessPreferences),
           isEgress
         );
 

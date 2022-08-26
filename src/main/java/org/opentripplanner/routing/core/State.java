@@ -421,8 +421,10 @@ public class State implements Cloneable {
   private State reversedClone() {
     // We no longer compensate for schedule slack (minTransferTime) here.
     // It is distributed symmetrically over all preboard and prealight edges.
-    // TODO: 2022-08-22 should be clone preferences as well here?
-    var newStateData = StateData.getInitialStateData(stateData.opt.reversedClone(), stateData.pref);
+    var reversedRequest = stateData.opt.reversedClone();
+    var reversedPreferences = stateData.pref.clone();
+    reversedPreferences.rental().setUseAvailabilityInformation(false);
+    var newStateData = StateData.getInitialStateData(reversedRequest, reversedPreferences);
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.

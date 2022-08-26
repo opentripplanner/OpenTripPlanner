@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
@@ -41,19 +40,21 @@ public class AccessEgressRouter {
     Set<Vertex> vertices = fromTarget != rr.arriveBy() ? rctx.toVertices : rctx.fromVertices;
 
     //TODO: Investigate why this is needed for flex
-    NewRouteRequest nearbyRequest = rr.getStreetSearchRequest(streetMode, pref);
+    var requestAndPreferences = rr.getStreetSearchRequestAndPreferences(streetMode, pref);
+    var nearbyRequest = requestAndPreferences.getLeft();
+    var nearbyPreferences = requestAndPreferences.getRight();
 
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       rctx.graph,
       transitService,
-      pref.street().maxAccessEgressDuration(streetMode),
+      nearbyPreferences.street().maxAccessEgressDuration(streetMode),
       true
     );
     List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
       vertices,
       fromTarget,
       nearbyRequest,
-      pref
+      nearbyPreferences
     );
 
     LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");

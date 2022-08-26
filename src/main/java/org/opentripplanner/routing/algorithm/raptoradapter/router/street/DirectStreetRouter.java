@@ -27,20 +27,24 @@ public class DirectStreetRouter {
       return Collections.emptyList();
     }
 
-    NewRouteRequest directRequest = request.getStreetSearchRequest(
+    var requestAndPreferences = request.getStreetSearchRequestAndPreferences(
       request.journey().direct().mode(),
       preferences
     );
+
+    var directRequest = requestAndPreferences.getLeft();
+    var directPreferences = requestAndPreferences.getRight();
+
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
         directRequest,
-        preferences
+        directPreferences
       )
     ) {
       final RoutingContext routingContext = new RoutingContext(
         directRequest,
-        preferences,
+        directPreferences,
         serverContext.graph(),
         temporaryVertices
       );
@@ -63,7 +67,10 @@ public class DirectStreetRouter {
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, preferences.wheelchair());
+      ItinerariesHelper.decorateItinerariesWithRequestData(
+        response,
+        directPreferences.wheelchair()
+      );
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();

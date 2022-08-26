@@ -45,19 +45,22 @@ public class Transfer {
     NewRouteRequest request,
     RoutingPreferences preferences
   ) {
-    NewRouteRequest rr = request.getStreetSearchRequest(
+    var requestAndPreferences = request.getStreetSearchRequestAndPreferences(
       request.journey().transfer().mode(),
       preferences
     );
+
+    var rr = requestAndPreferences.getLeft();
+    var rp = requestAndPreferences.getRight();
 
     rr.setArriveBy(false);
     rr.setDateTime(Instant.ofEpochSecond(0));
     rr.setFrom(null);
     rr.setTo(null);
 
-    var bp = preferences.bike();
-    var wp = preferences.walk();
-    var sp = preferences.street();
+    var bp = rp.bike();
+    var wp = rp.walk();
+    var sp = rp.street();
 
     // Some values are rounded to ease caching in RaptorRequestTransferCache
     bp.setTriangleSafetyFactor(roundTo(bp.triangleSafetyFactor(), 1));
@@ -66,9 +69,8 @@ public class Transfer {
     bp.setSwitchCost(roundTo100(bp.switchCost()));
     bp.setSwitchTime(roundTo100(bp.switchTime()));
 
-    // TODO: 2022-08-19 this now lies within parameter class - figure out what to do with it
     // it's a record (immutable) so can be safely reused
-    //    rr.wheelchairAccessibility = request.wheelchairAccessibility;
+    rp.wheelchair().setAccessibility(preferences.wheelchair().accessibility());
 
     wp.setSpeed(roundToHalf(wp.speed()));
     bp.setSpeed(roundToHalf(bp.speed()));
