@@ -58,11 +58,11 @@ public class RouteMapper {
     if (domain == null) {
       return null;
     }
-
+    I18NStringMapper stringMapper = new I18NStringMapper(null);
     ApiRouteShort api = new ApiRouteShort();
     api.id = FeedScopedIdMapper.mapToApi(domain.getId());
     api.shortName = domain.getShortName();
-    api.longName = domain.getLongName().toString();
+    api.longName = stringMapper.mapToApi(domain.getLongName());
     api.mode = TraverseModeMapper.mapToApi(domain.getMode());
     api.color = domain.getColor();
     api.agencyName = domain.getAgency().getName();
