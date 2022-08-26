@@ -191,6 +191,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   public String getName(Locale locale) {
     return shortName == null ? longName.toString(locale) : shortName;
   }
+
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
   public String getName() {
