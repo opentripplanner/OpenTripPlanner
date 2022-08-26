@@ -22,7 +22,6 @@ houston/osm.pbf:
 	${CURL} https://leonard.io/ibi/houston-2022-08-26.osm.pbf -o $@
 
 houston/gtfs.zip:
-	# Cobblinc's own feed expired at the end of January 2022. This URL contains the feed with extended dates.
 	${CURL} https://ridemetro-api.ibi-transit.com/download/liveGTFS.zip -o $@
 
 build-%: otp.jar %/osm.pbf %/gtfs.zip

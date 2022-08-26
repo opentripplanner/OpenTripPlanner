@@ -13,4 +13,4 @@ cd ..
 
 # run the actual smoke tests
 # we run surefire:test in order to not recompile the tests for each city
-mvn surefire:test -D groups="${LOCATION}" -P prettierSkip
+mvn surefire:test -Djunit.tags.included="${LOCATION}" -Djunit.tags.excluded="" -P prettierSkip
