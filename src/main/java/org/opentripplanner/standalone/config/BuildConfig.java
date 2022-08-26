@@ -305,12 +305,6 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Netex specific build parameters.
    */
   public final NetexDefaultsConfig netexDefaults;
-  /**
-   * Otp auto detect input and output files using the command line supplied paths. This parameter
-   * make it possible to override this by specifying a path for each file. All parameters in the
-   * storage section is optional, and the fallback is to use the auto detection. It is OK to
-   * autodetect some file and specify the path to others.
-   */
 
   public final List<RoutingRequest> transferRequests;
   /**
@@ -441,16 +435,23 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Whether to create stay-seated transfers in between two trips with the same block id.
    */
   public boolean blockBasedInterlining;
+
   /**
-   * Array of URIs to elevation data files.
-   * <p>
-   * Example: {@code "osm" : [ "file:///Users/kelvin/otp/norway-dem.tif" ] }
-   * <p>
-   * This parameter is optional.
+   * Specify parameters for DEM extracts. If not specified OTP will fall back to auto-detection
+   * based on the directory provided on the command line.
    */
   public final DemExtractsConfig dem;
 
+  /**
+   * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
+   * auto-detection based on the directory provided on the command line..
+   */
   public final OsmExtractsConfig osm;
+
+  /**
+   * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
+   * based on the directory provided on the command line..
+   */
   public final TransitFeedsConfig transitFeeds;
 
   /**

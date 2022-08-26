@@ -6,6 +6,7 @@ import org.opentripplanner.standalone.config.NetexDefaultsConfig;
 
 /**
  * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultsConfig}
+ * Example: {@code [ {type="netex", source: "file:///path/to/otp/norway-netex.zip"} ] }
  */
 public class NetexFeedConfig extends TransitFeedConfig {
 

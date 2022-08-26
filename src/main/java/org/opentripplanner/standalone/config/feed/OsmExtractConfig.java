@@ -7,6 +7,8 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 /**
  * Configure an OpenStreetMap extract.
+ * Example: {@code "osm" : [ {source: "file:///path/to/otp/norway.pbf"} ] }
+ *
  */
 public class OsmExtractConfig implements DataSourceConfig {
 
