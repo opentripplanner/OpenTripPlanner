@@ -23,6 +23,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
  * when there are slight changes in the schedule.
  */
 @Tag("smoke-test")
+@Tag("atlanta")
 public class AtlantaSmokeTest {
 
   WgsCoordinate nearGeorgiaStateStation = new WgsCoordinate(33.74139944890028, -84.38607215881348);

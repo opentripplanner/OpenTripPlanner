@@ -36,8 +36,10 @@ jobs:
           key: osm
 
       - name: Build jar file
-        run: "mvn --batch-mode clean package test-compile -Dmaven.test.skip -P prettierSkip"
+        run: mvn --batch-mode clean package test-compile -Dmaven.test.skip -P prettierSkip
 
-      - name: atlanta - Build graph, run OTP, run smoke tests
-        run: "scripts/smoke-tests.sh"
+      - name: "[Atlanta] Build graph, run OTP, run smoke tests"
+        run: "scripts/smoke-tests.sh atlanta"
 
+      - name: "[Houston] Build graph, run OTP, run smoke tests"
+        run: "scripts/smoke-tests.sh houston"

@@ -1,8 +1,10 @@
 #! /bin/bash -e
 
+LOCATION=$1
+
 cd smoke-tests
-make build-atlanta
-make run-atlanta &
+make build-"${LOCATION}"
+make run-"${LOCATION}"&
 
 # OTP needs a little while to start up so we sleep
 sleep 15
@@ -11,4 +13,4 @@ cd ..
 
 # run the actual smoke tests
 # we run surefire:test in order to not recompile the tests for each city
-mvn surefire:test -D groups=smoke-test -P prettierSkip
+mvn surefire:test -D groups="${LOCATION}" -P prettierSkip
