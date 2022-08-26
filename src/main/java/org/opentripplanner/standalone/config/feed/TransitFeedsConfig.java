@@ -17,17 +17,17 @@ public class TransitFeedsConfig {
   public final List<GtfsFeedConfig> gtfsFeedConfigs;
 
   public TransitFeedsConfig(NodeAdapter config) {
+    List<NodeAdapter> feedConfigs = config.asList();
+
     gtfsFeedConfigs =
-      config
-        .asList()
+      feedConfigs
         .stream()
         .filter(feedConfig -> FEED_TYPE_GTFS.equalsIgnoreCase(feedConfig.asText("type")))
         .map(feedConfig -> GtfsFeedConfigBuilder.of(feedConfig).build())
         .toList();
 
     netexFeedConfigs =
-      config
-        .asList()
+      feedConfigs
         .stream()
         .filter(feedConfig -> FEED_TYPE_NETEX.equalsIgnoreCase(feedConfig.asText("type")))
         .map(feedConfig -> NetexFeedConfigBuilder.of(feedConfig).build())
