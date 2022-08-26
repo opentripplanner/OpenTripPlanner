@@ -17,6 +17,14 @@ atlanta/cobblinc-flex.gtfs.zip:
 atlanta/gtfs.zip: atlanta/cobblinc.gtfs.zip atlanta/cobblinc-flex.gtfs.zip
 	${CURL} https://itsmarta.com/google_transit_feed/google_transit.zip -o $@
 
+houston/osm.pbf:
+	# this file can be re-hosted on IBI provided infrastructure
+	${CURL} https://leonard.io/ibi/houston-2022-08-26.osm.pbf -o $@
+
+houston/gtfs.zip:
+	# Cobblinc's own feed expired at the end of January 2022. This URL contains the feed with extended dates.
+	${CURL} https://ridemetro-api.ibi-transit.com/download/liveGTFS.zip -o $@
+
 build-%: otp.jar %/osm.pbf %/gtfs.zip
 	java -jar otp.jar --build --save $*
 
