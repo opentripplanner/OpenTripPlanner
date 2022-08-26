@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -185,6 +186,11 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return flexibleLineType;
   }
 
+  /** @return the route's short name, or the long name if the short name is null. */
+  @Nonnull
+  public String getName(Locale locale) {
+    return shortName == null ? longName.toString(locale) : shortName;
+  }
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
   public String getName() {
