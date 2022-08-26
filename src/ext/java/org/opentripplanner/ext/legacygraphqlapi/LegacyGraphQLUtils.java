@@ -104,10 +104,10 @@ public class LegacyGraphQLUtils {
   }
 
   public static boolean startsWith(String str, String name, Locale locale) {
-    return str.toLowerCase(locale).startsWith(name);
+    return str != null && str.toLowerCase(locale).startsWith(name);
   }
 
   public static boolean startsWith(I18NString str, String name, Locale locale) {
-    return str.toString(locale).toLowerCase(locale).startsWith(name);
+    return str != null && str.toString(locale).toLowerCase(locale).startsWith(name);
   }
 }
