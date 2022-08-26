@@ -127,7 +127,7 @@ public class StreetLeg implements Leg {
     return legGeometry;
   }
 
-  List<P2<Double>> getUnRoundedLegElevation() {
+  List<P2<Double>> getRawLegElevation() {
     return legElevation;
   }
 
@@ -135,7 +135,7 @@ public class StreetLeg implements Leg {
    * Get elevation profile, with values rounded to two decimals.
    */
   @Override
-  public List<P2<Double>> getLegElevation() {
+  public List<P2<Double>> getRoundedLegElevation() {
     return normalizeElevation(legElevation);
   }
 

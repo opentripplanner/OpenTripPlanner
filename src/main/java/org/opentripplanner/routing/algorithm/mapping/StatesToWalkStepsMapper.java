@@ -285,7 +285,7 @@ public class StatesToWalkStepsMapper {
         }
       }
     } else {
-      if (!createdNewStep && current.getUnRoundedElevation() != null) {
+      if (!createdNewStep && current.getRawElevation() != null) {
         updateElevationProfile(backState, edge);
       }
       distance += edge.getDistanceMeters();
@@ -323,13 +323,13 @@ public class StatesToWalkStepsMapper {
     current = threeBack;
     current.addDistance(twoBack.getDistance());
     distance += current.getDistance();
-    if (twoBack.getUnRoundedElevation() != null) {
-      if (current.getUnRoundedElevation() == null) {
-        current.addElevation(twoBack.getUnRoundedElevation());
+    if (twoBack.getRawElevation() != null) {
+      if (current.getRawElevation() == null) {
+        current.addElevation(twoBack.getRawElevation());
       } else {
         current.addElevation(
           twoBack
-            .getUnRoundedElevation()
+            .getRawElevation()
             .stream()
             .map(p -> new P2<>(p.first + current.getDistance(), p.second))
             .toList()

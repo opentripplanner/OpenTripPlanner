@@ -130,6 +130,9 @@ public class StreetEdge
    * <p>
    * Why not use a concurrent collection? That would mean that every StreetEdge has its own empty
    * instance which would increase memory significantly.
+   * <p>
+   * We use specifically an EmptyList here, in order to get very fast iteration, since it has a
+   * static iterator instance, which always returns false in hasNext
    */
   private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 

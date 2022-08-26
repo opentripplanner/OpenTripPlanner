@@ -125,7 +125,7 @@ public class LegMapper {
       api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
     }
     api.legGeometry = PolylineEncoder.encodeGeometry(domain.getLegGeometry());
-    api.legElevation = mapElevation(domain.getLegElevation());
+    api.legElevation = mapElevation(domain.getRoundedLegElevation());
     api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
     api.alerts =
       concatenateAlerts(
