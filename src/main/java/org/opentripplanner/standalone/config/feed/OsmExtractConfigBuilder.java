@@ -21,7 +21,7 @@ public class OsmExtractConfigBuilder {
   private WayPropertySetSource osmWayPropertySet;
 
   /**
-   * The timezone to use to resolve open hours in this extract.
+   * The timezone to use to resolve opening hours in this extract.
    */
   private ZoneId timeZone;
 
