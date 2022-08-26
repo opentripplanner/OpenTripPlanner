@@ -18,7 +18,8 @@ public class TransferMapperTest {
 
   private static final RouteMapper ROUTE_MAPPER = new RouteMapper(
     new AgencyMapper(FEED_ID),
-    ISSUE_STORE
+    ISSUE_STORE,
+    new TranslationHelper()
   );
 
   private static final TripMapper TRIP_MAPPER = new TripMapper(

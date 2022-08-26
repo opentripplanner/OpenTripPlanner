@@ -910,14 +910,10 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         routeStream =
           routeStream.filter(route ->
-            Stream
-              .of(route.getShortName(), route.getLongName())
-              .filter(Objects::nonNull)
-              .map(s -> s.toLowerCase(environment.getLocale()))
-              .anyMatch(s -> s.startsWith(name))
+            LegacyGraphQLUtils.startsWith(route.getShortName(), name, environment.getLocale()) ||
+            LegacyGraphQLUtils.startsWith(route.getLongName(), name, environment.getLocale())
           );
       }
-
       return routeStream.collect(Collectors.toList());
     };
   }
@@ -963,11 +959,7 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stationStream =
           stationStream.filter(station ->
-            station
-              .getName()
-              .toString(environment.getLocale())
-              .toLowerCase(environment.getLocale())
-              .startsWith(name)
+            LegacyGraphQLUtils.startsWith(station.getName(), name, environment.getLocale())
           );
       }
 
@@ -1008,11 +1000,7 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stopStream =
           stopStream.filter(stop ->
-            stop
-              .getName()
-              .toString(environment.getLocale())
-              .toLowerCase(environment.getLocale())
-              .startsWith(name)
+            LegacyGraphQLUtils.startsWith(stop.getName(), name, environment.getLocale())
           );
       }
 

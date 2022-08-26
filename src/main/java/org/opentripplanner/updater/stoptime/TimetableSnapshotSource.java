@@ -22,6 +22,8 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripTimesPatch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -606,7 +608,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       builder.withGtfsType(3);
       builder.withMode(TransitMode.BUS);
       // Create route name
-      builder.withLongName(tripDescriptor.getTripId());
+      I18NString longName = NonLocalizedString.ofNullable(tripDescriptor.getTripId());
+      builder.withLongName(longName);
       route = builder.build();
     }
 
