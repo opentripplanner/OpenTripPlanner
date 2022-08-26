@@ -40,7 +40,7 @@ public class OsmExtractConfig implements DataSourceConfig {
 
   /**
    *
-   * @return the timezone to use to resolve open hours in this extract.
+   * @return the timezone to use to resolve opening hours in this extract.
    */
   public ZoneId timeZone() {
     return timeZone;
