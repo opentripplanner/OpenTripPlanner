@@ -1055,7 +1055,6 @@ public class StreetEdge
               this,
               backPSE,
               backMode,
-              backOptions,
               (float) speed,
               (float) backSpeed
             );
@@ -1069,7 +1068,6 @@ public class StreetEdge
               backPSE,
               this,
               traverseMode,
-              options,
               (float) backSpeed,
               (float) speed
             );

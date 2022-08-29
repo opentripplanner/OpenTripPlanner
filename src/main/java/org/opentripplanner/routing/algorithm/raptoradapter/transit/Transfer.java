@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.prefs.Preferences;
+import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
@@ -36,12 +38,7 @@ public class Transfer {
     this.edges = null;
   }
 
-  // TODO: 2022-08-25 return pair
-  // TODO: 2022-08-19 We should think about what we should about this and smilar methods
-  // Previously it took one instance as an input returned another one
-  // Now it has to operate on two instances
-  // Maybe we should return a Pair<RoutingRequest,RoutingPreferences> instead?
-  public static NewRouteRequest prepareTransferRoutingRequest(
+  public static Pair<NewRouteRequest, RoutingPreferences> prepareTransferRoutingRequest(
     NewRouteRequest request,
     RoutingPreferences preferences
   ) {
@@ -50,44 +47,44 @@ public class Transfer {
       preferences
     );
 
-    var rr = requestAndPreferences.getLeft();
-    var rp = requestAndPreferences.getRight();
+    var transferRequest = requestAndPreferences.getLeft();
+    var transferPreferences = requestAndPreferences.getRight();
 
-    rr.setArriveBy(false);
-    rr.setDateTime(Instant.ofEpochSecond(0));
-    rr.setFrom(null);
-    rr.setTo(null);
+    transferRequest.setArriveBy(false);
+    transferRequest.setDateTime(Instant.ofEpochSecond(0));
+    transferRequest.setFrom(null);
+    transferRequest.setTo(null);
 
-    var bp = rp.bike();
-    var wp = rp.walk();
-    var sp = rp.street();
+    var bikePreferences = transferPreferences.bike();
+    var walkPreferences = transferPreferences.walk();
+    var streetPreferences = transferPreferences.street();
 
     // Some values are rounded to ease caching in RaptorRequestTransferCache
-    bp.setTriangleSafetyFactor(roundTo(bp.triangleSafetyFactor(), 1));
-    bp.setTriangleSlopeFactor(roundTo(bp.triangleSlopeFactor(), 1));
-    bp.setTriangleTimeFactor(1.0 - bp.triangleSafetyFactor() - bp.triangleSlopeFactor());
-    bp.setSwitchCost(roundTo100(bp.switchCost()));
-    bp.setSwitchTime(roundTo100(bp.switchTime()));
+    bikePreferences.setTriangleSafetyFactor(roundTo(bikePreferences.triangleSafetyFactor(), 1));
+    bikePreferences.setTriangleSlopeFactor(roundTo(bikePreferences.triangleSlopeFactor(), 1));
+    bikePreferences.setTriangleTimeFactor(1.0 - bikePreferences.triangleSafetyFactor() - bikePreferences.triangleSlopeFactor());
+    bikePreferences.setSwitchCost(roundTo100(bikePreferences.switchCost()));
+    bikePreferences.setSwitchTime(roundTo100(bikePreferences.switchTime()));
 
     // it's a record (immutable) so can be safely reused
-    rp.wheelchair().setAccessibility(preferences.wheelchair().accessibility());
+    transferPreferences.wheelchair().setAccessibility(preferences.wheelchair().accessibility());
 
-    wp.setSpeed(roundToHalf(wp.speed()));
-    bp.setSpeed(roundToHalf(bp.speed()));
+    walkPreferences.setSpeed(roundToHalf(walkPreferences.speed()));
+    bikePreferences.setSpeed(roundToHalf(bikePreferences.speed()));
 
-    wp.setReluctance(roundTo(wp.reluctance(), 1));
-    wp.setStairsReluctance(roundTo(wp.stairsReluctance(), 1));
+    walkPreferences.setReluctance(roundTo(walkPreferences.reluctance(), 1));
+    walkPreferences.setStairsReluctance(roundTo(walkPreferences.stairsReluctance(), 1));
 
-    wp.setStairsReluctance(roundTo(wp.stairsReluctance(), 1));
-    wp.setStairsTimeFactor(roundTo(wp.stairsTimeFactor(), 1));
-    sp.setTurnReluctance(roundTo(sp.turnReluctance(), 1));
-    wp.setSafetyFactor(roundTo(wp.safetyFactor(), 1));
-    sp.setElevatorBoardCost(roundTo100(sp.elevatorBoardCost()));
-    sp.setElevatorBoardTime(roundTo100(sp.elevatorBoardTime()));
-    sp.setElevatorHopCost(roundTo100(sp.elevatorHopCost()));
-    sp.setElevatorHopTime(roundTo100(sp.elevatorHopTime()));
+    walkPreferences.setStairsReluctance(roundTo(walkPreferences.stairsReluctance(), 1));
+    walkPreferences.setStairsTimeFactor(roundTo(walkPreferences.stairsTimeFactor(), 1));
+    streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
+    walkPreferences.setSafetyFactor(roundTo(walkPreferences.safetyFactor(), 1));
+    streetPreferences.setElevatorBoardCost(roundTo100(streetPreferences.elevatorBoardCost()));
+    streetPreferences.setElevatorBoardTime(roundTo100(streetPreferences.elevatorBoardTime()));
+    streetPreferences.setElevatorHopCost(roundTo100(streetPreferences.elevatorHopCost()));
+    streetPreferences.setElevatorHopTime(roundTo100(streetPreferences.elevatorHopTime()));
 
-    return rr;
+    return Pair.of(transferRequest, transferPreferences);
   }
 
   public List<Coordinate> getCoordinates() {

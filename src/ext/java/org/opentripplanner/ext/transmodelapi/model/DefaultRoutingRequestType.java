@@ -60,7 +60,7 @@ public class DefaultRoutingRequestType {
             "Use filters to limit what is presented to the client."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.street().maxDirectDuration())
+          .dataFetcher(env -> preferences.street().maxDirectDuration().toSeconds())
           .build()
       )
       .field(
@@ -69,7 +69,7 @@ public class DefaultRoutingRequestType {
           .name("wheelChairAccessible")
           .description("Whether the trip must be wheelchair accessible.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.wheelchair().accessibility())
+          .dataFetcher(env -> preferences.wheelchair().accessibility().enabled())
           .build()
       )
       .field(
@@ -312,8 +312,6 @@ public class DefaultRoutingRequestType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("boardSlackDefault")
-          // TODO: 2022-08-24 Take a closer look on this one
-          // this was e.getSource() before but I do not think this is necessary
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
           .dataFetcher(e -> preferences.transit().boardSlack())

@@ -41,8 +41,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     lon = target.getLon();
   }
 
-  // TODO: 2022-08-22 moved this method here since it was the most logical place for me
-  // open for suggestions
   /** @return The highest speed for all possible road-modes. */
   private double getStreetSpeedUpperBound(RoutingContext rctx) {
     var options = rctx.opt;

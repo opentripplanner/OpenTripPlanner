@@ -24,7 +24,6 @@ public abstract class AbstractIntersectionTraversalCostModel
     StreetEdge from,
     StreetEdge to,
     TraverseMode mode,
-    NewRouteRequest options,
     float fromSpeed,
     float toSpeed
   );

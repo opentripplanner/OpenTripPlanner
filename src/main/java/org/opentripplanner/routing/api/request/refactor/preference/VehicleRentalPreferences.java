@@ -24,12 +24,11 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
    * trips
    */
   private boolean useAvailabilityInformation = false;
-  // TODO: 2022-08-18 fix documentation
   /**
    * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
    * it off.
    *
-   * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+   * @see VehicleRentalPreferences#keepingVehicleAtDestinationCost
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
   private boolean allowKeepingRentedVehicleAtDestination = false;

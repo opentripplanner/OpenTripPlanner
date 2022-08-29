@@ -928,7 +928,6 @@ public abstract class RoutingResource {
     }
     /* Temporary code to get bike/car parking and renting working. */
     if (modes != null && !modes.qModes.isEmpty()) {
-      // TODO: 2022-08-24 ensure that this is right
       var requestModes = modes.getRequestModes();
       request.journey().transit().setModes(requestModes.transitModes);
       request.journey().access().setMode(requestModes.accessMode);

@@ -228,7 +228,6 @@ public class TransitRouter {
       );
 
       if (!isEgress) {
-        // TODO: 2022-08-19 is this right?
         accessRequest.journey().rental().setAllowKeepingVehicleAtDestination(true);
       }
 
@@ -261,10 +260,10 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    NewRouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(
-      request,
-      preferences
-    );
+    var requestAndPreferences = Transfer.prepareTransferRoutingRequest(request, preferences);
+
+    var transferRoutingRequest = requestAndPreferences.getLeft();
+    var transferRoutingPreferences = requestAndPreferences.getRight();
 
     return new RaptorRoutingRequestTransitData(
       transitLayer,
@@ -274,7 +273,7 @@ public class TransitRouter {
       createRequestTransitDataProviderFilter(serverContext.transitService()),
       new RoutingContext(
         transferRoutingRequest,
-        preferences,
+        transferRoutingPreferences,
         serverContext.graph(),
         (Vertex) null,
         null

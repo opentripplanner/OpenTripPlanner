@@ -270,9 +270,8 @@ public class TransmodelGraphQLPlanner {
       preferences.bike().setSpeed(4.3);
     }
 
-    // TODO: 2022-08-25 same field mapped from two different arguments, why?
+    // One of those arguments has been deprecated. That's why we are mapping same thing twice.
     callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
-
     callWith.argument("transferSlack", preferences.transfer()::setSlack);
     callWith.argument("boardSlackDefault", preferences.transit()::setBoardSlack);
     callWith.argument(

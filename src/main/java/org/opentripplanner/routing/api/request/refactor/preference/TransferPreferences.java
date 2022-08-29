@@ -21,12 +21,11 @@ public class TransferPreferences implements Cloneable, Serializable {
    * that's what we'll return.
    */
   private int cost = 0;
-  // TODO: 2022-08-18 fix links
   /**
    * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must
    * pass between exiting one transit vehicle and boarding another. This time is in addition to time
-   * it might take to walk between transit stops, the {@link #alightSlack}, and the {@link
-   * #boardSlack}. This time should also be overridden by specific transfer timing information in
+   * it might take to walk between transit stops, the {@link TransitPreferences#alightSlack()}, and the {@link
+   * TransitPreferences#boardSlack()}. This time should also be overridden by specific transfer timing information in
    * transfers.txt
    * <p>
    * This only apply to transfers between two trips, it does not apply when boarding the first
@@ -35,7 +34,6 @@ public class TransferPreferences implements Cloneable, Serializable {
    * Unit is seconds. Default value is 2 minutes.
    */
   private int slack = 120;
-  // TODO: 2022-08-18 which one is it?
   /**
    * Penalty for using a non-preferred transfer
    *

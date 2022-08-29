@@ -31,7 +31,6 @@ public class SimpleIntersectionTraversalCostModel
     StreetEdge from,
     StreetEdge to,
     TraverseMode mode,
-    NewRouteRequest request,
     float fromSpeed,
     float toSpeed
   ) {
@@ -41,9 +40,9 @@ public class SimpleIntersectionTraversalCostModel
     }
 
     if (mode.isDriving()) {
-      return computeDrivingTraversalCost(v, from, to, request);
+      return computeDrivingTraversalCost(v, from, to);
     } else if (mode.isCycling()) {
-      return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed, request);
+      return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed);
     } else {
       return computeNonDrivingTraversalCost(from, to, toSpeed);
     }
@@ -153,13 +152,7 @@ public class SimpleIntersectionTraversalCostModel
     }
   }
 
-  // TODO: 2022-08-22 Why do we need RoutingRequest here?
-  private double computeDrivingTraversalCost(
-    IntersectionVertex v,
-    StreetEdge from,
-    StreetEdge to,
-    NewRouteRequest request
-  ) {
+  private double computeDrivingTraversalCost(IntersectionVertex v, StreetEdge from, StreetEdge to) {
     double turnCost = 0;
 
     int turnAngle = calculateTurnAngle(from, to);
@@ -191,14 +184,12 @@ public class SimpleIntersectionTraversalCostModel
     return turnCost;
   }
 
-  // TODO: 2022-08-22 Why do we need RoutingRequest here?
   private double computeCyclingTraversalCost(
     IntersectionVertex v,
     StreetEdge from,
     StreetEdge to,
     float fromSpeed,
-    float toSpeed,
-    NewRouteRequest request
+    float toSpeed
   ) {
     var turnAngle = calculateTurnAngle(from, to);
     final var baseCost = computeNonDrivingTraversalCost(from, to, toSpeed);

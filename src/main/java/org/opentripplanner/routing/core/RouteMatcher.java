@@ -185,8 +185,6 @@ public class RouteMatcher implements Cloneable, Serializable {
     );
   }
 
-  // TODO: 2022-08-22 I guess we want to go over to Matcher instead of using lists for unpreferredRoutes
-  // added this method so that we can map banned routes to McCostParamsBuilder
   public HashSet<FeedScopedId> getAgencyAndRouteIds() {
     return agencyAndRouteIds;
   }

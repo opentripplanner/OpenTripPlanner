@@ -97,8 +97,8 @@ public class RoutingWorker {
       request.journey().direct().mode()
     );
 
-    // TODO: 2022-08-18 this was a builder pattern before
-    request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
+    var routeRequest = request.clone();
+    routeRequest.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -132,12 +132,12 @@ public class RoutingWorker {
 
     // Filter itineraries
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-      request.itinerariesSortOrder(),
+      routeRequest.itinerariesSortOrder(),
       preferences.system().itineraryFilters(),
-      request.numItineraries(),
+      routeRequest.numItineraries(),
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
-      request.maxNumberOfItinerariesCropHead(),
+      routeRequest.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       preferences.wheelchair().accessibility().enabled(),
       preferences.wheelchair().accessibility().maxSlope(),
@@ -160,16 +160,15 @@ public class RoutingWorker {
 
     this.debugTimingAggregator.finishedFiltering();
 
-    // TODO: 2022-08-18 this was a builder pattern before
     // Restore original directMode.
-    request.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
+    routeRequest.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
     var searchWindowNextSearch = calculateSearchWindowNextSearch(filteredItineraries);
 
     return RoutingResponseMapper.map(
-      request,
+      routeRequest,
       transitSearchTimeZero,
       raptorSearchParamsUsed,
       searchWindowNextSearch,

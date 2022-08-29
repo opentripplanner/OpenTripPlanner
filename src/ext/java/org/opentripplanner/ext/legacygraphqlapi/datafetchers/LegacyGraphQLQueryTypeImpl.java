@@ -620,7 +620,7 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("carReluctance", preferences.car()::setReluctance);
       callWith.argument("walkReluctance", preferences.walk()::setReluctance);
       callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
-      callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitReluctance);
+      callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
       callWith.argument("walkSpeed", preferences.walk()::setSpeed);
       callWith.argument("bikeWalkingSpeed", preferences.bike()::setWalkingSpeed);
       callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
@@ -688,14 +688,14 @@ public class LegacyGraphQLQueryTypeImpl
       );
       callWith.argument(
         "unpreferred.unpreferredRouteCost",
-        preferences.transit()::setUnpreferredRouteCostString
+        preferences.transit()::setUnpreferredCostString
       );
       callWith.argument(
         "unpreferred.useUnpreferredRoutesPenalty",
         (Integer v) ->
           preferences
             .transit()
-            .setUnpreferredRouteCostString(
+            .setUnpreferredCostString(
               RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
             )
       );
@@ -746,7 +746,6 @@ public class LegacyGraphQLQueryTypeImpl
             )
             .collect(Collectors.toSet());
 
-        // TODO: 2022-08-24 ensure taht this is right
         var requestModes = modes.getRequestModes();
         request.journey().transit().setModes(requestModes.transitModes);
         request.journey().transfer().setMode(requestModes.transferMode);
@@ -762,8 +761,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       var vehicleRental = request.journey().rental();
 
-      // TODO: 2022-08-24 what happens here?
-      // TODO: 2022-08-24 it will be overwritten by next argument
+      // Deprecated, the next one will override this, if both are set
       callWith.argument(
         "allowedBikeRentalNetworks",
         (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))

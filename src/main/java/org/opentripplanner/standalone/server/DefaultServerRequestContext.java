@@ -93,7 +93,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public RoutingPreferences defaultRoutingPreferences() {
     if (routingPreferences == null) {
-      routingPreferences = routerConfig.routingPreferencesDefaults();
+      routingPreferences = routerConfig.routingPreferencesDefaults().clone();
     }
 
     return routingPreferences;

@@ -30,7 +30,6 @@ public class VehicleRentalEdge extends Edge {
     }
 
     var options = s0.getOptions();
-    // TODO: 2022-08-22 fix this
     var vehicleRental = options.journey().rental();
     var preferences = s0.getPreferences();
 

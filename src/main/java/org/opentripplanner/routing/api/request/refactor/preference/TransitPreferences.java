@@ -86,7 +86,7 @@ public class TransitPreferences implements Cloneable, Serializable {
    * A cost function used to calculate penalty for an unpreferred route. Function should return
    * number of seconds that we are willing to wait for preferred route.
    */
-  private DoubleFunction<Double> unpreferredRouteCost = RequestFunctions.createLinearFunction(
+  private DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
     0.0,
     DEFAULT_ROUTE_RELUCTANCE
   );
@@ -180,15 +180,15 @@ public class TransitPreferences implements Cloneable, Serializable {
     return raptorOptions;
   }
 
-  public void setUnpreferredRouteCost(DoubleFunction<Double> unpreferredRouteCost) {
-    this.unpreferredRouteCost = unpreferredRouteCost;
+  public void setUnpreferredCost(DoubleFunction<Double> unpreferredCost) {
+    this.unpreferredCost = unpreferredCost;
   }
 
-  public void setUnpreferredRouteCostString(String constFunction) {
-    unpreferredRouteCost = RequestFunctions.parse(constFunction);
+  public void setUnpreferredCostString(String constFunction) {
+    unpreferredCost = RequestFunctions.parse(constFunction);
   }
 
-  public DoubleFunction<Double> unpreferredRouteCost() {
-    return unpreferredRouteCost;
+  public DoubleFunction<Double> unpreferredCost() {
+    return unpreferredCost;
   }
 }

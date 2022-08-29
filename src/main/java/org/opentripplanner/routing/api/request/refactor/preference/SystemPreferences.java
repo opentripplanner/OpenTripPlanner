@@ -14,7 +14,6 @@ public class SystemPreferences implements Cloneable, Serializable {
   @Nonnull
   private ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
-  // TODO: 2022-08-17 is this right?
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
    * tags. Currently, all tags are added to all the timer instances for this request.
@@ -37,7 +36,6 @@ public class SystemPreferences implements Cloneable, Serializable {
   /** Whether the planner should return intermediate stops lists for transit legs. */
   private boolean showIntermediateStops = false;
 
-  // TODO: 2022-08-18 Should it be here?
   /**
    * The expected maximum time a journey can last across all possible journeys for the current
    * deployment. Normally you would just do an estimate and add enough slack, so you are sure that
@@ -60,7 +58,6 @@ public class SystemPreferences implements Cloneable, Serializable {
 
       clone.itineraryFilters = new ItineraryFilterParameters(this.itineraryFilters);
       clone.tags = new HashSet<>(this.tags);
-      clone.maxJourneyDuration = Duration.ofNanos(this.maxJourneyDuration.toNanos());
 
       return clone;
     } catch (CloneNotSupportedException e) {

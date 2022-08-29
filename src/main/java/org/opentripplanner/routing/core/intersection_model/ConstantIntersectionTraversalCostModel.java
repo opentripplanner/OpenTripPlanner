@@ -33,7 +33,6 @@ public class ConstantIntersectionTraversalCostModel extends AbstractIntersection
     StreetEdge from,
     StreetEdge to,
     TraverseMode mode,
-    NewRouteRequest options,
     float fromSpeed,
     float toSpeed
   ) {

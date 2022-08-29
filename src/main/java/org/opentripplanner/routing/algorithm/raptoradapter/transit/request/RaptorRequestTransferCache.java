@@ -84,10 +84,9 @@ public class RaptorRequestTransferCache {
     }
   }
 
-  // TODO: 2022-08-23 fix documentation
   /**
    * This contains an extract of the parameters which may influence transfers. The possible values
-   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RoutingRequest)}.
+   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(NewRouteRequest, RoutingPreferences)}.
    * <p>
    * TODO: the bikeWalking options are not used.
    */

@@ -19,11 +19,10 @@ public class BikePreferences implements Cloneable, Serializable {
    */
   private double speed = 5;
 
-  // TODO: 2022-08-17 check documentation
   /**
    * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. This
    * is in addition to the cost of the transfer(biking) and waiting-time. It is also in addition to
-   * the {@link #transferCost}.
+   * the {@link TransferPreferences#cost()}.
    */
   private int boardCost = 60 * 10;
   /**

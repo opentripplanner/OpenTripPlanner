@@ -2,13 +2,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.BitSet;
-import java.util.List;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
@@ -63,7 +59,7 @@ public class McCostParamsMapper {
         }
       }
       builder.unpreferredPatterns(unpreferredPatterns);
-      builder.unpreferredCost(preferences.transit().unpreferredRouteCost());
+      builder.unpreferredCost(preferences.transit().unpreferredCost());
     }
 
     return builder.build();

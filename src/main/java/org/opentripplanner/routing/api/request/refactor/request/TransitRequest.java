@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.refactor.request;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -242,11 +243,10 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   public TransitRequest clone() {
-    // TODO: 2022-08-25 is skipping modes right?
-
     try {
       var clone = (TransitRequest) super.clone();
 
+      clone.modes = new ArrayList<>(this.modes);
       clone.whiteListedAgencies = new HashSet<>(this.whiteListedAgencies);
       clone.bannedAgencies = new HashSet<>(this.bannedAgencies);
       clone.preferredAgencies = new HashSet<>(this.preferredAgencies);

@@ -184,7 +184,6 @@ public class RoutingRequestMapper {
         c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
       );
 
-    // TODO: 2022-08-23 Verify that this is right
     var journeyRequest = c.asJourneyRequest("modes", dft.journey());
     request.journey().access().setMode(journeyRequest.access().mode());
     request.journey().direct().setMode(journeyRequest.direct().mode());
@@ -261,8 +260,8 @@ public class RoutingRequestMapper {
       );
     preferences
       .transit()
-      .setUnpreferredRouteCost(
-        c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredRouteCost())
+      .setUnpreferredCost(
+        c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredCost())
       );
     preferences.rental().setAllow(c.asBoolean("allowBikeRental", preferences.rental().allow()));
     preferences

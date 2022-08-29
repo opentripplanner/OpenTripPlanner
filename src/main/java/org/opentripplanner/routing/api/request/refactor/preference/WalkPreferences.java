@@ -21,11 +21,11 @@ public class WalkPreferences implements Cloneable, Serializable {
    * performance with high values. Default value: 2.0
    */
   private double reluctance = 2.0;
-  // TODO: 2022-08-18 fix documentation
+
   /**
    * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
    * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to the
-   * {@link #transferCost}.
+   * {@link TransferPreferences#cost()}.
    */
   private int boardCost = 60 * 10;
   /** Used instead of walk reluctance for stairs */

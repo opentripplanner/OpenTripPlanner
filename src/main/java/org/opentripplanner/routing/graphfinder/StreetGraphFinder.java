@@ -79,7 +79,6 @@ public class StreetGraphFinder implements GraphFinder {
     var rr = new NewRouteRequest(TraverseMode.WALK);
     var pref = new RoutingPreferences();
 
-    rr.setTo(new GenericLocation(null, null, lat, lon));
     rr.setFrom(new GenericLocation(null, null, lat, lon));
 
     pref.walk().setSpeed(1);

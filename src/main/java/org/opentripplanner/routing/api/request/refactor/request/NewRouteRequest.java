@@ -182,7 +182,7 @@ public class NewRouteRequest implements Cloneable, Serializable {
       }
       this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
 
-      // TODO: 2022-08-18 this was a builder pattern before
+      this.journey = journey.clone();
       journey.direct().setMode(StreetMode.NOT_SET);
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }

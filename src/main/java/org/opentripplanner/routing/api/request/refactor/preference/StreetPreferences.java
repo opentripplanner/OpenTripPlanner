@@ -71,9 +71,7 @@ public class StreetPreferences implements Cloneable, Serializable {
     try {
       var clone = (StreetPreferences) super.clone();
 
-      clone.maxAccessEgressDuration = Duration.ofNanos(maxAccessEgressDuration.getNano());
       clone.maxAccessEgressDurationForMode = new HashMap<>(maxAccessEgressDurationForMode);
-      clone.maxDirectDuration = Duration.ofNanos(maxDirectDuration.toNanos());
       clone.maxDirectDurationForMode = new HashMap<>(maxDirectDurationForMode);
 
       return clone;
@@ -91,7 +89,7 @@ public class StreetPreferences implements Cloneable, Serializable {
     return maxAccessEgressDurationForMode.getOrDefault(mode, maxAccessEgressDuration);
   }
 
-  // TODO: 2022-08-22 do we wanna have this method here?
+  // TODO: 2022-08-22 do we want to have this method here?
   public Comparator<GraphPath> pathComparator(boolean compareStartTimes) {
     if ("duration".equals(pathComparator)) {
       return new DurationComparator();

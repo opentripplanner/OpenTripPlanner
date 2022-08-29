@@ -110,7 +110,7 @@ public class StateData implements Cloneable {
     //   - CAR / IN_CAR where pickup happens directly at the bus stop
     //   - WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
     // For forward/reverse searches to be symmetric both initial states need to be created.
-    if (preferences.car().parkAndRide()) {
+    if (preferences.car().allowPickup()) {
       if (!forceSingleState) {
         var inCarPickupStateData = proto.clone();
         inCarPickupStateData.carPickupState = CarPickupState.IN_CAR;

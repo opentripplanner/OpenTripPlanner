@@ -71,8 +71,6 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   private ShortestPathTree routeToMany(Vertex vertex) {
-    // TODO: 2022-08-22 guess this should not be a problem since we are using defaults for everything
-    // TODO: 2022-08-22 maybe use builder pattern?
     NewRouteRequest routingRequest = new NewRouteRequest(TraverseMode.CAR);
     routingRequest.setArriveBy(reverseDirection);
     RoutingPreferences preferences = new RoutingPreferences();

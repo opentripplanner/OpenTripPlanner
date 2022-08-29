@@ -122,15 +122,18 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           NewRouteRequest transferProfile = transferRequests.get(i);
           RoutingPreferences transferPreferences = this.transferPreferences.get(i);
 
-          NewRouteRequest streetRequest = Transfer.prepareTransferRoutingRequest(
+          var requestAndPreferences = Transfer.prepareTransferRoutingRequest(
             transferProfile,
             transferPreferences
           );
 
+          var streetRequest = requestAndPreferences.getLeft();
+          var streetPreferences = requestAndPreferences.getRight();
+
           for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
             ts0,
             streetRequest,
-            transferPreferences,
+            streetPreferences,
             false
           )) {
             // Skip the origin stop, loop transfers are not needed.
@@ -148,7 +151,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
               ts0,
               streetRequest,
-              transferPreferences,
+              streetPreferences,
               true
             )) {
               // Skip the origin stop, loop transfers are not needed.

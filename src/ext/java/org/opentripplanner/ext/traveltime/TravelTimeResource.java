@@ -137,10 +137,13 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    NewRouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(
+    var requestAndPreferences = Transfer.prepareTransferRoutingRequest(
       routingRequest,
       routingPreferences
     );
+
+    var transferRoutingRequest = requestAndPreferences.getLeft();
+    var transferRoutingPreferences = requestAndPreferences.getRight();
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
@@ -150,10 +153,16 @@ public class TravelTimeResource {
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
         new RoutingRequestTransitDataProviderFilter(
           routingRequest,
-          routingPreferences,
+          transferRoutingPreferences,
           transitService
         ),
-        new RoutingContext(transferRoutingRequest, routingPreferences, graph, (Vertex) null, null)
+        new RoutingContext(
+          transferRoutingRequest,
+          transferRoutingPreferences,
+          graph,
+          (Vertex) null,
+          null
+        )
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());
@@ -234,8 +243,7 @@ public class TravelTimeResource {
 
   private ZSampleGrid<WTWD> getSampleGrid() {
     final NewRouteRequest accessRequest = routingRequest.clone();
-    // TODO: 2022-08-25 clone
-    final RoutingPreferences accessPreferences = routingPreferences;
+    final RoutingPreferences accessPreferences = routingPreferences.clone();
 
     accessPreferences.street().setMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration);
 

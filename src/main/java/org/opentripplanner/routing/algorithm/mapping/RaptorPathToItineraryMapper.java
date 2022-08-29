@@ -267,15 +267,15 @@ public class RaptorPathToItineraryMapper {
     } else {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges
       // may be re-traversed to create the leg(s) from the list of edges.
-      NewRouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(
-        request,
-        preferences
-      );
+      var requestAndPreferences = Transfer.prepareTransferRoutingRequest(request, preferences);
+
+      var traverseRequest = requestAndPreferences.getLeft();
+      var traversePreferences = requestAndPreferences.getRight();
 
       traverseRequest.setArriveBy(false);
       RoutingContext routingContext = new RoutingContext(
         traverseRequest,
-        preferences,
+        traversePreferences,
         graph,
         (Vertex) null,
         null
