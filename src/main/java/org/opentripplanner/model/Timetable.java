@@ -301,11 +301,11 @@ public class Timetable implements Serializable {
       }
     }
     if (update != null) {
-      LOG.error(
+      LOG.debug(
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return generalError;
+      return ApplicationResult.failure(new UpdateError(feedScopedTripId, UNKNOWN));
     }
 
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {

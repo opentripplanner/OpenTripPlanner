@@ -12,6 +12,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimaps;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -213,6 +216,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     bufferLock.lock();
 
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
+    List<UpdateError> errors = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -294,6 +298,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             case DUPLICATED -> UpdateError.noError();
           };
 
+        updateError.ifPresent(errors::add);
+
         if (updateError.isEmpty()) {
           successfullyApplied++;
           totalSuccessfullyApplied++;
@@ -320,6 +326,23 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           successfullyApplied,
           updates.size()
         );
+
+        var m = Multimaps.index(errors, UpdateError::errorType);
+
+        m
+          .keySet()
+          .forEach(key -> {
+            var value = m.get(key);
+            var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
+            LOG.error(
+              "[feedId: {}] {} failures of type {}: {}",
+              feedId,
+              value.size(),
+              key,
+              tripIds
+            );
+          });
+
         if (!failuresByRelationship.isEmpty()) {
           LOG.info(
             "[feedId: {}] Failures by scheduleRelationship {}",
@@ -1057,6 +1080,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private static void warn(String feedId, String tripId, String message, Object... params) {
     String m = "[feedId: %s, tripId: %s] %s".formatted(feedId, tripId, message);
-    LOG.warn(m, params);
+    LOG.debug(m, params);
   }
 }
