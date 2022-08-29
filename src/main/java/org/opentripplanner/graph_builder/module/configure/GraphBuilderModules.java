@@ -288,7 +288,6 @@ public class GraphBuilderModules {
       osmModule.elevationDataOutput(),
       config.readCachedElevations,
       config.writeCachedElevations,
-      config.elevationUnitMultiplier,
       config.distanceBetweenElevationSamples,
       config.maxElevationPropagationMeters,
       config.includeEllipsoidToGeoidDifference,

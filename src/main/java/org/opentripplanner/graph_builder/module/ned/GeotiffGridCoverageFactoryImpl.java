@@ -12,8 +12,11 @@ import org.opengis.coverage.grid.GridCoverage;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.feed.DemExtractConfig;
+import org.opentripplanner.standalone.config.feed.DemExtractConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +28,27 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
   private static final Logger LOG = LoggerFactory.getLogger(GeotiffGridCoverageFactoryImpl.class);
 
   private final DataSource input;
+  private final double elevationUnitMultiplier;
   private GridCoverage2D coverage;
 
-  public GeotiffGridCoverageFactoryImpl(DataSource input) {
-    this.input = input;
+  public GeotiffGridCoverageFactoryImpl(
+    ConfiguredDataSource<DemExtractConfig> configuredDataSource
+  ) {
+    this.input = configuredDataSource.dataSource();
+    this.elevationUnitMultiplier = configuredDataSource.config().elevationUnitMultiplier();
   }
 
   public GeotiffGridCoverageFactoryImpl(File path) {
     this(new FileDataSource(path, FileType.DEM));
+  }
+
+  public GeotiffGridCoverageFactoryImpl(DataSource dataSource) {
+    this(
+      new ConfiguredDataSource<>(
+        dataSource,
+        new DemExtractConfigBuilder().withSource(dataSource.uri()).build()
+      )
+    );
   }
 
   /**
@@ -44,6 +60,11 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
     return NoDataGridCoverage.create(
       Interpolator2D.create(getUninterpolatedGridCoverage(), new InterpolationBilinear())
     );
+  }
+
+  @Override
+  public double elevationUnitMultiplier() {
+    return elevationUnitMultiplier;
   }
 
   @Override
