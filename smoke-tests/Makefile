@@ -4,8 +4,7 @@ otp.jar:
 	cp ../target/otp-*-SNAPSHOT-shaded.jar otp.jar
 
 atlanta/osm.pbf:
-	# this file can be re-hosted on IBI provided infrastructure
-	${CURL} https://leonard.io/ibi/atlanta-2021-12-08.osm.pbf -o $@
+	${CURL} http://osm.ibi-transit.com/vex/33.654066160697056,-84.759521484375,33.994611584814606,-84.30976867675781.pbf -o $@
 
 atlanta/cobblinc.gtfs.zip:
 	# Cobblinc's own feed expired at the end of January 2022. This URL contains the feed with extended dates.
@@ -24,8 +23,7 @@ houston/gtfs.zip:
 	${CURL} https://ridemetro-api.ibi-transit.com/download/liveGTFS.zip -o $@
 
 denver/osm.pbf:
-	# this file can be re-hosted on IBI provided infrastructure
-	${CURL} https://leonard.io/ibi/denver-2022-08-26.osm.pbf -o $@
+	${CURL} http://osm.ibi-transit.com/vex/39.65857056750545,-105.0567626953125,39.8578370694061,-104.86862182617188.pbf -o $@
 
 denver/gtfs.zip:
 	${CURL} https://www.rtd-denver.com/files/gtfs/google_transit.zip -o $@

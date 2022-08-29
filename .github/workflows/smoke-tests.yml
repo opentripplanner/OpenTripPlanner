@@ -31,11 +31,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Cache OSM files
-        uses: actions/cache@v2
-        with:
-          path: smoke-tests/**/*.pbf
-          key: osm-2022-08-29
+      #- name: Cache OSM files
+      #  uses: actions/cache@v2
+      #  with:
+      #    path: smoke-tests/**/*.pbf
+      #    key: osm-2022-08-29
 
       - name: Build jar file, compile tests
         run: |
