@@ -12,19 +12,18 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 /**
  * This smoke test expects an OTP installation running at localhost:8080
  * <p>
- * It uses the REST API to check that a route from South to North Houston
- * can be found.
+ * It uses the REST API to check that a route from South to North Denver can be found.
  */
 @Tag("smoke-test")
-@Tag("houston")
-public class HoustonSmokeTest {
+@Tag("denver")
+public class DenverSmokeTest {
 
-  WgsCoordinate galvestonRoad = new WgsCoordinate(29.6598, -95.2342);
-  WgsCoordinate northLindale = new WgsCoordinate(29.8158, -95.3697);
+  WgsCoordinate southBroadway = new WgsCoordinate(39.7020, -104.9866);
+  WgsCoordinate twinLakes = new WgsCoordinate(39.8232, -105.0055);
 
   @Test
   public void routeFromSouthToNorth() {
-    var request = new SmokeTestRequest(galvestonRoad, northLindale, Set.of("TRANSIT", "WALK"));
+    var request = new SmokeTestRequest(southBroadway, twinLakes, Set.of("TRANSIT", "WALK"));
     var otpResponse = SmokeTest.sendPlanRequest(request);
     var itineraries = otpResponse.getPlan().itineraries;
 

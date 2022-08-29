@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -36,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * By default, the smoke tests are not run when you execute `mvn test`.
  * <p>
- * If you want run them, use `mvn test -P smoke-tests`.
+ * If you want run them, use `mvn test -Djunit.tags.included="atlanta" -Djunit.tags.excluded=""`.
  */
 public class SmokeTest {
 

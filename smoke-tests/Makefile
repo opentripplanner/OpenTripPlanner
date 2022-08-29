@@ -24,6 +24,13 @@ houston/osm.pbf:
 houston/gtfs.zip:
 	${CURL} https://ridemetro-api.ibi-transit.com/download/liveGTFS.zip -o $@
 
+denver/osm.pbf:
+	# this file can be re-hosted on IBI provided infrastructure
+	${CURL} https://leonard.io/ibi/denver-2022-08-26.osm.pbf -o $@
+
+denver/gtfs.zip:
+	${CURL} https://www.rtd-denver.com/files/gtfs/google_transit.zip -o $@
+
 build-%: otp.jar %/osm.pbf %/gtfs.zip
 	java -jar otp.jar --build --save $*
 
