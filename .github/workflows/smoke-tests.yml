@@ -36,6 +36,8 @@ jobs:
         with:
           path: smoke-tests/**/*.pbf
           key: osm-2022-08-29-1
+          restore-keys: |
+            osm-
 
       - name: Build jar file, compile tests
         run: |
