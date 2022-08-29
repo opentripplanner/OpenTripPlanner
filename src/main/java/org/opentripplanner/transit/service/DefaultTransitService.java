@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -21,7 +20,6 @@ import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
@@ -471,13 +469,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return this.transitModel.getTransfersByStop(stop);
-  }
-
-  @Override
-  public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(
-    Function<TransitModel, T> creator
-  ) {
-    return this.transitModel.getOrSetupTimetableSnapshotProvider(creator);
   }
 
   @Override

@@ -18,8 +18,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -29,18 +29,18 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
-  private boolean isPrimed = false;
-  protected WriteToGraphCallback saveResultOnGraph;
-  protected SiriTimetableSnapshotSource snapshotSource;
   private final String configRef;
-
-  private ServiceBusProcessorClient eventProcessor;
+  private final String serviceBusUrl;
+  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
   private final Consumer<ServiceBusReceivedMessageContext> messageConsumer = this::messageConsumer;
   private final Consumer<ServiceBusErrorContext> errorConsumer = this::errorConsumer;
+  private final String topicName;
+
+  protected WriteToGraphCallback saveResultOnGraph;
+  private ServiceBusProcessorClient eventProcessor;
   private ServiceBusAdministrationAsyncClient serviceBusAdmin;
-  protected final String topicName;
+  private boolean isPrimed = false;
   private String subscriptionName;
-  private final String serviceBusUrl;
   protected String feedId;
 
   /**
@@ -52,15 +52,14 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
    */
   protected int timeout;
 
-  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config) {
+  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
     this.configRef = config.getConfigRef();
-
     this.serviceBusUrl = config.getServiceBusUrl();
     this.topicName = config.getTopicName();
-
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
     this.feedId = config.getFeedId();
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
   }
 
   /**
@@ -78,12 +77,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) throws Exception {
-    snapshotSource =
-      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
   }
 
   @Override
@@ -170,6 +163,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   @Override
   public String getConfigRef() {
     return this.configRef;
+  }
+
+  SiriFuzzyTripMatcher fuzzyTripMatcher() {
+    return fuzzyTripMatcher;
   }
 
   /**

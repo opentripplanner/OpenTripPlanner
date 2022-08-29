@@ -15,9 +15,10 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,46 +36,59 @@ import org.slf4j.LoggerFactory;
  */
 public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
+  private static final Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
+
   /**
    * Number of seconds to wait before checking again whether we are still connected
    */
   private static final int CHECK_CONNECTION_PERIOD_SEC = 1;
 
-  private static final Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
   /**
    * Url of the websocket server
    */
   private final String url;
+
   /**
    * The ID for the static feed to which these TripUpdates are applied
    */
   private final String feedId;
+
   /**
    * The number of seconds to wait before reconnecting after a failed connection.
    */
   private final int reconnectPeriodSec;
+
   private final String configRef;
+
+  private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+
+  private final TimetableSnapshotSource snapshotSource;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
 
-  public WebsocketGtfsRealtimeUpdater(WebsocketGtfsRealtimeUpdaterParameters parameters) {
+  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+
+  public WebsocketGtfsRealtimeUpdater(
+    WebsocketGtfsRealtimeUpdaterParameters parameters,
+    TimetableSnapshotSource snapshotSource,
+    TransitModel transitModel
+  ) {
     this.configRef = parameters.getConfigRef();
     this.url = parameters.getUrl();
     this.feedId = parameters.getFeedId();
     this.reconnectPeriodSec = parameters.getReconnectPeriodSec();
+    this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.snapshotSource = snapshotSource;
+    this.fuzzyTripMatcher =
+      new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
   }
 
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    // Only create a realtime data snapshot source if none exists already
-    transitModel.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::ofTransitModel);
   }
 
   @Override
@@ -119,9 +133,6 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
       client.close();
     }
   }
-
-  @Override
-  public void teardown() {}
 
   @Override
   public String getConfigRef() {
@@ -179,6 +190,9 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
       if (updates != null) {
         // Handle trip updates via graph writer runnable
         TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
+          snapshotSource,
+          fuzzyTripMatcher,
+          backwardsDelayPropagationType,
           fullDataset,
           updates,
           feedId

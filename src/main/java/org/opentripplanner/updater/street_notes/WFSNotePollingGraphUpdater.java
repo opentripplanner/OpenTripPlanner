@@ -3,7 +3,6 @@ package org.opentripplanner.updater.street_notes;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,50 +42,66 @@ import org.slf4j.LoggerFactory;
  * Classes that extend this class should provide getNote which parses the WFS features into notes.
  * Also the implementing classes should be added to the GraphUpdaterConfigurator
  *
- * @author hannesj
  * @see WinkkiPollingGraphUpdater
  */
 public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
 
-  // How much should the geometries be padded with in order to be sure they intersect with graph edges
+  private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
+
+  /**
+   * How much should the geometries be padded with in order to be sure they intersect with
+   * graph edges
+   */
   private static final double SEARCH_RADIUS_M = 1;
   private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(
     SEARCH_RADIUS_M
   );
-  // Set the matcher type for the notes, can be overridden in extending classes
+
+  /** Set the matcher type for the notes */
   private static final NoteMatcher NOTE_MATCHER = StreetNotesService.ALWAYS_MATCHER;
-  private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
+
   private final DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
-  protected Graph graph;
+  private final FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+  private final Query query;
+  private final Graph graph;
   private WriteToGraphCallback saveResultOnGraph;
   private SetMultimap<Edge, MatcherAndStreetNote> notesForEdge;
+
   /**
    * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
    * are identical).
    */
   private Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers;
-  private URL url;
-  private String featureType;
-  private Query query;
-  private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
   /**
    * The property 'frequencySec' is already read and used by the abstract base class.
    */
-  public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
+  public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config, Graph graph) {
     super(config);
     try {
-      url = new URL(config.getUrl());
-      featureType = config.getFeatureType();
+      LOG.info("Setup WFS polling updater");
+      URL url = new URL(config.getUrl());
+      String featureType = config.getFeatureType();
+
+      this.graph = graph;
+
+      HashMap<String, Object> connectionParameters = new HashMap<>();
+      connectionParameters.put(WFSDataStoreFactory.URL.key, url);
+      WFSDataStore data = (new WFSDataStoreFactory()).createDataStore(connectionParameters);
+
+      this.query = new Query(featureType); // Read only single feature type from the source
+      this.query.setCoordinateSystem(CRS.decode("EPSG:4326", true)); // Get coordinates in WGS-84
+      this.featureSource = data.getFeatureSource(featureType);
+      graph.streetNotesService.addNotesSource(notesSource);
+
       LOG.info(
         "Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
-        pollingPeriodSeconds,
+        pollingPeriodSeconds(),
         url.toString(),
         featureType
       );
-    } catch (MalformedURLException e) {
-      // TODO Handle this in config loading
-      LOG.warn(e.toString());
+    } catch (FactoryException | IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
     }
   }
 
@@ -96,27 +111,6 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  /**
-   * Setup the WFS data source and add the DynamicStreetNotesSource to the graph
-   */
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) throws IOException, FactoryException {
-    this.graph = graph;
-    LOG.info("Setup WFS polling updater");
-    HashMap<String, Object> connectionParameters = new HashMap<>();
-    connectionParameters.put(WFSDataStoreFactory.URL.key, url);
-    WFSDataStore data = (new WFSDataStoreFactory()).createDataStore(connectionParameters);
-    query = new Query(featureType); // Read only single feature type from the source
-    query.setCoordinateSystem(CRS.decode("EPSG:4326", true)); // Get coordinates in WGS-84
-    featureSource = data.getFeatureSource(featureType);
-    graph.streetNotesService.addNotesSource(notesSource);
-  }
-
-  @Override
-  public void teardown() {
-    LOG.info("Teardown WFS polling updater");
   }
 
   /**
