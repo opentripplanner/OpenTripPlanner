@@ -1,6 +1,7 @@
 package org.opentripplanner.common.model;
 
 import com.google.common.base.Preconditions;
+import java.util.function.Consumer;
 
 public abstract class ApplicationResult<L, R> {
 
@@ -22,14 +23,18 @@ public abstract class ApplicationResult<L, R> {
     return !isSuccess();
   }
 
+  public abstract void ifFailure(Consumer<L> func);
+
+  public abstract void ifSuccess(Consumer<R> func);
+
   private static class Failure<L, R> extends ApplicationResult<L, R> {
 
-    private final L left;
+    private final L failure;
 
     private Failure(L left) {
       Preconditions.checkNotNull(left, "failure must not be null");
 
-      this.left = left;
+      this.failure = left;
     }
 
     @Override
@@ -38,8 +43,16 @@ public abstract class ApplicationResult<L, R> {
     }
 
     public L value() {
-      return left;
+      return failure;
     }
+
+    @Override
+    public void ifFailure(Consumer<L> func) {
+      func.accept(failure);
+    }
+
+    @Override
+    public void ifSuccess(Consumer<R> func) {}
   }
 
   private static class Success<L, R> extends ApplicationResult<L, R> {
@@ -59,6 +72,14 @@ public abstract class ApplicationResult<L, R> {
 
     public R value() {
       return right;
+    }
+
+    @Override
+    public void ifFailure(Consumer<L> func) {}
+
+    @Override
+    public void ifSuccess(Consumer<R> func) {
+      func.accept(right);
     }
   }
 }

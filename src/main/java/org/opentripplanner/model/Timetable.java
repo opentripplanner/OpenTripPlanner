@@ -177,7 +177,12 @@ public class Timetable implements Serializable {
     int tripIndex = getTripIndex(tripId);
     if (tripIndex == -1) {
       LOG.info("tripId {} not found in pattern.", tripId);
-      return null;
+      return ApplicationResult.failure(
+        new UpdateError(
+          new FeedScopedId(this.getPattern().getFeedId(), tripId),
+          UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN
+        )
+      );
     } else {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
