@@ -1,5 +1,9 @@
 package org.opentripplanner.model;
 
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
+
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -154,34 +158,37 @@ public class Timetable implements Serializable {
     LocalDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
+    ApplicationResult<UpdateError, TripTimesPatch> generalError = ApplicationResult.failure(
+      UpdateError.noTripId(UNKNOWN)
+    );
     if (tripUpdate == null) {
-      LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
-      return null;
+      LOG.debug("A null TripUpdate pointer was passed to the Timetable class update method.");
+      return generalError;
     }
 
     // Though all timetables have the same trip ordering, some may have extra trips due to
     // the dynamic addition of unscheduled trips.
     // However, we want to apply trip updates on top of *scheduled* times
     if (!tripUpdate.hasTrip()) {
-      LOG.error("TripUpdate object has no TripDescriptor field.");
-      return null;
+      LOG.debug("TripUpdate object has no TripDescriptor field.");
+      return generalError;
     }
 
     TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
-      LOG.error("TripDescriptor object has no TripId field");
-      return null;
+      LOG.debug("TripDescriptor object has no TripId field");
+      ApplicationResult.failure(UpdateError.noTripId(UNKNOWN));
     }
 
     String tripId = tripDescriptor.getTripId();
+
+    var feedScopedTripId = new FeedScopedId(this.getPattern().getFeedId(), tripId);
+
     int tripIndex = getTripIndex(tripId);
     if (tripIndex == -1) {
-      LOG.info("tripId {} not found in pattern.", tripId);
+      LOG.debug("tripId {} not found in pattern.", tripId);
       return ApplicationResult.failure(
-        new UpdateError(
-          new FeedScopedId(this.getPattern().getFeedId(), tripId),
-          UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN
-        )
+        new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN)
       );
     } else {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
@@ -194,7 +201,7 @@ public class Timetable implements Serializable {
     Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
     if (!updates.hasNext()) {
       LOG.warn("Won't apply zero-length trip update to trip {}.", tripId);
-      return null;
+      return ApplicationResult.failure(new UpdateError(feedScopedTripId, TOO_FEW_STOPS));
     }
     StopTimeUpdate update = updates.next();
 
@@ -205,8 +212,6 @@ public class Timetable implements Serializable {
     final long today = ServiceDateUtils
       .asStartOfService(updateServiceDate, timeZone)
       .toEpochSecond();
-
-    FeedScopedId feedScopedTripId = new FeedScopedId(this.getPattern().getFeedId(), tripId);
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;
@@ -300,7 +305,7 @@ public class Timetable implements Serializable {
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return null;
+      return generalError;
     }
 
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
@@ -328,7 +333,7 @@ public class Timetable implements Serializable {
 
     OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
     if (invalidStopIndex.isPresent()) {
-      LOG.error(
+      LOG.debug(
         "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
         tripId,
         invalidStopIndex.getAsInt()
@@ -347,7 +352,7 @@ public class Timetable implements Serializable {
       }
     }
 
-    LOG.debug(
+    LOG.trace(
       "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
       tripId
     );

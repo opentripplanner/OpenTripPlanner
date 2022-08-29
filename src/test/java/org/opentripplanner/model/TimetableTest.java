@@ -23,7 +23,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.model.ApplicationResult;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -51,8 +50,8 @@ public class TimetableTest {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 
-    TripPattern pattern1 = patternIndex.get(new FeedScopedId(feedId, "1.1"));
-    timetable = pattern1.getScheduledTimetable();
+    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    timetable = pattern.getScheduledTimetable();
   }
 
   @Test
@@ -106,7 +105,7 @@ public class TimetableTest {
         serviceDate,
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
-    assertNull(result);
+    assertTrue(result.isFailure());
 
     // update trip with non-increasing data
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -450,7 +449,6 @@ public class TimetableTest {
     StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(-100);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var timetable = this.timetable;
     var patch = timetable.createUpdatedTripTimes(
       tripUpdate,
       timeZone,

@@ -1,9 +1,10 @@
 package org.opentripplanner.model;
 
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public record UpdateError(FeedScopedId tripId, UpdateErrorType errorType) {
+public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
   public enum UpdateErrorType {
     UNKNOWN,
     TRIP_ID_NOT_FOUND,
@@ -25,5 +26,9 @@ public record UpdateError(FeedScopedId tripId, UpdateErrorType errorType) {
 
   public static Optional<UpdateError> noError() {
     return Optional.empty();
+  }
+
+  public static UpdateError noTripId(UpdateErrorType errorType) {
+    return new UpdateError(null, errorType);
   }
 }
