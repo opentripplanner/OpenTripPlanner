@@ -35,7 +35,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: smoke-tests/**/*.pbf
-          key: osm
+          key: osm-2022-08
+          restore-keys: |
+            osm
 
       - name: Build jar file, compile tests
         run: |
