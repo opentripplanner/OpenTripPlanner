@@ -8,7 +8,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
 
   private Set<String> requiredTags = Set.of();
   private Set<String> bannedTags = Set.of();
-
+// TODO: Move useAvailabilityInformation here
   private boolean allowPickup = false;
 
   public void setRequiredTags(Set<String> requiredTags) {
