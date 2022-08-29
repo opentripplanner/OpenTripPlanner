@@ -1151,6 +1151,7 @@ public class TransmodelGraphQLSchema {
                   .filter(route ->
                     route
                       .getLongName()
+                      .toString()
                       .toLowerCase()
                       .startsWith(((String) environment.getArgument("name")).toLowerCase())
                   );

@@ -332,7 +332,7 @@ public interface Leg {
   /**
    * The leg's elevation profile.
    */
-  default List<P2<Double>> getLegElevation() {
+  default List<P2<Double>> getRoundedLegElevation() {
     return null;
   }
 

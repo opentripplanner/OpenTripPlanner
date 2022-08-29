@@ -5,9 +5,11 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -24,7 +26,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   private final Branding branding;
   private final List<GroupOfRoutes> groupsOfRoutes;
   private final String shortName;
-  private final String longName;
+  private final I18NString longName;
   private final TransitMode mode;
   // TODO: consolidate gtfsType and netexSubmode
   private final Integer gtfsType;
@@ -127,7 +129,7 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   }
 
   @Nullable
-  public String getLongName() {
+  public I18NString getLongName() {
     return longName;
   }
 
@@ -186,8 +188,14 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
 
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
+  public String getName(Locale locale) {
+    return shortName == null ? longName.toString(locale) : shortName;
+  }
+
+  /** @return the route's short name, or the long name if the short name is null. */
+  @Nonnull
   public String getName() {
-    return shortName == null ? longName : shortName;
+    return shortName == null ? longName.toString() : shortName;
   }
 
   @Override

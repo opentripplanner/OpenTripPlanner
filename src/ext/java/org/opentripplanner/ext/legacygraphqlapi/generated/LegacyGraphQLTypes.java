@@ -2548,6 +2548,25 @@ public class LegacyGraphQLTypes {
     }
   }
 
+  public static class LegacyGraphQLRouteLongNameArgs {
+
+    private String language;
+
+    public LegacyGraphQLRouteLongNameArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   /** Entities that are relevant for routes that can contain alerts */
   public enum LegacyGraphQLRouteAlertType {
     AGENCY,

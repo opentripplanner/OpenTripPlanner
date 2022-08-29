@@ -81,12 +81,16 @@ public class WalkStep {
     absoluteDirection = AbsoluteDirection.values()[octant];
   }
 
+  public List<P2<Double>> getRawElevation() {
+    return elevation;
+  }
+
   /**
    * The elevation profile as a comma-separated list of x,y values. x is the distance from the start
-   * of the step, y is the elevation at this distance.
+   * of the step, y is the elevation at this distance. The values are rounded to two decimals.
    */
-  public List<P2<Double>> getElevation() {
-    return elevation;
+  public List<P2<Double>> getRoundedElevation() {
+    return StreetLeg.normalizeElevation(elevation);
   }
 
   public void addElevation(List<P2<Double>> elevation) {
@@ -96,7 +100,7 @@ public class WalkStep {
     if (this.elevation == null) {
       this.elevation = new ArrayList<>();
     }
-    this.elevation.addAll(StreetLeg.normalizeElevation(elevation));
+    this.elevation.addAll(elevation);
   }
 
   public void addStreetNotes(Collection<StreetNote> streetNotes) {
