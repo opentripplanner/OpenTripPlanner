@@ -31,6 +31,8 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
    * @see VehicleRentalPreferences#keepingVehicleAtDestinationCost
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
+  // TODO - Rename to 'allowArrivingInRentedVehicleAtDestination' , rename cost param as well
+  //             - A request parameter?  
   private boolean allowKeepingRentedVehicleAtDestination = false;
   /**
    * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
