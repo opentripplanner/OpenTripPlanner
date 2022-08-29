@@ -54,7 +54,7 @@ public class SiriFuzzyTripMatcher {
   private final TransitService transitService;
 
   /**
-   * Factory method used to crete only one instance.
+   * Factory method used to create only one instance.
    * <p>
    * THIS METHOD IS NOT THREAD-SAFE AND SHOULD BE CALLED DURING THE
    * INITIALIZATION PROCESS.
