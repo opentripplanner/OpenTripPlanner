@@ -487,7 +487,7 @@ or region are tagged affects routing. As an example are roads tagged with `highw
 walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to
 snap stops to these roads, or by giving you poor routing results for walking and biking. You can
 adjust which road types that are accessible by foot, car & bicycle as well as speed limits,
-suitability for biking and walking.
+suitability for biking and walking. It's possible to define "safety" values for cycling and walking which are used in routing.
 
 There are currently following wayPropertySets defined;
 
@@ -495,6 +495,8 @@ There are currently following wayPropertySets defined;
 - `finland` which is adjusted to rules and speeds in Finland
 - `norway` which is adjusted to rules and speeds in Norway
 - `uk` which is adjusted to rules and speed in the UK
+- `germany` which is adjusted to rules and speed in Germany
+- `atlanta` which is adjusted to rules in Atlanta
 
 To add your own custom property set have a look
 at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
