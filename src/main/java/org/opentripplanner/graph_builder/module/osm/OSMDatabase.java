@@ -9,7 +9,6 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -130,20 +128,10 @@ public class OSMDatabase {
    */
   public boolean noZeroLevels = true;
   private final Set<String> boardingAreaRefTags;
-  private final Supplier<ZoneId> timeZone;
-
-  public OSMDatabase(
-    DataImportIssueStore issueStore,
-    Set<String> boardingAreaRefTags,
-    Supplier<ZoneId> timeZoneId
-  ) {
-    this.issueStore = issueStore;
-    this.boardingAreaRefTags = boardingAreaRefTags;
-    this.timeZone = timeZoneId;
-  }
 
   public OSMDatabase(DataImportIssueStore issueStore, Set<String> boardingAreaRefTags) {
-    this(issueStore, boardingAreaRefTags, () -> ZoneId.of("UTC"));
+    this.issueStore = issueStore;
+    this.boardingAreaRefTags = boardingAreaRefTags;
   }
 
   public OSMNode getNode(Long nodeId) {
@@ -1040,7 +1028,7 @@ public class OSMDatabase {
             relation.getTag("day_off"),
             relation.getTag("hour_on"),
             relation.getTag("hour_off"),
-            timeZone
+            relation.getOsmProvider()::getZoneId
           );
       } catch (NumberFormatException e) {
         LOG.info("Unparseable turn restriction: " + relation.getId());

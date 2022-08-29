@@ -77,8 +77,6 @@ public class WalkableAreaBuilder {
 
   private final OSMDatabase osmdb;
 
-  private final WayPropertySet wayPropertySet;
-
   private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
   // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
@@ -94,7 +92,6 @@ public class WalkableAreaBuilder {
   public WalkableAreaBuilder(
     Graph graph,
     OSMDatabase osmdb,
-    WayPropertySet wayPropertySet,
     Handler handler,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
@@ -103,7 +100,6 @@ public class WalkableAreaBuilder {
   ) {
     this.graph = graph;
     this.osmdb = osmdb;
-    this.wayPropertySet = wayPropertySet;
     this.handler = handler;
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
@@ -478,7 +474,10 @@ public class WalkableAreaBuilder {
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
 
-      float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity, false);
+      float carSpeed = areaEntity
+        .getOsmProvider()
+        .getWayPropertySet()
+        .getCarSpeedForWay(areaEntity, false);
 
       double length = SphericalDistanceLibrary.distance(
         startEndpoint.getCoordinate(),
@@ -551,7 +550,10 @@ public class WalkableAreaBuilder {
       backStreet.setStreetClass(cls);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+        WayProperties wayData = areaEntity
+          .getOsmProvider()
+          .getWayPropertySet()
+          .getDataForWay(areaEntity);
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
@@ -637,7 +639,10 @@ public class WalkableAreaBuilder {
       namedArea.setName(name);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+        WayProperties wayData = areaEntity
+          .getOsmProvider()
+          .getWayPropertySet()
+          .getDataForWay(areaEntity);
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
