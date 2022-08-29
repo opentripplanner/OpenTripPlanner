@@ -29,7 +29,7 @@ public class DenverSmokeTest {
 
     assertTrue(itineraries.size() > 1);
 
-    var expectedModes = List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK");
+    var expectedModes = List.of("WALK", "TRAM", "WALK", "BUS", "WALK");
     assertThatItineraryHasModes(itineraries, expectedModes);
   }
 }
