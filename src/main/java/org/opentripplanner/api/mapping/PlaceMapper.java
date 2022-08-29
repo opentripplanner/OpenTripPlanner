@@ -20,9 +20,11 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class PlaceMapper {
 
   private final Locale locale;
+  private final I18NStringMapper i18NStringMapper;
 
   public PlaceMapper(Locale locale) {
     this.locale = locale;
+    i18NStringMapper = new I18NStringMapper(this.locale);
   }
 
   public List<ApiPlace> mapStopArrivals(Collection<StopArrival> domain) {
@@ -115,10 +117,10 @@ public class PlaceMapper {
     return ApiVehicleParkingWithEntrance
       .builder()
       .id(FeedScopedIdMapper.mapToApi(vp.getId()))
-      .name(I18NStringMapper.mapToApi(vp.getName(), locale))
+      .name(i18NStringMapper.mapToApi(vp.getName()))
       .entranceId(FeedScopedIdMapper.mapToApi(e.getEntranceId()))
-      .entranceName(I18NStringMapper.mapToApi(e.getName(), locale))
-      .note(I18NStringMapper.mapToApi(vp.getNote(), locale))
+      .entranceName(i18NStringMapper.mapToApi(e.getName()))
+      .note(i18NStringMapper.mapToApi(vp.getNote()))
       .detailsUrl(vp.getDetailsUrl())
       .imageUrl(vp.getImageUrl())
       .tags(new ArrayList<>(vp.getTags()))

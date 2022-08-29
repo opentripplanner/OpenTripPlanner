@@ -19,8 +19,6 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  */
 public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
-  private static final long serialVersionUID = 3925814840369402222L;
-
   /**
    * This is the level of this elevator exit, used in narrative generation.
    */

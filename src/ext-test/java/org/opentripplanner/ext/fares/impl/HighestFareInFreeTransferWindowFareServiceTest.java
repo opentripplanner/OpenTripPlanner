@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -225,6 +226,12 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   }
 
   private static Route route(String id, String name) {
-    return Route.of(id(id)).withLongName(name).withAgency(agency).withMode(TransitMode.BUS).build();
+    NonLocalizedString lName = new NonLocalizedString(name);
+    return Route
+      .of(id(id))
+      .withLongName(lName)
+      .withAgency(agency)
+      .withMode(TransitMode.BUS)
+      .build();
   }
 }

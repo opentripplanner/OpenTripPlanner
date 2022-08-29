@@ -46,7 +46,7 @@ public class WalkStepMapper {
       api.lon = domain.getStartLocation().longitude();
       api.lat = domain.getStartLocation().latitude();
     }
-    api.elevation = mapElevation(domain.getElevation());
+    api.elevation = mapElevation(domain.getRoundedElevation());
     api.walkingBike = domain.isWalkingBike();
     api.alerts = alertsMapper.mapToApi(domain.getStreetNotes());
 

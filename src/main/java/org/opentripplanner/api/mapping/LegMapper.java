@@ -21,12 +21,15 @@ public class LegMapper {
   private final PlaceMapper placeMapper;
   private final boolean addIntermediateStops;
 
+  private final I18NStringMapper i18NStringMapper;
+
   public LegMapper(Locale locale, boolean addIntermediateStops) {
     this.walkStepMapper = new WalkStepMapper(locale);
     this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
     this.alertMapper = new AlertMapper(locale);
     this.placeMapper = new PlaceMapper(locale);
     this.addIntermediateStops = addIntermediateStops;
+    this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
   public List<ApiLeg> mapLegs(List<Leg> domain) {
@@ -98,12 +101,12 @@ public class LegMapper {
       api.agencyBrandingUrl = agency.getBrandingUrl();
 
       var route = domain.getRoute();
-      api.route = route.getLongName();
+      api.route = i18NStringMapper.mapToApi(route.getLongName());
       api.routeColor = route.getColor();
       api.routeType = domain.getRouteType();
       api.routeId = FeedScopedIdMapper.mapToApi(route.getId());
       api.routeShortName = route.getShortName();
-      api.routeLongName = route.getLongName();
+      api.routeLongName = i18NStringMapper.mapToApi(route.getLongName());
       api.routeTextColor = route.getTextColor();
 
       var trip = domain.getTrip();
@@ -125,7 +128,7 @@ public class LegMapper {
       api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
     }
     api.legGeometry = PolylineEncoder.encodeGeometry(domain.getLegGeometry());
-    api.legElevation = mapElevation(domain.getLegElevation());
+    api.legElevation = mapElevation(domain.getRoundedLegElevation());
     api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
     api.alerts =
       concatenateAlerts(

@@ -28,10 +28,6 @@ public class StreetVehicleParkingLink extends Edge {
     vehicleParkingEntranceVertex = fromv;
   }
 
-  public String getDirection() {
-    return null;
-  }
-
   public String toString() {
     return "StreetVehicleParkingLink(" + fromv + " -> " + tov + ")";
   }

@@ -46,6 +46,7 @@ public class ShortestPathTree {
 
   public ShortestPathTree(DominanceFunction dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
+    // TODO: Calculate the initial size based on the search properties
     stateSets = new IdentityHashMap<>();
   }
 

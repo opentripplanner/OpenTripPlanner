@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
@@ -13,8 +12,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  * This represents the connection between a street vertex and a bike rental station vertex.
  */
 public class StreetVehicleRentalLink extends Edge {
-
-  private static final long serialVersionUID = 1L;
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
@@ -26,18 +23,6 @@ public class StreetVehicleRentalLink extends Edge {
   public StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = fromv;
-  }
-
-  public Vertex getFromVertex() {
-    return fromv;
-  }
-
-  public Vertex getToVertex() {
-    return tov;
-  }
-
-  public String getDirection() {
-    return null;
   }
 
   public String toString() {
