@@ -69,12 +69,7 @@ public class TimetableTest {
     StopTimeEvent.Builder stopTimeEventBuilder;
 
     int trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
-    Vertex stop_a = graph.getVertex(feedId + ":A");
-    Vertex stop_c = graph.getVertex(feedId + ":C");
     RoutingRequest options = new RoutingRequest();
-
-    ShortestPathTree spt;
-    GraphPath path;
 
     // non-existing trip
     tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -164,12 +159,14 @@ public class TimetableTest {
     tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
     patch =
-      timetable.createUpdatedTripTimes(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+      timetable
+        .createUpdatedTripTimes(
+          tripUpdate,
+          timeZone,
+          serviceDate,
+          BackwardsDelayPropagationType.REQUIRED_NO_DATA
+        )
+        .value();
     var updatedTripTimes = patch.getTripTimes();
     assertNotNull(updatedTripTimes);
     timetable.setTripTimes(trip_1_1_index, updatedTripTimes);

@@ -3,6 +3,11 @@ package org.opentripplanner.ext.siri;
 import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -15,10 +20,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
+import org.opentripplanner.common.model.ApplicationResult;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -686,14 +693,14 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-  public static TripTimes createUpdatedTripTimes(
+  public static ApplicationResult<UpdateError, TripTimes> createUpdatedTripTimes(
     Timetable timetable,
     VehicleActivityStructure activity,
     FeedScopedId tripId,
     Function<FeedScopedId, StopLocation> getStopById
   ) {
     if (activity == null) {
-      return null;
+      return ApplicationResult.failure(new UpdateError(tripId, UNKNOWN));
     }
 
     MonitoredVehicleJourneyStructure mvj = activity.getMonitoredVehicleJourney();
@@ -701,14 +708,14 @@ public class TimetableHelper {
     final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
     if (existingTripTimes == null) {
       LOG.trace("tripId {} not found in pattern.", tripId);
-      return null;
+      return ApplicationResult.failure(new UpdateError(tripId, TRIP_NOT_FOUND_IN_PATTERN));
     }
 
     TripTimes newTimes = new TripTimes(existingTripTimes);
 
     MonitoredCallStructure update = mvj.getMonitoredCall();
     if (update == null) {
-      return null;
+      return ApplicationResult.failure(new UpdateError(tripId, UNKNOWN));
     }
 
     VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
@@ -774,7 +781,7 @@ public class TimetableHelper {
         tripId,
         invalidStopIndex.getAsInt()
       );
-      return null;
+      return ApplicationResult.failure(new UpdateError(tripId, NON_INCREASING_TRIP_TIMES));
     }
 
     //If state is already MODIFIED - keep existing state
@@ -783,7 +790,7 @@ public class TimetableHelper {
       newTimes.setRealTimeState(RealTimeState.UPDATED);
     }
 
-    return newTimes;
+    return ApplicationResult.success(newTimes);
   }
 
   /**

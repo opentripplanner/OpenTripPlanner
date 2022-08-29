@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import org.opentripplanner.common.model.ApplicationResult;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -133,11 +134,11 @@ public class Timetable implements Serializable {
    * cloning the same Timetable when several updates are applied to it at once. We assume here that
    * all trips in a timetable are from the same feed, which should always be the case.
    *
-   * @param tripUpdate        GTFS-RT trip update
-   * @param timeZone          time zone of trip update
-   * @param updateServiceDate service date of trip update
+   * @param tripUpdate                    GTFS-RT trip update
+   * @param timeZone                      time zone of trip update
+   * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
-   *                          if these stops are given the NO_DATA flag
+   *                                      if these stops are given the NO_DATA flag
    * @return {@link TripTimesPatch} that contains a new copy of updated TripTimes after TripUpdate
    * has been applied on TripTimes of trip with the id specified in the trip descriptor of the
    * TripUpdate and a list of stop indices that have been skipped with the realtime update; null if
@@ -147,7 +148,7 @@ public class Timetable implements Serializable {
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
    */
-  public TripTimesPatch createUpdatedTripTimes(
+  public ApplicationResult<UpdateError, TripTimesPatch> createUpdatedTripTimes(
     TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
@@ -171,6 +172,7 @@ public class Timetable implements Serializable {
       LOG.error("TripDescriptor object has no TripId field");
       return null;
     }
+
     String tripId = tripDescriptor.getTripId();
     int tripIndex = getTripIndex(tripId);
     if (tripIndex == -1) {
@@ -198,6 +200,8 @@ public class Timetable implements Serializable {
     final long today = ServiceDateUtils
       .asStartOfService(updateServiceDate, timeZone)
       .toEpochSecond();
+
+    FeedScopedId feedScopedTripId = new FeedScopedId(this.getPattern().getFeedId(), tripId);
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;
@@ -242,7 +246,9 @@ public class Timetable implements Serializable {
               delay = newTimes.getArrivalDelay(i);
             } else {
               LOG.error("Arrival time at index {} is erroneous.", i);
-              return null;
+              return ApplicationResult.failure(
+                new UpdateError(feedScopedTripId, UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME)
+              );
             }
           } else if (delay != null) {
             newTimes.updateArrivalDelay(i, delay);
@@ -265,7 +271,9 @@ public class Timetable implements Serializable {
               delay = newTimes.getDepartureDelay(i);
             } else {
               LOG.error("Departure time at index {} is erroneous.", i);
-              return null;
+              return ApplicationResult.failure(
+                new UpdateError(feedScopedTripId, UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME)
+              );
             }
           } else if (delay != null) {
             newTimes.updateDepartureDelay(i, delay);
@@ -320,7 +328,9 @@ public class Timetable implements Serializable {
         tripId,
         invalidStopIndex.getAsInt()
       );
-      return null;
+      return ApplicationResult.failure(
+        new UpdateError(feedScopedTripId, UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES)
+      );
     }
 
     if (tripUpdate.hasVehicle()) {
@@ -336,7 +346,7 @@ public class Timetable implements Serializable {
       "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
       tripId
     );
-    return new TripTimesPatch(newTimes, skippedStopIndices);
+    return ApplicationResult.success(new TripTimesPatch(newTimes, skippedStopIndices));
   }
 
   /**
