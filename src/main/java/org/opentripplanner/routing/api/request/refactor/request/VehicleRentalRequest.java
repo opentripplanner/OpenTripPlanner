@@ -11,6 +11,9 @@ public class VehicleRentalRequest implements Cloneable, Serializable {
   private Set<String> allowedNetworks = Set.of();
   private Set<String> bannedNetworks = Set.of();
   private boolean allowKeepingVehicleAtDestination = false;
+  private boolean parkAndRide = false;
+
+  private boolean allow = false;
 
   public Set<RentalVehicleType.FormFactor> allowedFormFactors() {
     return allowedFormFactors;
@@ -52,5 +55,21 @@ public class VehicleRentalRequest implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  public void setParkAndRide(boolean parkAndRide) {
+    this.parkAndRide = parkAndRide;
+  }
+
+  public boolean parkAndRide() {
+    return parkAndRide;
+  }
+
+  public void setAllow(boolean allow) {
+    this.allow = allow;
+  }
+
+  public boolean allow() {
+    return allow;
   }
 }

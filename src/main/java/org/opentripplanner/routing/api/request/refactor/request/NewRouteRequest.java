@@ -250,20 +250,20 @@ public class NewRouteRequest implements Cloneable, Serializable {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
           );
-          routingPreferences.bike().setParkAndRide(true);
+          journey.rental().setParkAndRide(true);
         }
         case BIKE_RENTAL -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
           );
-          routingPreferences.rental().setAllow(true);
+          journeyRequest.rental().setAllow(true);
           journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.BICYCLE);
         }
         case SCOOTER_RENTAL -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK)
           );
-          routingPreferences.rental().setAllow(true);
+          journeyRequest.rental().setAllow(true);
           journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.SCOOTER);
         }
         case CAR -> journeyRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.CAR));
@@ -271,19 +271,19 @@ public class NewRouteRequest implements Cloneable, Serializable {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
-          routingPreferences.car().setParkAndRide(true);
+          journeyRequest.rental().setParkAndRide(true);
         }
         case CAR_PICKUP -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
-          routingPreferences.car().allowPickup();
+          journeyRequest.parking().allowPickup();
         }
         case CAR_RENTAL -> {
           journeyRequest.setStreetSubRequestModes(
             new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK)
           );
-          routingPreferences.rental().setAllow(true);
+          journeyRequest.rental().setAllow(true);
           journeyRequest.rental().allowedFormFactors().add(RentalVehicleType.FormFactor.CAR);
         }
       }

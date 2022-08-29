@@ -186,15 +186,15 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = stateData.pref.car().parkAndRide();
+    boolean parkAndRide = stateData.opt.journey().rental().parkAndRide();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
     if (stateData.opt.arriveBy()) {
-      vehicleRentingOk = !stateData.pref.rental().allow() || !isRentingVehicle();
+      vehicleRentingOk = !stateData.opt.journey().rental().allow() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.pref.rental().allow() ||
+        !stateData.opt.journey().rental().allow() ||
         (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }

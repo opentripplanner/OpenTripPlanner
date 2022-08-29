@@ -405,10 +405,11 @@ public class StreetVertexIndex {
   ) {
     TraverseMode nonTransitMode = TraverseMode.WALK;
     //It can be null in tests
-    if (options != null) {
+    if (options != null && preferences != null) {
       TraverseModeSet modes = options.journey().streetSubRequestModes();
       // for park and ride we will start in car mode and walk to the end vertex
-      boolean parkAndRideDepart = modes.getCar() && preferences.car().parkAndRide() && !endVertex;
+      boolean parkAndRideDepart =
+        modes.getCar() && options.journey().rental().parkAndRide() && !endVertex;
       boolean onlyCarAvailable = modes.getCar() && !(modes.getWalk() || modes.getBicycle());
       if (onlyCarAvailable || parkAndRideDepart) {
         nonTransitMode = TraverseMode.CAR;

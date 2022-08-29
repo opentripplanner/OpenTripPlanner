@@ -51,9 +51,8 @@ public class VehicleParkingEdge extends Edge {
   @Override
   public State traverse(State s0) {
     NewRouteRequest options = s0.getOptions();
-    RoutingPreferences preferences = s0.getPreferences();
 
-    if (!preferences.car().parkAndRide()) {
+    if (!options.journey().rental().parkAndRide()) {
       return null;
     }
 

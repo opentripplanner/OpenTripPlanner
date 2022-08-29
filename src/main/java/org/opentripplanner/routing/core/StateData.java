@@ -110,7 +110,7 @@ public class StateData implements Cloneable {
     //   - CAR / IN_CAR where pickup happens directly at the bus stop
     //   - WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
     // For forward/reverse searches to be symmetric both initial states need to be created.
-    if (preferences.car().allowPickup()) {
+    if (options.journey().parking().allowPickup()) {
       if (!forceSingleState) {
         var inCarPickupStateData = proto.clone();
         inCarPickupStateData.carPickupState = CarPickupState.IN_CAR;
@@ -130,7 +130,7 @@ public class StateData implements Cloneable {
     //   - HAVE_RENTED
     // When searching backwards:
     //   - BEFORE_RENTING
-    else if (preferences.rental().allow()) {
+    else if (options.journey().rental().allow()) {
       if (options.arriveBy()) {
         if (!forceSingleState) {
           if (preferences.rental().allowKeepingRentedVehicleAtDestination()) {
@@ -158,7 +158,7 @@ public class StateData implements Cloneable {
     // If the itinerary is to begin with a car that is parked for transit the initial state is
     //   - In arriveBy searches is with the car already "parked" and in WALK mode
     //   - In departAt searches, we are in CAR mode and "unparked".
-    else if (preferences.car().parkAndRide()) {
+    else if (options.journey().rental().parkAndRide()) {
       var parkAndRideStateData = proto.clone();
       parkAndRideStateData.vehicleParked = options.arriveBy();
       parkAndRideStateData.currentMode =

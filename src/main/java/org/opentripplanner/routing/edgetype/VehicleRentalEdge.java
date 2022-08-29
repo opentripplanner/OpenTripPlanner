@@ -25,7 +25,7 @@ public class VehicleRentalEdge extends Edge {
   }
 
   public State traverse(State s0) {
-    if (!s0.getPreferences().rental().allow()) {
+    if (!s0.getOptions().journey().rental().allow()) {
       return null;
     }
 

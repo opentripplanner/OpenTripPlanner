@@ -775,7 +775,7 @@ public class LegacyGraphQLQueryTypeImpl
         (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
       );
 
-      if (preferences.rental().allow() && !hasArgument(environment, "bikeSpeed")) {
+      if (request.journey().rental().allow() && !hasArgument(environment, "bikeSpeed")) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.
         preferences.bike().setSpeed(4.3);
       }

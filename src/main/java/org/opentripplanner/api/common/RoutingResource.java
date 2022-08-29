@@ -936,7 +936,7 @@ public abstract class RoutingResource {
       request.journey().transfer().setMode(requestModes.transferMode);
     }
 
-    if (preferences.rental().allow() && bikeSpeed == null) {
+    if (request.journey().rental().allow() && bikeSpeed == null) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
       preferences.bike().setSpeed(4.3);
     }

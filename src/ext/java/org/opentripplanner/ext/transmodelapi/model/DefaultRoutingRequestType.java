@@ -429,7 +429,7 @@ public class DefaultRoutingRequestType {
           .description("")
           .type(Scalars.GraphQLBoolean)
           .deprecate("Rental is specified by modes")
-          .dataFetcher(env -> preferences.rental().allow())
+          .dataFetcher(env -> request.journey().rental().allow())
           .build()
       )
       .field(
@@ -437,8 +437,7 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("parkAndRide")
           .type(Scalars.GraphQLBoolean)
-          // TODO: 2022-08-24 Which one should it be here? car or bike?
-          .dataFetcher(env -> preferences.car().parkAndRide())
+          .dataFetcher(env -> request.journey().rental().allow())
           .build()
       )
       .field(
@@ -446,7 +445,7 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("kissAndRide")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.car().allowPickup())
+          .dataFetcher(env -> request.journey().parking().allowPickup())
           .build()
       )
       .field(

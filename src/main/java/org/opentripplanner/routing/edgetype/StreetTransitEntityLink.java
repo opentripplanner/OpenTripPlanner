@@ -107,7 +107,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     switch (s0.getNonTransitMode()) {
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
-        if (pref.bike().parkAndRide() && !s0.isVehicleParked()) {
+        if (req.journey().rental().parkAndRide() && !s0.isVehicleParked()) {
           return null;
         }
         // Forbid taking a (station) rental vehicle in the station. This allows taking along
@@ -125,7 +125,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         break;
       case CAR:
         // Forbid taking your own car in the station if bike P+R activated.
-        if (pref.car().parkAndRide() && !s0.isVehicleParked()) {
+        if (req.journey().rental().parkAndRide() && !s0.isVehicleParked()) {
           return null;
         }
         // For Kiss & Ride allow dropping of the passenger before entering the station

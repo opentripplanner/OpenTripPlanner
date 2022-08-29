@@ -9,6 +9,8 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
   private Set<String> requiredTags = Set.of();
   private Set<String> bannedTags = Set.of();
 
+  private boolean allowPickup = false;
+
   public void setRequiredTags(Set<String> requiredTags) {
     this.requiredTags = requiredTags;
   }
@@ -36,5 +38,13 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  public void setAllowPickup(boolean allowPickup) {
+    this.allowPickup = allowPickup;
+  }
+
+  public boolean allowPickup() {
+    return allowPickup;
   }
 }

@@ -265,7 +265,7 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-    if (preferences.rental().allow() && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
+    if (request.journey().rental().allow() && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
       preferences.bike().setSpeed(4.3);
     }

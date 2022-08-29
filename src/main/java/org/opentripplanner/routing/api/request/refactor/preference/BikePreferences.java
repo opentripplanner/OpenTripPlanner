@@ -26,7 +26,7 @@ public class BikePreferences implements Cloneable, Serializable {
    */
   private int boardCost = 60 * 10;
   /**
-   * Default: 1.33 m/s ~ Same as walkSpeed
+   * The walking speed when walking a bike. Default: 1.33 m/s ~ Same as walkSpeed
    */
   private double walkingSpeed = 1.33;
   /**
@@ -58,9 +58,6 @@ public class BikePreferences implements Cloneable, Serializable {
   private double triangleSlopeFactor;
   /** For the bike triangle, how important safety is */
   private double triangleSafetyFactor;
-
-  // TODO: 2022-08-18 Is this right?
-  private boolean parkAndRide = false;
 
   public BikePreferences clone() {
     try {
@@ -211,13 +208,5 @@ public class BikePreferences implements Cloneable, Serializable {
 
   public double triangleSafetyFactor() {
     return triangleSafetyFactor;
-  }
-
-  public void setParkAndRide(boolean parkAndRide) {
-    this.parkAndRide = parkAndRide;
-  }
-
-  public boolean parkAndRide() {
-    return parkAndRide;
   }
 }

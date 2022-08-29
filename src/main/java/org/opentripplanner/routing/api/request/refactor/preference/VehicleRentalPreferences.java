@@ -6,8 +6,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 public class VehicleRentalPreferences implements Cloneable, Serializable {
 
-  private boolean allow = false;
-
   /** Time to rent a vehicle */
   private int pickupTime = 60;
   /**
@@ -106,13 +104,5 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
 
   public double keepingVehicleAtDestinationCost() {
     return keepingVehicleAtDestinationCost;
-  }
-
-  public void setAllow(boolean allow) {
-    this.allow = allow;
-  }
-
-  public boolean allow() {
-    return allow;
   }
 }

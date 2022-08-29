@@ -62,7 +62,9 @@ public class Transfer {
     // Some values are rounded to ease caching in RaptorRequestTransferCache
     bikePreferences.setTriangleSafetyFactor(roundTo(bikePreferences.triangleSafetyFactor(), 1));
     bikePreferences.setTriangleSlopeFactor(roundTo(bikePreferences.triangleSlopeFactor(), 1));
-    bikePreferences.setTriangleTimeFactor(1.0 - bikePreferences.triangleSafetyFactor() - bikePreferences.triangleSlopeFactor());
+    bikePreferences.setTriangleTimeFactor(
+      1.0 - bikePreferences.triangleSafetyFactor() - bikePreferences.triangleSlopeFactor()
+    );
     bikePreferences.setSwitchCost(roundTo100(bikePreferences.switchCost()));
     bikePreferences.setSwitchTime(roundTo100(bikePreferences.switchTime()));
 
