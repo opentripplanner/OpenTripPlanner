@@ -9,15 +9,15 @@ import javax.annotation.Nonnull;
  * <p>
  * It's very similar to the Either or Validation type found in functional programming languages.
  */
-public abstract class Result<L, R> {
+public abstract class Result<E, T> {
 
   private Result() {}
 
-  public static <L, R> Result<L, R> failure(@Nonnull L failure) {
+  public static <E, T> Result<E, T> failure(@Nonnull E failure) {
     return new Failure<>(failure);
   }
 
-  public static <L, R> Result<L, R> success(@Nonnull R success) {
+  public static <E, T> Result<E, T> success(@Nonnull T success) {
     return new Success<>(success);
   }
 
@@ -32,9 +32,9 @@ public abstract class Result<L, R> {
    * <p>
    * If it is a success, this method throws an exception.
    */
-  public L failureValue() {
+  public E failureValue() {
     if (isFailure()) {
-      return (L) value();
+      return (E) value();
     } else {
       throw new RuntimeException(
         "Value %s is not a failure. Check isFailure() before calling failureValue().".formatted(
@@ -59,21 +59,21 @@ public abstract class Result<L, R> {
   /**
    * If the type contained is a success then execute the function passed into this method.
    */
-  public abstract void ifSuccess(Consumer<R> func);
+  public abstract void ifSuccess(Consumer<T> func);
 
   /**
    * If the type contained is a failure then execute the function passed into this method.
    */
-  public abstract void ifFailure(Consumer<L> func);
+  public abstract void ifFailure(Consumer<E> func);
 
   /**
    * If the value contained is success return it cast to the correct type.
    * <p>
    * If it is a failure, this method throws an exception.
    */
-  public R successValue() {
+  public T successValue() {
     if (isSuccess()) {
-      return (R) value();
+      return (T) value();
     } else {
       throw new RuntimeException(
         "Value %s is not a success. Check isSuccess() before calling successValue().".formatted(
@@ -83,16 +83,16 @@ public abstract class Result<L, R> {
     }
   }
 
-  private static class Failure<L, R> extends Result<L, R> {
+  private static class Failure<E, T> extends Result<E, T> {
 
-    private final L failure;
+    private final E failure;
 
-    private Failure(L failure) {
+    private Failure(E failure) {
       Objects.requireNonNull(failure, "failure must not be null");
       this.failure = failure;
     }
 
-    protected L value() {
+    protected E value() {
       return failure;
     }
 
@@ -102,24 +102,24 @@ public abstract class Result<L, R> {
     }
 
     @Override
-    public void ifSuccess(Consumer<R> func) {}
+    public void ifSuccess(Consumer<T> func) {}
 
     @Override
-    public void ifFailure(Consumer<L> func) {
+    public void ifFailure(Consumer<E> func) {
       func.accept(failure);
     }
   }
 
-  private static class Success<L, R> extends Result<L, R> {
+  private static class Success<E, T> extends Result<E, T> {
 
-    private final R success;
+    private final T success;
 
-    private Success(R success) {
+    private Success(T success) {
       Objects.requireNonNull(success);
       this.success = success;
     }
 
-    protected R value() {
+    protected T value() {
       return success;
     }
 
@@ -129,11 +129,11 @@ public abstract class Result<L, R> {
     }
 
     @Override
-    public void ifSuccess(Consumer<R> func) {
+    public void ifSuccess(Consumer<T> func) {
       func.accept(success);
     }
 
     @Override
-    public void ifFailure(Consumer<L> func) {}
+    public void ifFailure(Consumer<E> func) {}
   }
 }
