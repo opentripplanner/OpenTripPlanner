@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
@@ -53,11 +54,11 @@ public class StateData implements Cloneable {
   protected boolean enteredNoThroughTrafficArea;
 
   /** Private constructor, use static methods to get a set of initial states. */
-  private StateData(RoutingRequest options, RoutingPreferences preferences) {
-    this.opt = options;
-    this.pref = preferences;
+  private StateData(RoutingRequestAndPreferences requestAndPreferences) {
+    this.opt = requestAndPreferences.request();
+    this.pref = requestAndPreferences.preferences();
 
-    TraverseModeSet modes = options.journey().streetSubRequestModes();
+    TraverseModeSet modes = opt.journey().streetSubRequestModes();
     if (modes.getCar()) {
       currentMode = TraverseMode.CAR;
     } else if (modes.getWalk()) {
@@ -73,10 +74,9 @@ public class StateData implements Cloneable {
    * Returns a set of initial StateDatas based on the options from the RoutingRequest
    */
   public static List<StateData> getInitialStateDatas(
-    RoutingRequest options,
-    RoutingPreferences preferences
+    RoutingRequestAndPreferences routingRequestAndPreferences
   ) {
-    return getInitialStateDatas(options, preferences, false);
+    return getInitialStateDatas(routingRequestAndPreferences, false);
   }
 
   /**
@@ -84,10 +84,9 @@ public class StateData implements Cloneable {
    * only a single state, which is considered the "base case"
    */
   public static StateData getInitialStateData(
-    RoutingRequest options,
-    RoutingPreferences preferences
+    RoutingRequestAndPreferences routingRequestAndPreferences
   ) {
-    var stateDatas = getInitialStateDatas(options, preferences, true);
+    var stateDatas = getInitialStateDatas(routingRequestAndPreferences, true);
     if (stateDatas.size() != 1) {
       throw new IllegalStateException("Unable to create only a single state");
     }
@@ -99,13 +98,13 @@ public class StateData implements Cloneable {
    *                         mostly in tests, which test a single State
    */
   private static List<StateData> getInitialStateDatas(
-    RoutingRequest options,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences requestAndPreferences,
     boolean forceSingleState
   ) {
     List<StateData> res = new ArrayList<>();
-    var proto = new StateData(options, preferences);
+    var proto = new StateData(requestAndPreferences);
 
+    var options = requestAndPreferences.request();
     // carPickup searches may start and end in two distinct states:
     //   - CAR / IN_CAR where pickup happens directly at the bus stop
     //   - WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
@@ -133,7 +132,9 @@ public class StateData implements Cloneable {
     else if (options.journey().rental().allow()) {
       if (options.arriveBy()) {
         if (!forceSingleState) {
-          if (preferences.rental().allowKeepingRentedVehicleAtDestination()) {
+          if (
+            requestAndPreferences.preferences().rental().allowKeepingRentedVehicleAtDestination()
+          ) {
             var keptVehicleStateData = proto.clone();
             keptVehicleStateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
             keptVehicleStateData.currentMode = TraverseMode.BICYCLE;

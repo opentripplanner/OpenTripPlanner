@@ -69,7 +69,7 @@ class DataOverlayStreetEdgeCostExtension implements StreetEdgeCostExtension, Ser
       return 0d;
     }
     double totalPenalty = 0d;
-    Instant requestInstant = routingContext.opt.dateTime();
+    Instant requestInstant = routingContext.opt.request().dateTime();
     var context = routingContext.dataOverlayContext;
 
     for (Parameter parameter : context.getParameters()) {

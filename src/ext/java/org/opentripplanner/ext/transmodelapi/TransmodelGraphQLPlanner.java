@@ -23,6 +23,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
@@ -50,10 +51,9 @@ public class TransmodelGraphQLPlanner {
     RoutingPreferences preferences = null;
     try {
       var requestAndPreferences = createRequest(environment);
-      request = requestAndPreferences.getLeft();
-      preferences = requestAndPreferences.getRight();
+      request = requestAndPreferences.request();
 
-      RoutingResponse res = ctx.getRoutingService().route(request, preferences);
+      RoutingResponse res = ctx.getRoutingService().route(requestAndPreferences);
 
       response.plan = res.getTripPlan();
       response.metadata = res.getMetadata();
@@ -91,9 +91,7 @@ public class TransmodelGraphQLPlanner {
     return new GenericLocation(name, stopId, lat, lon);
   }
 
-  private Pair<RoutingRequest, RoutingPreferences> createRequest(
-    DataFetchingEnvironment environment
-  ) {
+  private RoutingRequestAndPreferences createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
     RoutingRequest request = serverContext.defaultRoutingRequest();
@@ -295,7 +293,7 @@ public class TransmodelGraphQLPlanner {
     );
     //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
-    return Pair.of(request, preferences);
+    return new RoutingRequestAndPreferences(request, preferences);
   }
 
   @SuppressWarnings("unchecked")

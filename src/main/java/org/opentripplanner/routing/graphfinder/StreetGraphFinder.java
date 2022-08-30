@@ -8,6 +8,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -83,14 +84,15 @@ public class StreetGraphFinder implements GraphFinder {
 
     pref.walk().setSpeed(1);
     rr.setNumItineraries(1);
+    var opt = new RoutingRequestAndPreferences(rr, pref);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, rr, pref)) {
+    try (var temporaryVertices = new TemporaryVerticesContainer(graph, opt)) {
       AStarBuilder
         .allDirections(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunction.LeastWalk())
-        .setContext(new RoutingContext(rr, pref, graph, temporaryVertices))
+        .setContext(new RoutingContext(opt, graph, temporaryVertices))
         .getShortestPathTree();
     }
   }

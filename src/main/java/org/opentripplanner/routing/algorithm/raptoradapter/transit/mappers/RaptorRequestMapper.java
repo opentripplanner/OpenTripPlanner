@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
@@ -22,9 +23,7 @@ import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
-  private final RoutingRequest request;
-
-  private final RoutingPreferences preferences;
+  private final RoutingRequestAndPreferences opt;
   private final Collection<? extends RaptorTransfer> accessPaths;
   private final Collection<? extends RaptorTransfer> egressPaths;
   private final long transitSearchTimeZeroEpocSecond;
@@ -32,16 +31,14 @@ public class RaptorRequestMapper {
   private final MeterRegistry meterRegistry;
 
   private RaptorRequestMapper(
-    RoutingRequest request,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
     Collection<? extends RaptorTransfer> egressPaths,
     long transitSearchTimeZeroEpocSecond,
     MeterRegistry meterRegistry
   ) {
-    this.request = request;
-    this.preferences = preferences;
+    this.opt = opt;
     this.isMultiThreadedEnbled = isMultiThreaded;
     this.accessPaths = accessPaths;
     this.egressPaths = egressPaths;
@@ -50,8 +47,7 @@ public class RaptorRequestMapper {
   }
 
   public static RaptorRequest<TripSchedule> mapRequest(
-    RoutingRequest request,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
@@ -59,8 +55,7 @@ public class RaptorRequestMapper {
     MeterRegistry meterRegistry
   ) {
     return new RaptorRequestMapper(
-      request,
-      preferences,
+      opt,
       isMultiThreaded,
       accessPaths,
       egressPaths,
@@ -73,6 +68,9 @@ public class RaptorRequestMapper {
   private RaptorRequest<TripSchedule> doMap() {
     var builder = new RaptorRequestBuilder<TripSchedule>();
     var searchParams = builder.searchParams();
+
+    var request = opt.request();
+    var preferences = opt.preferences();
 
     if (request.pageCursor() == null) {
       int time = relativeTime(request.dateTime());

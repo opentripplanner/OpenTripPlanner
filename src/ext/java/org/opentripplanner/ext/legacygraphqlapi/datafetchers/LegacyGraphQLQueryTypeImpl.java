@@ -43,6 +43,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -802,7 +803,9 @@ public class LegacyGraphQLQueryTypeImpl
         "locale",
         (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
       );
-      RoutingResponse res = context.getRoutingService().route(request, preferences);
+      RoutingResponse res = context
+        .getRoutingService()
+        .route(new RoutingRequestAndPreferences(request, preferences));
       return DataFetcherResult
         .<RoutingResponse>newResult()
         .data(res)

@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
@@ -51,8 +52,8 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
   }
 
   @Override
-  public RoutingResponse route(RoutingRequest request, RoutingPreferences preferences) {
-    RoutingWorker worker = new RoutingWorker(serverContext, request, preferences, timeZone);
+  public RoutingResponse route(RoutingRequestAndPreferences requestAndPreferences) {
+    RoutingWorker worker = new RoutingWorker(serverContext, requestAndPreferences, timeZone);
     return worker.route();
   }
 

@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -49,8 +50,7 @@ public class RoutingWorker {
   public final DebugTimingAggregator debugTimingAggregator;
   public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
-  private final RoutingRequest request;
-  private final RoutingPreferences preferences;
+  private final RoutingRequestAndPreferences opt;
   private final OtpServerRequestContext serverContext;
   /**
    * The transit service time-zero normalized for the current search. All transit times are relative
@@ -68,25 +68,23 @@ public class RoutingWorker {
 
   public RoutingWorker(
     OtpServerRequestContext serverContext,
-    RoutingRequest request,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     ZoneId zoneId
   ) {
-    request.applyPageCursor();
-    this.request = request;
-    this.preferences = preferences;
+    this.opt = opt;
+    opt.request().applyPageCursor();
     this.serverContext = serverContext;
     this.debugTimingAggregator =
-      new DebugTimingAggregator(serverContext.meterRegistry(), preferences.system().tags());
-    this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
+      new DebugTimingAggregator(serverContext.meterRegistry(), opt.preferences().system().tags());
+    this.transitSearchTimeZero =
+      ServiceDateUtils.asStartOfService(opt.request().dateTime(), zoneId);
     this.pagingSearchWindowAdjuster =
       createPagingSearchWindowAdjuster(serverContext.routerConfig());
     this.additionalSearchDays =
       createAdditionalSearchDays(
         serverContext.routerConfig().raptorTuningParameters(),
         zoneId,
-        request,
-        preferences
+        opt
       );
   }
 
@@ -94,10 +92,10 @@ public class RoutingWorker {
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      request.journey().direct().mode()
+      opt.request().journey().direct().mode()
     );
 
-    var routeRequest = request.clone();
+    var routeRequest = opt.request().clone();
     routeRequest.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
@@ -133,14 +131,14 @@ public class RoutingWorker {
     // Filter itineraries
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
       routeRequest.itinerariesSortOrder(),
-      preferences.system().itineraryFilters(),
+      opt.preferences().system().itineraryFilters(),
       routeRequest.numItineraries(),
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
       routeRequest.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
-      preferences.wheelchair().accessibility().enabled(),
-      preferences.wheelchair().accessibility().maxSlope(),
+      opt.preferences().wheelchair().accessibility().enabled(),
+      opt.preferences().wheelchair().accessibility().maxSlope(),
       serverContext.graph().getFareService(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
@@ -182,20 +180,19 @@ public class RoutingWorker {
   private static AdditionalSearchDays createAdditionalSearchDays(
     RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,
-    RoutingRequest request,
-    RoutingPreferences preferences
+    RoutingRequestAndPreferences opt
   ) {
-    var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
+    var searchDateTime = ZonedDateTime.ofInstant(opt.request().dateTime(), zoneId);
     var maxWindow = Duration.ofMinutes(
       raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
     );
 
     return new AdditionalSearchDays(
-      request.arriveBy(),
+      opt.request().arriveBy(),
       searchDateTime,
-      request.searchWindow(),
+      opt.request().searchWindow(),
       maxWindow,
-      preferences.system().maxJourneyDuration()
+      opt.preferences().system().maxJourneyDuration()
     );
   }
 
@@ -207,7 +204,7 @@ public class RoutingWorker {
    */
   private Instant filterOnLatestDepartureTime() {
     if (
-      !request.arriveBy() &&
+      !opt.request().arriveBy() &&
       raptorSearchParamsUsed != null &&
       raptorSearchParamsUsed.isSearchWindowSet() &&
       raptorSearchParamsUsed.isEarliestDepartureTimeSet()
@@ -226,7 +223,7 @@ public class RoutingWorker {
   ) {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      itineraries.addAll(DirectStreetRouter.route(serverContext, request, preferences));
+      itineraries.addAll(DirectStreetRouter.route(serverContext, opt));
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -244,9 +241,7 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      itineraries.addAll(
-        DirectFlexRouter.route(serverContext, request, preferences, additionalSearchDays)
-      );
+      itineraries.addAll(DirectFlexRouter.route(serverContext, opt, additionalSearchDays));
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -258,8 +253,7 @@ public class RoutingWorker {
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
-        request,
-        preferences,
+        opt,
         serverContext,
         transitSearchTimeZero,
         additionalSearchDays,
@@ -286,7 +280,7 @@ public class RoutingWorker {
     if (firstRemovedItinerary != null) {
       Instant swStartTime = searchStartTime()
         .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
-      boolean cropSWHead = request.doCropSearchWindowAtTail();
+      boolean cropSWHead = opt.request().doCropSearchWindowAtTail();
       Instant rmItineraryStartTime = firstRemovedItinerary.startTime().toInstant();
 
       return pagingSearchWindowAdjuster.decreaseSearchWindow(
@@ -298,7 +292,7 @@ public class RoutingWorker {
     }
     // (num-of-itineraries found <= numItineraries)  ->  increase or keep search-window
     else {
-      int nRequested = request.numItineraries();
+      int nRequested = opt.request().numItineraries();
       int nFound = (int) itineraries
         .stream()
         .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())

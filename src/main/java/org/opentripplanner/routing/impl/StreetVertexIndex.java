@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -183,13 +184,12 @@ public class StreetVertexIndex {
    */
   public Set<Vertex> getVerticesForLocation(
     GenericLocation location,
-    RoutingRequest options,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
     // Differentiate between driving and non-driving, as driving is not available from transit stops
-    TraverseMode nonTransitMode = getTraverseModeForLinker(options, preferences, endVertex);
+    TraverseMode nonTransitMode = getTraverseModeForLinker(opt, endVertex);
 
     if (nonTransitMode.isDriving()) {
       // Fetch coordinate from stop, if not given in request
@@ -217,7 +217,7 @@ public class StreetVertexIndex {
 
     // Check if coordinate is provided and connect it to graph
     if (location.getCoordinate() != null) {
-      return Set.of(createVertexFromLocation(location, options, preferences, endVertex, tempEdges));
+      return Set.of(createVertexFromLocation(location, opt, endVertex, tempEdges));
     }
 
     return null;
@@ -241,8 +241,7 @@ public class StreetVertexIndex {
    */
   public Vertex getVertexForLocationForTest(
     GenericLocation location,
-    RoutingRequest options,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -250,7 +249,7 @@ public class StreetVertexIndex {
     Coordinate coordinate = location.getCoordinate();
     if (coordinate != null) {
       //return getClosestVertex(loc, options, endVertex);
-      return createVertexFromLocation(location, options, preferences, endVertex, tempEdges);
+      return createVertexFromLocation(location, opt, endVertex, tempEdges);
     }
 
     return null;
@@ -342,8 +341,7 @@ public class StreetVertexIndex {
 
   private Vertex createVertexFromLocation(
     GenericLocation location,
-    RoutingRequest options,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -371,7 +369,7 @@ public class StreetVertexIndex {
       endVertex
     );
 
-    TraverseMode nonTransitMode = getTraverseModeForLinker(options, preferences, endVertex);
+    TraverseMode nonTransitMode = getTraverseModeForLinker(opt, endVertex);
 
     tempEdges.add(
       vertexLinker.linkVertexForRequest(
@@ -399,17 +397,18 @@ public class StreetVertexIndex {
   }
 
   private TraverseMode getTraverseModeForLinker(
-    RoutingRequest options,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean endVertex
   ) {
+    var request = opt.request();
+    var preferences = opt.preferences();
     TraverseMode nonTransitMode = TraverseMode.WALK;
     //It can be null in tests
-    if (options != null && preferences != null) {
-      TraverseModeSet modes = options.journey().streetSubRequestModes();
+    if (request != null && preferences != null) {
+      TraverseModeSet modes = request.journey().streetSubRequestModes();
       // for park and ride we will start in car mode and walk to the end vertex
       boolean parkAndRideDepart =
-        modes.getCar() && options.journey().rental().parkAndRide() && !endVertex;
+        modes.getCar() && request.journey().rental().parkAndRide() && !endVertex;
       boolean onlyCarAvailable = modes.getCar() && !(modes.getWalk() || modes.getBicycle());
       if (onlyCarAvailable || parkAndRideDepart) {
         nonTransitMode = TraverseMode.CAR;

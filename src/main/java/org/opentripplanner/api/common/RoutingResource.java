@@ -17,6 +17,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -710,7 +711,7 @@ public abstract class RoutingResource {
    *
    * @param queryParameters incoming request parameters
    */
-  protected Pair<RoutingRequest, RoutingPreferences> buildRequest(
+  protected RoutingRequestAndPreferences buildRequest(
     MultivaluedMap<String, String> queryParameters
   ) {
     RoutingRequest request = serverContext.defaultRoutingRequest();
@@ -1016,6 +1017,6 @@ public abstract class RoutingResource {
       }
     }
 
-    return Pair.of(request, preferences);
+    return new RoutingRequestAndPreferences(request, preferences);
   }
 }

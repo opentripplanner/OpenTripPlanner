@@ -17,6 +17,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
@@ -227,12 +228,12 @@ public class RoutingRequest implements Cloneable, Serializable {
   }
 
   // TODO: 2022-08-18 This probably should not be here
-  public Pair<RoutingRequest, RoutingPreferences> getStreetSearchRequestAndPreferences(
+  public RoutingRequestAndPreferences getStreetSearchRequestAndPreferences(
     StreetMode streetMode,
-    RoutingPreferences routingPreferences
+    RoutingRequestAndPreferences opt
   ) {
-    var streetRequest = this.clone();
-    var streetPreferences = routingPreferences.clone();
+    var streetRequest = opt.request().clone();
+    var streetPreferences = opt.preferences().clone();
     var journeyRequest = streetRequest.journey;
     journeyRequest.setStreetSubRequestModes(new TraverseModeSet());
 
@@ -287,7 +288,7 @@ public class RoutingRequest implements Cloneable, Serializable {
       }
     }
 
-    return Pair.of(streetRequest, streetPreferences);
+    return new RoutingRequestAndPreferences(streetRequest, streetPreferences);
   }
 
   /**

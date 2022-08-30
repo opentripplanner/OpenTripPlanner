@@ -29,6 +29,7 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -389,14 +390,16 @@ public class WalkableAreaBuilder {
     } else {
       mode = TraverseMode.CAR;
     }
-    RoutingRequest options = new RoutingRequest(mode);
-    RoutingPreferences preferences = new RoutingPreferences();
+    var options = new RoutingRequestAndPreferences(
+      new RoutingRequest(mode),
+      new RoutingPreferences()
+    );
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree spt = AStarBuilder
         .allDirections(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
-        .setContext(new RoutingContext(options, preferences, graph, vertex, null))
+        .setContext(new RoutingContext(options, graph, vertex, null))
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {

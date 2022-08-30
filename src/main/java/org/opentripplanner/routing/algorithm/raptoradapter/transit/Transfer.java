@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -37,17 +38,15 @@ public class Transfer {
     this.edges = null;
   }
 
-  public static Pair<RoutingRequest, RoutingPreferences> prepareTransferRoutingRequest(
-    RoutingRequest request,
-    RoutingPreferences preferences
+  public static RoutingRequestAndPreferences prepareTransferRoutingRequest(
+    RoutingRequestAndPreferences opt
   ) {
-    var requestAndPreferences = request.getStreetSearchRequestAndPreferences(
-      request.journey().transfer().mode(),
-      preferences
-    );
+    var requestAndPreferences = opt
+      .request()
+      .getStreetSearchRequestAndPreferences(opt.request().journey().transfer().mode(), opt);
 
-    var transferRequest = requestAndPreferences.getLeft();
-    var transferPreferences = requestAndPreferences.getRight();
+    var transferRequest = requestAndPreferences.request();
+    var transferPreferences = requestAndPreferences.preferences();
 
     transferRequest.setArriveBy(false);
     transferRequest.setDateTime(Instant.ofEpochSecond(0));
@@ -68,7 +67,9 @@ public class Transfer {
     bikePreferences.setSwitchTime(roundTo100(bikePreferences.switchTime()));
 
     // it's a record (immutable) so can be safely reused
-    transferPreferences.wheelchair().setAccessibility(preferences.wheelchair().accessibility());
+    transferPreferences
+      .wheelchair()
+      .setAccessibility(opt.preferences().wheelchair().accessibility());
 
     walkPreferences.setSpeed(roundToHalf(walkPreferences.speed()));
     bikePreferences.setSpeed(roundToHalf(bikePreferences.speed()));
@@ -85,7 +86,7 @@ public class Transfer {
     streetPreferences.setElevatorHopCost(roundTo100(streetPreferences.elevatorHopCost()));
     streetPreferences.setElevatorHopTime(roundTo100(streetPreferences.elevatorHopTime()));
 
-    return Pair.of(transferRequest, transferPreferences);
+    return new RoutingRequestAndPreferences(transferRequest, transferPreferences);
   }
 
   public List<Coordinate> getCoordinates() {
@@ -114,7 +115,7 @@ public class Transfer {
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(RoutingContext routingContext) {
-    RoutingPreferences routingPreferences = routingContext.pref;
+    RoutingPreferences routingPreferences = routingContext.opt.preferences();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / routingPreferences.walk().speed();
       return Optional.of(

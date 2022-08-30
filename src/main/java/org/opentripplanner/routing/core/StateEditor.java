@@ -29,7 +29,7 @@ public class StateEditor {
   /* CONSTRUCTORS */
 
   public StateEditor(RoutingContext routingContext, Vertex v) {
-    child = new State(v, routingContext.opt, routingContext.pref, routingContext);
+    child = new State(v, routingContext.opt, routingContext);
   }
 
   public StateEditor(State parent, Edge e) {

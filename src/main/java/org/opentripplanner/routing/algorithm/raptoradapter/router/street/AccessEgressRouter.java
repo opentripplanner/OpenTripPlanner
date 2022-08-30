@@ -35,26 +35,24 @@ public class AccessEgressRouter {
     StreetMode streetMode,
     boolean fromTarget
   ) {
-    final RoutingRequest rr = rctx.opt;
-    final RoutingPreferences pref = rctx.pref;
+    final RoutingRequest rr = rctx.opt.request();
     Set<Vertex> vertices = fromTarget != rr.arriveBy() ? rctx.toVertices : rctx.fromVertices;
 
     //TODO: Investigate why this is needed for flex
-    var requestAndPreferences = rr.getStreetSearchRequestAndPreferences(streetMode, pref);
-    var nearbyRequest = requestAndPreferences.getLeft();
-    var nearbyPreferences = requestAndPreferences.getRight();
+    var requestAndPreferences = rctx.opt
+      .request()
+      .getStreetSearchRequestAndPreferences(streetMode, rctx.opt);
 
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       rctx.graph,
       transitService,
-      nearbyPreferences.street().maxAccessEgressDuration(streetMode),
+      requestAndPreferences.preferences().street().maxAccessEgressDuration(streetMode),
       true
     );
     List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
       vertices,
       fromTarget,
-      nearbyRequest,
-      nearbyPreferences
+      requestAndPreferences
     );
 
     LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");

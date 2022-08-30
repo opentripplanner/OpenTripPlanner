@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -49,17 +50,16 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   }
 
   public RoutingRequestTransitDataProviderFilter(
-    RoutingRequest request,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     TransitService transitService
   ) {
     this(
-      request.journey().transfer().mode() == StreetMode.BIKE,
-      preferences.wheelchair().accessibility(),
-      preferences.transit().includePlannedCancellations(),
-      request.journey().transit().modes(),
-      request.journey().transit().bannedRoutes(transitService.getAllRoutes()),
-      request.journey().transit().bannedTrips()
+      opt.request().journey().transfer().mode() == StreetMode.BIKE,
+      opt.preferences().wheelchair().accessibility(),
+      opt.preferences().transit().includePlannedCancellations(),
+      opt.request().journey().transit().modes(),
+      opt.request().journey().transit().bannedRoutes(transitService.getAllRoutes()),
+      opt.request().journey().transit().bannedTrips()
     );
   }
 

@@ -66,7 +66,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     MeterRegistry meterRegistry,
     @Nullable TraverseVisitor traverseVisitor
   ) {
-    var defaultRoutingPreferences = routerConfig.routingPreferencesDefaults();
+    var defaultRoutingPreferences = routerConfig.routingRequestOptions().preferences();
 
     return new DefaultServerRequestContext(
       graph,
@@ -84,7 +84,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public RoutingRequest defaultRoutingRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
     if (routingRequest == null) {
-      routingRequest = routerConfig.routingRequestDefaults().copyWithDateTimeNow();
+      routingRequest = routerConfig.routingRequestOptions().request().copyWithDateTimeNow();
     }
     return routingRequest;
   }
@@ -92,7 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public RoutingPreferences defaultRoutingPreferences() {
     if (routingPreferences == null) {
-      routingPreferences = routerConfig.routingPreferencesDefaults().clone();
+      routingPreferences = routerConfig.routingRequestOptions().preferences().clone();
     }
 
     return routingPreferences;
@@ -103,7 +103,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
    */
   @Override
   public Locale defaultLocale() {
-    return routerConfig().routingRequestDefaults().locale();
+    return routerConfig().routingRequestOptions().request().locale();
   }
 
   @Override

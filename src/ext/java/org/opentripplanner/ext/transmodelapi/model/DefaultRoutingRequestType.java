@@ -3,22 +3,21 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 
 public class DefaultRoutingRequestType {
 
-  public final RoutingRequest request;
-  public final RoutingPreferences preferences;
+  public final RoutingRequestAndPreferences opt;
   public final GraphQLObjectType graphQLType;
 
-  public DefaultRoutingRequestType(RoutingRequest request, RoutingPreferences preferences) {
-    this.request = request;
-    this.preferences = preferences;
+  public DefaultRoutingRequestType(RoutingRequestAndPreferences opt) {
+    this.opt = opt;
     this.graphQLType = createGraphQLType();
   }
 
   private GraphQLObjectType createGraphQLType() {
+    var preferences = opt.preferences();
+    var request = opt.request();
     return GraphQLObjectType
       .newObject()
       .name("RoutingParameters")

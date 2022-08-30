@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -16,12 +17,12 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static Pair<RoutingRequest, RoutingPreferences> mapRoutingRequest(NodeAdapter c) {
+  public static RoutingRequestAndPreferences mapRoutingRequest(NodeAdapter c) {
     var dft = new RoutingRequest();
     var pref = new RoutingPreferences();
 
     if (c.isEmpty()) {
-      return Pair.of(dft, pref);
+      return new RoutingRequestAndPreferences(dft, pref);
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
@@ -321,7 +322,7 @@ public class RoutingRequestMapper {
           .getAgencyAndRouteIds()
       );
 
-    return Pair.of(request, preferences);
+    return new RoutingRequestAndPreferences(request, preferences);
   }
 
   private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {

@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -56,7 +57,7 @@ public class RaptorRequestTransferCache {
     private CacheKey(List<List<Transfer>> transfersByStopIndex, RoutingContext routingContext) {
       this.transfersByStopIndex = transfersByStopIndex;
       this.routingContext = routingContext;
-      this.options = new StreetRelevantOptions(routingContext.opt, routingContext.pref);
+      this.options = new StreetRelevantOptions(routingContext.opt);
     }
 
     @Override
@@ -110,8 +111,11 @@ public class RaptorRequestTransferCache {
     private final int bikeSwitchCost;
     private final int bikeSwitchTime;
 
-    public StreetRelevantOptions(RoutingRequest routingRequest, RoutingPreferences preferences) {
-      this.transferMode = routingRequest.journey().transfer().mode();
+    public StreetRelevantOptions(RoutingRequestAndPreferences requestAndPreferences) {
+      var request = requestAndPreferences.request();
+      var preferences = requestAndPreferences.preferences();
+
+      this.transferMode = request.journey().transfer().mode();
 
       this.optimize = preferences.bike().optimizeType();
       this.bikeTriangleSafetyFactor = preferences.bike().triangleSafetyFactor();

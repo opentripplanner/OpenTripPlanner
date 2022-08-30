@@ -68,11 +68,11 @@ public class PlannerResource extends RoutingResource {
     try {
       /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
       var requestAndPreferences = super.buildRequest(uriInfo.getQueryParameters());
-      request = requestAndPreferences.getLeft();
-      preferences = requestAndPreferences.getRight();
+      request = requestAndPreferences.request();
+      preferences = requestAndPreferences.preferences();
 
       // Route
-      res = serverContext.routingService().route(request, preferences);
+      res = serverContext.routingService().route(requestAndPreferences);
 
       // Map to API
       TripPlanMapper tripPlanMapper = new TripPlanMapper(

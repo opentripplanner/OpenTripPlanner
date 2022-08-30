@@ -10,6 +10,7 @@ import java.time.format.DateTimeParseException;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
@@ -41,8 +42,7 @@ public class RouterConfig implements Serializable {
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
   private final Duration streetRoutingTimeout;
-  private final RoutingRequest routingRequestDefaults;
-  private final RoutingPreferences routingPreferenceDefaults;
+  private final RoutingRequestAndPreferences opt;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
   private final VectorTileConfig vectorTileLayers;
@@ -56,9 +56,7 @@ public class RouterConfig implements Serializable {
     this.transmodelApi = new TransmodelAPIConfig(adapter.path("transmodelApi"));
     this.streetRoutingTimeout = parseStreetRoutingTimeout(adapter);
     this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
-    var mappingResult = mapRoutingRequest(adapter.path("routingDefaults"));
-    this.routingRequestDefaults = mappingResult.getLeft();
-    this.routingPreferenceDefaults = mappingResult.getRight();
+    this.opt = mapRoutingRequest(adapter.path("routingDefaults"));
     this.updatersParameters = new UpdatersConfig(adapter);
     this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
     this.flexConfig = new FlexConfig(adapter.path("flex"));
@@ -102,12 +100,8 @@ public class RouterConfig implements Serializable {
     return transmodelApi;
   }
 
-  public RoutingRequest routingRequestDefaults() {
-    return routingRequestDefaults;
-  }
-
-  public RoutingPreferences routingPreferencesDefaults() {
-    return routingPreferenceDefaults;
+  public RoutingRequestAndPreferences routingRequestOptions() {
+    return opt;
   }
 
   public RaptorTuningParameters raptorTuningParameters() {

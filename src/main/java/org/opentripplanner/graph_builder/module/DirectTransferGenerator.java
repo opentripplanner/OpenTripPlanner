@@ -13,6 +13,7 @@ import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
@@ -122,17 +123,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           RoutingPreferences transferPreferences = this.transferPreferences.get(i);
 
           var requestAndPreferences = Transfer.prepareTransferRoutingRequest(
-            transferProfile,
-            transferPreferences
+            new RoutingRequestAndPreferences(transferProfile, transferPreferences)
           );
-
-          var streetRequest = requestAndPreferences.getLeft();
-          var streetPreferences = requestAndPreferences.getRight();
 
           for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
             ts0,
-            streetRequest,
-            streetPreferences,
+            requestAndPreferences,
             false
           )) {
             // Skip the origin stop, loop transfers are not needed.
@@ -149,8 +145,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             // from Stops to AreaStops and between Stops are already covered above.
             for (NearbyStop sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(
               ts0,
-              streetRequest,
-              streetPreferences,
+              requestAndPreferences,
               true
             )) {
               // Skip the origin stop, loop transfers are not needed.

@@ -6,6 +6,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
@@ -20,31 +21,23 @@ public class DirectStreetRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
-    RoutingRequest request,
-    RoutingPreferences preferences
+    RoutingRequestAndPreferences opt
   ) {
+    var request = opt.request();
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
 
     var requestAndPreferences = request.getStreetSearchRequestAndPreferences(
       request.journey().direct().mode(),
-      preferences
+      opt
     );
 
-    var directRequest = requestAndPreferences.getLeft();
-    var directPreferences = requestAndPreferences.getRight();
+    var directPreferences = requestAndPreferences.preferences();
 
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        serverContext.graph(),
-        directRequest,
-        directPreferences
-      )
-    ) {
+    try (var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), opt)) {
       final RoutingContext routingContext = new RoutingContext(
-        directRequest,
-        directPreferences,
+        opt,
         serverContext.graph(),
         temporaryVertices
       );
@@ -84,7 +77,7 @@ public class DirectStreetRouter {
       routingContext.fromVertices.iterator().next().getCoordinate(),
       routingContext.toVertices.iterator().next().getCoordinate()
     );
-    return distance < calculateDistanceMaxLimit(routingContext.opt, routingContext.pref);
+    return distance < calculateDistanceMaxLimit(routingContext.opt);
   }
 
   /**
@@ -92,10 +85,9 @@ public class DirectStreetRouter {
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RoutingRequest.
    */
-  private static double calculateDistanceMaxLimit(
-    RoutingRequest request,
-    RoutingPreferences preferences
-  ) {
+  private static double calculateDistanceMaxLimit(RoutingRequestAndPreferences opt) {
+    var request = opt.request();
+    var preferences = opt.preferences();
     double distanceLimit;
     StreetMode mode = request.journey().direct().mode();
 

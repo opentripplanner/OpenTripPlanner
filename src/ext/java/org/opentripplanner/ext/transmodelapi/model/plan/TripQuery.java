@@ -21,6 +21,8 @@ public class TripQuery {
     GraphQLOutputType tripType,
     GqlUtil gqlUtil
   ) {
+    var request = routing.opt.request();
+    var preferences = routing.opt.preferences();
     return GraphQLFieldDefinition
       .newFieldDefinition()
       .name("trip")
@@ -145,7 +147,7 @@ public class TripQuery {
             "dateTime. See `timetableView` for use-cases where this parameter is relevant."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.request.arriveBy())
+          .defaultValue(request.arriveBy())
           .build()
       )
       .argument(
@@ -157,7 +159,7 @@ public class TripQuery {
             "the search, not implemented for the transit jet."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.preferences.wheelchair().accessibility().enabled())
+          .defaultValue(preferences.wheelchair().accessibility().enabled())
           .build()
       )
       .argument(
@@ -166,7 +168,7 @@ public class TripQuery {
           .name("ignoreRealtimeUpdates")
           .description("When true, realtime updates are ignored during this search.")
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.preferences.transit().ignoreRealtimeUpdates())
+          .defaultValue(preferences.transit().ignoreRealtimeUpdates())
           .build()
       )
       .argument(
@@ -177,7 +179,7 @@ public class TripQuery {
             "When true, service journeys cancelled in scheduled route data will be included during this search."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.preferences.transit().includePlannedCancellations())
+          .defaultValue(preferences.transit().includePlannedCancellations())
           .build()
       )
       .argument(
@@ -233,7 +235,7 @@ public class TripQuery {
           .name("walkSpeed")
           .description("The maximum walk speed along streets, in meters per second.")
           .type(Scalars.GraphQLFloat)
-          .defaultValue(routing.preferences.walk().speed())
+          .defaultValue(preferences.walk().speed())
           .build()
       )
       .argument(
@@ -244,7 +246,7 @@ public class TripQuery {
             "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
           )
           .type(Scalars.GraphQLFloat)
-          .defaultValue(routing.preferences.walk().reluctance())
+          .defaultValue(preferences.walk().reluctance())
           .build()
       )
       .argument(
@@ -258,7 +260,7 @@ public class TripQuery {
             "to avoid waiting."
           )
           .type(Scalars.GraphQLFloat)
-          .defaultValue(routing.preferences.transfer().waitReluctance())
+          .defaultValue(preferences.transfer().waitReluctance())
           .build()
       )
       .argument(
@@ -267,7 +269,7 @@ public class TripQuery {
           .name("bikeSpeed")
           .description("The maximum bike speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
-          .defaultValue(routing.preferences.bike().speed())
+          .defaultValue(preferences.bike().speed())
           .build()
       )
       .argument(
@@ -279,11 +281,11 @@ public class TripQuery {
             "searches -- defaults to " +
             enumValAsString(
               EnumTypes.BICYCLE_OPTIMISATION_METHOD,
-              routing.preferences.bike().optimizeType()
+              preferences.bike().optimizeType()
             )
           )
           .type(EnumTypes.BICYCLE_OPTIMISATION_METHOD)
-          .defaultValue(routing.preferences.bike().optimizeType())
+          .defaultValue(preferences.bike().optimizeType())
           .build()
       )
       .argument(
@@ -309,7 +311,7 @@ public class TripQuery {
             "rental trips."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.preferences.rental().useAvailabilityInformation())
+          .defaultValue(preferences.rental().useAvailabilityInformation())
           .build()
       )
       .argument(
@@ -330,7 +332,7 @@ public class TripQuery {
             "transferPenalty seconds, then that's what we'll return."
           )
           .type(Scalars.GraphQLInt)
-          .defaultValue(routing.preferences.transfer().cost())
+          .defaultValue(preferences.transfer().cost())
           .build()
       )
       .argument(
@@ -343,7 +345,7 @@ public class TripQuery {
             "This time is in addition to time it might take to walk between stops."
           )
           .type(Scalars.GraphQLInt)
-          .defaultValue(routing.preferences.transfer().slack())
+          .defaultValue(preferences.transfer().slack())
           .build()
       )
       .argument(
@@ -352,7 +354,7 @@ public class TripQuery {
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
-          .defaultValue(routing.preferences.transit().boardSlack())
+          .defaultValue(preferences.transit().boardSlack())
           .build()
       )
       .argument(
@@ -362,7 +364,7 @@ public class TripQuery {
           .description(
             TransportModeSlack.slackByGroupDescription(
               "boardSlack",
-              routing.preferences.transit().boardSlackForMode()
+              preferences.transit().boardSlackForMode()
             )
           )
           .type(TransportModeSlack.SLACK_LIST_INPUT_TYPE)
@@ -374,7 +376,7 @@ public class TripQuery {
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
-          .defaultValue(routing.preferences.transit().alightSlack())
+          .defaultValue(preferences.transit().alightSlack())
           .build()
       )
       .argument(
@@ -384,7 +386,7 @@ public class TripQuery {
           .description(
             TransportModeSlack.slackByGroupDescription(
               "alightSlack",
-              routing.preferences.transit().alightSlackForMode()
+              preferences.transit().alightSlackForMode()
             )
           )
           .type(TransportModeSlack.SLACK_LIST_INPUT_TYPE)
@@ -402,7 +404,7 @@ public class TripQuery {
             "this size. It does not make the search faster, as it did in OTP1. See also the " +
             "trip meta-data on how to implement paging."
           )
-          .defaultValue(routing.request.numItineraries())
+          .defaultValue(request.numItineraries())
           .type(Scalars.GraphQLInt)
           .build()
       )
@@ -415,7 +417,7 @@ public class TripQuery {
             "transfers is to set the `transferPenalty` parameter."
           )
           .type(Scalars.GraphQLInt)
-          .defaultValue(routing.preferences.transfer().maxTransfers())
+          .defaultValue(preferences.transfer().maxTransfers())
           .build()
       )
       .argument(
@@ -427,7 +429,7 @@ public class TripQuery {
             "instead of removing them. This is very convenient when tuning the filters."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.preferences.system().itineraryFilters().debug)
+          .defaultValue(preferences.system().itineraryFilters().debug)
           .build()
       )
       .argument(
@@ -438,12 +440,7 @@ public class TripQuery {
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
-          .type(
-            ItineraryFiltersInputType.create(
-              gqlUtil,
-              routing.preferences.system().itineraryFilters()
-            )
-          )
+          .type(ItineraryFiltersInputType.create(gqlUtil, preferences.system().itineraryFilters()))
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

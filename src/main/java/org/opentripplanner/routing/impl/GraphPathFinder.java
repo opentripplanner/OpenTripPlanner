@@ -63,16 +63,16 @@ public class GraphPathFinder {
       return null;
     }
 
-    RoutingRequest options = routingContext.opt;
-    RoutingPreferences preferences = routingContext.pref;
+    RoutingRequest request = routingContext.opt.request();
+    RoutingPreferences preferences = routingContext.opt.preferences();
 
-    if (options.journey().streetSubRequestModes().isTransit()) {
+    if (request.journey().streetSubRequestModes().isTransit()) {
       throw new UnsupportedOperationException("Transit search not supported");
     }
 
     AStarBuilder aStar = AStarBuilder
       .oneToOneMaxDuration(
-        preferences.street().maxDirectDuration(options.journey().direct().mode())
+        preferences.street().maxDirectDuration(request.journey().direct().mode())
       )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
@@ -85,7 +85,7 @@ public class GraphPathFinder {
       aStar.setTraverseVisitor(traverseVisitor);
     }
 
-    LOG.debug("rreq={}", options);
+    LOG.debug("rreq={}", request);
 
     long searchBeginTime = System.currentTimeMillis();
     LOG.debug("BEGIN SEARCH");
@@ -94,7 +94,7 @@ public class GraphPathFinder {
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-    paths.sort(preferences.street().pathComparator(options.arriveBy()));
+    paths.sort(preferences.street().pathComparator(request.arriveBy()));
     return paths;
   }
 
@@ -102,7 +102,7 @@ public class GraphPathFinder {
    * Try to find N paths through the Graph
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
-    RoutingRequest request = routingContext.opt;
+    RoutingRequest request = routingContext.opt.request();
     Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
 
     List<GraphPath> paths = getPaths(routingContext);

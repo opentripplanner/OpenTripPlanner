@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -73,16 +74,14 @@ public class TransmodelAPI {
   public static void setUp(
     TransmodelAPIParameters config,
     TransitModel transitModel,
-    RoutingRequest defaultRoutingRequest,
-    RoutingPreferences defaultRoutingPreferences
+    RoutingRequestAndPreferences defaultRequestAndPreferences
   ) {
     if (config.hideFeedId()) {
       TransitIdMapper.setupFixedFeedId(transitModel.getAgencies());
     }
     tracingHeaderTags = config.tracingHeaderTags();
     GqlUtil gqlUtil = new GqlUtil(transitModel.getTimeZone());
-    schema =
-      TransmodelGraphQLSchema.create(defaultRoutingRequest, defaultRoutingPreferences, gqlUtil);
+    schema = TransmodelGraphQLSchema.create(defaultRequestAndPreferences, gqlUtil);
   }
 
   /**

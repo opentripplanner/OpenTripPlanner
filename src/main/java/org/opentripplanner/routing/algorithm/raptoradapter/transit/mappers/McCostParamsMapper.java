@@ -8,6 +8,7 @@ import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
@@ -17,11 +18,12 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class McCostParamsMapper {
 
   public static McCostParams map(
-    RoutingRequest request,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     List<? extends DefaultTripPattern> patternIndex
   ) {
     McCostParamsBuilder builder = new McCostParamsBuilder();
+    var preferences = opt.preferences();
+    var request = opt.request();
 
     builder
       .transferCost(preferences.transfer().cost())

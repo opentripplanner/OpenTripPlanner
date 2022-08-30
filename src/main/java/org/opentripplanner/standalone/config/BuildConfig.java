@@ -391,14 +391,14 @@ public class BuildConfig {
           .path("transferRequests")
           .asList()
           .stream()
-          .map(n -> RoutingRequestMapper.mapRoutingRequest(n).getLeft())
+          .map(n -> RoutingRequestMapper.mapRoutingRequest(n).request())
           .toList();
       transferPreferences =
         c
           .path("transferRequests")
           .asList()
           .stream()
-          .map(n -> RoutingRequestMapper.mapRoutingRequest(n).getRight())
+          .map(n -> RoutingRequestMapper.mapRoutingRequest(n).preferences())
           .toList();
     } else {
       transferRequests = List.of(new RoutingRequest());

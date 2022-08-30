@@ -19,6 +19,7 @@ import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
@@ -109,10 +110,11 @@ public class NearbyStopFinder {
    */
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
-    RoutingRequest routingRequest,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean reverseDirection
   ) {
+    var routingRequest = opt.request();
+    var preferences = opt.preferences();
     /* Track the closest stop on each pattern passing nearby. */
     MinMap<TripPattern, NearbyStop> closestStopForPattern = new MinMap<>();
 
@@ -122,9 +124,8 @@ public class NearbyStopFinder {
     /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
     for (NearbyStop nearbyStop : findNearbyStops(
       vertex,
-      routingRequest.clone(),
-      // TODO: 2022-08-22 do we need to clone preferences as well?
-      preferences,
+      // TODO: 2022-08-30 this is ugly
+      new RoutingRequestAndPreferences(routingRequest.clone(), preferences.clone()),
       reverseDirection
     )) {
       StopLocation ts1 = nearbyStop.stop;
@@ -157,17 +158,11 @@ public class NearbyStopFinder {
    */
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
-    RoutingRequest routingRequest,
-    RoutingPreferences preferences,
+    RoutingRequestAndPreferences opt,
     boolean reverseDirection
   ) {
     if (useStreets) {
-      return findNearbyStopsViaStreets(
-        Set.of(vertex),
-        reverseDirection,
-        routingRequest,
-        preferences
-      );
+      return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, opt);
     } else {
       return findNearbyStopsViaDirectTransfers(vertex);
     }
@@ -184,18 +179,17 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RoutingRequest routingRequest,
-    RoutingPreferences preferences
+    RoutingRequestAndPreferences opt
   ) {
     List<NearbyStop> stopsFound = new ArrayList<>();
 
-    routingRequest.setArriveBy(reverseDirection);
+    opt.request().setArriveBy(reverseDirection);
 
     RoutingContext routingContext;
     if (!reverseDirection) {
-      routingContext = new RoutingContext(routingRequest, preferences, graph, originVertices, null);
+      routingContext = new RoutingContext(opt, graph, originVertices, null);
     } else {
-      routingContext = new RoutingContext(routingRequest, preferences, graph, null, originVertices);
+      routingContext = new RoutingContext(opt, graph, null, originVertices);
     }
 
     /* Add the origin vertices if they are stops */
@@ -206,19 +200,19 @@ public class NearbyStopFinder {
             tsv.getStop(),
             0,
             Collections.emptyList(),
-            new State(vertex, routingRequest, preferences, routingContext)
+            new State(vertex, opt, routingContext)
           )
         );
       }
     }
 
     // Return only the origin vertices if there are no valid street modes
-    if (!routingRequest.journey().streetSubRequestModes().isValid()) {
+    if (!opt.request().journey().streetSubRequestModes().isValid()) {
       return stopsFound;
     }
 
     ShortestPathTree spt = AStarBuilder
-      .allDirections(getSkipEdgeStrategy(reverseDirection, routingRequest))
+      .allDirections(getSkipEdgeStrategy(reverseDirection, opt.request()))
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
       .getShortestPathTree();

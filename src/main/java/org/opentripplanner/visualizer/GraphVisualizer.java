@@ -59,6 +59,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -456,25 +457,25 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // otherwise 'false' will clear trainish and busish
     if (transitCheckBox.isSelected()) modeSet.setTransit(true);
 
-    RoutingRequest options = new RoutingRequest(modeSet);
+    RoutingRequest request = new RoutingRequest(modeSet);
     RoutingPreferences preferences = new RoutingPreferences();
 
-    options.setArriveBy(arriveByCheckBox.isSelected());
+    request.setArriveBy(arriveByCheckBox.isSelected());
     preferences.walk().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
     // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
     preferences.bike().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
     // there should be a ui element for walk distance and optimize type
     preferences.bike().setOptimizeType(getSelectedOptimizeType());
-    options.setDateTime(when);
-    options.setFrom(LocationStringParser.fromOldStyleString(from));
-    options.setTo(LocationStringParser.fromOldStyleString(to));
+    request.setDateTime(when);
+    request.setFrom(LocationStringParser.fromOldStyleString(from));
+    request.setTo(LocationStringParser.fromOldStyleString(to));
     preferences.walk().setSpeed(Float.parseFloat(walkSpeed.getText()));
     preferences.bike().setSpeed(Float.parseFloat(bikeSpeed.getText()));
-    options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
+    request.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);
     System.out.println("\tModes: " + modeSet);
-    System.out.println("\tOptions: " + options);
+    System.out.println("\tOptions: " + request);
 
     // apply callback if the options call for it
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
@@ -484,8 +485,17 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, options, preferences)) {
-      var routingContext = new RoutingContext(options, preferences, graph, temporaryVertices);
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        new RoutingRequestAndPreferences(request, preferences)
+      )
+    ) {
+      var routingContext = new RoutingContext(
+        new RoutingRequestAndPreferences(request, preferences),
+        graph,
+        temporaryVertices
+      );
       List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");

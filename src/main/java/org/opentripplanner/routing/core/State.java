@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
@@ -47,9 +48,9 @@ public class State implements Cloneable {
   public State(RoutingContext rctx) {
     this(
       rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
-      rctx.opt.dateTime(),
+      rctx.opt.request().dateTime(),
       rctx,
-      StateData.getInitialStateData(rctx.opt, rctx.pref)
+      StateData.getInitialStateData(rctx.opt)
     );
   }
 
@@ -59,12 +60,16 @@ public class State implements Cloneable {
    */
   public State(
     Vertex vertex,
-    RoutingRequest opt,
-    RoutingPreferences pref,
+    RoutingRequestAndPreferences requestAndPreferences,
     RoutingContext routingContext
   ) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.dateTime(), routingContext, StateData.getInitialStateData(opt, pref));
+    this(
+      vertex,
+      requestAndPreferences.request().dateTime(),
+      routingContext,
+      StateData.getInitialStateData(requestAndPreferences)
+    );
   }
 
   /**
@@ -94,10 +99,9 @@ public class State implements Cloneable {
    * states must be created from a parent and associated with an edge.
    */
   public static Collection<State> getInitialStates(RoutingContext routingContext) {
-    RoutingRequest request = routingContext.opt;
-    RoutingPreferences preferences = routingContext.pref;
+    RoutingRequest request = routingContext.opt.request();
     Collection<State> states = new ArrayList<>();
-    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, preferences);
+    List<StateData> initialStateDatas = StateData.getInitialStateDatas(routingContext.opt);
     for (Vertex vertex : routingContext.fromVertices) {
       for (StateData stateData : initialStateDatas) {
         states.add(new State(vertex, request.dateTime(), routingContext, stateData));
@@ -423,7 +427,9 @@ public class State implements Cloneable {
     var reversedRequest = stateData.opt.reversedClone();
     var reversedPreferences = stateData.pref.clone();
     reversedPreferences.rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(reversedRequest, reversedPreferences);
+    var newStateData = StateData.getInitialStateData(
+      new RoutingRequestAndPreferences(reversedRequest, reversedPreferences)
+    );
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.

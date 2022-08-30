@@ -92,8 +92,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequestAndPreferences;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -124,20 +123,18 @@ public class TransmodelGraphQLSchema {
   private final Relay relay = new Relay();
 
   private TransmodelGraphQLSchema(
-    RoutingRequest defaultRequest,
-    RoutingPreferences defaultPreferences,
+    RoutingRequestAndPreferences requestAndPreferences,
     GqlUtil gqlUtil
   ) {
     this.gqlUtil = gqlUtil;
-    this.routing = new DefaultRoutingRequestType(defaultRequest, defaultPreferences);
+    this.routing = new DefaultRoutingRequestType(requestAndPreferences);
   }
 
   public static GraphQLSchema create(
-    RoutingRequest defaultRequest,
-    RoutingPreferences defaultPreferences,
+    RoutingRequestAndPreferences requestAndPreferences,
     GqlUtil qglUtil
   ) {
-    return new TransmodelGraphQLSchema(defaultRequest, defaultPreferences, qglUtil).create();
+    return new TransmodelGraphQLSchema(requestAndPreferences, qglUtil).create();
   }
 
   public GraphQLObjectType createPlanType(
@@ -1473,7 +1470,7 @@ public class TransmodelGraphQLSchema {
           .description("Get default routing parameters.")
           .withDirective(gqlUtil.timingData)
           .type(this.routing.graphQLType)
-          .dataFetcher(environment -> routing.request)
+          .dataFetcher(environment -> routing.opt.request())
           .build()
       )
       .field(
