@@ -146,22 +146,22 @@ public class Timetable implements Serializable {
    * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
-   * @return {@link TripTimesPatch} that contains a new copy of updated TripTimes after TripUpdate
-   * has been applied on TripTimes of trip with the id specified in the trip descriptor of the
-   * TripUpdate and a list of stop indices that have been skipped with the realtime update; null if
-   * something went wrong
+   * @return {@link Result<TripTimesPatch, UpdateError>} contains either a new copy of updated
+   * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
+   * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
+   * realtime update; or an error if something went wrong
    * <p>
    * TODO OTP2 - This method depend on GTFS RealTime classes. Refactor this so GTFS RT can do
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
    */
-  public Result<UpdateError, TripTimesPatch> createUpdatedTripTimes(
+  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimes(
     TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
-    Result<UpdateError, TripTimesPatch> generalError = Result.failure(
+    Result<TripTimesPatch, UpdateError> generalError = Result.failure(
       UpdateError.noTripId(UNKNOWN)
     );
     if (tripUpdate == null) {

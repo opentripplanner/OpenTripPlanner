@@ -9,7 +9,7 @@ class ResultTest {
 
   @Test
   public void success() {
-    Result<Exception, String> res = Result.success("hello");
+    Result<String, Exception> res = Result.success("hello");
     assertTrue(res.isSuccess());
     assertFalse(res.isFailure());
 
@@ -33,7 +33,7 @@ class ResultTest {
   @Test
   public void failure() {
     var msg = "An error happened";
-    Result<Exception, String> res = Result.failure(new RuntimeException(msg));
+    Result<String, Exception> res = Result.failure(new RuntimeException(msg));
 
     assertFalse(res.isSuccess());
     assertTrue(res.isFailure());

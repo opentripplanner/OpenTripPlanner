@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -69,7 +70,7 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     var tripUpdate = tripUpdateBuilder.build();
 
-    Result<UpdateError, TripTimesPatch> result = timetable.createUpdatedTripTimes(
+    Result<TripTimesPatch, UpdateError> result = timetable.createUpdatedTripTimes(
       tripUpdate,
       timeZone,
       serviceDate,
@@ -105,6 +106,8 @@ public class TimetableTest {
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
+
+    result.ifFailure(e -> assertEquals(UNKNOWN, e.errorType()));
   }
 
   @Test

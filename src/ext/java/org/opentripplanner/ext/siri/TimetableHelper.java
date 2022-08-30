@@ -688,10 +688,10 @@ public class TimetableHelper {
    * all trips in a timetable are from the same feed, which should always be the case.
    *
    * @param activity SIRI-VM VehicleActivity
-   * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
-   * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
+   * @return a Result with a copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
+   * with the id specified in the trip descriptor of the TripUpdate; a failed Result if something went wrong
    */
-  public static Result<UpdateError, TripTimes> createUpdatedTripTimes(
+  public static Result<TripTimes, UpdateError> createUpdatedTripTimes(
     Timetable timetable,
     VehicleActivityStructure activity,
     FeedScopedId tripId,

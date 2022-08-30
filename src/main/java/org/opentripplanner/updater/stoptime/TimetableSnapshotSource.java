@@ -472,7 +472,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    *
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @param tripDescriptor GTFS-RT TripDescriptor
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
   private Optional<UpdateError> validateAndHandleAddedTrip(
     final TripUpdate tripUpdate,
@@ -621,7 +621,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripDescriptor GTFS-RT TripDescriptor
    * @param stops          the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate    service date for added trip
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
   private Optional<UpdateError> handleAddedTrip(
     final TripUpdate tripUpdate,
@@ -716,7 +716,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param stops         list of stops corresponding to stop time updates
    * @param serviceDate   service date of trip
    * @param realTimeState real-time state of new trip
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
   private Optional<UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
@@ -906,7 +906,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    *
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @param tripDescriptor GTFS-RT TripDescriptor
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
   private Optional<UpdateError> validateAndHandleModifiedTrip(
     final TripUpdate tripUpdate,
@@ -974,7 +974,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripUpdate  GTFS-RT TripUpdate message
    * @param stops       the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate service date for modified trip
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
   private Optional<UpdateError> handleModifiedTrip(
     final Trip trip,

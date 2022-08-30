@@ -9,15 +9,15 @@ import javax.annotation.Nonnull;
  * <p>
  * It's very similar to the Either or Validation type found in functional programming languages.
  */
-public abstract class Result<E, T> {
+public abstract sealed class Result<T, E> {
 
   private Result() {}
 
-  public static <E, T> Result<E, T> failure(@Nonnull E failure) {
+  public static <T, E> Result<T, E> failure(@Nonnull E failure) {
     return new Failure<>(failure);
   }
 
-  public static <E, T> Result<E, T> success(@Nonnull T success) {
+  public static <T, E> Result<T, E> success(@Nonnull T success) {
     return new Success<>(success);
   }
 
@@ -83,7 +83,7 @@ public abstract class Result<E, T> {
     }
   }
 
-  private static class Failure<E, T> extends Result<E, T> {
+  private static final class Failure<T, E> extends Result<T, E> {
 
     private final E failure;
 
@@ -110,7 +110,7 @@ public abstract class Result<E, T> {
     }
   }
 
-  private static class Success<E, T> extends Result<E, T> {
+  private static final class Success<T, E> extends Result<T, E> {
 
     private final T success;
 
