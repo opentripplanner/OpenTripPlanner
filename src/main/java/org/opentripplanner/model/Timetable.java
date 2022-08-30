@@ -1,5 +1,8 @@
 package org.opentripplanner.model;
 
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
@@ -17,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
-import org.opentripplanner.common.model.ApplicationResult;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -152,13 +155,13 @@ public class Timetable implements Serializable {
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
    */
-  public ApplicationResult<UpdateError, TripTimesPatch> createUpdatedTripTimes(
+  public Result<UpdateError, TripTimesPatch> createUpdatedTripTimes(
     TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
-    ApplicationResult<UpdateError, TripTimesPatch> generalError = ApplicationResult.failure(
+    Result<UpdateError, TripTimesPatch> generalError = Result.failure(
       UpdateError.noTripId(UNKNOWN)
     );
     if (tripUpdate == null) {
@@ -177,7 +180,7 @@ public class Timetable implements Serializable {
     TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
       LOG.debug("TripDescriptor object has no TripId field");
-      ApplicationResult.failure(UpdateError.noTripId(UNKNOWN));
+      Result.failure(UpdateError.noTripId(UNKNOWN));
     }
 
     String tripId = tripDescriptor.getTripId();
@@ -187,9 +190,7 @@ public class Timetable implements Serializable {
     int tripIndex = getTripIndex(tripId);
     if (tripIndex == -1) {
       LOG.debug("tripId {} not found in pattern.", tripId);
-      return ApplicationResult.failure(
-        new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN)
-      );
+      return Result.failure(new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN));
     } else {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
@@ -201,7 +202,7 @@ public class Timetable implements Serializable {
     Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
     if (!updates.hasNext()) {
       LOG.warn("Won't apply zero-length trip update to trip {}.", tripId);
-      return ApplicationResult.failure(new UpdateError(feedScopedTripId, TOO_FEW_STOPS));
+      return Result.failure(new UpdateError(feedScopedTripId, TOO_FEW_STOPS));
     }
     StopTimeUpdate update = updates.next();
 
@@ -256,9 +257,7 @@ public class Timetable implements Serializable {
               delay = newTimes.getArrivalDelay(i);
             } else {
               LOG.error("Arrival time at index {} is erroneous.", i);
-              return ApplicationResult.failure(
-                new UpdateError(feedScopedTripId, UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME)
-              );
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME));
             }
           } else if (delay != null) {
             newTimes.updateArrivalDelay(i, delay);
@@ -281,9 +280,7 @@ public class Timetable implements Serializable {
               delay = newTimes.getDepartureDelay(i);
             } else {
               LOG.error("Departure time at index {} is erroneous.", i);
-              return ApplicationResult.failure(
-                new UpdateError(feedScopedTripId, UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME)
-              );
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME));
             }
           } else if (delay != null) {
             newTimes.updateDepartureDelay(i, delay);
@@ -305,7 +302,7 @@ public class Timetable implements Serializable {
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return ApplicationResult.failure(new UpdateError(feedScopedTripId, UNKNOWN));
+      return Result.failure(new UpdateError(feedScopedTripId, UNKNOWN));
     }
 
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
@@ -338,9 +335,7 @@ public class Timetable implements Serializable {
         tripId,
         invalidStopIndex.getAsInt()
       );
-      return ApplicationResult.failure(
-        new UpdateError(feedScopedTripId, UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES)
-      );
+      return Result.failure(new UpdateError(feedScopedTripId, NON_INCREASING_TRIP_TIMES));
     }
 
     if (tripUpdate.hasVehicle()) {
@@ -356,7 +351,7 @@ public class Timetable implements Serializable {
       "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
       tripId
     );
-    return ApplicationResult.success(new TripTimesPatch(newTimes, skippedStopIndices));
+    return Result.success(new TripTimesPatch(newTimes, skippedStopIndices));
   }
 
   /**

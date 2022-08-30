@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.common.model.ApplicationResult;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -69,7 +69,7 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     var tripUpdate = tripUpdateBuilder.build();
 
-    ApplicationResult<UpdateError, TripTimesPatch> result = timetable.createUpdatedTripTimes(
+    Result<UpdateError, TripTimesPatch> result = timetable.createUpdatedTripTimes(
       tripUpdate,
       timeZone,
       serviceDate,
