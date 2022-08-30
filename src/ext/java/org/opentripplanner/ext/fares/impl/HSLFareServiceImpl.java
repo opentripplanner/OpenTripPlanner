@@ -90,7 +90,7 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
         if (
           isSpecialRoute ||
           (
-            ruleSet.getRoutes().contains(leg.getRoute()) &&
+            ruleSet.getRoutes().contains(leg.getRoute().getId()) &&
             ruleSet.getContains().contains(leg.getFrom().stop.getFirstZoneAsString()) &&
             ruleSet.getContains().contains(leg.getTo().stop.getFirstZoneAsString())
           )
