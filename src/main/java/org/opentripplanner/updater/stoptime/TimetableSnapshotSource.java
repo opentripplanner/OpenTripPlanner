@@ -10,6 +10,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_VALID_STO
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
@@ -21,7 +22,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +34,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TripTimesPatch;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.I18NString;
@@ -295,7 +294,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case DUPLICATED -> UpdateError.noError();
+            case DUPLICATED -> UpdateError.of(tripId, UNKNOWN);
           };
 
         updateError.ifPresent(errors::add);
