@@ -24,7 +24,6 @@ import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRe
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.TicketType;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -587,7 +586,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Connection<NearbyStop>> stopsByRadius();
 
-    public DataFetcher<Iterable<TicketType>> ticketTypes();
+    public DataFetcher<Iterable<org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLTicketType>> ticketTypes();
 
     public DataFetcher<Trip> trip();
 

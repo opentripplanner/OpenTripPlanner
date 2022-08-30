@@ -1,12 +1,13 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.ext.legacygraphqlapi.model;
 
 import java.util.Set;
+import org.opentripplanner.routing.core.FareRuleSet;
 
-public class TicketType {
+public class LegacyGraphQLTicketType {
 
   FareRuleSet rs;
 
-  public TicketType(FareRuleSet rs) {
+  public LegacyGraphQLTicketType(FareRuleSet rs) {
     this.rs = rs;
   }
 
