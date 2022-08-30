@@ -286,7 +286,7 @@ public class TimetableSnapshot {
   /**
    * Clear all data of snapshot for the provided feed id
    *
-   * @param feedId feed id to clear the snapshop for
+   * @param feedId feed id to clear the snapshot for
    */
   public void clear(String feedId) {
     if (readOnly) {

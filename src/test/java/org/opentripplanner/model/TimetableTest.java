@@ -3,7 +3,6 @@ package org.opentripplanner.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
@@ -36,6 +35,7 @@ public class TimetableTest {
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static Timetable timetable;
   private static String feedId;
+  private static int trip_1_1_index;
 
   @BeforeAll
   public static void setUp() throws Exception {
@@ -51,6 +51,7 @@ public class TimetableTest {
 
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     timetable = pattern.getScheduledTimetable();
+    trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
   }
 
   @Test
@@ -83,8 +84,7 @@ public class TimetableTest {
   }
 
   @Test
-  public void update() {
-    int trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
+  public void badData() {
     TripUpdate tripUpdate;
     TripUpdate.Builder tripUpdateBuilder;
     StopTimeUpdate.Builder stopTimeUpdateBuilder;
@@ -105,15 +105,18 @@ public class TimetableTest {
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
     assertTrue(result.isFailure());
+  }
 
+  @Test
+  public void nonIncreasingTimes() {
     // update trip with non-increasing data
-    tripDescriptorBuilder = tripDescriptorBuilder("1.1");
-    tripUpdateBuilder = TripUpdate.newBuilder();
+    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    var tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
     stopTimeUpdateBuilder.setStopSequence(2);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
-    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setTime(
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 1)
     );
@@ -121,26 +124,29 @@ public class TimetableTest {
     stopTimeEventBuilder.setTime(
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 10, 0)
     );
-    tripUpdate = tripUpdateBuilder.build();
-    result =
-      timetable.createUpdatedTripTimes(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    var tripUpdate = tripUpdateBuilder.build();
+    var result = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
     assertTrue(result.isFailure());
 
-    //---
-    // update trip
-    tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+    result.ifFailure(e -> assertEquals(NON_INCREASING_TRIP_TIMES, e.errorType()));
+  }
 
-    tripUpdateBuilder = TripUpdate.newBuilder();
+  @Test
+  public void update() {
+    // update trip
+    var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
+
+    var tripUpdateBuilder = TripUpdate.newBuilder();
     tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
     stopTimeUpdateBuilder.setStopSequence(1);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
-    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setTime(
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
     );
@@ -148,15 +154,14 @@ public class TimetableTest {
     stopTimeEventBuilder.setTime(
       TestUtils.dateInSeconds("America/New_York", 2009, AUGUST, 7, 0, 2, 0)
     );
-    tripUpdate = tripUpdateBuilder.build();
+    var tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-    result =
-      timetable.createUpdatedTripTimes(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    var result = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
 
     assertTrue(result.isSuccess());
 
