@@ -3,8 +3,8 @@ package org.opentripplanner.routing.core;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
 /**
@@ -27,7 +27,7 @@ public class StateData implements Cloneable {
 
   protected CarPickupState carPickupState;
 
-  protected NewRouteRequest opt;
+  protected RoutingRequest opt;
   protected RoutingPreferences pref;
   protected RoutingContext rctx;
 
@@ -53,7 +53,7 @@ public class StateData implements Cloneable {
   protected boolean enteredNoThroughTrafficArea;
 
   /** Private constructor, use static methods to get a set of initial states. */
-  private StateData(NewRouteRequest options, RoutingPreferences preferences) {
+  private StateData(RoutingRequest options, RoutingPreferences preferences) {
     this.opt = options;
     this.pref = preferences;
 
@@ -73,7 +73,7 @@ public class StateData implements Cloneable {
    * Returns a set of initial StateDatas based on the options from the RoutingRequest
    */
   public static List<StateData> getInitialStateDatas(
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences
   ) {
     return getInitialStateDatas(options, preferences, false);
@@ -84,7 +84,7 @@ public class StateData implements Cloneable {
    * only a single state, which is considered the "base case"
    */
   public static StateData getInitialStateData(
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences
   ) {
     var stateDatas = getInitialStateDatas(options, preferences, true);
@@ -99,7 +99,7 @@ public class StateData implements Cloneable {
    *                         mostly in tests, which test a single State
    */
   private static List<StateData> getInitialStateDatas(
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences,
     boolean forceSingleState
   ) {

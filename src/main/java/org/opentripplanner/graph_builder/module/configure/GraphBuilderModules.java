@@ -36,7 +36,8 @@ import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFacto
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
@@ -213,7 +214,7 @@ public class GraphBuilderModules {
       graph,
       transitModel,
       issueStore,
-      config.maxTransferDurationSeconds * new RoutingRequest().walkSpeed
+      config.maxTransferDurationSeconds * new WalkPreferences().speed()
     );
   }
 

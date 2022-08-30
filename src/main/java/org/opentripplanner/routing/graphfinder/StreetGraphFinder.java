@@ -8,8 +8,8 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -76,7 +76,7 @@ public class StreetGraphFinder implements GraphFinder {
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
-    var rr = new NewRouteRequest(TraverseMode.WALK);
+    var rr = new RoutingRequest(TraverseMode.WALK);
     var pref = new RoutingPreferences();
 
     rr.setFrom(new GenericLocation(null, null, lat, lon));

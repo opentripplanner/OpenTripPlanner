@@ -54,9 +54,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
@@ -83,7 +82,7 @@ public class TravelTimeResource {
 
   private static final SimpleFeatureType contourSchema = makeContourSchema();
 
-  private final NewRouteRequest routingRequest;
+  private final RoutingRequest routingRequest;
 
   private final RoutingPreferences routingPreferences;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
@@ -242,7 +241,7 @@ public class TravelTimeResource {
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    final NewRouteRequest accessRequest = routingRequest.clone();
+    final RoutingRequest accessRequest = routingRequest.clone();
     final RoutingPreferences accessPreferences = routingPreferences.clone();
 
     accessPreferences.street().setMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration);
@@ -281,7 +280,7 @@ public class TravelTimeResource {
   }
 
   private Collection<AccessEgress> getAccess(
-    NewRouteRequest accessRequest,
+    RoutingRequest accessRequest,
     RoutingPreferences accessPreferences,
     TemporaryVerticesContainer temporaryVertices
   ) {

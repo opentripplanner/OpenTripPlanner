@@ -2,13 +2,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.DoubleFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RequestFunctions;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

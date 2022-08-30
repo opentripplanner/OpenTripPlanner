@@ -21,8 +21,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -49,7 +49,7 @@ public class RoutingWorker {
   public final DebugTimingAggregator debugTimingAggregator;
   public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
-  private final NewRouteRequest request;
+  private final RoutingRequest request;
   private final RoutingPreferences preferences;
   private final OtpServerRequestContext serverContext;
   /**
@@ -68,7 +68,7 @@ public class RoutingWorker {
 
   public RoutingWorker(
     OtpServerRequestContext serverContext,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     ZoneId zoneId
   ) {
@@ -182,7 +182,7 @@ public class RoutingWorker {
   private static AdditionalSearchDays createAdditionalSearchDays(
     RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);

@@ -3,9 +3,8 @@ package org.opentripplanner.routing.core;
 import java.util.Collections;
 import java.util.Set;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -23,7 +22,7 @@ public class RoutingContext {
 
   /* FINAL FIELDS */
 
-  public final NewRouteRequest opt;
+  public final RoutingRequest opt;
 
   public final RoutingPreferences pref;
 
@@ -44,7 +43,7 @@ public class RoutingContext {
    * Constructor that automatically computes origin/target from TemporaryVerticesContainer.
    */
   public RoutingContext(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     Graph graph,
     TemporaryVerticesContainer temporaryVertices
@@ -62,7 +61,7 @@ public class RoutingContext {
    * Constructor that takes to/from vertices as input.
    */
   public RoutingContext(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     Graph graph,
     Vertex from,
@@ -75,7 +74,7 @@ public class RoutingContext {
    * Constructor that takes sets of to/from vertices as input.
    */
   public RoutingContext(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     Graph graph,
     Set<Vertex> from,

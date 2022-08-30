@@ -1,7 +1,6 @@
-package org.opentripplanner.routing.api.request.refactor.preference;
+package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 
 public class VehicleRentalPreferences implements Cloneable, Serializable {

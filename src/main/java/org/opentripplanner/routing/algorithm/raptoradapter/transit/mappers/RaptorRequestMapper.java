@@ -9,8 +9,8 @@ import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -22,7 +22,7 @@ import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
-  private final NewRouteRequest request;
+  private final RoutingRequest request;
 
   private final RoutingPreferences preferences;
   private final Collection<? extends RaptorTransfer> accessPaths;
@@ -32,7 +32,7 @@ public class RaptorRequestMapper {
   private final MeterRegistry meterRegistry;
 
   private RaptorRequestMapper(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
@@ -50,7 +50,7 @@ public class RaptorRequestMapper {
   }
 
   public static RaptorRequest<TripSchedule> mapRequest(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,

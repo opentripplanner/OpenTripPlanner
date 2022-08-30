@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -60,7 +59,7 @@ public class State implements Cloneable {
    */
   public State(
     Vertex vertex,
-    NewRouteRequest opt,
+    RoutingRequest opt,
     RoutingPreferences pref,
     RoutingContext routingContext
   ) {
@@ -95,7 +94,7 @@ public class State implements Cloneable {
    * states must be created from a parent and associated with an edge.
    */
   public static Collection<State> getInitialStates(RoutingContext routingContext) {
-    NewRouteRequest request = routingContext.opt;
+    RoutingRequest request = routingContext.opt;
     RoutingPreferences preferences = routingContext.pref;
     Collection<State> states = new ArrayList<>();
     List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, preferences);
@@ -270,7 +269,7 @@ public class State implements Cloneable {
     return this;
   }
 
-  public NewRouteRequest getOptions() {
+  public RoutingRequest getOptions() {
     return stateData.opt;
   }
 

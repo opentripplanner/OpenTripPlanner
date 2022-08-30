@@ -17,9 +17,8 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
@@ -63,7 +62,7 @@ public class PlannerResource extends RoutingResource {
 
     // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
     TripPlannerResponse response = new TripPlannerResponse(uriInfo);
-    NewRouteRequest request = null;
+    RoutingRequest request = null;
     RoutingPreferences preferences = null;
     RoutingResponse res = null;
     try {
@@ -114,7 +113,7 @@ public class PlannerResource extends RoutingResource {
 
   private void logRequest(
     Request grizzlyRequest,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     OtpServerRequestContext serverContext,
     RoutingResponse res

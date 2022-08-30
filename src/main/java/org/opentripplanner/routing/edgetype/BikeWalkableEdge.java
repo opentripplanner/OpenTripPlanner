@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;

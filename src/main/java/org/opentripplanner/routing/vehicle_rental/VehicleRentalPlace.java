@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.vehicle_rental;
 
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
-import org.opentripplanner.routing.api.request.refactor.request.VehicleRentalRequest;
+import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

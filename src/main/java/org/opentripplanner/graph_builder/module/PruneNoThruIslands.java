@@ -16,12 +16,10 @@ import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -319,7 +317,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
-    NewRouteRequest options = new NewRouteRequest(traverseMode);
+    RoutingRequest options = new RoutingRequest(traverseMode);
     RoutingPreferences preferences = new RoutingPreferences();
 
     for (Vertex gv : graph.getVertices()) {

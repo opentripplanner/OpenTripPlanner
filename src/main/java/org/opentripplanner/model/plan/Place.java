@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
@@ -128,7 +128,7 @@ public class Place {
 
   public static Place forVehicleParkingEntrance(
     VehicleParkingEntranceVertex vertex,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences
   ) {
     TraverseMode traverseMode = null;

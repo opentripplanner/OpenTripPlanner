@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.refactor.preference;
+package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 

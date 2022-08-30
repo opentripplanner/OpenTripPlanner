@@ -19,8 +19,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -50,7 +50,7 @@ public class RaptorPathToItineraryMapper {
 
   private final TransitLayer transitLayer;
 
-  private final NewRouteRequest request;
+  private final RoutingRequest request;
 
   private final RoutingPreferences preferences;
 
@@ -71,7 +71,7 @@ public class RaptorPathToItineraryMapper {
     TransitService transitService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences
   ) {
     this.graph = graph;

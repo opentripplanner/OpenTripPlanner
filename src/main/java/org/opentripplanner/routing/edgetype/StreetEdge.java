@@ -18,9 +18,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -403,7 +402,7 @@ public class StreetEdge
 
   @Override
   public State traverse(State s0) {
-    final NewRouteRequest options = s0.getOptions();
+    final RoutingRequest options = s0.getOptions();
     final RoutingPreferences preferences = s0.getPreferences();
     final StateEditor editor;
 
@@ -969,7 +968,7 @@ public class StreetEdge
    */
   private StateEditor doTraverse(
     State s0,
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences,
     TraverseMode traverseMode,
     boolean walkingBike
@@ -1022,7 +1021,7 @@ public class StreetEdge
     StreetEdge backPSE;
     if (backEdge instanceof StreetEdge) {
       backPSE = (StreetEdge) backEdge;
-      NewRouteRequest backOptions = s0.getOptions();
+      RoutingRequest backOptions = s0.getOptions();
       RoutingPreferences backPreferences = s0.getPreferences();
       double backSpeed = backPSE.calculateSpeed(backPreferences, backMode, backWalkingBike);
       final double realTurnCost; // Units are seconds.

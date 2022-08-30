@@ -18,8 +18,8 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -183,7 +183,7 @@ public class StreetVertexIndex {
    */
   public Set<Vertex> getVerticesForLocation(
     GenericLocation location,
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
@@ -241,7 +241,7 @@ public class StreetVertexIndex {
    */
   public Vertex getVertexForLocationForTest(
     GenericLocation location,
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
@@ -342,7 +342,7 @@ public class StreetVertexIndex {
 
   private Vertex createVertexFromLocation(
     GenericLocation location,
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
@@ -399,7 +399,7 @@ public class StreetVertexIndex {
   }
 
   private TraverseMode getTraverseModeForLinker(
-    NewRouteRequest options,
+    RoutingRequest options,
     RoutingPreferences preferences,
     boolean endVertex
   ) {

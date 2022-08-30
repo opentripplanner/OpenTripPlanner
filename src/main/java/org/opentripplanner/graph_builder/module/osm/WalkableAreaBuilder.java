@@ -29,9 +29,8 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -390,7 +389,7 @@ public class WalkableAreaBuilder {
     } else {
       mode = TraverseMode.CAR;
     }
-    NewRouteRequest options = new NewRouteRequest(mode);
+    RoutingRequest options = new RoutingRequest(mode);
     RoutingPreferences preferences = new RoutingPreferences();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {

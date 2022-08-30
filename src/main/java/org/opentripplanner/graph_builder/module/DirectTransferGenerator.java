@@ -13,9 +13,8 @@ import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -43,7 +42,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final Duration radiusByDuration;
 
-  private final List<NewRouteRequest> transferRequests;
+  private final List<RoutingRequest> transferRequests;
   private final List<RoutingPreferences> transferPreferences;
   private final Graph graph;
   private final TransitModel transitModel;
@@ -54,7 +53,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransitModel transitModel,
     DataImportIssueStore issueStore,
     Duration radiusByDuration,
-    List<NewRouteRequest> transferRequests,
+    List<RoutingRequest> transferRequests,
     List<RoutingPreferences> transferPreferences
   ) {
     // TODO: 2022-08-22 figure out what to do with it
@@ -119,7 +118,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (int i = 0; i < transferRequests.size(); i++) {
-          NewRouteRequest transferProfile = transferRequests.get(i);
+          RoutingRequest transferProfile = transferRequests.get(i);
           RoutingPreferences transferPreferences = this.transferPreferences.get(i);
 
           var requestAndPreferences = Transfer.prepareTransferRoutingRequest(

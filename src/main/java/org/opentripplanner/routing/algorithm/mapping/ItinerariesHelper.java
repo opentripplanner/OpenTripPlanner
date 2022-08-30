@@ -5,10 +5,7 @@ import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.preference.WheelchairPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class ItinerariesHelper {

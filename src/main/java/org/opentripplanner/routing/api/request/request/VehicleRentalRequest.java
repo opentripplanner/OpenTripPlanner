@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.refactor.request;
+package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
 import java.util.HashSet;

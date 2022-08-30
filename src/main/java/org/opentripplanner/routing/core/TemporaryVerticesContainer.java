@@ -11,9 +11,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -33,14 +32,14 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 public class TemporaryVerticesContainer implements AutoCloseable {
 
   private final Graph graph;
-  private final NewRouteRequest opt;
+  private final RoutingRequest opt;
   private final Set<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
 
   public TemporaryVerticesContainer(
     Graph graph,
-    NewRouteRequest opt,
+    RoutingRequest opt,
     RoutingPreferences preferences
   ) {
     this.tempEdges = new HashSet<>();

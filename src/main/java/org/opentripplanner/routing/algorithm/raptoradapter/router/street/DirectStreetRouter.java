@@ -7,8 +7,8 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -20,7 +20,7 @@ public class DirectStreetRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences
   ) {
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
@@ -93,7 +93,7 @@ public class DirectStreetRouter {
    * RoutingRequest.
    */
   private static double calculateDistanceMaxLimit(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences
   ) {
     double distanceLimit;

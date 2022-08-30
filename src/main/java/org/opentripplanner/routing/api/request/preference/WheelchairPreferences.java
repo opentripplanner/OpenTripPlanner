@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.refactor.preference;
+package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import javax.annotation.Nonnull;

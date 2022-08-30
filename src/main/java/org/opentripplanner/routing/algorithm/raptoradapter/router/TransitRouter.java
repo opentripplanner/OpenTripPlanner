@@ -20,8 +20,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Routi
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -41,7 +41,7 @@ public class TransitRouter {
 
   public static final int NOT_SET = -1;
 
-  private final NewRouteRequest request;
+  private final RoutingRequest request;
   private final RoutingPreferences preferences;
   private final OtpServerRequestContext serverContext;
   private final DebugTimingAggregator debugTimingAggregator;
@@ -49,7 +49,7 @@ public class TransitRouter {
   private final AdditionalSearchDays additionalSearchDays;
 
   private TransitRouter(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     OtpServerRequestContext serverContext,
     ZonedDateTime transitSearchTimeZero,
@@ -65,7 +65,7 @@ public class TransitRouter {
   }
 
   public static TransitRouterResult route(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     OtpServerRequestContext serverContext,
     ZonedDateTime transitSearchTimeZero,

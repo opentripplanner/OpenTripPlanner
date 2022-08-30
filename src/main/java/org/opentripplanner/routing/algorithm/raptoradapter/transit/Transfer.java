@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.prefs.Preferences;
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -38,8 +37,8 @@ public class Transfer {
     this.edges = null;
   }
 
-  public static Pair<NewRouteRequest, RoutingPreferences> prepareTransferRoutingRequest(
-    NewRouteRequest request,
+  public static Pair<RoutingRequest, RoutingPreferences> prepareTransferRoutingRequest(
+    RoutingRequest request,
     RoutingPreferences preferences
   ) {
     var requestAndPreferences = request.getStreetSearchRequestAndPreferences(

@@ -59,9 +59,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -457,7 +456,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     // otherwise 'false' will clear trainish and busish
     if (transitCheckBox.isSelected()) modeSet.setTransit(true);
 
-    NewRouteRequest options = new NewRouteRequest(modeSet);
+    RoutingRequest options = new RoutingRequest(modeSet);
     RoutingPreferences preferences = new RoutingPreferences();
 
     options.setArriveBy(arriveByCheckBox.isSelected());

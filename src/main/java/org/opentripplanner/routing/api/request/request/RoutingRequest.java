@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.refactor.request;
+package org.opentripplanner.routing.api.request.request;
 
 import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 
@@ -17,9 +17,8 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -31,16 +30,15 @@ import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO: 2022-08-18 rename class when done
-public class NewRouteRequest implements Cloneable, Serializable {
+public class RoutingRequest implements Cloneable, Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NewRouteRequest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
 
   /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
   /**
    * How close to do you have to be to the start or end to be considered "close".
    *
-   * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
+   * @see org.opentripplanner.routing.api.request.RoutingRequest#isCloseToStartOrEnd(Vertex)
    * @see DominanceFunction#betterOrEqualAndComparable(State, State)
    */
   private static final int MAX_CLOSENESS_METERS = 500;
@@ -152,18 +150,18 @@ public class NewRouteRequest implements Cloneable, Serializable {
   @Deprecated
   private FeedScopedId startingTransitTripId;
 
-  public NewRouteRequest() {
+  public RoutingRequest() {
     // So that they are never null.
     from = new GenericLocation(null, null);
     to = new GenericLocation(null, null);
   }
 
-  public NewRouteRequest(TraverseMode mode) {
+  public RoutingRequest(TraverseMode mode) {
     this();
     this.journey.setStreetSubRequestModes(new TraverseModeSet(mode));
   }
 
-  public NewRouteRequest(TraverseModeSet modeSet) {
+  public RoutingRequest(TraverseModeSet modeSet) {
     this();
     this.journey.setStreetSubRequestModes(modeSet);
   }
@@ -229,7 +227,7 @@ public class NewRouteRequest implements Cloneable, Serializable {
   }
 
   // TODO: 2022-08-18 This probably should not be here
-  public Pair<NewRouteRequest, RoutingPreferences> getStreetSearchRequestAndPreferences(
+  public Pair<RoutingRequest, RoutingPreferences> getStreetSearchRequestAndPreferences(
     StreetMode streetMode,
     RoutingPreferences routingPreferences
   ) {
@@ -303,7 +301,7 @@ public class NewRouteRequest implements Cloneable, Serializable {
    * <p>
    * If you encounter a case of this, you can adjust this code to take this into account.
    *
-   * @see NewRouteRequest#MAX_CLOSENESS_METERS
+   * @see RoutingRequest#MAX_CLOSENESS_METERS
    * @see DominanceFunction#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {
@@ -332,7 +330,7 @@ public class NewRouteRequest implements Cloneable, Serializable {
     return env;
   }
 
-  public NewRouteRequest reversedClone() {
+  public RoutingRequest reversedClone() {
     var request = this.clone();
     request.setArriveBy(!request.arriveBy);
 
@@ -343,12 +341,12 @@ public class NewRouteRequest implements Cloneable, Serializable {
     this.journey = journey;
   }
 
-  public NewRouteRequest clone() {
+  public RoutingRequest clone() {
     try {
       // TODO: 2022-08-25 there are some fields which will not be cloned in proper way
       // but that's how it was implemented before so I'm leaving it like that
 
-      var clone = (NewRouteRequest) super.clone();
+      var clone = (RoutingRequest) super.clone();
       clone.setJourney(this.journey().clone());
 
       return clone;
@@ -358,7 +356,7 @@ public class NewRouteRequest implements Cloneable, Serializable {
     }
   }
 
-  public NewRouteRequest copyWithDateTimeNow() {
+  public RoutingRequest copyWithDateTimeNow() {
     var request = clone();
     request.setDateTime(Instant.now());
     return request;

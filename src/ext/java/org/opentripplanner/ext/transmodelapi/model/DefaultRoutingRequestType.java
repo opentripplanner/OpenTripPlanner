@@ -3,16 +3,16 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 
 public class DefaultRoutingRequestType {
 
-  public final NewRouteRequest request;
+  public final RoutingRequest request;
   public final RoutingPreferences preferences;
   public final GraphQLObjectType graphQLType;
 
-  public DefaultRoutingRequestType(NewRouteRequest request, RoutingPreferences preferences) {
+  public DefaultRoutingRequestType(RoutingRequest request, RoutingPreferences preferences) {
     this.request = request;
     this.preferences = preferences;
     this.graphQLType = createGraphQLType();

@@ -2,9 +2,8 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -82,7 +81,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       return null;
     }
 
-    NewRouteRequest req = s0.getOptions();
+    RoutingRequest req = s0.getOptions();
     RoutingPreferences pref = s0.getPreferences();
 
     // Do not check here whether any transit modes are selected. A check for the presence of
@@ -182,7 +181,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return transitEntityVertex;
   }
 
-  boolean isLeavingStreetNetwork(NewRouteRequest req) {
+  boolean isLeavingStreetNetwork(RoutingRequest req) {
     return (req.arriveBy() ? fromv : tov) == getTransitEntityVertex();
   }
 }

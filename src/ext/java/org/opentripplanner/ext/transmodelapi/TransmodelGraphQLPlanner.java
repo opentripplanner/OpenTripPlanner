@@ -24,8 +24,8 @@ import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -46,7 +46,7 @@ public class TransmodelGraphQLPlanner {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
     OtpServerRequestContext serverContext = ctx.getServerContext();
-    NewRouteRequest request = null;
+    RoutingRequest request = null;
     RoutingPreferences preferences = null;
     try {
       var requestAndPreferences = createRequest(environment);
@@ -91,12 +91,12 @@ public class TransmodelGraphQLPlanner {
     return new GenericLocation(name, stopId, lat, lon);
   }
 
-  private Pair<NewRouteRequest, RoutingPreferences> createRequest(
+  private Pair<RoutingRequest, RoutingPreferences> createRequest(
     DataFetchingEnvironment environment
   ) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
-    NewRouteRequest request = serverContext.defaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
     RoutingPreferences preferences = serverContext.defaultRoutingPreferences();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);

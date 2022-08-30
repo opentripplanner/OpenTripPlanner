@@ -5,11 +5,10 @@ import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -50,7 +49,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   }
 
   public RoutingRequestTransitDataProviderFilter(
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     TransitService transitService
   ) {

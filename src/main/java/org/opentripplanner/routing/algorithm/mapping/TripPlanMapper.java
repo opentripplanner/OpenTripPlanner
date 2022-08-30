@@ -6,8 +6,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -17,7 +16,7 @@ public class TripPlanMapper {
   /** This is a utility class with static method only. */
   private TripPlanMapper() {}
 
-  public static TripPlan mapTripPlan(NewRouteRequest request, List<Itinerary> itineraries) {
+  public static TripPlan mapTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
     Place from;
     Place to;
 

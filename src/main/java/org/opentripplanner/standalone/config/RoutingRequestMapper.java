@@ -5,8 +5,8 @@ import static org.opentripplanner.standalone.config.WheelchairAccessibilityReque
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
@@ -16,8 +16,8 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static Pair<NewRouteRequest, RoutingPreferences> mapRoutingRequest(NodeAdapter c) {
-    var dft = new NewRouteRequest();
+  public static Pair<RoutingRequest, RoutingPreferences> mapRoutingRequest(NodeAdapter c) {
+    var dft = new RoutingRequest();
     var pref = new RoutingPreferences();
 
     if (c.isEmpty()) {
@@ -25,7 +25,7 @@ public class RoutingRequestMapper {
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
-    var request = new NewRouteRequest();
+    var request = new RoutingRequest();
     var preferences = new RoutingPreferences();
     var vehicleRental = request.journey().rental();
     var vehicleParking = request.journey().parking();
@@ -163,7 +163,10 @@ public class RoutingRequestMapper {
       .setIgnoreRealtimeUpdates(
         c.asBoolean("ignoreRealtimeUpdates", preferences.transit().ignoreRealtimeUpdates())
       );
-    request.journey().parking().setAllowPickup(c.asBoolean("kissAndRide", request.journey().parking().allowPickup()));
+    request
+      .journey()
+      .parking()
+      .setAllowPickup(c.asBoolean("kissAndRide", request.journey().parking().allowPickup()));
 
     request.setLocale(c.asLocale("locale", dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here

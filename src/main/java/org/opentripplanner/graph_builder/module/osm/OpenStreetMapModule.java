@@ -43,7 +43,7 @@ import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;

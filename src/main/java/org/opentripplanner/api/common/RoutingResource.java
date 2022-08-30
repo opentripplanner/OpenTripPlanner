@@ -17,8 +17,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -710,10 +710,10 @@ public abstract class RoutingResource {
    *
    * @param queryParameters incoming request parameters
    */
-  protected Pair<NewRouteRequest, RoutingPreferences> buildRequest(
+  protected Pair<RoutingRequest, RoutingPreferences> buildRequest(
     MultivaluedMap<String, String> queryParameters
   ) {
-    NewRouteRequest request = serverContext.defaultRoutingRequest();
+    RoutingRequest request = serverContext.defaultRoutingRequest();
     RoutingPreferences preferences = serverContext.defaultRoutingPreferences();
 
     // The routing request should already contain defaults, which are set when it is initialized or

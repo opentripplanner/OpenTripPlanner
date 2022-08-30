@@ -8,8 +8,8 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.refactor.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.refactor.request.NewRouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -19,7 +19,7 @@ public class DirectFlexRouter {
 
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
-    NewRouteRequest request,
+    RoutingRequest request,
     RoutingPreferences preferences,
     AdditionalSearchDays additionalSearchDays
   ) {

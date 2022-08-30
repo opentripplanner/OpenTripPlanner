@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.refactor.request;
+package org.opentripplanner.routing.api.request.request;
 
 import java.time.Duration;
 import org.opentripplanner.model.GenericLocation;

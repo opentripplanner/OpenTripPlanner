@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.refactor.request.JourneyRequest;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;

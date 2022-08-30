@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
