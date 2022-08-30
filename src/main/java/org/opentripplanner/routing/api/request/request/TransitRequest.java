@@ -26,8 +26,8 @@ public class TransitRequest implements Cloneable, Serializable {
   private Set<FeedScopedId> bannedTrips = Set.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
 
-  // TODO OTP2 - The methods in this class perform domain specific functionality and should be moved 
-  //           - outside this class. Move to mapper, service or supporting class. 
+  // TODO OTP2 - The methods in this class perform domain specific functionality and should be moved
+  //           - outside this class. Move to mapper, service or supporting class.
   public Set<FeedScopedId> bannedRoutes(Collection<Route> routes) {
     if (
       bannedRoutes.isEmpty() &&
