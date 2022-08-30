@@ -432,10 +432,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
 
     if (result.isFailure()) {
-      return Optional.of((UpdateError) result.value());
+      return Optional.of(result.failureValue());
     }
 
-    var tripTimesPatch = (TripTimesPatch) result.value();
+    var tripTimesPatch = result.successValue();
 
     List<Integer> skippedStopIndices = tripTimesPatch.getSkippedStopIndices();
 

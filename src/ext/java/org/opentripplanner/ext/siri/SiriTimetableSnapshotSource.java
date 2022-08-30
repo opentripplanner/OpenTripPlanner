@@ -465,11 +465,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       transitModel::getStopLocationById
     );
     if (updatedTripTimes.isFailure()) {
-      return Optional.of((UpdateError) updatedTripTimes.value());
+      return Optional.of(updatedTripTimes.failureValue());
+    } else {
+      return buffer.update(pattern, updatedTripTimes.successValue(), serviceDate);
     }
-
-    // return success
-    return buffer.update(pattern, (TripTimes) updatedTripTimes.value(), serviceDate);
   }
 
   /**

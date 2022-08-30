@@ -25,15 +25,32 @@ public abstract class Result<L, R> {
    * Get the value contained with an erased type. If you want to use the typed version of the value
    * use {@link Result#ifFailure(Consumer)} or  {@link Result#ifSuccess(Consumer)}}.
    */
-  public abstract Object value();
+  protected abstract Object value();
 
   /**
-   * If the type contained is of the success type.
+   * If the value contained is failure return it cast to the correct type.
+   * <p>
+   * If it is a success, this method throws an exception.
+   */
+  public L failureValue() {
+    if (isFailure()) {
+      return (L) value();
+    } else {
+      throw new RuntimeException(
+        "Value %s is not a failure. Check isFailure() before calling failureValue().".formatted(
+            value()
+          )
+      );
+    }
+  }
+
+  /**
+   * If the type contained is a success.
    */
   public abstract boolean isSuccess();
 
   /**
-   * If the type contained is of the failure type.
+   * If the type contained is a failure.
    */
   public boolean isFailure() {
     return !isSuccess();
@@ -49,6 +66,23 @@ public abstract class Result<L, R> {
    */
   public abstract void ifFailure(Consumer<L> func);
 
+  /**
+   * If the value contained is success return it cast to the correct type.
+   * <p>
+   * If it is a failure, this method throws an exception.
+   */
+  public R successValue() {
+    if (isSuccess()) {
+      return (R) value();
+    } else {
+      throw new RuntimeException(
+        "Value %s is not a success. Check isSuccess() before calling successValue().".formatted(
+            value()
+          )
+      );
+    }
+  }
+
   private static class Failure<L, R> extends Result<L, R> {
 
     private final L failure;
@@ -58,7 +92,7 @@ public abstract class Result<L, R> {
       this.failure = failure;
     }
 
-    public L value() {
+    protected L value() {
       return failure;
     }
 
@@ -85,7 +119,7 @@ public abstract class Result<L, R> {
       this.success = success;
     }
 
-    public R value() {
+    protected R value() {
       return success;
     }
 

@@ -275,7 +275,7 @@ public class TimetableSnapshotTest {
         BackwardsDelayPropagationType.REQUIRED_NO_DATA
       );
     if (result.isSuccess()) {
-      var updatedTripTimes = (TripTimesPatch) result.value();
+      var updatedTripTimes = result.successValue();
       return resolver.update(pattern, updatedTripTimes.getTripTimes(), serviceDate);
     }
     throw new RuntimeException("createUpdatedTripTimes returned an error: " + result);
