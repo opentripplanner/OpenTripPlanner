@@ -38,7 +38,7 @@ public class FareRuleSet implements Serializable {
   }
 
   /* Used for checking ticket validity on HSL special routes on which some tickets are valid
-  * outside their normal validity zones*/
+   * outside their normal validity zones*/
   public void addRouteOriginDestination(String route, String origin, String destination) {
     routeOriginDestinations.add(new P3<String>(route, origin, destination));
   }
