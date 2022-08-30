@@ -6,7 +6,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 | config key             | description                                                        | value type             | value default | notes                                                                 |
 |------------------------|--------------------------------------------------------------------|------------------------|---------------|-----------------------------------------------------------------------|
 | `routingDefaults`      | Default routing parameters, which will be applied to every request | object                 |               | see [routing defaults](#routing-defaults)                             |
-| `streetRoutingTimeout` | maximum time limit for street route queries                        | string                 | 5s            | see [timeout](#timeout)                               |
+| `streetRoutingTimeout` | maximum time limit for street route queries                        | string                 | 5s            | see [timeout](#timeout)                                               |
 | `requestLogFile`       | Path to a plain-text file where requests will be logged            | string                 | null          | see [logging incoming requests](#logging-incoming-requests)           |
 | `transit`              | Transit tuning parameters                                          | `TransitRoutingConfig` |               | see [Tuning transit routing](#Tuning-transit-routing)                 |
 | `updaters`             | configure real-time updaters, such as GTFS-realtime feeds          | object                 | null          | see [configuring real-time updaters](#configuring-real-time-updaters) |
