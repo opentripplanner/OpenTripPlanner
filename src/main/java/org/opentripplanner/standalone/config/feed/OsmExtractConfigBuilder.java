@@ -29,7 +29,7 @@ public class OsmExtractConfigBuilder {
     OsmExtractConfigBuilder osmExtractConfigBuilder = new OsmExtractConfigBuilder();
     osmExtractConfigBuilder.source = config.asUri("source");
     osmExtractConfigBuilder.osmWayPropertySet =
-      WayPropertySetSource.fromConfig(config.asText("osmWayPropertySet", "default"));
+      WayPropertySetSource.fromConfig(config.asText("osmTagMapping", "default"));
     osmExtractConfigBuilder.timeZone = config.asZoneId("timeZone", null);
     return osmExtractConfigBuilder;
   }
