@@ -19,6 +19,8 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
   /**
    * Whether or not vehicle rental availability information will be used to plan vehicle rental
    * trips
+   *
+   * TODO: This belong in the request?
    */
   private boolean useAvailabilityInformation = false;
   /**
@@ -28,6 +30,8 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
    * @see VehicleRentalPreferences#keepingVehicleAtDestinationCost
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
+  // TODO - Rename to 'allowArrivingInRentedVehicleAtDestination' , rename cost param as well
+  //             - A request parameter?  
   private boolean allowKeepingRentedVehicleAtDestination = false;
   /**
    * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
