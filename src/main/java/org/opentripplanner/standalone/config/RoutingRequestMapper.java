@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
@@ -15,15 +15,15 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static RoutingRequest mapRoutingRequest(NodeAdapter c) {
-    RoutingRequest dft = new RoutingRequest();
+  public static RouteRequest mapRoutingRequest(NodeAdapter c) {
+    RouteRequest dft = new RouteRequest();
 
     if (c.isEmpty()) {
       return dft;
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.

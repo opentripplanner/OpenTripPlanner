@@ -3,14 +3,14 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class DefaultRoutingRequestType {
 
-  public final RoutingRequest request;
+  public final RouteRequest request;
   public final GraphQLObjectType graphQLType;
 
-  public DefaultRoutingRequestType(RoutingRequest request) {
+  public DefaultRoutingRequestType(RouteRequest request) {
     this.request = request;
     this.graphQLType = createGraphQLType();
   }
@@ -312,7 +312,7 @@ public class DefaultRoutingRequestType {
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> ((RoutingRequest) e.getSource()).boardSlack)
+          .dataFetcher(e -> ((RouteRequest) e.getSource()).boardSlack)
           .build()
       )
       .field(
@@ -322,7 +322,7 @@ public class DefaultRoutingRequestType {
           .description(TransportModeSlack.slackByGroupDescription("boardSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
           .dataFetcher(e ->
-            TransportModeSlack.mapToApiList(((RoutingRequest) e.getSource()).boardSlackForMode)
+            TransportModeSlack.mapToApiList(((RouteRequest) e.getSource()).boardSlackForMode)
           )
           .build()
       )
@@ -332,7 +332,7 @@ public class DefaultRoutingRequestType {
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> ((RoutingRequest) e.getSource()).alightSlack)
+          .dataFetcher(e -> ((RouteRequest) e.getSource()).alightSlack)
           .build()
       )
       .field(
@@ -342,7 +342,7 @@ public class DefaultRoutingRequestType {
           .description(TransportModeSlack.slackByGroupDescription("alightSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
           .dataFetcher(e ->
-            TransportModeSlack.mapToApiList(((RoutingRequest) e.getSource()).alightSlackForMode)
+            TransportModeSlack.mapToApiList(((RouteRequest) e.getSource()).alightSlackForMode)
           )
           .build()
       )

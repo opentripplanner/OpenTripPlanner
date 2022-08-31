@@ -21,7 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -48,7 +48,7 @@ public class RoutingWorker {
   public final DebugTimingAggregator debugTimingAggregator;
   public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
 
-  private final RoutingRequest request;
+  private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
   /**
    * The transit service time-zero normalized for the current search. All transit times are relative
@@ -64,11 +64,7 @@ public class RoutingWorker {
   private SearchParams raptorSearchParamsUsed = null;
   private Itinerary firstRemovedItinerary = null;
 
-  public RoutingWorker(
-    OtpServerRequestContext serverContext,
-    RoutingRequest request,
-    ZoneId zoneId
-  ) {
+  public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
@@ -176,7 +172,7 @@ public class RoutingWorker {
   private static AdditionalSearchDays createAdditionalSearchDays(
     RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,
-    RoutingRequest request
+    RouteRequest request
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.getDateTime(), zoneId);
     var maxWindow = Duration.ofMinutes(

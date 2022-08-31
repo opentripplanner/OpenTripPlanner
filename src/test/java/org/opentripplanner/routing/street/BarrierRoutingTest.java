@@ -24,7 +24,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -151,10 +151,10 @@ public class BarrierRoutingTest {
     GenericLocation from,
     GenericLocation to,
     TraverseMode traverseMode,
-    Consumer<RoutingRequest> options,
+    Consumer<RouteRequest> options,
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
     request.from = from;
     request.to = to;

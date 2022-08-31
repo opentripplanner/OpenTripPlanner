@@ -92,7 +92,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -122,12 +122,12 @@ public class TransmodelGraphQLSchema {
 
   private final Relay relay = new Relay();
 
-  private TransmodelGraphQLSchema(RoutingRequest defaultRequest, GqlUtil gqlUtil) {
+  private TransmodelGraphQLSchema(RouteRequest defaultRequest, GqlUtil gqlUtil) {
     this.gqlUtil = gqlUtil;
     this.routing = new DefaultRoutingRequestType(defaultRequest);
   }
 
-  public static GraphQLSchema create(RoutingRequest defaultRequest, GqlUtil qglUtil) {
+  public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil qglUtil) {
     return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
   }
 

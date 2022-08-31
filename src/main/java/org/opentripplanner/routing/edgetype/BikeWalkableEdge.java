@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -11,7 +11,7 @@ public interface BikeWalkableEdge {
     return state.getNonTransitMode() == TraverseMode.BICYCLE;
   }
 
-  default void switchToWalkingBike(RoutingRequest options, StateEditor editor) {
+  default void switchToWalkingBike(RouteRequest options, StateEditor editor) {
     // If this is the first traversed edge than the bikeSwitch cost doesn't need to be applied
     var parentState = editor.getBackState();
     var shouldIncludeCost = !parentState.isBackWalkingBike() && hadBackModeSet(parentState);
@@ -23,7 +23,7 @@ public interface BikeWalkableEdge {
     }
   }
 
-  default void switchToBiking(RoutingRequest options, StateEditor editor) {
+  default void switchToBiking(RouteRequest options, StateEditor editor) {
     var parentState = editor.getBackState();
     var shouldIncludeCost = parentState.isBackWalkingBike();
 

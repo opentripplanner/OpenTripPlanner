@@ -11,7 +11,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 @ExtendWith(SnapshotExtension.class)
@@ -62,7 +62,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_TO_PARK")
   @Test
   public void directCarPark() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_TO_PARK).clearTransitModes().build();
@@ -75,7 +75,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (with walking both ends)")
   @Test
   public void directCarPickupWithWalking() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
@@ -88,7 +88,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (with walking both ends) - arriveBy")
   @Test
   public void directCarPickupWithWalkingArriveBy() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 16, 54);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 16, 54);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
@@ -102,7 +102,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (without walking at either end)")
   @Test
   public void directCarPickupWithoutWalking() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();

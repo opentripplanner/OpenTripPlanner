@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -47,7 +47,7 @@ public class VehicleParkingEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
-    RoutingRequest options = s0.getOptions();
+    RouteRequest options = s0.getOptions();
 
     if (!options.parkAndRide) {
       return null;
@@ -81,7 +81,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   protected State traverseUnPark(State s0) {
-    RoutingRequest options = s0.getOptions();
+    RouteRequest options = s0.getOptions();
 
     if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
       return null;
@@ -97,7 +97,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
-    RoutingRequest options = s0.getOptions();
+    RouteRequest options = s0.getOptions();
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
@@ -116,7 +116,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0) {
-    RoutingRequest options = s0.getOptions();
+    RouteRequest options = s0.getOptions();
 
     if (!options.streetSubRequestModes.getWalk() || s0.isVehicleParked()) {
       return null;
@@ -137,7 +137,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0, int parkingCost, int parkingTime) {
-    RoutingRequest options = s0.getOptions();
+    RouteRequest options = s0.getOptions();
 
     if (
       !vehicleParking.hasSpacesAvailable(

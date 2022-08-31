@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -151,7 +151,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     Set<String> requiredTags,
     boolean arriveBy
   ) {
-    var options = new RoutingRequest().getStreetSearchRequest(streetMode);
+    var options = new RouteRequest().getStreetSearchRequest(streetMode);
     options.bikeParkCost = 120;
     options.bikeParkTime = 60;
     options.carParkCost = 240;

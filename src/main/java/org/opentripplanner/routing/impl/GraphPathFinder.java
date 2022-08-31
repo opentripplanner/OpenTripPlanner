@@ -8,7 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -62,7 +62,7 @@ public class GraphPathFinder {
       return null;
     }
 
-    RoutingRequest options = routingContext.opt;
+    RouteRequest options = routingContext.opt;
 
     if (options.streetSubRequestModes.isTransit()) {
       throw new UnsupportedOperationException("Transit search not supported");
@@ -98,7 +98,7 @@ public class GraphPathFinder {
    * Try to find N paths through the Graph
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
-    RoutingRequest request = routingContext.opt;
+    RouteRequest request = routingContext.opt;
     Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.SECONDS);
 
     List<GraphPath> paths = getPaths(routingContext);

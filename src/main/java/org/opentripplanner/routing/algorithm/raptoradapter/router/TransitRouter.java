@@ -19,7 +19,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -40,14 +40,14 @@ public class TransitRouter {
 
   public static final int NOT_SET = -1;
 
-  private final RoutingRequest request;
+  private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
 
   private TransitRouter(
-    RoutingRequest request,
+    RouteRequest request,
     OtpServerRequestContext serverContext,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
@@ -61,7 +61,7 @@ public class TransitRouter {
   }
 
   public static TransitRouterResult route(
-    RoutingRequest request,
+    RouteRequest request,
     OtpServerRequestContext serverContext,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
@@ -201,7 +201,7 @@ public class TransitRouter {
     var mode = isEgress ? request.modes.egressMode : request.modes.accessMode;
 
     // Prepare access/egress lists
-    RoutingRequest accessRequest = request.getStreetSearchRequest(mode);
+    RouteRequest accessRequest = request.getStreetSearchRequest(mode);
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest)
     ) {
@@ -244,7 +244,7 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
+    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
       transitLayer,

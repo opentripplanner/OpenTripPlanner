@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -35,8 +35,8 @@ public class Transfer {
     this.edges = null;
   }
 
-  public static RoutingRequest prepareTransferRoutingRequest(RoutingRequest request) {
-    RoutingRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
+  public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
+    RouteRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
 
     rr.arriveBy = false;
     rr.setDateTime(Instant.ofEpochSecond(0));
@@ -96,7 +96,7 @@ public class Transfer {
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(RoutingContext routingContext) {
-    RoutingRequest routingRequest = routingContext.opt;
+    RouteRequest routingRequest = routingContext.opt;
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / routingRequest.walkSpeed;
       return Optional.of(

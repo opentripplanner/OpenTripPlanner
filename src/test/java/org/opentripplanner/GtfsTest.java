@@ -23,7 +23,7 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -65,7 +65,7 @@ public abstract class GtfsTest {
     int legCount
   ) {
     final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     routingRequest.setNumItineraries(1);
 
     routingRequest.setArriveBy(dateTime < 0);

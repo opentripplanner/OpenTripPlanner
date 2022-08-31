@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -71,7 +71,7 @@ public class TimetableTest {
     int trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, "1.1"));
     Vertex stop_a = graph.getVertex(feedId + ":A");
     Vertex stop_c = graph.getVertex(feedId + ":C");
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
 
     ShortestPathTree spt;
     GraphPath path;

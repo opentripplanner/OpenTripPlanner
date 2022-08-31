@@ -9,7 +9,7 @@ import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -21,7 +21,7 @@ import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
-  private final RoutingRequest request;
+  private final RouteRequest request;
   private final Collection<? extends RaptorTransfer> accessPaths;
   private final Collection<? extends RaptorTransfer> egressPaths;
   private final long transitSearchTimeZeroEpocSecond;
@@ -29,7 +29,7 @@ public class RaptorRequestMapper {
   private final MeterRegistry meterRegistry;
 
   private RaptorRequestMapper(
-    RoutingRequest request,
+    RouteRequest request,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,
     Collection<? extends RaptorTransfer> egressPaths,
@@ -45,7 +45,7 @@ public class RaptorRequestMapper {
   }
 
   public static RaptorRequest<TripSchedule> mapRequest(
-    RoutingRequest request,
+    RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,
     Collection<? extends RaptorTransfer> accessPaths,

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -30,7 +30,7 @@ public class SimpleTraversalCostModelTest {
 
   private Graph graph;
 
-  private RoutingRequest options;
+  private RouteRequest options;
 
   public SimpleIntersectionTraversalCostModel costModel;
 
@@ -40,7 +40,7 @@ public class SimpleTraversalCostModelTest {
     costModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.RIGHT_HAND_TRAFFIC);
 
     // Initialize the routing request.
-    options = new RoutingRequest();
+    options = new RouteRequest();
     options.carSpeed = 1.0;
     options.walkSpeed = 1.0;
     options.carDecelerationSpeed = (2.0);

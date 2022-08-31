@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -93,7 +93,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.wheelchairAccessibility =
       new WheelchairAccessibilityRequest(
         true,
@@ -125,7 +125,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.wheelchairAccessibility =
       new WheelchairAccessibilityRequest(
         true,
@@ -163,7 +163,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setWheelchairAccessible(false);
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.wheelchairAccessibility =
       new WheelchairAccessibilityRequest(
         true,
@@ -200,7 +200,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     double length = 10;
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setWalkReluctance(walkReluctance);
     req.wheelchairAccessibility = WheelchairAccessibilityRequest.DEFAULT.withEnabled(true);
 
@@ -210,7 +210,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     assertEquals(8, result.getElapsedTimeSeconds());
   }
 
-  private State traverse(StreetEdge edge, RoutingRequest req) {
+  private State traverse(StreetEdge edge, RouteRequest req) {
     var ctx = new RoutingContext(req, graph, V1, V2);
     var state = new State(ctx);
 

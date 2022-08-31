@@ -23,7 +23,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -44,7 +44,7 @@ public class TransmodelGraphQLPlanner {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
     OtpServerRequestContext serverContext = ctx.getServerContext();
-    RoutingRequest request = null;
+    RouteRequest request = null;
     try {
       request = createRequest(environment);
 
@@ -86,10 +86,10 @@ public class TransmodelGraphQLPlanner {
     return new GenericLocation(name, stopId, lat, lon);
   }
 
-  private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+  private RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
-    RoutingRequest request = serverContext.defaultRoutingRequest();
+    RouteRequest request = serverContext.defaultRoutingRequest();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 

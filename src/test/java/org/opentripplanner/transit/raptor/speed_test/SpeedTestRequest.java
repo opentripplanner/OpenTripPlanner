@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
@@ -40,7 +40,7 @@ public class SpeedTestRequest {
     return testCase;
   }
 
-  RoutingRequest toRoutingRequest() {
+  RouteRequest toRoutingRequest() {
     var request = config.request.clone();
     var input = testCase.definition();
 
@@ -83,7 +83,7 @@ public class SpeedTestRequest {
     return request;
   }
 
-  private static void addDebugOptions(RoutingRequest request, SpeedTestCmdLineOpts opts) {
+  private static void addDebugOptions(RouteRequest request, SpeedTestCmdLineOpts opts) {
     request.raptorDebugging.withStops(opts.debugStops()).withPath(opts.debugPath());
   }
 

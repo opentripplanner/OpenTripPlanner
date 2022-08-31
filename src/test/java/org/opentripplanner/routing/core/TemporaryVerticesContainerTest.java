@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
@@ -57,7 +57,7 @@ public class TemporaryVerticesContainerTest {
   @Test
   public void temporaryChangesRemovedOnClose() {
     // Given - A request
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.from = from;
     request.to = to;
 

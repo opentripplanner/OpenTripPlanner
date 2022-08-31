@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
@@ -127,7 +127,7 @@ public class Place {
 
   public static Place forVehicleParkingEntrance(
     VehicleParkingEntranceVertex vertex,
-    RoutingRequest request
+    RouteRequest request
   ) {
     TraverseMode traverseMode = null;
     if (request.streetSubRequestModes.getCar()) {

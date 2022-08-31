@@ -68,9 +68,9 @@ import org.slf4j.LoggerFactory;
  *           class, but we want to keep it in the RoutingResource as long as we support the
  *           REST API.
  */
-public class RoutingRequest implements Cloneable, Serializable {
+public class RouteRequest implements Cloneable, Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RouteRequest.class);
 
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
@@ -78,7 +78,7 @@ public class RoutingRequest implements Cloneable, Serializable {
   /**
    * How close to do you have to be to the start or end to be considered "close".
    *
-   * @see RoutingRequest#isCloseToStartOrEnd(Vertex)
+   * @see RouteRequest#isCloseToStartOrEnd(Vertex)
    * @see DominanceFunction#betterOrEqualAndComparable(State, State)
    */
   private static final int MAX_CLOSENESS_METERS = 500;
@@ -572,14 +572,14 @@ public class RoutingRequest implements Cloneable, Serializable {
    * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
    * it off.
    *
-   * @see RoutingRequest#keepingRentedVehicleAtDestinationCost
+   * @see RouteRequest#keepingRentedVehicleAtDestinationCost
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
   public boolean allowKeepingRentedVehicleAtDestination = false;
   /**
    * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
    *
-   * @see RoutingRequest#allowKeepingRentedVehicleAtDestination
+   * @see RouteRequest#allowKeepingRentedVehicleAtDestination
    */
   public double keepingRentedVehicleAtDestinationCost = 0;
   /**
@@ -688,35 +688,35 @@ public class RoutingRequest implements Cloneable, Serializable {
   /* CONSTRUCTORS */
 
   /** Constructor for options; modes defaults to walk and transit */
-  public RoutingRequest() {
+  public RouteRequest() {
     // So that they are never null.
     from = new GenericLocation(null, null);
     to = new GenericLocation(null, null);
   }
 
-  public RoutingRequest(TraverseModeSet streetSubRequestModes) {
+  public RouteRequest(TraverseModeSet streetSubRequestModes) {
     this();
     this.setStreetSubRequestModes(streetSubRequestModes);
   }
 
-  public RoutingRequest(TraverseMode mode) {
+  public RouteRequest(TraverseMode mode) {
     this();
     this.setStreetSubRequestModes(new TraverseModeSet(mode));
   }
 
   /* ACCESSOR/SETTER METHODS */
 
-  public RoutingRequest(TraverseMode mode, BicycleOptimizeType bicycleOptimizeType) {
+  public RouteRequest(TraverseMode mode, BicycleOptimizeType bicycleOptimizeType) {
     this(new TraverseModeSet(mode), bicycleOptimizeType);
   }
 
-  public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType bicycleOptimizeType) {
+  public RouteRequest(TraverseModeSet modeSet, BicycleOptimizeType bicycleOptimizeType) {
     this();
     this.bicycleOptimizeType = bicycleOptimizeType;
     this.setStreetSubRequestModes(modeSet);
   }
 
-  public RoutingRequest(RequestModes modes) {
+  public RouteRequest(RequestModes modes) {
     this();
     this.modes = modes;
   }
@@ -1056,8 +1056,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     this.intermediatePlaces.add(location);
   }
 
-  public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
-    RoutingRequest streetRequest = this.clone();
+  public RouteRequest getStreetSearchRequest(StreetMode streetMode) {
+    RouteRequest streetRequest = this.clone();
     streetRequest.streetSubRequestModes = new TraverseModeSet();
 
     if (streetMode != null) {
@@ -1121,16 +1121,16 @@ public class RoutingRequest implements Cloneable, Serializable {
    * is to copy the default request(from router-config), and then set all user specified parameters
    * before performing a routing search.
    */
-  public RoutingRequest copyWithDateTimeNow() {
-    RoutingRequest copy = clone();
+  public RouteRequest copyWithDateTimeNow() {
+    RouteRequest copy = clone();
     copy.setDateTime(Instant.now());
     return copy;
   }
 
   @Override
-  public RoutingRequest clone() {
+  public RouteRequest clone() {
     try {
-      RoutingRequest clone = (RoutingRequest) super.clone();
+      RouteRequest clone = (RouteRequest) super.clone();
       clone.streetSubRequestModes = streetSubRequestModes.clone();
 
       clone.allowedVehicleRentalNetworks = Set.copyOf(allowedVehicleRentalNetworks);
@@ -1168,8 +1168,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     return toString(" ");
   }
 
-  public RoutingRequest reversedClone() {
-    RoutingRequest ret = this.clone();
+  public RouteRequest reversedClone() {
+    RouteRequest ret = this.clone();
     ret.setArriveBy(!ret.arriveBy);
     ret.useVehicleRentalAvailabilityInformation = false;
     return ret;
@@ -1329,7 +1329,7 @@ public class RoutingRequest implements Cloneable, Serializable {
    * <p>
    * If you encounter a case of this, you can adjust this code to take this into account.
    *
-   * @see RoutingRequest#MAX_CLOSENESS_METERS
+   * @see RouteRequest#MAX_CLOSENESS_METERS
    * @see DominanceFunction#betterOrEqualAndComparable(State, State)
    */
   public boolean isCloseToStartOrEnd(Vertex vertex) {

@@ -19,7 +19,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -294,7 +294,7 @@ public class StreetEdge
    * Calculate the speed appropriately given the RoutingRequest and traverseMode.
    */
   public double calculateSpeed(
-    RoutingRequest options,
+    RouteRequest options,
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
@@ -396,7 +396,7 @@ public class StreetEdge
 
   @Override
   public State traverse(State s0) {
-    final RoutingRequest options = s0.getOptions();
+    final RouteRequest options = s0.getOptions();
     final StateEditor editor;
 
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
@@ -965,7 +965,7 @@ public class StreetEdge
    */
   private StateEditor doTraverse(
     State s0,
-    RoutingRequest options,
+    RouteRequest options,
     TraverseMode traverseMode,
     boolean walkingBike
   ) {
@@ -1009,7 +1009,7 @@ public class StreetEdge
     StreetEdge backPSE;
     if (backEdge instanceof StreetEdge) {
       backPSE = (StreetEdge) backEdge;
-      RoutingRequest backOptions = s0.getOptions();
+      RouteRequest backOptions = s0.getOptions();
       double backSpeed = backPSE.calculateSpeed(backOptions, backMode, backWalkingBike);
       final double realTurnCost; // Units are seconds.
 
@@ -1089,7 +1089,7 @@ public class StreetEdge
 
   @Nonnull
   private TraversalCosts otherTraversalCosts(
-    RoutingRequest options,
+    RouteRequest options,
     TraverseMode traverseMode,
     boolean walkingBike,
     double speed
@@ -1107,7 +1107,7 @@ public class StreetEdge
   }
 
   @Nonnull
-  private TraversalCosts bicycleTraversalCost(RoutingRequest req, double speed) {
+  private TraversalCosts bicycleTraversalCost(RouteRequest req, double speed) {
     double time = getEffectiveBikeDistance() / speed;
     double weight;
     switch (req.bicycleOptimizeType) {
@@ -1149,7 +1149,7 @@ public class StreetEdge
 
   @Nonnull
   private TraversalCosts walkingTraversalCosts(
-    RoutingRequest routingRequest,
+    RouteRequest routingRequest,
     TraverseMode traverseMode,
     double speed,
     boolean walkingBike

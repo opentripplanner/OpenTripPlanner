@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -24,7 +24,7 @@ public class TriangleTest {
 
   @Test
   public void testPreciseValues() {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setTriangleNormalized(0.5, 0.4, 0.1);
     assertEquals(req.bikeTriangleSafetyFactor, 0.5, DELTA);
     assertEquals(req.bikeTriangleSlopeFactor, 0.4, DELTA);
@@ -33,7 +33,7 @@ public class TriangleTest {
 
   @Test
   public void testNormalizationGreaterThan1() {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setTriangleNormalized(1, 1, 1);
     assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
     assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
@@ -47,7 +47,7 @@ public class TriangleTest {
 
   @Test
   public void testNormalizationLessThan1() {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setTriangleNormalized(0.1, 0.1, 0.1);
     assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
     assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
@@ -56,7 +56,7 @@ public class TriangleTest {
 
   @Test
   public void testZero() {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setTriangleNormalized(0, 0, 0.1);
     assertEquals(req.bikeTriangleSafetyFactor, 0, DELTA);
     assertEquals(req.bikeTriangleSlopeFactor, 0, DELTA);
@@ -70,7 +70,7 @@ public class TriangleTest {
 
   @Test
   public void testLessThanZero() {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setTriangleNormalized(-1, -1, 0.1);
     assertEquals(req.bikeTriangleSafetyFactor, 0, DELTA);
     assertEquals(req.bikeTriangleSlopeFactor, 0, DELTA);
@@ -114,7 +114,7 @@ public class TriangleTest {
     double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
     double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
-    RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
+    RouteRequest options = new RouteRequest(TraverseMode.BICYCLE);
     options.bicycleOptimizeType = BicycleOptimizeType.TRIANGLE;
     options.bikeSpeed = 6.0;
     options.setNonTransitReluctance(1);

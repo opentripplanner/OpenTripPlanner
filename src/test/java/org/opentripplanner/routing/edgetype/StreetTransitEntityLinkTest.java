@@ -9,7 +9,7 @@ import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.PO
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -92,7 +92,7 @@ class StreetTransitEntityLinkTest {
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     WheelchairAccessibilityFeature feature;
     if (onlyAccessible) {
       feature = WheelchairAccessibilityFeature.ofOnlyAccessible();

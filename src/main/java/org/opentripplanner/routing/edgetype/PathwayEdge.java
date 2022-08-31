@@ -3,7 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -83,7 +83,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       return null;
     }
 
-    RoutingRequest options = s0.getOptions();
+    RouteRequest options = s0.getOptions();
 
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     int time = traversalTime;

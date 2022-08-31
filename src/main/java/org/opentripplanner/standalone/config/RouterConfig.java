@@ -10,7 +10,7 @@ import java.time.format.DateTimeParseException;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -40,7 +40,7 @@ public class RouterConfig implements Serializable {
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
   private final Duration streetRoutingTimeout;
-  private final RoutingRequest routingRequestDefaults;
+  private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
   private final VectorTileConfig vectorTileLayers;
@@ -98,7 +98,7 @@ public class RouterConfig implements Serializable {
     return transmodelApi;
   }
 
-  public RoutingRequest routingRequestDefaults() {
+  public RouteRequest routingRequestDefaults() {
     return routingRequestDefaults;
   }
 
@@ -118,7 +118,7 @@ public class RouterConfig implements Serializable {
     return vectorTileLayers;
   }
 
-  public FlexParameters flexParameters(RoutingRequest request) {
+  public FlexParameters flexParameters(RouteRequest request) {
     return flexConfig.toFlexParameters(request);
   }
 

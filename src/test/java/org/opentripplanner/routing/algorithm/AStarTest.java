@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -85,7 +85,7 @@ public class AStarTest {
 
   @Test
   public void testForward() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.walkSpeed = 1.0;
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
@@ -111,7 +111,7 @@ public class AStarTest {
 
   @Test
   public void testBack() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.walkSpeed = 1.0;
     options.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
@@ -148,7 +148,7 @@ public class AStarTest {
 
   @Test
   public void testForwardExtraEdges() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.walkSpeed = 1.0;
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
@@ -191,7 +191,7 @@ public class AStarTest {
 
   @Test
   public void testBackExtraEdges() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.walkSpeed = 1.0;
     options.setArriveBy(true);
 
@@ -235,7 +235,7 @@ public class AStarTest {
 
   @Test
   public void testMultipleTargets() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.walkSpeed = 1.0;
 
     Set<Vertex> targets = new HashSet<>();

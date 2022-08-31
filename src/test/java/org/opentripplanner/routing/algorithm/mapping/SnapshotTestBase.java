@@ -42,7 +42,7 @@ import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -91,7 +91,7 @@ public abstract class SnapshotTestBase {
     return ConstantsForTests.getInstance().getCachedPortlandGraph();
   }
 
-  protected RoutingRequest createTestRequest(
+  protected RouteRequest createTestRequest(
     int year,
     int month,
     int day,
@@ -101,7 +101,7 @@ public abstract class SnapshotTestBase {
   ) {
     OtpServerRequestContext serverContext = serverContext();
 
-    RoutingRequest request = serverContext.defaultRoutingRequest();
+    RouteRequest request = serverContext.defaultRoutingRequest();
     request.setDateTime(
       TestUtils.dateInstant(
         serverContext.transitService().getTimeZone().getId(),
@@ -168,14 +168,14 @@ public abstract class SnapshotTestBase {
     );
   }
 
-  protected void expectRequestResponseToMatchSnapshot(RoutingRequest request) {
+  protected void expectRequestResponseToMatchSnapshot(RouteRequest request) {
     List<Itinerary> itineraries = retrieveItineraries(request);
 
     logDebugInformationOnFailure(request, () -> expectItinerariesToMatchSnapshot(itineraries));
   }
 
-  protected void expectArriveByToMatchDepartAtAndSnapshot(RoutingRequest request) {
-    RoutingRequest departAt = request.clone();
+  protected void expectArriveByToMatchDepartAtAndSnapshot(RouteRequest request) {
+    RouteRequest departAt = request.clone();
     List<Itinerary> departByItineraries = retrieveItineraries(departAt);
 
     logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
@@ -185,7 +185,7 @@ public abstract class SnapshotTestBase {
       () -> expectItinerariesToMatchSnapshot(departByItineraries)
     );
 
-    RoutingRequest arriveBy = request.clone();
+    RouteRequest arriveBy = request.clone();
     arriveBy.setArriveBy(true);
     arriveBy.setDateTime(departByItineraries.get(0).lastLeg().getEndTime().toInstant());
 
@@ -210,7 +210,7 @@ public abstract class SnapshotTestBase {
       .toMatchSnapshot();
   }
 
-  protected void logDebugInformationOnFailure(RoutingRequest request, Runnable task) {
+  protected void logDebugInformationOnFailure(RouteRequest request, Runnable task) {
     try {
       task.run();
     } catch (Throwable e) {
@@ -250,7 +250,7 @@ public abstract class SnapshotTestBase {
     return snapshotSerializer.apply(new Object[] { object });
   }
 
-  private List<Itinerary> retrieveItineraries(RoutingRequest request) {
+  private List<Itinerary> retrieveItineraries(RouteRequest request) {
     long startMillis = System.currentTimeMillis();
     RoutingResponse response = serverContext.routingService().route(request);
 
@@ -267,7 +267,7 @@ public abstract class SnapshotTestBase {
     return itineraries;
   }
 
-  private String createDebugUrlForRequest(RoutingRequest request) {
+  private String createDebugUrlForRequest(RouteRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.getDateTime().getEpochSecond())
       .atZone(serverContext().transitService().getTimeZone())

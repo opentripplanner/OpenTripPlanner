@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 
 class StreetEdgeReluctanceCalculator {
@@ -10,10 +10,10 @@ class StreetEdgeReluctanceCalculator {
 
   /**
    * Compute reluctance for a regular street section. Note! This does not apply if in a wheelchair,
-   * see {@link #computeWheelchairReluctance(RoutingRequest, double, boolean, boolean)}.
+   * see {@link #computeWheelchairReluctance(RouteRequest, double, boolean, boolean)}.
    */
   static double computeReluctance(
-    RoutingRequest req,
+    RouteRequest req,
     TraverseMode traverseMode,
     boolean walkingBike,
     boolean edgeIsStairs
@@ -33,7 +33,7 @@ class StreetEdgeReluctanceCalculator {
   }
 
   static double computeWheelchairReluctance(
-    RoutingRequest request,
+    RouteRequest request,
     double maxSlope,
     boolean edgeWheelchairAccessible,
     boolean stairs

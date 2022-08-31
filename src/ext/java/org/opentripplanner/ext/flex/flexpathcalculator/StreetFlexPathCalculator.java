@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -70,7 +70,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   private ShortestPathTree routeToMany(Vertex vertex) {
-    RoutingRequest routingRequest = new RoutingRequest(TraverseMode.CAR);
+    RouteRequest routingRequest = new RouteRequest(TraverseMode.CAR);
     routingRequest.arriveBy = reverseDirection;
     RoutingContext rctx;
     if (reverseDirection) {

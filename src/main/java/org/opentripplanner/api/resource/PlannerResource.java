@@ -2,12 +2,10 @@ package org.opentripplanner.api.resource;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -19,7 +17,7 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
@@ -63,7 +61,7 @@ public class PlannerResource extends RoutingResource {
 
     // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
     TripPlannerResponse response = new TripPlannerResponse(uriInfo);
-    RoutingRequest request = null;
+    RouteRequest request = null;
     RoutingResponse res = null;
     try {
       /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
@@ -109,7 +107,7 @@ public class PlannerResource extends RoutingResource {
 
   private void logRequest(
     Request grizzlyRequest,
-    RoutingRequest request,
+    RouteRequest request,
     OtpServerRequestContext serverContext,
     RoutingResponse res
   ) {

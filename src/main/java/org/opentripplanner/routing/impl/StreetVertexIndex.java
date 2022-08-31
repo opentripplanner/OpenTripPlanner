@@ -18,7 +18,7 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -182,7 +182,7 @@ public class StreetVertexIndex {
    */
   public Set<Vertex> getVerticesForLocation(
     GenericLocation location,
-    RoutingRequest options,
+    RouteRequest options,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -239,7 +239,7 @@ public class StreetVertexIndex {
    */
   public Vertex getVertexForLocationForTest(
     GenericLocation location,
-    RoutingRequest options,
+    RouteRequest options,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -339,7 +339,7 @@ public class StreetVertexIndex {
 
   private Vertex createVertexFromLocation(
     GenericLocation location,
-    RoutingRequest options,
+    RouteRequest options,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -394,7 +394,7 @@ public class StreetVertexIndex {
     return temporaryStreetLocation;
   }
 
-  private TraverseMode getTraverseModeForLinker(RoutingRequest options, boolean endVertex) {
+  private TraverseMode getTraverseModeForLinker(RouteRequest options, boolean endVertex) {
     TraverseMode nonTransitMode = TraverseMode.WALK;
     //It can be null in tests
     if (options != null) {

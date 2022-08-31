@@ -11,7 +11,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -94,7 +94,7 @@ public abstract class GraphRoutingTest {
     StreetVertex to,
     TraverseModeSet traverseModeSet
   ) {
-    RoutingRequest request = new RoutingRequest(traverseModeSet);
+    RouteRequest request = new RouteRequest(traverseModeSet);
     RoutingContext rctx = new RoutingContext(request, graph, from, to);
     request.parkAndRide = true;
 

@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -194,7 +194,7 @@ class PathwayEdgeTest {
   }
 
   private State assertThatEdgeIsTraversable(PathwayEdge edge, boolean wheelchair) {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.wheelchairAccessibility =
       new WheelchairAccessibilityRequest(
         wheelchair,

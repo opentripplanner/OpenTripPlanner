@@ -30,7 +30,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
@@ -194,7 +194,7 @@ public class FlexIntegrationTest {
     new FlexLocationsToStreetEdgesMapper(graph, transitModel).buildGraph();
 
     // generate direct transfers
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
 
     // we don't have a complete coverage of the entire area so use straight lines for transfers
     new DirectTransferGenerator(
@@ -220,7 +220,7 @@ public class FlexIntegrationTest {
     int index,
     boolean onlyDirect
   ) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
     request.from = from;
     request.to = to;

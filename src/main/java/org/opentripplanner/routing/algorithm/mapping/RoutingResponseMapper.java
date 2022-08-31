@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageCursorFactory;
 import org.opentripplanner.model.plan.pagecursor.PageType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
@@ -25,7 +25,7 @@ public class RoutingResponseMapper {
   private static final Logger LOG = LoggerFactory.getLogger(RoutingResponseMapper.class);
 
   public static RoutingResponse map(
-    RoutingRequest request,
+    RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
     SearchParams searchParams,
     Duration searchWindowForNextSearch,
@@ -106,7 +106,7 @@ public class RoutingResponseMapper {
 
   @Nullable
   private static TripSearchMetadata createTripSearchMetadata(
-    RoutingRequest request,
+    RouteRequest request,
     SearchParams searchParams,
     Itinerary firstRemovedItinerary
   ) {

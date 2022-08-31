@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -37,7 +37,7 @@ public class TurnCostTest {
 
   private StreetEdge maple_main1, broad1_2;
 
-  private RoutingRequest proto;
+  private RouteRequest proto;
 
   @BeforeEach
   public void before() {
@@ -89,7 +89,7 @@ public class TurnCostTest {
     bottomLeft = broad3;
 
     // Make a prototype routing request.
-    proto = new RoutingRequest();
+    proto = new RouteRequest();
     proto.carSpeed = 1.0;
     proto.walkSpeed = 1.0;
     proto.bikeSpeed = 1.0;
@@ -109,7 +109,7 @@ public class TurnCostTest {
 
   @Test
   public void testForwardDefaultConstTurnCosts() {
-    RoutingRequest options = proto.clone();
+    RouteRequest options = proto.clone();
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
@@ -139,7 +139,7 @@ public class TurnCostTest {
 
   @Test
   public void testForwardCarNoTurnCosts() {
-    RoutingRequest options = proto.clone();
+    RouteRequest options = proto.clone();
     options.setMode(TraverseMode.CAR);
 
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
@@ -160,7 +160,7 @@ public class TurnCostTest {
 
   @Test
   public void testForwardCarConstTurnCosts() {
-    RoutingRequest options = proto.clone();
+    RouteRequest options = proto.clone();
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
     options.setMode(TraverseMode.CAR);
 

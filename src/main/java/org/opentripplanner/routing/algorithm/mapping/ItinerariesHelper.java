@@ -5,14 +5,14 @@ import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class ItinerariesHelper {
 
   public static void decorateItinerariesWithRequestData(
     List<Itinerary> itineraries,
-    RoutingRequest routingRequest
+    RouteRequest routingRequest
   ) {
     for (Itinerary it : itineraries) {
       if (routingRequest.wheelchairAccessibility.enabled()) {

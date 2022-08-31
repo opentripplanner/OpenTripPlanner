@@ -54,7 +54,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
@@ -81,7 +81,7 @@ public class TravelTimeResource {
 
   private static final SimpleFeatureType contourSchema = makeContourSchema();
 
-  private final RoutingRequest routingRequest;
+  private final RouteRequest routingRequest;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
   private final Instant startTime;
   private final Instant endTime;
@@ -124,7 +124,7 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
+    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
@@ -213,7 +213,7 @@ public class TravelTimeResource {
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    final RoutingRequest accessRequest = routingRequest.clone();
+    final RouteRequest accessRequest = routingRequest.clone();
 
     accessRequest.maxAccessEgressDuration = traveltimeRequest.maxAccessDuration;
 
@@ -236,7 +236,7 @@ public class TravelTimeResource {
   }
 
   private Collection<AccessEgress> getAccess(
-    RoutingRequest accessRequest,
+    RouteRequest accessRequest,
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(

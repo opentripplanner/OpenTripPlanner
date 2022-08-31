@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
@@ -466,7 +467,7 @@ public class Itinerary {
   }
 
   /**
-   * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
+   * If {@link RouteRequest#allowKeepingRentedVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
    */
   public boolean isArrivedAtDestinationWithRentedVehicle() {

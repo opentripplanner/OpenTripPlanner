@@ -8,13 +8,13 @@ import static org.opentripplanner.routing.core.TraverseMode.CAR;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class RoutingRequestTest {
 
   @Test
   public void testRequest() {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
 
     request.addMode(CAR);
     assertTrue(request.streetSubRequestModes.getCar());
@@ -29,7 +29,7 @@ public class RoutingRequestTest {
 
   @Test
   public void testIntermediatePlaces() {
-    RoutingRequest req = new RoutingRequest();
+    RouteRequest req = new RouteRequest();
     assertFalse(req.hasIntermediatePlaces());
 
     req.clearIntermediatePlaces();
@@ -48,7 +48,7 @@ public class RoutingRequestTest {
 
   @Test
   public void shouldCloneObjectFields() {
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
 
     var clone = req.clone();
 

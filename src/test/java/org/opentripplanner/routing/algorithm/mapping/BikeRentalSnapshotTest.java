@@ -12,7 +12,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -58,7 +58,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
@@ -80,7 +80,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")
   @Test
   public void directBikeRentalArrivingAtDestinationWithDepartAt() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
@@ -94,7 +94,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with arriveBy")
   @Test
   public void directBikeRentalArrivingAtDestinationWithArriveBy() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
@@ -109,7 +109,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Access BIKE_RENTAL")
   @Test
   public void accessBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
     request.modes =
       RequestModes
@@ -133,7 +133,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Egress BIKE_RENTAL")
   @Test
   public void egressBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes

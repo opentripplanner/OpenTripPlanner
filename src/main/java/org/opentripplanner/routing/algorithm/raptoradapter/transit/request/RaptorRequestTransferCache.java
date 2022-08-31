@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -84,7 +84,7 @@ public class RaptorRequestTransferCache {
 
   /**
    * This contains an extract of the parameters which may influence transfers. The possible values
-   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RoutingRequest)}.
+   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RouteRequest)}.
    * <p>
    * TODO: the bikeWalking options are not used.
    */
@@ -109,7 +109,7 @@ public class RaptorRequestTransferCache {
     private final int bikeSwitchCost;
     private final int bikeSwitchTime;
 
-    public StreetRelevantOptions(RoutingRequest routingRequest) {
+    public StreetRelevantOptions(RouteRequest routingRequest) {
       this.transferMode = routingRequest.modes.transferMode;
 
       this.optimize = routingRequest.bicycleOptimizeType;

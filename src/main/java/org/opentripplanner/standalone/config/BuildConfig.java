@@ -18,7 +18,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemExtractsConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
@@ -307,7 +307,8 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public final OsmDefaultsConfig osmDefaults;
 
-  public final List<RoutingRequest> transferRequests;
+  public final List<RouteRequest> transferRequests;
+
   /**
    * Visibility calculations for an area will not be done if there are more nodes than this limit.
    */
@@ -539,7 +540,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           .map(RoutingRequestMapper::mapRoutingRequest)
           .toList();
     } else {
-      transferRequests = List.of(new RoutingRequest());
+      transferRequests = List.of(new RouteRequest());
     }
 
     if (logUnusedParams) {

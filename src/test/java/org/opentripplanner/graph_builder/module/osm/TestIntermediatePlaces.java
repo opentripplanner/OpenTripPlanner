@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -242,7 +242,7 @@ public class TestIntermediatePlaces {
     TraverseModeSet modes,
     boolean arriveBy
   ) {
-    RoutingRequest request = new RoutingRequest(modes);
+    RouteRequest request = new RouteRequest(modes);
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
     request.from = from;
@@ -304,7 +304,7 @@ public class TestIntermediatePlaces {
   }
 
   // Check that the start time and end time of each leg are consistent
-  private void validateLegsTemporally(RoutingRequest request, Itinerary itinerary) {
+  private void validateLegsTemporally(RouteRequest request, Itinerary itinerary) {
     Instant departTime;
     Instant arriveTime;
     if (request.arriveBy) {

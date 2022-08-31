@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -97,11 +97,11 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @Test
   public void testCarParkLinking() {
-    var setup = (BiFunction<Double, Double, Consumer<RoutingRequest>>) (
+    var setup = (BiFunction<Double, Double, Consumer<RouteRequest>>) (
       Double latitude,
       Double longitude
     ) -> {
-      return (RoutingRequest rr) -> {
+      return (RouteRequest rr) -> {
         rr.from = new GenericLocation(latitude, longitude);
         rr.to = new GenericLocation(latitude, longitude);
         rr.parkAndRide = true;
@@ -195,13 +195,13 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   private void assertLinking(
-    Consumer<RoutingRequest> consumer,
+    Consumer<RouteRequest> consumer,
     String fromStreetName,
     String toStreetName,
     StreetMode... streetModes
   ) {
     for (final StreetMode streetMode : streetModes) {
-      var routingRequest = new RoutingRequest().getStreetSearchRequest(streetMode);
+      var routingRequest = new RouteRequest().getStreetSearchRequest(streetMode);
 
       consumer.accept(routingRequest);
 
@@ -220,7 +220,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         }
       }
 
-      routingRequest = new RoutingRequest().getStreetSearchRequest(streetMode);
+      routingRequest = new RouteRequest().getStreetSearchRequest(streetMode);
 
       consumer.accept(routingRequest);
 

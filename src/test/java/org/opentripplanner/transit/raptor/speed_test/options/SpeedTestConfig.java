@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.net.URI;
 import java.time.LocalDate;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
@@ -31,7 +31,7 @@ public class SpeedTestConfig {
   public final String feedId;
 
   public final TransitRoutingConfig transitRoutingParams;
-  public final RoutingRequest request;
+  public final RouteRequest request;
 
   public SpeedTestConfig(JsonNode node) {
     NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
