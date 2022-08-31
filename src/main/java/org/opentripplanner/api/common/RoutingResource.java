@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -353,6 +354,7 @@ public abstract class RoutingResource {
    * Prospect Park to DeKalb Avenue, whether 7th Avenue and Atlantic Avenue should be included.
    */
   @QueryParam("showIntermediateStops")
+  @DefaultValue("false")
   protected Boolean showIntermediateStops;
 
   /**
@@ -819,9 +821,6 @@ public abstract class RoutingResource {
 
     if (arriveBy != null) {
       request.setArriveBy(arriveBy);
-    }
-    if (showIntermediateStops != null) {
-      request.showIntermediateStops = showIntermediateStops;
     }
     if (intermediatePlaces != null) {
       request.setIntermediatePlacesFromStrings(intermediatePlaces);

@@ -140,7 +140,6 @@ public class TransmodelGraphQLPlanner {
     }
 
     callWith.argument("arriveBy", request::setArriveBy);
-    request.showIntermediateStops = true;
     callWith.argument(
       "vias",
       (List<Map<String, Object>> v) ->

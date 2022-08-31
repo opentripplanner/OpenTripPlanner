@@ -2,10 +2,12 @@ package org.opentripplanner.api.resource;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -71,10 +73,8 @@ public class PlannerResource extends RoutingResource {
       res = serverContext.routingService().route(request);
 
       // Map to API
-      TripPlanMapper tripPlanMapper = new TripPlanMapper(
-        request.locale,
-        request.showIntermediateStops
-      );
+      // TODO VIA - we should store the default somewhere
+      TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale, showIntermediateStops);
       response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
       if (res.getPreviousPageCursor() != null) {
         response.setPreviousPageCursor(res.getPreviousPageCursor().encode());

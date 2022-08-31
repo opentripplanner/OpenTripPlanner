@@ -647,7 +647,6 @@ public class LegacyGraphQLQueryTypeImpl
       );
       callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
       callWith.argument("arriveBy", request::setArriveBy);
-      request.showIntermediateStops = true;
       callWith.argument(
         "intermediatePlaces",
         (List<Map<String, Object>> v) ->

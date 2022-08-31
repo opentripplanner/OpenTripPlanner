@@ -113,7 +113,6 @@ public class RoutingRequestMapper {
     request.searchWindow = c.asDuration("searchWindow", dft.searchWindow);
     request.requiredVehicleParkingTags =
       c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
-    request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
     request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
     request.stairsTimeFactor = c.asDouble("stairsTimeFactor", dft.stairsTimeFactor);
     request.startingTransitTripId =

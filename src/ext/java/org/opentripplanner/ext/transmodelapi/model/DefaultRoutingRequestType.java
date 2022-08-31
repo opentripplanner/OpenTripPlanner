@@ -94,8 +94,9 @@ public class DefaultRoutingRequestType {
           .description(
             "Whether the planner should return intermediate stops lists for transit legs."
           )
+          .deprecate("This parameter is always enabled")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.showIntermediateStops)
+          .dataFetcher(env -> true)
           .build()
       )
       .field(

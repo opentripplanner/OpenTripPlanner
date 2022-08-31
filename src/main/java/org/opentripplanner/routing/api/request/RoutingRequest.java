@@ -258,8 +258,6 @@ public class RoutingRequest implements Cloneable, Serializable {
    */
   public int numItineraries = 50;
 
-  /** Whether the planner should return intermediate stops lists for transit legs. */
-  public boolean showIntermediateStops = false;
   /**
    * Human walk speed along streets, in meters per second.
    * <p>
