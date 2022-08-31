@@ -30,6 +30,10 @@
     "groupFilePattern": "(\\w{3})_.*\\.xml",
     "netexFeedId": "RB"
   },
+  "osmDefaults": {
+    "osmTagMapping": "norway",
+    "timeZone": "Europe/Oslo"
+  },
   "transitFeeds": [
     {
       "type": "netex",
@@ -38,19 +42,13 @@
   ],
   "osm": [
     {
-      "source": "gs://<bucket>/osm/norway-latest.osm.pbf",
-      "osmTagMapping": "norway",
-      "timeZone": "Europe/Oslo"
+      "source": "gs://<bucket>/osm/norway-latest.osm.pbf"
     },
     {
-      "source": "gs://<bucket>/osm/static/osm_static_sweden_extract.pbf",
-      "osmTagMapping": "norway",
-      "timeZone": "Europe/Oslo"
+      "source": "gs://<bucket>/osm/static/osm_static_sweden_extract.pbf"
     },
     {
-      "source": "gs://<bucket>/osm/static/osm_static_sweden_storlien_extract.pbf",
-      "osmTagMapping": "norway",
-      "timeZone": "Europe/Oslo"
+      "source": "gs://<bucket>/osm/static/osm_static_sweden_storlien_extract.pbf"
     }
   ],
   "dem": [
