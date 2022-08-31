@@ -23,13 +23,11 @@ public class DenverSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
-    var request = new SmokeTestRequest(southBroadway, twinLakes, Set.of("TRANSIT", "WALK"));
-    var otpResponse = SmokeTest.sendPlanRequest(request);
-    var itineraries = otpResponse.getPlan().itineraries;
-
-    assertTrue(itineraries.size() > 1);
-
-    var expectedModes = List.of("WALK", "TRAM", "WALK", "BUS", "WALK");
-    assertThatItineraryHasModes(itineraries, expectedModes);
+    SmokeTest.basicTest(
+      southBroadway,
+      twinLakes,
+      Set.of("TRANSIT", "WALK"),
+      List.of("WALK", "TRAM", "WALK", "BUS", "WALK")
+    );
   }
 }

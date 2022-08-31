@@ -21,11 +21,13 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.TripPlannerResponse;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,5 +143,20 @@ public class SmokeTest {
         itineraryModes
       )
     );
+  }
+
+  static void basicTest(
+    WgsCoordinate start,
+    WgsCoordinate end,
+    Set<String> modes,
+    List<String> expectedModes
+  ) {
+    var request = new SmokeTestRequest(start, end, modes);
+    var otpResponse = SmokeTest.sendPlanRequest(request);
+    var itineraries = otpResponse.getPlan().itineraries;
+
+    assertTrue(itineraries.size() > 1);
+
+    assertThatItineraryHasModes(itineraries, expectedModes);
   }
 }

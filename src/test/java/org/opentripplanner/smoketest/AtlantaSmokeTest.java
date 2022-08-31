@@ -34,18 +34,12 @@ public class AtlantaSmokeTest {
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
-    var params = new SmokeTestRequest(
+    SmokeTest.basicTest(
       nearGeorgiaStateStation,
       powderSpringsInsideFlexZone1,
-      Set.of("TRANSIT", "WALK")
+      Set.of("TRANSIT", "WALK"),
+      List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK")
     );
-    var otpResponse = SmokeTest.sendPlanRequest(params);
-    var itineraries = otpResponse.getPlan().itineraries;
-
-    assertTrue(itineraries.size() > 1);
-
-    var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK");
-    assertThatItineraryHasModes(itineraries, expectedModes);
   }
 
   @Test
