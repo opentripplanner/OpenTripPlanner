@@ -97,12 +97,12 @@ public class SimpleTraversalCostModelTest {
 
     assertEquals(
       1.6875,
-      costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, options, 40, 40),
+      costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       0.5625,
-      costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, options, 40, 40),
+      costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
 
@@ -110,28 +110,12 @@ public class SimpleTraversalCostModelTest {
 
     assertEquals(
       0.5625,
-      leftHandDriveCostModel.computeTraversalCost(
-        v2,
-        e1,
-        e2,
-        TraverseMode.BICYCLE,
-        options,
-        40,
-        40
-      ),
+      leftHandDriveCostModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       1.6875,
-      leftHandDriveCostModel.computeTraversalCost(
-        v2,
-        e2,
-        e1,
-        TraverseMode.BICYCLE,
-        options,
-        40,
-        40
-      ),
+      leftHandDriveCostModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
   }
@@ -184,7 +168,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -218,7 +201,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -255,7 +237,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -296,7 +277,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -337,7 +317,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );

@@ -296,7 +296,6 @@ public class TemporaryPartialStreetEdgeTest {
       StreetEdge from,
       StreetEdge to,
       TraverseMode mode,
-      RoutingRequest options,
       float fromSpeed,
       float toSpeed
     ) {

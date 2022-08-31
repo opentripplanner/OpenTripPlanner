@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core.intersection_model;
 
 import java.io.Serializable;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -30,7 +29,6 @@ public class SimpleIntersectionTraversalCostModel
     StreetEdge from,
     StreetEdge to,
     TraverseMode mode,
-    RoutingRequest request,
     float fromSpeed,
     float toSpeed
   ) {
@@ -40,9 +38,9 @@ public class SimpleIntersectionTraversalCostModel
     }
 
     if (mode.isDriving()) {
-      return computeDrivingTraversalCost(v, from, to, request);
+      return computeDrivingTraversalCost(v, from, to);
     } else if (mode.isCycling()) {
-      return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed, request);
+      return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed);
     } else {
       return computeNonDrivingTraversalCost(from, to, toSpeed);
     }
@@ -152,12 +150,7 @@ public class SimpleIntersectionTraversalCostModel
     }
   }
 
-  private double computeDrivingTraversalCost(
-    IntersectionVertex v,
-    StreetEdge from,
-    StreetEdge to,
-    RoutingRequest request
-  ) {
+  private double computeDrivingTraversalCost(IntersectionVertex v, StreetEdge from, StreetEdge to) {
     double turnCost = 0;
 
     int turnAngle = calculateTurnAngle(from, to);
@@ -194,8 +187,7 @@ public class SimpleIntersectionTraversalCostModel
     StreetEdge from,
     StreetEdge to,
     float fromSpeed,
-    float toSpeed,
-    RoutingRequest request
+    float toSpeed
   ) {
     var turnAngle = calculateTurnAngle(from, to);
     final var baseCost = computeNonDrivingTraversalCost(from, to, toSpeed);
