@@ -29,7 +29,7 @@ And finally run the smoke tests with
 ```
 # go back to the root directory
 cd ..
-mvn test -P smoke-tests
+mvn test -Djunit.tags.included="atlanta" -Djunit.tags.excluded=""
 ```
 
 ### CI

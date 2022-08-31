@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -22,11 +21,13 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.TripPlannerResponse;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * By default, the smoke tests are not run when you execute `mvn test`.
  * <p>
- * If you want run them, use `mvn test -P smoke-tests`.
+ * If you want run them, use `mvn test -Djunit.tags.included="atlanta" -Djunit.tags.excluded=""`.
  */
 public class SmokeTest {
 
@@ -51,8 +52,7 @@ public class SmokeTest {
   static class FareDeserializer extends JsonDeserializer<Fare> {
 
     @Override
-    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-      throws IOException, JsonProcessingException {
+    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
       return null;
     }
   }
@@ -101,8 +101,8 @@ public class SmokeTest {
   /**
    * Sends an HTTP request to the OTP plan endpoint and deserializes the response.
    */
-  static TripPlannerResponse sendPlanRequest(Map<String, String> params) {
-    var request = SmokeTest.buildPlanRequest(params);
+  static TripPlannerResponse sendPlanRequest(SmokeTestRequest req) {
+    var request = SmokeTest.buildPlanRequest(req.toMap());
     LOG.info("Sending request to {}", request.uri());
     TripPlannerResponse otpResponse;
     try {
@@ -133,8 +133,8 @@ public class SmokeTest {
   ) {
     var itineraryModes = itineraries
       .stream()
-      .map(i -> i.legs.stream().map(l -> l.mode).collect(Collectors.toList()))
-      .collect(Collectors.toList());
+      .map(i -> i.legs.stream().map(l -> l.mode).toList())
+      .toList();
     assertTrue(
       itineraryModes.contains(expectedModes),
       String.format(
@@ -143,5 +143,20 @@ public class SmokeTest {
         itineraryModes
       )
     );
+  }
+
+  static void basicTest(
+    WgsCoordinate start,
+    WgsCoordinate end,
+    Set<String> modes,
+    List<String> expectedModes
+  ) {
+    var request = new SmokeTestRequest(start, end, modes);
+    var otpResponse = SmokeTest.sendPlanRequest(request);
+    var itineraries = otpResponse.getPlan().itineraries;
+
+    assertTrue(itineraries.size() > 1);
+
+    assertThatItineraryHasModes(itineraries, expectedModes);
   }
 }

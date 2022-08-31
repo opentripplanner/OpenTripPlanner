@@ -34,19 +34,21 @@ jobs:
       - name: Cache OSM files
         uses: actions/cache@v2
         with:
-          path: smoke-tests/atlanta/*.pbf
-          key: osm
+          path: smoke-tests/**/*.pbf
+          key: osm-2022-08-29-1
+          restore-keys: |
+            osm-
 
-      - name: Build jar file
-        run: mvn --batch-mode clean package -Dmaven.test.skip -P prettierSkip
-
-      - name: Build Atlanta graph and start OTP in background
+      - name: Build jar file, compile tests
         run: |
-          cd smoke-tests
-          make build-atlanta
-          make run-atlanta &
-          # OTP needs a little while to start up so we sleep
-          sleep 10
+          mvn --batch-mode clean package -Dmaven.test.skip -P prettierSkip
+          mvn org.apache.maven.plugins:maven-compiler-plugin:testCompile
+        
+      - name: "[Atlanta] Build graph, run OTP, run smoke tests"
+        run: scripts/smoke-tests.sh atlanta
 
-      - name: Run smoke tests
-        run: mvn test -P smoke-tests -P prettierSkip
+      - name: "[Houston] Build graph, run OTP, run smoke tests"
+        run: scripts/smoke-tests.sh houston
+
+      - name: "[Denver] Build graph, run OTP, run smoke tests"
+        run: scripts/smoke-tests.sh denver
