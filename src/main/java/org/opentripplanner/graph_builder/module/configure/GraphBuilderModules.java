@@ -6,10 +6,8 @@ import dagger.Module;
 import dagger.Provides;
 import java.io.File;
 import java.time.Duration;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
@@ -53,12 +51,17 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
-    @Nullable ZoneId zoneId,
     DataImportIssueStore issueStore
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
-    for (ConfiguredDataSource<OsmExtractConfig> osmFile : dataSources.getOsmConfiguredDatasource()) {
-      providers.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
+    for (ConfiguredDataSource<OsmExtractConfig> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+      providers.add(
+        new OpenStreetMapProvider(
+          osmConfiguredDataSource,
+          config.osmDefaults,
+          config.osmCacheDataInMem
+        )
+      );
     }
 
     return new OpenStreetMapModule(
@@ -66,7 +69,7 @@ public class GraphBuilderModules {
       providers,
       config.boardingLocationTags,
       graph,
-      zoneId,
+      config.osmDefaults.timeZone,
       issueStore
     );
   }

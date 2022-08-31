@@ -11,6 +11,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -42,16 +43,19 @@ public class OpenStreetMapProvider {
         fileDataSource,
         new OsmExtractConfigBuilder().withSource(fileDataSource.uri()).build()
       ),
+      new OsmDefaultsConfig(),
       cacheDataInMem
     );
   }
 
   public OpenStreetMapProvider(
     ConfiguredDataSource<OsmExtractConfig> osmExtractConfigConfiguredDataSource,
+    OsmDefaultsConfig osmDefaultsConfig,
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.timeZone = osmExtractConfigConfiguredDataSource.config().timeZone();
+    this.timeZone =
+      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
     this.cacheDataInMem = cacheDataInMem;
   }
 

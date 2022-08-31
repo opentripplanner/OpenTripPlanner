@@ -16,12 +16,13 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemExtractsConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
@@ -257,11 +258,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final CustomNamer customNamer;
 
   /**
-   * Custom OSM way properties
-   */
-  public final WayPropertySetSource osmWayPropertySet;
-
-  /**
    * When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
    * for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
    * to cache the entire osm file im memory. The trade off is of cause that OTP might use more
@@ -305,6 +301,11 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Netex specific build parameters.
    */
   public final NetexDefaultsConfig netexDefaults;
+
+  /**
+   * OpenStreetMap specific build parameters.
+   */
+  public final OsmDefaultsConfig osmDefaults;
 
   public final List<RoutingRequest> transferRequests;
   /**
@@ -429,7 +430,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Time zone for the graph. This is used to store the timetables in the transit model, and to
    * interpret times in incoming requests.
    */
-  public ZoneId timeZone;
+  public ZoneId transitModelTimeZone;
 
   /**
    * Whether to create stay-seated transfers in between two trips with the same block id.
@@ -491,7 +492,6 @@ public class BuildConfig implements OtpDataStoreConfig {
     maxStopToShapeSnapDistance = c.asDouble("maxStopToShapeSnapDistance", 150);
     multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
     osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
-    osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
     platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
     readCachedElevations = c.asBoolean("readCachedElevations", true);
     staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
@@ -506,7 +506,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
     boardingLocationTags = c.asTextSet("boardingLocationTags", Set.of("ref"));
     discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
-    timeZone = c.asZoneId("timeZone", null);
+    transitModelTimeZone = c.asZoneId("transitModelTimeZone", null);
 
     var localFileNamePatternsConfig = c.path("localFileNamePatterns");
     gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
@@ -527,6 +527,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     fareServiceFactory = FaresConfiguration.fromConfig(c.asRawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
     netexDefaults = new NetexDefaultsConfig(c.path("netexDefaults"));
+    osmDefaults = new OsmDefaultsConfig(c.path("osmDefaults"));
     dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
 
     if (c.path("transferRequests").isNonEmptyArray()) {
