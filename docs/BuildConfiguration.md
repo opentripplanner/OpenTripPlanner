@@ -62,15 +62,15 @@ for transit data files in the [base directory](Configuration.md#Base Directory).
 located outside the local filesystem (including cloud storage services) or at various
 different locations around the local filesystem.
 
-| config key                | description                                                                                                                                         | value type | value default |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------------|
-| `type`                    | The type of transit data. Supported types are `netex` and `gtfs`.                                                                                   | string     | mandatory     |
-| `feedId`                  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                             | string     | `null`        |
-| `source`                  | The unique URI pointing to the data file.                                                                                                           | uri        | `null`        |
-| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.       | string     | `null`        |
-| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults. | string     | `null`        |
-| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.            | string     | `null`        |
-| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.                          | string     | `null`        |
+| config key                | description                                                                                                                                         | value type      | value default |
+|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|---------------|
+| `type`                    | The type of transit data. Supported types are `netex` and `gtfs`.                                                                                   | string          | mandatory     |
+| `feedId`                  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                             | string          | `null`        |
+| `source`                  | The unique URI pointing to the data file.                                                                                                           | uri             | `null`        |
+| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.       | regexp pattern  | `null`        |
+| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults. | regexp pattern  | `null`        |
+| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.            | regexp pattern  | `null`        |
+| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.                          | regexp pattern  | `null`        |
 
 ## OSM 
 
@@ -92,10 +92,10 @@ for elevation files in the [base directory](Configuration.md#Base Directory). Yo
 located outside the local filesystem (including cloud storage services) or at various
 different locations around the local filesystem.
 
-| config key                 | description                                                                            | value type | value default |
-|----------------------------|----------------------------------------------------------------------------------------|------------|---------------|
-| `source`                   | The unique URI pointing to the data file.                                              | uri        | mandatory     |
-| `elevationUnitMultiplier`  | The multiplier applied to elevation values. Use 0.1 if values are given in decimeters. | double     | 1.0           |
+| config key                 | description                                                                                                                                        | value type | value default |
+|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------------|
+| `source`                   | The unique URI pointing to the data file.                                                                                                          | uri        | mandatory     |
+| `elevationUnitMultiplier`  | The multiplier applied to elevation values. Use 0.1 if values are given in decimeters. See [Elevation unit conversion](#elevation-unit-conversion) | double     | 1.0           |
 
 ## Specifying URIs
 
@@ -366,14 +366,15 @@ converts the elevation values from some other unit to metres.
 
 ```JSON
 // build-config.json
-"dem": [
 {
-  "source": "gs://otp-test-bucket/a/b/northpole.dem.tif",
-  // Correct conversation multiplier when source data uses decimetres instead of metres
-  "elevationUnitMultiplier": 0.1
+  "dem": [
+    {
+      "source": "gs://otp-test-bucket/a/b/northpole.dem.tif",
+      // Correct conversion multiplier when source data uses decimetres instead of metres
+      "elevationUnitMultiplier": 0.1
+    }
+  ]
 }
-]
-
 ```
 
 ### Elevation Data Calculation Optimizations
@@ -523,23 +524,23 @@ The current list of `combinationStrategy` is:
 It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part
 of the routing graph.
 
-### Way property sets
+### OSM tag mapping
 
 OSM tags have different meanings in different countries, and how the roads in a particular country
-or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly)
+or region are tagged affects routing. As an example roads tagged with `highway=trunk are (mainly)
 walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to
 snap stops to these roads, or by giving you poor routing results for walking and biking. You can
 adjust which road types that are accessible by foot, car & bicycle as well as speed limits,
 suitability for biking and walking.
 
-There are currently following wayPropertySets defined;
+There are currently following OSM tag mapping defined;
 
 - `default` which is based on California/US mapping standard
 - `finland` which is adjusted to rules and speeds in Finland
 - `norway` which is adjusted to rules and speeds in Norway
 - `uk` which is adjusted to rules and speed in the UK
 
-To add your own custom property set have a look
+To add your own OSM tag mapping have a look
 at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
 and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly
 rely on the default rules, make sure you add your own rules first before applying the default ones.
@@ -548,7 +549,12 @@ The mechanism is that for any two identical tags, OTP will use the first one.
 ```JSON
 // build-config.json
 {
-  "osmTagMapping": "norway"
+  "osm": [
+    {
+      "source": "gs://marduk-dev/osm/oslo_norway.osm-160816.pbf",
+      "osmTagMapping": "norway"
+    }
+    ]
 }
 ```
 
