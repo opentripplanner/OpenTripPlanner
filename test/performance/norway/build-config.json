@@ -24,7 +24,7 @@
   "boardingLocationTags": [],
   "transitModelTimeZone": "Europe/Oslo",
   "osmDefaults": {
-    "osmWayPropertySet": "norway",
+    "osmTagMapping": "norway",
     "timeZone": "Europe/Oslo"
   },
   "netex": {
