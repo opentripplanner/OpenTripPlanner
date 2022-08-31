@@ -68,7 +68,7 @@ public class OtpDataStoreTest {
 
   @Test
   public void readEmptyDir() {
-    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null, null);
 
     assertNoneExistingFile(store.getGraph(), GRAPH_FILENAME, GRAPH);
     assertNoneExistingFile(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
@@ -96,7 +96,7 @@ public class OtpDataStoreTest {
     write(baseDir, GRAPH_FILENAME, "Data");
     writeToDir(baseDir, REPORT_FILENAME, "index.json");
 
-    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, config(), null, null);
 
     assertExistingGraph(store.getGraph(), GRAPH_FILENAME);
     assertExistingGraph(store.getStreetGraph(), STREET_GRAPH_FILENAME);
@@ -168,7 +168,7 @@ public class OtpDataStoreTest {
     var confLoader = new ConfigLoader(baseDir);
     var buildConfig = confLoader.loadBuildConfig();
 
-    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig.storage, null);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig.storage, null, null);
 
     // Collect result and prepare it for assertion
     List<String> filenames = listFilesByRelativeName(store, baseDir, tempDataDir);

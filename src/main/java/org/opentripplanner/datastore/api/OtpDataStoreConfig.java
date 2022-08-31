@@ -40,6 +40,17 @@ public interface OtpDataStoreConfig {
   URI reportDirectory();
 
   /**
+   * Amazon AWS Region for accessing S3 Storage
+   */
+  String s3Region();
+
+  /**
+   * Amazon AWS Credentials Profile for accessing S3 Storage. Use "DEFAULT" to use default
+   * Credentials, in empty no profile is set.
+   */
+  String s3CredentialsProfile();
+
+  /**
    * Local file system path to Google Cloud Platform service accounts credentials file. The
    * credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
    * need to provide a path the the service credentials.

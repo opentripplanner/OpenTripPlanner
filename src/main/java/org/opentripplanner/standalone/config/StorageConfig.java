@@ -173,8 +173,11 @@ public class StorageConfig implements OtpDataStoreConfig {
    */
   public final URI buildReportDir;
 
+  public final String s3Region;
+
+  public final String s3CredentialsProfile;
+
   StorageConfig(NodeAdapter config) {
-    this.gsCredentials = config.asText("gsCredentials", null);
     this.graph = config.asUri("graph", null);
     this.streetGraph = config.asUri("streetGraph", null);
     this.osm.addAll(config.asUris("osm"));
@@ -189,16 +192,14 @@ public class StorageConfig implements OtpDataStoreConfig {
       this.osmLocalFilePattern = c.asPattern("osm", DEFAULT_OSM_PATTERN);
       this.demLocalFilePattern = c.asPattern("dem", DEFAULT_DEM_PATTERN);
     }
+    this.gsCredentials = config.asText("gsCredentials", null);
+    this.s3Region = config.asText("s3Region", null);
+    this.s3CredentialsProfile = config.asText("s3CredentialsProfile", null);
   }
 
   @Override
   public URI reportDirectory() {
     return buildReportDir;
-  }
-
-  @Override
-  public String gsCredentials() {
-    return gsCredentials;
   }
 
   @Override
@@ -249,5 +250,20 @@ public class StorageConfig implements OtpDataStoreConfig {
   @Override
   public Pattern demLocalFilePattern() {
     return demLocalFilePattern;
+  }
+
+  @Override
+  public String gsCredentials() {
+    return gsCredentials;
+  }
+
+  @Override
+  public String s3Region() {
+    return s3Region;
+  }
+
+  @Override
+  public String s3CredentialsProfile() {
+    return s3CredentialsProfile;
   }
 }
