@@ -36,7 +36,6 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLTicketType;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.GenericLocation;
@@ -1075,7 +1074,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<LegacyGraphQLTicketType>> ticketTypes() {
+  public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
       Map<Fare.FareType, Collection<FareRuleSet>> fareRules =
         ((DefaultFareServiceImpl) getFareService(environment)).getFareRulesPerType();
@@ -1085,7 +1084,6 @@ public class LegacyGraphQLQueryTypeImpl
         .stream()
         .filter(entry -> entry.getKey() == Fare.FareType.regular)
         .map(e -> e.getValue())
-        .map(frs -> frs.stream().map(fr -> new LegacyGraphQLTicketType(fr)).toList())
         .toList()
         .stream()
         .flatMap(rs -> rs.stream())

@@ -2,20 +2,23 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
+import java.text.DecimalFormat;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLTicketType;
+import org.opentripplanner.routing.core.FareRuleSet;
 
 public class LegacyGraphQLTicketTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLTicketType {
 
   @Override
   public DataFetcher<String> currency() {
-    return environment -> ((LegacyGraphQLTicketType) environment.getSource()).getCurrency();
+    return environment ->
+      ((FareRuleSet) environment.getSource()).getFareAttribute().getCurrencyType();
   }
 
   @Override
   public DataFetcher<String> fareId() {
-    return environment -> ((LegacyGraphQLTicketType) environment.getSource()).getFareId();
+    return environment ->
+      ((FareRuleSet) environment.getSource()).getFareAttribute().getId().toString();
   }
 
   @Override
@@ -23,17 +26,24 @@ public class LegacyGraphQLTicketTypeImpl
     return environment ->
       new Relay.ResolvedGlobalId(
         "TicketType",
-        ((LegacyGraphQLTicketType) environment.getSource()).getFareId()
+        ((FareRuleSet) environment.getSource()).getFareAttribute().getId().toString()
       );
   }
 
   @Override
-  public DataFetcher<Float> price() {
-    return environment -> ((LegacyGraphQLTicketType) environment.getSource()).getPrice();
+  public DataFetcher<Double> price() {
+    return environment ->
+      // This is needed to overcome float prices becoming inexact in output, e.g. 2.8 becoming 2.7999...
+      Double.valueOf(
+        new DecimalFormat("#.00")
+          .format(
+            Double.valueOf(((FareRuleSet) environment.getSource()).getFareAttribute().getPrice())
+          )
+      );
   }
 
   @Override
   public DataFetcher<Iterable<String>> zones() {
-    return environment -> ((LegacyGraphQLTicketType) environment.getSource()).getZones();
+    return environment -> ((FareRuleSet) environment.getSource()).getContains();
   }
 }
