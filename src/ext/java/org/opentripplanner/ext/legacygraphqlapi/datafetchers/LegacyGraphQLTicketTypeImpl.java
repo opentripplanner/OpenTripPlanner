@@ -36,9 +36,7 @@ public class LegacyGraphQLTicketTypeImpl
       // This is needed to overcome float prices becoming inexact in output, e.g. 2.8 becoming 2.7999...
       Double.valueOf(
         new DecimalFormat("#.00")
-          .format(
-            Double.valueOf(((FareRuleSet) environment.getSource()).getFareAttribute().getPrice())
-          )
+          .format(((FareRuleSet) environment.getSource()).getFareAttribute().getPrice())
       );
   }
 
