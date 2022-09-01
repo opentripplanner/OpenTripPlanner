@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.common.model.P3;
+import org.opentripplanner.common.model.RouteOriginDestination;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -57,7 +57,7 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
       float bestSpecialFare = Float.POSITIVE_INFINITY;
       Set<String> ruleZones = null;
       for (FareRuleSet ruleSet : fareRules) {
-        P3<String> routeOriginDestination = new P3<>(
+        RouteOriginDestination routeOriginDestination = new RouteOriginDestination(
           leg.getRoute().getId().toString(),
           leg.getFrom().stop.getFirstZoneAsString(),
           leg.getTo().stop.getFirstZoneAsString()

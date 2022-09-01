@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.P3;
+import org.opentripplanner.common.model.RouteOriginDestination;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -15,7 +15,7 @@ public class FareRuleSet implements Serializable {
   private final Set<FeedScopedId> routes;
   private final Set<P2<String>> originDestinations;
 
-  private final Set<P3<String>> routeOriginDestinations;
+  private final Set<RouteOriginDestination> routeOriginDestinations;
   private final Set<String> contains;
   private final FareAttribute fareAttribute;
   private final Set<FeedScopedId> trips;
@@ -42,10 +42,10 @@ public class FareRuleSet implements Serializable {
    * outside their normal validity zones
    */
   public void addRouteOriginDestination(String route, String origin, String destination) {
-    routeOriginDestinations.add(new P3<String>(route, origin, destination));
+    routeOriginDestinations.add(new RouteOriginDestination(route, origin, destination));
   }
 
-  public Set<P3<String>> getRouteOriginDestinations() {
+  public Set<RouteOriginDestination> getRouteOriginDestinations() {
     return routeOriginDestinations;
   }
 
