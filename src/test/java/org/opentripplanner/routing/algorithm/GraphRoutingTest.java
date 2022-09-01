@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -459,6 +460,14 @@ public abstract class GraphRoutingTest {
     public StopTime st(TransitStopVertex s1) {
       var st = new StopTime();
       st.setStop(s1.getStop());
+      return st;
+    }
+
+    public StopTime st(TransitStopVertex s1, boolean board, boolean alight) {
+      var st = new StopTime();
+      st.setStop(s1.getStop());
+      st.setPickupType(board ? PickDrop.SCHEDULED : PickDrop.NONE);
+      st.setDropOffType(alight ? PickDrop.SCHEDULED : PickDrop.NONE);
       return st;
     }
   }
