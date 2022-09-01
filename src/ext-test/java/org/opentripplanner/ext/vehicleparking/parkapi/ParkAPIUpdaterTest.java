@@ -17,18 +17,23 @@ public class ParkAPIUpdaterTest {
   @Test
   void parseCars() {
     var url = "file:src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
-
-    var parameters = new ParkAPIUpdaterParameters("", url, "park-api", 30, null, List.of(), null);
+    var timeZone = ZoneId.of("Europe/Berlin");
+    var parameters = new ParkAPIUpdaterParameters(
+      "",
+      url,
+      "park-api",
+      30,
+      null,
+      List.of(),
+      null,
+      timeZone
+    );
     var openingHoursCalendarService = new OpeningHoursCalendarService(
       new Deduplicator(),
       LocalDate.of(2022, Month.JANUARY, 1),
       LocalDate.of(2023, Month.JANUARY, 1)
     );
-    var updater = new CarParkAPIUpdater(
-      parameters,
-      openingHoursCalendarService,
-      ZoneId.of("Europe/Berlin")
-    );
+    var updater = new CarParkAPIUpdater(parameters, openingHoursCalendarService);
 
     assertTrue(updater.update());
     var parkingLots = updater.getUpdates();

@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,12 +32,15 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
 
   public HslParkUpdater(
     HslParkUpdaterParameters parameters,
-    OpeningHoursCalendarService openingHoursCalendarService,
-    ZoneId zoneId
+    OpeningHoursCalendarService openingHoursCalendarService
   ) {
     String feedId = parameters.getFeedId();
     vehicleParkingMapper =
-      new HslParkToVehicleParkingMapper(feedId, openingHoursCalendarService, zoneId);
+      new HslParkToVehicleParkingMapper(
+        feedId,
+        openingHoursCalendarService,
+        parameters.getTimeZone()
+      );
     parkPatchMapper = new HslParkUtilizationToPatchMapper(feedId);
     facilitiesDownloader =
       new JsonDataListDownloader<>(

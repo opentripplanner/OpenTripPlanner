@@ -2,7 +2,6 @@ package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import ch.poole.openinghoursparser.OpeningHoursParseException;
 import com.fasterxml.jackson.databind.JsonNode;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,13 +38,13 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
   public ParkAPIUpdater(
     ParkAPIUpdaterParameters parameters,
-    OpeningHoursCalendarService openingHoursCalendarService,
-    ZoneId zoneId
+    OpeningHoursCalendarService openingHoursCalendarService
   ) {
     super(parameters.getUrl(), JSON_PARSE_PATH, parameters.getHttpHeaders());
     this.feedId = parameters.getFeedId();
     this.staticTags = parameters.getTags();
-    this.osmOpeningHoursParser = new OSMOpeningHoursParser(openingHoursCalendarService, zoneId);
+    this.osmOpeningHoursParser =
+      new OSMOpeningHoursParser(openingHoursCalendarService, parameters.getTimeZone());
   }
 
   @Override

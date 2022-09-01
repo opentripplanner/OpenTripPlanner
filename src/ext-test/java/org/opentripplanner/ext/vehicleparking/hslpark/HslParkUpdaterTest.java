@@ -20,6 +20,7 @@ public class HslParkUpdaterTest {
   void parseParks() {
     var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
     var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
+    var timeZone = ZoneId.of("Europe/Helsinki");
 
     var parameters = new HslParkUpdaterParameters(
       "",
@@ -28,18 +29,15 @@ public class HslParkUpdaterTest {
       "hslpark",
       null,
       30,
-      utilizationsUrl
+      utilizationsUrl,
+      timeZone
     );
     var openingHoursCalendarService = new OpeningHoursCalendarService(
       new Deduplicator(),
       LocalDate.of(2022, Month.JANUARY, 1),
       LocalDate.of(2023, Month.JANUARY, 1)
     );
-    var updater = new HslParkUpdater(
-      parameters,
-      openingHoursCalendarService,
-      ZoneId.of("Europe/Helsinki")
-    );
+    var updater = new HslParkUpdater(parameters, openingHoursCalendarService);
 
     assertTrue(updater.update());
     var parkingLots = updater.getUpdates();

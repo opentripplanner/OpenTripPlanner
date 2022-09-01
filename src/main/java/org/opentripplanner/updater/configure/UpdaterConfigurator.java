@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.configure;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
@@ -123,7 +122,6 @@ public class UpdaterConfigurator {
    */
   private List<GraphUpdater> createUpdatersFromConfig() {
     OpeningHoursCalendarService openingHoursCalendarService = graph.getOpeningHoursCalendarService();
-    ZoneId zoneId = transitModel.getTimeZone();
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
@@ -180,11 +178,7 @@ public class UpdaterConfigurator {
       );
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
-      var source = VehicleParkingDataSourceFactory.create(
-        configItem,
-        openingHoursCalendarService,
-        zoneId
-      );
+      var source = VehicleParkingDataSourceFactory.create(configItem, openingHoursCalendarService);
       updaters.add(
         new VehicleParkingUpdater(
           configItem,
