@@ -33,6 +33,7 @@ public enum OTPFeature {
   // Sandbox extension features - Must be turned OFF by default
   ActuatorAPI(false),
   DataOverlay(false),
+  FaresV2(false),
   FlexRouting(false),
   GoogleCloudStorage(false),
   ReportApi(false),

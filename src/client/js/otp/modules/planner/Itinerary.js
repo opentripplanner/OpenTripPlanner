@@ -91,10 +91,78 @@ otp.modules.planner.Itinerary = otp.Class({
         return this.itinData.generalizedCost;
     },
 
+    buildFaresTable: function (products) {
+        const table = document.createElement("table");
+        table.classList.add("fares")
+
+        products.forEach(p => {
+
+            const tr = document.createElement("tr");
+            table.appendChild(tr);
+
+            const nameCell = document.createElement("td");
+            nameCell.classList.add("name");
+            nameCell.innerText = p.name || "";
+            const catCell = document.createElement("td");
+            if(p.category) {
+                catCell.innerText = p.category.name || "";
+            }
+            const containerCell = document.createElement("td");
+            if(p.container){
+                containerCell.innerText = p.container.name || "";
+            }
+
+            tr.appendChild(nameCell);
+            tr.appendChild(catCell);
+            tr.appendChild(containerCell);
+            const decimalPlaces = p.amount.currency.defaultFractionDigits;
+            const amount = (p.amount.cents / Math.pow(10, decimalPlaces)).toFixed(decimalPlaces);
+            const price = new Intl.NumberFormat(otp.config.locale.config.locale_short,
+                {
+                    style: 'currency',
+                    currency: p.amount.currency.currencyCode,
+                    maximumFractionDigits: p.amount.currency.defaultFractionDigits,
+                }
+            ).format(amount);
+            const priceCell = document.createElement("td");
+            priceCell.textContent = price;
+            tr.appendChild(priceCell);
+            table.appendChild(tr);
+
+        });
+        return table;
+    },
+
+    formatFaresV2: function (fare, legs) {
+        const allFares = document.createElement("div");
+        if (fare.coveringItinerary && fare.coveringItinerary.length > 0) {
+            const title = document.createElement("strong");
+            title.innerText = "Covering entire itinerary";
+            allFares.appendChild(title);
+            allFares.appendChild(this.buildFaresTable(this.itinData.fare.coveringItinerary));
+        }
+
+        if (fare.legProducts) {
+            fare.legProducts.forEach(legProducts => {
+                const name = legProducts.legIndices.map(index => `${legs[index].agencyName} ${legs[index].routeLongName}`).join(",");
+                const title = document.createElement("strong");
+                title.innerText = `Covering ${name}`;
+                allFares.appendChild(title);
+                allFares.appendChild(this.buildFaresTable(legProducts.products));
+            })
+        }
+
+        return allFares.outerHTML;
+    },
+
     getFareStr : function() {
         if(this.fareDisplayOverride) return this.fareDisplayOverride;
         if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
-        if(this.itinData.fare && this.itinData.fare.fare.regular) {
+
+        const fare = this.itinData.fare;
+        if(fare && (fare.coveringItinerary || fare.legProducts)) {
+            return this.formatFaresV2(fare, this.itinData.legs);
+        } else if(this.itinData.fare && this.itinData.fare.fare.regular) {
             var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
             var fare_info = {
                 'currency': this.itinData.fare.fare.regular.currency.symbol,
@@ -103,6 +171,7 @@ otp.modules.planner.Itinerary = otp.Class({
             //TRANSLATORS: Fare Currency Fare price
             return _tr('%(currency)s %(price)s', fare_info);
         }
+
         return "N/A";
     },
 

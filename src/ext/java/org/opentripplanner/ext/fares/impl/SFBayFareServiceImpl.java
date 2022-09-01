@@ -8,9 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +105,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
   @Override
   protected boolean populateFare(
-    Fare fare,
+    ItineraryFares fare,
     Currency currency,
     FareType fareType,
     List<Leg> rides,

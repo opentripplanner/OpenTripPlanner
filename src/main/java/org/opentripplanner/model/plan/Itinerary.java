@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -48,7 +48,7 @@ public class Itinerary {
   private final List<SystemNotice> systemNotices = new ArrayList<>();
   private List<Leg> legs;
 
-  private Fare fare = new Fare();
+  private ItineraryFares fare = ItineraryFares.empty();
 
   public Itinerary(List<Leg> legs) {
     setLegs(legs);
@@ -480,13 +480,45 @@ public class Itinerary {
   }
 
   /**
+   * Get the index of a leg when you want to reference it in an API response, for example when you
+   * want to say that a fare is valid for legs 2 and 3.
+   */
+  public int getLegIndex(Leg leg) {
+    var index = legs.indexOf(leg);
+    // the filter pipeline can also modify the identity of Leg instances. that's why we not only
+    // check that but also the start and end point as a replacement for the identity.
+    if (index > -1) {
+      return index;
+    } else {
+      for (int i = 0; i < legs.size() - 1; i++) {
+        var currentLeg = legs.get(i);
+        if (
+          currentLeg.getFrom().sameLocation(leg.getFrom()) &&
+          currentLeg.getTo().sameLocation(leg.getTo())
+        ) {
+          return i;
+        }
+      }
+      return -1;
+    }
+  }
+
+  /**
    * The cost of this trip
    */
-  public Fare getFare() {
+  public ItineraryFares getFares() {
     return fare;
   }
 
-  public void setFare(Fare fare) {
+  public void setFare(ItineraryFares fare) {
     this.fare = fare;
+  }
+
+  public List<ScheduledTransitLeg> getScheduledTransitLegs() {
+    return getLegs()
+      .stream()
+      .filter(ScheduledTransitLeg.class::isInstance)
+      .map(ScheduledTransitLeg.class::cast)
+      .toList();
   }
 }
