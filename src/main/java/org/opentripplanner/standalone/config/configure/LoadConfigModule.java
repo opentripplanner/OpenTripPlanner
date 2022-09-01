@@ -41,7 +41,7 @@ public class LoadConfigModule {
 
   @Provides
   static OtpDataStoreConfig providesDataStoreConfig(BuildConfig buildConfig) {
-    return buildConfig.storage;
+    return buildConfig;
   }
 
   @Provides

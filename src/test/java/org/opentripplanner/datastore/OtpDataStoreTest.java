@@ -134,12 +134,18 @@ public class OtpDataStoreTest {
     String buildConfigJson = String
       .format(
         "{" +
-        "%n  storage: {" +
-        "%n      osm: ['%s']," +
-        "%n      gtfs: ['%s']," +
-        "%n      graph: '%s'," +
-        "%n      buildReportDir: '%s'" +
-        "%n  }" +
+        "%n  osm: [{" +
+        "%n    source: '%s'" +
+        "%n  }]," +
+        "%n  transitFeeds: [" +
+        "%n      {" +
+        "%n         type: 'GTFS'," +
+        "%n         feedId: 'NO'," +
+        "%n         source: '%s'" +
+        "%n      }" +
+        "%n  ]," +
+        "%n  graph: '%s'," +
+        "%n  buildReportDir: '%s'" +
         "%n}",
         uri + OSM_FILENAME,
         uri + GTFS_FILENAME,
@@ -168,7 +174,7 @@ public class OtpDataStoreTest {
     var confLoader = new ConfigLoader(baseDir);
     var buildConfig = confLoader.loadBuildConfig();
 
-    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig.storage, null);
+    OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig, null);
 
     // Collect result and prepare it for assertion
     List<String> filenames = listFilesByRelativeName(store, baseDir, tempDataDir);
@@ -267,7 +273,6 @@ public class OtpDataStoreTest {
 
   private OtpDataStoreConfig config() {
     var confLoader = new ConfigLoader(baseDir);
-    var buildConfig = confLoader.loadBuildConfig();
-    return buildConfig.storage;
+    return confLoader.loadBuildConfig();
   }
 }

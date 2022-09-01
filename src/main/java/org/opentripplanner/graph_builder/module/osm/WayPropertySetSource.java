@@ -10,6 +10,10 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
  * @author bdferris, novalis, seime
  */
 public interface WayPropertySetSource {
+  static WayPropertySetSource defaultWayPropertySetSource() {
+    return fromConfig("default");
+  }
+
   /**
    * Return the given WayPropertySetSource or throws IllegalArgumentException if an unknown type is
    * specified

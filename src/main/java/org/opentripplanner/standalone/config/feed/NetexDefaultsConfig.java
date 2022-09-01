@@ -1,10 +1,11 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.feed;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.opentripplanner.standalone.config.NodeAdapter;
 
-public class NetexConfig {
+public class NetexDefaultsConfig {
 
   private static final String EMPTY_STRING_PATTERN = "$^";
 
@@ -98,7 +99,7 @@ public class NetexConfig {
    */
   public final Set<String> ferryIdsNotAllowedForBicycle;
 
-  NetexConfig(NodeAdapter config) {
+  public NetexDefaultsConfig(NodeAdapter config) {
     ignoreFilePattern = config.asPattern("ignoreFilePattern", IGNORE_FILE_PATTERN);
     sharedFilePattern = config.asPattern("sharedFilePattern", SHARED_FILE_PATTERN);
     sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);

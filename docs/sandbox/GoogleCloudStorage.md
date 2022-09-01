@@ -14,21 +14,32 @@
 
 To enable this turn on the feature `GoogleCloudStorage`. OTP can load or store artifacts from one or
 more Google Cloud Storge locations. Each artifact must be configured in the _build-config.json_:
-See [`StorageConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java)
+See [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
 on how to configure artifacts.
 
 Example (build-config.json):
 
 ```json
 {
-    "storage" : {
-        "gcsCredentials": "/Users/alf/secret/otp-test-1234567890.json",
-        "osm" : [ "gs://otp-test-bucket/a/b/northpole.pbf" ], 
-        "dem" : [ "gs://otp-test-bucket/a/b/northpole.dem.tif" ],
-        "gtfs": [ "gs://otp-test-bucket/a/b/gtfs.zip" ],
-        "graph": "gs://otp-test-bucket/a/b/graph.obj"
-        "buildReportDir": "gs://otp-test-bucket/a/b/np-report"
+  "gcsCredentials": "file:///Users/alf/secret/otp-test-1234567890.json",
+  "graph": "gs://otp-test-bucket/a/b/graph.obj",
+  "buildReportDir": "gs://otp-test-bucket/a/b/np-report",
+  "osm": [
+    {
+      "source": "gs://otp-test-bucket/a/b/northpole.pbf"
     }
+    ],
+  "dem": [
+    {
+      "source": "gs://otp-test-bucket/a/b/northpole.dem.tif"
+    }
+    ],
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "gs://otp-test-bucket/a/b/gtfs.zip"
+    }
+    ]
 }
 ```
 

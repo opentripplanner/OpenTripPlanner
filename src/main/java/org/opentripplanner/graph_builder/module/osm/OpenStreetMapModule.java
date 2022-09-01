@@ -168,7 +168,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   ) {
     this(List.copyOf(providers), boardingAreaRefTags, graph, timeZoneId, issueStore);
     this.customNamer = config.customNamer;
-    this.setDefaultWayPropertySetSource(config.osmWayPropertySet);
+    this.setDefaultWayPropertySetSource(config.osmDefaults.osmWayPropertySetSource);
     this.skipVisibility = !config.areaVisibility;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;

@@ -4,11 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneId;
 import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -24,6 +29,7 @@ public class OpenStreetMapProvider {
 
   private final DataSource source;
   private final boolean cacheDataInMem;
+  private final ZoneId timeZone;
   private byte[] cachedBytes = null;
 
   /** For tests */
@@ -31,8 +37,25 @@ public class OpenStreetMapProvider {
     this(new FileDataSource(file, FileType.OSM), cacheDataInMem);
   }
 
-  public OpenStreetMapProvider(DataSource source, boolean cacheDataInMem) {
-    this.source = source;
+  public OpenStreetMapProvider(FileDataSource fileDataSource, boolean cacheDataInMem) {
+    this(
+      new ConfiguredDataSource<>(
+        fileDataSource,
+        new OsmExtractConfigBuilder().withSource(fileDataSource.uri()).build()
+      ),
+      new OsmDefaultsConfig(),
+      cacheDataInMem
+    );
+  }
+
+  public OpenStreetMapProvider(
+    ConfiguredDataSource<OsmExtractConfig> osmExtractConfigConfiguredDataSource,
+    OsmDefaultsConfig osmDefaultsConfig,
+    boolean cacheDataInMem
+  ) {
+    this.source = osmExtractConfigConfiguredDataSource.dataSource();
+    this.timeZone =
+      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
     this.cacheDataInMem = cacheDataInMem;
   }
 
