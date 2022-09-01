@@ -28,6 +28,8 @@ The classes and their maintainers are as follows:
 | HighestFareInFreeTransferWindowFareServiceDutchFareServiceImpl | IBI Group ([David Emory](mailto:david.emory@ibigroup.com) |
 | NycFareServiceImpl                                             | unmaintained                                              |
 | SFBayFareServiceImpl                                           | unmaintained                                              |
+| HSLFareServiceImpl                                             | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com)) |
+| HSLFareServiceFactory                                          | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com)) |
 
 ## Removed fare calculators
 
