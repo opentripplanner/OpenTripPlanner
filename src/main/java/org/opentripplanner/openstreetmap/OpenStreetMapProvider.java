@@ -14,6 +14,7 @@ import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.openstreetmap.model.OSMProvider;
+import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -52,21 +53,22 @@ public class OpenStreetMapProvider implements OSMProvider {
         fileDataSource,
         new OsmExtractConfigBuilder().withSource(fileDataSource.uri()).build()
       ),
+      new OsmDefaultsConfig(),
       cacheDataInMem
     );
   }
 
   public OpenStreetMapProvider(
     ConfiguredDataSource<OsmExtractConfig> osmExtractConfigConfiguredDataSource,
+    OsmDefaultsConfig osmDefaultsConfig,
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone();
+    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
     this.wayPropertySetSource =
       osmExtractConfigConfiguredDataSource.config().getOsmWayPropertySet();
     this.wayPropertySet = new WayPropertySet();
-    wayPropertySetSource.populateProperties(wayPropertySet);
-    this.cacheDataInMem = cacheDataInMem;
+    wayPropertySetSource.populateProperties(wayPropertySet);this.cacheDataInMem = cacheDataInMem;
   }
 
   public void readOSM(OSMDatabase osmdb) {

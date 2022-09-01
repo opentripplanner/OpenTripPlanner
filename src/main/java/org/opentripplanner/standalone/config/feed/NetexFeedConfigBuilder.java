@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.regex.Pattern;
-import org.opentripplanner.standalone.config.NetexDefaultsConfig;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
 /**

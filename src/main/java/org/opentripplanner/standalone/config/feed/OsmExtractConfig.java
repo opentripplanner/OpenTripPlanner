@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Objects;
+import java.util.Optional;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
 /**
@@ -20,10 +21,7 @@ public class OsmExtractConfig implements DataSourceConfig {
 
   OsmExtractConfig(OsmExtractConfigBuilder osmExtractConfigBuilder) {
     this.source = Objects.requireNonNull(osmExtractConfigBuilder.getSource());
-    this.osmWayPropertySet =
-      osmExtractConfigBuilder.getOsmWayPropertySet() != null
-        ? osmExtractConfigBuilder.getOsmWayPropertySet()
-        : WayPropertySetSource.fromConfig("default");
+    this.osmWayPropertySet = osmExtractConfigBuilder.getOsmWayPropertySet();
     this.timeZone = osmExtractConfigBuilder.getTimeZone();
   }
 
@@ -34,17 +32,17 @@ public class OsmExtractConfig implements DataSourceConfig {
 
   /**
    *
-   * @return the custom OSM way properties for this OSM extract.
+   * @return the custom OSM way properties for this OSM extract. Overrides {@link OsmDefaultsConfig#osmWayPropertySetSource}.
    */
-  public WayPropertySetSource getOsmWayPropertySet() {
-    return osmWayPropertySet;
+  public Optional<WayPropertySetSource> getOsmWayPropertySet() {
+    return Optional.ofNullable(osmWayPropertySet);
   }
 
   /**
    *
-   * @return the timezone to use to resolve opening hours in this extract.
+   * @return the timezone to use to resolve opening hours in this extract. Overrides {@link OsmDefaultsConfig#timeZone}
    */
-  public ZoneId timeZone() {
-    return timeZone;
+  public Optional<ZoneId> timeZone() {
+    return Optional.ofNullable(timeZone);
   }
 }

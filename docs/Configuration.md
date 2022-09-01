@@ -88,10 +88,8 @@ to be part of the _graph-file-name_, or you want to inject credentials in a clou
 
 ```JSON
 {
-  "storage" : {
     "gsCredentials": "${GCS_SERVICE_CREDENTIALS}",
     "graph": "file:///var/otp/graph-${otp.serialization.version.id}.obj"
-  }
 }
 ```     
 
@@ -166,24 +164,28 @@ Here is an example including variable substitution, assuming version 2.1.0 of OT
 ```JSON
 // build-config.json
 {
-  "storage" : "${includeFile:storage.json}"
+  "transitFeeds" : "${includeFile:transit.json}"
 } 
 ``` 
 
 ```JSON
-// storage.json
-{
-  "streetGraph": "street-graph-v${maven.version}.obj"
+// transit.json
+[
+  {
+  "source": "netex-v${FEED_VERSION}.obj"
 }
+]
 ``` 
 
 The result will look like this:
 
 ```JSON
 {
-  "storage" : {
-    "streetGraph": "street-graph-v2.1.0.obj"
-  }
+      "transitFeeds": [
+        {
+          "source": "netex-v2_0.obj"
+        }
+      ]
 } 
 ``` 
 

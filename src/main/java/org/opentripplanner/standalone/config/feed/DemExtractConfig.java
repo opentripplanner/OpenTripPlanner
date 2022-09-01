@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Configuration of a DEM extract. Example:
@@ -11,7 +12,7 @@ public class DemExtractConfig implements DataSourceConfig {
 
   private final URI source;
 
-  private final double elevationUnitMultiplier;
+  private final Double elevationUnitMultiplier;
 
   DemExtractConfig(DemExtractConfigBuilder demExtractConfigBuilder) {
     source = Objects.requireNonNull(demExtractConfigBuilder.getSource());
@@ -23,7 +24,10 @@ public class DemExtractConfig implements DataSourceConfig {
     return source;
   }
 
-  public double elevationUnitMultiplier() {
-    return elevationUnitMultiplier;
+  /**
+   * Returns the custom elevation unit multiplier for this feed. Overrides {@link org.opentripplanner.standalone.config.BuildConfig#elevationUnitMultiplier}
+   */
+  public Optional<Double> elevationUnitMultiplier() {
+    return Optional.ofNullable(elevationUnitMultiplier);
   }
 }

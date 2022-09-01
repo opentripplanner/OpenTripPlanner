@@ -28,8 +28,10 @@ public class OsmExtractConfigBuilder {
   public static OsmExtractConfigBuilder of(NodeAdapter config) {
     OsmExtractConfigBuilder osmExtractConfigBuilder = new OsmExtractConfigBuilder();
     osmExtractConfigBuilder.source = config.asUri("source");
-    osmExtractConfigBuilder.osmWayPropertySet =
-      WayPropertySetSource.fromConfig(config.asText("osmWayPropertySet", "default"));
+    String osmTagMapping = config.asText("osmTagMapping", null);
+    if (osmTagMapping != null) {
+      osmExtractConfigBuilder.osmWayPropertySet = WayPropertySetSource.fromConfig(osmTagMapping);
+    }
     osmExtractConfigBuilder.timeZone = config.asZoneId("timeZone", null);
     return osmExtractConfigBuilder;
   }

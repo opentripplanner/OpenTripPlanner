@@ -16,7 +16,7 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
-import org.opentripplanner.standalone.config.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
