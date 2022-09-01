@@ -37,7 +37,7 @@ public class FareRuleSet implements Serializable {
     return originDestinations;
   }
 
-  /** 
+  /**
    * Used for checking ticket validity on HSL special routes on which some tickets are valid
    * outside their normal validity zones
    */
