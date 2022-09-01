@@ -29,7 +29,6 @@ The classes and their maintainers are as follows:
 | NycFareServiceImpl                                             | unmaintained                                              |
 | SFBayFareServiceImpl                                           | unmaintained                                              |
 | HSLFareServiceImpl                                             | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com)) |
-| HSLFareServiceFactory                                          | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com)) |
 
 ## Removed fare calculators
 
