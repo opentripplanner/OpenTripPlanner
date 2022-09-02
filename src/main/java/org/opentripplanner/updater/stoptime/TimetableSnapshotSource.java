@@ -326,12 +326,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           updates.size()
         );
 
-        var m = Multimaps.index(errors, UpdateError::errorType);
+        var errorIndex = Multimaps.index(errors, UpdateError::errorType);
 
-        m
+        errorIndex
           .keySet()
           .forEach(key -> {
-            var value = m.get(key);
+            var value = errorIndex.get(key);
             var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
             LOG.error(
               "[feedId: {}] {} failures of type {}: {}",
@@ -928,14 +928,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
       debug(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
-      UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
       debug(tripId, "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping.");
-      UpdateError.of(tripId, NO_START_DATE);
+      return UpdateError.of(tripId, NO_START_DATE);
     } else {
       // Check whether service date is served by trip
       final Set<FeedScopedId> serviceIds = transitService
@@ -944,20 +944,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (!serviceIds.contains(trip.getServiceId())) {
         // TODO: should we support this and change service id of trip?
         debug(tripId, "REPLACEMENT trip has a service date that is not served by trip, skipping.");
-        UpdateError.of(tripId, NO_SERVICE_ON_DATE);
+        return UpdateError.of(tripId, NO_SERVICE_ON_DATE);
       }
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
       debug(tripId, "REPLACEMENT trip has less then two stops, skipping.");
-      UpdateError.of(tripId, TOO_FEW_STOPS);
+      return UpdateError.of(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
     var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
-      UpdateError.of(tripId, NO_VALID_STOPS);
+      return UpdateError.of(tripId, NO_VALID_STOPS);
     }
 
     //

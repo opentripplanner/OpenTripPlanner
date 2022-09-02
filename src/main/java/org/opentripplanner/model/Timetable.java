@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
@@ -304,7 +305,7 @@ public class Timetable implements Serializable {
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return Result.failure(new UpdateError(feedScopedTripId, UNKNOWN));
+      return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
     }
 
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
