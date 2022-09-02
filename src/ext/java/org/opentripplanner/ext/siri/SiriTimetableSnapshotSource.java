@@ -10,7 +10,6 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRI
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
@@ -890,7 +889,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       if (exactPattern != null) {
         Timetable currentTimetable = getCurrentTimetable(exactPattern, serviceDate);
-        TripTimes exactUpdatedTripTimes = createUpdatedTripTimes(
+        var updateResult = createUpdatedTripTimes(
           currentTimetable,
           estimatedVehicleJourney,
           tripMatchedByServiceJourneyId.getId(),
@@ -898,15 +897,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           timeZone,
           transitModel.getDeduplicator()
         );
-        if (exactUpdatedTripTimes != null) {
-          times.add(exactUpdatedTripTimes);
+        if (updateResult.isSuccess()) {
+          times.add(updateResult.successValue());
           patterns.add(exactPattern);
         } else {
           LOG.info(
             "Failed to update TripTimes for trip found by exact match {}",
             tripMatchedByServiceJourneyId.getId()
           );
-          return List.of(new UpdateError(tripMatchedByServiceJourneyId.getId(), UNKNOWN));
+          return List.of(updateResult.failureValue());
         }
       }
     } else {
@@ -942,7 +941,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         TripPattern pattern = getPatternForTrip(matchingTrip, estimatedVehicleJourney);
         if (pattern != null) {
           Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
-          TripTimes updatedTripTimes = createUpdatedTripTimes(
+          var updateResult = createUpdatedTripTimes(
             currentTimetable,
             estimatedVehicleJourney,
             matchingTrip.getId(),
@@ -950,10 +949,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             timeZone,
             transitModel.getDeduplicator()
           );
-          if (updatedTripTimes != null) {
+          updateResult.ifSuccess(tripTimes -> {
             patterns.add(pattern);
-            times.add(updatedTripTimes);
-          }
+            times.add(tripTimes);
+          });
         }
       }
     }

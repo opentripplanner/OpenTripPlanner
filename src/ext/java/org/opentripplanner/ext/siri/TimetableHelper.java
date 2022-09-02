@@ -5,6 +5,7 @@ import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
@@ -63,7 +64,7 @@ public class TimetableHelper {
    * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
    * with the id specified in the trip descriptor of the TripUpdate; null if something went wrong
    */
-  public static TripTimes createUpdatedTripTimes(
+  public static Result<TripTimes, UpdateError> createUpdatedTripTimes(
     Timetable timetable,
     EstimatedVehicleJourney journey,
     FeedScopedId tripId,
@@ -78,14 +79,14 @@ public class TimetableHelper {
     final TripTimes existingTripTimes = timetable.getTripTimes(tripId);
     if (existingTripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
-      return null;
+      return UpdateError.result(tripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
 
     TripTimes oldTimes = new TripTimes(existingTripTimes);
 
     if (journey.isCancellation() != null && journey.isCancellation()) {
       oldTimes.cancelTrip();
-      return oldTimes;
+      return Result.success(oldTimes);
     }
 
     List<EstimatedCall> estimatedCalls = getEstimatedCalls(journey);
@@ -109,7 +110,7 @@ public class TimetableHelper {
       getStopById
     );
     if (modifiedStopTimes == null) {
-      return null;
+      return UpdateError.result(tripId, UNKNOWN);
     }
     TripTimes newTimes = new TripTimes(oldTimes.getTrip(), modifiedStopTimes, deduplicator);
 
@@ -387,15 +388,15 @@ public class TimetableHelper {
         tripId,
         invalidStopIndex.getAsInt()
       );
-      return null;
+      return UpdateError.result(tripId, NON_INCREASING_TRIP_TIMES);
     }
 
     if (newTimes.getNumStops() != pattern.numberOfStops()) {
-      return null;
+      return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return newTimes;
+    return Result.success(newTimes);
   }
 
   private static int calculateDayOffset(TripTimes oldTimes) {
