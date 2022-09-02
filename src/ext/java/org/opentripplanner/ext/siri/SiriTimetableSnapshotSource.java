@@ -308,7 +308,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 }
               } else {
                 // Updated trip
-                if (handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey).isEmpty()) {
+                if (
+                  handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey).isSuccess()
+                ) {
                   handledCounter++;
                 } else {
                   if (journey.isMonitored() != null && !journey.isMonitored()) {
@@ -834,7 +836,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return null;
   }
 
-  private List<UpdateError> handleModifiedTrip(
+  private Result<Void, List<UpdateError>> handleModifiedTrip(
     TransitModel transitModel,
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
@@ -847,7 +849,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         estimatedVehicleJourney.isCancellation() != null &&
         !estimatedVehicleJourney.isCancellation()
       ) {
-        return List.of();
+        return Result.success();
       }
     }
 
@@ -870,7 +872,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
     if (serviceDate == null) {
-      return List.of();
+      return Result.success();
     }
 
     Set<TripTimes> times = new HashSet<>();
@@ -905,7 +907,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             "Failed to update TripTimes for trip found by exact match {}",
             tripMatchedByServiceJourneyId.getId()
           );
-          return List.of(updateResult.failureValue());
+          return Result.failure(List.of(updateResult.failureValue()));
         }
       }
     } else {
@@ -920,7 +922,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           lineRef,
           vehicleRef
         );
-        return List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH));
+        return Result.failure(List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH)));
       }
 
       //Find the trips that best corresponds to EstimatedVehicleJourney
@@ -934,7 +936,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           lineRef,
           vehicleRef
         );
-        return List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH));
+        return Result.failure(List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH)));
       }
 
       for (Trip matchingTrip : matchingTrips) {
@@ -965,11 +967,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         lineRef,
         vehicleRef
       );
-      return List.of(new UpdateError(null, TRIP_NOT_FOUND_IN_PATTERN));
+      return Result.failure(List.of(new UpdateError(null, TRIP_NOT_FOUND_IN_PATTERN)));
     }
 
     if (times.isEmpty()) {
-      return List.of(new UpdateError(null, NO_UPDATES));
+      return Result.failure(List.of(new UpdateError(null, NO_UPDATES)));
     }
 
     List<UpdateError> errors = new ArrayList<>();
@@ -1029,7 +1031,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
     }
 
-    return errors;
+    if (errors.isEmpty()) {
+      return Result.success();
+    } else {
+      return Result.failure(errors);
+    }
   }
 
   private LocalDate getServiceDateForEstimatedVehicleJourney(
@@ -1114,7 +1120,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
     addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
 
-    return maybeError.map(Result::<Void, UpdateError>failure).orElse(Result.success(null));
+    return maybeError.map(Result::<Void, UpdateError>failure).orElse(Result.success());
   }
 
   private void addTripOnServiceDateToBuffer(

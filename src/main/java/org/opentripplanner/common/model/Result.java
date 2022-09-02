@@ -21,6 +21,10 @@ public abstract sealed class Result<T, E> {
     return new Success<>(success);
   }
 
+  public static <E> Result<Void, E> success() {
+    return new Success<>(null);
+  }
+
   /**
    * Get the value contained with an erased type. If you want to use the typed version of the value
    * use {@link Result#ifFailure(Consumer)} or  {@link Result#ifSuccess(Consumer)}}.
@@ -115,7 +119,6 @@ public abstract sealed class Result<T, E> {
     private final T success;
 
     private Success(T success) {
-      Objects.requireNonNull(success);
       this.success = success;
     }
 
