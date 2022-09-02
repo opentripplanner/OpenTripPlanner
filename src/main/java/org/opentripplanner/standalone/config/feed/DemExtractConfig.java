@@ -12,6 +12,11 @@ public class DemExtractConfig implements DataSourceConfig {
 
   private final URI source;
 
+  /**
+   * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+   * are defined in meters in the source data. If, for example, decimetres are used in the source
+   * data, this should be set to 0.1.
+   */
   private final Double elevationUnitMultiplier;
 
   DemExtractConfig(DemExtractConfigBuilder demExtractConfigBuilder) {

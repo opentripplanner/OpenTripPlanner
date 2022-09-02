@@ -84,12 +84,7 @@ public class ElevationModule implements GraphBuilderModule {
   private final AtomicInteger nPointsEvaluated = new AtomicInteger(0);
   private final AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
   private final double distanceBetweenSamplesM;
-  /**
-   * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
-   * are defined in meters in the source data. If, for example, decimetres are used in the source
-   * data, this should be set to 0.1 in build-config.json.
-   */
-  private final double elevationUnitMultiplier;
+
   /** A concurrent hashmap used for storing geoid difference values at various coordinates */
   private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
   private final ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
@@ -120,7 +115,6 @@ public class ElevationModule implements GraphBuilderModule {
       new HashMap<>(),
       false,
       false,
-      1,
       10,
       2000,
       true,
@@ -136,7 +130,6 @@ public class ElevationModule implements GraphBuilderModule {
     Map<Vertex, Double> elevationData,
     boolean readCachedElevations,
     boolean writeCachedElevations,
-    double elevationUnitMultiplier,
     double distanceBetweenSamplesM,
     double maxElevationPropagationMeters,
     boolean includeEllipsoidToGeoidDifference,
@@ -149,7 +142,6 @@ public class ElevationModule implements GraphBuilderModule {
     this.elevationData = elevationData;
     this.readCachedElevations = readCachedElevations;
     this.writeCachedElevations = writeCachedElevations;
-    this.elevationUnitMultiplier = elevationUnitMultiplier;
     this.maxElevationPropagationMeters = maxElevationPropagationMeters;
     this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
     this.multiThreadElevationCalculations = multiThreadElevationCalculations;
@@ -574,7 +566,7 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     var elevation =
-      (values[0] * elevationUnitMultiplier) -
+      (values[0] * gridCoverageFactory.elevationUnitMultiplier()) -
       (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
 
     minElevation = Math.min(minElevation, elevation);

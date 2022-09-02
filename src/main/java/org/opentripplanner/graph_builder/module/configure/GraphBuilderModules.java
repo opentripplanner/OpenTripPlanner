@@ -171,7 +171,10 @@ public class GraphBuilderModules {
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
-        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDatasource())
+        createDemGeotiffGridCoverageFactories(
+          dataSources.getDemConfiguredDatasource(),
+          config.elevationUnitMultiplier
+        )
       );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
@@ -262,12 +265,17 @@ public class GraphBuilderModules {
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(
-    Iterable<ConfiguredDataSource<DemExtractConfig>> dataSources
+    Iterable<ConfiguredDataSource<DemExtractConfig>> dataSources,
+    double defaultElevationUnitMultiplier
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
     for (ConfiguredDataSource<DemExtractConfig> demSource : dataSources) {
+      double elevationUnitMultiplier = demSource
+        .config()
+        .elevationUnitMultiplier()
+        .orElse(defaultElevationUnitMultiplier);
       elevationGridCoverageFactories.add(
-        createGeotiffGridCoverageFactoryImpl(demSource.dataSource())
+        createGeotiffGridCoverageFactoryImpl(demSource.dataSource(), elevationUnitMultiplier)
       );
     }
     return elevationGridCoverageFactories;
@@ -291,7 +299,6 @@ public class GraphBuilderModules {
       osmModule.elevationDataOutput(),
       config.readCachedElevations,
       config.writeCachedElevations,
-      config.elevationUnitMultiplier,
       config.distanceBetweenElevationSamples,
       config.maxElevationPropagationMeters,
       config.includeEllipsoidToGeoidDifference,
@@ -300,8 +307,9 @@ public class GraphBuilderModules {
   }
 
   private static ElevationGridCoverageFactory createGeotiffGridCoverageFactoryImpl(
-    DataSource demSource
+    DataSource demSource,
+    double elevationUnitMultiplier
   ) {
-    return new GeotiffGridCoverageFactoryImpl(demSource);
+    return new GeotiffGridCoverageFactoryImpl(demSource, elevationUnitMultiplier);
   }
 }
