@@ -293,7 +293,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               if (journey.isExtraJourney() != null && journey.isExtraJourney()) {
                 // Added trip
                 try {
-                  if (handleAddedTrip(transitModel, feedId, journey).isEmpty()) {
+                  if (handleAddedTrip(transitModel, feedId, journey).isSuccess()) {
                     addedCounter++;
                   } else {
                     skippedCounter++;
@@ -492,7 +492,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return tripPattern.getScheduledTimetable();
   }
 
-  private Optional<UpdateError> handleAddedTrip(
+  private Result<Void, UpdateError> handleAddedTrip(
     TransitModel transitModel,
     String feedId,
     EstimatedVehicleJourney estimatedVehicleJourney
@@ -589,13 +589,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
     if (serviceDate == null) {
-      return UpdateError.of(tripId, NO_START_DATE);
+      return UpdateError.result(tripId, NO_START_DATE);
     }
 
     FeedScopedId calServiceId = transitModel.getOrCreateServiceIdForDate(serviceDate);
 
     if (calServiceId == null) {
-      return UpdateError.of(tripId, NO_START_DATE);
+      return UpdateError.result(tripId, NO_START_DATE);
     }
 
     tripBuilder.withServiceId(calServiceId);
@@ -1017,7 +1017,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 serviceDate,
                 estimatedVehicleJourney
               )
-                .ifPresent(errors::add);
+                .ifFailure(errors::add);
             }
           } else {
             buffer.update(pattern, tripTimes, serviceDate).ifPresent(errors::add);
@@ -1081,7 +1081,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Add a (new) trip to the transitModel and the buffer
    */
-  private Optional<UpdateError> addTripToGraphAndBuffer(
+  private Result<Void, UpdateError> addTripToGraphAndBuffer(
     final String feedId,
     final TransitModel transitModel,
     final Trip trip,
@@ -1115,7 +1115,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
     addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
 
-    return maybeError;
+    return maybeError.map(Result::<Void, UpdateError>failure).orElse(Result.success(null));
   }
 
   private void addTripOnServiceDateToBuffer(

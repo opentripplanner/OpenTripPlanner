@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
@@ -25,8 +26,12 @@ public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorTy
     NOT_IMPLEMENTED_DUPLICATED,
   }
 
-  public static Optional<UpdateError> of(FeedScopedId tripId, UpdateErrorType errorType) {
+  public static Optional<UpdateError> optional(FeedScopedId tripId, UpdateErrorType errorType) {
     return Optional.of(new UpdateError(tripId, errorType));
+  }
+
+  public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {
+    return Result.failure(new UpdateError(tripId, errorType));
   }
 
   public static Optional<UpdateError> noError() {

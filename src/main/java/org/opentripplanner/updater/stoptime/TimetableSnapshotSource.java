@@ -294,8 +294,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case UNSCHEDULED -> UpdateError.of(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
-            case DUPLICATED -> UpdateError.of(tripId, NOT_IMPLEMENTED_DUPLICATED);
+            case UNSCHEDULED -> UpdateError.optional(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
+            case DUPLICATED -> UpdateError.optional(tripId, NOT_IMPLEMENTED_DUPLICATED);
           };
 
         updateError.ifPresent(errors::add);
@@ -414,12 +414,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (pattern == null) {
       debug(tripId, "No pattern found for tripId, skipping TripUpdate.");
-      return UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.optional(tripId, TRIP_ID_NOT_FOUND);
     }
 
     if (tripUpdate.getStopTimeUpdateCount() < 1) {
       debug(tripId, "TripUpdate contains no updates, skipping.");
-      return UpdateError.of(tripId, NO_UPDATES);
+      return UpdateError.optional(tripId, NO_UPDATES);
     }
 
     // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the sequence of stops has
@@ -496,26 +496,26 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // TODO: should we support this and add a new instantiation of this trip (making it
       // frequency based)?
       debug(tripId, "Graph already contains trip id of ADDED trip, skipping.");
-      UpdateError.of(tripId, TRIP_ALREADY_EXISTS);
+      UpdateError.optional(tripId, TRIP_ALREADY_EXISTS);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
       debug(tripId, "ADDED trip doesn't have a start date in TripDescriptor, skipping.");
-      UpdateError.of(tripId, NO_START_DATE);
+      UpdateError.optional(tripId, NO_START_DATE);
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
       debug(tripId, "ADDED trip has fewer than two stops, skipping.");
-      UpdateError.of(tripId, TOO_FEW_STOPS);
+      UpdateError.optional(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
     final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
-      return UpdateError.of(tripId, NO_VALID_STOPS);
+      return UpdateError.optional(tripId, NO_VALID_STOPS);
     }
 
     //
@@ -694,7 +694,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         "ADDED trip has service date {} for which no service id is available, skipping.",
         serviceDate.toString()
       );
-      return UpdateError.of(tripId, NO_SERVICE_ON_DATE);
+      return UpdateError.optional(tripId, NO_SERVICE_ON_DATE);
     } else {
       // Just use first service id of set
       tripBuilder.withServiceId(serviceIds.iterator().next());
@@ -757,7 +757,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             "ADDED trip has invalid arrival time (compared to start date in " +
             "TripDescriptor), skipping."
           );
-          return UpdateError.of(trip.getId(), INVALID_ARRIVAL_TIME);
+          return UpdateError.optional(trip.getId(), INVALID_ARRIVAL_TIME);
         }
         stopTime.setArrivalTime((int) arrivalTime);
       }
@@ -771,7 +771,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             "ADDED trip has invalid departure time (compared to start date in " +
             "TripDescriptor), skipping."
           );
-          return UpdateError.of(trip.getId(), INVALID_DEPARTURE_TIME);
+          return UpdateError.optional(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
       }
@@ -923,14 +923,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
       debug(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
-      return UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.optional(tripId, TRIP_ID_NOT_FOUND);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
       debug(tripId, "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping.");
-      return UpdateError.of(tripId, NO_START_DATE);
+      return UpdateError.optional(tripId, NO_START_DATE);
     } else {
       // Check whether service date is served by trip
       final Set<FeedScopedId> serviceIds = transitService
@@ -939,20 +939,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (!serviceIds.contains(trip.getServiceId())) {
         // TODO: should we support this and change service id of trip?
         debug(tripId, "REPLACEMENT trip has a service date that is not served by trip, skipping.");
-        return UpdateError.of(tripId, NO_SERVICE_ON_DATE);
+        return UpdateError.optional(tripId, NO_SERVICE_ON_DATE);
       }
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
       debug(tripId, "REPLACEMENT trip has less then two stops, skipping.");
-      return UpdateError.of(tripId, TOO_FEW_STOPS);
+      return UpdateError.optional(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
     var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
-      return UpdateError.of(tripId, NO_VALID_STOPS);
+      return UpdateError.optional(tripId, NO_VALID_STOPS);
     }
 
     //
@@ -1008,7 +1008,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (!cancelScheduledSuccess && !cancelPreviouslyAddedSuccess) {
       debug(tripId, "No pattern found for tripId. Skipping cancellation.");
-      return UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.optional(tripId, TRIP_ID_NOT_FOUND);
     }
     return UpdateError.noError();
   }
