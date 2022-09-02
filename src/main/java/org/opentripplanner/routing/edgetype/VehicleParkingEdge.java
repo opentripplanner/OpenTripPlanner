@@ -53,7 +53,7 @@ public class VehicleParkingEdge extends Edge {
       return null;
     }
 
-    if (options.arriveBy) {
+    if (options.arriveBy()) {
       return traverseUnPark(s0);
     } else {
       return traversePark(s0);

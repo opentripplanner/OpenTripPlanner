@@ -222,10 +222,10 @@ public class FlexIntegrationTest {
   ) {
     RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
-    request.numItineraries = 10;
-    request.searchWindow = Duration.ofHours(2);
+    request.setFrom(from);
+    request.setTo(to);
+    request.setNumItineraries(10);
+    request.setSearchWindow(Duration.ofHours(2));
 
     var modes = request.modes.copy();
     modes.withEgressMode(FLEXIBLE);

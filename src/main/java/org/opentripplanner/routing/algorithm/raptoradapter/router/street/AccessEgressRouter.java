@@ -35,7 +35,7 @@ public class AccessEgressRouter {
     boolean fromTarget
   ) {
     final RouteRequest rr = rctx.opt;
-    Set<Vertex> vertices = fromTarget != rr.arriveBy ? rctx.toVertices : rctx.fromVertices;
+    Set<Vertex> vertices = fromTarget != rr.arriveBy() ? rctx.toVertices : rctx.fromVertices;
 
     //TODO: Investigate why this is needed for flex
     RouteRequest nearbyRequest = rr.getStreetSearchRequest(streetMode);

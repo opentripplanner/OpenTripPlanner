@@ -76,7 +76,7 @@ public class StreetGraphFinder implements GraphFinder {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
     RouteRequest rr = new RouteRequest(TraverseMode.WALK);
-    rr.from = new GenericLocation(null, null, lat, lon);
+    rr.setFrom(new GenericLocation(null, null, lat, lon));
     rr.walkSpeed = 1;
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.

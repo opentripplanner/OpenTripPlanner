@@ -48,7 +48,7 @@ public class VehicleRentalEdge extends Edge {
     }
 
     boolean pickedUp;
-    if (options.arriveBy) {
+    if (options.arriveBy()) {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING:
           return null;

@@ -1014,9 +1014,9 @@ public class StreetEdge
       final double realTurnCost; // Units are seconds.
 
       // Apply turn restrictions
-      if (options.arriveBy && !canTurnOnto(backPSE, s0, backMode)) {
+      if (options.arriveBy() && !canTurnOnto(backPSE, s0, backMode)) {
         return null;
-      } else if (!options.arriveBy && !backPSE.canTurnOnto(this, s0, traverseMode)) {
+      } else if (!options.arriveBy() && !backPSE.canTurnOnto(this, s0, traverseMode)) {
         return null;
       }
 
@@ -1031,7 +1031,7 @@ public class StreetEdge
        * that during reverse traversal, we must also use the speed for the mode of
        * the backEdge, rather than of the current edge.
        */
-      if (options.arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
+      if (options.arriveBy() && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
         realTurnCost =
           s0
             .getRoutingContext()
@@ -1044,7 +1044,7 @@ public class StreetEdge
               (float) speed,
               (float) backSpeed
             );
-      } else if (!options.arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
+      } else if (!options.arriveBy() && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
         realTurnCost =
           s0
             .getRoutingContext()

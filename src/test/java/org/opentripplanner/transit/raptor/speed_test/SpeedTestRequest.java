@@ -46,22 +46,22 @@ public class SpeedTestRequest {
 
     if (input.departureTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.departureTime()));
-      request.arriveBy = false;
+      request.setArriveBy(false);
       if (input.arrivalTime() != TestCase.NOT_SET) {
         request.raptorOptions.withTimeLimit(time(input.arrivalTime()));
       }
     } else if (input.arrivalTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.arrivalTime()));
-      request.arriveBy = true;
+      request.setArriveBy(true);
     }
 
     if (input.window() != TestCase.NOT_SET) {
-      request.searchWindow = Duration.ofSeconds(input.window());
+      request.setSearchWindow(Duration.ofSeconds(input.window()));
     }
 
-    request.from = input.fromPlace();
-    request.to = input.toPlace();
-    request.numItineraries = opts.numOfItineraries();
+    request.setFrom(input.fromPlace());
+    request.setTo(input.toPlace());
+    request.setNumItineraries(opts.numOfItineraries());
     request.modes = input.modes();
 
     request.raptorOptions
@@ -70,7 +70,7 @@ public class SpeedTestRequest {
       .withSearchDirection(profile.direction());
 
     if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
-      request.searchWindow = Duration.ZERO;
+      request.setSearchWindow(Duration.ZERO);
     }
 
     addDebugOptions(request, opts);

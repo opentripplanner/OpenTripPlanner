@@ -102,8 +102,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       Double longitude
     ) -> {
       return (RouteRequest rr) -> {
-        rr.from = new GenericLocation(latitude, longitude);
-        rr.to = new GenericLocation(latitude, longitude);
+        rr.setFrom(new GenericLocation(latitude, longitude));
+        rr.setTo(new GenericLocation(latitude, longitude));
         rr.parkAndRide = true;
       };
     };
@@ -115,8 +115,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
     assertLinking(
       rr -> {
-        rr.from = new GenericLocation(null, TransitModelForTest.id("STOP"), null, null);
-        rr.to = new GenericLocation(null, TransitModelForTest.id("STOP"), null, null);
+        rr.setFrom(new GenericLocation(null, TransitModelForTest.id("STOP"), null, null));
+        rr.setTo(new GenericLocation(null, TransitModelForTest.id("STOP"), null, null));
       },
       "E1E2 street",
       "D1D2 street",
@@ -155,8 +155,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   public void testWheelchairLinking() {
     assertLinking(
       rr -> {
-        rr.from = new GenericLocation(47.5010, 19.03);
-        rr.to = new GenericLocation(47.5010, 19.03);
+        rr.setFrom(new GenericLocation(47.5010, 19.03));
+        rr.setTo(new GenericLocation(47.5010, 19.03));
         rr.wheelchairAccessibility = WheelchairAccessibilityRequest.makeDefault(true);
       },
       "C1C2 street",
@@ -173,8 +173,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   ) {
     assertLinking(
       rr -> {
-        rr.from = new GenericLocation(latitude, longitude);
-        rr.to = new GenericLocation(latitude, longitude);
+        rr.setFrom(new GenericLocation(latitude, longitude));
+        rr.setTo(new GenericLocation(latitude, longitude));
       },
       streetName,
       streetName,
@@ -185,8 +185,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
     assertLinking(
       rr -> {
-        rr.from = new GenericLocation(null, TransitModelForTest.id(stopId), null, null);
-        rr.to = new GenericLocation(null, TransitModelForTest.id(stopId), null, null);
+        rr.setFrom(new GenericLocation(null, TransitModelForTest.id(stopId), null, null));
+        rr.setTo(new GenericLocation(null, TransitModelForTest.id(stopId), null, null));
       },
       streetName,
       streetName,
@@ -206,7 +206,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       consumer.accept(routingRequest);
 
       // Remove to, so that origin and destination are different
-      routingRequest.to = new GenericLocation(null, null);
+      routingRequest.setTo(new GenericLocation(null, null));
 
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
         RoutingContext routingContext = new RoutingContext(
@@ -225,7 +225,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       consumer.accept(routingRequest);
 
       // Remove from, so that origin and destination are different
-      routingRequest.from = new GenericLocation(null, null);
+      routingRequest.setFrom(new GenericLocation(null, null));
 
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
         RoutingContext routingContext = new RoutingContext(

@@ -43,14 +43,14 @@ public class RoutingResponseMapper {
       searchParams,
       searchWindowForNextSearch,
       firstRemovedItinerary,
-      request.pageCursor == null ? null : request.pageCursor.type
+      request.pageCursor() == null ? null : request.pageCursor().type
     );
 
     PageCursor nextPageCursor = factory.nextPageCursor();
     PageCursor prevPageCursor = factory.previousPageCursor();
 
     if (LOG.isDebugEnabled()) {
-      logPagingInformation(request.pageCursor, prevPageCursor, nextPageCursor, routingErrors);
+      logPagingInformation(request.pageCursor(), prevPageCursor, nextPageCursor, routingErrors);
     }
 
     var metadata = createTripSearchMetadata(request, searchParams, firstRemovedItinerary);
@@ -114,9 +114,9 @@ public class RoutingResponseMapper {
       return null;
     }
 
-    Instant reqTime = request.getDateTime();
+    Instant reqTime = request.dateTime();
 
-    if (request.arriveBy) {
+    if (request.arriveBy()) {
       return TripSearchMetadata.createForArriveBy(
         reqTime,
         searchParams.searchWindowInSeconds(),

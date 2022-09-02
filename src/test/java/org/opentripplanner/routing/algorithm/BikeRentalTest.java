@@ -595,7 +595,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     Consumer<RouteRequest> optionsSetter
   ) {
     var options = new RouteRequest();
-    options.arriveBy = arriveBy;
+    options.setArriveBy(arriveBy);
     options.vehicleRentalPickupTime = 42;
     options.vehicleRentalPickupCost = 62;
     options.vehicleRentalDropoffCost = 33;

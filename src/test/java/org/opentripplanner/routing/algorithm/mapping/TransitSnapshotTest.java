@@ -67,8 +67,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitModes().build();
-    request.from = p0;
-    request.to = p2;
+    request.setFrom(p0);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -86,8 +86,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .clearTransitModes()
         .build();
-    request.from = ps;
-    request.to = p2;
+    request.setFrom(ps);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -105,8 +105,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .clearTransitModes()
         .build();
-    request.from = ptc;
-    request.to = p3;
+    request.setFrom(ptc);
+    request.setTo(p3);
 
     expectRequestResponseToMatchSnapshot(request);
     // not equal - expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -125,8 +125,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -144,8 +144,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = ps;
-    request.to = p3;
+    request.setFrom(ps);
+    request.setTo(p3);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -164,8 +164,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = ptc;
-    request.to = p3;
+    request.setFrom(ptc);
+    request.setTo(p3);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

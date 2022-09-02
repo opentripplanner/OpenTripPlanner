@@ -28,7 +28,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     Vertex target = rctx.toVertices.iterator().next();
     maxStreetSpeed = rctx.opt.getStreetSpeedUpperBound();
     walkingSpeed = rctx.opt.walkSpeed;
-    arriveBy = rctx.opt.arriveBy;
+    arriveBy = rctx.opt.arriveBy();
 
     if (target.getDegreeIn() == 1) {
       Edge edge = target.getIncoming().iterator().next();

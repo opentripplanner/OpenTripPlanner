@@ -66,8 +66,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitModes().build();
-    request.from = p1;
-    request.to = p4;
+    request.setFrom(p1);
+    request.setTo(p4);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -79,8 +79,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -95,9 +95,9 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.bikeTriangleSlopeFactor = 0.4;
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitModes().build();
-    request.from = p1;
-    request.to = p4;
-    request.arriveBy = true;
+    request.setFrom(p1);
+    request.setTo(p4);
+    request.setArriveBy(true);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -116,8 +116,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         .withDirectMode(StreetMode.NOT_SET)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p1;
-    request.to = p3;
+    request.setFrom(p1);
+    request.setTo(p3);
 
     try {
       expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -140,8 +140,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         .withDirectMode(StreetMode.NOT_SET)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p3;
-    request.to = p1;
+    request.setFrom(p3);
+    request.setTo(p1);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

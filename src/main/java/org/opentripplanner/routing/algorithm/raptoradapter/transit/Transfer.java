@@ -38,10 +38,10 @@ public class Transfer {
   public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
     RouteRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
 
-    rr.arriveBy = false;
+    rr.setArriveBy(false);
     rr.setDateTime(Instant.ofEpochSecond(0));
-    rr.from = null;
-    rr.to = null;
+    rr.setFrom(null);
+    rr.setTo(null);
 
     // Some of the values are rounded to ease caching in RaptorRequestTransferCache
     rr.bikeTriangleSafetyFactor = roundTo(request.bikeTriangleSafetyFactor, 1);

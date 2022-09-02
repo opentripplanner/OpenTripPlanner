@@ -16,7 +16,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -184,13 +183,12 @@ public abstract class RoutingResource {
   protected Double bikeWalkingReluctance;
 
   /**
-   * A multiplier for how bad walking is, compared to being in transit for equal
-   * lengths of time. Empirically, values between 2 and 4 seem to correspond
-   * well to the concept of not wanting to walk too much without asking for
-   * totally ridiculous itineraries, but this observation should in no way be
-   * taken as scientific or definitive. Your mileage may vary. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
-   * performance with high values. Default value: 2.0
+   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+   * Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to
+   * walk too much without asking for totally ridiculous itineraries, but this observation should in
+   * no way be taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
+   * high values. Default value: 2.0
    */
   @QueryParam("walkReluctance")
   protected Double walkReluctance;
@@ -717,9 +715,13 @@ public abstract class RoutingResource {
     // The routing request should already contain defaults, which are set when it is initialized or
     // in the JSON router configuration and cloned. We check whether each parameter was supplied
     // before overwriting the default.
-    if (fromPlace != null) request.from = LocationStringParser.fromOldStyleString(fromPlace);
+    if (fromPlace != null) {
+      request.setFrom(LocationStringParser.fromOldStyleString(fromPlace));
+    }
 
-    if (toPlace != null) request.to = LocationStringParser.fromOldStyleString(toPlace);
+    if (toPlace != null) {
+      request.setTo(LocationStringParser.fromOldStyleString(toPlace));
+    }
 
     {
       //FIXME: move into setter method on routing request
@@ -744,68 +746,106 @@ public abstract class RoutingResource {
     }
 
     if (searchWindow != null) {
-      request.searchWindow = Duration.ofSeconds(searchWindow);
+      request.setSearchWindow(Duration.ofSeconds(searchWindow));
     }
     if (pageCursor != null) {
-      request.pageCursor = PageCursor.decode(pageCursor);
+      request.setPageCursorFromEncoded(pageCursor);
     }
     if (timetableView != null) {
-      request.timetableView = timetableView;
+      request.setTimetableView(timetableView);
     }
 
-    if (wheelchair != null) request.setWheelchairAccessible(wheelchair);
+    if (wheelchair != null) {
+      request.setWheelchairAccessible(wheelchair);
+    }
 
-    if (numItineraries != null) request.setNumItineraries(numItineraries);
+    if (numItineraries != null) {
+      request.setNumItineraries(numItineraries);
+    }
 
-    if (bikeReluctance != null) request.setBikeReluctance(bikeReluctance);
+    if (bikeReluctance != null) {
+      request.setBikeReluctance(bikeReluctance);
+    }
 
-    if (bikeWalkingReluctance != null) request.setBikeWalkingReluctance(bikeWalkingReluctance);
+    if (bikeWalkingReluctance != null) {
+      request.setBikeWalkingReluctance(bikeWalkingReluctance);
+    }
 
-    if (carReluctance != null) request.setCarReluctance(carReluctance);
+    if (carReluctance != null) {
+      request.setCarReluctance(carReluctance);
+    }
 
-    if (walkReluctance != null) request.setWalkReluctance(walkReluctance);
+    if (walkReluctance != null) {
+      request.setWalkReluctance(walkReluctance);
+    }
 
-    if (waitReluctance != null) request.setWaitReluctance(waitReluctance);
+    if (waitReluctance != null) {
+      request.setWaitReluctance(waitReluctance);
+    }
 
-    if (waitAtBeginningFactor != null) request.setWaitAtBeginningFactor(waitAtBeginningFactor);
+    if (waitAtBeginningFactor != null) {
+      request.setWaitAtBeginningFactor(waitAtBeginningFactor);
+    }
 
-    if (walkSpeed != null) request.walkSpeed = walkSpeed;
+    if (walkSpeed != null) {
+      request.walkSpeed = walkSpeed;
+    }
 
-    if (bikeSpeed != null) request.bikeSpeed = bikeSpeed;
+    if (bikeSpeed != null) {
+      request.bikeSpeed = bikeSpeed;
+    }
 
-    if (bikeWalkingSpeed != null) request.bikeWalkingSpeed = bikeWalkingSpeed;
+    if (bikeWalkingSpeed != null) {
+      request.bikeWalkingSpeed = bikeWalkingSpeed;
+    }
 
-    if (bikeSwitchTime != null) request.bikeSwitchTime = bikeSwitchTime;
+    if (bikeSwitchTime != null) {
+      request.bikeSwitchTime = bikeSwitchTime;
+    }
 
-    if (bikeSwitchCost != null) request.bikeSwitchCost = bikeSwitchCost;
+    if (bikeSwitchCost != null) {
+      request.bikeSwitchCost = bikeSwitchCost;
+    }
 
-    if (
-      allowKeepingRentedBicycleAtDestination != null
-    ) request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
+    if (allowKeepingRentedBicycleAtDestination != null) {
+      request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
+    }
 
-    if (
-      keepingRentedBicycleAtDestinationCost != null
-    ) request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+    if (keepingRentedBicycleAtDestinationCost != null) {
+      request.keepingRentedVehicleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
+    }
 
-    if (allowedVehicleRentalNetworks != null) request.allowedVehicleRentalNetworks =
-      allowedVehicleRentalNetworks;
+    if (allowedVehicleRentalNetworks != null) {
+      request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+    }
 
-    if (bannedVehicleRentalNetworks != null) request.bannedVehicleRentalNetworks =
-      bannedVehicleRentalNetworks;
+    if (bannedVehicleRentalNetworks != null) {
+      request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+    }
 
-    if (bikeParkCost != null) request.bikeParkCost = bikeParkCost;
+    if (bikeParkCost != null) {
+      request.bikeParkCost = bikeParkCost;
+    }
 
-    if (bikeParkTime != null) request.bikeParkTime = bikeParkTime;
+    if (bikeParkTime != null) {
+      request.bikeParkTime = bikeParkTime;
+    }
 
-    if (carParkCost != null) request.carParkCost = carParkCost;
+    if (carParkCost != null) {
+      request.carParkCost = carParkCost;
+    }
 
-    if (carParkTime != null) request.carParkTime = carParkTime;
+    if (carParkTime != null) {
+      request.carParkTime = carParkTime;
+    }
 
-    if (bannedVehicleParkingTags != null) request.bannedVehicleParkingTags =
-      bannedVehicleParkingTags;
+    if (bannedVehicleParkingTags != null) {
+      request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+    }
 
-    if (requiredVehicleParkingTags != null) request.requiredVehicleParkingTags =
-      requiredVehicleParkingTags;
+    if (requiredVehicleParkingTags != null) {
+      request.requiredVehicleParkingTags = requiredVehicleParkingTags;
+    }
 
     if (optimize != null) {
       // Optimize types are basically combined presets of routing parameters, except for triangle
@@ -883,9 +923,13 @@ public abstract class RoutingResource {
       request.bikeSpeed = 4.3;
     }
 
-    if (boardSlack != null) request.boardSlack = boardSlack;
+    if (boardSlack != null) {
+      request.boardSlack = boardSlack;
+    }
 
-    if (alightSlack != null) request.alightSlack = alightSlack;
+    if (alightSlack != null) {
+      request.alightSlack = alightSlack;
+    }
 
     if (minTransferTime != null) {
       int alightAndBoardSlack = request.boardSlack + request.alightSlack;
@@ -897,26 +941,39 @@ public abstract class RoutingResource {
       request.transferSlack = minTransferTime - alightAndBoardSlack;
     }
 
-    if (nonpreferredTransferPenalty != null) request.nonpreferredTransferCost =
-      nonpreferredTransferPenalty;
+    if (nonpreferredTransferPenalty != null) {
+      request.nonpreferredTransferCost = nonpreferredTransferPenalty;
+    }
 
-    if (maxTransfers != null) request.maxTransfers = maxTransfers;
+    if (maxTransfers != null) {
+      request.maxTransfers = maxTransfers;
+    }
 
     request.useVehicleRentalAvailabilityInformation = request.isTripPlannedForNow();
 
-    if (startTransitStopId != null && !startTransitStopId.isEmpty()) request.startingTransitStopId =
-      FeedScopedId.parseId(startTransitStopId);
+    if (startTransitStopId != null && !startTransitStopId.isEmpty()) {
+      request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
+    }
 
-    if (startTransitTripId != null && !startTransitTripId.isEmpty()) request.startingTransitTripId =
-      FeedScopedId.parseId(startTransitTripId);
+    if (startTransitTripId != null && !startTransitTripId.isEmpty()) {
+      request.startingTransitTripId = FeedScopedId.parseId(startTransitTripId);
+    }
 
-    if (ignoreRealtimeUpdates != null) request.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
+    if (ignoreRealtimeUpdates != null) {
+      request.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
+    }
 
-    if (disableAlertFiltering != null) request.disableAlertFiltering = disableAlertFiltering;
+    if (disableAlertFiltering != null) {
+      request.disableAlertFiltering = disableAlertFiltering;
+    }
 
-    if (geoidElevation != null) request.geoidElevation = geoidElevation;
+    if (geoidElevation != null) {
+      request.geoidElevation = geoidElevation;
+    }
 
-    if (pathComparator != null) request.pathComparator = pathComparator;
+    if (pathComparator != null) {
+      request.pathComparator = pathComparator;
+    }
 
     if (debugItineraryFilter != null) {
       request.itineraryFilters.debug = debugItineraryFilter;
@@ -929,7 +986,7 @@ public abstract class RoutingResource {
     }
 
     if (locale != null) {
-      request.locale = Locale.forLanguageTag(locale.replaceAll("-", "_"));
+      request.setLocale(Locale.forLanguageTag(locale.replaceAll("-", "_")));
     }
 
     if (OTPFeature.DataOverlay.isOn()) {

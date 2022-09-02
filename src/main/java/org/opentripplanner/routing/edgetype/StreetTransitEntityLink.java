@@ -167,6 +167,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   }
 
   boolean isLeavingStreetNetwork(RouteRequest req) {
-    return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
+    return (req.arriveBy() ? fromv : tov) == getTransitEntityVertex();
   }
 }

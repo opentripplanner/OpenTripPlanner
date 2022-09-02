@@ -608,8 +608,8 @@ public class TestHalfEdges {
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
     RouteRequest walking = new RouteRequest(TraverseMode.WALK);
-    walking.from = new GenericLocation(40.004, -74.0);
-    walking.to = new GenericLocation(40.008, -74.0);
+    walking.setFrom(new GenericLocation(40.004, -74.0));
+    walking.setTo(new GenericLocation(40.008, -74.0));
     try (var container = new TemporaryVerticesContainer(graph, walking)) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());

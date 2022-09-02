@@ -236,8 +236,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     RouteRequest request = new RouteRequest();
     Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
 
     var time = dateTime.atZone(ZoneId.of("America/New_York"));
     var additionalSearchDays = AdditionalSearchDays.defaults(time);

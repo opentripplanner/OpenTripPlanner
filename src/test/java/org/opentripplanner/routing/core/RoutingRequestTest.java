@@ -57,8 +57,8 @@ public class RoutingRequestTest {
     assertNotSame(clone.raptorDebugging, req.raptorDebugging);
     assertNotSame(clone.raptorOptions, req.raptorOptions);
 
-    assertEquals(50, req.numItineraries);
-    assertEquals(50, clone.numItineraries);
+    assertEquals(50, req.numItineraries());
+    assertEquals(50, clone.numItineraries());
   }
 
   private GenericLocation randomLocation() {

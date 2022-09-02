@@ -92,7 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
    */
   @Override
   public Locale defaultLocale() {
-    return routerConfig().routingRequestDefaults().locale;
+    return routerConfig().routingRequestDefaults().locale();
   }
 
   @Override

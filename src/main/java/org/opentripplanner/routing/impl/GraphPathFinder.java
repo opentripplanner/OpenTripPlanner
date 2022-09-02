@@ -90,7 +90,7 @@ public class GraphPathFinder {
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-    paths.sort(options.getPathComparator(options.arriveBy));
+    paths.sort(options.getPathComparator(options.arriveBy()));
     return paths;
   }
 
@@ -99,7 +99,7 @@ public class GraphPathFinder {
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
     RouteRequest request = routingContext.opt;
-    Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.SECONDS);
+    Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
 
     List<GraphPath> paths = getPaths(routingContext);
 
@@ -110,7 +110,7 @@ public class GraphPathFinder {
       while (gpi.hasNext()) {
         GraphPath graphPath = gpi.next();
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
-        if (request.arriveBy) {
+        if (request.arriveBy()) {
           if (graphPath.states.getLast().getTime().isAfter(reqTime)) {
             LOG.error("A graph path arrives after the requested time. This implies a bug.");
             gpi.remove();
@@ -125,7 +125,7 @@ public class GraphPathFinder {
     }
 
     if (paths == null || paths.size() == 0) {
-      LOG.debug("Path not found: " + request.from + " : " + request.to);
+      LOG.debug("Path not found: " + request.from() + " : " + request.to());
       throw new PathNotFoundException();
     }
 

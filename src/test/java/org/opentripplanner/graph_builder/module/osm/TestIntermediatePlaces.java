@@ -245,8 +245,8 @@ public class TestIntermediatePlaces {
     RouteRequest request = new RouteRequest(modes);
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
     for (GenericLocation intermediateLocation : via) {
       request.addIntermediatePlace(intermediateLocation);
     }
@@ -307,11 +307,11 @@ public class TestIntermediatePlaces {
   private void validateLegsTemporally(RouteRequest request, Itinerary itinerary) {
     Instant departTime;
     Instant arriveTime;
-    if (request.arriveBy) {
+    if (request.arriveBy()) {
       departTime = itinerary.getLegs().get(0).getStartTime().toInstant();
-      arriveTime = request.getDateTime();
+      arriveTime = request.dateTime();
     } else {
-      departTime = request.getDateTime();
+      departTime = request.dateTime();
       arriveTime = itinerary.getLegs().get(itinerary.getLegs().size() - 1).getEndTime().toInstant();
     }
     long sumOfDuration = 0;

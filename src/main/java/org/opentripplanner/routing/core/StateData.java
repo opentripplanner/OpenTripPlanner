@@ -109,7 +109,7 @@ public class StateData implements Cloneable {
       }
       var walkingPickupStateData = proto.clone();
       walkingPickupStateData.carPickupState =
-        options.arriveBy ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
+        options.arriveBy() ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
       walkingPickupStateData.currentMode = TraverseMode.WALK;
       res.add(walkingPickupStateData);
     }
@@ -121,7 +121,7 @@ public class StateData implements Cloneable {
     // When searching backwards:
     //   - BEFORE_RENTING
     else if (options.vehicleRental) {
-      if (options.arriveBy) {
+      if (options.arriveBy()) {
         if (!forceSingleState) {
           if (options.allowKeepingRentedVehicleAtDestination) {
             var keptVehicleStateData = proto.clone();
@@ -150,7 +150,7 @@ public class StateData implements Cloneable {
     //   - In departAt searches, we are in CAR mode and "unparked".
     else if (options.parkAndRide) {
       var parkAndRideStateData = proto.clone();
-      parkAndRideStateData.vehicleParked = options.arriveBy;
+      parkAndRideStateData.vehicleParked = options.arriveBy();
       parkAndRideStateData.currentMode =
         parkAndRideStateData.vehicleParked
           ? TraverseMode.WALK

@@ -62,8 +62,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -85,8 +85,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.allowKeepingRentedVehicleAtDestination = true;
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -99,9 +99,9 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.allowKeepingRentedVehicleAtDestination = true;
-    request.from = p1;
-    request.to = p2;
-    request.arriveBy = true;
+    request.setFrom(p1);
+    request.setTo(p2);
+    request.setArriveBy(true);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -120,8 +120,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p1;
-    request.to = p3;
+    request.setFrom(p1);
+    request.setTo(p3);
 
     try {
       expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -144,8 +144,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         .withDirectMode(StreetMode.NOT_SET)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p3;
-    request.to = p1;
+    request.setFrom(p3);
+    request.setTo(p1);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

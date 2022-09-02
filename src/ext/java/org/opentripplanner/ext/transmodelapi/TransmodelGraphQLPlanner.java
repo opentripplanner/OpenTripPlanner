@@ -61,7 +61,7 @@ public class TransmodelGraphQLPlanner {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
-    Locale locale = request == null ? serverContext.defaultLocale() : request.locale;
+    Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult
       .<PlanResponse>newResult()
       .data(response)
@@ -93,18 +93,21 @@ public class TransmodelGraphQLPlanner {
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
-    callWith.argument("locale", (String v) -> request.locale = Locale.forLanguageTag(v));
+    callWith.argument("locale", (String v) -> request.setLocale(Locale.forLanguageTag(v)));
 
-    callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
-    callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
+    callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
+    callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
     callWith.argument(
       "dateTime",
       millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
-    callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
-    callWith.argument("pageCursor", request::setPageCursor);
-    callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
+    callWith.argument(
+      "searchWindow",
+      (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))
+    );
+    callWith.argument("pageCursor", request::setPageCursorFromEncoded);
+    callWith.argument("timetableView", (Boolean v) -> request.setTimetableView(v));
     callWith.argument("wheelchairAccessible", request::setWheelchairAccessible);
     callWith.argument("numTripPatterns", request::setNumItineraries);
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);

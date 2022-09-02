@@ -156,8 +156,8 @@ public class BarrierRoutingTest {
   ) {
     RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
     request.streetSubRequestModes = new TraverseModeSet(traverseMode);
 
     options.accept(request);

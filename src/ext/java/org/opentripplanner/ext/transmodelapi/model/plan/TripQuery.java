@@ -145,7 +145,7 @@ public class TripQuery {
             "dateTime. See `timetableView` for use-cases where this parameter is relevant."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(routing.request.arriveBy)
+          .defaultValue(routing.request.arriveBy())
           .build()
       )
       .argument(
@@ -402,7 +402,7 @@ public class TripQuery {
             "this size. It does not make the search faster, as it did in OTP1. See also the " +
             "trip meta-data on how to implement paging."
           )
-          .defaultValue(routing.request.numItineraries)
+          .defaultValue(routing.request.numItineraries())
           .type(Scalars.GraphQLInt)
           .build()
       )

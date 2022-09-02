@@ -67,21 +67,21 @@ public class RaptorRequestMapper {
     var builder = new RaptorRequestBuilder<TripSchedule>();
     var searchParams = builder.searchParams();
 
-    if (request.pageCursor == null) {
-      int time = relativeTime(request.getDateTime());
+    if (request.pageCursor() == null) {
+      int time = relativeTime(request.dateTime());
 
       int timeLimit = relativeTime(request.raptorOptions.getTimeLimit());
 
-      if (request.arriveBy) {
+      if (request.arriveBy()) {
         searchParams.latestArrivalTime(time);
         searchParams.earliestDepartureTime(timeLimit);
       } else {
         searchParams.earliestDepartureTime(time);
         searchParams.latestArrivalTime(timeLimit);
       }
-      searchParams.searchWindow(request.searchWindow);
+      searchParams.searchWindow(request.searchWindow());
     } else {
-      var c = request.pageCursor;
+      var c = request.pageCursor();
 
       if (c.earliestDepartureTime != null) {
         searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime));
@@ -124,7 +124,7 @@ public class RaptorRequestMapper {
 
     builder
       .searchParams()
-      .timetableEnabled(request.timetableView)
+      .timetableEnabled(request.timetableView())
       .constrainedTransfersEnabled(OTPFeature.TransferConstraints.isOn())
       .addAccessPaths(accessPaths)
       .addEgressPaths(egressPaths);
@@ -143,7 +143,7 @@ public class RaptorRequestMapper {
         .logger(debugLogger);
     }
 
-    if (!request.timetableView && request.arriveBy) {
+    if (!request.timetableView() && request.arriveBy()) {
       builder.searchParams().preferLateArrival(true);
     }
 

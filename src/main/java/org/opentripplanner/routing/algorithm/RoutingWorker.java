@@ -70,7 +70,7 @@ public class RoutingWorker {
     this.serverContext = serverContext;
     this.debugTimingAggregator =
       new DebugTimingAggregator(serverContext.meterRegistry(), request.tags);
-    this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.getDateTime(), zoneId);
+    this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     this.pagingSearchWindowAdjuster =
       createPagingSearchWindowAdjuster(serverContext.routerConfig());
     this.additionalSearchDays =
@@ -123,7 +123,7 @@ public class RoutingWorker {
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
       request.getItinerariesSortOrder(),
       request.itineraryFilters,
-      request.numItineraries,
+      request.numItineraries(),
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
       request.maxNumberOfItinerariesCropHead(),
@@ -174,15 +174,15 @@ public class RoutingWorker {
     ZoneId zoneId,
     RouteRequest request
   ) {
-    var searchDateTime = ZonedDateTime.ofInstant(request.getDateTime(), zoneId);
+    var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
     var maxWindow = Duration.ofMinutes(
       raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
     );
 
     return new AdditionalSearchDays(
-      request.arriveBy,
+      request.arriveBy(),
       searchDateTime,
-      request.searchWindow,
+      request.searchWindow(),
       maxWindow,
       request.maxJourneyDuration
     );
@@ -196,7 +196,7 @@ public class RoutingWorker {
    */
   private Instant filterOnLatestDepartureTime() {
     if (
-      !request.arriveBy &&
+      !request.arriveBy() &&
       raptorSearchParamsUsed != null &&
       raptorSearchParamsUsed.isSearchWindowSet() &&
       raptorSearchParamsUsed.isEarliestDepartureTimeSet()
@@ -284,7 +284,7 @@ public class RoutingWorker {
     }
     // (num-of-itineraries found <= numItineraries)  ->  increase or keep search-window
     else {
-      int nRequested = request.numItineraries;
+      int nRequested = request.numItineraries();
       int nFound = (int) itineraries
         .stream()
         .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())

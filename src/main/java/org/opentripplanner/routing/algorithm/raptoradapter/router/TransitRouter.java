@@ -82,7 +82,7 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!serverContext.transitService().transitFeedCovers(request.getDateTime())) {
+    if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );

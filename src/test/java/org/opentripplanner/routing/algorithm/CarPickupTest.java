@@ -174,7 +174,7 @@ public class CarPickupTest extends GraphRoutingTest {
     boolean arriveBy
   ) {
     var options = new RouteRequest();
-    options.arriveBy = arriveBy;
+    options.setArriveBy(arriveBy);
 
     var carPickupOptions = options.getStreetSearchRequest(StreetMode.CAR_PICKUP);
     var tree = AStarBuilder

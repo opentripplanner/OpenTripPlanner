@@ -46,7 +46,7 @@ public class State implements Cloneable {
   public State(RoutingContext rctx) {
     this(
       rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
-      rctx.opt.getDateTime(),
+      rctx.opt.dateTime(),
       rctx,
       StateData.getInitialStateData(rctx.opt)
     );
@@ -58,7 +58,7 @@ public class State implements Cloneable {
    */
   public State(Vertex vertex, RouteRequest opt, RoutingContext routingContext) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.getDateTime(), routingContext, StateData.getInitialStateData(opt));
+    this(vertex, opt.dateTime(), routingContext, StateData.getInitialStateData(opt));
   }
 
   /**
@@ -93,7 +93,7 @@ public class State implements Cloneable {
     List<StateData> initialStateDatas = StateData.getInitialStateDatas(request);
     for (Vertex vertex : routingContext.fromVertices) {
       for (StateData stateData : initialStateDatas) {
-        states.add(new State(vertex, request.getDateTime(), routingContext, stateData));
+        states.add(new State(vertex, request.dateTime(), routingContext, stateData));
       }
     }
     return states;
@@ -181,7 +181,7 @@ public class State implements Cloneable {
     boolean parkAndRide = stateData.opt.parkAndRide;
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
-    if (stateData.opt.arriveBy) {
+    if (stateData.opt.arriveBy()) {
       vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {

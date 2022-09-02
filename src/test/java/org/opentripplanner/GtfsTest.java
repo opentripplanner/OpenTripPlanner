@@ -71,12 +71,14 @@ public abstract class GtfsTest {
     routingRequest.setArriveBy(dateTime < 0);
     routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
     if (fromVertex != null && !fromVertex.isEmpty()) {
-      routingRequest.from =
-        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
+      routingRequest.setFrom(
+        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex)
+      );
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      routingRequest.to =
-        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex);
+      routingRequest.setTo(
+        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex)
+      );
     }
     if (onTripId != null && !onTripId.isEmpty()) {
       routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));

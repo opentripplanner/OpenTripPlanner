@@ -73,8 +73,8 @@ public class RoutingContext {
     }
     this.opt = routingRequest;
     this.graph = graph;
-    this.fromVertices = routingRequest.arriveBy ? to : from;
-    this.toVertices = routingRequest.arriveBy ? from : to;
+    this.fromVertices = routingRequest.arriveBy() ? to : from;
+    this.toVertices = routingRequest.arriveBy() ? from : to;
     this.dataOverlayContext =
       OTPFeature.DataOverlay.isOnElseNull(() ->
         new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)

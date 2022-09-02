@@ -66,8 +66,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_TO_PARK).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -79,8 +79,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
-    request.from = p3;
-    request.to = p4;
+    request.setFrom(p3);
+    request.setTo(p4);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -92,9 +92,9 @@ public class CarSnapshotTest extends SnapshotTestBase {
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
-    request.from = p3;
-    request.to = p4;
-    request.arriveBy = true;
+    request.setFrom(p3);
+    request.setTo(p4);
+    request.setArriveBy(true);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -106,8 +106,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
     request.walkSpeed = 1;
 
     expectArriveByToMatchDepartAtAndSnapshot(request);

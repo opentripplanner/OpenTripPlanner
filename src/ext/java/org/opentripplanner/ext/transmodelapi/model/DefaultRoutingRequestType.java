@@ -75,7 +75,7 @@ public class DefaultRoutingRequestType {
           .name("numItineraries")
           .description("The maximum number of itineraries to return.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.numItineraries)
+          .dataFetcher(env -> request.numItineraries())
           .build()
       )
       .field(

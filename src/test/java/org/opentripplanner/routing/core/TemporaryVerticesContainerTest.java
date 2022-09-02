@@ -58,8 +58,8 @@ public class TemporaryVerticesContainerTest {
   public void temporaryChangesRemovedOnClose() {
     // Given - A request
     RouteRequest request = new RouteRequest();
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
 
     // When - the container is created
     subject = new TemporaryVerticesContainer(g, request);

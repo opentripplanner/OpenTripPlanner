@@ -597,8 +597,8 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("fromPlace", request::setFromString);
       callWith.argument("toPlace", request::setToString);
 
-      callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
-      callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
+      callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
+      callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
       request.setDateTime(
         environment.getArgument("date"),
@@ -608,8 +608,8 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);
       callWith.argument("numItineraries", request::setNumItineraries);
-      callWith.argument("searchWindow", (Long m) -> request.searchWindow = Duration.ofSeconds(m));
-      callWith.argument("pageCursor", request::setPageCursor);
+      callWith.argument("searchWindow", (Long m) -> request.setSearchWindow(Duration.ofSeconds(m)));
+      callWith.argument("pageCursor", request::setPageCursorFromEncoded);
       // callWith.argument("maxSlope", request::setMaxSlope);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
@@ -773,13 +773,13 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument(
         "locale",
-        (String v) -> request.locale = LegacyGraphQLUtils.getLocale(environment, v)
+        (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
       );
       RoutingResponse res = context.getRoutingService().route(request);
       return DataFetcherResult
         .<RoutingResponse>newResult()
         .data(res)
-        .localContext(Map.of("locale", request.locale))
+        .localContext(Map.of("locale", request.locale()))
         .build();
     };
   }

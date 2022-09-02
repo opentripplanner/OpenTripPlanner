@@ -70,8 +70,8 @@ public class BicycleRoutingTest {
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
     RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
     request.bicycleOptimizeType = BicycleOptimizeType.QUICK;
 
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);

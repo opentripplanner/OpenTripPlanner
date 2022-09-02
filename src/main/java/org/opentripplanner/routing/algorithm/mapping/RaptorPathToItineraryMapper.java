@@ -261,7 +261,7 @@ public class RaptorPathToItineraryMapper {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges
       // may be re-traversed to create the leg(s) from the list of edges.
       RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
-      traverseRequest.arriveBy = false;
+      traverseRequest.setArriveBy(false);
       RoutingContext routingContext = new RoutingContext(
         traverseRequest,
         graph,

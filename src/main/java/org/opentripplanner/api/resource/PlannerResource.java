@@ -72,7 +72,7 @@ public class PlannerResource extends RoutingResource {
 
       // Map to API
       // TODO VIA - we should store the default somewhere
-      TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale, showIntermediateStops);
+      TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale(), showIntermediateStops);
       response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
       if (res.getPreviousPageCursor() != null) {
         response.setPreviousPageCursor(res.getPreviousPageCursor().encode());
@@ -117,19 +117,19 @@ public class PlannerResource extends RoutingResource {
       //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
       sb.append(clientIpAddress);
       sb.append(' ');
-      sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
+      sb.append(request.arriveBy() ? "ARRIVE" : "DEPART");
       sb.append(' ');
-      sb.append(LocalDateTime.ofInstant(request.getDateTime(), ZoneId.systemDefault()));
+      sb.append(LocalDateTime.ofInstant(request.dateTime(), ZoneId.systemDefault()));
       sb.append(' ');
       sb.append(request.streetSubRequestModes.getAsStr());
       sb.append(' ');
-      sb.append(request.from.lat);
+      sb.append(request.from().lat);
       sb.append(' ');
-      sb.append(request.from.lng);
+      sb.append(request.from().lng);
       sb.append(' ');
-      sb.append(request.to.lat);
+      sb.append(request.to().lat);
       sb.append(' ');
-      sb.append(request.to.lng);
+      sb.append(request.to().lng);
       sb.append(' ');
       if (res != null) {
         for (Itinerary it : res.getTripPlan().itineraries) {

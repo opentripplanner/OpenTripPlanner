@@ -32,7 +32,7 @@ public class RoutingRequestMapper {
       c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt);
     request.allowedVehicleRentalNetworks =
       c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
-    request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
+    request.setArriveBy(c.asBoolean("arriveBy", dft.arriveBy()));
     request.bannedVehicleParkingTags =
       c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
     request.bannedVehicleRentalNetworks =
@@ -93,7 +93,7 @@ public class RoutingRequestMapper {
     request.geoidElevation = c.asBoolean("geoidElevation", dft.geoidElevation);
     request.ignoreRealtimeUpdates = c.asBoolean("ignoreRealtimeUpdates", dft.ignoreRealtimeUpdates);
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
-    request.locale = c.asLocale("locale", dft.locale);
+    request.setLocale(c.asLocale("locale", dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
     request.maxDirectStreetDuration =
       c.asDuration("maxDirectStreetDuration", dft.maxDirectStreetDuration);
@@ -103,21 +103,21 @@ public class RoutingRequestMapper {
     request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes());
     request.nonpreferredTransferCost =
       c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
-    request.numItineraries = c.asInt("numItineraries", dft.numItineraries);
+    request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
     request.onlyTransitTrips = c.asBoolean("onlyTransitTrips", dft.onlyTransitTrips);
     request.bicycleOptimizeType = c.asEnum("optimize", dft.bicycleOptimizeType);
     request.otherThanPreferredRoutesPenalty =
       c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
     request.pathComparator = c.asText("pathComparator", dft.pathComparator);
-    request.searchWindow = c.asDuration("searchWindow", dft.searchWindow);
+    request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
     request.requiredVehicleParkingTags =
       c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
     request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
     request.stairsTimeFactor = c.asDouble("stairsTimeFactor", dft.stairsTimeFactor);
     request.startingTransitTripId =
       c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
-    request.timetableView = c.asBoolean("timetableView", dft.timetableView);
+    request.setTimetableView(c.asBoolean("timetableView", dft.timetableView()));
     request.transferCost = c.asInt("transferPenalty", dft.transferCost);
     request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
     request.setTransitReluctanceForMode(

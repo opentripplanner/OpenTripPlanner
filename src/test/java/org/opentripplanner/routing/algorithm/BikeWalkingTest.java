@@ -376,7 +376,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
     options.walkSpeed = 10;
     options.bikeSpeed = 20;
     options.bikeWalkingSpeed = 5;
-    options.arriveBy = arriveBy;
+    options.setArriveBy(arriveBy);
 
     var bikeOptions = options.getStreetSearchRequest(streetMode);
 

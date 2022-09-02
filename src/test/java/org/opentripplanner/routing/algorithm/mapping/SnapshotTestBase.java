@@ -114,8 +114,8 @@ public abstract class SnapshotTestBase {
       )
     );
     request.maxTransfers = 6;
-    request.numItineraries = 6;
-    request.searchWindow = Duration.ofHours(5);
+    request.setNumItineraries(6);
+    request.setSearchWindow(Duration.ofHours(5));
 
     return request;
   }
@@ -269,7 +269,7 @@ public abstract class SnapshotTestBase {
 
   private String createDebugUrlForRequest(RouteRequest request) {
     var dateTime = Instant
-      .ofEpochSecond(request.getDateTime().getEpochSecond())
+      .ofEpochSecond(request.dateTime().getEpochSecond())
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
@@ -292,12 +292,12 @@ public abstract class SnapshotTestBase {
 
     return String.format(
       "http://localhost:8080/?module=planner&fromPlace=%s&toPlace=%s&date=%s&time=%s&mode=%s&arriveBy=%s&wheelchair=%s",
-      formatPlace(request.from),
-      formatPlace(request.to),
+      formatPlace(request.from()),
+      formatPlace(request.to()),
       dateTime.toLocalDate().format(apiDateFormatter),
       dateTime.toLocalTime().format(apiTimeFormatter),
       modes,
-      request.arriveBy,
+      request.arriveBy(),
       request.wheelchairAccessibility
     );
   }

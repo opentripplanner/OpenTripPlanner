@@ -71,7 +71,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private ShortestPathTree routeToMany(Vertex vertex) {
     RouteRequest routingRequest = new RouteRequest(TraverseMode.CAR);
-    routingRequest.arriveBy = reverseDirection;
+    routingRequest.setArriveBy(reverseDirection);
     RoutingContext rctx;
     if (reverseDirection) {
       rctx = new RoutingContext(routingRequest, graph, null, vertex);
