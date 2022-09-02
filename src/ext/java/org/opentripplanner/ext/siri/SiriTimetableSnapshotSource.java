@@ -6,6 +6,8 @@ import static org.opentripplanner.ext.siri.TimetableHelper.createModifiedStops;
 import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTimes;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import com.google.common.base.Preconditions;
@@ -913,7 +915,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           lineRef,
           vehicleRef
         );
-        return List.of(new UpdateError(null, UNKNOWN));
+        return List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH));
       }
 
       //Find the trips that best corresponds to EstimatedVehicleJourney
@@ -958,7 +960,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         lineRef,
         vehicleRef
       );
-      return List.of(new UpdateError(null, UNKNOWN));
+      return List.of(new UpdateError(null, TRIP_NOT_FOUND_IN_PATTERN));
     }
 
     if (times.isEmpty()) {

@@ -7,8 +7,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
   public enum UpdateErrorType {
     UNKNOWN,
+    INVALID_INPUT_STRUCTURE,
     TRIP_ID_NOT_FOUND,
     TRIP_NOT_FOUND_IN_PATTERN,
+    NO_FUZZY_TRIP_MATCH,
     TRIP_ALREADY_EXISTS,
     NO_START_DATE,
     NO_UPDATES,

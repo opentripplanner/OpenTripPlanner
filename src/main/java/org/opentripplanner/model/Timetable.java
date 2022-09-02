@@ -2,8 +2,10 @@ package org.opentripplanner.model;
 
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
@@ -161,12 +163,12 @@ public class Timetable implements Serializable {
     LocalDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
-    Result<TripTimesPatch, UpdateError> generalError = Result.failure(
-      UpdateError.noTripId(UNKNOWN)
+    Result<TripTimesPatch, UpdateError> invalidInput = Result.failure(
+      UpdateError.noTripId(INVALID_INPUT_STRUCTURE)
     );
     if (tripUpdate == null) {
       LOG.debug("A null TripUpdate pointer was passed to the Timetable class update method.");
-      return generalError;
+      return invalidInput;
     }
 
     // Though all timetables have the same trip ordering, some may have extra trips due to
@@ -174,13 +176,13 @@ public class Timetable implements Serializable {
     // However, we want to apply trip updates on top of *scheduled* times
     if (!tripUpdate.hasTrip()) {
       LOG.debug("TripUpdate object has no TripDescriptor field.");
-      return generalError;
+      return invalidInput;
     }
 
     TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
       LOG.debug("TripDescriptor object has no TripId field");
-      Result.failure(UpdateError.noTripId(UNKNOWN));
+      Result.failure(UpdateError.noTripId(TRIP_ID_NOT_FOUND));
     }
 
     String tripId = tripDescriptor.getTripId();
