@@ -60,7 +60,7 @@ the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/d
 ## Transit Feeds
 
 The transitFeeds section of `build-config.json` allows you to override the default behavior of scanning
-for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base Directory). You can specify data
+for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
 located outside the local filesystem (including cloud storage services) or at various
 different locations around the local filesystem.  
 When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds section, auto-scanning in the base directory for this feed type will be disabled.
@@ -90,7 +90,7 @@ The netexDefaults section of `build-config.json` allows you to specify default p
 ## OSM 
 
 The osm section of `build-config.json` allows you to override the default behavior of scanning
-for OpenStreetMap files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base Directory). You can specify data
+for OpenStreetMap files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
 located outside the local filesystem (including cloud storage services) or at various
 different locations around the local filesystem.
 
@@ -112,7 +112,7 @@ The osmDefaults section of `build-config.json` allows you to specify default pro
 ## DEM
 
 The dem section of `build-config.json` allows you to override the default behavior of scanning
-for elevation files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base Directory). You can specify data
+for elevation files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
 located outside the local filesystem (including cloud storage services) or at various
 different locations around the local filesystem.
 
@@ -128,7 +128,7 @@ Example:
 Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`   
 Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`
 
-Alternatively if a relative URI can be provided, it is interpreted as a path relative to the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base Directory).
+Alternatively if a relative URI can be provided, it is interpreted as a path relative to the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
 Example:   
 File relative to the base directory (inside the base directory): `streetGraph.obj`   
 File relative to the base directory (outside the base directory): `../street-graphs/streetGraph.obj`
