@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
@@ -698,7 +699,7 @@ public class TimetableHelper {
     Function<FeedScopedId, StopLocation> getStopById
   ) {
     if (activity == null) {
-      return Result.failure(new UpdateError(tripId, UNKNOWN));
+      return Result.failure(new UpdateError(tripId, INVALID_INPUT_STRUCTURE));
     }
 
     MonitoredVehicleJourneyStructure mvj = activity.getMonitoredVehicleJourney();
@@ -713,7 +714,7 @@ public class TimetableHelper {
 
     MonitoredCallStructure update = mvj.getMonitoredCall();
     if (update == null) {
-      return Result.failure(new UpdateError(tripId, UNKNOWN));
+      return Result.failure(new UpdateError(tripId, INVALID_INPUT_STRUCTURE));
     }
 
     VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
