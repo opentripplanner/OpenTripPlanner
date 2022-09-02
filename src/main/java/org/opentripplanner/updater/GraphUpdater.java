@@ -1,8 +1,5 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.service.TransitModel;
-
 /**
  * Interface for graph updaters. Objects that implement this interface should always be configured
  * via PreferencesConfigurable.configure after creating the object. GraphUpdaterConfigurator should
@@ -25,7 +22,7 @@ public interface GraphUpdater {
    * method won't be called). All updaters' setup methods will be run sequentially in a
    * single-threaded manner before updates begin, in order to avoid concurrent reads/writes.
    */
-  void setup(Graph graph, TransitModel transitModel) throws Exception;
+  //void setup(Graph graph, TransitModel transitModel) throws Exception;
 
   /**
    * This method will run in its own thread. It pulls or receives updates and applies them to the
@@ -38,7 +35,7 @@ public interface GraphUpdater {
   /**
    * Here the updater can clean up after itself.
    */
-  void teardown();
+  default void teardown() {}
 
   /**
    * Allow clients to wait for all realtime data to be loaded before submitting any travel plan

@@ -22,7 +22,7 @@ import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -131,8 +131,8 @@ public class ConstructApplication {
 
     creatTransitLayerForRaptor(transitModel(), routerConfig());
 
-    /* Create Graph updater modules from JSON config. */
-    GraphUpdaterConfigurator.setupGraph(graph(), transitModel(), routerConfig().updaterConfig());
+    /* Create updater modules from JSON config. */
+    UpdaterConfigurator.configure(graph(), transitModel(), routerConfig().updaterConfig());
 
     graph().initEllipsoidToGeoidDifference();
 

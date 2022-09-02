@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
-import org.opentripplanner.standalone.config.NetexDefaultsConfig;
 
 /**
  * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultsConfig}

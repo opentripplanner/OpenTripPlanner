@@ -14,7 +14,7 @@ import org.opentripplanner.standalone.configure.LoadApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.ThrowableUtils;
 import org.slf4j.Logger;
@@ -218,7 +218,7 @@ public class OTPMain {
   ) {
     var hook = new Thread(() -> {
       LOG.info("OTP shutdown started...");
-      GraphUpdaterConfigurator.shutdownGraph(transitModel);
+      UpdaterConfigurator.shutdownGraph(transitModel);
       raptorConfig.shutdown();
       WeakCollectionCleaner.DEFAULT.exit();
       DeferredAuthorityFactory.exit();

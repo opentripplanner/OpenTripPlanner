@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import java.util.BitSet;
-import java.util.List;
+import java.util.Collections;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -107,7 +107,8 @@ public final class McStopArrivals<T extends RaptorTripSchedule> implements StopA
   Iterable<AbstractStopArrival<T>> listArrivalsAfterMarker(final int stop) {
     StopArrivalParetoSet<T> it = arrivals[stop];
     if (it == null) {
-      return List.of();
+      // Avoid creating new objects in a tight loop
+      return Collections::emptyIterator;
     }
     return it.elementsAfterMarker();
   }

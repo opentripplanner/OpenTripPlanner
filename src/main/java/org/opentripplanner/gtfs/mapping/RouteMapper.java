@@ -7,6 +7,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.util.MapUtils;
 
@@ -82,6 +84,12 @@ class RouteMapper {
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
     lhs.withBranding(brandingMapper.map(rhs));
+    if (rhs.getNetworkId() != null) {
+      var networkId = GroupOfRoutes
+        .of(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId()))
+        .build();
+      lhs.getGroupsOfRoutes().add(networkId);
+    }
 
     return lhs.build();
   }

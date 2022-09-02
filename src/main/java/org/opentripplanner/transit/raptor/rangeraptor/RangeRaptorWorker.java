@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
 import java.util.Collection;
+import javax.annotation.Nonnull;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripScheduleBoardSearch;
 import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -241,17 +242,19 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
             transitWorker.forEachBoarding(
               stopIndex,
               (int prevArrivalTime) -> {
-                boolean handled = boardWithConstrainedTransfer(
-                  txSearch,
-                  route.timetable(),
-                  stopIndex,
-                  stopPos,
-                  prevArrivalTime,
-                  boardSlack
-                );
+                boolean boardedUsingConstrainedTransfer =
+                  enableTransferConstraints &&
+                  boardWithConstrainedTransfer(
+                    txSearch,
+                    route.timetable(),
+                    stopIndex,
+                    stopPos,
+                    prevArrivalTime,
+                    boardSlack
+                  );
 
                 // Find the best trip and board [no guaranteed transfer exist]
-                if (!handled) {
+                if (!boardedUsingConstrainedTransfer) {
                   boardWithRegularTransfer(
                     tripSearch,
                     stopIndex,
@@ -292,17 +295,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    * execution.
    */
   private boolean boardWithConstrainedTransfer(
-    RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
+    @Nonnull RaptorConstrainedTripScheduleBoardingSearch<T> txSearch,
     RaptorTimeTable<T> targetTimetable,
     int targetStopIndex,
     int targetStopPos,
     int prevArrivalTime,
     int boardSlack
   ) {
-    if (!enableTransferConstraints) {
-      return false;
-    }
-
     if (!txSearch.transferExist(targetStopPos)) {
       return false;
     }

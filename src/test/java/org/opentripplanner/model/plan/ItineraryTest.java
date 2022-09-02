@@ -5,10 +5,12 @@ import static java.time.Duration.ofMinutes;
 import static java.time.Duration.ofSeconds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -155,6 +157,26 @@ public class ItineraryTest implements PlanTestConstants {
       "~ Walk 3m ~ E ~ RAIL 20 11:30 11:50 ~ F ~ Walk 1m ~ G [ $3648 ]",
       result.toStr()
     );
+  }
+
+  @Test
+  public void legIndex() {
+    var itinerary = newItinerary(A, T11_00)
+      .walk(D2m, B)
+      .bus(55, T11_04, T11_14, C)
+      .bus(21, T11_16, T11_20, D)
+      .walk(D3m, E)
+      .rail(20, T11_30, T11_50, F)
+      .walk(D1m, G)
+      .build();
+
+    var leg = itinerary.getLegs().get(0);
+    var oneHourLater = leg.withTimeShift(Duration.ofHours(1));
+
+    assertNotSame(leg, oneHourLater);
+
+    assertEquals(0, itinerary.getLegIndex(leg));
+    assertEquals(0, itinerary.getLegIndex(oneHourLater));
   }
 
   private void assertSameLocation(Place expected, Place actual) {

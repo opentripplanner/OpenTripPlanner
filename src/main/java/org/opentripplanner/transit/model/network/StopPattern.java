@@ -182,6 +182,20 @@ public final class StopPattern implements Serializable {
     return dropoffs[stopPosInPattern].isRoutable();
   }
 
+  /**
+   * Returns whether passengers can alight at a given stop. This is an inefficient method iterating
+   * over the stops, do not use it in routing.
+   */
+  boolean canAlight(StopLocation stop) {
+    // We skip the last stop, not allowed for boarding
+    for (int i = 0; i < stops.length - 1; ++i) {
+      if (stop == stops[i] && canAlight(i)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /** Returns whether passengers can board at a given stop */
   boolean canBoard(int stopPosInPattern) {
     return pickups[stopPosInPattern].isRoutable();

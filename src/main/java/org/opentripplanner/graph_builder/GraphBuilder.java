@@ -65,7 +65,7 @@ public class GraphBuilder implements Runnable {
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
 
-    transitModel.initTimeZone(config.timeZone);
+    transitModel.initTimeZone(config.transitModelTimeZone);
 
     var factory = DaggerGraphBuilderFactory
       .builder()

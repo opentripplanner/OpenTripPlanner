@@ -114,7 +114,7 @@ public class NearbyStopFinder {
     MinMap<TripPattern, NearbyStop> closestStopForPattern = new MinMap<>();
 
     /* Track the closest stop on each flex trip nearby. */
-    MinMap<FlexTrip, NearbyStop> closestStopForFlexTrip = new MinMap<>();
+    MinMap<FlexTrip<?, ?>, NearbyStop> closestStopForFlexTrip = new MinMap<>();
 
     /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
     for (NearbyStop nearbyStop : findNearbyStops(
@@ -127,12 +127,24 @@ public class NearbyStopFinder {
       if (ts1 instanceof RegularStop) {
         /* Consider this destination stop as a candidate for every trip pattern passing through it. */
         for (TripPattern pattern : transitService.getPatternsForStop(ts1)) {
-          closestStopForPattern.putMin(pattern, nearbyStop);
+          if (
+            reverseDirection
+              ? pattern.canAlight(nearbyStop.stop)
+              : pattern.canBoard(nearbyStop.stop)
+          ) {
+            closestStopForPattern.putMin(pattern, nearbyStop);
+          }
         }
       }
       if (OTPFeature.FlexRouting.isOn()) {
-        for (FlexTrip trip : transitService.getFlexIndex().getFlexTripsByStop(ts1)) {
-          closestStopForFlexTrip.putMin(trip, nearbyStop);
+        for (FlexTrip<?, ?> trip : transitService.getFlexIndex().getFlexTripsByStop(ts1)) {
+          if (
+            reverseDirection
+              ? trip.isAlightingPossible(nearbyStop)
+              : trip.isBoardingPossible(nearbyStop)
+          ) {
+            closestStopForFlexTrip.putMin(trip, nearbyStop);
+          }
         }
       }
     }

@@ -243,6 +243,14 @@ public final class TripPattern
     return stopPattern.canBoard(stop);
   }
 
+  /**
+   * Returns whether passengers can alight at a given stop. This is an inefficient method iterating
+   * over the stops, do not use it in routing.
+   */
+  public boolean canAlight(StopLocation stop) {
+    return stopPattern.canAlight(stop);
+  }
+
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopIndex) {
     return (

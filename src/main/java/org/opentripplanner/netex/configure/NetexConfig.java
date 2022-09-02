@@ -14,7 +14,7 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
 import org.opentripplanner.transit.service.TransitModel;

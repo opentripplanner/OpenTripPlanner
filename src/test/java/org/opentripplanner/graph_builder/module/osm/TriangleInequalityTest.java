@@ -30,6 +30,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -62,7 +63,11 @@ public class TriangleInequalityTest {
       dataSource,
       new OsmExtractConfigBuilder().withSource(dataSource.uri()).build()
     );
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(source, true);
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(
+      source,
+      new OsmDefaultsConfig(),
+      true
+    );
 
     OpenStreetMapModule osmModule = new OpenStreetMapModule(
       List.of(provider),

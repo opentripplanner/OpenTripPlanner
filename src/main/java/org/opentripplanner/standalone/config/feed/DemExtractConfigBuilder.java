@@ -6,13 +6,13 @@ import org.opentripplanner.standalone.config.NodeAdapter;
 public class DemExtractConfigBuilder {
 
   private URI source;
-  private double elevationUnitMultiplier = 1.0;
+  private Double elevationUnitMultiplier;
 
   public static DemExtractConfigBuilder of(NodeAdapter config) {
     DemExtractConfigBuilder demExtractConfigBuilder = new DemExtractConfigBuilder();
     demExtractConfigBuilder.source = config.asUri("source");
     demExtractConfigBuilder.elevationUnitMultiplier =
-      config.asDouble("elevationUnitMultiplier", 1.0);
+      config.asDoubleOptional("elevationUnitMultiplier").orElse(null);
     return demExtractConfigBuilder;
   }
 
@@ -29,7 +29,7 @@ public class DemExtractConfigBuilder {
     return source;
   }
 
-  public double getElevationUnitMultiplier() {
+  public Double getElevationUnitMultiplier() {
     return elevationUnitMultiplier;
   }
 }
