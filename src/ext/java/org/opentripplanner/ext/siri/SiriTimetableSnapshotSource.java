@@ -7,6 +7,8 @@ import static org.opentripplanner.ext.siri.TimetableHelper.createUpdatedTripTime
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
@@ -583,13 +585,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
     if (serviceDate == null) {
-      return UpdateError.of(tripId, UNKNOWN);
+      return UpdateError.of(tripId, NO_START_DATE);
     }
 
     FeedScopedId calServiceId = transitModel.getOrCreateServiceIdForDate(serviceDate);
 
     if (calServiceId == null) {
-      return UpdateError.of(tripId, UNKNOWN);
+      return UpdateError.of(tripId, NO_START_DATE);
     }
 
     tripBuilder.withServiceId(calServiceId);
@@ -929,7 +931,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           lineRef,
           vehicleRef
         );
-        return List.of(new UpdateError(null, UNKNOWN));
+        return List.of(new UpdateError(null, NO_FUZZY_TRIP_MATCH));
       }
 
       for (Trip matchingTrip : matchingTrips) {
@@ -964,7 +966,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (times.isEmpty()) {
-      return List.of(new UpdateError(null, UNKNOWN));
+      return List.of(new UpdateError(null, NO_UPDATES));
     }
 
     List<UpdateError> errors = new ArrayList<>();
