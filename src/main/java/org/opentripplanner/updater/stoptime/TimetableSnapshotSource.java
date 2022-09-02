@@ -286,7 +286,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case UNSCHEDULED -> handleUnscheduledTrip(tripId);
+            case UNSCHEDULED -> UpdateError.of(tripId, NOT_IMPLEMETED_UNSCHEDULED);
             case CANCELED -> handleCanceledTrip(tripId, serviceDate);
             case REPLACEMENT -> validateAndHandleModifiedTrip(
               tripUpdate,
