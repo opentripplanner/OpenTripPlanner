@@ -34,7 +34,7 @@ public class OsmExtractConfig implements DataSourceConfig {
    *
    * @return the custom OSM way properties for this OSM extract. Overrides {@link OsmDefaultsConfig#osmWayPropertySetSource}.
    */
-  public Optional<WayPropertySetSource> getOsmWayPropertySet() {
+  public Optional<WayPropertySetSource> osmWayPropertySet() {
     return Optional.ofNullable(osmWayPropertySet);
   }
 

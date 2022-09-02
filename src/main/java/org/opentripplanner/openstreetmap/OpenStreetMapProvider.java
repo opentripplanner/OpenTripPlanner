@@ -64,11 +64,16 @@ public class OpenStreetMapProvider implements OSMProvider {
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
-    this.zoneId = osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
+    this.zoneId =
+      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
     this.wayPropertySetSource =
-      osmExtractConfigConfiguredDataSource.config().getOsmWayPropertySet();
+      osmExtractConfigConfiguredDataSource
+        .config()
+        .osmWayPropertySet()
+        .orElse(osmDefaultsConfig.osmWayPropertySetSource);
     this.wayPropertySet = new WayPropertySet();
-    wayPropertySetSource.populateProperties(wayPropertySet);this.cacheDataInMem = cacheDataInMem;
+    wayPropertySetSource.populateProperties(wayPropertySet);
+    this.cacheDataInMem = cacheDataInMem;
   }
 
   public void readOSM(OSMDatabase osmdb) {
