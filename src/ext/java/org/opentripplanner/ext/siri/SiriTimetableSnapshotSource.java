@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -165,10 +166,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   * @param transitModel       transitModel to update (needed for adding/changing stop patterns)
-   * @param fullDataset true if the list with updates represent all updates that are active right
-   *                    now, i.e. all previous updates should be disregarded
-   * @param updates     SIRI VehicleMonitoringDeliveries that should be applied atomically
+   * @param transitModel transitModel to update (needed for adding/changing stop patterns)
+   * @param fullDataset  true if the list with updates represent all updates that are active right
+   *                     now, i.e. all previous updates should be disregarded
+   * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyVehicleMonitoring(
     final TransitModel transitModel,
@@ -251,10 +252,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   * @param transitModel       transitModel to update (needed for adding/changing stop patterns)
-   * @param fullDataset true iff the list with updates represent all updates that are active right
-   *                    now, i.e. all previous updates should be disregarded
-   * @param updates     SIRI VehicleMonitoringDeliveries that should be applied atomically
+   * @param transitModel transitModel to update (needed for adding/changing stop patterns)
+   * @param fullDataset  true iff the list with updates represent all updates that are active right
+   *                     now, i.e. all previous updates should be disregarded
+   * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public void applyEstimatedTimetable(
     final TransitModel transitModel,
@@ -442,7 +443,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
     boolean success = false;
     for (TripPattern pattern : patterns) {
-      if (handleTripPatternUpdate(transitModel, pattern, activity, trip, serviceDate).isEmpty()) {
+      if (handleTripPatternUpdate(transitModel, pattern, activity, trip, serviceDate).isSuccess()) {
         success = true;
       }
     }
@@ -453,14 +454,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return success;
   }
 
-  private Optional<UpdateError> handleTripPatternUpdate(
+  private Result<TripTimes, UpdateError> handleTripPatternUpdate(
     TransitModel transitModel,
     TripPattern pattern,
     VehicleActivityStructure activity,
     Trip trip,
     LocalDate serviceDate
   ) {
-    // Apply update on the *scheduled* time table and set the updated trip times in the buffer
+    // Apply update on the *scheduled* timetable and set the updated trip times in the buffer
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
     var updatedTripTimes = createUpdatedTripTimes(
       currentTimetable,
@@ -469,9 +470,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       transitModel::getStopLocationById
     );
     if (updatedTripTimes.isFailure()) {
-      return Optional.of(updatedTripTimes.failureValue());
+      return updatedTripTimes;
     } else {
-      return buffer.update(pattern, updatedTripTimes.successValue(), serviceDate);
+      return buffer
+        .update(pattern, updatedTripTimes.successValue(), serviceDate)
+        .map(Result::<TripTimes, UpdateError>failure)
+        .orElse(updatedTripTimes);
     }
   }
 
