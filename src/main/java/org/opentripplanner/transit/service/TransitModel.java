@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -44,8 +43,8 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.util.lang.ObjectUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -135,26 +134,15 @@ public class TransitModel implements Serializable {
       : timetableSnapshotProvider.getTimetableSnapshot();
   }
 
-  /**
-   * TODO OTP2 - This should be replaced by proper dependency injection
-   */
-  @SuppressWarnings("unchecked")
-  public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(
-    Function<TransitModel, T> creator
-  ) {
-    if (timetableSnapshotProvider == null) {
-      timetableSnapshotProvider = creator.apply(this);
-    }
-    try {
-      return (T) timetableSnapshotProvider;
-    } catch (ClassCastException e) {
+  public void initTimetableSnapshotProvider(TimetableSnapshotProvider timetableSnapshotProvider) {
+    if (this.timetableSnapshotProvider != null) {
       throw new IllegalArgumentException(
-        "We support only one timetableSnapshotSource, there are two implementation; one for GTFS and one " +
-        "for Netex/Siri. They need to be refactored to work together. This cast will fail if updaters " +
-        "try setup both.",
-        e
+        "We support only one timetableSnapshotSource, there are two implementation; one for " +
+        "GTFS and one for Netex/Siri. They need to be refactored to work together. This cast " +
+        "will fail if updaters try setup both."
       );
     }
+    this.timetableSnapshotProvider = timetableSnapshotProvider;
   }
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
@@ -426,7 +414,7 @@ public class TransitModel implements Serializable {
    * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
    * graph updaters defined in the configuration.
    *
-   * @see GraphUpdaterConfigurator
+   * @see UpdaterConfigurator
    */
   public GraphUpdaterManager getUpdaterManager() {
     return updaterManager;

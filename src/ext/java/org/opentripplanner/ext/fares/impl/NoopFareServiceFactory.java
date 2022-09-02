@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 
@@ -39,7 +39,7 @@ public class NoopFareServiceFactory implements FareServiceFactory {
     private static final Long serialVersionUID = 1L;
 
     @Override
-    public Fare getCost(Itinerary path) {
+    public ItineraryFares getCost(Itinerary path) {
       return null;
     }
   }

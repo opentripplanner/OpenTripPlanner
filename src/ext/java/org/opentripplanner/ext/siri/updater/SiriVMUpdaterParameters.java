@@ -9,7 +9,6 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
   private final int logFrequency;
   private final int maxSnapshotFrequencyMs;
   private final boolean purgeExpiredData;
-  private final boolean fuzzyTripMatching;
   private final boolean blockReadinessUntilInitialized;
 
   // Source parameters
@@ -24,7 +23,6 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
     int logFrequency,
     int maxSnapshotFrequencyMs,
     boolean purgeExpiredData,
-    boolean fuzzyTripMatching,
     boolean blockReadinessUntilInitialized,
     String url,
     String requestorRef,
@@ -36,7 +34,6 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
     this.logFrequency = logFrequency;
     this.maxSnapshotFrequencyMs = maxSnapshotFrequencyMs;
     this.purgeExpiredData = purgeExpiredData;
-    this.fuzzyTripMatching = fuzzyTripMatching;
     this.blockReadinessUntilInitialized = blockReadinessUntilInitialized;
     this.url = url;
     this.requestorRef = requestorRef;
@@ -68,10 +65,6 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
 
   public boolean purgeExpiredData() {
     return purgeExpiredData;
-  }
-
-  public boolean fuzzyTripMatching() {
-    return fuzzyTripMatching;
   }
 
   public boolean blockReadinessUntilInitialized() {

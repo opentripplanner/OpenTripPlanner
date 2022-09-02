@@ -24,10 +24,8 @@ public class GroupOfRoutes
 
   GroupOfRoutes(GroupOfRoutesBuilder builder) {
     super(builder.getId());
-    // required fields
-    this.name = StringUtils.assertHasValue(builder.getName());
-
     // Optional fields
+    this.name = builder.getName();
     this.privateCode = builder.getPrivateCode();
     this.shortName = builder.getShortName();
     this.description = builder.getDescription();

@@ -26,14 +26,11 @@ public record Money(Currency currency, int cents) implements Comparable<Money> {
     return cents - m.cents;
   }
 
-  public Money withCurrency(Currency updatedCurrency) {
-    return new Money(updatedCurrency, cents);
-  }
-
   @Override
   public String toString() {
     NumberFormat nf = NumberFormat.getCurrencyInstance(Locale.ENGLISH);
     nf.setCurrency(currency);
+    nf.setMaximumFractionDigits(currency.getDefaultFractionDigits());
     return nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
   }
 }

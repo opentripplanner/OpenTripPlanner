@@ -16,10 +16,10 @@ import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -91,7 +91,7 @@ public class DefaultFareServiceImpl implements FareService {
   }
 
   @Override
-  public Fare getCost(Itinerary itinerary) {
+  public ItineraryFares getCost(Itinerary itinerary) {
     var fareLegs = itinerary
       .getLegs()
       .stream()
@@ -108,7 +108,7 @@ public class DefaultFareServiceImpl implements FareService {
       return null;
     }
 
-    Fare fare = new Fare();
+    ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
     for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
       FareType fareType = kv.getKey();
@@ -159,7 +159,7 @@ public class DefaultFareServiceImpl implements FareService {
    * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
   protected boolean populateFare(
-    Fare fare,
+    ItineraryFares fare,
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -184,11 +184,13 @@ public class DefaultFareServiceImpl implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
-      FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
+
+      var routes = new ArrayList<FeedScopedId>();
       for (int i = start; i <= via; ++i) {
-        detail.addRoute(legs.get(i).getRoute().getId());
+        routes.add(legs.get(i).getRoute().getId());
       }
-      details.add(detail);
+      var component = new FareComponent(fareId, null, getMoney(currency, cost), routes);
+      details.add(component);
       ++count;
       start = via + 1;
     }

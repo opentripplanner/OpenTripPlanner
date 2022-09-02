@@ -36,23 +36,37 @@ import uk.org.siri.siri20.VehicleModesEnumeration;
  * process will always be applied even in places where you have good quality IDs in SIRI data and
  * don't need it - we'd have to add a way to disable it.
  * <p>
- * Several instances of this SiriFuzzyTripMatcher may appear in different SIRI updaters, but they
- * all share a common set of static Map fields. We generally don't advocate using static fields in
- * this way, but as part of a sandbox contribution we are maintaining this implementation.
+ * The same instance of this SiriFuzzyTripMatcher may appear in different SIRI updaters. Be sure
+ * to fetch the instance at during the setup of the updaters, the initialization is not thread-safe.
  */
 public class SiriFuzzyTripMatcher {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
-  private static final Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
-  private static final Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
-  private static final Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
-  private static final Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
-  private static final Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
-  private static final Set<String> nonExistingStops = new HashSet<>();
 
+  private static SiriFuzzyTripMatcher instance;
+
+  private final Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
+  private final Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
+  private final Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
+  private final Map<String, Set<Trip>> start_stop_tripCache = new HashMap<>();
+  private final Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
+  private final Set<String> nonExistingStops = new HashSet<>();
   private final TransitService transitService;
 
-  public SiriFuzzyTripMatcher(TransitService transitService) {
+  /**
+   * Factory method used to create only one instance.
+   * <p>
+   * THIS METHOD IS NOT THREAD-SAFE AND SHOULD BE CALLED DURING THE
+   * INITIALIZATION PROCESS.
+   */
+  public static SiriFuzzyTripMatcher of(TransitService transitService) {
+    if (instance == null) {
+      instance = new SiriFuzzyTripMatcher(transitService);
+    }
+    return instance;
+  }
+
+  private SiriFuzzyTripMatcher(TransitService transitService) {
     this.transitService = transitService;
     initCache(this.transitService);
   }
@@ -246,7 +260,7 @@ public class SiriFuzzyTripMatcher {
     return null;
   }
 
-  private static void initCache(TransitService index) {
+  private void initCache(TransitService index) {
     if (mappedTripsCache.isEmpty()) {
       for (Trip trip : index.getAllTrips()) {
         TripPattern tripPattern = index.getPatternForTrip(trip);

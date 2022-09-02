@@ -10,7 +10,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -29,24 +28,20 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private static final long RETRY_INTERVAL_MILLIS = 5000;
   private static final Map<String, String> requestHeaders = new HashMap<>();
   private final String url;
-  private final String feedId;
-  private final long earlyStart;
   private final String originalRequestorRef;
+  private final TransitAlertService transitAlertService;
+  private final SiriAlertsUpdateHandler updateHandler;
   private WriteToGraphCallback saveResultOnGraph;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
-  private TransitAlertService transitAlertService;
-  private SiriAlertsUpdateHandler updateHandler = null;
   private String requestorRef;
   private int timeout;
   private int retryCount = 0;
 
-  public SiriSXUpdater(SiriSXUpdaterParameters config) {
+  public SiriSXUpdater(SiriSXUpdaterParameters config, TransitModel transitModel) {
     super(config);
     // TODO: add options to choose different patch services
     this.url = config.getUrl();
     this.requestorRef = config.getRequestorRef();
-    this.earlyStart = config.getEarlyStartSec();
-    this.feedId = config.getFeedId();
 
     if (requestorRef == null || requestorRef.isEmpty()) {
       requestorRef = "otp-" + UUID.randomUUID().toString();
@@ -61,12 +56,19 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     }
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-
     requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
+
+    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
+    this.updateHandler = new SiriAlertsUpdateHandler(config.getFeedId(), transitModel);
+    this.updateHandler.setEarlyStart(config.getEarlyStartSec());
+    this.updateHandler.setTransitAlertService(transitAlertService);
+    this.updateHandler.setSiriFuzzyTripMatcher(
+        SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+      );
 
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       url
     );
   }
@@ -75,23 +77,6 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
-    SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(
-      new DefaultTransitService(transitModel)
-    );
-    if (updateHandler == null) {
-      updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
-    }
-    updateHandler.setEarlyStart(earlyStart);
-    updateHandler.setTransitAlertService(transitAlertService);
-    updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
-  }
-
-  @Override
-  public void teardown() {}
 
   public TransitAlertService getTransitAlertService() {
     return transitAlertService;

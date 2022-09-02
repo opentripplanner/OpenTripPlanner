@@ -13,7 +13,6 @@ public class SiriVMUpdaterConfig {
       c.asInt("logFrequency", -1),
       c.asInt("maxSnapshotFrequencyMs", -1),
       c.asBoolean("purgeExpiredData", false),
-      c.asBoolean("fuzzyTripMatching", false),
       c.asBoolean("blockReadinessUntilInitialized", false),
       c.asText("url"),
       c.asText("requestorRef", "otp-" + UUID.randomUUID()),

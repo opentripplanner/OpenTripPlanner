@@ -1,8 +1,8 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 
-public enum ApiFareType implements Serializable {
+public enum FareType implements Serializable {
   regular,
   student,
   senior,

@@ -31,6 +31,7 @@ import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdater
 import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.azure.SiriAzureETUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.azure.SiriAzureSXUpdaterConfig;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
@@ -69,6 +70,8 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
+  private final TimetableSnapshotSourceParameters timetableUpdates;
+
   @Nullable
   private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
 
@@ -99,6 +102,8 @@ public class UpdatersConfig implements UpdatersParameters {
           : rootAdapter.path("bikeRentalServiceDirectory") // TODO: deprecated, remove in next major version
       );
 
+    timetableUpdates = timetableUpdates(rootAdapter.path("timetableUpdates"));
+
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
 
     for (NodeAdapter conf : updaters) {
@@ -109,6 +114,26 @@ public class UpdatersConfig implements UpdatersParameters {
       }
       configList.put(type, factory.apply(type, conf));
     }
+  }
+
+  /**
+   * Read "timetableUpdates" parameters. These parameters are used to configure the
+   * TimetableSnapshotSource. Both the GTFS and Siri version uses the same parameters.
+   */
+  private TimetableSnapshotSourceParameters timetableUpdates(NodeAdapter c) {
+    var dflt = TimetableSnapshotSourceParameters.DEFAULT;
+    if (c.isEmpty()) {
+      return dflt;
+    }
+    return new TimetableSnapshotSourceParameters(
+      c.asInt("logFrequency", dflt.logFrequency()),
+      c.asInt("maxSnapshotFrequency", dflt.maxSnapshotFrequencyMs()),
+      c.asBoolean("purgeExpiredData", dflt.purgeExpiredData())
+    );
+  }
+
+  public TimetableSnapshotSourceParameters timetableSnapshotParameters() {
+    return timetableUpdates;
   }
 
   /**

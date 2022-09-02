@@ -4,7 +4,6 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -33,25 +32,34 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
   private final String url;
-  private final String feedId;
-  private final long earlyStart;
-  private final boolean fuzzyTripMatching;
+  private final AlertsUpdateHandler updateHandler;
+  private final TransitAlertService transitAlertService;
   private WriteToGraphCallback saveResultOnGraph;
   private Long lastTimestamp = Long.MIN_VALUE;
-  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
-  private AlertsUpdateHandler updateHandler = null;
-  private TransitAlertService transitAlertService;
 
-  public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
+  public GtfsRealtimeAlertsUpdater(
+    GtfsRealtimeAlertsUpdaterParameters config,
+    TransitModel transitModel
+  ) {
     super(config);
     this.url = config.getUrl();
-    this.earlyStart = config.getEarlyStartSec();
-    this.feedId = config.getFeedId();
-    this.fuzzyTripMatching = config.fuzzyTripMatching();
+    TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
+
+    var fuzzyTripMatcher = config.fuzzyTripMatching()
+      ? new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel))
+      : null;
+
+    this.transitAlertService = transitAlertService;
+
+    this.updateHandler = new AlertsUpdateHandler();
+    this.updateHandler.setEarlyStart(config.getEarlyStartSec());
+    this.updateHandler.setFeedId(config.getFeedId());
+    this.updateHandler.setTransitAlertService(transitAlertService);
+    this.updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
 
     LOG.info(
       "Creating real-time alert updater running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       url
     );
   }
@@ -60,26 +68,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    TransitAlertService transitAlertService = new TransitAlertServiceImpl(transitModel);
-    if (fuzzyTripMatching) {
-      this.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
-    this.transitAlertService = transitAlertService;
-    if (updateHandler == null) {
-      updateHandler = new AlertsUpdateHandler();
-    }
-    updateHandler.setEarlyStart(earlyStart);
-    updateHandler.setFeedId(feedId);
-    updateHandler.setTransitAlertService(transitAlertService);
-    updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
-  }
-
-  @Override
-  public void teardown() {}
 
   public TransitAlertService getTransitAlertService() {
     return transitAlertService;

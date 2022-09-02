@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.service;
 
-import java.util.function.Function;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -19,10 +17,6 @@ public interface TransitEditorService extends TransitService {
   void addRoutes(Route route);
 
   void addTransitMode(TransitMode mode);
-
-  <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(
-    Function<TransitModel, T> creator
-  );
 
   void setTransitLayer(TransitLayer transitLayer);
 }

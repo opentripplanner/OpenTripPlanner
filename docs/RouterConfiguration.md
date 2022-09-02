@@ -6,7 +6,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 | config key             | description                                                        | value type             | value default | notes                                                                 |
 |------------------------|--------------------------------------------------------------------|------------------------|---------------|-----------------------------------------------------------------------|
 | `routingDefaults`      | Default routing parameters, which will be applied to every request | object                 |               | see [routing defaults](#routing-defaults)                             |
-| `streetRoutingTimeout` | maximum time limit for street route queries                        | double                 | null          | units: seconds; see [timeout](#timeout)                               |
+| `streetRoutingTimeout` | maximum time limit for street route queries                        | string                 | 5s            | see [timeout](#timeout)                                               |
 | `requestLogFile`       | Path to a plain-text file where requests will be logged            | string                 | null          | see [logging incoming requests](#logging-incoming-requests)           |
 | `transit`              | Transit tuning parameters                                          | `TransitRoutingConfig` |               | see [Tuning transit routing](#Tuning-transit-routing)                 |
 | `updaters`             | configure real-time updaters, such as GTFS-realtime feeds          | object                 | null          | see [configuring real-time updaters](#configuring-real-time-updaters) |
@@ -125,7 +125,7 @@ The group-by-filter work by grouping itineraries together and then reducing the 
 itineraries in each group, keeping the itinerary/itineraries with the best itinerary
 _generalized-cost_. The group-by function first pick all transit legs that account for more than N%
 of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
-legs in one of the keys also exist in the other. Note, one key may have a lager set of legs than the
+legs in one of the keys also exist in the other. Note, one key may have a larger set of legs than the
 other, but they can still be the same. When comparing two legs we compare the `tripId` and make sure
 the legs overlap in place and time. Two legs are the same if both legs ride at least a common
 subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The
@@ -135,14 +135,6 @@ The grouped itineraries can be further reduced by using `groupedOtherThanSameLeg
 This parameter filters out itineraries, where the legs that are not common for all the grouped
 itineraries have a much higher cost, than the lowest in the group. By default, it filters out
 itineraries that are at least double in cost for the non-grouped legs.
-
-### Drive-to-transit routing defaults
-
-When using the "park and ride" or "kiss and ride" modes (drive to transit), the initial driving time
-to reach a transit stop or park and ride facility is constrained. You can set a drive time limit in
-seconds by adding a line like
-`maxPreTransitTime = 1200` to the routingDefaults section. If the limit is too high on a very large
-street graph, routing performance may suffer.
 
 ### Boarding and alighting times
 
@@ -201,12 +193,11 @@ search-window. To set the street routing timeout use the following config:
 ```JSON
 // router-config.json
 {
-  "streetRoutingTimeout": 5.5
+  "streetRoutingTimeout": "5.5s"
 }
 ```
 
-This specifies a timeout in (optionally fractional) seconds. The search abort after this many
-seconds and any paths found are returned to the client.
+This specifies a timeout as duration which has the amount and the unit. The search abort after this duration and any paths found are returned to the client.
 
 ## maxAccessEgressDurationForMode
 
@@ -298,7 +289,7 @@ Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.js
 | `minWaitTimeCoefficient`    | The coefficient to multiply with a minimum wait time estimated based on the heuristic search. This will increase the search-window in low transit frequency areas. This value is added to the `minWinTimeMinutes`. A value between `0.0` to `1.0` is expected to give ok results. | double     | `0.5`           |
 | `minWinTimeMinutes`         | The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment.                                                                                                                                                     | int        | `40`            |
 | `maxWinTimeMinutes`         | Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time.        | int        | `180` (3 hours) |
-| `stepMinutes`               | The search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.                                      | int        | `10`            |
+| `stepMinutes`               | The search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. If the computed search-window is 5 minutes and 17 seconds, it will be rounded up to 10 minutes.                                      | int        | `10`            |
 
 ### Tuning transit routing - Stop transfer cost
 
