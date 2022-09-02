@@ -68,6 +68,8 @@ of this type:
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
 
+Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` nodes.
+
 OTP2 records the "parentStation" relationship between stops and stations in its internal transit
 model, based on the GTFS and/or NeTEx input. This enables OTP to search from all stop in a station
 _without_ walking/waiting when the request from/to input field is a station id. There is no way to

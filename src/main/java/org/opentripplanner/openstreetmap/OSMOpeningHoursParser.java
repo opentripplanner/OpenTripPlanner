@@ -78,6 +78,13 @@ public class OSMOpeningHoursParser {
 
   public OSMOpeningHoursParser(
     OpeningHoursCalendarService openingHoursCalendarService,
+    DataImportIssueStore issueStore
+  ) {
+    this(openingHoursCalendarService, () -> null, issueStore);
+  }
+
+  public OSMOpeningHoursParser(
+    OpeningHoursCalendarService openingHoursCalendarService,
     Supplier<ZoneId> zoneIdSupplier,
     DataImportIssueStore issueStore
   ) {
@@ -97,16 +104,25 @@ public class OSMOpeningHoursParser {
     this.issueStore = null;
   }
 
-  /**
-   * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours.
-   * Currently, doesn't have support for all types of rules.
-   */
   public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link)
     throws OpeningHoursParseException {
     ZoneId zoneId = zoneIdSupplier.get();
     if (zoneId == null) {
       return null;
     }
+    return parseOpeningHours(openingHoursTag, id, link, zoneId);
+  }
+
+  /**
+   * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours.
+   * Currently, doesn't have support for all types of rules.
+   */
+  public OHCalendar parseOpeningHours(
+    String openingHoursTag,
+    String id,
+    String link,
+    ZoneId zoneId
+  ) throws OpeningHoursParseException {
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
     var parser = new OpeningHoursParser(new ByteArrayInputStream(openingHoursTag.getBytes()));
     var rules = parser.rules(false);
