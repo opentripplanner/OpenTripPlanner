@@ -151,6 +151,13 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final S3BucketConfig elevationBucket;
 
   /**
+   * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+   * are defined in meters in the source data. If, for example, decimetres are used in the source
+   * data, this should be set to 0.1.
+   */
+  public final double elevationUnitMultiplier;
+
+  /**
    * A specific fares service to use.
    */
   public final FareServiceFactory fareServiceFactory;
@@ -470,6 +477,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
       );
     elevationBucket = S3BucketConfig.fromConfig(c.path("elevationBucket"));
+    elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
     embedRouterConfig = c.asBoolean("embedRouterConfig", true);
     extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
     includeEllipsoidToGeoidDifference = c.asBoolean("includeEllipsoidToGeoidDifference", false);
