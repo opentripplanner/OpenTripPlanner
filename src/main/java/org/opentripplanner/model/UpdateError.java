@@ -21,6 +21,8 @@ public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorTy
     INVALID_DEPARTURE_TIME,
     NON_INCREASING_TRIP_TIMES,
     INVALID_STOP_SEQUENCE,
+    NOT_IMPLEMENTED_UNSCHEDULED,
+    NOT_IMPLEMENTED_DUPLICATED,
   }
 
   public static Optional<UpdateError> of(FeedScopedId tripId, UpdateErrorType errorType) {

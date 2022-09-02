@@ -3,6 +3,8 @@ package org.opentripplanner.updater.stoptime;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
@@ -10,7 +12,6 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_VALID_STO
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
@@ -286,7 +287,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case UNSCHEDULED -> UpdateError.of(tripId, NOT_IMPLEMETED_UNSCHEDULED);
             case CANCELED -> handleCanceledTrip(tripId, serviceDate);
             case REPLACEMENT -> validateAndHandleModifiedTrip(
               tripUpdate,
@@ -294,7 +294,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case DUPLICATED -> UpdateError.of(tripId, UNKNOWN);
+            case UNSCHEDULED -> UpdateError.of(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
+            case DUPLICATED -> UpdateError.of(tripId, NOT_IMPLEMENTED_DUPLICATED);
           };
 
         updateError.ifPresent(errors::add);
@@ -893,12 +894,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     return success;
-  }
-
-  private Optional<UpdateError> handleUnscheduledTrip(FeedScopedId tripId) {
-    // TODO: Handle unscheduled trip
-    LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
-    return UpdateError.of(tripId, UpdateError.UpdateErrorType.UNKNOWN);
   }
 
   /**

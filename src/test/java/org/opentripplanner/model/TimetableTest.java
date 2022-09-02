@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
@@ -89,7 +90,6 @@ public class TimetableTest {
     TripUpdate tripUpdate;
     TripUpdate.Builder tripUpdateBuilder;
     StopTimeUpdate.Builder stopTimeUpdateBuilder;
-    StopTimeEvent.Builder stopTimeEventBuilder;
 
     // update trip with bad data
     var tripDescriptorBuilder = tripDescriptorBuilder("1.1");
@@ -107,7 +107,7 @@ public class TimetableTest {
     );
     assertTrue(result.isFailure());
 
-    result.ifFailure(e -> assertEquals(UNKNOWN, e.errorType()));
+    result.ifFailure(e -> assertEquals(INVALID_STOP_SEQUENCE, e.errorType()));
   }
 
   @Test
