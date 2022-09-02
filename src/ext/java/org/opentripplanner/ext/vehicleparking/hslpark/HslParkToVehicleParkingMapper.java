@@ -223,6 +223,9 @@ public class HslParkToVehicleParkingMapper {
   );
 
   private OHCalendar parseOpeningHours(JsonNode openingHoursByDayType) {
+    if (zoneId == null) {
+      return null;
+    }
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
     for (DayTypeAndDays dayTypeAndDays : DAYS_FOR_DAY_TYPES) {
       String key = dayTypeAndDays.typeKey();

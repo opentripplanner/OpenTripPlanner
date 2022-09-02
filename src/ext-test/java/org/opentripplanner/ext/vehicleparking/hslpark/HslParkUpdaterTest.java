@@ -126,4 +126,40 @@ public class HslParkUpdaterTest {
       fourth.getOpeningHours().toString()
     );
   }
+
+  @Test
+  void parseParksWithoutTimeZone() {
+    var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
+    var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
+    ZoneId timeZone = null;
+
+    var parameters = new HslParkUpdaterParameters(
+      "",
+      3000,
+      facilitiesUrl,
+      "hslpark",
+      null,
+      30,
+      utilizationsUrl,
+      timeZone
+    );
+    var openingHoursCalendarService = new OpeningHoursCalendarService(
+      new Deduplicator(),
+      LocalDate.of(2022, Month.JANUARY, 1),
+      LocalDate.of(2023, Month.JANUARY, 1)
+    );
+    var updater = new HslParkUpdater(parameters, openingHoursCalendarService);
+
+    assertTrue(updater.update());
+    var parkingLots = updater.getUpdates();
+
+    assertEquals(4, parkingLots.size());
+
+    var first = parkingLots.get(0);
+    assertEquals("Tapiola Park", first.getName().toString());
+    assertEquals("hslpark:990", first.getId().toString());
+    assertEquals(24.804713028552346, first.getX());
+    assertEquals(60.176018858575354, first.getY());
+    assertNull(first.getOpeningHours());
+  }
 }
