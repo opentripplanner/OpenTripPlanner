@@ -413,12 +413,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (pattern == null) {
       debug(tripId, "No pattern found for tripId, skipping TripUpdate.");
-      UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.of(tripId, TRIP_ID_NOT_FOUND);
     }
 
     if (tripUpdate.getStopTimeUpdateCount() < 1) {
       debug(tripId, "TripUpdate contains no updates, skipping.");
-      UpdateError.of(tripId, NO_UPDATES);
+      return UpdateError.of(tripId, NO_UPDATES);
     }
 
     // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the sequence of stops has
