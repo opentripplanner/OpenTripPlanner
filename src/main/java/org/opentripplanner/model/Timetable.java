@@ -6,7 +6,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPU
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -182,7 +182,7 @@ public class Timetable implements Serializable {
     TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
       LOG.debug("TripDescriptor object has no TripId field");
-      Result.failure(UpdateError.noTripId(TRIP_ID_NOT_FOUND));
+      Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
     }
 
     String tripId = tripDescriptor.getTripId();

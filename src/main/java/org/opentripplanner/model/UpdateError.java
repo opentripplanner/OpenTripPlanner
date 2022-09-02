@@ -9,9 +9,10 @@ public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorTy
   public enum UpdateErrorType {
     UNKNOWN,
     INVALID_INPUT_STRUCTURE,
-    TRIP_ID_NOT_FOUND,
+    TRIP_NOT_FOUND,
     TRIP_NOT_FOUND_IN_PATTERN,
     NO_FUZZY_TRIP_MATCH,
+    NO_TRIP_FOR_CANCELLATION_FOUND,
     TRIP_ALREADY_EXISTS,
     NO_START_DATE,
     NO_UPDATES,

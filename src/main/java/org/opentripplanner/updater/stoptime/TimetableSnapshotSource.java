@@ -7,11 +7,12 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMEN
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ID_NOT_FOUND;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
@@ -56,6 +57,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,10 +323,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       if (fullDataset) {
         LOG.info(
-          "[feedId: {}] {} of {} update messages were applied successfully",
+          "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
           feedId,
           successfullyApplied,
-          updates.size()
+          updates.size(),
+          DoubleUtils.roundTo2Decimals((double) successfullyApplied / updates.size() * 100)
         );
 
         var errorIndex = Multimaps.index(errors, UpdateError::errorType);
@@ -414,7 +417,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (pattern == null) {
       debug(tripId, "No pattern found for tripId, skipping TripUpdate.");
-      return UpdateError.optional(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.optional(tripId, TRIP_NOT_FOUND);
     }
 
     if (tripUpdate.getStopTimeUpdateCount() < 1) {
@@ -923,7 +926,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
       debug(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
-      return UpdateError.optional(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.optional(tripId, TRIP_NOT_FOUND);
     }
 
     // Check whether a start date exists
@@ -1008,7 +1011,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (!cancelScheduledSuccess && !cancelPreviouslyAddedSuccess) {
       debug(tripId, "No pattern found for tripId. Skipping cancellation.");
-      return UpdateError.optional(tripId, TRIP_ID_NOT_FOUND);
+      return UpdateError.optional(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
     return UpdateError.noError();
   }
