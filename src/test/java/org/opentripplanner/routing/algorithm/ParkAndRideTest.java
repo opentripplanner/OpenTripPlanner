@@ -152,12 +152,15 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     boolean arriveBy
   ) {
     var options = new RouteRequest().getStreetSearchRequest(streetMode);
-    options.bikeParkCost = 120;
-    options.bikeParkTime = 60;
-    options.carParkCost = 240;
-    options.carParkTime = 180;
-    options.wheelchairAccessibility =
-      WheelchairAccessibilityRequest.makeDefault(requireWheelChairAccessible);
+    var preferences = options.preferences();
+
+    preferences.bike().setParkCost(120);
+    preferences.bike().setParkTime(60);
+    preferences.car().setParkCost(240);
+    preferences.car().setParkTime(180);
+    preferences
+      .wheelchair()
+      .setAccessibility(WheelchairAccessibilityRequest.makeDefault(requireWheelChairAccessible));
     options.bannedVehicleParkingTags = bannedTags;
     options.requiredVehicleParkingTags = requiredTags;
     options.setArriveBy(arriveBy);

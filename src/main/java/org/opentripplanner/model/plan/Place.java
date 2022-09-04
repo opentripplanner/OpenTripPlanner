@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
@@ -136,11 +137,13 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
+    var preferences = request.preferences();
+
     boolean realTime =
-      request.useVehicleParkingAvailabilityInformation &&
+      preferences.parking().useAvailabilityInformation() &&
       vertex
         .getVehicleParking()
-        .hasRealTimeDataForMode(traverseMode, request.wheelchairAccessibility.enabled());
+        .hasRealTimeDataForMode(traverseMode, preferences.wheelchair().accessibility().enabled());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

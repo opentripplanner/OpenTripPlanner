@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -263,6 +264,10 @@ public class State implements Cloneable {
 
   public RouteRequest getOptions() {
     return stateData.opt;
+  }
+
+  public RoutingPreferences getPreferences() {
+    return stateData.opt.preferences();
   }
 
   public RoutingContext getRoutingContext() {

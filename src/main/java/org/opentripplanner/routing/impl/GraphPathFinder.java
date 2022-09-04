@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -63,13 +64,14 @@ public class GraphPathFinder {
     }
 
     RouteRequest options = routingContext.opt;
+    RoutingPreferences preferences = routingContext.opt.preferences();
 
     if (options.streetSubRequestModes.isTransit()) {
       throw new UnsupportedOperationException("Transit search not supported");
     }
 
     AStarBuilder aStar = AStarBuilder
-      .oneToOneMaxDuration(options.getMaxDirectStreetDuration(options.modes.directMode))
+      .oneToOneMaxDuration(preferences.street().maxDirectDuration(options.modes.directMode))
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
@@ -90,7 +92,7 @@ public class GraphPathFinder {
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-    paths.sort(options.getPathComparator(options.arriveBy()));
+    paths.sort(preferences.street().pathComparator(options.arriveBy()));
     return paths;
   }
 

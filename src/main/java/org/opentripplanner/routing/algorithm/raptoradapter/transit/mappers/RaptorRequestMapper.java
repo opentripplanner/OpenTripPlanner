@@ -67,10 +67,12 @@ public class RaptorRequestMapper {
     var builder = new RaptorRequestBuilder<TripSchedule>();
     var searchParams = builder.searchParams();
 
+    var preferences = request.preferences();
+
     if (request.pageCursor() == null) {
       int time = relativeTime(request.dateTime());
 
-      int timeLimit = relativeTime(request.raptorOptions.getTimeLimit());
+      int timeLimit = relativeTime(preferences.transit().raptorOptions().getTimeLimit());
 
       if (request.arriveBy()) {
         searchParams.latestArrivalTime(time);
@@ -92,11 +94,11 @@ public class RaptorRequestMapper {
       searchParams.searchWindow(c.searchWindow);
     }
 
-    if (request.maxTransfers != null) {
-      searchParams.maxNumberOfTransfers(request.maxTransfers);
+    if (preferences.transfer().maxTransfers() != null) {
+      searchParams.maxNumberOfTransfers(preferences.transfer().maxTransfers());
     }
 
-    for (Optimization optimization : request.raptorOptions.getOptimizations()) {
+    for (Optimization optimization : preferences.transit().raptorOptions().getOptimizations()) {
       if (optimization.is(PARALLEL)) {
         if (isMultiThreadedEnbled) {
           builder.enableOptimization(optimization);
@@ -106,19 +108,19 @@ public class RaptorRequestMapper {
       }
     }
 
-    builder.profile(request.raptorOptions.getProfile());
-    builder.searchDirection(request.raptorOptions.getSearchDirection());
+    builder.profile(preferences.transit().raptorOptions().getProfile());
+    builder.searchDirection(preferences.transit().raptorOptions().getSearchDirection());
 
     builder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
       .slackProvider(
         new SlackProvider(
-          request.transferSlack,
-          request.boardSlack,
-          request.boardSlackForMode,
-          request.alightSlack,
-          request.alightSlackForMode
+          preferences.transfer().slack(),
+          preferences.transit().boardSlack(),
+          preferences.transit().boardSlackForMode(),
+          preferences.transit().alightSlack(),
+          preferences.transit().alightSlackForMode()
         )
       );
 
@@ -149,7 +151,11 @@ public class RaptorRequestMapper {
 
     // Add this last, it depends on generating an alias from the set values
     builder.performanceTimers(
-      new PerformanceTimersForRaptor(builder.generateAlias(), request.tags, meterRegistry)
+      new PerformanceTimersForRaptor(
+        builder.generateAlias(),
+        preferences.system().tags(),
+        meterRegistry
+      )
     );
 
     return builder.build();

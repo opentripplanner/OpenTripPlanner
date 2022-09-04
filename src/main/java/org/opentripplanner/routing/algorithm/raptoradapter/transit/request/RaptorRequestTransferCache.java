@@ -11,6 +11,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 
@@ -110,29 +111,31 @@ public class RaptorRequestTransferCache {
     private final int bikeSwitchTime;
 
     public StreetRelevantOptions(RouteRequest routingRequest) {
+      var preferences = routingRequest.preferences();
+
       this.transferMode = routingRequest.modes.transferMode;
 
-      this.optimize = routingRequest.bicycleOptimizeType;
-      this.bikeTriangleSafetyFactor = routingRequest.bikeTriangleSafetyFactor;
-      this.bikeTriangleSlopeFactor = routingRequest.bikeTriangleSlopeFactor;
-      this.bikeTriangleTimeFactor = routingRequest.bikeTriangleTimeFactor;
-      this.bikeSwitchCost = routingRequest.bikeSwitchCost;
-      this.bikeSwitchTime = routingRequest.bikeSwitchTime;
+      this.optimize = preferences.bike().optimizeType();
+      this.bikeTriangleSafetyFactor = preferences.bike().triangleSafetyFactor();
+      this.bikeTriangleSlopeFactor = preferences.bike().triangleSlopeFactor();
+      this.bikeTriangleTimeFactor = preferences.bike().triangleTimeFactor();
+      this.bikeSwitchCost = preferences.bike().switchCost();
+      this.bikeSwitchTime = preferences.bike().switchTime();
 
-      this.wheelchairAccessibility = routingRequest.wheelchairAccessibility.round();
+      this.wheelchairAccessibility = preferences.wheelchair().accessibility().round();
 
-      this.walkSpeed = routingRequest.walkSpeed;
-      this.bikeSpeed = routingRequest.bikeSpeed;
+      this.walkSpeed = preferences.walk().speed();
+      this.bikeSpeed = preferences.bike().speed();
 
-      this.walkReluctance = routingRequest.walkReluctance;
-      this.stairsReluctance = routingRequest.stairsReluctance;
-      this.stairsTimeFactor = routingRequest.stairsTimeFactor;
-      this.turnReluctance = routingRequest.turnReluctance;
+      this.walkReluctance = preferences.walk().reluctance();
+      this.stairsReluctance = preferences.walk().stairsReluctance();
+      this.stairsTimeFactor = preferences.walk().stairsTimeFactor();
+      this.turnReluctance = preferences.street().turnReluctance();
 
-      this.elevatorBoardCost = routingRequest.elevatorBoardCost;
-      this.elevatorBoardTime = routingRequest.elevatorBoardTime;
-      this.elevatorHopCost = routingRequest.elevatorHopCost;
-      this.elevatorHopTime = routingRequest.elevatorHopTime;
+      this.elevatorBoardCost = preferences.street().elevatorBoardCost();
+      this.elevatorBoardTime = preferences.street().elevatorBoardTime();
+      this.elevatorHopCost = preferences.street().elevatorHopCost();
+      this.elevatorHopTime = preferences.street().elevatorHopTime();
     }
 
     @Override

@@ -195,16 +195,20 @@ class PathwayEdgeTest {
 
   private State assertThatEdgeIsTraversable(PathwayEdge edge, boolean wheelchair) {
     var req = new RouteRequest();
-    req.wheelchairAccessibility =
-      new WheelchairAccessibilityRequest(
-        wheelchair,
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        ofOnlyAccessible(),
-        25,
-        0.08,
-        1,
-        25
+    req
+      .preferences()
+      .wheelchair()
+      .setAccessibility(
+        new WheelchairAccessibilityRequest(
+          wheelchair,
+          ofOnlyAccessible(),
+          ofOnlyAccessible(),
+          ofOnlyAccessible(),
+          25,
+          0.08,
+          1,
+          25
+        )
       );
     var state = new State(new RoutingContext(req, graph, from, to));
 

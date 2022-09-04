@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeSt
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -277,7 +278,7 @@ public class NearbyStopFinder {
 
   private List<NearbyStop> findNearbyStopsViaDirectTransfers(Vertex vertex) {
     // It make sense for the directGraphFinder to use meters as a limit, so we convert first
-    double limitMeters = durationLimit.toSeconds() * new RouteRequest(TraverseMode.WALK).walkSpeed;
+    double limitMeters = durationLimit.toSeconds() * new WalkPreferences().speed();
     Coordinate c0 = vertex.getCoordinate();
     return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
   }

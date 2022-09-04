@@ -90,12 +90,13 @@ public class TurnCostTest {
 
     // Make a prototype routing request.
     proto = new RouteRequest();
-    proto.carSpeed = 1.0;
-    proto.walkSpeed = 1.0;
-    proto.bikeSpeed = 1.0;
-    proto.turnReluctance = (1.0);
-    proto.setNonTransitReluctance(1.0);
-    proto.stairsReluctance = (1.0);
+    var preferences = proto.preferences();
+    preferences.car().setSpeed(1.0);
+    preferences.walk().setSpeed(1.0);
+    preferences.bike().setSpeed(1.0);
+    preferences.street().setTurnReluctance(1.0);
+    preferences.setNonTransitReluctance(1.0);
+    preferences.walk().setStairsReluctance(1.0);
 
     // Turn costs are all 0 by default.
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));

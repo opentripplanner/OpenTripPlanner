@@ -41,10 +41,11 @@ public class SimpleTraversalCostModelTest {
 
     // Initialize the routing request.
     options = new RouteRequest();
-    options.carSpeed = 1.0;
-    options.walkSpeed = 1.0;
-    options.carDecelerationSpeed = (2.0);
-    options.carAccelerationSpeed = (2.0);
+    var pref = options.preferences();
+    pref.car().setSpeed(1.0);
+    pref.walk().setSpeed(1.0);
+    pref.car().setDecelerationSpeed(2.0);
+    pref.car().setAccelerationSpeed(2.0);
     options.setStreetSubRequestModes(TraverseModeSet.allModes());
   }
 

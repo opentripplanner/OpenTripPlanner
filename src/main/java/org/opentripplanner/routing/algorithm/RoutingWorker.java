@@ -69,7 +69,10 @@ public class RoutingWorker {
     this.request = request;
     this.serverContext = serverContext;
     this.debugTimingAggregator =
-      new DebugTimingAggregator(serverContext.meterRegistry(), request.tags);
+      new DebugTimingAggregator(
+        serverContext.meterRegistry(),
+        request.preferences().system().tags()
+      );
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     this.pagingSearchWindowAdjuster =
       createPagingSearchWindowAdjuster(serverContext.routerConfig());
@@ -122,14 +125,14 @@ public class RoutingWorker {
     // Filter itineraries
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
       request.getItinerariesSortOrder(),
-      request.itineraryFilters,
+      request.preferences().system().itineraryFilters(),
       request.numItineraries(),
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
-      request.wheelchairAccessibility.enabled(),
-      request.wheelchairAccessibility.maxSlope(),
+      request.preferences().wheelchair().accessibility().enabled(),
+      request.preferences().wheelchair().accessibility().maxSlope(),
       serverContext.graph().getFareService(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
@@ -184,7 +187,7 @@ public class RoutingWorker {
       searchDateTime,
       request.searchWindow(),
       maxWindow,
-      request.maxJourneyDuration
+      request.preferences().system().maxJourneyDuration()
     );
   }
 

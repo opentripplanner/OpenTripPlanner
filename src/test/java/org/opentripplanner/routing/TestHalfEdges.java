@@ -528,7 +528,7 @@ public class TestHalfEdges {
       StreetNotesService.WHEELCHAIR_MATCHER
     );
 
-    req.setWheelchairAccessible(true);
+    req.preferences().wheelchair().setAccessible(true);
 
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(

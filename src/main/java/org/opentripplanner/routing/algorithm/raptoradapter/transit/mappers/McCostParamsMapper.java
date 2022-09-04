@@ -20,17 +20,22 @@ public class McCostParamsMapper {
     List<? extends DefaultTripPattern> patternIndex
   ) {
     McCostParamsBuilder builder = new McCostParamsBuilder();
+    var preferences = request.preferences();
 
-    builder.transferCost(request.transferCost).waitReluctanceFactor(request.waitReluctance);
+    builder
+      .transferCost(preferences.transfer().cost())
+      .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
     if (request.modes.transferMode == StreetMode.BIKE) {
-      builder.boardCost(request.bikeBoardCost);
+      builder.boardCost(preferences.bike().boardCost());
     } else {
-      builder.boardCost(request.walkBoardCost);
+      builder.boardCost(preferences.walk().boardCost());
     }
-    builder.transitReluctanceFactors(mapTransitReluctance(request.transitReluctanceForMode()));
 
-    builder.wheelchairAccessibility(request.wheelchairAccessibility);
+    builder.transitReluctanceFactors(
+      mapTransitReluctance(preferences.transit().reluctanceForMode())
+    );
+    builder.wheelchairAccessibility(preferences.wheelchair().accessibility());
 
     final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
     final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
@@ -49,7 +54,7 @@ public class McCostParamsMapper {
         }
       }
       builder.unpreferredPatterns(unpreferredPatterns);
-      builder.unpreferredCost(request.unpreferredCost);
+      builder.unpreferredCost(preferences.transit().unpreferredCost());
     }
 
     return builder.build();

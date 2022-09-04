@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -82,27 +83,39 @@ public class VehicleParkingEdge extends Edge {
 
   protected State traverseUnPark(State s0) {
     RouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
     if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
       return null;
     }
 
     if (options.streetSubRequestModes.getBicycle()) {
-      return traverseUnPark(s0, options.bikeParkCost, options.bikeParkTime, TraverseMode.BICYCLE);
+      return traverseUnPark(
+        s0,
+        preferences.bike().parkCost(),
+        preferences.bike().parkTime(),
+        TraverseMode.BICYCLE
+      );
     } else if (options.streetSubRequestModes.getCar()) {
-      return traverseUnPark(s0, options.carParkCost, options.carParkTime, TraverseMode.CAR);
+      return traverseUnPark(
+        s0,
+        preferences.car().parkCost(),
+        preferences.car().parkTime(),
+        TraverseMode.CAR
+      );
     } else {
       return null;
     }
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
-    RouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
+
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
-        options.wheelchairAccessibility.enabled(),
-        options.useVehicleParkingAvailabilityInformation
+        preferences.wheelchair().accessibility().enabled(),
+        preferences.parking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -117,6 +130,7 @@ public class VehicleParkingEdge extends Edge {
 
   private State traversePark(State s0) {
     RouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
     if (!options.streetSubRequestModes.getWalk() || s0.isVehicleParked()) {
       return null;
@@ -128,22 +142,22 @@ public class VehicleParkingEdge extends Edge {
         return null;
       }
 
-      return traversePark(s0, options.bikeParkCost, options.bikeParkTime);
+      return traversePark(s0, preferences.bike().parkCost(), preferences.bike().parkTime());
     } else if (options.streetSubRequestModes.getCar()) {
-      return traversePark(s0, options.carParkCost, options.carParkTime);
+      return traversePark(s0, preferences.car().parkCost(), preferences.car().parkTime());
     } else {
       return null;
     }
   }
 
   private State traversePark(State s0, int parkingCost, int parkingTime) {
-    RouteRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
 
     if (
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
-        options.wheelchairAccessibility.enabled(),
-        options.useVehicleParkingAvailabilityInformation
+        preferences.wheelchair().accessibility().enabled(),
+        preferences.parking().useAvailabilityInformation()
       )
     ) {
       return null;

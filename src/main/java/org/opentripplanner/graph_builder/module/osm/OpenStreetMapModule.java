@@ -43,7 +43,6 @@ import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
@@ -615,8 +614,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       var creativeName = nameParkAndRideEntity(entity);
 
       // Check P+R accessibility by walking and driving.
-      RouteRequest walkReq = new RouteRequest(TraverseMode.WALK);
-      RouteRequest driveReq = new RouteRequest(TraverseMode.CAR);
       boolean walkAccessibleIn = false;
       boolean carAccessibleIn = false;
       boolean walkAccessibleOut = false;

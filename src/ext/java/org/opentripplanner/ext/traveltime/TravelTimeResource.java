@@ -105,10 +105,14 @@ public class TravelTimeResource {
     if (modes != null) {
       routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();
     }
+
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
-        routingRequest.getMaxAccessEgressDuration(routingRequest.modes.accessMode)
+        routingRequest
+          .preferences()
+          .street()
+          .maxAccessEgressDuration(routingRequest.modes.accessMode)
       );
 
     if (time != null) {
@@ -215,7 +219,10 @@ public class TravelTimeResource {
   private ZSampleGrid<WTWD> getSampleGrid() {
     final RouteRequest accessRequest = routingRequest.clone();
 
-    accessRequest.maxAccessEgressDuration = traveltimeRequest.maxAccessDuration;
+    accessRequest
+      .preferences()
+      .street()
+      .setMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration);
 
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);

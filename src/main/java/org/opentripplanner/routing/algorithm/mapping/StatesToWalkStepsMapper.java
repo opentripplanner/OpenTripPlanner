@@ -303,7 +303,7 @@ public class StatesToWalkStepsMapper {
     List<P2<Double>> s = encodeElevationProfile(
       edge,
       distance,
-      backState.getOptions().geoidElevation ? -ellipsoidToGeoidDifference : 0
+      backState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
     );
     current.addElevation(s);
   }
@@ -524,7 +524,7 @@ public class StatesToWalkStepsMapper {
       encodeElevationProfile(
         forwardState.getBackEdge(),
         0,
-        forwardState.getOptions().geoidElevation ? -ellipsoidToGeoidDifference : 0
+        forwardState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
       )
     );
     step.addStreetNotes(streetNotesService.getNotes(forwardState));

@@ -40,15 +40,15 @@ public class StreetEdgeTest {
     v2 = vertex("maple_2nd", 1.0, 2.0);
 
     proto = new RouteRequest();
-    proto.carSpeed = 15.0f;
-    proto.walkSpeed = 1.0;
-    proto.bikeSpeed = 5.0f;
-    proto.bikeWalkingSpeed = 0.8;
-    proto.bikeReluctance = 1.0;
-    proto.carReluctance = 1.0;
-    proto.walkReluctance = 1.0;
-    proto.stairsReluctance = 1.0;
-    proto.turnReluctance = 1.0;
+    proto.preferences().car().setSpeed(15.0f);
+    proto.preferences().walk().setSpeed(1.0);
+    proto.preferences().bike().setSpeed(5.0f);
+    proto.preferences().bike().setWalkingSpeed(0.8);
+    proto.preferences().bike().setReluctance(1.0);
+    proto.preferences().car().setReluctance(1.0);
+    proto.preferences().walk().setReluctance(1.0);
+    proto.preferences().walk().setStairsReluctance(1.0);
+    proto.preferences().street().setTurnReluctance(1.0);
     proto.setStreetSubRequestModes(TraverseModeSet.allModes());
   }
 
@@ -85,7 +85,7 @@ public class StreetEdgeTest {
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
-    double expectedWeight = e1.getDistanceMeters() / options.walkSpeed;
+    double expectedWeight = e1.getDistanceMeters() / options.preferences().walk().speed();
     long expectedDuration = (long) Math.ceil(expectedWeight);
     assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
     assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -141,7 +141,7 @@ public class StreetEdgeTest {
     v1.trafficLight = true;
 
     RouteRequest forward = proto.clone();
-    forward.bikeSpeed = 3.0f;
+    forward.preferences().bike().setSpeed(3.0f);
     forward.setMode(TraverseMode.BICYCLE);
 
     State s0 = new State(new RoutingContext(forward, graph, v0, v2));
@@ -150,7 +150,7 @@ public class StreetEdgeTest {
 
     RouteRequest reverse = proto.clone();
     reverse.setArriveBy(true);
-    reverse.bikeSpeed = 3.0f;
+    reverse.preferences().bike().setSpeed(3.0f);
     reverse.setMode(TraverseMode.BICYCLE);
 
     State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
@@ -204,8 +204,8 @@ public class StreetEdgeTest {
     StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     RouteRequest noPenalty = proto.clone();
-    noPenalty.bikeSwitchTime = 0;
-    noPenalty.bikeSwitchCost = 0;
+    noPenalty.preferences().bike().setSwitchTime(0);
+    noPenalty.preferences().bike().setSwitchCost(0);
     noPenalty.setMode(TraverseMode.BICYCLE);
 
     State s0 = new State(new RoutingContext(noPenalty, graph, v0, v0));
@@ -214,8 +214,8 @@ public class StreetEdgeTest {
     State s3 = e2.traverse(s2);
 
     RouteRequest withPenalty = proto.clone();
-    withPenalty.bikeSwitchTime = 42;
-    withPenalty.bikeSwitchCost = 23;
+    withPenalty.preferences().bike().setSwitchTime(42);
+    withPenalty.preferences().bike().setSwitchCost(23);
     withPenalty.setMode(TraverseMode.BICYCLE);
 
     State s4 = new State(new RoutingContext(withPenalty, graph, v0, v0));

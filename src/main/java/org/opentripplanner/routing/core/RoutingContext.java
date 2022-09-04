@@ -77,7 +77,10 @@ public class RoutingContext {
     this.toVertices = routingRequest.arriveBy() ? from : to;
     this.dataOverlayContext =
       OTPFeature.DataOverlay.isOnElseNull(() ->
-        new DataOverlayContext(graph.dataOverlayParameterBindings, routingRequest.dataOverlay)
+        new DataOverlayContext(
+          graph.dataOverlayParameterBindings,
+          routingRequest.preferences().system().dataOverlay()
+        )
       );
   }
 }

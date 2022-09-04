@@ -18,6 +18,7 @@ import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class PlannerResource extends RoutingResource {
       res = serverContext.routingService().route(request);
 
       // Map to API
-      // TODO VIA - we should store the default somewhere
+      // TODO VIA - we should store the default showIntermediateStops somewhere
       TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale(), showIntermediateStops);
       response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
       if (res.getPreviousPageCursor() != null) {
@@ -90,7 +91,7 @@ public class PlannerResource extends RoutingResource {
       response.elevationMetadata = new ElevationMetadata();
       response.elevationMetadata.ellipsoidToGeoidDifference =
         serverContext.graph().ellipsoidToGeoidDifference;
-      response.elevationMetadata.geoidElevation = request.geoidElevation;
+      response.elevationMetadata.geoidElevation = request.preferences().system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
     } catch (Exception e) {

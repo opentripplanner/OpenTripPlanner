@@ -227,7 +227,7 @@ public class FaresIntegrationTest {
     request.setDateTime(time);
     request.setFrom(from);
     request.setTo(to);
-    request.itineraryFilters.debug = true;
+    request.preferences().system().itineraryFilters().debug = true;
 
     var result = serverContext.routingService().route(request);
 

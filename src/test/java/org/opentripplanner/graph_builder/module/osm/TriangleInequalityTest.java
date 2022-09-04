@@ -193,12 +193,12 @@ public class TriangleInequalityTest {
     RouteRequest prototypeOptions = new RouteRequest();
 
     // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions.stairsReluctance = (1.0);
-    prototypeOptions.setNonTransitReluctance(1.0);
-    prototypeOptions.turnReluctance = (1.0);
-    prototypeOptions.carSpeed = 1.0;
-    prototypeOptions.walkSpeed = 1.0;
-    prototypeOptions.bikeSpeed = 1.0;
+    prototypeOptions.preferences().walk().setStairsReluctance(1.0);
+    prototypeOptions.preferences().setNonTransitReluctance(1.0);
+    prototypeOptions.preferences().street().setTurnReluctance(1.0);
+    prototypeOptions.preferences().car().setSpeed(1.0);
+    prototypeOptions.preferences().walk().setSpeed(1.0);
+    prototypeOptions.preferences().bike().setSpeed(1.0);
 
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 

@@ -53,8 +53,8 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this(
       request.modes.transferMode == StreetMode.BIKE,
-      request.wheelchairAccessibility,
-      request.includePlannedCancellations,
+      request.preferences().wheelchair().accessibility(),
+      request.preferences().transit().includePlannedCancellations(),
       request.modes.transitModes,
       request.getBannedRoutes(transitService.getAllRoutes()),
       request.bannedTrips

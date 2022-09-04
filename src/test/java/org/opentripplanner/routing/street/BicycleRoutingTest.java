@@ -72,7 +72,7 @@ public class BicycleRoutingTest {
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);
-    request.bicycleOptimizeType = BicycleOptimizeType.QUICK;
+    request.preferences().bike().setOptimizeType(BicycleOptimizeType.QUICK);
 
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);

@@ -242,13 +242,15 @@ public class TestIntermediatePlaces {
     TraverseModeSet modes,
     boolean arriveBy
   ) {
-    RouteRequest request = new RouteRequest(modes);
+    // TODO VIA - Why is input modes no longer set in the request
+    RouteRequest request = new RouteRequest();
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
     request.setFrom(from);
     request.setTo(to);
     for (GenericLocation intermediateLocation : via) {
-      request.addIntermediatePlace(intermediateLocation);
+      // TODO VIA - Replace with a RouteViaRequest
+      //options.addIntermediatePlace(intermediateLocation);
     }
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
       var routingContext = new RoutingContext(request, graph, temporaryVertices);

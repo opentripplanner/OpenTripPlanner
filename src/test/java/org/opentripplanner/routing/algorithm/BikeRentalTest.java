@@ -581,9 +581,9 @@ public class BikeRentalTest extends GraphRoutingTest {
       toVertex,
       arriveBy,
       options -> {
-        options.useVehicleRentalAvailabilityInformation = useAvailabilityInformation;
+        options.preferences().rental().setUseAvailabilityInformation(useAvailabilityInformation);
         options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
-        options.keepingRentedVehicleAtDestinationCost = keepRentedBicycleCost;
+        options.preferences().rental().setKeepingVehicleAtDestinationCost(keepRentedBicycleCost);
       }
     );
   }
@@ -594,20 +594,22 @@ public class BikeRentalTest extends GraphRoutingTest {
     boolean arriveBy,
     Consumer<RouteRequest> optionsSetter
   ) {
-    var options = new RouteRequest();
-    options.setArriveBy(arriveBy);
-    options.vehicleRentalPickupTime = 42;
-    options.vehicleRentalPickupCost = 62;
-    options.vehicleRentalDropoffCost = 33;
-    options.vehicleRentalDropoffTime = 15;
+    var request = new RouteRequest();
+    var preferences = request.preferences();
 
-    optionsSetter.accept(options);
+    request.setArriveBy(arriveBy);
+    preferences.rental().setPickupTime(42);
+    preferences.rental().setPickupCost(62);
+    preferences.rental().setDropoffCost(33);
+    preferences.rental().setDropoffTime(15);
+
+    optionsSetter.accept(request);
 
     return runStreetSearchAndCreateDescriptor(
       fromVertex,
       toVertex,
       arriveBy,
-      options,
+      request,
       StreetMode.BIKE_RENTAL
     );
   }

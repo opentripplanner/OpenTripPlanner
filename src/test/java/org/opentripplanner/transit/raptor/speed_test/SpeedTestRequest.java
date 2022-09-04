@@ -6,7 +6,7 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Set;
+import java.util.List;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
@@ -42,13 +42,15 @@ public class SpeedTestRequest {
 
   RouteRequest toRoutingRequest() {
     var request = config.request.clone();
+    var pref = request.preferences();
+
     var input = testCase.definition();
 
     if (input.departureTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.departureTime()));
       request.setArriveBy(false);
       if (input.arrivalTime() != TestCase.NOT_SET) {
-        request.raptorOptions.withTimeLimit(time(input.arrivalTime()));
+        pref.transit().raptorOptions().withTimeLimit(time(input.arrivalTime()));
       }
     } else if (input.arrivalTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.arrivalTime()));
@@ -64,7 +66,9 @@ public class SpeedTestRequest {
     request.setNumItineraries(opts.numOfItineraries());
     request.modes = input.modes();
 
-    request.raptorOptions
+    pref
+      .transit()
+      .raptorOptions()
       .withProfile(profile.raptorProfile())
       .withOptimizations(profile.optimizations())
       .withSearchDirection(profile.direction());
@@ -74,10 +78,15 @@ public class SpeedTestRequest {
     }
 
     addDebugOptions(request, opts);
-    request.tags =
-      Set.of(
-        RoutingTag.testCaseSample(input.idAndDescription()),
-        RoutingTag.testCaseCategory(input.category())
+
+    pref
+      .system()
+      .tags()
+      .addAll(
+        List.of(
+          RoutingTag.testCaseSample(input.idAndDescription()),
+          RoutingTag.testCaseCategory(input.category())
+        )
       );
 
     return request;

@@ -50,7 +50,10 @@ public class DirectStreetRouter {
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
+      ItinerariesHelper.decorateItinerariesWithRequestData(
+        response,
+        directRequest.preferences().wheelchair()
+      );
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
@@ -73,16 +76,18 @@ public class DirectStreetRouter {
    * RoutingRequest.
    */
   private static double calculateDistanceMaxLimit(RouteRequest request) {
+    var preferences = request.preferences();
     double distanceLimit;
     StreetMode mode = request.modes.directMode;
-    double durationLimit = request.getMaxDirectStreetDuration(mode).toSeconds();
+
+    double durationLimit = preferences.street().maxDirectDuration(mode).toSeconds();
 
     if (mode.includesDriving()) {
-      distanceLimit = durationLimit * request.carSpeed;
+      distanceLimit = durationLimit * preferences.car().speed();
     } else if (mode.includesBiking()) {
-      distanceLimit = durationLimit * request.bikeSpeed;
+      distanceLimit = durationLimit * preferences.bike().speed();
     } else if (mode.includesWalking()) {
-      distanceLimit = durationLimit * request.walkSpeed;
+      distanceLimit = durationLimit * preferences.walk().speed();
     } else {
       throw new IllegalStateException("Could not set max limit for StreetMode");
     }

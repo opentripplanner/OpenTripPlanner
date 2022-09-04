@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -24,57 +25,58 @@ public class TriangleTest {
 
   @Test
   public void testPreciseValues() {
-    var req = new RouteRequest();
-    req.setTriangleNormalized(0.5, 0.4, 0.1);
-    assertEquals(req.bikeTriangleSafetyFactor, 0.5, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0.4, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 0.1, DELTA);
+    var pref = new BikePreferences();
+    pref.setTriangleNormalized(0.5, 0.4, 0.1);
+
+    assertEquals(pref.triangleSafetyFactor(), 0.5, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0.4, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 0.1, DELTA);
   }
 
   @Test
   public void testNormalizationGreaterThan1() {
-    var req = new RouteRequest();
-    req.setTriangleNormalized(1, 1, 1);
-    assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 0.333, DELTA);
+    var pref = new BikePreferences();
+    pref.setTriangleNormalized(1, 1, 1);
+    assertEquals(pref.triangleSafetyFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 0.333, DELTA);
 
-    req.setTriangleNormalized(10, 20, 30);
-    assertEquals(req.bikeTriangleSafetyFactor, 0.166, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 0.5, DELTA);
+    pref.setTriangleNormalized(10, 20, 30);
+    assertEquals(pref.triangleSafetyFactor(), 0.166, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 0.5, DELTA);
   }
 
   @Test
   public void testNormalizationLessThan1() {
-    var req = new RouteRequest();
-    req.setTriangleNormalized(0.1, 0.1, 0.1);
-    assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 0.333, DELTA);
+    var pref = new BikePreferences();
+    pref.setTriangleNormalized(0.1, 0.1, 0.1);
+    assertEquals(pref.triangleSafetyFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 0.333, DELTA);
   }
 
   @Test
   public void testZero() {
-    var req = new RouteRequest();
-    req.setTriangleNormalized(0, 0, 0.1);
-    assertEquals(req.bikeTriangleSafetyFactor, 0, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 1, DELTA);
+    var pref = new BikePreferences();
+    pref.setTriangleNormalized(0, 0, 0.1);
+    assertEquals(pref.triangleSafetyFactor(), 0, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 1, DELTA);
 
-    req.setTriangleNormalized(0, 0, 0);
-    assertEquals(req.bikeTriangleSafetyFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0.333, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 0.333, DELTA);
+    pref.setTriangleNormalized(0, 0, 0);
+    assertEquals(pref.triangleSafetyFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0.333, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 0.333, DELTA);
   }
 
   @Test
   public void testLessThanZero() {
-    var req = new RouteRequest();
-    req.setTriangleNormalized(-1, -1, 0.1);
-    assertEquals(req.bikeTriangleSafetyFactor, 0, DELTA);
-    assertEquals(req.bikeTriangleSlopeFactor, 0, DELTA);
-    assertEquals(req.bikeTriangleTimeFactor, 1, DELTA);
+    var pref = new BikePreferences();
+    pref.setTriangleNormalized(-1, -1, 0.1);
+    assertEquals(pref.triangleSafetyFactor(), 0, DELTA);
+    assertEquals(pref.triangleSlopeFactor(), 0, DELTA);
+    assertEquals(pref.triangleTimeFactor(), 1, DELTA);
   }
 
   @Test
@@ -114,39 +116,48 @@ public class TriangleTest {
     double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
     double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
-    RouteRequest options = new RouteRequest(TraverseMode.BICYCLE);
-    options.bicycleOptimizeType = BicycleOptimizeType.TRIANGLE;
-    options.bikeSpeed = 6.0;
-    options.setNonTransitReluctance(1);
+    var request = new RouteRequest(TraverseMode.BICYCLE);
 
-    options.setTriangleNormalized(0, 0, 1);
-    State startState = new State(v1, options, null);
+    var bikePreferences = request.preferences().bike();
+    bikePreferences.setOptimizeType(BicycleOptimizeType.TRIANGLE);
+    bikePreferences.setSpeed(6.0);
+    request.preferences().setNonTransitReluctance(1);
+
+    bikePreferences.setTriangleNormalized(0, 0, 1);
+    State startState = new State(v1, request, null);
     State result = testStreet.traverse(startState);
     double timeWeight = result.getWeight();
-    double expectedTimeWeight = slopeSpeedLength / options.getSpeed(TraverseMode.BICYCLE, false);
+    double expectedTimeWeight =
+      slopeSpeedLength / request.preferences().getSpeed(TraverseMode.BICYCLE, false);
     assertTrue(Math.abs(expectedTimeWeight - timeWeight) < 0.00001);
 
-    options.setTriangleNormalized(0, 1, 0);
-    startState = new State(v1, options, null);
+    bikePreferences.setTriangleNormalized(0, 1, 0);
+    startState = new State(v1, request, null);
     result = testStreet.traverse(startState);
     double slopeWeight = result.getWeight();
-    double expectedSlopeWeight = slopeWorkLength / options.getSpeed(TraverseMode.BICYCLE, false);
+    double expectedSlopeWeight =
+      slopeWorkLength / request.preferences().getSpeed(TraverseMode.BICYCLE, false);
     assertTrue(Math.abs(expectedSlopeWeight - slopeWeight) < 0.00001);
-    assertTrue(length * 1.5 / options.getSpeed(TraverseMode.BICYCLE, false) < slopeWeight);
-    assertTrue(length * 1.5 * 10 / options.getSpeed(TraverseMode.BICYCLE, false) > slopeWeight);
+    assertTrue(
+      length * 1.5 / request.preferences().getSpeed(TraverseMode.BICYCLE, false) < slopeWeight
+    );
+    assertTrue(
+      length * 1.5 * 10 / request.preferences().getSpeed(TraverseMode.BICYCLE, false) > slopeWeight
+    );
 
-    options.setTriangleNormalized(1, 0, 0);
-    startState = new State(v1, options, null);
+    bikePreferences.setTriangleNormalized(1, 0, 0);
+    startState = new State(v1, request, null);
     result = testStreet.traverse(startState);
     double safetyWeight = result.getWeight();
     double slopeSafety = costs.slopeSafetyCost;
     double expectedSafetyWeight =
-      (trueLength * 0.74 + slopeSafety) / options.getSpeed(TraverseMode.BICYCLE, false);
+      (trueLength * 0.74 + slopeSafety) /
+      request.preferences().getSpeed(TraverseMode.BICYCLE, false);
     assertTrue(Math.abs(expectedSafetyWeight - safetyWeight) < 0.00001);
 
     final double ONE_THIRD = 1 / 3.0;
-    options.setTriangleNormalized(ONE_THIRD, ONE_THIRD, ONE_THIRD);
-    startState = new State(v1, options, null);
+    bikePreferences.setTriangleNormalized(ONE_THIRD, ONE_THIRD, ONE_THIRD);
+    startState = new State(v1, request, null);
     result = testStreet.traverse(startState);
     double averageWeight = result.getWeight();
     assertTrue(
