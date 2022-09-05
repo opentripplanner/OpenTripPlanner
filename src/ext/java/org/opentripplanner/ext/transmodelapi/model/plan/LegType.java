@@ -146,7 +146,7 @@ public class LegType {
           .name("duration")
           .description("The leg's duration in seconds")
           .type(new GraphQLNonNull(ExtendedScalars.GraphQLLong))
-          .dataFetcher(env -> leg(env).getDuration())
+          .dataFetcher(env -> leg(env).getDuration().toSeconds())
           .build()
       )
       .field(
