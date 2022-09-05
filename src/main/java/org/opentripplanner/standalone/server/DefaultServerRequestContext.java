@@ -81,7 +81,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   // TODO VIA: Create assert that this is never mutated (even in deeply nested objects)
   @Override
-  public RouteRequest defaultRoutingRequest() {
+  public RouteRequest defaultRouteRequest() {
     // Lazy initialize request-scoped request to avoid doing this when not needed
     if (routeRequest == null) {
       routeRequest = routerConfig.routingRequestDefaults().copyWithDateTimeNow();

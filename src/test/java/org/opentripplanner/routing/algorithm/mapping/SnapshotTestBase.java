@@ -101,7 +101,7 @@ public abstract class SnapshotTestBase {
   ) {
     OtpServerRequestContext serverContext = serverContext();
 
-    RouteRequest request = serverContext.defaultRoutingRequest();
+    RouteRequest request = serverContext.defaultRouteRequest();
     request.setDateTime(
       TestUtils.dateInstant(
         serverContext.transitService().getTimeZone().getId(),

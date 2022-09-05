@@ -88,7 +88,7 @@ public class TransmodelGraphQLPlanner {
   private RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
-    RouteRequest request = serverContext.defaultRoutingRequest();
+    RouteRequest request = serverContext.defaultRouteRequest();
     RoutingPreferences preferences = request.preferences();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);

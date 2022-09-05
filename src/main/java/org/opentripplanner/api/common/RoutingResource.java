@@ -711,7 +711,7 @@ public abstract class RoutingResource {
    * @param queryParameters incoming request parameters
    */
   protected RouteRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
-    RouteRequest request = serverContext.defaultRoutingRequest();
+    RouteRequest request = serverContext.defaultRouteRequest();
     RoutingPreferences preferences = request.preferences();
 
     // The routing request should already contain defaults, which are set when it is initialized or

@@ -101,7 +101,7 @@ public class TravelTimeResource {
   ) {
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
-    routingRequest = serverContext.defaultRoutingRequest();
+    routingRequest = serverContext.defaultRouteRequest();
     routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
     if (modes != null) {
       routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();

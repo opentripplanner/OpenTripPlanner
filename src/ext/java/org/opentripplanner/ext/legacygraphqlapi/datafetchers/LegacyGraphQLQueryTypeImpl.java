@@ -591,7 +591,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<DataFetcherResult<RoutingResponse>> plan() {
     return environment -> {
       LegacyGraphQLRequestContext context = environment.<LegacyGraphQLRequestContext>getContext();
-      RouteRequest request = context.getServerContext().defaultRoutingRequest();
+      RouteRequest request = context.getServerContext().defaultRouteRequest();
       RoutingPreferences preferences = request.preferences();
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);

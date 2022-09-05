@@ -43,7 +43,7 @@ public interface OtpServerRequestContext {
    * A RoutingRequest containing default parameters that will be cloned when handling each request.
    */
   @HttpRequestScoped
-  RouteRequest defaultRoutingRequest();
+  RouteRequest defaultRouteRequest();
 
   /**
    * Return the default routing request locale(without cloning the request).
