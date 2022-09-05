@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.routing.api.request.TransferOptimizationPreferences;
 
 // TODO VIA: Javadoc
 public class TransferPreferences implements Cloneable, Serializable {
@@ -68,7 +68,7 @@ public class TransferPreferences implements Cloneable, Serializable {
   private double waitAtBeginningFactor = 0.4;
 
   /** Configure the transfer optimization */
-  private TransferOptimizationParameters optimization = new TransferOptimizationRequest();
+  private TransferOptimizationParameters optimization = new TransferOptimizationPreferences();
   /**
    * Ideally maxTransfers should be set in the router config, not here. Instead the client should be
    * able to pass in a parameter for the max number of additional/extra transfers relative to the

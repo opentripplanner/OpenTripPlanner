@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.WheelchairAccessibilityReque
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.routing.api.request.TransferOptimizationPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -259,7 +259,7 @@ public class RoutingRequestMapper {
       .setAccessibility(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
 
     mapTransferOptimization(
-      (TransferOptimizationRequest) preferences.transfer().optimization(),
+      (TransferOptimizationPreferences) preferences.transfer().optimization(),
       c.path("transferOptimization")
     );
 
@@ -277,7 +277,7 @@ public class RoutingRequestMapper {
     return request;
   }
 
-  private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
+  private static void mapTransferOptimization(TransferOptimizationPreferences p, NodeAdapter c) {
     p.optimizeTransferWaitTime =
       c.asBoolean("optimizeTransferWaitTime", p.optimizeTransferWaitTime);
     p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
