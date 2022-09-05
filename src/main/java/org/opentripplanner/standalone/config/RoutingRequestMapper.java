@@ -258,10 +258,7 @@ public class RoutingRequestMapper {
       .wheelchair()
       .setAccessibility(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
 
-    mapTransferOptimization(
-      (TransferOptimizationPreferences) preferences.transfer().optimization(),
-      c.path("transferOptimization")
-    );
+    preferences.transfer().setOptimization(mapTransferOptimization(c.path("transferOptimization")));
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
@@ -277,12 +274,13 @@ public class RoutingRequestMapper {
     return request;
   }
 
-  private static void mapTransferOptimization(TransferOptimizationPreferences p, NodeAdapter c) {
-    p.optimizeTransferWaitTime =
-      c.asBoolean("optimizeTransferWaitTime", p.optimizeTransferWaitTime);
-    p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
-    p.backTravelWaitTimeFactor = c.asDouble("backTravelWaitTimeFactor", p.backTravelWaitTimeFactor);
-    p.extraStopBoardAlightCostsFactor =
-      c.asDouble("extraStopBoardAlightCostsFactor", p.extraStopBoardAlightCostsFactor);
+  private static TransferOptimizationPreferences mapTransferOptimization(NodeAdapter c) {
+    var dft = TransferOptimizationPreferences.DEFAULT;
+    return new TransferOptimizationPreferences(
+      c.asBoolean("optimizeTransferWaitTime", dft.optimizeTransferWaitTime()),
+      c.asDouble("minSafeWaitTimeFactor", dft.minSafeWaitTimeFactor()),
+      c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor()),
+      c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())
+    );
   }
 }
