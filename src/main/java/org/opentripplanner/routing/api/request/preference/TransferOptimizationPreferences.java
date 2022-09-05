@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.preference;
 
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.util.OTPFeature;

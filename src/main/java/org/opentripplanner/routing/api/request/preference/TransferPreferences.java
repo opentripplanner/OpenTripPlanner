@@ -2,7 +2,6 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.api.request.TransferOptimizationPreferences;
 
 // TODO VIA: Javadoc
 public class TransferPreferences implements Cloneable, Serializable {
