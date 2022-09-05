@@ -24,13 +24,6 @@ class DurationForEnumTest {
   }
 
   @Test
-  void copyOf() {
-    var copy = subject.copyOf();
-    assertEquals(subject, copy);
-    assertEquals(subject.hashCode(), copy.hashCode());
-  }
-
-  @Test
   void defaultValue() {
     assertEquals(DEFAULT, subject.defaultValue());
   }

@@ -160,7 +160,7 @@ public class StreetPreferences implements Cloneable, Serializable {
     try {
       var clone = (StreetPreferences) super.clone();
 
-      clone.maxAccessEgressDuration = maxAccessEgressDuration.copyOf();
+      clone.maxAccessEgressDuration = this.maxAccessEgressDuration;
 
       return clone;
     } catch (CloneNotSupportedException e) {

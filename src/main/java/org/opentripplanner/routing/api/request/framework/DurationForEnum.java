@@ -8,6 +8,8 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 /**
  * This class is used to store a {@link Duration} value for each of the enum type values.
  * If an enum value does not exist, it falls back to the default value.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
 
 public class DurationForEnum<E extends Enum<?>> {
@@ -15,12 +17,6 @@ public class DurationForEnum<E extends Enum<?>> {
   private final Class<E> type;
   private final Duration defaultValue;
   private final Duration[] valueForEnum;
-
-  private DurationForEnum(DurationForEnum<E> other) {
-    this.type = other.type;
-    this.defaultValue = other.defaultValue;
-    this.valueForEnum = Arrays.copyOf(other.valueForEnum, other.valueForEnum.length);
-  }
 
   public DurationForEnum(Class<E> type, Duration defaultValue) {
     this(type, defaultValue, Map.of());
@@ -42,10 +38,6 @@ public class DurationForEnum<E extends Enum<?>> {
 
   public Duration valueOf(E type) {
     return valueForEnum[type.ordinal()];
-  }
-
-  public DurationForEnum<E> copyOf() {
-    return new DurationForEnum<>(this);
   }
 
   @Override
