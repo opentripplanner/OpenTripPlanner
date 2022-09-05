@@ -6,6 +6,29 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 // TODO VIA: Javadoc
 public class TransferPreferences implements Cloneable, Serializable {
 
+  private int cost = 0;
+  private int slack = 120;
+  private int nonpreferredCost = 180;
+  private double waitReluctance = 1.0;
+
+  @Deprecated
+  private double waitAtBeginningFactor = 0.4;
+
+  private TransferOptimizationParameters optimization = TransferOptimizationPreferences.DEFAULT;
+  private Integer maxTransfers = 12;
+
+  public TransferPreferences() {}
+
+  public TransferPreferences(TransferPreferences other) {
+    this.cost = other.cost;
+    this.slack = other.slack;
+    this.nonpreferredCost = other.nonpreferredCost;
+    this.waitReluctance = other.waitReluctance;
+    this.waitAtBeginningFactor = other.waitAtBeginningFactor;
+    this.optimization = other.optimization;
+    this.maxTransfers = other.maxTransfers;
+  }
+
   /**
    * An extra penalty added on transfers (i.e. all boardings except the first one). Not to be
    * confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a vehicle with
@@ -20,7 +43,14 @@ public class TransferPreferences implements Cloneable, Serializable {
    * Square, then transfer to the 6. If this takes less than optimize_transfer_penalty seconds, then
    * that's what we'll return.
    */
-  private int cost = 0;
+  public int cost() {
+    return cost;
+  }
+
+  public void setCost(int cost) {
+    this.cost = cost;
+  }
+
   /**
    * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must
    * pass between exiting one transit vehicle and boarding another. This time is in addition to time
@@ -33,7 +63,14 @@ public class TransferPreferences implements Cloneable, Serializable {
    * <p>
    * Unit is seconds. Default value is 2 minutes.
    */
-  private int slack = 120;
+  public int slack() {
+    return slack;
+  }
+
+  public void setSlack(int slack) {
+    this.slack = slack;
+  }
+
   /**
    * Penalty for using a non-preferred transfer
    *
@@ -41,7 +78,14 @@ public class TransferPreferences implements Cloneable, Serializable {
    * old functionality the same way, but we will try to map this parameter
    * so it does work similar as before.
    */
-  private int nonpreferredCost = 180;
+  public int nonpreferredCost() {
+    return nonpreferredCost;
+  }
+
+  public void setNonpreferredCost(int nonpreferredCost) {
+    this.nonpreferredCost = nonpreferredCost;
+  }
+
   /**
    * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
    * multiplier. The default value treats wait and on-vehicle time as the same.
@@ -54,7 +98,17 @@ public class TransferPreferences implements Cloneable, Serializable {
    * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this
    * problem could disappear.
    */
-  private double waitReluctance = 1.0;
+  public double waitReluctance() {
+    return waitReluctance;
+  }
+
+  public void setWaitReluctance(double waitReluctance) {
+    this.waitReluctance = waitReluctance;
+  }
+
+  public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
+    this.waitAtBeginningFactor = waitAtBeginningFactor;
+  }
 
   /**
    * How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first
@@ -63,11 +117,19 @@ public class TransferPreferences implements Cloneable, Serializable {
    * @deprecated TODO OTP2 Probably a regression, but I'm not sure it worked correctly in OTP 1.X
    * either. It could be a part of itinerary-filtering after a Raptor search.
    */
-  @Deprecated
-  private double waitAtBeginningFactor = 0.4;
+  public double waitAtBeginningFactor() {
+    return waitAtBeginningFactor;
+  }
 
   /** Configure the transfer optimization */
-  private TransferOptimizationParameters optimization = new TransferOptimizationPreferences();
+  public TransferOptimizationParameters optimization() {
+    return optimization;
+  }
+
+  public void setOptimization(TransferOptimizationParameters optimization) {
+    this.optimization = optimization;
+  }
+
   /**
    * Ideally maxTransfers should be set in the router config, not here. Instead the client should be
    * able to pass in a parameter for the max number of additional/extra transfers relative to the
@@ -79,7 +141,13 @@ public class TransferPreferences implements Cloneable, Serializable {
    * <p>
    * See https://github.com/opentripplanner/OpenTripPlanner/issues/2886
    */
-  private Integer maxTransfers = 12;
+  public Integer maxTransfers() {
+    return maxTransfers;
+  }
+
+  public void setMaxTransfers(Integer maxTransfers) {
+    this.maxTransfers = maxTransfers;
+  }
 
   public TransferPreferences clone() {
     try {
@@ -92,61 +160,5 @@ public class TransferPreferences implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
-  }
-
-  public void setCost(int cost) {
-    this.cost = cost;
-  }
-
-  public int cost() {
-    return cost;
-  }
-
-  public void setSlack(int slack) {
-    this.slack = slack;
-  }
-
-  public int slack() {
-    return slack;
-  }
-
-  public void setNonpreferredCost(int nonpreferredCost) {
-    this.nonpreferredCost = nonpreferredCost;
-  }
-
-  public int nonpreferredCost() {
-    return nonpreferredCost;
-  }
-
-  public void setWaitReluctance(double waitReluctance) {
-    this.waitReluctance = waitReluctance;
-  }
-
-  public double waitReluctance() {
-    return waitReluctance;
-  }
-
-  public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
-    this.waitAtBeginningFactor = waitAtBeginningFactor;
-  }
-
-  public double waitAtBeginningFactor() {
-    return waitAtBeginningFactor;
-  }
-
-  public void setOptimization(TransferOptimizationParameters optimization) {
-    this.optimization = optimization;
-  }
-
-  public TransferOptimizationParameters optimization() {
-    return optimization;
-  }
-
-  public void setMaxTransfers(Integer maxTransfers) {
-    this.maxTransfers = maxTransfers;
-  }
-
-  public Integer maxTransfers() {
-    return maxTransfers;
   }
 }

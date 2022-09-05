@@ -5,12 +5,20 @@ import java.io.Serializable;
 // TODO VIA: Javadoc
 public class VehicleParkingPreferences implements Cloneable, Serializable {
 
+  // TODO VIA: What should the default be
+  private boolean useAvailabilityInformation = false;
+
   /**
    * If true vehicle parking availability information will be used to plan park and ride trips where
    * it exists.
    */
-  // TODO VIA: What should the default be
-  private boolean useAvailabilityInformation = false;
+  public boolean useAvailabilityInformation() {
+    return useAvailabilityInformation;
+  }
+
+  public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
+    this.useAvailabilityInformation = useAvailabilityInformation;
+  }
 
   public VehicleParkingPreferences clone() {
     try {
@@ -21,13 +29,5 @@ public class VehicleParkingPreferences implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
-  }
-
-  public void setUseAvailabilityInformation(boolean useAvailabilityInformation) {
-    this.useAvailabilityInformation = useAvailabilityInformation;
-  }
-
-  public boolean useAvailabilityInformation() {
-    return useAvailabilityInformation;
   }
 }

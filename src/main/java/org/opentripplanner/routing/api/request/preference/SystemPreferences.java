@@ -15,21 +15,64 @@ public class SystemPreferences implements Cloneable, Serializable {
   @Nonnull
   private ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
 
+  private Set<RoutingTag> tags = Set.of();
+  private DataOverlayParameters dataOverlay;
+  private boolean geoidElevation = false;
+
+  @Deprecated
+  private boolean disableAlertFiltering = false;
+
+  private Duration maxJourneyDuration = Duration.ofHours(24);
+
+  @Nonnull
+  public ItineraryFilterParameters itineraryFilters() {
+    return itineraryFilters;
+  }
+
+  public void setItineraryFilters(@Nonnull ItineraryFilterParameters itineraryFilters) {
+    this.itineraryFilters = itineraryFilters;
+  }
+
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
    * tags. Currently, all tags are added to all the timer instances for this request.
    */
-  private Set<RoutingTag> tags = Set.of();
+  public Set<RoutingTag> tags() {
+    return tags;
+  }
+
+  public void setTags(Set<RoutingTag> tags) {
+    this.tags = tags;
+  }
+
   /**
    * The filled request parameters for penalties and thresholds values
    */
-  private DataOverlayParameters dataOverlay;
+  public DataOverlayParameters dataOverlay() {
+    return dataOverlay;
+  }
+
+  public void setDataOverlay(DataOverlayParameters dataOverlay) {
+    this.dataOverlay = dataOverlay;
+  }
+
   /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
-  private boolean geoidElevation = false;
+  public boolean geoidElevation() {
+    return geoidElevation;
+  }
+
+  public void setGeoidElevation(boolean geoidElevation) {
+    this.geoidElevation = geoidElevation;
+  }
 
   /** Option to disable the default filtering of GTFS-RT alerts by time. */
-  @Deprecated
-  private boolean disableAlertFiltering = false;
+  public boolean disableAlertFiltering() {
+    return disableAlertFiltering;
+  }
+
+  public void setDisableAlertFiltering(boolean disableAlertFiltering) {
+    this.disableAlertFiltering = disableAlertFiltering;
+  }
 
   /**
    * The expected maximum time a journey can last across all possible journeys for the current
@@ -43,7 +86,13 @@ public class SystemPreferences implements Cloneable, Serializable {
    * including more patterns in the search, hence, making it a bit slower. Recommended values would
    * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
    */
-  private Duration maxJourneyDuration = Duration.ofHours(24);
+  public Duration maxJourneyDuration() {
+    return maxJourneyDuration;
+  }
+
+  public void setMaxJourneyDuration(Duration maxJourneyDuration) {
+    this.maxJourneyDuration = maxJourneyDuration;
+  }
 
   public SystemPreferences clone() {
     try {
@@ -59,54 +108,5 @@ public class SystemPreferences implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
-  }
-
-  public void setItineraryFilters(@Nonnull ItineraryFilterParameters itineraryFilters) {
-    this.itineraryFilters = itineraryFilters;
-  }
-
-  @Nonnull
-  public ItineraryFilterParameters itineraryFilters() {
-    return itineraryFilters;
-  }
-
-  public void setTags(Set<RoutingTag> tags) {
-    this.tags = tags;
-  }
-
-  public Set<RoutingTag> tags() {
-    return tags;
-  }
-
-  public void setDataOverlay(DataOverlayParameters dataOverlay) {
-    this.dataOverlay = dataOverlay;
-  }
-
-  public DataOverlayParameters dataOverlay() {
-    return dataOverlay;
-  }
-
-  public void setGeoidElevation(boolean geoidElevation) {
-    this.geoidElevation = geoidElevation;
-  }
-
-  public boolean geoidElevation() {
-    return geoidElevation;
-  }
-
-  public void setDisableAlertFiltering(boolean disableAlertFiltering) {
-    this.disableAlertFiltering = disableAlertFiltering;
-  }
-
-  public boolean disableAlertFiltering() {
-    return disableAlertFiltering;
-  }
-
-  public void setMaxJourneyDuration(Duration maxJourneyDuration) {
-    this.maxJourneyDuration = maxJourneyDuration;
-  }
-
-  public Duration maxJourneyDuration() {
-    return maxJourneyDuration;
   }
 }

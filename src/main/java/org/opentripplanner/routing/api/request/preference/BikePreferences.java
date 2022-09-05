@@ -10,57 +10,25 @@ public class BikePreferences implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(BikePreferences.class);
 
-  /**
-   * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
-   */
   private BicycleOptimizeType optimizeType = BicycleOptimizeType.SAFE;
 
-  /**
-   * Default: 5 m/s, ~11 mph, a random bicycling speed
-   */
   private double speed = 5;
 
-  /**
-   * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. This
-   * is in addition to the cost of the transfer(biking) and waiting-time. It is also in addition to
-   * the {@link TransferPreferences#cost()}.
-   */
   // TODO VIA: Is this part of transit preferences
   private int boardCost = 60 * 10;
-  /**
-   * The walking speed when walking a bike. Default: 1.33 m/s ~ Same as walkSpeed
-   */
   private double walkingSpeed = 1.33;
-  /**
-   * A multiplier for how bad walking is, compared to being in transit for equal
-   * lengths of time. Empirically, values between 2 and 4 seem to correspond
-   * well to the concept of not wanting to walk too much without asking for
-   * totally ridiculous itineraries, but this observation should in no way be
-   * taken as scientific or definitive. Your mileage may vary. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
-   * performance with high values. Default value: 2.0
-   */
   private double walkingReluctance = 5.0;
   private double reluctance = 2.0;
 
-  /** Time to get on and off your own bike */
   private int switchTime;
-  /** Cost of getting on and off your own bike */
   private int switchCost;
-  /** Time to park a bike */
   private int parkTime = 60;
   /** Cost of parking a bike. */
   private int parkCost = 120;
 
   // TODO VIA: Make these three a record with normalization in constructor
-  /**
-   * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor
-   * == 1
-   */
   private double triangleTimeFactor;
-  /** For the bike triangle, how important slope is */
   private double triangleSlopeFactor;
-  /** For the bike triangle, how important safety is */
   private double triangleSafetyFactor;
 
   public BikePreferences clone() {
@@ -85,9 +53,9 @@ public class BikePreferences implements Cloneable, Serializable {
       slope = oneThird;
       time = oneThird;
     }
-    safe = setMinValue(safe);
-    slope = setMinValue(slope);
-    time = setMinValue(time);
+    safe = positiveValueOrZero(safe);
+    slope = positiveValueOrZero(slope);
+    time = positiveValueOrZero(time);
 
     double total = safe + slope + time;
     if (total != 1) {
@@ -104,48 +72,67 @@ public class BikePreferences implements Cloneable, Serializable {
     this.triangleTimeFactor = time;
   }
 
-  private double setMinValue(double value) {
-    return Math.max(0, value);
+  /**
+   * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
+   */
+  public BicycleOptimizeType optimizeType() {
+    return optimizeType;
   }
 
   public void setOptimizeType(BicycleOptimizeType optimizeType) {
     this.optimizeType = optimizeType;
   }
 
-  public BicycleOptimizeType optimizeType() {
-    return optimizeType;
+  /**
+   * Default: 5 m/s, ~11 mph, a random bicycling speed
+   */
+  public double speed() {
+    return speed;
   }
 
   public void setSpeed(double speed) {
     this.speed = speed;
   }
 
-  public double speed() {
-    return speed;
+  /**
+   * Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. This
+   * is in addition to the cost of the transfer(biking) and waiting-time. It is also in addition to
+   * the {@link TransferPreferences#cost()}.
+   */
+  public int boardCost() {
+    return boardCost;
   }
 
   public void setBoardCost(int boardCost) {
     this.boardCost = boardCost;
   }
 
-  public int boardCost() {
-    return boardCost;
+  /**
+   * The walking speed when walking a bike. Default: 1.33 m/s ~ Same as walkSpeed
+   */
+  public double walkingSpeed() {
+    return walkingSpeed;
   }
 
   public void setWalkingSpeed(double walkingSpeed) {
     this.walkingSpeed = walkingSpeed;
   }
 
-  public double walkingSpeed() {
-    return walkingSpeed;
+  /**
+   * A multiplier for how bad walking is, compared to being in transit for equal
+   * lengths of time. Empirically, values between 2 and 4 seem to correspond
+   * well to the concept of not wanting to walk too much without asking for
+   * totally ridiculous itineraries, but this observation should in no way be
+   * taken as scientific or definitive. Your mileage may vary. See
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
+   * performance with high values. Default value: 2.0
+   */
+  public double walkingReluctance() {
+    return walkingReluctance;
   }
 
   public void setWalkingReluctance(double walkingReluctance) {
     this.walkingReluctance = walkingReluctance;
-  }
-
-  public double walkingReluctance() {
-    return walkingReluctance;
   }
 
   public void setReluctance(double reluctance) {
@@ -156,28 +143,31 @@ public class BikePreferences implements Cloneable, Serializable {
     return reluctance;
   }
 
+  /** Time to get on and off your own bike */
+  public int switchTime() {
+    return switchTime;
+  }
+
   public void setSwitchTime(int switchTime) {
     this.switchTime = switchTime;
   }
 
-  public int switchTime() {
-    return switchTime;
+  /** Cost of getting on and off your own bike */
+  public int switchCost() {
+    return switchCost;
   }
 
   public void setSwitchCost(int switchCost) {
     this.switchCost = switchCost;
   }
 
-  public int switchCost() {
-    return switchCost;
+  /** Time to park a bike */
+  public int parkTime() {
+    return parkTime;
   }
 
   public void setParkTime(int parkTime) {
     this.parkTime = parkTime;
-  }
-
-  public int parkTime() {
-    return parkTime;
   }
 
   public void setParkCost(int parkCost) {
@@ -188,27 +178,39 @@ public class BikePreferences implements Cloneable, Serializable {
     return parkCost;
   }
 
+  /**
+   * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor
+   * == 1
+   */
+  public double triangleTimeFactor() {
+    return triangleTimeFactor;
+  }
+
   public void setTriangleTimeFactor(double triangleTimeFactor) {
     this.triangleTimeFactor = triangleTimeFactor;
   }
 
-  public double triangleTimeFactor() {
-    return triangleTimeFactor;
+  /** For the bike triangle, how important slope is */
+  public double triangleSlopeFactor() {
+    return triangleSlopeFactor;
   }
 
   public void setTriangleSlopeFactor(double triangleSlopeFactor) {
     this.triangleSlopeFactor = triangleSlopeFactor;
   }
 
-  public double triangleSlopeFactor() {
-    return triangleSlopeFactor;
+  /** For the bike triangle, how important safety is */
+  public double triangleSafetyFactor() {
+    return triangleSafetyFactor;
   }
 
   public void setTriangleSafetyFactor(double triangleSafetyFactor) {
     this.triangleSafetyFactor = triangleSafetyFactor;
   }
 
-  public double triangleSafetyFactor() {
-    return triangleSafetyFactor;
+  /* private methods */
+
+  private double positiveValueOrZero(double value) {
+    return Math.max(0, value);
   }
 }

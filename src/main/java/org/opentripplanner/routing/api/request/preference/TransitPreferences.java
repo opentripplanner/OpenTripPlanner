@@ -11,24 +11,48 @@ import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-// TODO VIA: Javadoc
+/**
+ * Preferences for transit routing.
+ */
 public class TransitPreferences implements Cloneable, Serializable {
 
-  /**
-   * When true, realtime updates are ignored during this search.
-   */
+  private int boardSlack;
+  private Map<TransitMode, Integer> boardSlackForMode = new EnumMap<TransitMode, Integer>(
+    TransitMode.class
+  );
+
+  private int alightSlack = 0;
+  private Map<TransitMode, Integer> alightSlackForMode = new EnumMap<TransitMode, Integer>(
+    TransitMode.class
+  );
+  private Map<TransitMode, Double> reluctanceForMode = new HashMap<>();
+
+  private int otherThanPreferredRoutesPenalty = 300;
+
+  private DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
+    0.0,
+    DEFAULT_ROUTE_RELUCTANCE
+  );
+
   private boolean ignoreRealtimeUpdates = false;
-  /**
-   * When true, trips cancelled in scheduled data are included in this search.
-   */
   private boolean includePlannedCancellations = false;
+
+  private RaptorOptions raptorOptions = new RaptorOptions();
+
   /**
    * The number of seconds to add before boarding a transit leg. It is recommended to use the
    * `boardTimes` in the `router-config.json` to set this for each mode.
    * <p>
    * Unit is seconds. Default value is 0.
    */
-  private int boardSlack;
+  public int boardSlack() {
+    return boardSlack;
+  }
+
+  public void setBoardSlack(int boardSlack) {
+    this.boardSlack = boardSlack;
+  }
+
   /**
    * Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or
    * ferries.
@@ -39,16 +63,28 @@ public class TransitPreferences implements Cloneable, Serializable {
    * <p>
    * Unit is seconds. Default value is not-set(empty map).
    */
-  private Map<TransitMode, Integer> boardSlackForMode = new EnumMap<TransitMode, Integer>(
-    TransitMode.class
-  );
+  public Map<TransitMode, Integer> boardSlackForMode() {
+    return boardSlackForMode;
+  }
+
+  public void setBoardSlackForMode(Map<TransitMode, Integer> boardSlackForMode) {
+    this.boardSlackForMode = boardSlackForMode;
+  }
+
   /**
    * The number of seconds to add after alighting a transit leg. It is recommended to use the
    * `alightTimes` in the `router-config.json` to set this for each mode.
    * <p>
    * Unit is seconds. Default value is 0.
    */
-  private int alightSlack = 0;
+  public int alightSlack() {
+    return alightSlack;
+  }
+
+  public void setAlightSlack(int alightSlack) {
+    this.alightSlack = alightSlack;
+  }
+
   /**
    * Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or
    * ferries.
@@ -59,9 +95,14 @@ public class TransitPreferences implements Cloneable, Serializable {
    * <p>
    * Unit is seconds. Default value is not-set(empty map).
    */
-  private Map<TransitMode, Integer> alightSlackForMode = new EnumMap<TransitMode, Integer>(
-    TransitMode.class
-  );
+  public Map<TransitMode, Integer> alightSlackForMode() {
+    return alightSlackForMode;
+  }
+
+  public void setAlightSlackForMode(Map<TransitMode, Integer> alightSlackForMode) {
+    this.alightSlackForMode = alightSlackForMode;
+  }
+
   /**
    * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add a
    * penalty to other modes (> 1.0). The type used here it the internal model {@link TransitMode}
@@ -72,7 +113,18 @@ public class TransitPreferences implements Cloneable, Serializable {
    * This is a scalar multiplied with the time in second on board the transit vehicle. Default value
    * is not-set(empty map).
    */
-  private Map<TransitMode, Double> reluctanceForMode = new HashMap<>();
+  public Map<TransitMode, Double> reluctanceForMode() {
+    return reluctanceForMode;
+  }
+
+  public void setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+    this.reluctanceForMode = reluctanceForMode;
+  }
+
+  @Deprecated
+  public void setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
+    this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
+  }
 
   /**
    * Penalty added for using every route that is not preferred if user set any route as preferred.
@@ -81,21 +133,54 @@ public class TransitPreferences implements Cloneable, Serializable {
    * @deprecated TODO OTP2 Needs to be implemented
    */
   @Deprecated
-  private int otherThanPreferredRoutesPenalty = 300;
+  public int otherThanPreferredRoutesPenalty() {
+    return otherThanPreferredRoutesPenalty;
+  }
 
   /**
    * A cost function used to calculate penalty for an unpreferred route. Function should return
    * number of seconds that we are willing to wait for preferred route.
    */
-  private DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
-    0.0,
-    DEFAULT_ROUTE_RELUCTANCE
-  );
+  public DoubleFunction<Double> unpreferredCost() {
+    return unpreferredCost;
+  }
+
+  public void setUnpreferredCost(DoubleFunction<Double> unpreferredCost) {
+    this.unpreferredCost = unpreferredCost;
+  }
+
+  public void setUnpreferredCostString(String constFunction) {
+    unpreferredCost = RequestFunctions.parse(constFunction);
+  }
+
+  /**
+   * When true, realtime updates are ignored during this search.
+   */
+  public boolean ignoreRealtimeUpdates() {
+    return ignoreRealtimeUpdates;
+  }
+
+  public void setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
+    this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
+  }
+
+  public void setIncludePlannedCancellations(boolean includePlannedCancellations) {
+    this.includePlannedCancellations = includePlannedCancellations;
+  }
+
+  /**
+   * When true, trips cancelled in scheduled data are included in this search.
+   */
+  public boolean includePlannedCancellations() {
+    return includePlannedCancellations;
+  }
 
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
-  private RaptorOptions raptorOptions = new RaptorOptions();
+  public RaptorOptions raptorOptions() {
+    return raptorOptions;
+  }
 
   public TransitPreferences clone() {
     try {
@@ -112,85 +197,5 @@ public class TransitPreferences implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
-  }
-
-  public void setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
-    this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
-  }
-
-  public boolean ignoreRealtimeUpdates() {
-    return ignoreRealtimeUpdates;
-  }
-
-  public void setIncludePlannedCancellations(boolean includePlannedCancellations) {
-    this.includePlannedCancellations = includePlannedCancellations;
-  }
-
-  public boolean includePlannedCancellations() {
-    return includePlannedCancellations;
-  }
-
-  public void setBoardSlack(int boardSlack) {
-    this.boardSlack = boardSlack;
-  }
-
-  public int boardSlack() {
-    return boardSlack;
-  }
-
-  public void setBoardSlackForMode(Map<TransitMode, Integer> boardSlackForMode) {
-    this.boardSlackForMode = boardSlackForMode;
-  }
-
-  public Map<TransitMode, Integer> boardSlackForMode() {
-    return boardSlackForMode;
-  }
-
-  public void setAlightSlack(int alightSlack) {
-    this.alightSlack = alightSlack;
-  }
-
-  public int alightSlack() {
-    return alightSlack;
-  }
-
-  public void setAlightSlackForMode(Map<TransitMode, Integer> alightSlackForMode) {
-    this.alightSlackForMode = alightSlackForMode;
-  }
-
-  public Map<TransitMode, Integer> alightSlackForMode() {
-    return alightSlackForMode;
-  }
-
-  public void setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
-    this.reluctanceForMode = reluctanceForMode;
-  }
-
-  public Map<TransitMode, Double> reluctanceForMode() {
-    return reluctanceForMode;
-  }
-
-  public void setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
-    this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
-  }
-
-  public int otherThanPreferredRoutesPenalty() {
-    return otherThanPreferredRoutesPenalty;
-  }
-
-  public RaptorOptions raptorOptions() {
-    return raptorOptions;
-  }
-
-  public void setUnpreferredCost(DoubleFunction<Double> unpreferredCost) {
-    this.unpreferredCost = unpreferredCost;
-  }
-
-  public void setUnpreferredCostString(String constFunction) {
-    unpreferredCost = RequestFunctions.parse(constFunction);
-  }
-
-  public DoubleFunction<Double> unpreferredCost() {
-    return unpreferredCost;
   }
 }
