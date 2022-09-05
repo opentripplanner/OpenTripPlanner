@@ -74,8 +74,9 @@ public class PatternCostCalculatorTest {
   @DisplayName("cost mapper should create penalty map")
   public void testMcCostParameterMapping() {
     RouteRequest routingRequest = new RouteRequest();
-    routingRequest.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-    routingRequest.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+
+    routingRequest.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+    routingRequest.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
     routingRequest
       .preferences()
       .transit()
@@ -234,17 +235,17 @@ public class PatternCostCalculatorTest {
 
       if (prefAgency) {
         // TODO
-        request.setPreferredAgencies(List.of());
+        request.journey().transit().setUnpreferredAgencies(List.of());
       }
       if (prefRoute) {
         // TODO
-        request.setPreferredRoutes(List.of());
+        request.journey().transit().setUnpreferredRoutes(List.of());
       }
       if (unPrefAgency) {
-        request.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+        request.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
       }
       if (unPrefRoute) {
-        request.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+        request.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
       }
       return request;
     }

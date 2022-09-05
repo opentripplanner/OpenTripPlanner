@@ -7,12 +7,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -22,8 +20,8 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
-import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -32,7 +30,6 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +107,9 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private Locale locale = new Locale("en", "US");
 
-  private RoutingPreferences preferences;
+  private RoutingPreferences preferences = new RoutingPreferences();
+
+  private JourneyRequest journey = new JourneyRequest();
 
   /** The vehicle rental networks which may be used. If empty all networks may be used. */
   public Set<String> allowedVehicleRentalNetworks = Set.of();
@@ -124,58 +123,10 @@ public class RouteRequest implements Cloneable, Serializable {
   private boolean wheelchair = false;
 
   /**
-   * Do not use certain named agencies
-   */
-  private Set<FeedScopedId> bannedAgencies = Set.of();
-  /**
-   * Only use certain named agencies
-   */
-  private Set<FeedScopedId> whiteListedAgencies = Set.of();
-
-  /**
-   * Set of preferred agencies by user.
-   */
-  @Deprecated
-  private Set<FeedScopedId> preferredAgencies = Set.of();
-
-  /**
-   * Set of unpreferred agencies for given user.
-   */
-  private Set<FeedScopedId> unpreferredAgencies = Set.of();
-
-  /**
-   * Do not use certain named routes. The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
-   * This parameter format is completely nonstandard and should be revised for the 2.0 API, see
-   * issue #1671.
-   */
-  private RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
-  /**
-   * Only use certain named routes
-   */
-  private RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
-
-  /**
-   * Set of preferred routes by user and configuration.
-   *
-   * @deprecated TODO OTP2 Needs to be implemented
-   */
-  @Deprecated
-  public List<FeedScopedId> preferredRoutes = List.of();
-
-  /**
-   * Set of unpreferred routes for given user and configuration.
-   */
-  private Set<FeedScopedId> unpreferredRoutes = Set.of();
-
-  /**
-   * Do not use certain trips
-   */
-  public Set<FeedScopedId> bannedTrips = Set.of();
-  /**
    * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
    * it off.
    *
-   * @see RouteRequest#keepingRentedVehicleAtDestinationCost
+   * @see VehicleRentalPreferences#keepingVehicleAtDestinationCost()
    * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
    */
   public boolean allowKeepingRentedVehicleAtDestination = false;
@@ -189,11 +140,6 @@ public class RouteRequest implements Cloneable, Serializable {
   public boolean carPickup = false;
   public Set<FormFactor> allowedRentalFormFactors = new HashSet<>();
 
-  /**
-   * Raptor can print all events when arriving at stops to system error. For developers only.
-   */
-  public DebugRaptor raptorDebugging = new DebugRaptor();
-
   private Envelope fromEnvelope;
 
   private Envelope toEnvelope;
@@ -202,7 +148,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /** Constructor for options; modes defaults to walk and transit */
   public RouteRequest() {
-    this.preferences = new RoutingPreferences();
     // So that they are never null.
     from = new GenericLocation(null, null);
     to = new GenericLocation(null, null);
@@ -236,28 +181,8 @@ public class RouteRequest implements Cloneable, Serializable {
     this.streetSubRequestModes = streetSubRequestModes;
   }
 
-  public void setPreferredAgencies(Collection<FeedScopedId> ids) {
-    if (ids != null) {
-      preferredAgencies = Set.copyOf(ids);
-    }
-  }
-
-  public void setPreferredAgenciesFromString(String s) {
-    if (!s.isEmpty()) {
-      preferredAgencies = FeedScopedId.parseSetOfIds(s);
-    }
-  }
-
-  public void setUnpreferredAgencies(Collection<FeedScopedId> ids) {
-    if (ids != null) {
-      unpreferredAgencies = Set.copyOf(ids);
-    }
-  }
-
-  public void setUnpreferredAgenciesFromString(String s) {
-    if (!s.isEmpty()) {
-      unpreferredAgencies = FeedScopedId.parseSetOfIds(s);
-    }
+  public JourneyRequest journey() {
+    return journey;
   }
 
   public RoutingPreferences preferences() {
@@ -273,90 +198,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void setWheelchair(boolean wheelchair) {
     this.wheelchair = wheelchair;
-  }
-
-  public void setBannedAgencies(Collection<FeedScopedId> ids) {
-    if (ids != null) {
-      bannedAgencies = Set.copyOf(ids);
-    }
-  }
-
-  public void setBannedAgenciesFromSting(String s) {
-    if (!s.isEmpty()) {
-      bannedAgencies = FeedScopedId.parseSetOfIds(s);
-    }
-  }
-
-  public void setWhiteListedAgencies(Collection<FeedScopedId> ids) {
-    if (ids != null) {
-      whiteListedAgencies = Set.copyOf(ids);
-    }
-  }
-
-  public void setWhiteListedAgenciesFromSting(String s) {
-    if (!s.isEmpty()) {
-      whiteListedAgencies = FeedScopedId.parseSetOfIds(s);
-    }
-  }
-
-  public void setPreferredRoutes(Collection<FeedScopedId> routeIds) {
-    preferredRoutes = routeIds.stream().toList();
-  }
-
-  public void setPreferredRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      preferredRoutes = FeedScopedId.parseListOfIds(s);
-    } else {
-      preferredRoutes = List.of();
-    }
-  }
-
-  public void setUnpreferredRoutes(Collection<FeedScopedId> routeIds) {
-    unpreferredRoutes = Set.copyOf(routeIds);
-  }
-
-  public void setUnpreferredRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      unpreferredRoutes = Set.copyOf(FeedScopedId.parseListOfIds(s));
-    } else {
-      unpreferredRoutes = Set.of();
-    }
-  }
-
-  public void setBannedRoutes(List<FeedScopedId> routeIds) {
-    bannedRoutes = RouteMatcher.idMatcher(routeIds);
-  }
-
-  public void setBannedRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      bannedRoutes = RouteMatcher.parse(s);
-    } else {
-      bannedRoutes = RouteMatcher.emptyMatcher();
-    }
-  }
-
-  public void setWhiteListedRoutesFromString(String s) {
-    if (!s.isEmpty()) {
-      whiteListedRoutes = RouteMatcher.parse(s);
-    } else {
-      whiteListedRoutes = RouteMatcher.emptyMatcher();
-    }
-  }
-
-  public void setWhiteListedRoutes(List<FeedScopedId> routeIds) {
-    whiteListedRoutes = RouteMatcher.idMatcher(routeIds);
-  }
-
-  public void setBannedTrips(List<FeedScopedId> ids) {
-    if (ids != null) {
-      bannedTrips = Set.copyOf(ids);
-    }
-  }
-
-  public void setBannedTripsFromString(String ids) {
-    if (!ids.isEmpty()) {
-      bannedTrips = FeedScopedId.parseSetOfIds(ids);
-    }
   }
 
   public void setFromString(String from) {
@@ -544,22 +385,10 @@ public class RouteRequest implements Cloneable, Serializable {
       clone.requiredVehicleParkingTags = Set.copyOf(requiredVehicleParkingTags);
       clone.bannedVehicleParkingTags = Set.copyOf(bannedVehicleParkingTags);
 
-      clone.preferredAgencies = Set.copyOf(preferredAgencies);
-      clone.unpreferredAgencies = Set.copyOf(unpreferredAgencies);
-      clone.whiteListedAgencies = Set.copyOf(whiteListedAgencies);
-      clone.bannedAgencies = Set.copyOf(bannedAgencies);
-
-      clone.bannedRoutes = bannedRoutes.clone();
-      clone.whiteListedRoutes = whiteListedRoutes.clone();
-      clone.preferredRoutes = List.copyOf(preferredRoutes);
-      clone.unpreferredRoutes = Set.copyOf(unpreferredRoutes);
-
-      clone.bannedTrips = Set.copyOf(bannedTrips);
-
       clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
-      clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
       clone.preferences = preferences.clone();
+      clone.journey = journey.clone();
 
       return clone;
     } catch (CloneNotSupportedException e) {
@@ -577,33 +406,6 @@ public class RouteRequest implements Cloneable, Serializable {
     ret.setArriveBy(!ret.arriveBy);
     preferences().rental().setUseAvailabilityInformation(false);
     return ret;
-  }
-
-  public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
-    if (
-      bannedRoutes.isEmpty() &&
-      bannedAgencies.isEmpty() &&
-      whiteListedRoutes.isEmpty() &&
-      whiteListedAgencies.isEmpty()
-    ) {
-      return Set.of();
-    }
-
-    Set<FeedScopedId> bannedRoutes = new HashSet<>();
-    for (Route route : routes) {
-      if (routeIsBanned(route)) {
-        bannedRoutes.add(route.getId());
-      }
-    }
-    return bannedRoutes;
-  }
-
-  public Set<FeedScopedId> getUnpreferredAgencies() {
-    return unpreferredAgencies;
-  }
-
-  public Set<FeedScopedId> getUnpreferredRoutes() {
-    return unpreferredRoutes;
   }
 
   /**
@@ -777,52 +579,5 @@ public class RouteRequest implements Cloneable, Serializable {
     env.expandBy(lon, lat);
 
     return env;
-  }
-
-  /**
-   * Checks if the route is banned. Also, if whitelisting is used, the route (or its agency) has to
-   * be whitelisted in order to not count as banned.
-   *
-   * @return True if the route is banned
-   */
-  private boolean routeIsBanned(Route route) {
-    /* check if agency is banned for this plan */
-    if (!bannedAgencies.isEmpty()) {
-      if (bannedAgencies.contains(route.getAgency().getId())) {
-        return true;
-      }
-    }
-
-    /* check if route banned for this plan */
-    if (!bannedRoutes.isEmpty()) {
-      if (bannedRoutes.matches(route)) {
-        return true;
-      }
-    }
-
-    boolean whiteListed = false;
-    boolean whiteListInUse = false;
-
-    /* check if agency is whitelisted for this plan */
-    if (!whiteListedAgencies.isEmpty()) {
-      whiteListInUse = true;
-      if (whiteListedAgencies.contains(route.getAgency().getId())) {
-        whiteListed = true;
-      }
-    }
-
-    /* check if route is whitelisted for this plan */
-    if (!whiteListedRoutes.isEmpty()) {
-      whiteListInUse = true;
-      if (whiteListedRoutes.matches(route)) {
-        whiteListed = true;
-      }
-    }
-
-    if (whiteListInUse && !whiteListed) {
-      return true;
-    }
-
-    return false;
   }
 }

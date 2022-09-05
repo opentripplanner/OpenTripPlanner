@@ -667,15 +667,28 @@ public class LegacyGraphQLQueryTypeImpl
       //              .stream()
       //              .map(LegacyGraphQLQueryTypeImpl::toGenericLocation)
       //              .collect(Collectors.toList())
-      //      )
-      callWith.argument("preferred.routes", request::setPreferredRoutesFromString);
+      //      );
+      callWith.argument(
+        "preferred.routes",
+        request.journey().transit()::setPreferredRoutesFromString
+      );
       callWith.argument(
         "preferred.otherThanPreferredRoutesPenalty",
         preferences.transit()::setOtherThanPreferredRoutesPenalty
       );
-      callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
-      callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
-      callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
+      callWith.argument(
+        "preferred.agencies",
+        request.journey().transit()::setPreferredAgenciesFromString
+      );
+      callWith.argument(
+        "unpreferred.routes",
+        request.journey().transit()::setUnpreferredRoutesFromString
+      );
+      callWith.argument(
+        "unpreferred.agencies",
+        request.journey().transit()::setUnpreferredAgenciesFromString
+      );
+      // This is deprecated, if both are set, the proper one will override this
       callWith.argument(
         "unpreferred.useUnpreferredRoutesPenalty",
         (Integer v) ->
@@ -691,9 +704,9 @@ public class LegacyGraphQLQueryTypeImpl
       );
       callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
       callWith.argument("bikeBoardCost", preferences.bike()::setBoardCost);
-      callWith.argument("banned.routes", request::setBannedRoutesFromString);
-      callWith.argument("banned.agencies", request::setBannedAgenciesFromSting);
-      callWith.argument("banned.trips", request::setBannedTripsFromString);
+      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
+      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
+      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
       callWith.argument("transferPenalty", preferences.transfer()::setCost);

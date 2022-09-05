@@ -258,14 +258,23 @@ public class RoutingRequestMapper {
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
-    var unpreferred = c.path("unpreferred");
-    request.setUnpreferredRoutes(
-      unpreferred.asFeedScopedIdSet("routes", dft.getUnpreferredRoutes())
-    );
+    request
+      .journey()
+      .transit()
+      .setUnpreferredRoutes(
+        c
+          .path("unpreferred")
+          .asFeedScopedIdList("routes", request.journey().transit().unpreferredRoutes())
+      );
 
-    request.setUnpreferredAgencies(
-      unpreferred.asFeedScopedIdSet("agencies", dft.getUnpreferredAgencies())
-    );
+    request
+      .journey()
+      .transit()
+      .setUnpreferredAgencies(
+        c
+          .path("unpreferred")
+          .asFeedScopedIdList("agencies", request.journey().transit().unpreferredRoutes())
+      );
 
     return request;
   }

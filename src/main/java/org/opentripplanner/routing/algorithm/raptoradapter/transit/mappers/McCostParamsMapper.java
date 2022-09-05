@@ -38,8 +38,12 @@ public class McCostParamsMapper {
     builder.wheelchairEnabled(request.wheelchair());
     builder.wheelchairAccessibility(preferences.wheelchairAccessibility());
 
-    final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
-    final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
+    final Set<FeedScopedId> unpreferredRoutes = Set.copyOf(
+      request.journey().transit().unpreferredRoutes()
+    );
+    final Set<FeedScopedId> unpreferredAgencies = Set.copyOf(
+      request.journey().transit().unpreferredAgencies()
+    );
 
     if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
       final BitSet unpreferredPatterns = new BitSet();

@@ -50,14 +50,17 @@ public class RoutingRequestTest {
 
   @Test
   public void shouldCloneObjectFields() {
-    var req = new RouteRequest();
+    // TODO VIA: There are more objects that are cloned
+    RouteRequest request = new RouteRequest();
 
-    var clone = req.clone();
+    var clone = request.clone();
 
-    assertNotSame(clone, req);
-    assertNotSame(clone.raptorDebugging, req.raptorDebugging);
-
-    assertEquals(50, req.numItineraries());
+    assertNotSame(clone, request);
+    assertNotSame(
+      clone.journey().transit().raptorDebugging(),
+      request.journey().transit().raptorDebugging()
+    );
+    assertEquals(50, request.numItineraries());
     assertEquals(50, clone.numItineraries());
   }
 

@@ -77,7 +77,12 @@ public class SpeedTestRequest {
       request.setSearchWindow(Duration.ZERO);
     }
 
-    addDebugOptions(request, opts);
+    request
+      .journey()
+      .transit()
+      .raptorDebugging()
+      .withStops(opts.debugStops())
+      .withPath(opts.debugPath());
 
     pref
       .system()
@@ -88,12 +93,7 @@ public class SpeedTestRequest {
           RoutingTag.testCaseCategory(input.category())
         )
       );
-
     return request;
-  }
-
-  private static void addDebugOptions(RouteRequest request, SpeedTestCmdLineOpts opts) {
-    request.raptorDebugging.withStops(opts.debugStops()).withPath(opts.debugPath());
   }
 
   private Instant time(int time) {

@@ -7,7 +7,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,13 +71,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   public static String concatenateId(String feedId, String id) {
     return feedId + ID_SEPARATOR + id;
-  }
-
-  /**
-   * Parses a string consisting of concatenated FeedScopedIds to a Set
-   */
-  public static Set<FeedScopedId> parseSetOfIds(String s) {
-    return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toSet());
   }
 
   /**

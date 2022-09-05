@@ -92,7 +92,12 @@ public abstract class GtfsTest {
     preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
     routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      routingRequest.setBannedRoutes(List.of(new FeedScopedId(feedId.getId(), excludedRoute)));
+      routingRequest
+        .journey()
+        .transit()
+        .setBannedRoutes(
+          RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
+        );
     }
     if (excludedStop != null && !excludedStop.isEmpty()) {
       throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
