@@ -105,7 +105,11 @@ public class RoutingRequestMapper {
       );
     preferences
       .street()
-      .setMaxAccessEgressDurationForMode(
+      .initMaxAccessEgressDuration(
+        c.asDuration(
+          "maxAccessEgressDuration",
+          preferences.street().maxAccessEgressDurationDefaultValue()
+        ),
         c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
     preferences
@@ -159,12 +163,11 @@ public class RoutingRequestMapper {
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
     preferences
       .street()
-      .setMaxDirectDuration(
-        c.asDuration("maxDirectStreetDuration", preferences.street().maxDirectDuration())
-      );
-    preferences
-      .street()
-      .setMaxDirectDurationForMode(
+      .initMaxDirectDuration(
+        c.asDuration(
+          "maxDirectStreetDuration",
+          preferences.street().maxDirectDurationDefaultValue()
+        ),
         c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
 

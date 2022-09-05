@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import javax.media.jai.RasterFactory;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -222,7 +223,7 @@ public class TravelTimeResource {
     accessRequest
       .preferences()
       .street()
-      .setMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration);
+      .initMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of());
 
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
