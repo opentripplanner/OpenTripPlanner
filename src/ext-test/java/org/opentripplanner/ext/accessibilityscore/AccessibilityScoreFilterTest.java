@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public class AccessibilityScoreFilterTest implements PlanTestConstants {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.preference;
 
 /**
  * A container for how to treat trips or stops with which don't have a wheelchair accessibility

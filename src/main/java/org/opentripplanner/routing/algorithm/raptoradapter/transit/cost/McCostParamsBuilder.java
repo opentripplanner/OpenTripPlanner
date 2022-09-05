@@ -1,10 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import java.util.Set;
 import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
 
 /**
  * Mutable version of the {@link McCostParams}.
