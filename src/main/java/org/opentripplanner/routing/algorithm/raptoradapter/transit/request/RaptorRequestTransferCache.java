@@ -10,7 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 
@@ -95,7 +95,7 @@ public class RaptorRequestTransferCache {
     private final double bikeTriangleSafetyFactor;
     private final double bikeTriangleSlopeFactor;
     private final double bikeTriangleTimeFactor;
-    private final WheelchairAccessibilityRequest wheelchairAccessibility;
+    private final WheelchairAccessibilityPreferences wheelchairAccessibility;
     private final double walkSpeed;
     private final double bikeSpeed;
     private final double walkReluctance;

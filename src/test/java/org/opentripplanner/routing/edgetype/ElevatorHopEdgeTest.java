@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,7 +38,7 @@ class ElevatorHopEdgeTest {
       .preferences()
       .wheelchair()
       .setAccessibility(
-        new WheelchairAccessibilityRequest(true, feature, feature, feature, 25, 8, 10, 25)
+        new WheelchairAccessibilityPreferences(true, feature, feature, feature, 25, 8, 10, 25)
       );
     State result = traverse(wheelchair, req);
     assertNull(result);
@@ -64,7 +64,7 @@ class ElevatorHopEdgeTest {
     req
       .preferences()
       .wheelchair()
-      .setAccessibility(WheelchairAccessibilityRequest.DEFAULT.withEnabled(true));
+      .setAccessibility(WheelchairAccessibilityPreferences.DEFAULT.withEnabled(true));
     var wheelchairResult = traverse(wheelchair, req);
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);

@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -98,7 +98,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
       .preferences()
       .wheelchair()
       .setAccessibility(
-        new WheelchairAccessibilityRequest(
+        new WheelchairAccessibilityPreferences(
           true,
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -134,7 +134,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
       .preferences()
       .wheelchair()
       .setAccessibility(
-        new WheelchairAccessibilityRequest(
+        new WheelchairAccessibilityPreferences(
           true,
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -176,7 +176,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
       .preferences()
       .wheelchair()
       .setAccessibility(
-        new WheelchairAccessibilityRequest(
+        new WheelchairAccessibilityPreferences(
           true,
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -217,7 +217,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     req
       .preferences()
       .wheelchair()
-      .setAccessibility(WheelchairAccessibilityRequest.DEFAULT.withEnabled(true));
+      .setAccessibility(WheelchairAccessibilityPreferences.DEFAULT.withEnabled(true));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);

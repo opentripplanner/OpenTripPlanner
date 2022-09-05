@@ -22,7 +22,7 @@ import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -248,7 +248,7 @@ public class GeometryProcessorTest {
     options
       .preferences()
       .wheelchair()
-      .setAccessibility(WheelchairAccessibilityRequest.makeDefault(true));
+      .setAccessibility(WheelchairAccessibilityPreferences.makeDefault(true));
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
     ShortestPathTree spt;

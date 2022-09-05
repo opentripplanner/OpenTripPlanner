@@ -14,7 +14,7 @@ import java.math.RoundingMode;
  *                                punished. This should be a very high value as you want to only
  *                                include stairs as a last result.
  */
-public record WheelchairAccessibilityRequest(
+public record WheelchairAccessibilityPreferences(
   boolean enabled,
   WheelchairAccessibilityFeature trip,
   WheelchairAccessibilityFeature stop,
@@ -53,7 +53,7 @@ public record WheelchairAccessibilityRequest(
 
   private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
-  public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
+  public static final WheelchairAccessibilityPreferences DEFAULT = new WheelchairAccessibilityPreferences(
     false,
     DEFAULT_TRIP_FEATURE,
     DEFAULT_STOP_FEATURE,
@@ -64,12 +64,12 @@ public record WheelchairAccessibilityRequest(
     DEFAULT_STAIRS_RELUCTANCE
   );
 
-  public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
+  public static WheelchairAccessibilityPreferences makeDefault(boolean enabled) {
     return DEFAULT.withEnabled(enabled);
   }
 
-  public WheelchairAccessibilityRequest withEnabled(boolean enabled) {
-    return new WheelchairAccessibilityRequest(
+  public WheelchairAccessibilityPreferences withEnabled(boolean enabled) {
+    return new WheelchairAccessibilityPreferences(
       enabled,
       trip,
       stop,
@@ -81,13 +81,13 @@ public record WheelchairAccessibilityRequest(
     );
   }
 
-  public WheelchairAccessibilityRequest round() {
+  public WheelchairAccessibilityPreferences round() {
     double roundedMaxSlope = BigDecimal
       .valueOf(maxSlope)
       .setScale(3, RoundingMode.HALF_EVEN)
       .round(MathContext.UNLIMITED)
       .doubleValue();
-    return new WheelchairAccessibilityRequest(
+    return new WheelchairAccessibilityPreferences(
       enabled,
       trip,
       stop,

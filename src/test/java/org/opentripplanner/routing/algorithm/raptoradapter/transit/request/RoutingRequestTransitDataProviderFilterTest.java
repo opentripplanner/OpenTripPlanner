@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -48,10 +48,10 @@ public class RoutingRequestTransitDataProviderFilterTest {
     0
   );
 
-  private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
-    WheelchairAccessibilityRequest.DEFAULT;
+  private static final WheelchairAccessibilityPreferences DEFAULT_ACCESSIBILITY =
+    WheelchairAccessibilityPreferences.DEFAULT;
 
-  private static final WheelchairAccessibilityRequest ENABLED_ACCESSIBILITY = WheelchairAccessibilityRequest.makeDefault(
+  private static final WheelchairAccessibilityPreferences ENABLED_ACCESSIBILITY = WheelchairAccessibilityPreferences.makeDefault(
     true
   );
 
@@ -86,7 +86,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      WheelchairAccessibilityRequest.makeDefault(true),
+      WheelchairAccessibilityPreferences.makeDefault(true),
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -482,7 +482,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       true,
-      WheelchairAccessibilityRequest.makeDefault(true),
+      WheelchairAccessibilityPreferences.makeDefault(true),
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -504,7 +504,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   ) {
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      WheelchairAccessibilityRequest.makeDefault(false),
+      WheelchairAccessibilityPreferences.makeDefault(false),
       false,
       allowedModes,
       Set.of(),

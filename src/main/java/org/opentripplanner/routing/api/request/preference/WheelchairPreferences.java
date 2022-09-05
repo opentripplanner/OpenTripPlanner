@@ -10,7 +10,8 @@ public class WheelchairPreferences implements Cloneable, Serializable {
    * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
    */
   @Nonnull
-  private WheelchairAccessibilityRequest accessibility = WheelchairAccessibilityRequest.DEFAULT;
+  private WheelchairAccessibilityPreferences accessibility =
+    WheelchairAccessibilityPreferences.DEFAULT;
 
   // TODO VIA: 2022-08-18 Is it new? never used
   private double maxSlope = 0.0833333333333;
@@ -36,12 +37,12 @@ public class WheelchairPreferences implements Cloneable, Serializable {
     this.accessibility = this.accessibility.withEnabled(wheelchair);
   }
 
-  public void setAccessibility(@Nonnull WheelchairAccessibilityRequest accessibility) {
+  public void setAccessibility(@Nonnull WheelchairAccessibilityPreferences accessibility) {
     this.accessibility = accessibility;
   }
 
   @Nonnull
-  public WheelchairAccessibilityRequest accessibility() {
+  public WheelchairAccessibilityPreferences accessibility() {
     return accessibility;
   }
 

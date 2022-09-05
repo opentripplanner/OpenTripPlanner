@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -160,7 +160,9 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     preferences.car().setParkTime(180);
     preferences
       .wheelchair()
-      .setAccessibility(WheelchairAccessibilityRequest.makeDefault(requireWheelChairAccessible));
+      .setAccessibility(
+        WheelchairAccessibilityPreferences.makeDefault(requireWheelChairAccessible)
+      );
     options.bannedVehicleParkingTags = bannedTags;
     options.requiredVehicleParkingTags = requiredTags;
     options.setArriveBy(arriveBy);

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
 import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 
 /**
  * Mutable version of the {@link McCostParams}.
@@ -14,7 +14,7 @@ public class McCostParamsBuilder {
   private int transferCost;
   private double[] transitReluctanceFactors;
   private double waitReluctanceFactor;
-  private WheelchairAccessibilityRequest accessibilityRequest;
+  private WheelchairAccessibilityPreferences accessibilityRequest;
   private BitSet unpreferredPatterns;
   private DoubleFunction<Double> unpreferredCost;
 
@@ -67,11 +67,11 @@ public class McCostParamsBuilder {
     return this;
   }
 
-  public WheelchairAccessibilityRequest wheelchairAccessibility() {
+  public WheelchairAccessibilityPreferences wheelchairAccessibility() {
     return accessibilityRequest;
   }
 
-  public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityRequest mode) {
+  public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityPreferences mode) {
     accessibilityRequest = mode;
     return this;
   }

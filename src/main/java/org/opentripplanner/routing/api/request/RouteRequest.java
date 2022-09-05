@@ -22,7 +22,7 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -110,8 +110,8 @@ public class RouteRequest implements Cloneable, Serializable {
    * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
    */
   @Nonnull
-  public WheelchairAccessibilityRequest wheelchairAccessibility =
-    WheelchairAccessibilityRequest.DEFAULT;
+  public WheelchairAccessibilityPreferences wheelchairAccessibility =
+    WheelchairAccessibilityPreferences.DEFAULT;
 
   private int numItineraries = 50;
 

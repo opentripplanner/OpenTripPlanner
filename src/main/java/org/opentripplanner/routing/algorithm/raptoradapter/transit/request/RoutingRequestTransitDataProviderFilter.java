@@ -7,7 +7,7 @@ import org.opentripplanner.model.modes.AllowTransitModeFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -21,7 +21,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
-  private final WheelchairAccessibilityRequest wheelchairAccessibility;
+  private final WheelchairAccessibilityPreferences wheelchairAccessibility;
 
   private final boolean includePlannedCancellations;
 
@@ -33,7 +33,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
     boolean requireBikesAllowed,
-    WheelchairAccessibilityRequest accessibility,
+    WheelchairAccessibilityPreferences accessibility,
     boolean includePlannedCancellations,
     Collection<MainAndSubMode> allowedTransitModes,
     Set<FeedScopedId> bannedRoutes,

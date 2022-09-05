@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -31,7 +31,7 @@ public class WheelchairCostCalculatorTest {
 
   private final WheelchairCostCalculator<TestTripSchedule> wheelchairCostCalculator = new WheelchairCostCalculator<>(
     defaultCostCalculator,
-    new WheelchairAccessibilityRequest(
+    new WheelchairAccessibilityPreferences(
       true,
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
