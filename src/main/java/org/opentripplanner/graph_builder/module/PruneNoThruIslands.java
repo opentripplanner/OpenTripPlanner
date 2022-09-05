@@ -19,7 +19,6 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -317,7 +316,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
-    RouteRequest options = new RouteRequest(new TraverseModeSet(traverseMode));
+    RouteRequest options = new RouteRequest(traverseMode);
 
     for (Vertex gv : graph.getVertices()) {
       if (!(gv instanceof StreetVertex)) {

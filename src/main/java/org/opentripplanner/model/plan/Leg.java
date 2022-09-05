@@ -16,7 +16,6 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -190,7 +189,7 @@ public interface Leg {
   /**
    * The mode (e.g., <code>Walk</code>) used when traversing this leg.
    */
-  TraverseMode getMode();
+  LegMode getMode();
 
   /**
    * The date and time this leg begins.

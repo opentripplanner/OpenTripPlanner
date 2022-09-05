@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
@@ -113,7 +113,7 @@ class ItineraryResultMapper {
   private Result map(Itinerary itinerary) {
     List<String> agencies = new ArrayList<>();
     List<String> routes = new ArrayList<>();
-    Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
+    Set<LegMode> modes = EnumSet.noneOf(LegMode.class);
     List<String> stops = new ArrayList<>();
 
     for (Leg it : itinerary.getLegs()) {

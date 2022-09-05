@@ -1,9 +1,9 @@
 package org.opentripplanner.model.plan;
 
 import static java.time.ZoneOffset.UTC;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.model.plan.LegMode.BICYCLE;
+import static org.opentripplanner.model.plan.LegMode.CAR;
+import static org.opentripplanner.model.plan.LegMode.WALK;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
@@ -392,7 +392,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return this;
   }
 
-  private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
+  private Leg streetLeg(LegMode mode, int startTime, int endTime, Place to, int legCost) {
     StreetLeg leg = StreetLeg
       .create()
       .withMode(mode)
@@ -415,21 +415,15 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return leg;
   }
 
-  private double speed(TraverseMode mode) {
-    switch (mode) {
-      case WALK:
-        return WALK_SPEED;
-      case BICYCLE:
-        return BICYCLE_SPEED;
-      case BUS:
-        return BUS_SPEED;
-      case RAIL:
-        return RAIL_SPEED;
-      case CAR:
-        return CAR_SPEED;
-      default:
-        throw new IllegalStateException("Unsupported mode: " + mode);
-    }
+  private double speed(LegMode mode) {
+    return switch (mode) {
+      case WALK -> WALK_SPEED;
+      case BICYCLE -> BICYCLE_SPEED;
+      case BUS -> BUS_SPEED;
+      case RAIL -> RAIL_SPEED;
+      case CAR -> CAR_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
   }
 
   private int cost(float reluctance, int durationSeconds) {

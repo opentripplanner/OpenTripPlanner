@@ -89,7 +89,7 @@ public class LegMapper {
     api.distance = round3Decimals(domain.getDistanceMeters());
     api.generalizedCost = domain.getGeneralizedCost();
     api.pathway = domain.getPathwayId() != null;
-    api.mode = TraverseModeMapper.mapToApi(domain.getMode());
+    api.mode = ModeMapper.mapToApi(domain.getMode());
     api.agencyTimeZoneOffset = domain.getAgencyTimeZoneOffset();
     api.transitLeg = domain.isTransitLeg();
 

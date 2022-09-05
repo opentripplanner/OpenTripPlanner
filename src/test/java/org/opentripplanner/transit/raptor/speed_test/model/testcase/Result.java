@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.util.CompositeComparator;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -33,7 +33,7 @@ class Result {
   /** Alphabetical distinct list of agencies. A {@code List} is used because the order is important. */
   final List<String> agencies;
   /** Alphabetical distinct list of modes. A {@code List} is used because the order is important. */
-  final List<TraverseMode> modes;
+  final List<LegMode> modes;
   /** A list of routes in tha same order as they appear in the journey. */
   final List<String> routes;
   /** A list of stops in tha same order as they appear in the journey. */
@@ -53,7 +53,7 @@ class Result {
     Integer startTime,
     Integer endTime,
     Collection<String> agencies,
-    Collection<TraverseMode> modes,
+    Collection<LegMode> modes,
     Collection<String> routes,
     Collection<String> stops,
     String details

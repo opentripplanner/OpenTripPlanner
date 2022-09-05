@@ -19,7 +19,6 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -162,8 +161,8 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   @Override
-  public TraverseMode getMode() {
-    return TraverseMode.fromTransitMode(getTrip().getMode());
+  public LegMode getMode() {
+    return LegMode.fromTransitMode(getTrip().getMode());
   }
 
   @Override

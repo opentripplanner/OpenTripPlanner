@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -20,7 +19,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public class StreetLeg implements Leg {
 
-  private final TraverseMode mode;
+  private final LegMode mode;
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final double distanceMeters;
@@ -79,7 +78,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public boolean isWalkingLeg() {
-    return mode.isWalking();
+    return mode == LegMode.WALK;
   }
 
   @Override
@@ -88,7 +87,7 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public TraverseMode getMode() {
+  public LegMode getMode() {
     return mode;
   }
 

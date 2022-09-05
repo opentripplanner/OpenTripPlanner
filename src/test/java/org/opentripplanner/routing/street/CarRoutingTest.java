@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -145,7 +146,7 @@ public class CarRoutingTest {
 
     // make sure that we only get CAR legs
     itineraries.forEach(i ->
-      i.getLegs().forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR))
+      i.getLegs().forEach(l -> Assertions.assertEquals(LegMode.CAR, l.getMode()))
     );
     Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
     return PolylineEncoder.encodeGeometry(legGeometry).points();

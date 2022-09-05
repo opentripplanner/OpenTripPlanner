@@ -17,12 +17,12 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -253,7 +253,7 @@ public class GraphPathToItineraryMapper {
    *
    * @param states The states that go with the leg
    */
-  private static TraverseMode resolveMode(List<State> states) {
+  private static LegMode resolveMode(List<State> states) {
     return states
       .stream()
       // The first state is part of the previous leg
@@ -265,12 +265,12 @@ public class GraphPathToItineraryMapper {
           // Resolve correct mode if renting vehicle
           if (state.isRentingVehicle()) {
             return switch (state.stateData.rentalVehicleFormFactor) {
-              case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-              case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-              case CAR -> TraverseMode.CAR;
+              case BICYCLE, OTHER -> LegMode.BICYCLE;
+              case SCOOTER, MOPED -> LegMode.SCOOTER;
+              case CAR -> LegMode.CAR;
             };
           } else {
-            return mode;
+            return LegMode.fromAStarTraverseMode(mode);
           }
         }
 
@@ -279,7 +279,7 @@ public class GraphPathToItineraryMapper {
       .filter(Objects::nonNull)
       .findFirst()
       // Fallback to walking
-      .orElse(TraverseMode.WALK);
+      .orElse(LegMode.WALK);
   }
 
   private static List<P2<Double>> encodeElevationProfileWithNaN(

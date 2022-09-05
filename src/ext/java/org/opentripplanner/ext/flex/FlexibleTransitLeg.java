@@ -11,10 +11,10 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -85,8 +85,8 @@ public class FlexibleTransitLeg implements Leg {
   }
 
   @Override
-  public TraverseMode getMode() {
-    return TraverseMode.fromTransitMode(getTrip().getMode());
+  public LegMode getMode() {
+    return LegMode.fromTransitMode(getTrip().getMode());
   }
 
   @Override

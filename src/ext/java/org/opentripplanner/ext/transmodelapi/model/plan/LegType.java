@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ALTERNATIVE_LEGS_FILTER;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.LEG_MODE;
 
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
@@ -119,7 +119,7 @@ public class LegType {
           .description(
             "The mode of transport or access (e.g., foot) used when traversing this leg."
           )
-          .type(new GraphQLNonNull(MODE))
+          .type(new GraphQLNonNull(LEG_MODE))
           .dataFetcher(env -> leg(env).getMode())
           .build()
       )

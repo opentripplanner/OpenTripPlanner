@@ -8,6 +8,7 @@ import java.util.List;
 import org.opentripplanner.model.plan.FrequencyTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -23,7 +24,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -103,7 +103,7 @@ public class RaptorPathToItineraryMapper {
         legs.addAll(
           mapTransferLeg(
             pathLeg.asTransferLeg(),
-            request.modes.transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+            request.modes.transferMode == StreetMode.BIKE ? LegMode.BICYCLE : LegMode.WALK
           )
         );
       }
@@ -203,10 +203,7 @@ public class RaptorPathToItineraryMapper {
     );
   }
 
-  private List<Leg> mapTransferLeg(
-    TransferPathLeg<TripSchedule> pathLeg,
-    TraverseMode transferMode
-  ) {
+  private List<Leg> mapTransferLeg(TransferPathLeg<TripSchedule> pathLeg, LegMode transferMode) {
     var transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
     var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
     Transfer transfer = ((TransferWithDuration) pathLeg.transfer()).transfer();
@@ -237,7 +234,7 @@ public class RaptorPathToItineraryMapper {
   private List<Leg> mapNonTransitLeg(
     PathLeg<TripSchedule> pathLeg,
     Transfer transfer,
-    TraverseMode transferMode,
+    LegMode transferMode,
     Place from,
     Place to
   ) {

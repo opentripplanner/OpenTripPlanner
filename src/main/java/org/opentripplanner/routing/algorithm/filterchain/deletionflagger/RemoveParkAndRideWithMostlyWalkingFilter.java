@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.model.plan.LegMode;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
@@ -38,7 +37,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
       double carDuration = itinerary
         .getLegs()
         .stream()
-        .filter(l -> l.getMode() == TraverseMode.CAR)
+        .filter(l -> l.getMode() == LegMode.CAR)
         .mapToDouble(l -> l.getDuration().toSeconds())
         .sum();
       double totalDuration = itinerary.getDuration().toSeconds();

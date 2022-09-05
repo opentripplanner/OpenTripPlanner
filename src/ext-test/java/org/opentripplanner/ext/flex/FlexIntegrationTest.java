@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
+import static org.opentripplanner.model.plan.LegMode.BUS;
+import static org.opentripplanner.model.plan.LegMode.WALK;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
-import static org.opentripplanner.routing.core.TraverseMode.BUS;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -31,7 +31,6 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -82,14 +81,14 @@ public class FlexIntegrationTest {
     assertEquals(4, itin.getLegs().size());
 
     var walkToBus = itin.getLegs().get(0);
-    assertEquals(TraverseMode.WALK, walkToBus.getMode());
+    assertEquals(WALK, walkToBus.getMode());
 
     var bus = itin.getLegs().get(1);
     assertEquals(BUS, bus.getMode());
     assertEquals("30", bus.getRoute().getShortName());
 
     var transfer = itin.getLegs().get(2);
-    assertEquals(TraverseMode.WALK, transfer.getMode());
+    assertEquals(WALK, transfer.getMode());
 
     var flex = itin.getLegs().get(3);
     assertEquals(BUS, flex.getMode());
@@ -146,7 +145,7 @@ public class FlexIntegrationTest {
     assertEquals(3173, itin.getGeneralizedCost());
 
     var walkToFlex = itin.getLegs().get(0);
-    assertEquals(TraverseMode.WALK, walkToFlex.getMode());
+    assertEquals(WALK, walkToFlex.getMode());
 
     var flex = itin.getLegs().get(1);
     assertEquals(BUS, flex.getMode());

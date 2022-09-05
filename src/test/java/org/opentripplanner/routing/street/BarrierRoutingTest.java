@@ -22,6 +22,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -73,7 +74,7 @@ public class BarrierRoutingTest {
           .flatMap(i ->
             Stream.of(
               () -> assertEquals(1, i.getLegs().size()),
-              () -> assertEquals(BICYCLE, i.getLegs().get(0).getMode()),
+              () -> assertEquals(LegMode.BICYCLE, i.getLegs().get(0).getMode()),
               () ->
                 assertEquals(
                   List.of(false, true, false, true, false),
@@ -141,7 +142,12 @@ public class BarrierRoutingTest {
           .stream()
           .flatMap(i -> i.getLegs().stream())
           .map(l ->
-            () -> assertEquals(traverseMode, l.getMode(), "Allow only " + traverseMode + " legs")
+            () ->
+              assertEquals(
+                LegMode.fromAStarTraverseMode(traverseMode),
+                l.getMode(),
+                "Allow only " + traverseMode + " legs"
+              )
           )
     );
   }

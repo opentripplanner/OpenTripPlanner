@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.plan.AbsoluteDirection;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.transfer.TransferPriority;
@@ -14,7 +15,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -254,29 +254,25 @@ public class EnumTypes {
     )
     .build();
 
-  public static GraphQLEnumType MODE = GraphQLEnumType
+  public static GraphQLEnumType LEG_MODE = GraphQLEnumType
     .newEnum()
     .name("Mode")
-    .value("air", TraverseMode.AIRPLANE)
-    .value("bicycle", TraverseMode.BICYCLE)
-    .value("bus", TraverseMode.BUS)
-    .value("cableway", TraverseMode.CABLE_CAR)
-    .value("water", TraverseMode.FERRY)
-    .value("funicular", TraverseMode.FUNICULAR)
-    .value("lift", TraverseMode.GONDOLA)
-    .value("rail", TraverseMode.RAIL)
-    .value("metro", TraverseMode.SUBWAY)
-    .value("tram", TraverseMode.TRAM)
-    .value("coach", TraverseMode.BUS)
-    .description("NOT IMPLEMENTED")
-    .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
-    .value("foot", TraverseMode.WALK)
-    .value("car", TraverseMode.CAR)
-    .value("scooter", TraverseMode.SCOOTER)
-    // TODO OTP2 - Car park no added
-    // .value("car_park", TraverseMode.CAR_PARK, "Combine with foot and transit for park and ride.")
-    // .value("car_dropoff", TraverseMode.CAR_DROPOFF, "Combine with foot and transit for kiss and ride.")
-    // .value("car_pickup", TraverseMode.CAR_PICKUP, "Combine with foot and transit for ride and kiss.")
+    .value("air", LegMode.AIRPLANE)
+    .value("bicycle", LegMode.BICYCLE)
+    .value("bus", LegMode.BUS)
+    .value("cableway", LegMode.CABLE_CAR)
+    .value("water", LegMode.FERRY)
+    .value("funicular", LegMode.FUNICULAR)
+    .value("lift", LegMode.GONDOLA)
+    .value("rail", LegMode.RAIL)
+    .value("metro", LegMode.SUBWAY)
+    .value("tram", LegMode.TRAM)
+    .value("trolleybus", LegMode.TROLLEYBUS)
+    .value("monorail", LegMode.MONORAIL)
+    .value("coach", LegMode.COACH)
+    .value("foot", LegMode.WALK)
+    .value("car", LegMode.CAR)
+    .value("scooter", LegMode.SCOOTER)
     .build();
 
   public static GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType

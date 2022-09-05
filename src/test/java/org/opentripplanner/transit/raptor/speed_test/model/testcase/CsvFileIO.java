@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -258,7 +258,7 @@ public class CsvFileIO {
         parseTime(csvReader.get("startTime")),
         parseTime(csvReader.get("endTime")),
         str2Col(csvReader.get("agencies")),
-        str2Col(csvReader.get("modes"), TraverseMode::valueOf),
+        str2Col(csvReader.get("modes"), LegMode::valueOf),
         str2Col(csvReader.get("routes")),
         str2Col(csvReader.get("stops")),
         csvReader.get("details")
