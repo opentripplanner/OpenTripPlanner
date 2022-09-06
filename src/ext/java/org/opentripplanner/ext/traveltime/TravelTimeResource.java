@@ -104,7 +104,7 @@ public class TravelTimeResource {
     routingRequest = serverContext.defaultRouteRequest();
     routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
     if (modes != null) {
-      routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();
+      routingRequest.journey().setModes(new QualifiedModeSet(modes).getRequestModes());
     }
 
     traveltimeRequest =
@@ -113,7 +113,7 @@ public class TravelTimeResource {
         routingRequest
           .preferences()
           .street()
-          .maxAccessEgressDuration(routingRequest.modes.accessMode)
+          .maxAccessEgressDuration(routingRequest.journey().access().mode())
       );
 
     if (time != null) {
@@ -250,7 +250,7 @@ public class TravelTimeResource {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
       new RoutingContext(accessRequest, graph, temporaryVertices),
       transitService,
-      routingRequest.modes.accessMode,
+      routingRequest.journey().access().mode(),
       false
     );
     return new AccessEgressMapper().mapNearbyStops(accessStops, false);

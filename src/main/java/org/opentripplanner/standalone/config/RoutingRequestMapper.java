@@ -172,7 +172,7 @@ public class RoutingRequestMapper {
         c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
       );
 
-    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes());
+    request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
 
     preferences
       .transfer()

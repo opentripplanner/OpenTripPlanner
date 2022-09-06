@@ -221,7 +221,7 @@ public class TransmodelGraphQLPlanner {
 
     RequestModes modes = getModes(environment, callWith);
     if (modes != null) {
-      request.modes = modes;
+      request.journey().setModes(modes);
     }
     ItineraryFiltersInputType.mapToRequest(
       environment,

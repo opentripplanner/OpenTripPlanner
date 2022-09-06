@@ -87,10 +87,11 @@ public class RoutingWorker {
   public RoutingResponse route() {
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
-    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
+      request.journey().direct().mode()
+    );
 
-    request.modes =
-      request.modes.copy().withDirectMode(emptyDirectModeHandler.resolveDirectMode()).build();
+    request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -153,8 +154,7 @@ public class RoutingWorker {
     this.debugTimingAggregator.finishedFiltering();
 
     // Restore original directMode.
-    request.modes =
-      request.modes.copy().withDirectMode(emptyDirectModeHandler.originalDirectMode()).build();
+    request.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).

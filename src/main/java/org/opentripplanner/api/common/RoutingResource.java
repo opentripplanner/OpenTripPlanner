@@ -909,7 +909,7 @@ public abstract class RoutingResource {
     }
     /* Temporary code to get bike/car parking and renting working. */
     if (modes != null && !modes.qModes.isEmpty()) {
-      request.modes = modes.getRequestModes();
+      request.journey().setModes(modes.getRequestModes());
     }
 
     if (request.vehicleRental && bikeSpeed == null) {

@@ -64,7 +64,7 @@ public class SpeedTestRequest {
     request.setFrom(input.fromPlace());
     request.setTo(input.toPlace());
     request.setNumItineraries(opts.numOfItineraries());
-    request.modes = input.modes();
+    request.journey().setModes(input.modes());
 
     pref
       .transit()

@@ -26,7 +26,7 @@ public class McCostParamsMapper {
       .transferCost(preferences.transfer().cost())
       .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
-    if (request.modes.transferMode == StreetMode.BIKE) {
+    if (request.journey().transfer().mode() == StreetMode.BIKE) {
       builder.boardCost(preferences.bike().boardCost());
     } else {
       builder.boardCost(preferences.walk().boardCost());

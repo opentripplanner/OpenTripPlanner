@@ -1,13 +1,17 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 // TODO VIA: Javadoc
 public class TransitRequest implements Cloneable, Serializable {
+
+  private List<MainAndSubMode> modes = MainAndSubMode.all();
 
   private List<FeedScopedId> whiteListedAgencies = List.of();
   private List<FeedScopedId> bannedAgencies = List.of();
@@ -19,6 +23,14 @@ public class TransitRequest implements Cloneable, Serializable {
   private List<FeedScopedId> unpreferredRoutes = List.of();
   private List<FeedScopedId> bannedTrips = List.of();
   private DebugRaptor raptorDebugging = new DebugRaptor();
+
+  public void setModes(List<MainAndSubMode> modes) {
+    this.modes = modes;
+  }
+
+  public List<MainAndSubMode> modes() {
+    return modes;
+  }
 
   public void setWhiteListedAgenciesFromSting(String s) {
     if (!s.isEmpty()) {
@@ -166,6 +178,7 @@ public class TransitRequest implements Cloneable, Serializable {
     try {
       var clone = (TransitRequest) super.clone();
 
+      clone.modes = new ArrayList<>(this.modes);
       clone.whiteListedAgencies = List.copyOf(this.whiteListedAgencies);
       clone.bannedAgencies = List.copyOf(this.bannedAgencies);
       clone.preferredAgencies = List.copyOf(this.preferredAgencies);

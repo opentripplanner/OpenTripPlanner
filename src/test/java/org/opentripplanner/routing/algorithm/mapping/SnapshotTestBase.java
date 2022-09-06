@@ -274,15 +274,15 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    var transitModes = mapModes(request.modes.transitModes);
+    var transitModes = mapModes(request.journey().transit().modes());
 
     var modes = Stream
       .concat(
         Stream
           .of(
-            asQualifiedMode(request.modes.directMode, false),
-            asQualifiedMode(request.modes.accessMode, false),
-            asQualifiedMode(request.modes.egressMode, true)
+            asQualifiedMode(request.journey().direct().mode(), false),
+            asQualifiedMode(request.journey().access().mode(), false),
+            asQualifiedMode(request.journey().egress().mode(), true)
           )
           .filter(Objects::nonNull)
           .map(QualifiedMode::toString),

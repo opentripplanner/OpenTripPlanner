@@ -57,7 +57,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
-  /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
   /**
    * How close to do you have to be to the start or end to be considered "close".
    *
@@ -65,7 +64,8 @@ public class RouteRequest implements Cloneable, Serializable {
    * @see DominanceFunction#betterOrEqualAndComparable(State, State)
    */
   private static final int MAX_CLOSENESS_METERS = 500;
-  /** The complete list of incoming query parameters. */
+
+  /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
   private GenericLocation from;
 
@@ -80,13 +80,6 @@ public class RouteRequest implements Cloneable, Serializable {
   @Deprecated
   public List<GenericLocation> intermediatePlaces;
 
-  /**
-   * The access/egress/direct/transit modes allowed for this main request. The parameter
-   * "streetSubRequestModes" below is used for a single A Star sub request.
-   * <p>
-   * // TODO OTP2 Street routing requests should eventually be split into its own request class.
-   */
-  public RequestModes modes = RequestModes.defaultRequestModes();
   /**
    * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //
    * TODO OTP2 Street routing requests should eventually be split into its own request class.
@@ -164,10 +157,6 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   /* ACCESSOR/SETTER METHODS */
-  public RouteRequest(RequestModes modes) {
-    this();
-    this.modes = modes;
-  }
 
   public void setArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
@@ -256,7 +245,7 @@ public class RouteRequest implements Cloneable, Serializable {
         arriveBy = false;
       }
       setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
-      modes = modes.copy().withDirectMode(StreetMode.NOT_SET).build();
+      journey.setModes(journey.modes().copy().withDirectMode(StreetMode.NOT_SET).build());
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }
