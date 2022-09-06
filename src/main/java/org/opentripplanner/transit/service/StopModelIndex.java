@@ -38,8 +38,10 @@ class StopModelIndex {
 
     var allStops = new CollectionsView<StopLocation>(stops, flexStops, groupStops);
     for (StopLocation it : allStops) {
-      Envelope envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
-      regularStopSpatialIndex.insert(envelope, it);
+      if (it instanceof RegularStop regularStop) {
+        var envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
+        regularStopSpatialIndex.insert(envelope, regularStop);
+      }
       stopsByIndex[it.getIndex()] = it;
     }
 
