@@ -11,21 +11,30 @@ import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class StreetEdgeTest {
+
+  private static final double ONE_THIRD = 1 / 3.0;
+  private static final double DELTA = 0.00001;
+  private static final double SPEED = 6.0;
 
   private Graph graph;
   private IntersectionVertex v0, v1, v2;
@@ -334,5 +343,82 @@ public class StreetEdgeTest {
     var edge = new StreetEdge(vA, vB, geom, name, length, perm, false);
     StreetElevationExtension.addToEdge(edge, elevationProfile, false);
     return edge;
+  }
+
+  @Test
+  public void testBikeOptimizeTriangle() {
+    // This test does not depend on the setup method - and can probably be simplified
+
+    Coordinate c1 = new Coordinate(-122.575033, 45.456773);
+    Coordinate c2 = new Coordinate(-122.576668, 45.451426);
+
+    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, (NonLocalizedString) null);
+    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, (NonLocalizedString) null);
+
+    GeometryFactory factory = new GeometryFactory();
+    LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+
+    double length = 650.0;
+
+    StreetEdge testStreet = new StreetEdge(
+      v1,
+      v2,
+      geometry,
+      "Test Lane",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
+    testStreet.setBicycleSafetyFactor(0.74f); // a safe street
+
+    Coordinate[] profile = new Coordinate[] {
+      new Coordinate(0, 0), // slope = 0.1
+      new Coordinate(length / 2, length / 20.0),
+      new Coordinate(length, 0), // slope = -0.1
+    };
+    PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
+    StreetElevationExtension.addToEdge(testStreet, elev, false);
+
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
+    double trueLength = costs.lengthMultiplier * length;
+    double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
+    double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
+
+    var request = new RouteRequest(TraverseMode.BICYCLE);
+
+    var bikePreferences = request.preferences().bike();
+    bikePreferences.setOptimizeType(BicycleOptimizeType.TRIANGLE);
+    bikePreferences.setSpeed(SPEED);
+    request.preferences().setNonTransitReluctance(1);
+
+    bikePreferences.initOptimizeTriangle(1, 0, 0);
+    State startState = new State(v1, request, null);
+    State result = testStreet.traverse(startState);
+    double timeWeight = result.getWeight();
+    double expectedTimeWeight = slopeSpeedLength / SPEED;
+    assertEquals(expectedTimeWeight, result.getWeight(), DELTA);
+
+    bikePreferences.initOptimizeTriangle(0, 1, 0);
+    startState = new State(v1, request, null);
+    result = testStreet.traverse(startState);
+    double slopeWeight = result.getWeight();
+    double expectedSlopeWeight = slopeWorkLength / SPEED;
+    assertEquals(expectedSlopeWeight, slopeWeight, DELTA);
+    assertTrue(length * 1.5 / SPEED < slopeWeight);
+    assertTrue(length * 1.5 * 10 / SPEED > slopeWeight);
+
+    bikePreferences.initOptimizeTriangle(0, 0, 1);
+    startState = new State(v1, request, null);
+    result = testStreet.traverse(startState);
+    double slopeSafety = costs.slopeSafetyCost;
+    double safetyWeight = result.getWeight();
+    double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / SPEED;
+    assertEquals(expectedSafetyWeight, safetyWeight, DELTA);
+
+    bikePreferences.initOptimizeTriangle(ONE_THIRD, ONE_THIRD, ONE_THIRD);
+    startState = new State(v1, request, null);
+    result = testStreet.traverse(startState);
+    double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;
+    assertEquals(expectedWeight, result.getWeight(), DELTA);
   }
 }

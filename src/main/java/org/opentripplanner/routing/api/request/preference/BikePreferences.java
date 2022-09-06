@@ -25,11 +25,7 @@ public class BikePreferences implements Cloneable, Serializable {
   private int parkTime = 60;
   /** Cost of parking a bike. */
   private int parkCost = 120;
-
-  // TODO VIA: Make these three a record with normalization in constructor
-  private double triangleTimeFactor;
-  private double triangleSlopeFactor;
-  private double triangleSafetyFactor;
+  private TimeSlopeSafetyTriangle optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
 
   public BikePreferences clone() {
     try {
@@ -41,38 +37,6 @@ public class BikePreferences implements Cloneable, Serializable {
   }
 
   /**
-   * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
-   * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and
-   * should add up to 1. This setter function accepts any three numbers and will normalize them to
-   * add up to 1.
-   */
-  public void setTriangleNormalized(double safe, double slope, double time) {
-    if (safe == 0 && slope == 0 && time == 0) {
-      var oneThird = 1f / 3;
-      safe = oneThird;
-      slope = oneThird;
-      time = oneThird;
-    }
-    safe = positiveValueOrZero(safe);
-    slope = positiveValueOrZero(slope);
-    time = positiveValueOrZero(time);
-
-    double total = safe + slope + time;
-    if (total != 1) {
-      LOG.warn(
-        "Bicycle triangle factors don't add up to 1. Values will be scaled proportionally to each other."
-      );
-    }
-
-    safe /= total;
-    slope /= total;
-    time /= total;
-    this.triangleSafetyFactor = safe;
-    this.triangleSlopeFactor = slope;
-    this.triangleTimeFactor = time;
-  }
-
-  /**
    * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
    */
   public BicycleOptimizeType optimizeType() {
@@ -81,6 +45,18 @@ public class BikePreferences implements Cloneable, Serializable {
 
   public void setOptimizeType(BicycleOptimizeType optimizeType) {
     this.optimizeType = optimizeType;
+  }
+
+  public TimeSlopeSafetyTriangle optimizeTriangle() {
+    return optimizeTriangle;
+  }
+
+  /**
+   * Sets the bicycle optimize triangle routing parameters. See {@link TimeSlopeSafetyTriangle}
+   * for details.
+   */
+  public void initOptimizeTriangle(double time, double slope, double safety) {
+    this.optimizeTriangle = new TimeSlopeSafetyTriangle(time, slope, safety);
   }
 
   /**
@@ -176,41 +152,5 @@ public class BikePreferences implements Cloneable, Serializable {
 
   public int parkCost() {
     return parkCost;
-  }
-
-  /**
-   * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor
-   * == 1
-   */
-  public double triangleTimeFactor() {
-    return triangleTimeFactor;
-  }
-
-  public void setTriangleTimeFactor(double triangleTimeFactor) {
-    this.triangleTimeFactor = triangleTimeFactor;
-  }
-
-  /** For the bike triangle, how important slope is */
-  public double triangleSlopeFactor() {
-    return triangleSlopeFactor;
-  }
-
-  public void setTriangleSlopeFactor(double triangleSlopeFactor) {
-    this.triangleSlopeFactor = triangleSlopeFactor;
-  }
-
-  /** For the bike triangle, how important safety is */
-  public double triangleSafetyFactor() {
-    return triangleSafetyFactor;
-  }
-
-  public void setTriangleSafetyFactor(double triangleSafetyFactor) {
-    this.triangleSafetyFactor = triangleSafetyFactor;
-  }
-
-  /* private methods */
-
-  private double positiveValueOrZero(double value) {
-    return Math.max(0, value);
   }
 }

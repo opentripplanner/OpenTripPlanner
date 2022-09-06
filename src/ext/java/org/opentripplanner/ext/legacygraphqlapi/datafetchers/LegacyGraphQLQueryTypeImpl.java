@@ -703,13 +703,11 @@ public class LegacyGraphQLQueryTypeImpl
 
         if (optimize == BicycleOptimizeType.TRIANGLE) {
           // because we must use a final variable in the lambda we have to use this ugly crutch.
-          // Arguments: [ safety, slope, time ]
           final double[] args = new double[3];
-
-          callWith.argument("triangle.safetyFactor", (Double v) -> args[0] = v);
+          callWith.argument("triangle.timeFactor", (Double v) -> args[0] = v);
           callWith.argument("triangle.slopeFactor", (Double v) -> args[1] = v);
-          callWith.argument("triangle.timeFactor", (Double v) -> args[2] = v);
-          preferences.bike().setTriangleNormalized(args[0], args[1], args[2]);
+          callWith.argument("triangle.safetyFactor", (Double v) -> args[2] = v);
+          preferences.bike().initOptimizeTriangle(args[0], args[1], args[2]);
         }
 
         if (optimize != null) {

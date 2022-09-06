@@ -857,7 +857,7 @@ public abstract class RoutingResource {
       if (optimize == BicycleOptimizeType.TRIANGLE) {
         preferences
           .bike()
-          .setTriangleNormalized(triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor);
+          .initOptimizeTriangle(triangleTimeFactor, triangleSlopeFactor, triangleSafetyFactor);
       }
     }
 

@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransfe
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -92,9 +93,7 @@ public class RaptorRequestTransferCache {
 
     private final StreetMode transferMode;
     private final BicycleOptimizeType optimize;
-    private final double bikeTriangleSafetyFactor;
-    private final double bikeTriangleSlopeFactor;
-    private final double bikeTriangleTimeFactor;
+    private final TimeSlopeSafetyTriangle bikeOptimizeTimeSlopeSafety;
     private final WheelchairAccessibilityPreferences wheelchairAccessibility;
     private final double walkSpeed;
     private final double bikeSpeed;
@@ -115,9 +114,7 @@ public class RaptorRequestTransferCache {
       this.transferMode = routingRequest.modes.transferMode;
 
       this.optimize = preferences.bike().optimizeType();
-      this.bikeTriangleSafetyFactor = preferences.bike().triangleSafetyFactor();
-      this.bikeTriangleSlopeFactor = preferences.bike().triangleSlopeFactor();
-      this.bikeTriangleTimeFactor = preferences.bike().triangleTimeFactor();
+      this.bikeOptimizeTimeSlopeSafety = preferences.bike().optimizeTriangle();
       this.bikeSwitchCost = preferences.bike().switchCost();
       this.bikeSwitchTime = preferences.bike().switchTime();
 
@@ -142,9 +139,7 @@ public class RaptorRequestTransferCache {
       return Objects.hash(
         transferMode,
         optimize,
-        bikeTriangleSafetyFactor,
-        bikeTriangleSlopeFactor,
-        bikeTriangleTimeFactor,
+        bikeOptimizeTimeSlopeSafety,
         wheelchairAccessibility,
         walkSpeed,
         bikeSpeed,
@@ -171,15 +166,13 @@ public class RaptorRequestTransferCache {
       }
       final StreetRelevantOptions that = (StreetRelevantOptions) o;
       return (
-        Double.compare(that.bikeTriangleSafetyFactor, bikeTriangleSafetyFactor) == 0 &&
-        Double.compare(that.bikeTriangleSlopeFactor, bikeTriangleSlopeFactor) == 0 &&
-        Double.compare(that.bikeTriangleTimeFactor, bikeTriangleTimeFactor) == 0 &&
         Double.compare(that.walkSpeed, walkSpeed) == 0 &&
         Double.compare(that.bikeSpeed, bikeSpeed) == 0 &&
         Double.compare(that.walkReluctance, walkReluctance) == 0 &&
         Double.compare(that.stairsReluctance, stairsReluctance) == 0 &&
         Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
         Double.compare(that.turnReluctance, turnReluctance) == 0 &&
+        Objects.equals(that.bikeOptimizeTimeSlopeSafety, bikeOptimizeTimeSlopeSafety) &&
         wheelchairAccessibility.equals(that.wheelchairAccessibility) &&
         elevatorBoardCost == that.elevatorBoardCost &&
         elevatorBoardTime == that.elevatorBoardTime &&

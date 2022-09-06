@@ -93,7 +93,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
     BikePreferences bikePreferences = request.preferences().bike();
     bikePreferences.setOptimizeType(BicycleOptimizeType.TRIANGLE);
-    bikePreferences.setTriangleNormalized(0.3, 0.4, 0.3);
+    bikePreferences.initOptimizeTriangle(0.3, 0.4, 0.3);
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitModes().build();
     request.setFrom(p1);

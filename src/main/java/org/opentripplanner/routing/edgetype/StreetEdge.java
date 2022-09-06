@@ -1140,11 +1140,11 @@ public class StreetEdge
         double slope = getEffectiveBikeDistanceForWorkCost();
         weight =
           quick *
-          pref.bike().triangleTimeFactor() +
+          pref.bike().optimizeTriangle().time() +
           slope *
-          pref.bike().triangleSlopeFactor() +
+          pref.bike().optimizeTriangle().slope() +
           safety *
-          pref.bike().triangleSafetyFactor();
+          pref.bike().optimizeTriangle().safety();
         weight /= speed;
       }
       default -> weight = getDistanceMeters() / speed;

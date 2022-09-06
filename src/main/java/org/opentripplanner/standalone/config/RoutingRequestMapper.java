@@ -63,18 +63,10 @@ public class RoutingRequestMapper {
     preferences.bike().setSpeed(c.asDouble("bikeSpeed", preferences.bike().speed()));
     preferences
       .bike()
-      .setTriangleSafetyFactor(
-        c.asDouble("bikeTriangleSafetyFactor", preferences.bike().triangleSafetyFactor())
-      );
-    preferences
-      .bike()
-      .setTriangleSlopeFactor(
-        c.asDouble("bikeTriangleSlopeFactor", preferences.bike().triangleSlopeFactor())
-      );
-    preferences
-      .bike()
-      .setTriangleTimeFactor(
-        c.asDouble("bikeTriangleTimeFactor", preferences.bike().triangleTimeFactor())
+      .initOptimizeTriangle(
+        c.asDouble("bikeTriangleTimeFactor", preferences.bike().optimizeTriangle().time()),
+        c.asDouble("bikeTriangleSlopeFactor", preferences.bike().optimizeTriangle().slope()),
+        c.asDouble("bikeTriangleSafetyFactor", preferences.bike().optimizeTriangle().safety())
       );
     preferences.bike().setSwitchTime(c.asInt("bikeSwitchTime", preferences.bike().switchTime()));
     preferences.bike().setSwitchCost(c.asInt("bikeSwitchCost", preferences.bike().switchCost()));

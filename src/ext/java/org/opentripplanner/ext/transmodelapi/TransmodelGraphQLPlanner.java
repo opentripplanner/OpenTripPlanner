@@ -132,14 +132,14 @@ public class TransmodelGraphQLPlanner {
     BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
     if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-      // Arguments: [ safety, slope, time ]
+      // Arguments: [ time, slope, safety ]
       final double[] args = new double[3];
 
-      callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+      callWith.argument("triangleFactors.time", (Double v) -> args[0] = v);
       callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
-      callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
+      callWith.argument("triangleFactors.safety", (Double v) -> args[2] = v);
 
-      preferences.bike().setTriangleNormalized(args[0], args[1], args[2]);
+      preferences.bike().initOptimizeTriangle(args[0], args[1], args[2]);
     }
 
     if (bicycleOptimizeType != null) {
