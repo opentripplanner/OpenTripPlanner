@@ -13,13 +13,19 @@ import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.FareContainer;
+import org.onebusaway.gtfs.model.FareLegRule;
+import org.onebusaway.gtfs.model.FareProduct;
+import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.Pathway;
+import org.onebusaway.gtfs.model.RiderCategory;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopArea;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -48,6 +54,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GtfsModule implements GraphBuilderModule {
+
+  public static final Set<Class<?>> FARES_V2_CLASSES = Set.of(
+    FareProduct.class,
+    FareLegRule.class,
+    FareTransferRule.class,
+    RiderCategory.class,
+    FareContainer.class,
+    StopArea.class
+  );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
   private final EntityHandler counter = new EntityCounter();
@@ -265,7 +280,11 @@ public class GtfsModule implements GraphBuilderModule {
     if (LOG.isDebugEnabled()) reader.addEntityHandler(counter);
 
     for (Class<?> entityClass : reader.getEntityClasses()) {
-      LOG.info("reading entities: " + entityClass.getName());
+      if (skipEntityClass(entityClass)) {
+        LOG.info("Skipping entity: " + entityClass.getName());
+        continue;
+      }
+      LOG.info("Reading entity: " + entityClass.getName());
       reader.readEntities(entityClass);
       store.flush();
       // NOTE that agencies are first in the list and read before all other entity types, so it is effective to
@@ -322,12 +341,24 @@ public class GtfsModule implements GraphBuilderModule {
     for (FareAttribute fareAttribute : store.getAllEntitiesForType(FareAttribute.class)) {
       fareAttribute.getId().setAgencyId(reader.getDefaultAgencyId());
     }
+    for (var fareProduct : store.getAllEntitiesForType(FareProduct.class)) {
+      fareProduct.getId().setAgencyId(reader.getDefaultAgencyId());
+    }
     for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
       pathway.getId().setAgencyId(reader.getDefaultAgencyId());
     }
 
     store.close();
     return store.dao;
+  }
+
+  /**
+   * Since GTFS Fares V2 is a very new, constantly evolving standard there might be a lot of errors
+   * in the data. We only want to try to parse them when the feature flag is explicitly enabled as
+   * it can easily lead to graph build failures.
+   */
+  private boolean skipEntityClass(Class<?> entityClass) {
+    return OTPFeature.FaresV2.isOff() && FARES_V2_CLASSES.contains(entityClass);
   }
 
   /**

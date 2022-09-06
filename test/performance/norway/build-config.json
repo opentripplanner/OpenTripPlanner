@@ -9,7 +9,6 @@
   "areaVisibility": true,
   "platformEntriesLinking": true,
   "matchBusRoutesToStreets": false,
-  "osmWayPropertySet": "norway",
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
   "maxDataImportIssuesPerFile": 1000,
@@ -23,8 +22,12 @@
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "boardingLocationTags": [],
-  "timeZone": "Europe/Oslo",
-  "netex": {
+  "transitModelTimeZone": "Europe/Oslo",
+  "osmDefaults": {
+    "osmTagMapping": "norway",
+    "timeZone": "Europe/Oslo"
+  },
+  "netexDefaults": {
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
     "groupFilePattern": "(\\w{3})_.*\\.xml",

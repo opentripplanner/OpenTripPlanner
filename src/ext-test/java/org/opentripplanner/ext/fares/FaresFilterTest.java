@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -27,16 +28,16 @@ public class FaresFilterTest implements PlanTestConstants {
 
     List<Itinerary> input = List.of(i1, i1, i1);
 
-    input.forEach(i -> assertEquals(Fare.empty(), i.getFare()));
+    input.forEach(i -> assertEquals(ItineraryFares.empty(), i.getFares()));
 
-    var twoEighty = new Fare();
-    twoEighty.addFare(Fare.FareType.regular, Money.euros(280));
+    var twoEighty = new ItineraryFares();
+    twoEighty.addFare(FareType.regular, Money.euros(280));
 
     var filter = new FaresFilter((FareService) itinerary -> twoEighty);
     var filtered = filter.filter(input);
 
     filtered.forEach(i -> {
-      assertEquals(twoEighty, i.getFare());
+      assertEquals(twoEighty, i.getFares());
     });
   }
 }

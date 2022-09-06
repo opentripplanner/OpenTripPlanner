@@ -27,6 +27,8 @@ public class OSMWithTags {
 
   protected I18NString creativeName;
 
+  private OSMProvider osmProvider;
+
   public static boolean isFalse(String tagValue) {
     return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
   }
@@ -378,6 +380,14 @@ public class OSMWithTags {
       .map(String::strip)
       .filter(v -> !v.isBlank())
       .collect(Collectors.toSet());
+  }
+
+  public OSMProvider getOsmProvider() {
+    return osmProvider;
+  }
+
+  public void setOsmProvider(OSMProvider provider) {
+    this.osmProvider = provider;
   }
 
   /**

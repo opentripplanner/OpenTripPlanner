@@ -43,13 +43,17 @@ class VehicleParkingUpdaterTest {
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
 
-    var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
-    vehicleParkingUpdater = new VehicleParkingUpdater(parameters, dataSource);
-
     transitModel.index();
     graph.index(transitModel.getStopModel());
 
-    vehicleParkingUpdater.setup(graph, transitModel);
+    var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
+    vehicleParkingUpdater =
+      new VehicleParkingUpdater(
+        parameters,
+        dataSource,
+        graph.getLinker(),
+        graph.getVehicleParkingService()
+      );
   }
 
   @Test

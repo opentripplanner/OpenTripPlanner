@@ -65,6 +65,10 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareRuleMapper fareRuleMapper;
 
+  private final FareProductMapper fareProductMapper;
+
+  private final FareLegRuleMapper fareLegRuleMapper;
+
   private final DirectionMapper directionMapper;
 
   private final DataImportIssueStore issueStore;
@@ -102,7 +106,7 @@ public class GTFSToOtpTransitServiceMapper {
     locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
-    routeMapper = new RouteMapper(agencyMapper, issueStore);
+    routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
     directionMapper = new DirectionMapper(issueStore);
     tripMapper = new TripMapper(routeMapper, directionMapper);
     bookingRuleMapper = new BookingRuleMapper();
@@ -116,6 +120,8 @@ public class GTFSToOtpTransitServiceMapper {
       );
     frequencyMapper = new FrequencyMapper(tripMapper);
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
+    fareProductMapper = new FareProductMapper();
+    fareLegRuleMapper = new FareLegRuleMapper(fareProductMapper, issueStore);
   }
 
   public OtpTransitServiceBuilder getBuilder() {
@@ -153,6 +159,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
     fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
+    fareRulesBuilder.fareLegRules().addAll(fareLegRuleMapper.map(data.getAllFareLegRules()));
 
     mapAndAddTransfersToBuilder();
   }

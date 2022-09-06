@@ -55,7 +55,7 @@ public class StreetLeg implements Leg {
     this.from = builder.getFrom();
     this.to = builder.getTo();
     this.generalizedCost = builder.getGeneralizedCost();
-    this.legElevation = normalizeElevation(builder.getElevation());
+    this.legElevation = builder.getElevation();
     this.legGeometry = builder.getGeometry();
     this.walkSteps = builder.getWalkSteps();
     this.elevationGained = calculateElevationGained(legElevation);
@@ -127,9 +127,16 @@ public class StreetLeg implements Leg {
     return legGeometry;
   }
 
-  @Override
-  public List<P2<Double>> getLegElevation() {
+  List<P2<Double>> getRawLegElevation() {
     return legElevation;
+  }
+
+  /**
+   * Get elevation profile, with values rounded to two decimals.
+   */
+  @Override
+  public List<P2<Double>> getRoundedLegElevation() {
+    return normalizeElevation(legElevation);
   }
 
   @Override

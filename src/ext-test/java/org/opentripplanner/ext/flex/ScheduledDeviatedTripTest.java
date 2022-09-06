@@ -27,7 +27,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -143,9 +143,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
 
     var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.getFare().fare.isEmpty());
+    assertFalse(itinerary.getFares().getTypes().isEmpty());
 
-    assertEquals(Money.usDollars(250), itinerary.getFare().getFare(FareType.regular));
+    assertEquals(Money.usDollars(250), itinerary.getFares().getFare(FareType.regular));
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }

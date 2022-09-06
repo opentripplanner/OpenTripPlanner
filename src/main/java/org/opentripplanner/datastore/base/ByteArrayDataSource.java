@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 
@@ -50,6 +51,11 @@ public class ByteArrayDataSource implements DataSource {
   @Override
   public String path() {
     return path;
+  }
+
+  @Override
+  public URI uri() {
+    return URI.create(path());
   }
 
   @Override

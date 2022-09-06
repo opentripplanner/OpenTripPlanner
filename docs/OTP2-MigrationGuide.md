@@ -68,6 +68,8 @@ of this type:
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
 
+Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` nodes.
+
 OTP2 records the "parentStation" relationship between stops and stations in its internal transit
 model, based on the GTFS and/or NeTEx input. This enables OTP to search from all stop in a station
 _without_ walking/waiting when the request from/to input field is a station id. There is no way to
@@ -286,4 +288,6 @@ The scripting API endpoint has been removed.
   citi-bike-nyc*, *jcdecaux*, *keolis-rennes*, *kml*, *next-bike*, *ov-fiets*, *sf-bay-area*, *
   share-bike*, *smoove*, *uip-bike*, and *vcub*. Use the standard *gtfs* updater instead, or
   reintroduce your custom updater as a Sandbox module.
+- The `logFrequency`, `maxSnapshotFrequency`, `purgeExpiredData` updater parameters are moved from 
+  the individual updaters to `timetableUpdates`(root level in the router config).  
 

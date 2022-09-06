@@ -18,7 +18,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -44,11 +43,13 @@ import org.slf4j.LoggerFactory;
 public class TimetableSnapshot {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
+
   /**
    * A set of all timetables which have been modified and are waiting to be indexed. When
    * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
    */
   private final Set<Timetable> dirtyTimetables = new HashSet<>();
+
   /**
    * The timetables for different days, for each TripPattern (each sequence of stops on a particular
    * Route) for which we have an updated Timetable. The keys include both TripPatterns from the
@@ -60,6 +61,7 @@ public class TimetableSnapshot {
    * FIXME: this could be made into a flat hashtable with compound keys.
    */
   private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
+
   /**
    * <p>
    * Map containing the current trip pattern given a trip id and a service date, if it has been
@@ -69,8 +71,10 @@ public class TimetableSnapshot {
    * This is a HashMap and not a Map so the clone function is available.
    */
   private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
+
   private HashMap<FeedScopedId, TripOnServiceDate> realtimeAddedTripOnServiceDate = new HashMap<>();
   private HashMap<TripIdAndServiceDate, TripOnServiceDate> realtimeAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
+
   /**
    * This maps contains all of the new or updated TripPatterns added by realtime data indexed on
    * stop. This has to be kept in order for them to be included in the stop times api call on a
@@ -81,11 +85,13 @@ public class TimetableSnapshot {
    * TODO Find a generic way to keep all realtime indexes.
    */
   private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
+
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
    * shouldn't be possible to change it to false anymore.
    */
   private boolean readOnly = false;
+
   /**
    * Boolean value indicating that this timetable snapshot contains changes compared to the state of
    * the last commit if true.

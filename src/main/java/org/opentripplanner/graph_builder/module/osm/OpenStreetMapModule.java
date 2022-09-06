@@ -107,10 +107,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   public boolean skipVisibility = false;
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
-  /**
-   * WayPropertySet computes edge properties from OSM way data.
-   */
-  public WayPropertySet wayPropertySet = new WayPropertySet();
+
   /**
    * Allows for arbitrary custom naming of edges.
    */
@@ -140,9 +137,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
 
   private final Graph graph;
-  private final ZoneId timeZoneId;
-
-  private boolean hasWarnedAboutMissingTimeZone = false;
 
   public OpenStreetMapModule(
     Collection<OpenStreetMapProvider> providers,
@@ -154,7 +148,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
-    this.timeZoneId = timeZoneId;
     this.issueStore = issueStore;
   }
 
@@ -168,7 +161,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   ) {
     this(List.copyOf(providers), boardingAreaRefTags, graph, timeZoneId, issueStore);
     this.customNamer = config.customNamer;
-    this.setDefaultWayPropertySetSource(config.osmWayPropertySet);
+    this.setDefaultWayPropertySetSource(config.osmDefaults.osmWayPropertySetSource);
     this.skipVisibility = !config.areaVisibility;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
@@ -184,21 +177,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
    * @param source the way properties source
    */
   public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
-    wayPropertySet = new WayPropertySet();
-    source.populateProperties(wayPropertySet);
     wayPropertySetSource = source;
   }
 
   @Override
   public void buildGraph() {
     this.osmOpeningHoursParser =
-      new OSMOpeningHoursParser(
-        graph.getOpeningHoursCalendarService(),
-        this::getTimeZone,
-        issueStore
-      );
+      new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
 
-    OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags, this::getTimeZone);
+    OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
       LOG.info("Gathering OSM from provider: " + provider);
@@ -316,14 +303,23 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       WayProperties wayData,
       OSMWithTags way
     ) {
-      Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
-      boolean motorVehicleNoThrough = wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(
+      WayPropertySetSource wayPropertySetSourceForWay = way
+        .getOsmProvider()
+        .getWayPropertySetSource();
+
+      Set<T2<StreetNote, NoteMatcher>> notes = way
+        .getOsmProvider()
+        .getWayPropertySet()
+        .getNoteForWay(way);
+      boolean motorVehicleNoThrough = wayPropertySetSourceForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
         way
       );
-      boolean bicycleNoThrough = wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(
+      boolean bicycleNoThrough = wayPropertySetSourceForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(
         way
       );
-      boolean walkNoThrough = wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(way);
+      boolean walkNoThrough = wayPropertySetSourceForWay.isWalkNoThroughTrafficExplicitlyDisallowed(
+        way
+      );
 
       if (street != null) {
         double bicycleSafety = wayData.getBicycleSafetyFeatures().first;
@@ -552,7 +548,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
         graph,
         osmdb,
-        wayPropertySet,
         this,
         issueStore,
         maxAreaNodes,
@@ -780,11 +775,17 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private OHCalendar parseOpeningHours(OSMWithTags entity) {
       final var openingHoursTag = entity.getTag("opening_hours");
-      final var id = entity.getId();
-      final var link = entity.getOpenStreetMapLink();
       if (openingHoursTag != null) {
+        final ZoneId zoneId = entity.getOsmProvider().getZoneId();
+        final var id = entity.getId();
+        final var link = entity.getOpenStreetMapLink();
         try {
-          return osmOpeningHoursParser.parseOpeningHours(openingHoursTag, String.valueOf(id), link);
+          return osmOpeningHoursParser.parseOpeningHours(
+            openingHoursTag,
+            String.valueOf(id),
+            link,
+            zoneId
+          );
         } catch (OpeningHoursParseException e) {
           issueStore.add(
             "OSMOpeningHoursUnparsed",
@@ -803,7 +804,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       I18NString creativeName = osmWithTags.getAssumedName();
       if (creativeName == null) {
         // ... otherwise resort to "CreativeNamer"s
-        creativeName = wayPropertySet.getCreativeNameForWay(osmWithTags);
+        creativeName =
+          osmWithTags.getOsmProvider().getWayPropertySet().getCreativeNameForWay(osmWithTags);
       }
       if (creativeName == null) {
         creativeName =
@@ -911,7 +913,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       LOG.info(progress.startMessage());
 
       WAY:for (OSMWay way : osmdb.getWays()) {
-        WayProperties wayData = wayPropertySet.getDataForWay(way);
+        WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
         setWayName(way);
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(
           way,
@@ -1067,7 +1069,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void setWayName(OSMWithTags way) {
       if (!way.hasTag("name")) {
-        I18NString creativeName = wayPropertySet.getCreativeNameForWay(way);
+        I18NString creativeName = way
+          .getOsmProvider()
+          .getWayPropertySet()
+          .getCreativeNameForWay(way);
         if (creativeName != null) {
           //way.addTag("otp:gen_name", creativeName);
           way.setCreativeName(creativeName);
@@ -1573,7 +1578,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       label = label.intern();
       I18NString name = getNameForWay(way, label);
 
-      float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
+      float carSpeed = way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, back);
 
       StreetEdge street = new StreetEdge(
         startEndpoint,
@@ -1629,7 +1634,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         street.setWheelchairAccessible(false);
       }
 
-      street.setSlopeOverride(wayPropertySet.getSlopeOverride(way));
+      street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
 
       // < 0.04: account for
       if (carSpeed < 0.04) {
@@ -1678,17 +1683,5 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
       return vertices.get(level);
     }
-  }
-
-  private ZoneId getTimeZone() {
-    if (timeZoneId == null) {
-      if (!hasWarnedAboutMissingTimeZone) {
-        hasWarnedAboutMissingTimeZone = true;
-        LOG.warn(
-          "Missing time zone - time-restricted entities will not be created, please configure it in the build-config.json"
-        );
-      }
-    }
-    return timeZoneId;
   }
 }

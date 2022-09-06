@@ -11,9 +11,9 @@ import org.opentripplanner.common.model.RouteOriginDestination;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +28,8 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
 
-  public Fare getCost(Itinerary itinerary) {
-    Fare fare = super.getCost(itinerary);
+  public ItineraryFares getCost(Itinerary itinerary) {
+    ItineraryFares fare = super.getCost(itinerary);
     if (fare == null) {
       itinerary.setFare(null);
     }

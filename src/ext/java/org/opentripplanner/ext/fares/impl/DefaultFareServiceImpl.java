@@ -16,13 +16,14 @@ import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.FareZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +77,6 @@ class FareAndId {
  */
 public class DefaultFareServiceImpl implements FareService {
 
-  private static final long serialVersionUID = 20120229L;
-
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
@@ -96,7 +95,7 @@ public class DefaultFareServiceImpl implements FareService {
   }
 
   @Override
-  public Fare getCost(Itinerary itinerary) {
+  public ItineraryFares getCost(Itinerary itinerary) {
     var fareLegs = itinerary
       .getLegs()
       .stream()
@@ -113,7 +112,7 @@ public class DefaultFareServiceImpl implements FareService {
       return null;
     }
 
-    Fare fare = new Fare();
+    ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
     for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
       FareType fareType = kv.getKey();
@@ -136,10 +135,6 @@ public class DefaultFareServiceImpl implements FareService {
     }
     int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
     return new Money(currency, cents);
-  }
-
-  protected float addFares(List<Leg> ride0, List<Leg> ride1, float cost0, float cost1) {
-    return cost0 + cost1;
   }
 
   protected float getLowestCost(
@@ -168,7 +163,7 @@ public class DefaultFareServiceImpl implements FareService {
    * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
   protected boolean populateFare(
-    Fare fare,
+    ItineraryFares fare,
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -193,11 +188,13 @@ public class DefaultFareServiceImpl implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
-      FareComponent detail = new FareComponent(fareId, getMoney(currency, cost));
+
+      var routes = new ArrayList<FeedScopedId>();
       for (int i = start; i <= via; ++i) {
-        detail.addRoute(legs.get(i).getRoute().getId());
+        routes.add(legs.get(i).getRoute().getId());
       }
-      details.add(detail);
+      var component = new FareComponent(fareId, null, getMoney(currency, cost), routes);
+      details.add(component);
       ++count;
       start = via + 1;
     }
@@ -273,12 +270,7 @@ public class DefaultFareServiceImpl implements FareService {
         r.resultTable[j][j + i] = cost;
         r.fareIds[j][j + i] = best.fareId;
         for (int k = 0; k < i; k++) {
-          float via = addFares(
-            rides.subList(j, j + k + 1),
-            rides.subList(j + k + 1, j + i + 1),
-            r.resultTable[j][j + k],
-            r.resultTable[j + k + 1][j + i]
-          );
+          float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
           if (r.resultTable[j][j + i] > via) {
             r.resultTable[j][j + i] = via;
             r.endOfComponent[j] = j + i;
@@ -303,13 +295,13 @@ public class DefaultFareServiceImpl implements FareService {
     var firstRide = legs.get(0);
     ZonedDateTime startTime = firstRide.getStartTime();
     String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
-    String endZone = firstRide.getTo().stop.getFirstZoneAsString();
+    String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getFrom().stop.getId().getFeedId();
-    ZonedDateTime lastRideStartTime = firstRide.getStartTime();
-    ZonedDateTime lastRideEndTime = firstRide.getEndTime();
+    String feedId = firstRide.getTrip().getId().getFeedId();
+    ZonedDateTime lastRideStartTime = null;
+    ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-      if (!leg.getFrom().stop.getId().getFeedId().equals(feedId)) {
+      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
         LOG.debug("skipped multi-feed ride sequence {}", legs);
         return new FareAndId(Float.POSITIVE_INFINITY, null);
       }
@@ -317,8 +309,10 @@ public class DefaultFareServiceImpl implements FareService {
       lastRideEndTime = leg.getEndTime();
       endZone = leg.getTo().stop.getFirstZoneAsString();
       routes.add(leg.getRoute().getId());
-      zones.addAll(leg.getFareZones().stream().map(z -> z.getId().getId()).toList());
       trips.add(leg.getTrip().getId());
+      for (FareZone z : leg.getFareZones()) {
+        zones.add(z.getId().getId());
+      }
       transfersUsed += 1;
     }
 

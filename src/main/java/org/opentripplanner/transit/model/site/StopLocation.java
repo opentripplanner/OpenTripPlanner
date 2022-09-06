@@ -101,7 +101,10 @@ public interface StopLocation extends LogInfo {
    */
   @Nullable
   default String getFirstZoneAsString() {
-    return getFareZones().stream().map(t -> t.getId().getId()).findFirst().orElse(null);
+    for (FareZone t : getFareZones()) {
+      return t.getId().getId();
+    }
+    return null;
   }
 
   /**

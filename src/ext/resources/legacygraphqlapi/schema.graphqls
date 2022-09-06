@@ -2728,7 +2728,11 @@ type Route implements Node {
     shortName: String
 
     """Long name of the route, e.g. Helsinki-Leppävaara"""
-    longName: String
+    longName(
+        """If translated longName is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from routes.txt.
+        """
+        language: String): String
 
     """Transport mode of this route, e.g. `BUS`"""
     mode: Mode

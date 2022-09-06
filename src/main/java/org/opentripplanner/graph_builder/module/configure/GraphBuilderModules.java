@@ -1,24 +1,19 @@
 package org.opentripplanner.graph_builder.module.configure;
 
 import static org.opentripplanner.datastore.api.FileType.DEM;
-import static org.opentripplanner.datastore.api.FileType.GTFS;
-import static org.opentripplanner.datastore.api.FileType.NETEX;
-import static org.opentripplanner.datastore.api.FileType.OSM;
 
 import dagger.Module;
 import dagger.Provides;
 import java.io.File;
 import java.time.Duration;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
-import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
+import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -39,6 +34,9 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.feed.DemExtractConfig;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -53,12 +51,17 @@ public class GraphBuilderModules {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
-    @Nullable ZoneId zoneId,
     DataImportIssueStore issueStore
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
-    for (DataSource osmFile : dataSources.get(OSM)) {
-      providers.add(new OpenStreetMapProvider(osmFile, config.osmCacheDataInMem));
+    for (ConfiguredDataSource<OsmExtractConfig> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+      providers.add(
+        new OpenStreetMapProvider(
+          osmConfiguredDataSource,
+          config.osmDefaults,
+          config.osmCacheDataInMem
+        )
+      );
     }
 
     return new OpenStreetMapModule(
@@ -66,7 +69,7 @@ public class GraphBuilderModules {
       providers,
       config.boardingLocationTags,
       graph,
-      zoneId,
+      config.osmDefaults.timeZone,
       issueStore
     );
   }
@@ -81,8 +84,8 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (DataSource gtfsData : dataSources.get(GTFS)) {
-      GtfsBundle gtfsBundle = new GtfsBundle((CompositeDataSource) gtfsData);
+    for (ConfiguredDataSource<GtfsFeedConfig> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+      GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
 
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
       gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
@@ -111,7 +114,12 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     return new NetexConfig(config)
-      .createNetexModule(dataSources.get(NETEX), transitModel, graph, issueStore);
+      .createNetexModule(
+        dataSources.getNetexConfiguredDatasource(),
+        transitModel,
+        graph,
+        issueStore
+      );
   }
 
   @Provides
@@ -162,7 +170,12 @@ public class GraphBuilderModules {
         createNedElevationFactory(new File(dataSources.getCacheDirectory(), "ned"), config)
       );
     } else if (dataSources.has(DEM)) {
-      gridCoverageFactories.addAll(createDemGeotiffGridCoverageFactories(dataSources.get(DEM)));
+      gridCoverageFactories.addAll(
+        createDemGeotiffGridCoverageFactories(
+          dataSources.getDemConfiguredDatasource(),
+          config.elevationUnitMultiplier
+        )
+      );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation
     // modules to the same graph builder. We do not actually know if this is supported by the
@@ -252,11 +265,18 @@ public class GraphBuilderModules {
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(
-    Iterable<DataSource> dataSources
+    Iterable<ConfiguredDataSource<DemExtractConfig>> dataSources,
+    double defaultElevationUnitMultiplier
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
-    for (DataSource demSource : dataSources) {
-      elevationGridCoverageFactories.add(createGeotiffGridCoverageFactoryImpl(demSource));
+    for (ConfiguredDataSource<DemExtractConfig> demSource : dataSources) {
+      double elevationUnitMultiplier = demSource
+        .config()
+        .elevationUnitMultiplier()
+        .orElse(defaultElevationUnitMultiplier);
+      elevationGridCoverageFactories.add(
+        createGeotiffGridCoverageFactoryImpl(demSource.dataSource(), elevationUnitMultiplier)
+      );
     }
     return elevationGridCoverageFactories;
   }
@@ -279,7 +299,6 @@ public class GraphBuilderModules {
       osmModule.elevationDataOutput(),
       config.readCachedElevations,
       config.writeCachedElevations,
-      config.elevationUnitMultiplier,
       config.distanceBetweenElevationSamples,
       config.maxElevationPropagationMeters,
       config.includeEllipsoidToGeoidDifference,
@@ -288,8 +307,9 @@ public class GraphBuilderModules {
   }
 
   private static ElevationGridCoverageFactory createGeotiffGridCoverageFactoryImpl(
-    DataSource demSource
+    DataSource demSource,
+    double elevationUnitMultiplier
   ) {
-    return new GeotiffGridCoverageFactoryImpl(demSource);
+    return new GeotiffGridCoverageFactoryImpl(demSource, elevationUnitMultiplier);
   }
 }

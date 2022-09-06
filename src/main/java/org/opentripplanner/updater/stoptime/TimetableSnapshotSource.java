@@ -16,12 +16,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TripTimesPatch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -38,6 +41,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,76 +59,92 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Maximum time in seconds since midnight for arrivals and departures
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
+
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
+
   /**
    * Lock to indicate that buffer is in use
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
+
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
    * messages.
    */
-  private final TripPatternCache tripPatternCache = new TripPatternCache();
-  private final ZoneId timeZone;
 
+  private final TripPatternCache tripPatternCache = new TripPatternCache();
+
+  private final ZoneId timeZone;
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
-  public int logFrequency = 2000;
+  private final int logFrequency;
   private int totalSuccessfullyApplied = 0;
+
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern → Timetable map and indexing the new Timetables.
    */
-  public int maxSnapshotFrequency = 1000; // msec
+  private final int maxSnapshotFrequencyMs;
+
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
    * to more than one routing thread if the maximum snapshot frequency is exceeded.
    */
   private volatile TimetableSnapshot snapshot = null;
+
   /** Should expired realtime data be purged from the graph. */
-  public boolean purgeExpiredData = true;
+  private final boolean purgeExpiredData;
+
   protected LocalDate lastPurgeDate = null;
+
   /** Epoch time in milliseconds at which the last snapshot was generated. */
   protected long lastSnapshotTime = -1;
-  public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
-  /**
-   * Defines when delays are propagated to previous stops and if these stops are given
-   * the NO_DATA flag.
-   */
-  BackwardsDelayPropagationType backwardsDelayPropagationType =
-    BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+
   private final Deduplicator deduplicator;
+
   private final Map<FeedScopedId, Integer> serviceCodes;
 
-  public static TimetableSnapshotSource ofTransitModel(final TransitModel transitModel) {
-    return new TimetableSnapshotSource(
-      transitModel.getTimeZone(),
-      new DefaultTransitService(transitModel),
-      transitModel.getTransitLayerUpdater(),
-      transitModel.getDeduplicator(),
-      transitModel.getServiceCodes()
-    );
-  }
+  /**
+   * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
+   * the purgeExpiredData feature.
+   */
+  private final Supplier<LocalDate> localDateNow;
 
   public TimetableSnapshotSource(
-    ZoneId timeZone,
-    TransitService transitService,
-    TransitLayerUpdater transitLayerUpdater,
-    Deduplicator deduplicator,
-    Map<FeedScopedId, Integer> serviceCodes
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel
   ) {
-    this.timeZone = timeZone;
-    this.transitService = transitService;
-    this.transitLayerUpdater = transitLayerUpdater;
-    this.deduplicator = deduplicator;
-    this.serviceCodes = serviceCodes;
+    this(parameters, transitModel, () -> LocalDate.now(transitModel.getTimeZone()));
+  }
+
+  /**
+   * Constructor is package local to allow unit-tests to provide their own clock, not using
+   * system time.
+   */
+  TimetableSnapshotSource(
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel,
+    Supplier<LocalDate> localDateNow
+  ) {
+    this.timeZone = transitModel.getTimeZone();
+    this.transitService = new DefaultTransitService(transitModel);
+    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
+    this.deduplicator = transitModel.getDeduplicator();
+    this.serviceCodes = transitModel.getServiceCodes();
+    this.logFrequency = parameters.logFrequency();
+    this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
+    this.purgeExpiredData = parameters.purgeExpiredData();
+    this.localDateNow = localDateNow;
+
+    // Inject this into the transit model
+    transitModel.initTimetableSnapshotProvider(this);
   }
 
   /**
@@ -160,14 +180,18 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * However, multi-feed support is not completed and we currently assume there is only one static
    * feed when matching IDs.
    *
+   * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
+   *                                     if these stops are given the NO_DATA flag.
    * @param fullDataset true if the list with updates represent all updates that are active right
    *                    now, i.e. all previous updates should be disregarded
    * @param updates     GTFS-RT TripUpdate's that should be applied atomically
    */
   public void applyTripUpdates(
-    final boolean fullDataset,
-    final List<TripUpdate> updates,
-    final String feedId
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
+    boolean fullDataset,
+    List<TripUpdate> updates,
+    String feedId
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -236,7 +260,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         boolean applied =
           switch (tripScheduleRelationship) {
-            case SCHEDULED -> handleScheduledTrip(tripUpdate, tripId, serviceDate);
+            case SCHEDULED -> handleScheduledTrip(
+              tripUpdate,
+              tripId,
+              serviceDate,
+              backwardsDelayPropagationType
+            );
             case ADDED -> validateAndHandleAddedTrip(
               tripUpdate,
               tripDescriptor,
@@ -306,9 +335,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
     final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+    if (force || now - lastSnapshotTime > maxSnapshotFrequencyMs) {
       if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
+        LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
       } else {
         LOG.debug("Buffer was unchanged, keeping old snapshot.");
@@ -342,9 +371,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean handleScheduledTrip(
-    final TripUpdate tripUpdate,
-    final FeedScopedId tripId,
-    final LocalDate serviceDate
+    TripUpdate tripUpdate,
+    FeedScopedId tripId,
+    LocalDate serviceDate,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     final TripPattern pattern = getPatternForTripId(tripId);
 
@@ -606,7 +636,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       builder.withGtfsType(3);
       builder.withMode(TransitMode.BUS);
       // Create route name
-      builder.withLongName(tripDescriptor.getTripId());
+      I18NString longName = NonLocalizedString.ofNullable(tripDescriptor.getTripId());
+      builder.withLongName(longName);
       route = builder.build();
     }
 
@@ -950,7 +981,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final LocalDate today = LocalDate.now(timeZone);
+    final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
     final LocalDate previously = today.minusDays(2); // Just to be safe...
 

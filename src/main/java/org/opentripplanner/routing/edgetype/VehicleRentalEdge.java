@@ -17,7 +17,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class VehicleRentalEdge extends Edge {
 
-  private static final long serialVersionUID = 1L;
   public FormFactor formFactor;
 
   public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, FormFactor formFactor) {

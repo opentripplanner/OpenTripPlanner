@@ -12,7 +12,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
@@ -46,45 +45,39 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String topic;
   private final String feedId;
   private final int qos;
-  private final boolean fuzzyTripMatching;
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
   private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
   private final String configRef;
+  private final MemoryPersistence persistence = new MemoryPersistence();
+  private final TimetableSnapshotSource snapshotSource;
   private WriteToGraphCallback saveResultOnGraph;
-  MemoryPersistence persistence = new MemoryPersistence();
+
+  private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher = null;
 
   private MqttClient client;
 
-  public MqttGtfsRealtimeUpdater(MqttGtfsRealtimeUpdaterParameters parameters) {
+  public MqttGtfsRealtimeUpdater(
+    MqttGtfsRealtimeUpdaterParameters parameters,
+    TransitModel transitModel,
+    TimetableSnapshotSource snapshotSource
+  ) {
     this.configRef = parameters.getConfigRef();
     this.url = parameters.getUrl();
     this.topic = parameters.getTopic();
     this.feedId = parameters.getFeedId();
     this.qos = parameters.getQos();
-    this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
+    this.snapshotSource = snapshotSource;
+    // Set properties of realtime data snapshot source
+    if (parameters.getFuzzyTripMatching()) {
+      this.fuzzyTripMatcher =
+        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
+    }
   }
 
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
-  }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    // Only create a realtime data snapshot source if none exists already
-    TimetableSnapshotSource snapshotSource = transitModel.getOrSetupTimetableSnapshotProvider(
-      TimetableSnapshotSource::ofTransitModel
-    );
-
-    // Set properties of realtime data snapshot source
-    if (fuzzyTripMatching) {
-      snapshotSource.fuzzyTripMatcher =
-        new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
-    }
-    if (backwardsDelayPropagationType != null) {
-      snapshotSource.backwardsDelayPropagationType = backwardsDelayPropagationType;
-    }
   }
 
   @Override
@@ -172,7 +165,16 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
       if (updates != null) {
         // Handle trip updates via graph writer runnable
-        saveResultOnGraph.execute(new TripUpdateGraphWriterRunnable(fullDataset, updates, feedId));
+        saveResultOnGraph.execute(
+          new TripUpdateGraphWriterRunnable(
+            snapshotSource,
+            fuzzyTripMatcher,
+            backwardsDelayPropagationType,
+            fullDataset,
+            updates,
+            feedId
+          )
+        );
       }
     }
 

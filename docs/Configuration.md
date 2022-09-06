@@ -88,10 +88,8 @@ to be part of the _graph-file-name_, or you want to inject credentials in a clou
 
 ```JSON
 {
-  "storage" : {
     "gsCredentials": "${GCS_SERVICE_CREDENTIALS}",
     "graph": "file:///var/otp/graph-${otp.serialization.version.id}.obj"
-  }
 }
 ```     
 
@@ -166,24 +164,28 @@ Here is an example including variable substitution, assuming version 2.1.0 of OT
 ```JSON
 // build-config.json
 {
-  "storage" : "${includeFile:storage.json}"
+  "transitFeeds" : "${includeFile:transit.json}"
 } 
 ``` 
 
 ```JSON
-// storage.json
-{
-  "streetGraph": "street-graph-v${maven.version}.obj"
+// transit.json
+[
+  {
+  "source": "netex-v${FEED_VERSION}.obj"
 }
+]
 ``` 
 
 The result will look like this:
 
 ```JSON
 {
-  "storage" : {
-    "streetGraph": "street-graph-v2.1.0.obj"
-  }
+      "transitFeeds": [
+        {
+          "source": "netex-v2_0.obj"
+        }
+      ]
 } 
 ``` 
 
@@ -213,22 +215,23 @@ example:
 
 Here is a list of all features which can be toggled on/off.
 
-| Feature                           | Description                                                                                                                                                                                     | Enabled by default | Sandbox |
-|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|---------|
-| `APIBikeRental`                   | Enable the bike rental endpoint                                                                                                                                                                 | yes                | no      |
-| `APIServerInfo`                   | Enable the server info endpoint                                                                                                                                                                 | yes                | no      |
-| `APIGraphInspectorTile`           | Enable the inspector  endpoint for graph information for inspection/debugging purpose                                                                                                           | yes                | no      |
-| `APIUpdaterStatus`                | Enable endpoint for graph updaters status                                                                                                                                                       | yes                | no      |
-| `OptimizeTransfers`               | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                       | yes                | no      |
-| `MinimumTransferTimeIsDefinitive` | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to true if you want to set a transfer time lower than what OTP derives from OSM data. | no                 | no      |
-| `ParallelRouting`                 | Enable performing parts of the trip planning in parallel                                                                                                                                        | no                 | no      |
-| `TransferConstraints`             | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little.                                   | yes                | no      |
-| `ActuatorAPI`                     | Enpoint for actuators (service health status)                                                                                                                                                   | no                 | yes     |
-| `GoogleCloudStorage`              | Enable Google Cloud Storage integration                                                                                                                                                         | no                 | yes     |
-| `SandboxAPITransmodelApi`         | Enable Entur Transmodel(NeTEx) GraphQL API                                                                                                                                                      | no                 | yes     |
-| `SandboxAPILegacyGraphQLApi`      | Enable (GTFS) GraphQL API                                                                                                                                                                       | no                 | yes     |
-| `SandboxAPIMapboxVectorTilesApi`  | Enable Mapbox vector tiles API                                                                                                                                                                  | no                 | yes     |
-| `SandboxAPIParkAndRideApi`        | Enable park-and-ride endpoint                                                                                                                                                                   | no                 | yes     |
-| `TransferAnalyzer`                | Analyze transfers during graph build                                                                                                                                                            | no                 | yes     |
-| `FlexRouting`                     | Enable FLEX routing                                                                                                                                                                             | no                 | yes     |
-| `FloatingBike`                    | Enable floating bike routing                                                                                                                                                                    | yes                | yes     |
+| Feature                                | Description                                                                                                                                                                                     | Enabled by default | Sandbox |
+|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|---------|
+| `APIBikeRental`                        | Enable the bike rental endpoint                                                                                                                                                                 | yes                | no      |
+| `APIServerInfo`                        | Enable the server info endpoint                                                                                                                                                                 | yes                | no      |
+| `APIGraphInspectorTile`                | Enable the inspector  endpoint for graph information for inspection/debugging purpose                                                                                                           | yes                | no      |
+| `APIUpdaterStatus`                     | Enable endpoint for graph updaters status                                                                                                                                                       | yes                | no      |
+| `ConsiderPatternsForDirectTransfers`   | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                              | yes                | no      | 
+| `OptimizeTransfers`                    | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                       | yes                | no      |
+| `MinimumTransferTimeIsDefinitive`      | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to true if you want to set a transfer time lower than what OTP derives from OSM data. | no                 | no      |
+| `ParallelRouting`                      | Enable performing parts of the trip planning in parallel                                                                                                                                        | no                 | no      |
+| `TransferConstraints`                  | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little.                                   | yes                | no      |
+| `ActuatorAPI`                          | Enpoint for actuators (service health status)                                                                                                                                                   | no                 | yes     |
+| `GoogleCloudStorage`                   | Enable Google Cloud Storage integration                                                                                                                                                         | no                 | yes     |
+| `SandboxAPITransmodelApi`              | Enable Entur Transmodel(NeTEx) GraphQL API                                                                                                                                                      | no                 | yes     |
+| `SandboxAPILegacyGraphQLApi`           | Enable (GTFS) GraphQL API                                                                                                                                                                       | no                 | yes     |
+| `SandboxAPIMapboxVectorTilesApi`       | Enable Mapbox vector tiles API                                                                                                                                                                  | no                 | yes     |
+| `SandboxAPIParkAndRideApi`             | Enable park-and-ride endpoint                                                                                                                                                                   | no                 | yes     |
+| `TransferAnalyzer`                     | Analyze transfers during graph build                                                                                                                                                            | no                 | yes     |
+| `FlexRouting`                          | Enable FLEX routing                                                                                                                                                                             | no                 | yes     |
+| `FloatingBike`                         | Enable floating bike routing                                                                                                                                                                    | yes                | yes     |

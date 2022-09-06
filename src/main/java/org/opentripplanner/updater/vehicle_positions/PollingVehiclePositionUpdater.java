@@ -4,7 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
@@ -26,51 +26,48 @@ import org.slf4j.LoggerFactory;
 public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
+
   /**
    * Update streamer
    */
   private final VehiclePositionSource vehiclePositionSource;
-  private final String feedId;
+
+  private final VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
-  private VehiclePositionPatternMatcher vehiclePositionPatternMatcher;
 
-  public PollingVehiclePositionUpdater(VehiclePositionsUpdaterParameters params) {
+  public PollingVehiclePositionUpdater(
+    VehiclePositionsUpdaterParameters params,
+    RealtimeVehiclePositionService vehiclePositionService,
+    TransitModel transitModel
+  ) {
     super(params);
-    var p = (VehiclePositionsUpdaterParameters) params;
-    vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(p.url());
+    this.vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(params.url());
+    var index = transitModel.getTransitModelIndex();
+    this.vehiclePositionPatternMatcher =
+      new VehiclePositionPatternMatcher(
+        params.feedId(),
+        tripId -> index.getTripForId().get(tripId),
+        trip -> index.getPatternForTrip().get(trip),
+        (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
+        vehiclePositionService,
+        transitModel.getTimeZone()
+      );
 
     LOG.info(
       "Creating vehicle position updater running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       vehiclePositionSource
     );
-    feedId = params.feedId();
   }
 
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    var index = transitModel.getTransitModelIndex();
-    vehiclePositionPatternMatcher =
-      new VehiclePositionPatternMatcher(
-        feedId,
-        tripId -> index.getTripForId().get(tripId),
-        trip -> index.getPatternForTrip().get(trip),
-        (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
-        graph.getVehiclePositionService(),
-        transitModel.getTimeZone()
-      );
-  }
-
-  @Override
-  public void teardown() {}
 
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and

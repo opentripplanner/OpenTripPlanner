@@ -3,6 +3,7 @@ package org.opentripplanner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -33,6 +34,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -159,9 +161,11 @@ public abstract class GtfsTest {
     transitModel.index();
     graph.index(transitModel.getStopModel());
     serverContext = TestServerContext.createServerContext(graph, transitModel);
-    timetableSnapshotSource = TimetableSnapshotSource.ofTransitModel(transitModel);
-    timetableSnapshotSource.purgeExpiredData = false;
-    transitModel.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
+    timetableSnapshotSource =
+      new TimetableSnapshotSource(
+        TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(false),
+        transitModel
+      );
     alertPatchServiceImpl = new TransitAlertServiceImpl(transitModel);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
@@ -175,7 +179,13 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      timetableSnapshotSource.applyTripUpdates(fullDataset, updates, feedId.getId());
+      timetableSnapshotSource.applyTripUpdates(
+        null,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        updates,
+        feedId.getId()
+      );
       alertsUpdateHandler.update(feedMessage);
     } catch (Exception exception) {}
   }

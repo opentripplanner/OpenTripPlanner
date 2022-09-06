@@ -13,8 +13,8 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -40,7 +40,7 @@ public class FaresIntegrationTest {
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
-    Fare fare = getFare(from, to, start, serverContext);
+    ItineraryFares fare = getFare(from, to, start, serverContext);
     assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
   }
 
@@ -67,7 +67,7 @@ public class FaresIntegrationTest {
 
     Instant startTime = TestUtils.dateInstant("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
-    Fare fare = getFare(from, to, startTime, serverContext);
+    ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
     assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
 
@@ -118,16 +118,16 @@ public class FaresIntegrationTest {
 
     var fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "AB"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "1"));
 
     // D -> E, null case
 
     from = GenericLocation.fromStopId("Origin", feedId, "D");
     to = GenericLocation.fromStopId("Destination", feedId, "E");
     fare = getFare(from, to, dateTime, serverContext);
-    assertEquals(Fare.empty(), fare);
+    assertEquals(ItineraryFares.empty(), fare);
 
     // A -> C, 2 components in a path
 
@@ -137,12 +137,12 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 2);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
-    assertEquals(fareComponents.get(1).price, tenUSD);
-    assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BC"));
-    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "AB"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "1"));
+    assertEquals(fareComponents.get(1).price(), tenUSD);
+    assertEquals(fareComponents.get(1).fareId(), new FeedScopedId(feedId, "BC"));
+    assertEquals(fareComponents.get(1).routes().get(0), new FeedScopedId(feedId, "2"));
 
     // B -> D, 2 fully connected components
     from = GenericLocation.fromStopId("Origin", feedId, "B");
@@ -151,10 +151,10 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "2"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "3"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "BD"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(0).routes().get(1), new FeedScopedId(feedId, "3"));
 
     // E -> G, missing in between fare
     from = GenericLocation.fromStopId("Origin", feedId, "E");
@@ -163,10 +163,10 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "EG"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes().get(1), new FeedScopedId(feedId, "6"));
 
     // C -> E, missing fare after
     from = GenericLocation.fromStopId("Origin", feedId, "C");
@@ -175,9 +175,9 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "3"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "CD"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "3"));
 
     // D -> G, missing fare before
     from = GenericLocation.fromStopId("Origin", feedId, "D");
@@ -186,10 +186,10 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "5"));
-    assertEquals(fareComponents.get(0).routes.get(1), new FeedScopedId(feedId, "6"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "EG"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "5"));
+    assertEquals(fareComponents.get(0).routes().get(1), new FeedScopedId(feedId, "6"));
 
     // A -> D, use individual component parts
     from = GenericLocation.fromStopId("Origin", feedId, "A");
@@ -198,23 +198,23 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getDetails(FareType.regular);
     assertEquals(fareComponents.size(), 2);
-    assertEquals(fareComponents.get(0).price, tenUSD);
-    assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
-    assertEquals(fareComponents.get(0).routes.get(0), new FeedScopedId(feedId, "1"));
-    assertEquals(fareComponents.get(1).price, tenUSD);
-    assertEquals(fareComponents.get(1).fareId, new FeedScopedId(feedId, "BD"));
-    assertEquals(fareComponents.get(1).routes.get(0), new FeedScopedId(feedId, "2"));
-    assertEquals(fareComponents.get(1).routes.get(1), new FeedScopedId(feedId, "3"));
+    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "AB"));
+    assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "1"));
+    assertEquals(fareComponents.get(1).price(), tenUSD);
+    assertEquals(fareComponents.get(1).fareId(), new FeedScopedId(feedId, "BD"));
+    assertEquals(fareComponents.get(1).routes().get(0), new FeedScopedId(feedId, "2"));
+    assertEquals(fareComponents.get(1).routes().get(1), new FeedScopedId(feedId, "3"));
   }
 
-  private static Fare getFare(
+  private static ItineraryFares getFare(
     GenericLocation from,
     GenericLocation to,
     Instant time,
     OtpServerRequestContext serverContext
   ) {
     Itinerary itinerary = getItineraries(from, to, time, serverContext).get(0);
-    return itinerary.getFare();
+    return itinerary.getFares();
   }
 
   private static List<Itinerary> getItineraries(

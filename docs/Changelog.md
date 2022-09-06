@@ -95,6 +95,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Digitransit stop vector layer updates [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
 - Re-enable copying of submode to trip from route [#4407](https://github.com/opentripplanner/OpenTripPlanner/pull/4407)
 - Use pattern index instead of route id or agency id for unpreferred cost [#4390](https://github.com/opentripplanner/OpenTripPlanner/pull/4390)
+- Performance improvements for DefaultFareServiceImpl [#4402](https://github.com/opentripplanner/OpenTripPlanner/pull/4402)
+- Add experimental support for GTFS Fares V2 [#4338](https://github.com/opentripplanner/OpenTripPlanner/pull/4338)
+- Configure each transit feed properties individually  [#4399](https://github.com/opentripplanner/OpenTripPlanner/pull/4399)
+- Account for boarding restrictions when calculating direct transfers [#4421](https://github.com/opentripplanner/OpenTripPlanner/pull/4421)
+- Configure the import of OSM extracts individually [#4419](https://github.com/opentripplanner/OpenTripPlanner/pull/4419)
+- Configure the import of elevation data individually [#4423](https://github.com/opentripplanner/OpenTripPlanner/pull/4423)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

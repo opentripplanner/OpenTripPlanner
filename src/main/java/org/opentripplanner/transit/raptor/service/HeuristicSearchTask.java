@@ -5,6 +5,8 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
@@ -131,16 +133,22 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
         profile = MIN_TRAVEL_DURATION;
       }
 
-      heuristicReq =
-        request
-          .mutate()
-          // Disable any optimization that is not valid for a heuristic search
-          .clearOptimizations()
-          .profile(profile)
-          .searchDirection(direction)
-          .searchParams()
-          .searchOneIterationOnly()
-          .build();
+      var builder = request
+        .mutate()
+        // Disable any optimization that is not valid for a heuristic search
+        .clearOptimizations()
+        .profile(profile)
+        .searchDirection(direction);
+
+      builder.searchParams().searchOneIterationOnly();
+
+      // Add this last, it depends on generating an alias from the set values
+      builder.performanceTimers(
+        request.performanceTimers().withNamePrefix(builder.generateAlias())
+      );
+
+      heuristicReq = builder.build();
+
       search = config.createHeuristicSearch(transitData, heuristicReq);
     }
   }

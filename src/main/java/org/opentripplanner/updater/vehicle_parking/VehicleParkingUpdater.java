@@ -48,14 +48,20 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
   public VehicleParkingUpdater(
     VehicleParkingUpdaterParameters parameters,
-    DataSource<VehicleParking> source
+    DataSource<VehicleParking> source,
+    VertexLinker vertexLinker,
+    VehicleParkingService vehicleParkingService
   ) {
     super(parameters);
     this.source = source;
+    // Creation of network linker library will not modify the graph
+    this.linker = vertexLinker;
+    // Adding a vehicle parking station service needs a graph writer runnable
+    this.vehicleParkingService = vehicleParkingService;
 
     LOG.info(
       "Creating vehicle-parking updater running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       source
     );
   }
@@ -64,17 +70,6 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    // Creation of network linker library will not modify the graph
-    linker = graph.getLinker();
-    // Adding a vehicle parking station service needs a graph writer runnable
-    vehicleParkingService = graph.getVehicleParkingService();
-  }
-
-  @Override
-  public void teardown() {}
 
   @Override
   protected void runPolling() throws Exception {

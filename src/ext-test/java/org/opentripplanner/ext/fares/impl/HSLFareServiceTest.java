@@ -10,12 +10,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.model.FareAttribute;
-import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
@@ -32,7 +31,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
   ) {
     Assertions.assertArrayEquals(
       expectedFareIds.toArray(),
-      fareService.getCost(i).getDetails(Fare.FareType.regular).stream().map(f -> f.fareId).toArray()
+      fareService.getCost(i).getDetails(FareType.regular).stream().map(f -> f.fareId()).toArray()
     );
   }
 
@@ -151,7 +150,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     ruleSetD.addContains("D");
 
     hslFareService.addFareRules(
-      Fare.FareType.regular,
+      FareType.regular,
       List.of(ruleSetAB, ruleSetBC, ruleSetCD, ruleSetABC, ruleSetBCD, ruleSetABCD, ruleSetD)
     );
 

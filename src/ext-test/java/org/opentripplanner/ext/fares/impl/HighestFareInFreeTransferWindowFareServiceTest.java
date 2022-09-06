@@ -14,10 +14,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -41,7 +42,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   ) {
     Assertions.assertEquals(
       Money.usDollars(Math.round(expectedFare * 100)),
-      fareService.getCost(i).getFare(Fare.FareType.regular)
+      fareService.getCost(i).getFare(FareType.regular)
     );
   }
 
@@ -225,6 +226,12 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
   }
 
   private static Route route(String id, String name) {
-    return Route.of(id(id)).withLongName(name).withAgency(agency).withMode(TransitMode.BUS).build();
+    NonLocalizedString lName = new NonLocalizedString(name);
+    return Route
+      .of(id(id))
+      .withLongName(lName)
+      .withAgency(agency)
+      .withMode(TransitMode.BUS)
+      .build();
   }
 }

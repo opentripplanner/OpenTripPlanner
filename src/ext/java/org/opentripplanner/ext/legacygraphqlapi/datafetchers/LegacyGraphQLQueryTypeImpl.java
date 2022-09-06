@@ -47,8 +47,8 @@ import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -913,14 +913,10 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         routeStream =
           routeStream.filter(route ->
-            Stream
-              .of(route.getShortName(), route.getLongName())
-              .filter(Objects::nonNull)
-              .map(s -> s.toLowerCase(environment.getLocale()))
-              .anyMatch(s -> s.startsWith(name))
+            LegacyGraphQLUtils.startsWith(route.getShortName(), name, environment.getLocale()) ||
+            LegacyGraphQLUtils.startsWith(route.getLongName(), name, environment.getLocale())
           );
       }
-
       return routeStream.collect(Collectors.toList());
     };
   }
@@ -966,11 +962,7 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stationStream =
           stationStream.filter(station ->
-            station
-              .getName()
-              .toString(environment.getLocale())
-              .toLowerCase(environment.getLocale())
-              .startsWith(name)
+            LegacyGraphQLUtils.startsWith(station.getName(), name, environment.getLocale())
           );
       }
 
@@ -1011,11 +1003,7 @@ public class LegacyGraphQLQueryTypeImpl
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
         stopStream =
           stopStream.filter(stop ->
-            stop
-              .getName()
-              .toString(environment.getLocale())
-              .toLowerCase(environment.getLocale())
-              .startsWith(name)
+            LegacyGraphQLUtils.startsWith(stop.getName(), name, environment.getLocale())
           );
       }
 
@@ -1076,13 +1064,13 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return environment -> {
-      Map<Fare.FareType, Collection<FareRuleSet>> fareRules =
+      Map<FareType, Collection<FareRuleSet>> fareRules =
         ((DefaultFareServiceImpl) getFareService(environment)).getFareRulesPerType();
 
       return fareRules
         .entrySet()
         .stream()
-        .filter(entry -> entry.getKey() == Fare.FareType.regular)
+        .filter(entry -> entry.getKey() == FareType.regular)
         .map(e -> e.getValue())
         .toList()
         .stream()

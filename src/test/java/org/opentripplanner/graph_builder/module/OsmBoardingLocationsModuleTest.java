@@ -186,7 +186,7 @@ class OsmBoardingLocationsModuleTest {
       .stream()
       .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
       .filter(StreetEdge.class::isInstance)
-      .forEach(e -> assertEquals("101;102", e.getName().toString()));
+      .forEach(e -> assertEquals("Platform 101;102", e.getName().toString()));
   }
 
   private void assertConnections(

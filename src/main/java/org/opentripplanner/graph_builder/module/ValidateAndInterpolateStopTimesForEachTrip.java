@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
@@ -34,6 +35,9 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   private static final Logger LOG = LoggerFactory.getLogger(
     ValidateAndInterpolateStopTimesForEachTrip.class
   );
+
+  /** Do not report zero-time hops less than 1km */
+  private static final double MIN_ZERO_TIME_HOP_DISTANCE_METERS = 1000.0;
 
   private final TripStopTimes stopTimesByTrip;
   private final boolean interpolate;
@@ -193,10 +197,12 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       // sanity-check the hop
       if (runningTime == 0) {
         // identical stop times at different stops
-        issueStore.add(new HopZeroTime((float) hopDistance, st1.getTrip(), st1.getStopSequence()));
-      } else if (hopSpeed > 45) {
-        // 45 m/sec ~= 100 miles/hr
-        // elapsed time of 0 will give speed of +inf
+        if (hopDistance > MIN_ZERO_TIME_HOP_DISTANCE_METERS) {
+          issueStore.add(
+            new HopZeroTime((float) hopDistance, st1.getTrip(), st1.getStopSequence())
+          );
+        }
+      } else if (hopSpeed > getMaxSpeedForMode(st0.getTrip().getMode())) {
         issueStore.add(
           new HopSpeedFast(
             (float) hopSpeed,
@@ -205,8 +211,8 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
             st0.getStopSequence()
           )
         );
-      } else if (hopSpeed < 0.1) {
-        // 0.1 m/sec ~= 0.2 miles/hr
+      } else if (hopSpeed < 0.3) {
+        // 0.3 m/sec ~= 1 km/h
         issueStore.add(
           new HopSpeedSlow(
             (float) hopSpeed,
@@ -219,6 +225,19 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
       st0 = st1;
     } // END for loop over stop times
     return true;
+  }
+
+  private double getMaxSpeedForMode(TransitMode mode) {
+    return switch (mode) {
+      // 1000 km/h
+      case AIRPLANE -> 280;
+      // 250 km/h
+      case RAIL -> 70;
+      // max in the world is 9 m/s for gondolas, 6 m/s for funiculars
+      case GONDOLA, FUNICULAR -> 10;
+      // 108km/h
+      default -> 30;
+    };
   }
 
   /**

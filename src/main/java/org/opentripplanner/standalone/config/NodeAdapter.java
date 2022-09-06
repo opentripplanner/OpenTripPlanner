@@ -407,7 +407,11 @@ public class NodeAdapter {
   }
 
   public Pattern asPattern(String paramName, String defaultValue) {
-    return Pattern.compile(asText(paramName, defaultValue));
+    String regex = asText(paramName, defaultValue);
+    if (regex == null) {
+      return null;
+    }
+    return Pattern.compile(regex);
   }
 
   public List<URI> asUris(String paramName) {
