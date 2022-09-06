@@ -1071,11 +1071,9 @@ public class LegacyGraphQLQueryTypeImpl
         .entrySet()
         .stream()
         .filter(entry -> entry.getKey() == FareType.regular)
-        .map(e -> e.getValue())
-        .toList()
-        .stream()
-        .flatMap(rs -> rs.stream())
-        .collect(Collectors.toList());
+        .map(Map.Entry::getValue)
+        .flatMap(Collection::stream)
+        .toList();
     };
   }
 
