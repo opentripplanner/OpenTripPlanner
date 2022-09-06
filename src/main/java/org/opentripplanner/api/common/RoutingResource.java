@@ -951,14 +951,6 @@ public abstract class RoutingResource {
 
     preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
-    if (startTransitStopId != null && !startTransitStopId.isEmpty()) {
-      request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
-    }
-
-    if (startTransitTripId != null && !startTransitTripId.isEmpty()) {
-      request.startingTransitTripId = FeedScopedId.parseId(startTransitTripId);
-    }
-
     if (ignoreRealtimeUpdates != null) {
       preferences.transit().setIgnoreRealtimeUpdates(ignoreRealtimeUpdates);
     }

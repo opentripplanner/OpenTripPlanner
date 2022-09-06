@@ -180,25 +180,6 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public boolean allowKeepingRentedVehicleAtDestination = false;
 
-  /**
-   * A transit stop that this trip must start from
-   *
-   * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
-   * the fromPlace parameter. Is is used for onBoard routing only?
-   */
-  @Deprecated
-  public FeedScopedId startingTransitStopId;
-
-  /**
-   * A trip where this trip must start from (depart-onboard routing)
-   *
-   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-   * old functionality the same way, but we will try to map this parameter
-   * so it does work similar as before.
-   */
-  @Deprecated
-  public FeedScopedId startingTransitTripId;
-
   /*
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
