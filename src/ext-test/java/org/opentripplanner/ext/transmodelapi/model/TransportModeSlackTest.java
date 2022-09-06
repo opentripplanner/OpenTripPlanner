@@ -1,41 +1,47 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransportModeSlackTest {
 
+  private static final Duration D10m = Duration.ofMinutes(10);
+  private static final Duration D30m = Duration.ofMinutes(30);
+  private static final Duration D60m = Duration.ofMinutes(60);
+
+  private static final int D10mSec = (int) D10m.toSeconds();
+  private static final int D30mSec = (int) D30m.toSeconds();
+  private static final int D60mSec = (int) D60m.toSeconds();
+
   @Test
   public void mapToApiList() {
     // Given
-    Map<TransitMode, Integer> domain = Map.of(
-      TransitMode.FUNICULAR,
-      600,
-      TransitMode.CABLE_CAR,
-      600,
-      TransitMode.RAIL,
-      1800,
-      TransitMode.AIRPLANE,
-      3600
-    );
+    DurationForEnum<TransitMode> domain = DurationForEnum
+      .of(TransitMode.class)
+      .with(TransitMode.FUNICULAR, D10m)
+      .with(TransitMode.CABLE_CAR, D10m)
+      .with(TransitMode.RAIL, D30m)
+      .with(TransitMode.AIRPLANE, D60m)
+      .build();
 
     // When
     List<TransportModeSlack> result = TransportModeSlack.mapToApiList(domain);
 
-    assertEquals(600, result.get(0).slack);
+    assertEquals(D10m.toSeconds(), result.get(0).slack);
     assertTrue(result.get(0).modes.contains(TransitMode.CABLE_CAR));
     assertTrue(result.get(0).modes.contains(TransitMode.FUNICULAR));
 
-    assertEquals(1800, result.get(1).slack);
+    assertEquals(D30m.toSeconds(), result.get(1).slack);
     assertTrue(result.get(1).modes.contains(TransitMode.RAIL));
 
-    assertEquals(3600, result.get(2).slack);
+    assertEquals(D60m.toSeconds(), result.get(2).slack);
     assertTrue(result.get(2).modes.contains(TransitMode.AIRPLANE));
   }
 
@@ -43,21 +49,23 @@ public class TransportModeSlackTest {
   public void mapToDomain() {
     // Given
     List<Object> apiSlackInput = List.of(
-      Map.of("slack", 600, "modes", List.of(TransitMode.FUNICULAR, TransitMode.CABLE_CAR)),
-      Map.of("slack", 1800, "modes", List.of(TransitMode.RAIL)),
-      Map.of("slack", 3600, "modes", List.of(TransitMode.AIRPLANE))
+      Map.of("slack", D10mSec, "modes", List.of(TransitMode.FUNICULAR, TransitMode.CABLE_CAR)),
+      Map.of("slack", D30mSec, "modes", List.of(TransitMode.RAIL)),
+      Map.of("slack", D60mSec, "modes", List.of(TransitMode.AIRPLANE))
     );
 
-    Map<TransitMode, Integer> result;
+    var builder = DurationForEnum.of(TransitMode.class);
 
     // When
-    result = TransportModeSlack.mapToDomain(apiSlackInput);
+    TransportModeSlack.mapIntoDomain(builder, apiSlackInput);
+
+    var result = builder.build();
 
     // Then
-    assertNull(result.get(TransitMode.BUS));
-    assertEquals(Integer.valueOf(600), result.get(TransitMode.FUNICULAR));
-    assertEquals(Integer.valueOf(600), result.get(TransitMode.CABLE_CAR));
-    assertEquals(Integer.valueOf(1800), result.get(TransitMode.RAIL));
-    assertEquals(Integer.valueOf(3600), result.get(TransitMode.AIRPLANE));
+    assertEquals(Duration.ZERO, result.valueOf(TransitMode.BUS));
+    assertEquals(D10m, result.valueOf(TransitMode.FUNICULAR));
+    assertEquals(D10m, result.valueOf(TransitMode.CABLE_CAR));
+    assertEquals(D30m, result.valueOf(TransitMode.RAIL));
+    assertEquals(D60m, result.valueOf(TransitMode.AIRPLANE));
   }
 }

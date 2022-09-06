@@ -928,17 +928,22 @@ public abstract class RoutingResource {
       preferences.bike().setSpeed(4.3);
     }
 
+    var transitPref = preferences.transit();
+
     if (boardSlack != null) {
-      preferences.transit().setBoardSlack(boardSlack);
+      transitPref.withBoardSlack(b -> b.withDefaultSec(boardSlack));
     }
 
     if (alightSlack != null) {
-      preferences.transit().setAlightSlack(alightSlack);
+      transitPref.withBoardSlack(b -> b.withDefaultSec(alightSlack));
     }
 
     if (minTransferTime != null) {
       int alightAndBoardSlack =
-        preferences.transit().boardSlack() + preferences.transit().alightSlack();
+        (
+          (int) transitPref.boardSlack().defaultValue().toSeconds() +
+          (int) transitPref.alightSlack().defaultValue().toSeconds()
+        );
       if (alightAndBoardSlack > minTransferTime) {
         throw new IllegalArgumentException(
           "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"

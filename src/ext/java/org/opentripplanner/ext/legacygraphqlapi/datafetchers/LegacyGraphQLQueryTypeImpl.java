@@ -758,8 +758,14 @@ public class LegacyGraphQLQueryTypeImpl
         preferences.bike().setSpeed(4.3);
       }
 
-      callWith.argument("boardSlack", preferences.transit()::setBoardSlack);
-      callWith.argument("alightSlack", preferences.transit()::setAlightSlack);
+      callWith.argument(
+        "boardSlack",
+        (Integer sec) -> preferences.transit().withBoardSlack(b -> b.withDefaultSec(sec))
+      );
+      callWith.argument(
+        "alightSlack",
+        (Integer sec) -> preferences.transit().withAlightSlack(b -> b.withDefaultSec(sec))
+      );
       callWith.argument("minTransferTime", preferences.transfer()::setSlack);
       callWith.argument("nonpreferredTransferPenalty", preferences.transfer()::setNonpreferredCost);
 

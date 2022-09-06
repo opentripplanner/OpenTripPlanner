@@ -315,7 +315,7 @@ public class DefaultRoutingRequestType {
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> preferences.transit().boardSlack())
+          .dataFetcher(e -> preferences.transit().boardSlack().defaultValue().toSeconds())
           .build()
       )
       .field(
@@ -324,9 +324,7 @@ public class DefaultRoutingRequestType {
           .name("boardSlackList")
           .description(TransportModeSlack.slackByGroupDescription("boardSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
-          .dataFetcher(e ->
-            TransportModeSlack.mapToApiList(preferences.transit().boardSlackForMode())
-          )
+          .dataFetcher(e -> TransportModeSlack.mapToApiList(preferences.transit().boardSlack()))
           .build()
       )
       .field(
@@ -335,7 +333,7 @@ public class DefaultRoutingRequestType {
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> preferences.transit().alightSlack())
+          .dataFetcher(e -> preferences.transit().alightSlack().defaultValue().toSeconds())
           .build()
       )
       .field(
@@ -344,9 +342,7 @@ public class DefaultRoutingRequestType {
           .name("alightSlackList")
           .description(TransportModeSlack.slackByGroupDescription("alightSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
-          .dataFetcher(e ->
-            TransportModeSlack.mapToApiList(preferences.transit().alightSlackForMode())
-          )
+          .dataFetcher(e -> TransportModeSlack.mapToApiList(preferences.transit().alightSlack()))
           .build()
       )
       .field(

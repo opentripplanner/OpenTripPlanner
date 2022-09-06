@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -29,11 +30,12 @@ public class RoutingRequestMapper {
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
-    preferences.transfer().setSlack(c.asInt("alightSlack", preferences.transfer().slack()));
+
     preferences
       .transit()
-      .setAlightSlackForMode(
-        c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt)
+      .initAlightSlack(
+        c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
+        c.asEnumMap("alightSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
       );
     request.allowedVehicleRentalNetworks =
       c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
@@ -97,12 +99,13 @@ public class RoutingRequestMapper {
           preferences.rental().keepingVehicleAtDestinationCost()
         )
       );
-    preferences.transit().setBoardSlack(c.asInt("boardSlack", preferences.transit().boardSlack()));
     preferences
       .transit()
-      .setBoardSlackForMode(
-        c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt)
+      .initBoardSlack(
+        c.asDuration2("boardSlack", preferences.transit().boardSlack().defaultValue(), SECONDS),
+        c.asEnumMap("boardSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
       );
+
     preferences
       .street()
       .initMaxAccessEgressDuration(

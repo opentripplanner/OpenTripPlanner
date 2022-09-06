@@ -3,12 +3,15 @@ package org.opentripplanner.routing.api.request.preference;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 
 import java.io.Serializable;
-import java.util.EnumMap;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.DurationForEnum;
+import org.opentripplanner.routing.api.request.framework.DurationForEnumBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
@@ -16,15 +19,9 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  */
 public class TransitPreferences implements Cloneable, Serializable {
 
-  private int boardSlack;
-  private Map<TransitMode, Integer> boardSlackForMode = new EnumMap<TransitMode, Integer>(
-    TransitMode.class
-  );
+  private DurationForEnum<TransitMode> boardSlack = DurationForEnum.of(TransitMode.class).build();
+  private DurationForEnum<TransitMode> alightSlack = DurationForEnum.of(TransitMode.class).build();
 
-  private int alightSlack = 0;
-  private Map<TransitMode, Integer> alightSlackForMode = new EnumMap<TransitMode, Integer>(
-    TransitMode.class
-  );
   private Map<TransitMode, Double> reluctanceForMode = new HashMap<>();
 
   private int otherThanPreferredRoutesPenalty = 300;
@@ -40,67 +37,51 @@ public class TransitPreferences implements Cloneable, Serializable {
   private RaptorOptions raptorOptions = new RaptorOptions();
 
   /**
-   * The number of seconds to add before boarding a transit leg. It is recommended to use the
-   * `boardTimes` in the `router-config.json` to set this for each mode.
+   * Has information how much time boarding a vehicle takes; The number of seconds to add before
+   * boarding a transit leg. Can be significant for airplanes or ferries. It is recommended to use
+   * the `boardTimes` in the `router-config.json` to set this for each mode.
+   * <p>
+   * Board-slack can be configured per mode, if not set for a given mode it falls back to the
+   * default value. This enables configuring the board-slack for airplane boarding to be 30 minutes
+   * and a 2 minutes slack for everything else.
    * <p>
    * Unit is seconds. Default value is 0.
    */
-  public int boardSlack() {
+  public DurationForEnum<TransitMode> boardSlack() {
     return boardSlack;
   }
 
-  public void setBoardSlack(int boardSlack) {
-    this.boardSlack = boardSlack;
+  public void initBoardSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
+    withBoardSlack(builder -> builder.withDefault(defaultValue).withValues(values));
+  }
+
+  public TransitPreferences withBoardSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
+    this.boardSlack = this.boardSlack.copyOf(body);
+    return this;
   }
 
   /**
-   * Has information how much time boarding a vehicle takes. Can be significant eg in airplanes or
-   * ferries.
+   * Has information how much time alighting a vehicle takes; The number of seconds to add after
+   * alighting a transit leg. Can be significant for airplanes or ferries.  It is recommended to
+   * use the `alightTimes` in the `router-config.json` to set this for each mode.
    * <p>
-   * If set, the board-slack-for-mode override the more general {@link #boardSlack}. This enables
-   * configuring the board-slack for airplane boarding to be 30 minutes and a slack for bus of 2
-   * minutes.
-   * <p>
-   * Unit is seconds. Default value is not-set(empty map).
-   */
-  public Map<TransitMode, Integer> boardSlackForMode() {
-    return boardSlackForMode;
-  }
-
-  public void setBoardSlackForMode(Map<TransitMode, Integer> boardSlackForMode) {
-    this.boardSlackForMode = boardSlackForMode;
-  }
-
-  /**
-   * The number of seconds to add after alighting a transit leg. It is recommended to use the
-   * `alightTimes` in the `router-config.json` to set this for each mode.
+   * Alight-slack can be configured per mode. The default value is used if not set for a given mode.
+   * This enables configuring the alight-slack for train alighting to be 4 minutes and a bus alight
+   * slack to be 0 minutes.
    * <p>
    * Unit is seconds. Default value is 0.
    */
-  public int alightSlack() {
+  public DurationForEnum<TransitMode> alightSlack() {
     return alightSlack;
   }
 
-  public void setAlightSlack(int alightSlack) {
-    this.alightSlack = alightSlack;
+  public void initAlightSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
+    withAlightSlack(builder -> builder.withDefault(defaultValue).withValues(values));
   }
 
-  /**
-   * Has information how much time alighting a vehicle takes. Can be significant eg in airplanes or
-   * ferries.
-   * <p>
-   * If set, the alight-slack-for-mode override the more general {@link #alightSlack}. This enables
-   * configuring the alight-slack for train alighting to be 4 minutes and a bus alight slack to be 0
-   * minutes.
-   * <p>
-   * Unit is seconds. Default value is not-set(empty map).
-   */
-  public Map<TransitMode, Integer> alightSlackForMode() {
-    return alightSlackForMode;
-  }
-
-  public void setAlightSlackForMode(Map<TransitMode, Integer> alightSlackForMode) {
-    this.alightSlackForMode = alightSlackForMode;
+  public TransitPreferences withAlightSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
+    this.alightSlack = this.alightSlack.copyOf(body);
+    return this;
   }
 
   /**
@@ -187,8 +168,8 @@ public class TransitPreferences implements Cloneable, Serializable {
       // TODO VIA: 2022-08-26 skipping unpreferredRouteCost (that's how it was before)
       var clone = (TransitPreferences) super.clone();
 
-      clone.boardSlackForMode = new EnumMap<>(boardSlackForMode);
-      clone.alightSlackForMode = new EnumMap<>(alightSlackForMode);
+      clone.boardSlack = this.boardSlack;
+      clone.alightSlack = alightSlack;
       clone.reluctanceForMode = new HashMap<>(reluctanceForMode);
       clone.raptorOptions = new RaptorOptions(raptorOptions);
 

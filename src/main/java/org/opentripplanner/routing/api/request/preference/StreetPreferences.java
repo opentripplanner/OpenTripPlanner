@@ -23,15 +23,15 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   private int elevatorHopCost = 20;
 
-  private DurationForEnum<StreetMode> maxAccessEgressDuration = new DurationForEnum<>(
-    StreetMode.class,
-    Duration.ofMinutes(45)
-  );
+  private DurationForEnum<StreetMode> maxAccessEgressDuration = DurationForEnum
+    .of(StreetMode.class)
+    .withDefault(Duration.ofMinutes(45))
+    .build();
 
-  private DurationForEnum<StreetMode> maxDirectDuration = new DurationForEnum<>(
-    StreetMode.class,
-    Duration.ofHours(4)
-  );
+  private DurationForEnum<StreetMode> maxDirectDuration = DurationForEnum
+    .of(StreetMode.class)
+    .withDefault(Duration.ofHours(4))
+    .build();
 
   private double turnReluctance = 1.0;
 
@@ -103,12 +103,10 @@ public class StreetPreferences implements Cloneable, Serializable {
     return maxAccessEgressDuration.valueOf(mode);
   }
 
-  public void initMaxAccessEgressDuration(
-    Duration defaultValue,
-    Map<StreetMode, Duration> valuePerMode
-  ) {
+  public void initMaxAccessEgressDuration(Duration defaultValue, Map<StreetMode, Duration> values) {
     this.maxAccessEgressDuration =
-      new DurationForEnum<>(StreetMode.class, defaultValue, valuePerMode);
+      maxAccessEgressDuration.copyOf(builder -> builder.withDefault(defaultValue).withValues(values)
+      );
   }
 
   /**
@@ -128,7 +126,10 @@ public class StreetPreferences implements Cloneable, Serializable {
   }
 
   public void initMaxDirectDuration(Duration defaultValue, Map<StreetMode, Duration> valuePerMode) {
-    this.maxDirectDuration = new DurationForEnum<>(StreetMode.class, defaultValue, valuePerMode);
+    this.maxDirectDuration =
+      this.maxDirectDuration.copyOf(builder ->
+          builder.withDefault(defaultValue).withValues(valuePerMode)
+        );
   }
 
   /** Multiplicative factor on expected turning time. */

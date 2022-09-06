@@ -1,8 +1,10 @@
 package org.opentripplanner.routing.api.request.framework;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.function.Consumer;
+import org.opentripplanner.util.lang.ObjectUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
@@ -12,24 +14,36 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
 
-public class DurationForEnum<E extends Enum<?>> {
+public class DurationForEnum<E extends Enum<?>> implements Serializable {
 
   private final Class<E> type;
   private final Duration defaultValue;
   private final Duration[] valueForEnum;
 
-  public DurationForEnum(Class<E> type, Duration defaultValue) {
-    this(type, defaultValue, Map.of());
+  DurationForEnum(DurationForEnumBuilder<E> builder) {
+    this.type = builder.type();
+    this.defaultValue = ObjectUtils.ifNotNull(builder.defaultValue(), Duration.ZERO);
+    this.valueForEnum = builder.valueForEnum();
+    // Set default values to avoid null checks later
+    for (int i = 0; i < valueForEnum.length; i++) {
+      if (valueForEnum[i] == null) {
+        valueForEnum[i] = defaultValue;
+      }
+    }
   }
 
-  public DurationForEnum(Class<E> type, Duration defaultValue, Map<E, Duration> values) {
-    this.type = type;
-    this.defaultValue = defaultValue;
-    this.valueForEnum = new Duration[type.getEnumConstants().length];
-    Arrays.fill(valueForEnum, defaultValue);
-    for (Map.Entry<E, Duration> e : values.entrySet()) {
-      this.valueForEnum[e.getKey().ordinal()] = e.getValue();
-    }
+  public static <S extends Enum<?>> DurationForEnumBuilder<S> of(Class<S> type) {
+    return new DurationForEnumBuilder<>(type);
+  }
+
+  public DurationForEnum<E> copyOf(Consumer<DurationForEnumBuilder<E>> body) {
+    var builder = new DurationForEnumBuilder<>(this);
+    body.accept(builder);
+    return builder.build();
+  }
+
+  Class<E> type() {
+    return type;
   }
 
   public Duration defaultValue() {
@@ -38,6 +52,10 @@ public class DurationForEnum<E extends Enum<?>> {
 
   public Duration valueOf(E type) {
     return valueForEnum[type.ordinal()];
+  }
+
+  public boolean isSet(E key) {
+    return valueOf(key) != defaultValue;
   }
 
   @Override
@@ -64,11 +82,11 @@ public class DurationForEnum<E extends Enum<?>> {
 
     DurationForEnum<?> that = (DurationForEnum<?>) o;
 
-    return Arrays.equals(valueForEnum, that.valueForEnum);
+    return type.equals(that.type) && Arrays.equals(valueForEnum, that.valueForEnum);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(valueForEnum);
+    return 31 * type.hashCode() + Arrays.hashCode(valueForEnum);
   }
 }

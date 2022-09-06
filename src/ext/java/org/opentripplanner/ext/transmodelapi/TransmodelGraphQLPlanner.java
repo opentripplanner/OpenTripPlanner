@@ -248,16 +248,25 @@ public class TransmodelGraphQLPlanner {
     // One of those arguments has been deprecated. That's why we are mapping same thing twice.
     callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
     callWith.argument("transferSlack", preferences.transfer()::setSlack);
-    callWith.argument("boardSlackDefault", preferences.transit()::setBoardSlack);
-    callWith.argument(
-      "boardSlackList",
-      (Object v) -> preferences.transit().setBoardSlackForMode(TransportModeSlack.mapToDomain(v))
-    );
-    callWith.argument("alightSlackDefault", (Integer v) -> preferences.transit().setAlightSlack(v));
-    callWith.argument(
-      "alightSlackList",
-      (Object v) -> preferences.transit().setAlightSlackForMode(TransportModeSlack.mapToDomain(v))
-    );
+
+    preferences
+      .transit()
+      .withBoardSlack(builder -> {
+        callWith.argument("boardSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "boardSlackList",
+          (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+    preferences
+      .transit()
+      .withAlightSlack(builder -> {
+        callWith.argument("alightSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "alightSlackList",
+          (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
     callWith.argument("maximumTransfers", preferences.transfer()::setMaxTransfers);
     callWith.argument(
       "useBikeRentalAvailabilityInformation",

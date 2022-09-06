@@ -118,9 +118,7 @@ public class RaptorRequestMapper {
         new SlackProvider(
           preferences.transfer().slack(),
           preferences.transit().boardSlack(),
-          preferences.transit().boardSlackForMode(),
-          preferences.transit().alightSlack(),
-          preferences.transit().alightSlackForMode()
+          preferences.transit().alightSlack()
         )
       );
 
