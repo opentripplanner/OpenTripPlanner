@@ -414,7 +414,7 @@ public class RouteRequest implements Cloneable, Serializable {
     return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
   }
 
-  public SortOrder getItinerariesSortOrder() {
+  public SortOrder itinerariesSortOrder() {
     if (pageCursor != null) {
       return pageCursor.originalSortOrder;
     }
@@ -467,7 +467,7 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public boolean doCropSearchWindowAtTail() {
     if (pageCursor == null) {
-      return getItinerariesSortOrder().isSortedByArrivalTimeAcceding();
+      return itinerariesSortOrder().isSortedByArrivalTimeAcceding();
     }
     return pageCursor.type == PageType.NEXT_PAGE;
   }

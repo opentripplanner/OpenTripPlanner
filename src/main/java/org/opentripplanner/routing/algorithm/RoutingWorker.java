@@ -124,7 +124,7 @@ public class RoutingWorker {
 
     // Filter itineraries
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
-      request.getItinerariesSortOrder(),
+      request.itinerariesSortOrder(),
       request.preferences().system().itineraryFilters(),
       request.numItineraries(),
       filterOnLatestDepartureTime(),
