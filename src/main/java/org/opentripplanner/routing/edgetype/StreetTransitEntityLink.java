@@ -76,8 +76,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
 
-    var accessibility = pref.wheelchair().accessibility();
-    if (accessibility.enabled()) {
+    if (req.wheelchair()) {
+      var accessibility = pref.wheelchairAccessibility();
       if (
         accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE

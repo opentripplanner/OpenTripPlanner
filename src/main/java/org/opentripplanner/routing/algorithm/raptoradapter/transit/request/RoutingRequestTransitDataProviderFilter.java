@@ -21,6 +21,8 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final boolean requireBikesAllowed;
 
+  private final boolean wheelchairEnabled;
+
   private final WheelchairAccessibilityPreferences wheelchairAccessibility;
 
   private final boolean includePlannedCancellations;
@@ -33,6 +35,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   public RoutingRequestTransitDataProviderFilter(
     boolean requireBikesAllowed,
+    boolean wheelchairEnabled,
     WheelchairAccessibilityPreferences accessibility,
     boolean includePlannedCancellations,
     Collection<MainAndSubMode> allowedTransitModes,
@@ -40,6 +43,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     Set<FeedScopedId> bannedTrips
   ) {
     this.requireBikesAllowed = requireBikesAllowed;
+    this.wheelchairEnabled = wheelchairEnabled;
     this.wheelchairAccessibility = accessibility;
     this.includePlannedCancellations = includePlannedCancellations;
     this.bannedRoutes = bannedRoutes;
@@ -53,7 +57,8 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
   ) {
     this(
       request.modes.transferMode == StreetMode.BIKE,
-      request.preferences().wheelchair().accessibility(),
+      request.wheelchair(),
+      request.preferences().wheelchairAccessibility(),
       request.preferences().transit().includePlannedCancellations(),
       request.modes.transitModes,
       request.getBannedRoutes(transitService.getAllRoutes()),
@@ -91,7 +96,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
       }
     }
 
-    if (wheelchairAccessibility.enabled()) {
+    if (wheelchairEnabled) {
       if (
         wheelchairAccessibility.trip().onlyConsiderAccessible() &&
         tripTimes.getWheelchairAccessibility() != WheelchairAccessibility.POSSIBLE
@@ -116,7 +121,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     // consider those stops which have the correct accessibility values then use only this for
     // checking whether to board/alight
     if (
-      wheelchairAccessibility.enabled() && wheelchairAccessibility.stop().onlyConsiderAccessible()
+      wheelchairEnabled && wheelchairAccessibility.stop().onlyConsiderAccessible()
     ) {
       var copy = (BitSet) boardingPossible.clone();
       // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair

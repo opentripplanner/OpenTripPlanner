@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
+import javax.annotation.Nonnull;
 import org.opentripplanner.routing.core.TraverseMode;
 
 // TODO VIA: Javadoc
@@ -14,7 +15,11 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   // TODO VIA - To enable wheelchair we need a flag in the request, not relay on
   //          - wheelchair preferences to be set.
-  private WheelchairPreferences wheelchair = new WheelchairPreferences();
+  /**
+   * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
+   */
+  @Nonnull
+  private WheelchairAccessibilityPreferences wheelchairAccessibility = WheelchairAccessibilityPreferences.DEFAULT;
   private BikePreferences bike = new BikePreferences();
   private CarPreferences car = new CarPreferences();
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
@@ -47,8 +52,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
     return street;
   }
 
-  public WheelchairPreferences wheelchair() {
-    return wheelchair;
+  @Nonnull
+  public WheelchairAccessibilityPreferences wheelchairAccessibility() {
+    return wheelchairAccessibility;
+  }
+
+  public void setWheelchairAccessibility(@Nonnull WheelchairAccessibilityPreferences wheelchairAccessibility) {
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   public BikePreferences bike() {
@@ -85,13 +95,15 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   public RoutingPreferences clone() {
     try {
+      // TODO VIA: 2022-09-06 Skipping WheelchairAccessibilityRequest
+
       var clone = (RoutingPreferences) super.clone();
 
       clone.transit = transit.clone();
       clone.transfer = transfer.clone();
       clone.walk = walk.clone();
       clone.street = street.clone();
-      clone.wheelchair = wheelchair.clone();
+      clone.wheelchairAccessibility = wheelchairAccessibility;
       clone.bike = bike.clone();
       clone.car = car.clone();
       clone.rental = rental.clone();

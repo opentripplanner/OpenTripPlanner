@@ -87,9 +87,7 @@ public abstract class GtfsTest {
     if (onTripId != null && !onTripId.isEmpty()) {
       routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
     }
-    preferences
-      .wheelchair()
-      .setAccessibility(preferences.wheelchair().accessibility().withEnabled(wheelchairAccessible));
+    routingRequest.setWheelchair(wheelchairAccessible);
     preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
     routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
     if (excludedRoute != null && !excludedRoute.isEmpty()) {

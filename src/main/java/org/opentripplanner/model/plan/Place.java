@@ -143,7 +143,7 @@ public class Place {
       preferences.parking().useAvailabilityInformation() &&
       vertex
         .getVehicleParking()
-        .hasRealTimeDataForMode(traverseMode, preferences.wheelchair().accessibility().enabled());
+        .hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

@@ -14,6 +14,7 @@ public class McCostParamsBuilder {
   private int transferCost;
   private double[] transitReluctanceFactors;
   private double waitReluctanceFactor;
+  private boolean wheelchairEnabled;
   private WheelchairAccessibilityPreferences accessibilityRequest;
   private BitSet unpreferredPatterns;
   private DoubleFunction<Double> unpreferredCost;
@@ -27,6 +28,7 @@ public class McCostParamsBuilder {
     this.transferCost = other.transferCost();
     this.transitReluctanceFactors = other.transitReluctanceFactors();
     this.waitReluctanceFactor = other.waitReluctanceFactor();
+    this.wheelchairEnabled = other.wheelchairEnabled();
     this.accessibilityRequest = other.accessibilityRequirements();
     this.unpreferredPatterns = other.unpreferredPatterns();
   }
@@ -67,8 +69,17 @@ public class McCostParamsBuilder {
     return this;
   }
 
+  public boolean wheelchairEnabled() {
+    return wheelchairEnabled;
+  }
+
   public WheelchairAccessibilityPreferences wheelchairAccessibility() {
     return accessibilityRequest;
+  }
+
+  public McCostParamsBuilder wheelchairEnabled(boolean wheelchairEnabled) {
+    this.wheelchairEnabled = wheelchairEnabled;
+    return this;
   }
 
   public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityPreferences mode) {

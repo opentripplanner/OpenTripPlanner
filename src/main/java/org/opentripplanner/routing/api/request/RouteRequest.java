@@ -106,13 +106,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private boolean arriveBy = false;
 
-  /**
-   * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
-   */
-  @Nonnull
-  public WheelchairAccessibilityPreferences wheelchairAccessibility =
-    WheelchairAccessibilityPreferences.DEFAULT;
-
   private int numItineraries = 50;
 
   private Locale locale = new Locale("en", "US");
@@ -127,6 +120,9 @@ public class RouteRequest implements Cloneable, Serializable {
   public Set<String> requiredVehicleParkingTags = Set.of();
   /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
   public Set<String> bannedVehicleParkingTags = Set.of();
+
+  // TODO VIA javadocs
+  private boolean wheelchair = false;
 
   /**
    * Do not use certain named agencies
@@ -260,10 +256,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.streetSubRequestModes = streetSubRequestModes;
   }
 
-  public void setWheelchairAccessible(boolean wheelchair) {
-    this.wheelchairAccessibility = this.wheelchairAccessibility.withEnabled(wheelchair);
-  }
-
   public void setPreferredAgencies(Collection<FeedScopedId> ids) {
     if (ids != null) {
       preferredAgencies = Set.copyOf(ids);
@@ -290,6 +282,14 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public RoutingPreferences preferences() {
     return preferences;
+  }
+
+  public boolean wheelchair() {
+    return wheelchair;
+  }
+
+  public void setWheelchair(boolean wheelchair) {
+    this.wheelchair = wheelchair;
   }
 
   public void setBannedAgencies(Collection<FeedScopedId> ids) {

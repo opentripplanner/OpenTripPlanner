@@ -55,9 +55,7 @@ public class Transfer {
     bikePreferences.setSwitchTime(roundTo100(bikePreferences.switchTime()));
 
     // it's a record (immutable) so can be safely reused
-    transferPreferences
-      .wheelchair()
-      .setAccessibility(request.preferences().wheelchair().accessibility());
+    transferPreferences.setWheelchairAccessibility(request.preferences().wheelchairAccessibility());
 
     walkPreferences.setSpeed(roundToHalf(walkPreferences.speed()));
     bikePreferences.setSpeed(roundToHalf(bikePreferences.speed()));

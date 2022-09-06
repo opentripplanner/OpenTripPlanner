@@ -608,7 +608,8 @@ public class LegacyGraphQLQueryTypeImpl
         context.getServerContext().transitService().getTimeZone()
       );
 
-      callWith.argument("wheelchair", preferences.wheelchair()::setAccessibility);
+      // TODO VIA: double check that
+      callWith.argument("wheelchair", request::setWheelchair);
       callWith.argument("numItineraries", request::setNumItineraries);
       callWith.argument("searchWindow", (Long m) -> request.setSearchWindow(Duration.ofSeconds(m)));
       callWith.argument("pageCursor", request::setPageCursorFromEncoded);

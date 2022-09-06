@@ -245,10 +245,7 @@ public class GeometryProcessorTest {
     }
 
     RouteRequest options = new RouteRequest();
-    options
-      .preferences()
-      .wheelchair()
-      .setAccessibility(WheelchairAccessibilityPreferences.makeDefault(true));
+    options.setWheelchair(true);
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 18, 0, 0, 0));
 
     ShortestPathTree spt;

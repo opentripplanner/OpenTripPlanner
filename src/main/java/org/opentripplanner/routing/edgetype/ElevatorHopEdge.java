@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -83,19 +84,20 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   @Override
   public State traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
+    RouteRequest request = s0.getOptions();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
-    if (preferences.wheelchair().accessibility().enabled()) {
+    if (request.wheelchair()) {
       if (
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
-        preferences.wheelchair().accessibility().elevator().onlyConsiderAccessible()
+          preferences.wheelchairAccessibility().elevator().onlyConsiderAccessible()
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(preferences.wheelchair().accessibility().elevator().unknownCost());
+        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().unknownCost());
       } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(preferences.wheelchair().accessibility().elevator().inaccessibleCost());
+        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().inaccessibleCost());
       }
     }
 

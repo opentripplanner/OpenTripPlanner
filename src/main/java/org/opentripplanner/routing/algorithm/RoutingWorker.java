@@ -131,8 +131,8 @@ public class RoutingWorker {
       emptyDirectModeHandler.removeWalkAllTheWayResults(),
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
-      request.preferences().wheelchair().accessibility().enabled(),
-      request.preferences().wheelchair().accessibility().maxSlope(),
+      request.wheelchair(),
+      request.preferences().wheelchairAccessibility().maxSlope(),
       serverContext.graph().getFareService(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation

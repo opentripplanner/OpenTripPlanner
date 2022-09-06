@@ -35,7 +35,8 @@ public class McCostParamsMapper {
     builder.transitReluctanceFactors(
       mapTransitReluctance(preferences.transit().reluctanceForMode())
     );
-    builder.wheelchairAccessibility(preferences.wheelchair().accessibility());
+    builder.wheelchairEnabled(request.wheelchair());
+    builder.wheelchairAccessibility(preferences.wheelchairAccessibility());
 
     final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
     final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();

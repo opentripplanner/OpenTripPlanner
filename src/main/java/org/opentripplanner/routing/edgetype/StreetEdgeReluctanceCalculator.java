@@ -38,7 +38,7 @@ class StreetEdgeReluctanceCalculator {
     boolean edgeWheelchairAccessible,
     boolean stairs
   ) {
-    var wheelchair = preferences.wheelchair().accessibility();
+    var wheelchair = preferences.wheelchairAccessibility();
     // Add reluctance if street is not wheelchair accessible
     double reluctance = edgeWheelchairAccessible ? 1.0 : wheelchair.inaccessibleStreetReluctance();
     reluctance *= preferences.walk().reluctance();

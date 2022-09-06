@@ -99,11 +99,11 @@ class StreetTransitEntityLinkTest {
     } else {
       feature = WheelchairAccessibilityFeature.ofCost(100, 100);
     }
+    req.setWheelchair(true);
     req
       .preferences()
-      .wheelchair()
-      .setAccessibility(
-        new WheelchairAccessibilityPreferences(true, feature, feature, feature, 25, 8, 10, 25)
+      .setWheelchairAccessibility(
+        new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25)
       );
 
     var ctx = new RoutingContext(req, graph, from, to);

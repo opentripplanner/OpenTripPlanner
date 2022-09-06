@@ -15,7 +15,6 @@ import java.math.RoundingMode;
  *                                include stairs as a last result.
  */
 public record WheelchairAccessibilityPreferences(
-  boolean enabled,
   WheelchairAccessibilityFeature trip,
   WheelchairAccessibilityFeature stop,
   WheelchairAccessibilityFeature elevator,
@@ -54,7 +53,6 @@ public record WheelchairAccessibilityPreferences(
   private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
   public static final WheelchairAccessibilityPreferences DEFAULT = new WheelchairAccessibilityPreferences(
-    false,
     DEFAULT_TRIP_FEATURE,
     DEFAULT_STOP_FEATURE,
     DEFAULT_ELEVATOR_FEATURE,
@@ -64,23 +62,6 @@ public record WheelchairAccessibilityPreferences(
     DEFAULT_STAIRS_RELUCTANCE
   );
 
-  public static WheelchairAccessibilityPreferences makeDefault(boolean enabled) {
-    return DEFAULT.withEnabled(enabled);
-  }
-
-  public WheelchairAccessibilityPreferences withEnabled(boolean enabled) {
-    return new WheelchairAccessibilityPreferences(
-      enabled,
-      trip,
-      stop,
-      elevator,
-      inaccessibleStreetReluctance,
-      maxSlope,
-      slopeExceededReluctance,
-      stairsReluctance
-    );
-  }
-
   public WheelchairAccessibilityPreferences round() {
     double roundedMaxSlope = BigDecimal
       .valueOf(maxSlope)
@@ -88,7 +69,6 @@ public record WheelchairAccessibilityPreferences(
       .round(MathContext.UNLIMITED)
       .doubleValue();
     return new WheelchairAccessibilityPreferences(
-      enabled,
       trip,
       stop,
       elevator,

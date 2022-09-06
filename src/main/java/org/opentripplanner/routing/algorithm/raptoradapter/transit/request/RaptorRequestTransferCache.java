@@ -117,8 +117,7 @@ public class RaptorRequestTransferCache {
       this.bikeOptimizeTimeSlopeSafety = preferences.bike().optimizeTriangle();
       this.bikeSwitchCost = preferences.bike().switchCost();
       this.bikeSwitchTime = preferences.bike().switchTime();
-
-      this.wheelchairAccessibility = preferences.wheelchair().accessibility().round();
+      this.wheelchairAccessibility = preferences.wheelchairAccessibility().round();
 
       this.walkSpeed = preferences.walk().speed();
       this.bikeSpeed = preferences.bike().speed();

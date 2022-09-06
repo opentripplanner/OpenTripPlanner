@@ -68,7 +68,7 @@ public class DefaultRoutingRequestType {
           .name("wheelChairAccessible")
           .description("Whether the trip must be wheelchair accessible.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.wheelchair().accessibility().enabled())
+          .dataFetcher(env -> request.wheelchair())
           .build()
       )
       .field(
@@ -86,7 +86,7 @@ public class DefaultRoutingRequestType {
           .name("maxSlope")
           .description("The maximum slope of streets for wheelchair trips.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.wheelchair().accessibility().maxSlope())
+          .dataFetcher(env -> preferences.wheelchairAccessibility().maxSlope())
           .build()
       )
       .field(

@@ -34,12 +34,8 @@ class ElevatorHopEdgeTest {
   public void shouldNotTraverse(WheelchairAccessibility wheelchair) {
     var req = new RouteRequest();
     WheelchairAccessibilityFeature feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
-    req
-      .preferences()
-      .wheelchair()
-      .setAccessibility(
-        new WheelchairAccessibilityPreferences(true, feature, feature, feature, 25, 8, 10, 25)
-      );
+    req.setWheelchair(true);
+    req.preferences().setWheelchairAccessibility(new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25));
     State result = traverse(wheelchair, req);
     assertNull(result);
   }
@@ -61,10 +57,7 @@ class ElevatorHopEdgeTest {
     assertNotNull(result);
     assertTrue(result.weight > 1);
 
-    req
-      .preferences()
-      .wheelchair()
-      .setAccessibility(WheelchairAccessibilityPreferences.DEFAULT.withEnabled(true));
+    req.setWheelchair(true);
     var wheelchairResult = traverse(wheelchair, req);
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);

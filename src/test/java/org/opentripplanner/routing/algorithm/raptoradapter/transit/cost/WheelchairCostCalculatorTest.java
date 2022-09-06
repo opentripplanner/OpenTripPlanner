@@ -32,7 +32,6 @@ public class WheelchairCostCalculatorTest {
   private final WheelchairCostCalculator<TestTripSchedule> wheelchairCostCalculator = new WheelchairCostCalculator<>(
     defaultCostCalculator,
     new WheelchairAccessibilityPreferences(
-      true,
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
       WheelchairAccessibilityFeature.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST),
       WheelchairAccessibilityFeature.ofOnlyAccessible(),

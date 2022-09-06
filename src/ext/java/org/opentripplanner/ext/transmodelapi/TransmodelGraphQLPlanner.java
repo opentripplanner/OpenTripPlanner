@@ -110,10 +110,7 @@ public class TransmodelGraphQLPlanner {
     callWith.argument("timetableView", request::setTimetableView);
     callWith.argument(
       "wheelchairAccessible",
-      (Boolean enabled) ->
-        preferences
-          .wheelchair()
-          .setAccessibility(preferences.wheelchair().accessibility().withEnabled(enabled))
+      request::setWheelchair
     );
     callWith.argument("numTripPatterns", request::setNumItineraries);
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);

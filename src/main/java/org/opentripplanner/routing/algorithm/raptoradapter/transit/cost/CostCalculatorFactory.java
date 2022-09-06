@@ -10,7 +10,7 @@ public class CostCalculatorFactory {
   ) {
     CostCalculator<T> calculator = new DefaultCostCalculator<>(mcCostParams, stopBoardAlightCosts);
 
-    if (mcCostParams.accessibilityRequirements().enabled()) {
+    if (mcCostParams.wheelchairEnabled()) {
       calculator =
         new WheelchairCostCalculator<>(calculator, mcCostParams.accessibilityRequirements());
     }

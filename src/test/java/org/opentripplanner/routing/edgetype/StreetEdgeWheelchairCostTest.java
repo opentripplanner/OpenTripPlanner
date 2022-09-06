@@ -94,12 +94,11 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
     var req = new RouteRequest();
+    req.setWheelchair(true);
     req
       .preferences()
-      .wheelchair()
-      .setAccessibility(
+      .setWheelchairAccessibility(
         new WheelchairAccessibilityPreferences(
-          true,
           ofOnlyAccessible(),
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -130,12 +129,11 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     edge.setStairs(true);
 
     var req = new RouteRequest();
+    req.setWheelchair(true);
     req
       .preferences()
-      .wheelchair()
-      .setAccessibility(
+      .setWheelchairAccessibility(
         new WheelchairAccessibilityPreferences(
-          true,
           ofOnlyAccessible(),
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -172,12 +170,11 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     edge.setWheelchairAccessible(false);
 
     var req = new RouteRequest();
+    req.setWheelchair(true);
     req
       .preferences()
-      .wheelchair()
-      .setAccessibility(
+      .setWheelchairAccessibility(
         new WheelchairAccessibilityPreferences(
-          true,
           ofOnlyAccessible(),
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -214,10 +211,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.preferences().walk().setReluctance(walkReluctance);
-    req
-      .preferences()
-      .wheelchair()
-      .setAccessibility(WheelchairAccessibilityPreferences.DEFAULT.withEnabled(true));
+    req.setWheelchair(true);
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);

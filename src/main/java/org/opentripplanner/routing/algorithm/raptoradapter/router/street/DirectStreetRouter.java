@@ -52,7 +52,8 @@ public class DirectStreetRouter {
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
       ItinerariesHelper.decorateItinerariesWithRequestData(
         response,
-        directRequest.preferences().wheelchair()
+        directRequest.wheelchair(),
+        directRequest.preferences().wheelchairAccessibility()
       );
       return response;
     } catch (PathNotFoundException e) {

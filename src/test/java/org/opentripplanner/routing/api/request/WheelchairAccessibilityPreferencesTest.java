@@ -23,7 +23,6 @@ class WheelchairAccessibilityPreferencesTest {
   @VariableSource("testCases")
   void shouldRoundTo3DecimalPlaces(double raw, double rounded) {
     var roundedRequest = new WheelchairAccessibilityPreferences(
-      true,
       ofOnlyAccessible(),
       ofOnlyAccessible(),
       ofOnlyAccessible(),
