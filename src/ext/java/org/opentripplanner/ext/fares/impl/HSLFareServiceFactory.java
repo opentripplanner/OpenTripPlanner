@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRule;
-import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

@@ -1,4 +1,4 @@
-package org.opentripplanner.common.model;
+package org.opentripplanner.ext.fares.model;
 
 import java.io.Serializable;
 

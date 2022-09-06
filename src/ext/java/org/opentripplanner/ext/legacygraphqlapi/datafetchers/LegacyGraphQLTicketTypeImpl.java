@@ -3,8 +3,8 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import java.text.DecimalFormat;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.core.FareRuleSet;
 
 public class LegacyGraphQLTicketTypeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLTicketType {
