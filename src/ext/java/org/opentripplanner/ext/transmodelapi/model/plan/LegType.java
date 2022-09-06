@@ -146,7 +146,7 @@ public class LegType {
           .name("duration")
           .description("The leg's duration in seconds")
           .type(new GraphQLNonNull(ExtendedScalars.GraphQLLong))
-          .dataFetcher(env -> leg(env).getDuration())
+          .dataFetcher(env -> leg(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -155,7 +155,7 @@ public class LegType {
           .name("directDuration")
           .type(new GraphQLNonNull(ExtendedScalars.GraphQLLong))
           .description("NOT IMPLEMENTED")
-          .dataFetcher(env -> leg(env).getDuration())
+          .dataFetcher(env -> leg(env).getDuration().toSeconds())
           .build()
       )
       .field(
