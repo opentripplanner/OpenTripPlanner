@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_parking;
 
-import java.time.ZoneId;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdater;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlBikeParkDataSource;
@@ -21,29 +20,25 @@ public class VehicleParkingDataSourceFactory {
 
   public static DataSource<VehicleParking> create(
     VehicleParkingUpdaterParameters parameters,
-    OpeningHoursCalendarService openingHoursCalendarService,
-    ZoneId zoneId
+    OpeningHoursCalendarService openingHoursCalendarService
   ) {
     switch (parameters.getSourceType()) {
       case HSL_PARK:
         return new HslParkUpdater(
           (HslParkUpdaterParameters) parameters,
-          openingHoursCalendarService,
-          zoneId
+          openingHoursCalendarService
         );
       case KML:
         return new KmlBikeParkDataSource((KmlUpdaterParameters) parameters);
       case PARK_API:
         return new CarParkAPIUpdater(
           (ParkAPIUpdaterParameters) parameters,
-          openingHoursCalendarService,
-          zoneId
+          openingHoursCalendarService
         );
       case BICYCLE_PARK_API:
         return new BicycleParkAPIUpdater(
           (ParkAPIUpdaterParameters) parameters,
-          openingHoursCalendarService,
-          zoneId
+          openingHoursCalendarService
         );
     }
     throw new IllegalArgumentException(
