@@ -674,17 +674,6 @@ public abstract class RoutingResource {
   @QueryParam("geoidElevation")
   private Boolean geoidElevation;
 
-  /**
-   * Set the method of sorting itineraries in the response. Right now, the only supported value is
-   * "duration"; otherwise it uses default sorting. More sorting methods may be added in the
-   * future.
-   *
-   * @deprecated TODO OTP2 Regression. Not currently working in OTP2 at the moment.
-   */
-  @Deprecated
-  @QueryParam("pathComparator")
-  private String pathComparator;
-
   @QueryParam("useVehicleParkingAvailabilityInformation")
   private Boolean useVehicleParkingAvailabilityInformation;
 
@@ -980,10 +969,6 @@ public abstract class RoutingResource {
 
     if (geoidElevation != null) {
       preferences.system().setGeoidElevation(geoidElevation);
-    }
-
-    if (pathComparator != null) {
-      preferences.street().setPathComparator(pathComparator);
     }
 
     if (debugItineraryFilter != null) {

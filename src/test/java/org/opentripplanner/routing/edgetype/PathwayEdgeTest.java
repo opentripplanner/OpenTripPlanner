@@ -197,7 +197,8 @@ class PathwayEdgeTest {
     var req = new RouteRequest();
     req.setWheelchair(wheelchair);
     req
-      .preferences().setWheelchairAccessibility(
+      .preferences()
+      .setWheelchairAccessibility(
         new WheelchairAccessibilityPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),

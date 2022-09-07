@@ -51,7 +51,6 @@ public class RoutingRequestTransitDataProviderFilterTest {
   private static final WheelchairAccessibilityPreferences DEFAULT_ACCESSIBILITY =
     WheelchairAccessibilityPreferences.DEFAULT;
 
-
   /**
    * Test filter for wheelchair access.
    *

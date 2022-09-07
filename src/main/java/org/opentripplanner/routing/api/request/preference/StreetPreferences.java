@@ -2,13 +2,9 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.Comparator;
 import java.util.Map;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.impl.DurationComparator;
-import org.opentripplanner.routing.impl.PathComparator;
-import org.opentripplanner.routing.spt.GraphPath;
 
 // TODO VIA: Javadoc
 // Direct street search
@@ -34,14 +30,6 @@ public class StreetPreferences implements Cloneable, Serializable {
     .build();
 
   private double turnReluctance = 1.0;
-
-  /**
-   * Which path comparator to use
-   *
-   * @deprecated TODO OTP2 Regression. Not currently working in OTP2 at the moment.
-   */
-  @Deprecated
-  private String pathComparator = null;
 
   /** What is the cost of boarding an elevator? */
   public int elevatorBoardCost() {
@@ -139,22 +127,6 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   public void setTurnReluctance(double turnReluctance) {
     this.turnReluctance = turnReluctance;
-  }
-
-  // TODO VIA: 2022-08-22 do we want to have this method here?
-  public String pathComparator() {
-    return pathComparator;
-  }
-
-  public Comparator<GraphPath> pathComparator(boolean compareStartTimes) {
-    if ("duration".equals(pathComparator)) {
-      return new DurationComparator();
-    }
-    return new PathComparator(compareStartTimes);
-  }
-
-  public void setPathComparator(String pathComparator) {
-    this.pathComparator = pathComparator;
   }
 
   public StreetPreferences clone() {

@@ -141,9 +141,7 @@ public class Place {
 
     boolean realTime =
       preferences.parking().useAvailabilityInformation() &&
-      vertex
-        .getVehicleParking()
-        .hasRealTimeDataForMode(traverseMode, request.wheelchair());
+      vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

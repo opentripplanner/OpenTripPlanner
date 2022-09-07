@@ -190,9 +190,6 @@ public class RoutingRequestMapper {
         )
       );
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
-    preferences
-      .street()
-      .setPathComparator(c.asText("pathComparator", preferences.street().pathComparator()));
     request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
     request.requiredVehicleParkingTags =
       c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
@@ -252,8 +249,9 @@ public class RoutingRequestMapper {
       .walk()
       .setSafetyFactor(c.asDouble("walkSafetyFactor", preferences.walk().safetyFactor()));
 
-    preferences
-      .setWheelchairAccessibility(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
+    preferences.setWheelchairAccessibility(
+      mapAccessibilityRequest(c.path("wheelchairAccessibility"))
+    );
     request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled"));
 
     preferences.transfer().setOptimization(mapTransferOptimization(c.path("transferOptimization")));

@@ -120,9 +120,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     // if the user wants wheelchair-accessible routes and the configuration requires us to only
     // consider those stops which have the correct accessibility values then use only this for
     // checking whether to board/alight
-    if (
-      wheelchairEnabled && wheelchairAccessibility.stop().onlyConsiderAccessible()
-    ) {
+    if (wheelchairEnabled && wheelchairAccessibility.stop().onlyConsiderAccessible()) {
       var copy = (BitSet) boardingPossible.clone();
       // Use the and bitwise operator to add false flag to all stops that are not accessible by wheelchair
       copy.and(tripPattern.getWheelchairAccessible());

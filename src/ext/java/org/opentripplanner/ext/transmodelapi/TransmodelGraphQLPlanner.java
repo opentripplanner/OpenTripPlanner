@@ -108,10 +108,7 @@ public class TransmodelGraphQLPlanner {
     );
     callWith.argument("pageCursor", request::setPageCursorFromEncoded);
     callWith.argument("timetableView", request::setTimetableView);
-    callWith.argument(
-      "wheelchairAccessible",
-      request::setWheelchair
-    );
+    callWith.argument("wheelchairAccessible", request::setWheelchair);
     callWith.argument("numTripPatterns", request::setNumItineraries);
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
     //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));

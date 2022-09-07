@@ -14,7 +14,9 @@ public class RoutingPreferences implements Cloneable, Serializable {
   private StreetPreferences street = new StreetPreferences();
 
   @Nonnull
-  private WheelchairAccessibilityPreferences wheelchairAccessibility = WheelchairAccessibilityPreferences.DEFAULT;
+  private WheelchairAccessibilityPreferences wheelchairAccessibility =
+    WheelchairAccessibilityPreferences.DEFAULT;
+
   private BikePreferences bike = new BikePreferences();
   private CarPreferences car = new CarPreferences();
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
@@ -55,7 +57,9 @@ public class RoutingPreferences implements Cloneable, Serializable {
     return wheelchairAccessibility;
   }
 
-  public void setWheelchairAccessibility(@Nonnull WheelchairAccessibilityPreferences wheelchairAccessibility) {
+  public void setWheelchairAccessibility(
+    @Nonnull WheelchairAccessibilityPreferences wheelchairAccessibility
+  ) {
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
