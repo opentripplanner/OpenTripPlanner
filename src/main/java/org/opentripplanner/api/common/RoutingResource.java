@@ -856,7 +856,7 @@ public abstract class RoutingResource {
       request.setArriveBy(arriveBy);
     }
 
-    // TODO VIA: 2022-08-24 should we just skip this step?
+    // TODO VIA (Leonard): 2022-08-24 should we just skip this step?
     // It will be refactored anyway
     //    if (intermediatePlaces != null) {
     //      request.setIntermediatePlacesFromStrings(intermediatePlaces);

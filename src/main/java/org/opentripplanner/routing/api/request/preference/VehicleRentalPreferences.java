@@ -11,7 +11,6 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
   private int dropoffTime = 30;
   private int dropoffCost = 30;
 
-  // TODO VIA: What should the default be
   private boolean useAvailabilityInformation = false;
   private double arrivingInRentalVehicleAtDestinationCost = 0;
 

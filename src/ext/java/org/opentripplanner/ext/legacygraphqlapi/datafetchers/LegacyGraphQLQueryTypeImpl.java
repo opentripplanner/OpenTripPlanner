@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceImpl;
@@ -599,8 +600,14 @@ public class LegacyGraphQLQueryTypeImpl
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
-      callWith.argument("fromPlace", request::setFromString);
-      callWith.argument("toPlace", request::setToString);
+      callWith.argument(
+        "fromPlace",
+        (String from) -> request.setFrom(LocationStringParser.fromOldStyleString(from))
+      );
+      callWith.argument(
+        "toPlace",
+        (String to) -> request.setTo(LocationStringParser.fromOldStyleString(to))
+      );
 
       callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
       callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
@@ -658,7 +665,7 @@ public class LegacyGraphQLQueryTypeImpl
         (Boolean v) -> preferences.system().itineraryFilters().debug = v
       );
       callWith.argument("arriveBy", request::setArriveBy);
-      // TODO VIA: 2022-08-24 I'm just commenting this out since we have to refactor it anyway
+      // TODO VIA (HSL): 2022-08-24 I'm just commenting this out since we have to refactor it anyway
       //      callWith.argument(
       //        "intermediatePlaces",
       //        (List<Map<String, Object>> v) ->

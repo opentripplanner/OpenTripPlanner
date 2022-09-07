@@ -142,7 +142,7 @@ public class TransmodelGraphQLPlanner {
     }
 
     callWith.argument("arriveBy", request::setArriveBy);
-    // TODO VIA: 2022-08-24 refactor
+    // TODO VIA (Skånetrafiken): 2022-08-24 refactor
     //    callWith.argument(
     //      "vias",
     //      (List<Map<String, Object>> v) ->

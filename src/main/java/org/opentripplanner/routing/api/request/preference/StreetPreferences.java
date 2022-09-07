@@ -6,11 +6,9 @@ import java.util.Map;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 
-// TODO VIA: Javadoc
+// TODO VIA (Thomas): Javadoc
 // Direct street search
 public class StreetPreferences implements Cloneable, Serializable {
-
-  // TODO VIA: Remove direct/access/egress references and map things into multiple StreetPreferences, one per type
 
   private int elevatorBoardCost = 90;
   // TODO: how long does it /really/ take to  an elevator?

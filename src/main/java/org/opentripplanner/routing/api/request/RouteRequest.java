@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
@@ -158,14 +157,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.wheelchair = wheelchair;
   }
 
-  public void setFromString(String from) {
-    this.from = LocationStringParser.fromOldStyleString(from);
-  }
-
-  public void setToString(String to) {
-    this.to = LocationStringParser.fromOldStyleString(to);
-  }
-
   /**
    * The epoch date/time in seconds that the trip should depart (or arrive, for requests where
    * arriveBy is true)
@@ -213,7 +204,7 @@ public class RouteRequest implements Cloneable, Serializable {
       if (pageCursor.latestArrivalTime == null) {
         arriveBy = false;
       }
-      setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
+      this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
       journey.setModes(journey.modes().copy().withDirectMode(StreetMode.NOT_SET).build());
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
@@ -353,10 +344,9 @@ public class RouteRequest implements Cloneable, Serializable {
     return toString(" ");
   }
 
-  public RouteRequest reversedClone() {
+  public RouteRequest copyOfReversed() {
     RouteRequest ret = this.clone();
     ret.setArriveBy(!ret.arriveBy);
-    preferences().rental().setUseAvailabilityInformation(false);
     return ret;
   }
 
