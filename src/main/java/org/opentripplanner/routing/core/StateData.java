@@ -123,7 +123,7 @@ public class StateData implements Cloneable {
     else if (options.vehicleRental) {
       if (options.arriveBy()) {
         if (!forceSingleState) {
-          if (options.allowKeepingRentedVehicleAtDestination) {
+          if (options.journey().rental().allowArrivingInRentedVehicleAtDestination()) {
             var keptVehicleStateData = proto.clone();
             keptVehicleStateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
             keptVehicleStateData.currentMode = TraverseMode.BICYCLE;

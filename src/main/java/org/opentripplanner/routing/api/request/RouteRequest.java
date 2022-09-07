@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
@@ -20,7 +19,6 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -28,8 +26,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,15 +68,6 @@ public class RouteRequest implements Cloneable, Serializable {
   private GenericLocation to;
 
   /**
-   * An ordered list of intermediate locations to be visited.
-   *
-   * @deprecated TODO OTP2 - Regression. Not currently working in OTP2. Must be re-implemented
-   * - using raptor.
-   */
-  @Deprecated
-  public List<GenericLocation> intermediatePlaces;
-
-  /**
    * The set of TraverseModes allowed when doing creating sub requests and doing street routing. //
    * TODO OTP2 Street routing requests should eventually be split into its own request class.
    */
@@ -104,25 +91,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private JourneyRequest journey = new JourneyRequest();
 
-  /** The vehicle rental networks which may be used. If empty all networks may be used. */
-  public Set<String> allowedVehicleRentalNetworks = Set.of();
-  /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
-  public Set<String> bannedVehicleRentalNetworks = Set.of();
-  /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
-  public Set<String> requiredVehicleParkingTags = Set.of();
-  /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
-  public Set<String> bannedVehicleParkingTags = Set.of();
-
   private boolean wheelchair = false;
-
-  /**
-   * Whether arriving at the destination with a rented (station) bicycle is allowed without dropping
-   * it off.
-   *
-   * @see VehicleRentalPreferences#keepingVehicleAtDestinationCost()
-   * @see VehicleRentalStation#isKeepingVehicleRentalAtDestinationAllowed
-   */
-  public boolean allowKeepingRentedVehicleAtDestination = false;
 
   /*
       Additional flags affecting mode transitions.
@@ -367,12 +336,6 @@ public class RouteRequest implements Cloneable, Serializable {
     try {
       RouteRequest clone = (RouteRequest) super.clone();
       clone.streetSubRequestModes = streetSubRequestModes.clone();
-
-      clone.allowedVehicleRentalNetworks = Set.copyOf(allowedVehicleRentalNetworks);
-      clone.bannedVehicleRentalNetworks = Set.copyOf(bannedVehicleRentalNetworks);
-
-      clone.requiredVehicleParkingTags = Set.copyOf(requiredVehicleParkingTags);
-      clone.bannedVehicleParkingTags = Set.copyOf(bannedVehicleParkingTags);
 
       clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 

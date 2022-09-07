@@ -155,7 +155,7 @@ public class State implements Cloneable {
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING ||
       (
-        getOptions().allowKeepingRentedVehicleAtDestination &&
+        getOptions().journey().rental().allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
       )

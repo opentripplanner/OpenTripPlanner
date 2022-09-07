@@ -210,7 +210,7 @@ public class TransitRouter {
       );
 
       if (!isEgress) {
-        accessRequest.allowKeepingRentedVehicleAtDestination = false;
+        accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(

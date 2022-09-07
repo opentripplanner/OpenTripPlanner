@@ -20,7 +20,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -799,21 +798,24 @@ public abstract class RoutingResource {
     }
 
     if (allowKeepingRentedBicycleAtDestination != null) {
-      request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
+      request
+        .journey()
+        .rental()
+        .setAllowArrivingInRentedVehicleAtDestination(allowKeepingRentedBicycleAtDestination);
     }
 
     if (keepingRentedBicycleAtDestinationCost != null) {
       preferences
         .rental()
-        .setKeepingVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
+        .setArrivingInRentalVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
     }
 
     if (allowedVehicleRentalNetworks != null) {
-      request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+      request.journey().rental().setAllowedNetworks(allowedVehicleRentalNetworks);
     }
 
     if (bannedVehicleRentalNetworks != null) {
-      request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+      request.journey().rental().setBannedNetworks(bannedVehicleRentalNetworks);
     }
 
     if (bikeParkCost != null) {
@@ -833,11 +835,11 @@ public abstract class RoutingResource {
     }
 
     if (bannedVehicleParkingTags != null) {
-      request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+      request.journey().parking().setBannedTags(bannedVehicleParkingTags);
     }
 
     if (requiredVehicleParkingTags != null) {
-      request.requiredVehicleParkingTags = requiredVehicleParkingTags;
+      request.journey().parking().setRequiredTags(requiredVehicleParkingTags);
     }
 
     if (optimize != null) {

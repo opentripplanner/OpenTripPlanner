@@ -467,7 +467,7 @@ public class Itinerary {
   }
 
   /**
-   * If {@link RouteRequest#allowKeepingRentedVehicleAtDestination}
+   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
    */
   public boolean isArrivedAtDestinationWithRentedVehicle() {

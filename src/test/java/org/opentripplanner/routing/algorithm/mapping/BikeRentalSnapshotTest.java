@@ -90,7 +90,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .setModes(
         RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build()
       );
-    request.allowKeepingRentedVehicleAtDestination = true;
+    request.journey().rental().setAllowArrivingInRentedVehicleAtDestination(true);
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -107,7 +107,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       .setModes(
         RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build()
       );
-    request.allowKeepingRentedVehicleAtDestination = true;
+    request.journey().rental().setAllowArrivingInRentedVehicleAtDestination(true);
     request.setFrom(p1);
     request.setTo(p2);
     request.setArriveBy(true);

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.vehicle_rental;
 
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -68,7 +68,7 @@ public interface VehicleRentalPlace {
   Set<FormFactor> getAvailableDropoffFormFactors(boolean includeRealtimeAvailability);
 
   /** Is it possible to arrive at the destination with a rented bicycle, without dropping it off */
-  boolean isKeepingVehicleRentalAtDestinationAllowed();
+  boolean isArrivingInRentalVehicleAtDestinationAllowed();
 
   /**
    * Whether this station has real-time data available currently. If no real-time data, users should
@@ -80,25 +80,22 @@ public interface VehicleRentalPlace {
   /** Deep links for this rental station or individual vehicle */
   VehicleRentalStationUris getRentalUris();
 
-  default boolean networkIsNotAllowed(RouteRequest options) {
+  default boolean networkIsNotAllowed(VehicleRentalRequest request) {
     if (
       getNetwork() == null &&
-      (
-        !options.allowedVehicleRentalNetworks.isEmpty() ||
-        !options.bannedVehicleRentalNetworks.isEmpty()
-      )
+      (!request.allowedNetworks().isEmpty() || !request.bannedNetworks().isEmpty())
     ) {
       return false;
     }
 
-    if (options.bannedVehicleRentalNetworks.contains(getNetwork())) {
+    if (request.bannedNetworks().contains(getNetwork())) {
       return true;
     }
 
-    if (options.allowedVehicleRentalNetworks.isEmpty()) {
+    if (request.allowedNetworks().isEmpty()) {
       return false;
     }
 
-    return !options.allowedVehicleRentalNetworks.contains(getNetwork());
+    return !request.allowedNetworks().contains(getNetwork());
   }
 }

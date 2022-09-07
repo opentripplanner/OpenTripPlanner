@@ -632,11 +632,11 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
       callWith.argument(
         "allowKeepingRentedBicycleAtDestination",
-        (Boolean v) -> request.allowKeepingRentedVehicleAtDestination = v
+        request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
       );
       callWith.argument(
         "keepingRentedBicycleAtDestinationCost",
-        preferences.rental()::setKeepingVehicleAtDestinationCost
+        preferences.rental()::setArrivingInRentalVehicleAtDestinationCost
       );
 
       callWith.argument(
@@ -755,17 +755,20 @@ public class LegacyGraphQLQueryTypeImpl
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
+      var vehicleRental = request.journey().rental();
+
+      // Deprecated, the next one will override this, if both are set
       callWith.argument(
         "allowedBikeRentalNetworks",
-        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
       );
       callWith.argument(
         "allowedVehicleRentalNetworks",
-        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
       );
       callWith.argument(
         "bannedVehicleRentalNetworks",
-        (Collection<String> v) -> request.bannedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
       );
 
       if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
