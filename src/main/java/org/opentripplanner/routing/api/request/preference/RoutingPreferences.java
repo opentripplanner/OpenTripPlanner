@@ -13,11 +13,6 @@ public class RoutingPreferences implements Cloneable, Serializable {
   private WalkPreferences walk = new WalkPreferences();
   private StreetPreferences street = new StreetPreferences();
 
-  // TODO VIA - To enable wheelchair we need a flag in the request, not relay on
-  //          - wheelchair preferences to be set.
-  /**
-   * Whether the trip must be wheelchair-accessible and how strictly this should be interpreted.
-   */
   @Nonnull
   private WheelchairAccessibilityPreferences wheelchairAccessibility = WheelchairAccessibilityPreferences.DEFAULT;
   private BikePreferences bike = new BikePreferences();
@@ -52,6 +47,9 @@ public class RoutingPreferences implements Cloneable, Serializable {
     return street;
   }
 
+  /**
+   * Preferences for how strict wheel-accessibility settings are
+   */
   @Nonnull
   public WheelchairAccessibilityPreferences wheelchairAccessibility() {
     return wheelchairAccessibility;

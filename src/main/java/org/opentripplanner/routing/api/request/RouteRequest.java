@@ -121,7 +121,6 @@ public class RouteRequest implements Cloneable, Serializable {
   /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
   public Set<String> bannedVehicleParkingTags = Set.of();
 
-  // TODO VIA javadocs
   private boolean wheelchair = false;
 
   /**
@@ -284,6 +283,9 @@ public class RouteRequest implements Cloneable, Serializable {
     return preferences;
   }
 
+  /**
+   * Whether the trip must be wheelchair-accessible
+   */
   public boolean wheelchair() {
     return wheelchair;
   }
