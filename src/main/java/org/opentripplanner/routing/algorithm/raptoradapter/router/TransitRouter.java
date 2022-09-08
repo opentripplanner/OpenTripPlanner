@@ -203,11 +203,7 @@ public class TransitRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest)
     ) {
-      var routingContext = new RoutingContext(
-        accessRequest,
-        serverContext.graph(),
-        temporaryVertices
-      );
+      var routingContext = new RoutingContext(accessRequest, temporaryVertices);
 
       if (!isEgress) {
         accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
@@ -227,7 +223,7 @@ public class TransitRouter {
       if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
         var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
           routingContext,
-          serverContext.transitService(),
+          serverContext,
           additionalSearchDays,
           serverContext.routerConfig().flexParameters(accessRequest.preferences()),
           serverContext.dataOverlayContext(accessRequest),
@@ -252,7 +248,7 @@ public class TransitRouter {
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       new RoutingRequestTransitDataProviderFilter(request, serverContext.transitService()),
-      new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null)
+      new RoutingContext(transferRoutingRequest, (Vertex) null, null)
     );
   }
 

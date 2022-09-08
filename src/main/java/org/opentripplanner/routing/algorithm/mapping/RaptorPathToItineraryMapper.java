@@ -45,8 +45,6 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  */
 public class RaptorPathToItineraryMapper {
 
-  private final Graph graph;
-
   private final TransitLayer transitLayer;
 
   private final RouteRequest request;
@@ -70,7 +68,6 @@ public class RaptorPathToItineraryMapper {
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request
   ) {
-    this.graph = graph;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.request = request;
@@ -264,12 +261,7 @@ public class RaptorPathToItineraryMapper {
       // may be re-traversed to create the leg(s) from the list of edges.
       RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
       traverseRequest.setArriveBy(false);
-      RoutingContext routingContext = new RoutingContext(
-        traverseRequest,
-        graph,
-        (Vertex) null,
-        null
-      );
+      RoutingContext routingContext = new RoutingContext(traverseRequest, (Vertex) null, null);
 
       StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
       se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());

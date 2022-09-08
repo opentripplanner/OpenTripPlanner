@@ -36,13 +36,11 @@ import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
 
 public class TriangleInequalityTest {
 
   private static Graph graph;
-  private static TransitModel transitModel;
+
   private final IntersectionTraversalCalculator calculator = new ConstantIntersectionTraversalCalculator(
     10.0
   );
@@ -52,10 +50,7 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(new Deduplicator());
 
     File file = new File(
       URLDecoder.decode(
@@ -78,7 +73,7 @@ public class TriangleInequalityTest {
       List.of(provider),
       Set.of(),
       graph,
-      transitModel.getTimeZone(),
+      null,
       noopIssueStore()
     );
     osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
@@ -182,7 +177,7 @@ public class TriangleInequalityTest {
     return AStarBuilder
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
-      .setContext(new RoutingContext(options, graph, u, v))
+      .setContext(new RoutingContext(options, u, v))
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
@@ -217,7 +212,7 @@ public class TriangleInequalityTest {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setDominanceFunction(new DominanceFunction.EarliestArrival())
-      .setContext(new RoutingContext(prototypeOptions, graph, start, end))
+      .setContext(new RoutingContext(prototypeOptions, start, end))
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 

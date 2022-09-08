@@ -70,9 +70,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
-      graph,
       new DefaultTransitService(transitModel),
-      radiusByDuration
+      radiusByDuration,
+      null,
+      graph.hasStreets
     );
     if (nearbyStopFinder.useStreets) {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");

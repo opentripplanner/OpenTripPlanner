@@ -390,7 +390,7 @@ public class WalkableAreaBuilder {
       ShortestPathTree spt = AStarBuilder
         .allDirections(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
-        .setContext(new RoutingContext(options, graph, vertex, null))
+        .setContext(new RoutingContext(options, vertex, null))
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {

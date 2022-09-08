@@ -9,7 +9,9 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {
@@ -18,12 +20,14 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RoutingContext routingContext,
-    TransitService transitService,
+    OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters params,
     DataOverlayContext dataOverlayContext,
     boolean isEgress
   ) {
+    TransitService transitService = serverContext.transitService();
+
     Collection<NearbyStop> accessStops = !isEgress
       ? AccessEgressRouter.streetSearch(
         routingContext,
@@ -45,7 +49,7 @@ public class FlexAccessEgressRouter {
       : List.of();
 
     FlexRouter flexRouter = new FlexRouter(
-      routingContext.graph,
+      serverContext.graph(),
       transitService,
       params,
       routingContext.opt.dateTime(),

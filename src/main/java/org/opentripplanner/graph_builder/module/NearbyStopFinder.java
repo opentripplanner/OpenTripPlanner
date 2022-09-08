@@ -28,7 +28,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -59,8 +58,6 @@ public class NearbyStopFinder {
 
   public final boolean useStreets;
 
-  private final Graph graph;
-
   private final TransitService transitService;
 
   private final Duration durationLimit;
@@ -69,28 +66,17 @@ public class NearbyStopFinder {
   private DirectGraphFinder directGraphFinder;
 
   /**
-   * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search
-   * via the street network or straight line distance based on the presence of OSM street data in
-   * the graph.
-   */
-  public NearbyStopFinder(Graph graph, TransitService transitService, Duration durationLimit) {
-    this(graph, transitService, durationLimit, null, graph.hasStreets);
-  }
-
-  /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
    * @param useStreets if true, search via the street network instead of using straight-line
    *                   distance.
    */
   public NearbyStopFinder(
-    Graph graph,
     TransitService transitService,
     Duration durationLimit,
     DataOverlayContext dataOverlayContext,
     boolean useStreets
   ) {
-    this.graph = graph;
     this.transitService = transitService;
     this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
@@ -198,9 +184,9 @@ public class NearbyStopFinder {
 
     RoutingContext routingContext;
     if (!reverseDirection) {
-      routingContext = new RoutingContext(routingRequest, graph, originVertices, null);
+      routingContext = new RoutingContext(routingRequest, originVertices, null);
     } else {
-      routingContext = new RoutingContext(routingRequest, graph, null, originVertices);
+      routingContext = new RoutingContext(routingRequest, null, originVertices);
     }
 
     /* Add the origin vertices if they are stops */

@@ -254,7 +254,7 @@ public class TestIntermediatePlaces {
       //options.addIntermediatePlace(intermediateLocation);
     }
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
-      var routingContext = new RoutingContext(request, graph, temporaryVertices);
+      var routingContext = new RoutingContext(request, temporaryVertices);
       List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
       assertNotNull(paths);

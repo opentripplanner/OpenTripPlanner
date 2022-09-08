@@ -28,11 +28,7 @@ public class DirectFlexRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
     ) {
-      RoutingContext routingContext = new RoutingContext(
-        directRequest,
-        serverContext.graph(),
-        temporaryVertices
-      );
+      RoutingContext routingContext = new RoutingContext(directRequest, temporaryVertices);
 
       // Prepare access/egress transfers
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(

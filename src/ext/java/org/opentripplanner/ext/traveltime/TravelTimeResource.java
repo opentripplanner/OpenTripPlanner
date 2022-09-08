@@ -139,7 +139,7 @@ public class TravelTimeResource {
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
         new RoutingRequestTransitDataProviderFilter(routingRequest, transitService),
-        new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+        new RoutingContext(transferRoutingRequest, (Vertex) null, null)
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());
@@ -231,7 +231,7 @@ public class TravelTimeResource {
 
       var arrivals = route(accessList).getArrivals();
 
-      RoutingContext routingContext = new RoutingContext(routingRequest, graph, temporaryVertices);
+      RoutingContext routingContext = new RoutingContext(routingRequest, temporaryVertices);
 
       var spt = AStarBuilder
         .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
@@ -249,7 +249,7 @@ public class TravelTimeResource {
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      new RoutingContext(accessRequest, graph, temporaryVertices),
+      new RoutingContext(accessRequest, temporaryVertices),
       transitService,
       routingRequest.journey().access().mode(),
       null,

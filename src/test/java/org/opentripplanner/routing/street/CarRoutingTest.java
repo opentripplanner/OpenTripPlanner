@@ -131,7 +131,7 @@ public class CarRoutingTest {
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.CAR);
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
-    final RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
+    final RoutingContext routingContext = new RoutingContext(request, temporaryVertices);
 
     var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
     var paths = gpf.graphPathFinderEntryPoint(routingContext);

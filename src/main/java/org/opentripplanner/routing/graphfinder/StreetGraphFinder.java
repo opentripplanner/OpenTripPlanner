@@ -86,7 +86,7 @@ public class StreetGraphFinder implements GraphFinder {
         .allDirections(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunction.LeastWalk())
-        .setContext(new RoutingContext(rr, graph, temporaryVertices))
+        .setContext(new RoutingContext(rr, temporaryVertices))
         .getShortestPathTree();
     }
   }

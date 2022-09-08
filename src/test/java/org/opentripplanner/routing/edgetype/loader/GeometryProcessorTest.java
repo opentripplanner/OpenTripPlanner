@@ -45,9 +45,6 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 public class GeometryProcessorTest {
 
   private Graph graph;
-  private TransitModel transitModel;
-
-  private GtfsContext context;
   private String feedId;
   private DataImportIssueStore issueStore;
 
@@ -56,11 +53,12 @@ public class GeometryProcessorTest {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    TransitModel transitModel = new TransitModel(stopModel, deduplicator);
     this.issueStore = new DataImportIssueStore();
 
-    context =
-      contextBuilder(ConstantsForTests.FAKE_GTFS).withIssueStoreAndDeduplicator(graph).build();
+    GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS)
+      .withIssueStoreAndDeduplicator(graph)
+      .build();
 
     feedId = context.getFeedId().getId();
     transitModel.updateCalendarServiceData(true, context.getCalendarServiceData(), null);
@@ -154,7 +152,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_g, stop_h))
+        .setContext(new RoutingContext(options, stop_g, stop_h))
         .getShortestPathTree();
 
     path = spt.getPath(stop_h);
@@ -167,7 +165,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_g, stop_h))
+        .setContext(new RoutingContext(options, stop_g, stop_h))
         .getShortestPathTree();
 
     path = spt.getPath(stop_h);
@@ -187,7 +185,7 @@ public class GeometryProcessorTest {
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 19, 12, 0, 0));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, stop_o, stop_p))
+      .setContext(new RoutingContext(options, stop_o, stop_p))
       .getShortestPathTree();
     GraphPath path = spt.getPath(stop_p);
     assertNotNull(path);
@@ -198,7 +196,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_o, stop_p))
+        .setContext(new RoutingContext(options, stop_o, stop_p))
         .getShortestPathTree();
     path = spt.getPath(stop_p);
     assertNotNull(path);
@@ -214,7 +212,7 @@ public class GeometryProcessorTest {
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 10, 0, 0));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, stop_d, stop_c))
+      .setContext(new RoutingContext(options, stop_d, stop_c))
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(stop_c);
@@ -252,7 +250,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, near_a, near_b))
+        .setContext(new RoutingContext(options, near_a, near_b))
         .getShortestPathTree();
 
     path = spt.getPath(near_b);
@@ -262,7 +260,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, near_a, near_c))
+        .setContext(new RoutingContext(options, near_a, near_c))
         .getShortestPathTree();
 
     path = spt.getPath(near_c);
@@ -272,7 +270,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, near_a, near_e))
+        .setContext(new RoutingContext(options, near_a, near_e))
         .getShortestPathTree();
 
     path = spt.getPath(near_e);
@@ -286,7 +284,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, near_a, split_d))
+        .setContext(new RoutingContext(options, near_a, split_d))
         .getShortestPathTree();
 
     ZonedDateTime endTime = zdt.plusHours(1).plusSeconds(1);
@@ -313,7 +311,7 @@ public class GeometryProcessorTest {
     Vertex q = graph.getVertex(feedId + ":Q");
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, q, destination))
+      .setContext(new RoutingContext(options, q, destination))
       .getShortestPathTree();
     GraphPath path = spt.getPath(destination);
 
@@ -336,7 +334,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_u, stop_v))
+        .setContext(new RoutingContext(options, stop_u, stop_v))
         .getShortestPathTree();
     path = spt.getPath(stop_v);
     assertNotNull(path);
@@ -349,7 +347,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_u, stop_v))
+        .setContext(new RoutingContext(options, stop_u, stop_v))
         .getShortestPathTree();
     path = spt.getPath(stop_v);
     assertNotNull(path);
@@ -362,7 +360,7 @@ public class GeometryProcessorTest {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, stop_u, stop_v))
+        .setContext(new RoutingContext(options, stop_u, stop_v))
         .getShortestPathTree();
     path = spt.getPath(stop_v);
     assertNotNull(path);
@@ -384,7 +382,7 @@ public class GeometryProcessorTest {
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 1, 16, 0, 0));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, entrance, stop))
+      .setContext(new RoutingContext(options, entrance, stop))
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(stop);

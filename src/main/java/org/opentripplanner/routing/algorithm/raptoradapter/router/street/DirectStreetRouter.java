@@ -28,11 +28,7 @@ public class DirectStreetRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
     ) {
-      final RoutingContext routingContext = new RoutingContext(
-        directRequest,
-        serverContext.graph(),
-        temporaryVertices
-      );
+      final RoutingContext routingContext = new RoutingContext(directRequest, temporaryVertices);
 
       if (!straightLineDistanceIsWithinLimit(routingContext)) {
         return Collections.emptyList();

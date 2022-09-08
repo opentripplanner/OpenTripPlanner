@@ -103,7 +103,7 @@ public class TurnRestrictionTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, topRight, bottomLeft))
+      .setContext(new RoutingContext(request, topRight, bottomLeft))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);
@@ -130,7 +130,7 @@ public class TurnRestrictionTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, topRight, bottomLeft))
+      .setContext(new RoutingContext(request, topRight, bottomLeft))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);
@@ -157,7 +157,7 @@ public class TurnRestrictionTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, topRight, bottomLeft))
+      .setContext(new RoutingContext(request, topRight, bottomLeft))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);

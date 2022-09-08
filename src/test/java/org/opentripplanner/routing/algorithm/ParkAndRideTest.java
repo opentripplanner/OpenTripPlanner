@@ -163,7 +163,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
 
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, fromVertex, toVertex))
+      .setContext(new RoutingContext(options, fromVertex, toVertex))
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

@@ -504,7 +504,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, options)) {
-      var routingContext = new RoutingContext(options, graph, temporaryVertices);
+      var routingContext = new RoutingContext(options, temporaryVertices);
       List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");

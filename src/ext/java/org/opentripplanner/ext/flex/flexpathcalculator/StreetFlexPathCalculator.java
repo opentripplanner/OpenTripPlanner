@@ -31,12 +31,10 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
-  private final Graph graph;
   private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
   private final boolean reverseDirection;
 
-  public StreetFlexPathCalculator(Graph graph, boolean reverseDirection) {
-    this.graph = graph;
+  public StreetFlexPathCalculator(boolean reverseDirection) {
     this.reverseDirection = reverseDirection;
   }
 
@@ -74,9 +72,9 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     routingRequest.setArriveBy(reverseDirection);
     RoutingContext rctx;
     if (reverseDirection) {
-      rctx = new RoutingContext(routingRequest, graph, null, vertex);
+      rctx = new RoutingContext(routingRequest, null, vertex);
     } else {
-      rctx = new RoutingContext(routingRequest, graph, vertex, null);
+      rctx = new RoutingContext(routingRequest, vertex, null);
     }
 
     return AStarBuilder

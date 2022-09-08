@@ -92,7 +92,7 @@ public class AStarTest {
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setContext(new RoutingContext(request, from, to))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(to);
@@ -120,7 +120,7 @@ public class AStarTest {
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setContext(new RoutingContext(request, from, to))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(from);
@@ -172,7 +172,7 @@ public class AStarTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setContext(new RoutingContext(request, from, to))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(to);
@@ -217,7 +217,7 @@ public class AStarTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setContext(new RoutingContext(request, from, to))
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(from);
@@ -256,7 +256,7 @@ public class AStarTest {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setTerminationStrategy(strategy)
-      .setContext(new RoutingContext(request, graph, v1, v2))
+      .setContext(new RoutingContext(request, v1, v2))
       .getShortestPathTree();
 
     for (Vertex v : targets) {

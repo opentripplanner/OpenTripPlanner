@@ -209,7 +209,7 @@ class PathwayEdgeTest {
           25
         )
       );
-    var state = new State(new RoutingContext(req, graph, from, to));
+    var state = new State(new RoutingContext(req, from, to));
 
     var afterTraversal = edge.traverse(state);
     assertNotNull(afterTraversal);

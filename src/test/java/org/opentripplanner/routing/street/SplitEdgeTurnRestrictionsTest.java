@@ -151,7 +151,7 @@ public class SplitEdgeTurnRestrictionsTest {
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.CAR);
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
-    RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
+    RoutingContext routingContext = new RoutingContext(request, temporaryVertices);
 
     var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
     var paths = gpf.graphPathFinderEntryPoint(routingContext);

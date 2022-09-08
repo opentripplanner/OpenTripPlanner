@@ -16,7 +16,6 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -27,7 +26,6 @@ import org.opentripplanner.transit.service.TransitModel;
 public class StreetModeLinkingTest extends GraphRoutingTest {
 
   private Graph graph;
-  private TransitModel transitModel;
 
   @BeforeEach
   protected void setUp() throws Exception {
@@ -78,8 +76,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     graph = otpModel.graph();
 
     graph.hasStreets = true;
-    transitModel = otpModel.transitModel();
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    StreetLinkerModule.linkStreetsForTestOnly(graph, otpModel.transitModel());
   }
 
   @Test
@@ -208,11 +205,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       routingRequest.setTo(new GenericLocation(null, null));
 
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
-        RoutingContext routingContext = new RoutingContext(
-          routingRequest,
-          graph,
-          temporaryVertices
-        );
+        RoutingContext routingContext = new RoutingContext(routingRequest, temporaryVertices);
 
         if (fromStreetName != null) {
           assertFromLink(fromStreetName, streetMode, routingContext);
@@ -227,11 +220,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       routingRequest.setFrom(new GenericLocation(null, null));
 
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
-        RoutingContext routingContext = new RoutingContext(
-          routingRequest,
-          graph,
-          temporaryVertices
-        );
+        RoutingContext routingContext = new RoutingContext(routingRequest, temporaryVertices);
 
         if (toStreetName != null) {
           assertToLink(toStreetName, streetMode, routingContext);

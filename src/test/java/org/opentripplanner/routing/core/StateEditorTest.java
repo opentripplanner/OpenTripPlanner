@@ -6,16 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class StateEditorTest {
 
   @Test
   public final void testIncrementTimeInSeconds() {
-    Graph graph = new Graph();
     RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
+    RoutingContext routingContext = new RoutingContext(routingRequest, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
     stateEditor.setTimeSeconds(0);
@@ -26,9 +24,8 @@ public class StateEditorTest {
 
   @Test
   public final void testWeightIncrement() {
-    Graph graph = new Graph();
     RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
+    RoutingContext routingContext = new RoutingContext(routingRequest, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
     stateEditor.setTimeSeconds(0);
@@ -39,9 +36,8 @@ public class StateEditorTest {
 
   @Test
   public final void testNanWeightIncrement() {
-    Graph graph = new Graph();
     RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
+    RoutingContext routingContext = new RoutingContext(routingRequest, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
     stateEditor.setTimeSeconds(0);
@@ -52,9 +48,8 @@ public class StateEditorTest {
 
   @Test
   public final void testInfinityWeightIncrement() {
-    Graph graph = new Graph();
     RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
+    RoutingContext routingContext = new RoutingContext(routingRequest, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
     stateEditor.setTimeSeconds(0);

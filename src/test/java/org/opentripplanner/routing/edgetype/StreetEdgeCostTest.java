@@ -11,7 +11,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.test.support.VariableSource;
 
@@ -20,10 +19,8 @@ class StreetEdgeCostTest extends GraphRoutingTest {
   StreetVertex V1;
   StreetVertex V2;
 
-  Graph graph;
-
   public StreetEdgeCostTest() {
-    var otpModel = modelOf(
+    modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -32,7 +29,6 @@ class StreetEdgeCostTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph();
   }
 
   static Stream<Arguments> walkReluctanceCases = Stream.of(
@@ -166,7 +162,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
   }
 
   private State traverse(StreetEdge edge, RouteRequest req) {
-    var ctx = new RoutingContext(req, graph, V1, V2);
+    var ctx = new RoutingContext(req, V1, V2);
     var state = new State(ctx);
 
     assertEquals(0, state.weight);

@@ -268,7 +268,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .orElseThrow();
     var r = new RouteRequest();
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, r)) {
-      RoutingContext routingContext = new RoutingContext(r, graph, temporaryVertices);
+      RoutingContext routingContext = new RoutingContext(r, temporaryVertices);
 
       return new NearbyStop(
         stopLocation,

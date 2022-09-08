@@ -110,7 +110,7 @@ public class TurnCostTest {
   @Test
   public void testForwardDefaultNoTurnCosts() {
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
-    checkForwardRouteDuration(new RoutingContext(proto, graph, topRight, bottomLeft), 300);
+    checkForwardRouteDuration(new RoutingContext(proto, topRight, bottomLeft), 300);
   }
 
   @Test
@@ -120,7 +120,7 @@ public class TurnCostTest {
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     // Since we traverse 3 intersections, the total cost should be 330.
     GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(proto, graph, topRight, bottomLeft),
+      new RoutingContext(proto, topRight, bottomLeft),
       330
     );
 
@@ -149,7 +149,7 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
     GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(options, graph, topRight, bottomLeft),
+      new RoutingContext(options, topRight, bottomLeft),
       350
     );
 
@@ -172,7 +172,7 @@ public class TurnCostTest {
     // Without turn costs, this path costs 3x100 + 1x50 = 350.
     // Since there are 3 turns, the total cost should be 380.
     GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(options, graph, topRight, bottomLeft),
+      new RoutingContext(options, topRight, bottomLeft),
       380
     );
 

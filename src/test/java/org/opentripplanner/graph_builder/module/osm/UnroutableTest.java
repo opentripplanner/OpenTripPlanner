@@ -71,7 +71,7 @@ public class UnroutableTest {
     options.setMode(TraverseMode.BICYCLE);
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, from, to))
+      .setContext(new RoutingContext(options, from, to))
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(to);

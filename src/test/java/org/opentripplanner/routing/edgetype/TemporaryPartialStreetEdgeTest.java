@@ -70,7 +70,7 @@ public class TemporaryPartialStreetEdgeTest {
   public void testTraversal() {
     RouteRequest options = new RouteRequest();
     options.setMode(TraverseMode.CAR);
-    RoutingContext routingContext = new RoutingContext(options, graph, v1, v2);
+    RoutingContext routingContext = new RoutingContext(options, v1, v2);
 
     // Partial edge with same endpoints as the parent.
     TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(
@@ -137,7 +137,7 @@ public class TemporaryPartialStreetEdgeTest {
 
     RouteRequest options = new RouteRequest();
     options.setMode(TraverseMode.CAR);
-    RoutingContext routingContext = new RoutingContext(options, graph, v1, v2);
+    RoutingContext routingContext = new RoutingContext(options, v1, v2);
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;

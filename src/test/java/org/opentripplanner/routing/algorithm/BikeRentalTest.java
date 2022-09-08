@@ -15,7 +15,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
@@ -35,7 +34,6 @@ import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 public class BikeRentalTest extends GraphRoutingTest {
 
   private final String NON_NETWORK = "non network";
-  private Graph graph;
   private TransitStopVertex S1;
   private TemporaryStreetLocation T1, T2;
   private TransitEntranceVertex E1;
@@ -54,7 +52,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     //   D <-> E1
     //   D <-> T2
 
-    var otpModel = modelOf(
+    modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -86,7 +84,6 @@ public class BikeRentalTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph();
   }
 
   // This tests exists to test if the cost of walking with a bike changes
@@ -631,7 +628,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(bikeRentalOptions, graph, fromVertex, toVertex))
+      .setContext(new RoutingContext(bikeRentalOptions, fromVertex, toVertex))
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);
