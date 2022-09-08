@@ -29,8 +29,8 @@ public class FinlandWayPropertySetSourceTest {
     sidewalk.addTag("footway", "sidewalk");
     sidewalk.addTag("highway", "footway");
     assertEquals(2.06, wps.getDataForWay(primaryWay).getBicycleSafetyFeatures().first, epsilon);
-    assertEquals(1.5, wps.getDataForWay(primaryWay).getWalkSafetyFeatures().first, epsilon);
-    assertEquals(0.8, wps.getDataForWay(footway).getWalkSafetyFeatures().first, epsilon);
-    assertEquals(0.7, wps.getDataForWay(sidewalk).getWalkSafetyFeatures().first, epsilon);
+    assertEquals(1.8, wps.getDataForWay(primaryWay).getWalkSafetyFeatures().first, epsilon);
+    assertEquals(1.1, wps.getDataForWay(footway).getWalkSafetyFeatures().first, epsilon);
+    assertEquals(1.0, wps.getDataForWay(sidewalk).getWalkSafetyFeatures().first, epsilon);
   }
 }
