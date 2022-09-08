@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.slf4j.Logger;
@@ -34,6 +36,10 @@ public class WayPropertySet {
 
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
+  /** Sets 1.0 as default safety value for all permissions. */
+  private final Function<StreetTraversalPermission, Double> DEFAULT_SAFETY_RESOLVER =
+    (permission -> 1.0);
+
   private final List<WayPropertyPicker> wayProperties;
 
   /** Assign names to ways that do not have them based on OSM tags. */
@@ -47,6 +53,10 @@ public class WayPropertySet {
   private final Pattern maxSpeedPattern;
   /** The automobile speed for street segments that do not match any SpeedPicker. */
   public Float defaultSpeed;
+  /** Resolves safety value for each {@link StreetTraversalPermission}. */
+  public Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission;
+  /** Resolves safety value for each {@link StreetTraversalPermission}. */
+  public Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   public WayProperties defaultProperties;
 
@@ -62,6 +72,8 @@ public class WayPropertySet {
     // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
     // and edited
     maxSpeedPattern = Pattern.compile("^([0-9][.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
+    defaultWalkSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
+    defaultBicycleSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
   }
 
   /**
@@ -336,6 +348,42 @@ public class WayPropertySet {
     addNote(new OSMSpecifier(spec), properties);
   }
 
+  /**
+   * A custom defaultWalkSafetyForPermission can only be set once. The given function should
+   *    * provide a default for each permission.
+   */
+  public void setDefaultWalkSafetyForPermission(
+    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
+  ) {
+    if (!this.defaultWalkSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
+      throw new RuntimeException("A custom default walk safety resolver was already set");
+    }
+    this.defaultWalkSafetyForPermission = defaultWalkSafetyForPermission;
+    defaultProperties =
+      defaultProperties
+        .mutate()
+        .walkSafety(defaultWalkSafetyForPermission.apply(defaultProperties.getPermission()))
+        .build();
+  }
+
+  /**
+   * A custom defaultBicycleSafetyForPermission can only be set once. The given function should
+   * provide a default for each permission.
+   */
+  public void setDefaultBicycleSafetyForPermission(
+    Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission
+  ) {
+    if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
+      throw new RuntimeException("A custom default cycling safety resolver was already set");
+    }
+    this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;
+    defaultProperties =
+      defaultProperties
+        .mutate()
+        .bicycleSafety(defaultBicycleSafetyForPermission.apply(defaultProperties.getPermission()))
+        .build();
+  }
+
   public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
     setMixinProperties(spec, properties.build());
   }
@@ -345,7 +393,10 @@ public class WayPropertySet {
   }
 
   public void setProperties(String spec, WayPropertiesBuilder properties) {
-    setProperties(spec, properties.build());
+    setProperties(
+      spec,
+      properties.build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission)
+    );
   }
 
   public void setProperties(String spec, WayProperties properties) {

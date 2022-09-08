@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.function.Function;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
@@ -77,6 +78,19 @@ public class WayPropertiesBuilder {
   }
 
   public WayProperties build() {
+    return new WayProperties(this);
+  }
+
+  public WayProperties build(
+    Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission,
+    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
+  ) {
+    if (bicycleSafetyFeatures.equals(defaultSafetyFeatures)) {
+      bicycleSafety(defaultBicycleSafetyForPermission.apply(permission));
+    }
+    if (walkSafetyFeatures.equals(defaultSafetyFeatures)) {
+      walkSafety(defaultWalkSafetyForPermission.apply(permission));
+    }
     return new WayProperties(this);
   }
 

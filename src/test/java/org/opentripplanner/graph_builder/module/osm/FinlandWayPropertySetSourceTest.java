@@ -20,11 +20,17 @@ public class FinlandWayPropertySetSourceTest {
    */
   @Test
   public void testSafety() {
-    OSMWithTags way;
-    way = new OSMWithTags();
-    way.addTag("highway", "primary");
-    way.addTag("oneway", "no");
-    assertEquals(2.06, wps.getDataForWay(way).getBicycleSafetyFeatures().first, epsilon);
-    assertEquals(2.06, wps.getDataForWay(way).getWalkSafetyFeatures().first, epsilon);
+    OSMWithTags primaryWay = new OSMWithTags();
+    primaryWay.addTag("highway", "primary");
+    primaryWay.addTag("oneway", "no");
+    OSMWithTags footway = new OSMWithTags();
+    footway.addTag("highway", "footway");
+    OSMWithTags sidewalk = new OSMWithTags();
+    sidewalk.addTag("footway", "sidewalk");
+    sidewalk.addTag("highway", "footway");
+    assertEquals(2.06, wps.getDataForWay(primaryWay).getBicycleSafetyFeatures().first, epsilon);
+    assertEquals(1.5, wps.getDataForWay(primaryWay).getWalkSafetyFeatures().first, epsilon);
+    assertEquals(0.8, wps.getDataForWay(footway).getWalkSafetyFeatures().first, epsilon);
+    assertEquals(0.7, wps.getDataForWay(sidewalk).getWalkSafetyFeatures().first, epsilon);
   }
 }
