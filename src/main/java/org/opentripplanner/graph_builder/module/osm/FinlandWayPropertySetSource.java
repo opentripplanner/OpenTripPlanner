@@ -33,11 +33,11 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
   public void populateProperties(WayPropertySet props) {
     Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission = permission ->
       switch (permission) {
-        case ALL, PEDESTRIAN_AND_CAR -> 1.5;
-        case PEDESTRIAN_AND_BICYCLE -> 1.0;
-        case PEDESTRIAN -> 0.8;
+        case ALL, PEDESTRIAN_AND_CAR -> 1.8;
+        case PEDESTRIAN_AND_BICYCLE -> 1.3;
+        case PEDESTRIAN -> 1.1;
         // these don't include walking
-        case BICYCLE_AND_CAR, BICYCLE, CAR, NONE -> 1.5;
+        case BICYCLE_AND_CAR, BICYCLE, CAR, NONE -> 1.8;
       };
     props.setDefaultWalkSafetyForPermission(defaultWalkSafetyForPermission);
     props.setProperties("highway=living_street", withModes(ALL).bicycleSafety(0.9));
@@ -71,7 +71,7 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
     // No biking on designated footways/sidewalks
     props.setProperties("highway=footway", withModes(PEDESTRIAN));
-    props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN).walkSafety(0.7));
+    props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN).walkSafety(1.0));
 
     // Prefer designated cycleways
     props.setProperties(
