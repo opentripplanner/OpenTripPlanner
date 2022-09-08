@@ -201,9 +201,18 @@ public class TimetableHelper {
             realtimeDepartureTime = departureTime;
           }
 
+          boolean isCallPredictionInaccurate = Boolean.TRUE.equals(
+            recordedCall.isPredictionInaccurate()
+          );
+
           if (recordedCall.isCancellation() != null && recordedCall.isCancellation()) {
             modifiedStopTimes.get(callCounter).cancel();
             newTimes.setCancelled(callCounter);
+          } else if (isJourneyPredictionInaccurate | isCallPredictionInaccurate) {
+            // Set flag for inaccurate prediction if either call OR journey has inaccurate-flag
+            // set if stop is not cancelled. Setting recorded if stop is cancelled would
+            // override the cancellation information.
+            newTimes.setPredictionInaccurate(callCounter);
           } else if (
             recordedCall.getActualArrivalTime() != null ||
             recordedCall.getActualDepartureTime() != null
