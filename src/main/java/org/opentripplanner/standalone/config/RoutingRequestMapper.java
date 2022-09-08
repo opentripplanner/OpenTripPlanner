@@ -252,7 +252,7 @@ public class RoutingRequestMapper {
     preferences.setWheelchairAccessibility(
       mapAccessibilityRequest(c.path("wheelchairAccessibility"))
     );
-    request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled"));
+    request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));
 
     preferences.transfer().setOptimization(mapTransferOptimization(c.path("transferOptimization")));
 
