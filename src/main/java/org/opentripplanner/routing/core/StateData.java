@@ -32,8 +32,6 @@ public class StateData implements Cloneable {
 
   protected RouteRequest opt;
 
-  protected RoutingContext rctx;
-
   // TODO VIA - this will be folded into an AStarRequest in the future
   public IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
     IntersectionTraversalModel.SIMPLE,

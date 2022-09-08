@@ -24,13 +24,8 @@ public class DominanceFunctionTest {
 
     // Test if domination works in the general case
 
-    State stateA = new State(
-      fromVertex,
-      Instant.EPOCH,
-      null,
-      StateData.getInitialStateData(request)
-    );
-    State stateB = new State(toVertex, Instant.EPOCH, null, StateData.getInitialStateData(request));
+    State stateA = new State(fromVertex, Instant.EPOCH, StateData.getInitialStateData(request));
+    State stateB = new State(toVertex, Instant.EPOCH, StateData.getInitialStateData(request));
     stateA.weight = 1;
     stateB.weight = 2;
 

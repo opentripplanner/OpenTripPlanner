@@ -20,13 +20,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
@@ -261,9 +259,8 @@ public class RaptorPathToItineraryMapper {
       // may be re-traversed to create the leg(s) from the list of edges.
       RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
       traverseRequest.setArriveBy(false);
-      RoutingContext routingContext = new RoutingContext(traverseRequest, (Vertex) null, null);
 
-      StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
+      StateEditor se = new StateEditor(traverseRequest, edges.get(0).getFromVertex());
       se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
 
       State s = se.makeState();

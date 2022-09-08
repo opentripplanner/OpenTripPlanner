@@ -263,13 +263,7 @@ public class StreetEdgeTest {
     StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
     StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
     RouteRequest routingRequest = proto.clone();
-    RoutingContext routingContext = new RoutingContext(routingRequest, v0, v2);
-    State state = new State(
-      v2,
-      Instant.EPOCH,
-      routingContext,
-      StateData.getInitialStateData(routingRequest)
-    );
+    State state = new State(v2, Instant.EPOCH, StateData.getInitialStateData(routingRequest));
 
     state.getOptions().setArriveBy(true);
     e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
@@ -391,14 +385,14 @@ public class StreetEdgeTest {
       );
     request.preferences().setAllStreetReluctance(1);
 
-    State startState = new State(v1, request, null);
+    State startState = new State(v1, request);
     State result = testStreet.traverse(startState);
     double timeWeight = result.getWeight();
     double expectedTimeWeight = slopeSpeedLength / SPEED;
     assertEquals(expectedTimeWeight, result.getWeight(), DELTA);
 
     request.preferences().withBike(bike -> bike.withOptimizeTriangle(it -> it.withSlope(1)));
-    startState = new State(v1, request, null);
+    startState = new State(v1, request);
     result = testStreet.traverse(startState);
     double slopeWeight = result.getWeight();
     double expectedSlopeWeight = slopeWorkLength / SPEED;
@@ -407,7 +401,7 @@ public class StreetEdgeTest {
     assertTrue(length * 1.5 * 10 / SPEED > slopeWeight);
 
     request.preferences().withBike(bike -> bike.withOptimizeTriangle(it -> it.withSafety(1)));
-    startState = new State(v1, request, null);
+    startState = new State(v1, request);
     result = testStreet.traverse(startState);
     double slopeSafety = costs.slopeSafetyCost;
     double safetyWeight = result.getWeight();
@@ -417,7 +411,7 @@ public class StreetEdgeTest {
     request
       .preferences()
       .withBike(bike -> bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1)));
-    startState = new State(v1, request, null);
+    startState = new State(v1, request);
     result = testStreet.traverse(startState);
     double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;
     assertEquals(expectedWeight, result.getWeight(), DELTA);

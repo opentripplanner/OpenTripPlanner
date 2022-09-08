@@ -47,21 +47,15 @@ public class State implements Cloneable {
   /* CONSTRUCTORS */
 
   public State(RoutingContext rctx) {
-    this(
-      rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
-      rctx.opt.dateTime(),
-      rctx,
-      StateData.getInitialStateData(rctx.opt)
-    );
+    this(rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(), rctx.opt);
   }
 
   /**
-   * Create an initial state, forcing vertex to the specified value. Useful for reusing a
-   * RoutingContext in TransitIndex, tests, etc.
+   * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(Vertex vertex, RouteRequest opt, RoutingContext routingContext) {
+  public State(Vertex vertex, RouteRequest opt) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.dateTime(), routingContext, StateData.getInitialStateData(opt));
+    this(vertex, opt.dateTime(), StateData.getInitialStateData(opt));
   }
 
   /**
@@ -69,17 +63,11 @@ public class State implements Cloneable {
    * values. Useful for starting a multiple initial state search, for example when propagating
    * profile results to the street network in RoundBasedProfileRouter.
    */
-  public State(
-    Vertex vertex,
-    Instant startTime,
-    RoutingContext routingContext,
-    StateData stateData
-  ) {
+  public State(Vertex vertex, Instant startTime, StateData stateData) {
     this.weight = 0;
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
-    this.stateData.rctx = routingContext;
     this.stateData.startTime = startTime;
     this.walkDistance = 0;
     this.time = startTime.getEpochSecond();
@@ -96,7 +84,7 @@ public class State implements Cloneable {
     List<StateData> initialStateDatas = StateData.getInitialStateDatas(request);
     for (Vertex vertex : routingContext.fromVertices) {
       for (StateData stateData : initialStateDatas) {
-        states.add(new State(vertex, request.dateTime(), routingContext, stateData));
+        states.add(new State(vertex, request.dateTime(), stateData));
       }
     }
     return states;
@@ -272,10 +260,6 @@ public class State implements Cloneable {
     return stateData.opt.preferences();
   }
 
-  public RoutingContext getRoutingContext() {
-    return stateData.rctx;
-  }
-
   /**
    * This method is on State rather than RoutingRequest because we care whether the user is in
    * possession of a rented bike.
@@ -433,6 +417,6 @@ public class State implements Cloneable {
     newStateData.vehicleParked = stateData.vehicleParked;
     newStateData.carPickupState = stateData.carPickupState;
 
-    return new State(this.vertex, getTime(), stateData.rctx, newStateData);
+    return new State(this.vertex, getTime(), newStateData);
   }
 }

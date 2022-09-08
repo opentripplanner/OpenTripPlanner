@@ -197,7 +197,7 @@ public class NearbyStopFinder {
             tsv.getStop(),
             0,
             Collections.emptyList(),
-            new State(vertex, routingRequest, routingContext)
+            new State(vertex, routingRequest)
           )
         );
       }

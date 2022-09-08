@@ -19,7 +19,6 @@ public class TraverseResultTest {
       State r = new State(
         null,
         Instant.ofEpochSecond(i * 1000),
-        null,
         StateData.getInitialStateData(new RouteRequest())
       );
       resultChain = r.addToExistingResultChain(resultChain);

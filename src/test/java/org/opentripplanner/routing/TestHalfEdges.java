@@ -495,7 +495,7 @@ public class TestHalfEdges {
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
     RouteRequest req = new RouteRequest();
-    State traversedOne = new State(start, req, null);
+    State traversedOne = new State(start, req);
     State currentState;
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
@@ -539,7 +539,7 @@ public class TestHalfEdges {
         tempEdges
       );
 
-    traversedOne = new State(start, req, null);
+    traversedOne = new State(start, req);
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
       if (currentState != null) {
