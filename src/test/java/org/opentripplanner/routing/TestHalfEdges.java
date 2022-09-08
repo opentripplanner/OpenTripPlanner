@@ -23,7 +23,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -227,7 +226,9 @@ public class TestHalfEdges {
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree spt1 = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, br, end))
+      .setRequest(options)
+      .setFrom(br)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath pathBr = spt1.getPath(end);
@@ -235,7 +236,9 @@ public class TestHalfEdges {
 
     ShortestPathTree spt2 = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, tr, end))
+      .setRequest(options)
+      .setFrom(tr)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath pathTr = spt2.getPath(end);
@@ -247,7 +250,9 @@ public class TestHalfEdges {
 
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, start, end))
+      .setRequest(options)
+      .setFrom(start)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
@@ -261,10 +266,7 @@ public class TestHalfEdges {
 
     options.setArriveBy(true);
     spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, start, end))
-        .getShortestPathTree();
+      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from start to end (looking back)");
@@ -306,10 +308,7 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, start, end))
-        .getShortestPathTree();
+      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom along the right");
@@ -345,10 +344,7 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, start, end))
-        .getShortestPathTree();
+      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom");
@@ -405,7 +401,9 @@ public class TestHalfEdges {
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, start, end))
+      .setRequest(options)
+      .setFrom(start)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
@@ -454,7 +452,9 @@ public class TestHalfEdges {
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, start, end))
+      .setRequest(options)
+      .setFrom(start)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
@@ -612,10 +612,10 @@ public class TestHalfEdges {
     try (var container = new TemporaryVerticesContainer(graph, walking)) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
-      // The visibility for temp edges for start and end is set in the setRoutingContext call
       ShortestPathTree spt = AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(walking, container))
+        .setRequest(walking)
+        .setVerticesContainer(container)
         .getShortestPathTree();
       GraphPath path = spt.getPath(container.getToVertices().iterator().next());
       for (State s : path.states) {

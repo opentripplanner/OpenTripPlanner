@@ -12,7 +12,6 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -110,7 +109,7 @@ public class TurnCostTest {
   @Test
   public void testForwardDefaultNoTurnCosts() {
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
-    checkForwardRouteDuration(new RoutingContext(proto, topRight, bottomLeft), 300);
+    checkForwardRouteDuration(proto, topRight, bottomLeft, 300);
   }
 
   @Test
@@ -119,10 +118,7 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     // Since we traverse 3 intersections, the total cost should be 330.
-    GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(proto, topRight, bottomLeft),
-      330
-    );
+    GraphPath path = checkForwardRouteDuration(proto, topRight, bottomLeft, 330);
 
     // The intersection traversal cost should be applied to the state *after*
     // the intersection itself.
@@ -148,10 +144,7 @@ public class TurnCostTest {
     options.setMode(TraverseMode.CAR);
 
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
-    GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(options, topRight, bottomLeft),
-      350
-    );
+    GraphPath path = checkForwardRouteDuration(options, topRight, bottomLeft, 350);
 
     List<State> states = path.states;
     assertEquals(5, states.size());
@@ -171,10 +164,7 @@ public class TurnCostTest {
 
     // Without turn costs, this path costs 3x100 + 1x50 = 350.
     // Since there are 3 turns, the total cost should be 380.
-    GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(options, topRight, bottomLeft),
-      380
-    );
+    GraphPath path = checkForwardRouteDuration(options, topRight, bottomLeft, 380);
 
     List<State> states = path.states;
     assertEquals(5, states.size());
@@ -192,10 +182,17 @@ public class TurnCostTest {
     assertEquals(380, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
   }
 
-  private GraphPath checkForwardRouteDuration(RoutingContext context, int expectedDuration) {
+  private GraphPath checkForwardRouteDuration(
+    RouteRequest request,
+    Vertex from,
+    Vertex to,
+    int expectedDuration
+  ) {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(context)
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
     GraphPath path = tree.getPath(bottomLeft);

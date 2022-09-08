@@ -56,7 +56,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Acces
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -231,11 +230,10 @@ public class TravelTimeResource {
 
       var arrivals = route(accessList).getArrivals();
 
-      RoutingContext routingContext = new RoutingContext(routingRequest, temporaryVertices);
-
       var spt = AStarBuilder
         .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
-        .setContext(routingContext)
+        .setRequest(routingRequest)
+        .setVerticesContainer(temporaryVertices)
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
         .setInitialStates(getInitialStates(arrivals, temporaryVertices))
         .getShortestPathTree();
@@ -249,7 +247,8 @@ public class TravelTimeResource {
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      new RoutingContext(accessRequest, temporaryVertices),
+      accessRequest,
+      temporaryVertices,
       transitService,
       routingRequest.journey().access().mode(),
       null,

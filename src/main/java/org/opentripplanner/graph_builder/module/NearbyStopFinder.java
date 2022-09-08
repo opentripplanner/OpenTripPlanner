@@ -23,7 +23,6 @@ import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -182,13 +181,6 @@ public class NearbyStopFinder {
 
     routingRequest.setArriveBy(reverseDirection);
 
-    RoutingContext routingContext;
-    if (!reverseDirection) {
-      routingContext = new RoutingContext(routingRequest, originVertices, null);
-    } else {
-      routingContext = new RoutingContext(routingRequest, null, originVertices);
-    }
-
     /* Add the origin vertices if they are stops */
     for (Vertex vertex : originVertices) {
       if (vertex instanceof TransitStopVertex tsv) {
@@ -211,7 +203,9 @@ public class NearbyStopFinder {
     ShortestPathTree spt = AStarBuilder
       .allDirections(getSkipEdgeStrategy(reverseDirection, routingRequest))
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
-      .setContext(routingContext)
+      .setRequest(routingRequest)
+      .setFrom(reverseDirection ? null : originVertices)
+      .setTo(reverseDirection ? originVertices : null)
       .setDataOverlayContext(dataOverlayContext)
       .getShortestPathTree();
 

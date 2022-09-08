@@ -14,7 +14,6 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -103,7 +102,9 @@ public class TurnRestrictionTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, topRight, bottomLeft))
+      .setRequest(request)
+      .setFrom(topRight)
+      .setTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);
@@ -130,7 +131,9 @@ public class TurnRestrictionTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, topRight, bottomLeft))
+      .setRequest(request)
+      .setFrom(topRight)
+      .setTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);
@@ -157,7 +160,9 @@ public class TurnRestrictionTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, topRight, bottomLeft))
+      .setRequest(request)
+      .setFrom(topRight)
+      .setTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);

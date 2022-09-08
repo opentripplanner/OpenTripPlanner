@@ -25,7 +25,6 @@ import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -254,8 +253,7 @@ public class TestIntermediatePlaces {
       //options.addIntermediatePlace(intermediateLocation);
     }
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
-      var routingContext = new RoutingContext(request, temporaryVertices);
-      List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(routingContext);
+      List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(request, temporaryVertices);
 
       assertNotNull(paths);
       assertFalse(paths.isEmpty());

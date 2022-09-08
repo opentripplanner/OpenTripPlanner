@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -87,7 +86,7 @@ public class StreetEdgeTest {
     RouteRequest options = proto.clone();
     options.setMode(TraverseMode.WALK);
 
-    State s0 = new State(new RoutingContext(options, v1, v2));
+    State s0 = new State(v1, options);
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
@@ -105,7 +104,7 @@ public class StreetEdgeTest {
     RouteRequest options = proto.clone();
     options.setMode(TraverseMode.CAR);
 
-    State s0 = new State(new RoutingContext(options, v1, v2));
+    State s0 = new State(v1, options);
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
@@ -150,7 +149,7 @@ public class StreetEdgeTest {
     forward.preferences().withBike(it -> it.setSpeed(3.0f));
     forward.setMode(TraverseMode.BICYCLE);
 
-    State s0 = new State(new RoutingContext(forward, v0, v2));
+    State s0 = new State(v0, forward);
     State s1 = e0.traverse(s0);
     State s2 = e1.traverse(s1);
 
@@ -159,7 +158,7 @@ public class StreetEdgeTest {
     reverse.preferences().withBike(it -> it.setSpeed(3.0f));
     reverse.setMode(TraverseMode.BICYCLE);
 
-    State s3 = new State(new RoutingContext(reverse, v0, v2));
+    State s3 = new State(v2, reverse);
     State s4 = e1.traverse(s3);
     State s5 = e0.traverse(s4);
 
@@ -184,7 +183,7 @@ public class StreetEdgeTest {
     RouteRequest forward = proto.clone();
     forward.setMode(TraverseMode.BICYCLE);
 
-    State s0 = new State(new RoutingContext(forward, v0, v2));
+    State s0 = new State(v0, forward);
     State s1 = e0.traverse(s0);
     State s2 = e1.traverse(s1);
 
@@ -192,7 +191,7 @@ public class StreetEdgeTest {
     reverse.setMode(TraverseMode.BICYCLE);
     reverse.setArriveBy(true);
 
-    State s3 = new State(new RoutingContext(reverse, v0, v2));
+    State s3 = new State(v2, reverse);
     State s4 = e1.traverse(s3);
     State s5 = e0.traverse(s4);
 
@@ -213,7 +212,7 @@ public class StreetEdgeTest {
     noPenalty.preferences().withBike(it -> it.setSwitchTime(0).setSwitchCost(0));
     noPenalty.setMode(TraverseMode.BICYCLE);
 
-    State s0 = new State(new RoutingContext(noPenalty, v0, v0));
+    State s0 = new State(v0, noPenalty);
     State s1 = e0.traverse(s0);
     State s2 = e1.traverse(s1);
     State s3 = e2.traverse(s2);
@@ -222,7 +221,7 @@ public class StreetEdgeTest {
     withPenalty.preferences().withBike(it -> it.setSwitchTime(42).setSwitchCost(23));
     withPenalty.setMode(TraverseMode.BICYCLE);
 
-    State s4 = new State(new RoutingContext(withPenalty, v0, v0));
+    State s4 = new State(v0, withPenalty);
     State s5 = e0.traverse(s4);
     State s6 = e1.traverse(s5);
     State s7 = e2.traverse(s6);

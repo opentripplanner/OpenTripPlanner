@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -46,10 +47,6 @@ public class State implements Cloneable {
 
   /* CONSTRUCTORS */
 
-  public State(RoutingContext rctx) {
-    this(rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(), rctx.opt);
-  }
-
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
@@ -74,15 +71,14 @@ public class State implements Cloneable {
   }
 
   /**
-   * Create an initial state representing the beginning of a search for the given routing context.
+   * Create an initial state representing the beginning of a search for the given routing request.
    * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
    * states must be created from a parent and associated with an edge.
    */
-  public static Collection<State> getInitialStates(RoutingContext routingContext) {
-    RouteRequest request = routingContext.opt;
+  public static Collection<State> getInitialStates(RouteRequest request, Set<Vertex> vertices) {
     Collection<State> states = new ArrayList<>();
     List<StateData> initialStateDatas = StateData.getInitialStateDatas(request);
-    for (Vertex vertex : routingContext.fromVertices) {
+    for (Vertex vertex : vertices) {
       for (StateData stateData : initialStateDatas) {
         states.add(new State(vertex, request.dateTime(), stateData));
       }

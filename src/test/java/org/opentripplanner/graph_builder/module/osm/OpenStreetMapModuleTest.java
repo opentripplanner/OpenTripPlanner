@@ -24,7 +24,6 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -324,10 +323,8 @@ public class OpenStreetMapModuleTest {
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(request, bottomV, topV);
-
     GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
-    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
+    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request, bottomV, topV);
 
     assertNotNull(pathList);
     assertFalse(pathList.isEmpty());

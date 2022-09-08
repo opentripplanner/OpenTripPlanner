@@ -23,7 +23,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -202,14 +201,13 @@ public class TransitRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest)
     ) {
-      var routingContext = new RoutingContext(accessRequest, temporaryVertices);
-
       if (!isEgress) {
         accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(
-        routingContext,
+        accessRequest,
+        temporaryVertices,
         serverContext.transitService(),
         mode,
         serverContext.dataOverlayContext(accessRequest),
@@ -221,7 +219,8 @@ public class TransitRouter {
       // Special handling of flex accesses
       if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
         var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
-          routingContext,
+          accessRequest,
+          temporaryVertices,
           serverContext,
           additionalSearchDays,
           serverContext.routerConfig().flexParameters(accessRequest.preferences()),

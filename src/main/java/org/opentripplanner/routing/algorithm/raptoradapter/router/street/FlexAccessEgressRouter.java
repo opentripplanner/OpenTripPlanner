@@ -7,9 +7,9 @@ import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -19,7 +19,8 @@ public class FlexAccessEgressRouter {
   private FlexAccessEgressRouter() {}
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
-    RoutingContext routingContext,
+    RouteRequest request,
+    TemporaryVerticesContainer verticesContainer,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters params,
@@ -30,7 +31,8 @@ public class FlexAccessEgressRouter {
 
     Collection<NearbyStop> accessStops = !isEgress
       ? AccessEgressRouter.streetSearch(
-        routingContext,
+        request,
+        verticesContainer,
         transitService,
         StreetMode.WALK,
         dataOverlayContext,
@@ -40,7 +42,8 @@ public class FlexAccessEgressRouter {
 
     Collection<NearbyStop> egressStops = isEgress
       ? AccessEgressRouter.streetSearch(
-        routingContext,
+        request,
+        verticesContainer,
         transitService,
         StreetMode.WALK,
         dataOverlayContext,
@@ -52,8 +55,8 @@ public class FlexAccessEgressRouter {
       serverContext.graph(),
       transitService,
       params,
-      routingContext.opt.dateTime(),
-      routingContext.opt.arriveBy(),
+      request.dateTime(),
+      request.arriveBy(),
       searchDays.additionalSearchDaysInPast(),
       searchDays.additionalSearchDaysInFuture(),
       accessStops,

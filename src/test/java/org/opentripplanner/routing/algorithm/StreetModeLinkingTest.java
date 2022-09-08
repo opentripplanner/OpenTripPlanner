@@ -11,10 +11,10 @@ import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 /**
@@ -205,10 +205,12 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       routingRequest.setTo(new GenericLocation(null, null));
 
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
-        RoutingContext routingContext = new RoutingContext(routingRequest, temporaryVertices);
-
         if (fromStreetName != null) {
-          assertFromLink(fromStreetName, streetMode, routingContext);
+          assertFromLink(
+            fromStreetName,
+            streetMode,
+            temporaryVertices.getFromVertices().iterator().next()
+          );
         }
       }
 
@@ -220,21 +222,18 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       routingRequest.setFrom(new GenericLocation(null, null));
 
       try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
-        RoutingContext routingContext = new RoutingContext(routingRequest, temporaryVertices);
-
         if (toStreetName != null) {
-          assertToLink(toStreetName, streetMode, routingContext);
+          assertToLink(
+            toStreetName,
+            streetMode,
+            temporaryVertices.getToVertices().iterator().next()
+          );
         }
       }
     }
   }
 
-  private void assertFromLink(
-    String streetName,
-    StreetMode streetMode,
-    RoutingContext routingContext
-  ) {
-    var fromVertex = routingContext.fromVertices.iterator().next();
+  private void assertFromLink(String streetName, StreetMode streetMode, Vertex fromVertex) {
     var outgoing = fromVertex
       .getOutgoing()
       .iterator()
@@ -250,12 +249,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     );
   }
 
-  private void assertToLink(
-    String streetName,
-    StreetMode streetMode,
-    RoutingContext routingContext
-  ) {
-    var toVertex = routingContext.toVertices.iterator().next();
+  private void assertToLink(String streetName, StreetMode streetMode, Vertex toVertex) {
     var outgoing = toVertex
       .getIncoming()
       .iterator()

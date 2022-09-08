@@ -63,7 +63,6 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -504,8 +503,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, options)) {
-      var routingContext = new RoutingContext(options, temporaryVertices);
-      List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
+      List<GraphPath> paths = finder.graphPathFinderEntryPoint(options, temporaryVertices);
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
 

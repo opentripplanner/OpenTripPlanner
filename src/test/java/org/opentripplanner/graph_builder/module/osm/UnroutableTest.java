@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -71,7 +70,9 @@ public class UnroutableTest {
     options.setMode(TraverseMode.BICYCLE);
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, from, to))
+      .setRequest(options)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(to);

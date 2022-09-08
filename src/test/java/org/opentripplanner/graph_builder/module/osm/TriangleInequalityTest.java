@@ -23,7 +23,6 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
@@ -177,7 +176,9 @@ public class TriangleInequalityTest {
     return AStarBuilder
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
-      .setContext(new RoutingContext(options, u, v))
+      .setRequest(options)
+      .setFrom(u)
+      .setTo(v)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
@@ -212,7 +213,9 @@ public class TriangleInequalityTest {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setDominanceFunction(new DominanceFunction.EarliestArrival())
-      .setContext(new RoutingContext(prototypeOptions, start, end))
+      .setRequest(prototypeOptions)
+      .setFrom(start)
+      .setTo(end)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 

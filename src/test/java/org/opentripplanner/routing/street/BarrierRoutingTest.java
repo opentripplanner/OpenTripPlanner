@@ -26,7 +26,6 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -169,10 +168,8 @@ public class BarrierRoutingTest {
     options.accept(request);
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
-    RoutingContext routingContext = new RoutingContext(request, temporaryVertices);
-
     var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
-    var paths = gpf.graphPathFinderEntryPoint(routingContext);
+    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneId.of("Europe/Berlin"),

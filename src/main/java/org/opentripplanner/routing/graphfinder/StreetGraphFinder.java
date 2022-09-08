@@ -9,7 +9,6 @@ import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -86,7 +85,8 @@ public class StreetGraphFinder implements GraphFinder {
         .allDirections(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunction.LeastWalk())
-        .setContext(new RoutingContext(rr, temporaryVertices))
+        .setRequest(rr)
+        .setVerticesContainer(temporaryVertices)
         .getShortestPathTree();
     }
   }
