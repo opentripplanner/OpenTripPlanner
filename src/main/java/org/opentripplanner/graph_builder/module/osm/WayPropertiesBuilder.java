@@ -14,6 +14,8 @@ public class WayPropertiesBuilder {
   private final StreetTraversalPermission permission;
   private P2<Double> bicycleSafetyFeatures = defaultSafetyFeatures;
   private P2<Double> walkSafetyFeatures = defaultSafetyFeatures;
+  private boolean hasCustomBicycleSafetyFeatures = false;
+  private boolean hasCustomWalkSafetyFeatures = false;
 
   public WayPropertiesBuilder(StreetTraversalPermission permission) {
     this.permission = permission;
@@ -33,6 +35,7 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety) {
     this.bicycleSafetyFeatures = new P2<>(bicycleSafety, bicycleSafety);
+    this.hasCustomBicycleSafetyFeatures = true;
     return this;
   }
 
@@ -42,6 +45,7 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety, double bicycleSafetyBack) {
     this.bicycleSafetyFeatures = new P2<>(bicycleSafety, bicycleSafetyBack);
+    this.hasCustomBicycleSafetyFeatures = true;
     return this;
   }
 
@@ -53,6 +57,7 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder walkSafety(double walkSafety) {
     this.walkSafetyFeatures = new P2<>(walkSafety, walkSafety);
+    this.hasCustomWalkSafetyFeatures = true;
     return this;
   }
 
@@ -62,6 +67,7 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder walkSafety(double walkSafety, double walkSafetyBack) {
     this.walkSafetyFeatures = new P2<>(walkSafety, walkSafetyBack);
+    this.hasCustomWalkSafetyFeatures = true;
     return this;
   }
 
@@ -85,10 +91,10 @@ public class WayPropertiesBuilder {
     Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission,
     Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
   ) {
-    if (bicycleSafetyFeatures.equals(defaultSafetyFeatures)) {
+    if (!hasCustomBicycleSafetyFeatures) {
       bicycleSafety(defaultBicycleSafetyForPermission.apply(permission));
     }
-    if (walkSafetyFeatures.equals(defaultSafetyFeatures)) {
+    if (!hasCustomWalkSafetyFeatures) {
       walkSafety(defaultWalkSafetyForPermission.apply(permission));
     }
     return new WayProperties(this);
