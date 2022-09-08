@@ -356,7 +356,7 @@ public class WayPropertySet {
     Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
   ) {
     if (!this.defaultWalkSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
-      throw new RuntimeException("A custom default walk safety resolver was already set");
+      throw new IllegalStateException("A custom default walk safety resolver was already set");
     }
     this.defaultWalkSafetyForPermission = defaultWalkSafetyForPermission;
     defaultProperties =
@@ -374,7 +374,7 @@ public class WayPropertySet {
     Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission
   ) {
     if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
-      throw new RuntimeException("A custom default cycling safety resolver was already set");
+      throw new IllegalStateException("A custom default cycling safety resolver was already set");
     }
     this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;
     defaultProperties =
