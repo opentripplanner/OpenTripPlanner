@@ -10,7 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -93,11 +93,11 @@ class StreetTransitEntityLinkTest {
       .build();
 
     var req = new RouteRequest();
-    WheelchairAccessibilityFeature feature;
+    AccessibilityPreferences feature;
     if (onlyAccessible) {
-      feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
+      feature = AccessibilityPreferences.ofOnlyAccessible();
     } else {
-      feature = WheelchairAccessibilityFeature.ofCost(100, 100);
+      feature = AccessibilityPreferences.ofCost(100, 100);
     }
     req.setWheelchair(true);
     req

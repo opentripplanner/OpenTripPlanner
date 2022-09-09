@@ -13,9 +13,9 @@ import org.opentripplanner.util.lang.DoubleUtils;
  *                                include stairs as a last result.
  */
 public record WheelchairPreferences(
-  WheelchairAccessibilityFeature trip,
-  WheelchairAccessibilityFeature stop,
-  WheelchairAccessibilityFeature elevator,
+  AccessibilityPreferences trip,
+  AccessibilityPreferences stop,
+  AccessibilityPreferences elevator,
   double inaccessibleStreetReluctance,
   double maxSlope,
   double slopeExceededReluctance,
@@ -41,14 +41,14 @@ public record WheelchairPreferences(
    * assumed to be so for that reason they only have a small default penalty for unknown
    * accessibility
    */
-  private static final WheelchairAccessibilityFeature DEFAULT_ELEVATOR_FEATURE = WheelchairAccessibilityFeature.ofCost(
+  private static final AccessibilityPreferences DEFAULT_ELEVATOR_FEATURE = AccessibilityPreferences.ofCost(
     20,
     3600
   );
 
   public static final WheelchairPreferences DEFAULT = new WheelchairPreferences(
-    WheelchairAccessibilityFeature.ofOnlyAccessible(),
-    WheelchairAccessibilityFeature.ofOnlyAccessible(),
+    AccessibilityPreferences.ofOnlyAccessible(),
+    AccessibilityPreferences.ofOnlyAccessible(),
     DEFAULT_ELEVATOR_FEATURE,
     DEFAULT_INACCESSIBLE_STREET_RELUCTANCE,
     DEFAULT_MAX_SLOPE,
@@ -57,9 +57,9 @@ public record WheelchairPreferences(
   );
 
   public WheelchairPreferences(
-    WheelchairAccessibilityFeature trip,
-    WheelchairAccessibilityFeature stop,
-    WheelchairAccessibilityFeature elevator,
+    AccessibilityPreferences trip,
+    AccessibilityPreferences stop,
+    AccessibilityPreferences elevator,
     double inaccessibleStreetReluctance,
     double maxSlope,
     double slopeExceededReluctance,

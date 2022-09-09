@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
 
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 
 public class WheelchairAccessibilityRequestMapper {
@@ -19,9 +19,9 @@ public class WheelchairAccessibilityRequestMapper {
     );
   }
 
-  private static WheelchairAccessibilityFeature mapAccessibilityFeature(
+  private static AccessibilityPreferences mapAccessibilityFeature(
     NodeAdapter adapter,
-    WheelchairAccessibilityFeature defaultValue
+    AccessibilityPreferences defaultValue
   ) {
     var onlyAccessible = adapter.asBoolean(
       "onlyConsiderAccessible",
@@ -31,9 +31,9 @@ public class WheelchairAccessibilityRequestMapper {
     var unknownCost = adapter.asInt("unknownCost", 60 * 10);
     var inaccessibleCost = adapter.asInt("inaccessibleCost", 60 * 60);
     if (onlyAccessible) {
-      return WheelchairAccessibilityFeature.ofOnlyAccessible();
+      return AccessibilityPreferences.ofOnlyAccessible();
     } else {
-      return WheelchairAccessibilityFeature.ofCost(unknownCost, inaccessibleCost);
+      return AccessibilityPreferences.ofCost(unknownCost, inaccessibleCost);
     }
   }
 }

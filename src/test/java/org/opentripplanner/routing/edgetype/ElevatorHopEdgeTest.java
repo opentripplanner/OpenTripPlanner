@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -33,7 +33,7 @@ class ElevatorHopEdgeTest {
   @VariableSource("noTraverse")
   public void shouldNotTraverse(WheelchairAccessibility wheelchair) {
     var req = new RouteRequest();
-    WheelchairAccessibilityFeature feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
+    AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
     req.setWheelchair(true);
     req
       .preferences()

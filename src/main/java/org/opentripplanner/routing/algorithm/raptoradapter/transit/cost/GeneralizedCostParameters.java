@@ -6,7 +6,7 @@ import java.util.function.DoubleFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -24,7 +24,7 @@ public class GeneralizedCostParameters {
   private final double[] transitReluctanceFactors;
   private final double waitReluctanceFactor;
   private final boolean wheelchairEnabled;
-  private final WheelchairAccessibilityFeature wheelchairAccessibility;
+  private final AccessibilityPreferences wheelchairAccessibility;
   private final BitSet unpreferredPatterns;
   private final DoubleFunction<Double> unpreferredCost;
 
@@ -38,7 +38,7 @@ public class GeneralizedCostParameters {
     this.transitReluctanceFactors = null;
     this.waitReluctanceFactor = 1.0;
     this.wheelchairEnabled = false;
-    this.wheelchairAccessibility = WheelchairAccessibilityFeature.ofOnlyAccessible();
+    this.wheelchairAccessibility = AccessibilityPreferences.ofOnlyAccessible();
     this.unpreferredPatterns = new BitSet();
     this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
   }
@@ -85,7 +85,7 @@ public class GeneralizedCostParameters {
     return wheelchairEnabled;
   }
 
-  public WheelchairAccessibilityFeature wheelchairAccessibility() {
+  public AccessibilityPreferences wheelchairAccessibility() {
     return wheelchairAccessibility;
   }
 

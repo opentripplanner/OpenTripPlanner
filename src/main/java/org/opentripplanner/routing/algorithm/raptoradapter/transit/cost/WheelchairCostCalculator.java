@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -14,7 +14,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
 
   public WheelchairCostCalculator(
     @Nonnull CostCalculator<T> delegate,
-    @Nonnull WheelchairAccessibilityFeature wheelchairAccessibility
+    @Nonnull AccessibilityPreferences wheelchairAccessibility
   ) {
     this.delegate = delegate;
     this.wheelchairBoardingCost = createWheelchairCost(wheelchairAccessibility);
@@ -77,7 +77,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
   /**
    * Create the wheelchair costs for boarding a trip with all possible accessibility values
    */
-  private static int[] createWheelchairCost(WheelchairAccessibilityFeature requirements) {
+  private static int[] createWheelchairCost(AccessibilityPreferences requirements) {
     int[] costIndex = new int[WheelchairAccessibility.values().length];
 
     for (var it : WheelchairAccessibility.values()) {

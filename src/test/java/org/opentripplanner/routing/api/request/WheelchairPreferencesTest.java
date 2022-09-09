@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.request;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature.ofOnlyAccessible;
+import static org.opentripplanner.routing.api.request.preference.AccessibilityPreferences.ofOnlyAccessible;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;

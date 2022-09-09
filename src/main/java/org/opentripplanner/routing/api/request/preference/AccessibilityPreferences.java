@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.api.request.preference;
 
 /**
- * A container for how to treat trips or stops with which don't have a wheelchair accessibility
- * of POSSIBLE.
+ * Preferences for how to treat trips or stops with accessibility restrictions, like wheelchair
+ * accessibility.
  */
-public class WheelchairAccessibilityFeature {
+public class AccessibilityPreferences {
 
   private static final int NOT_SET = -1;
 
-  private static final WheelchairAccessibilityFeature ONLY_CONSIDER_ACCESSIBLE = new WheelchairAccessibilityFeature(
+  private static final AccessibilityPreferences ONLY_CONSIDER_ACCESSIBLE = new AccessibilityPreferences(
     true,
     NOT_SET,
     NOT_SET
@@ -18,7 +18,7 @@ public class WheelchairAccessibilityFeature {
   private final int unknownCost;
   private final int inaccessibleCost;
 
-  private WheelchairAccessibilityFeature(
+  private AccessibilityPreferences(
     boolean onlyConsiderAccessible,
     int unknownCost,
     int inaccessibleCost
@@ -31,15 +31,15 @@ public class WheelchairAccessibilityFeature {
   /**
    * Create a feature which only considers wheelchair-accessible trips/stops.
    */
-  public static WheelchairAccessibilityFeature ofOnlyAccessible() {
+  public static AccessibilityPreferences ofOnlyAccessible() {
     return ONLY_CONSIDER_ACCESSIBLE;
   }
 
   /**
    * Create a feature which considers trips/stops that don't have an accessibility of POSSIBLE.
    */
-  public static WheelchairAccessibilityFeature ofCost(int unknownCost, int inaccessibleCost) {
-    return new WheelchairAccessibilityFeature(false, unknownCost, inaccessibleCost);
+  public static AccessibilityPreferences ofCost(int unknownCost, int inaccessibleCost) {
+    return new AccessibilityPreferences(false, unknownCost, inaccessibleCost);
   }
 
   /**
