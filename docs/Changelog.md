@@ -104,6 +104,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Minor fixes [#4433](https://github.com/opentripplanner/OpenTripPlanner/pull/4433)
 - Return typed errors from realtime updates, prepare for realtime statistics [#4424](https://github.com/opentripplanner/OpenTripPlanner/pull/4424)
 - Add mapping for RecordedCall.PredictionInaccurate [#4435](https://github.com/opentripplanner/OpenTripPlanner/pull/4435)
+- Routing request refactor - routing preferences [#4426](https://github.com/opentripplanner/OpenTripPlanner/pull/4426)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
