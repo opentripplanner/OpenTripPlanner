@@ -16,6 +16,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
     this.requiredTags = requiredTags;
   }
 
+  /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
   public Set<String> requiredTags() {
     return requiredTags;
   }
@@ -24,6 +25,7 @@ public class VehicleParkingRequest implements Cloneable, Serializable {
     this.bannedTags = bannedTags;
   }
 
+  /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
   public Set<String> bannedTags() {
     return bannedTags;
   }

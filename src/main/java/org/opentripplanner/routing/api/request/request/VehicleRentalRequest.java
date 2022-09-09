@@ -20,6 +20,7 @@ public class VehicleRentalRequest implements Cloneable, Serializable {
     this.allowedNetworks = allowedNetworks;
   }
 
+  /** The vehicle rental networks which may be used. If empty all networks may be used. */
   public Set<String> allowedNetworks() {
     return allowedNetworks;
   }
@@ -28,6 +29,7 @@ public class VehicleRentalRequest implements Cloneable, Serializable {
     this.bannedNetworks = bannedNetworks;
   }
 
+  /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
   public Set<String> bannedNetworks() {
     return bannedNetworks;
   }
