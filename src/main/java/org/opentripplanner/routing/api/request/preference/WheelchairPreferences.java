@@ -12,7 +12,7 @@ import org.opentripplanner.util.lang.DoubleUtils;
  *                                punished. This should be a very high value as you want to only
  *                                include stairs as a last result.
  */
-public record WheelchairAccessibilityPreferences(
+public record WheelchairPreferences(
   WheelchairAccessibilityFeature trip,
   WheelchairAccessibilityFeature stop,
   WheelchairAccessibilityFeature elevator,
@@ -46,7 +46,7 @@ public record WheelchairAccessibilityPreferences(
     3600
   );
 
-  public static final WheelchairAccessibilityPreferences DEFAULT = new WheelchairAccessibilityPreferences(
+  public static final WheelchairPreferences DEFAULT = new WheelchairPreferences(
     WheelchairAccessibilityFeature.ofOnlyAccessible(),
     WheelchairAccessibilityFeature.ofOnlyAccessible(),
     DEFAULT_ELEVATOR_FEATURE,
@@ -56,7 +56,7 @@ public record WheelchairAccessibilityPreferences(
     DEFAULT_STAIRS_RELUCTANCE
   );
 
-  public WheelchairAccessibilityPreferences(
+  public WheelchairPreferences(
     WheelchairAccessibilityFeature trip,
     WheelchairAccessibilityFeature stop,
     WheelchairAccessibilityFeature elevator,

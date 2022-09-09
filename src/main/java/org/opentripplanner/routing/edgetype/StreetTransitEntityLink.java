@@ -77,7 +77,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     StateEditor s1 = s0.edit(this);
 
     if (req.wheelchair()) {
-      var accessibility = pref.wheelchairAccessibility();
+      var accessibility = pref.wheelchair();
       if (
         accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -198,8 +198,8 @@ class PathwayEdgeTest {
     req.setWheelchair(wheelchair);
     req
       .preferences()
-      .setWheelchairAccessibility(
-        new WheelchairAccessibilityPreferences(
+      .setWheelchair(
+        new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
           ofOnlyAccessible(),

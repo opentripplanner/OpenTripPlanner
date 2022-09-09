@@ -25,11 +25,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
   public WheelchairEdgeRenderer(RoutingPreferences routingPreferences) {
     this.slopePalette =
-      new DefaultScalarColorPalette(
-        0.0,
-        routingPreferences.wheelchairAccessibility().maxSlope(),
-        1.0
-      );
+      new DefaultScalarColorPalette(0.0, routingPreferences.wheelchair().maxSlope(), 1.0);
   }
 
   @Override

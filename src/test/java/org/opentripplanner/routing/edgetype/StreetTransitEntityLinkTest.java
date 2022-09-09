@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -102,9 +102,7 @@ class StreetTransitEntityLinkTest {
     req.setWheelchair(true);
     req
       .preferences()
-      .setWheelchairAccessibility(
-        new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25)
-      );
+      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);

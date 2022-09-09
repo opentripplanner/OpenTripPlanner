@@ -36,7 +36,7 @@ public class GeneralizedCostParametersMapper {
       mapTransitReluctance(preferences.transit().reluctanceForMode())
     );
     builder.wheelchairEnabled(request.wheelchair());
-    builder.wheelchairAccessibility(preferences.wheelchairAccessibility().trip());
+    builder.wheelchairAccessibility(preferences.wheelchair().trip());
 
     final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
     final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();

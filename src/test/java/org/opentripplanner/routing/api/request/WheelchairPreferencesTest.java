@@ -6,10 +6,10 @@ import static org.opentripplanner.routing.api.request.preference.WheelchairAcces
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.test.support.VariableSource;
 
-class WheelchairAccessibilityPreferencesTest {
+class WheelchairPreferencesTest {
 
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(0.33333333333, 0.33, 0.333),
@@ -21,7 +21,7 @@ class WheelchairAccessibilityPreferencesTest {
   )
   @VariableSource("testCases")
   void testConstructorNormalization(double raw, double rounded2, double rounded3) {
-    var roundedRequest = new WheelchairAccessibilityPreferences(
+    var roundedRequest = new WheelchairPreferences(
       ofOnlyAccessible(),
       ofOnlyAccessible(),
       ofOnlyAccessible(),

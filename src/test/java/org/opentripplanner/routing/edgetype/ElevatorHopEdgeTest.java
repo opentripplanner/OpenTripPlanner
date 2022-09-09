@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -37,9 +37,7 @@ class ElevatorHopEdgeTest {
     req.setWheelchair(true);
     req
       .preferences()
-      .setWheelchairAccessibility(
-        new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25)
-      );
+      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
     State result = traverse(wheelchair, req);
     assertNull(result);
   }

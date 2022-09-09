@@ -53,7 +53,7 @@ public class DirectStreetRouter {
       ItinerariesHelper.decorateItinerariesWithRequestData(
         response,
         directRequest.wheelchair(),
-        directRequest.preferences().wheelchairAccessibility()
+        directRequest.preferences().wheelchair()
       );
       return response;
     } catch (PathNotFoundException e) {

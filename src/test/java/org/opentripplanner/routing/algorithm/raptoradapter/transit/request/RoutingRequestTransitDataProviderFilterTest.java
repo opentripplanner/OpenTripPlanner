@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -48,8 +48,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     0
   );
 
-  private static final WheelchairAccessibilityPreferences DEFAULT_ACCESSIBILITY =
-    WheelchairAccessibilityPreferences.DEFAULT;
+  private static final WheelchairPreferences DEFAULT_ACCESSIBILITY = WheelchairPreferences.DEFAULT;
 
   /**
    * Test filter for wheelchair access.
@@ -233,7 +232,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
       true,
       true,
-      WheelchairAccessibilityPreferences.DEFAULT,
+      WheelchairPreferences.DEFAULT,
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -260,7 +259,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
       true,
-      WheelchairAccessibilityPreferences.DEFAULT,
+      WheelchairPreferences.DEFAULT,
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -287,7 +286,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
       true,
-      WheelchairAccessibilityPreferences.DEFAULT,
+      WheelchairPreferences.DEFAULT,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -314,7 +313,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
       true,
-      WheelchairAccessibilityPreferences.DEFAULT,
+      WheelchairPreferences.DEFAULT,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -355,7 +354,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     var filter1 = new RoutingRequestTransitDataProviderFilter(
       false,
       false,
-      WheelchairAccessibilityPreferences.DEFAULT,
+      WheelchairPreferences.DEFAULT,
       true,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),

@@ -91,13 +91,13 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     if (request.wheelchair()) {
       if (
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
-        preferences.wheelchairAccessibility().elevator().onlyConsiderAccessible()
+        preferences.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().unknownCost());
+        s1.incrementWeight(preferences.wheelchair().elevator().unknownCost());
       } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().inaccessibleCost());
+        s1.incrementWeight(preferences.wheelchair().elevator().inaccessibleCost());
       }
     }
 
