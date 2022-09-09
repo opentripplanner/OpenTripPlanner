@@ -14,11 +14,11 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * This class define how to calculate the cost when cost is part of the multi-criteria pareto
  * function.
  */
-public class McCostParams {
+public class GeneralizedCostParameters {
 
   public static final double DEFAULT_TRANSIT_RELUCTANCE = 1.0;
 
-  public static final McCostParams DEFAULTS = new McCostParams();
+  public static final GeneralizedCostParameters DEFAULTS = new GeneralizedCostParameters();
 
   private final int boardCost;
   private final int transferCost;
@@ -33,7 +33,7 @@ public class McCostParams {
    * Default constructor defines default values. These defaults are overridden by defaults in the
    * {@link RouteRequest}.
    */
-  private McCostParams() {
+  private GeneralizedCostParameters() {
     this.boardCost = 600;
     this.transferCost = 0;
     this.transitReluctanceFactors = null;
@@ -44,7 +44,7 @@ public class McCostParams {
     this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
-  McCostParams(McCostParamsBuilder builder) {
+  GeneralizedCostParameters(GeneralizedCostParametersBuilder builder) {
     this.boardCost = builder.boardCost();
     this.transferCost = builder.transferCost();
     this.transitReluctanceFactors = builder.transitReluctanceFactors();
@@ -112,7 +112,7 @@ public class McCostParams {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    McCostParams that = (McCostParams) o;
+    GeneralizedCostParameters that = (GeneralizedCostParameters) o;
     return (
       boardCost == that.boardCost &&
       transferCost == that.transferCost &&
@@ -123,7 +123,7 @@ public class McCostParams {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(McCostParams.class)
+      .of(GeneralizedCostParameters.class)
       .addNum("boardCost", boardCost, 0)
       .addNum("transferCost", transferCost, 0)
       .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)

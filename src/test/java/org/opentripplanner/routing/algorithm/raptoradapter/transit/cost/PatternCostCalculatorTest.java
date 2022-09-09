@@ -15,7 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.test.support.VariableSource;
@@ -94,7 +94,10 @@ public class PatternCostCalculatorTest {
       route(defaultPattern)
     );
 
-    McCostParams costParams = McCostParamsMapper.map(routingRequest, data.getPatterns());
+    GeneralizedCostParameters costParams = GeneralizedCostParametersMapper.map(
+      routingRequest,
+      data.getPatterns()
+    );
     var unpreferredPatterns = costParams.unpreferredPatterns();
 
     assertTrue(unpreferredPatterns.get(unpreferredRoutePattern.patternIndex()));
@@ -195,7 +198,7 @@ public class PatternCostCalculatorTest {
     }
 
     CostCalculator<TestTripSchedule> createCostCalculator(TestTripSchedule schedule) {
-      McCostParams costParams = McCostParamsMapper.map(
+      GeneralizedCostParameters costParams = GeneralizedCostParametersMapper.map(
         createRoutingRequest(),
         List.of(schedule.pattern())
       );

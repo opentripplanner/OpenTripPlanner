@@ -5,10 +5,10 @@ import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 
 /**
- * Mutable version of the {@link McCostParams}.
+ * Mutable version of the {@link GeneralizedCostParameters}.
  */
 @SuppressWarnings("UnusedReturnValue")
-public class McCostParamsBuilder {
+public class GeneralizedCostParametersBuilder {
 
   private int boardCost;
   private int transferCost;
@@ -19,11 +19,11 @@ public class McCostParamsBuilder {
   private BitSet unpreferredPatterns;
   private DoubleFunction<Double> unpreferredCost;
 
-  public McCostParamsBuilder() {
-    this(McCostParams.DEFAULTS);
+  public GeneralizedCostParametersBuilder() {
+    this(GeneralizedCostParameters.DEFAULTS);
   }
 
-  private McCostParamsBuilder(McCostParams other) {
+  private GeneralizedCostParametersBuilder(GeneralizedCostParameters other) {
     this.boardCost = other.boardCost();
     this.transferCost = other.transferCost();
     this.transitReluctanceFactors = other.transitReluctanceFactors();
@@ -37,7 +37,7 @@ public class McCostParamsBuilder {
     return boardCost;
   }
 
-  public McCostParamsBuilder boardCost(int boardCost) {
+  public GeneralizedCostParametersBuilder boardCost(int boardCost) {
     this.boardCost = boardCost;
     return this;
   }
@@ -46,7 +46,7 @@ public class McCostParamsBuilder {
     return transferCost;
   }
 
-  public McCostParamsBuilder transferCost(int transferCost) {
+  public GeneralizedCostParametersBuilder transferCost(int transferCost) {
     this.transferCost = transferCost;
     return this;
   }
@@ -55,7 +55,9 @@ public class McCostParamsBuilder {
     return transitReluctanceFactors;
   }
 
-  public McCostParamsBuilder transitReluctanceFactors(double[] transitReluctanceFactors) {
+  public GeneralizedCostParametersBuilder transitReluctanceFactors(
+    double[] transitReluctanceFactors
+  ) {
     this.transitReluctanceFactors = transitReluctanceFactors;
     return this;
   }
@@ -64,7 +66,7 @@ public class McCostParamsBuilder {
     return waitReluctanceFactor;
   }
 
-  public McCostParamsBuilder waitReluctanceFactor(double waitReluctanceFactor) {
+  public GeneralizedCostParametersBuilder waitReluctanceFactor(double waitReluctanceFactor) {
     this.waitReluctanceFactor = waitReluctanceFactor;
     return this;
   }
@@ -77,12 +79,14 @@ public class McCostParamsBuilder {
     return accessibilityRequest;
   }
 
-  public McCostParamsBuilder wheelchairEnabled(boolean wheelchairEnabled) {
+  public GeneralizedCostParametersBuilder wheelchairEnabled(boolean wheelchairEnabled) {
     this.wheelchairEnabled = wheelchairEnabled;
     return this;
   }
 
-  public McCostParamsBuilder wheelchairAccessibility(WheelchairAccessibilityPreferences mode) {
+  public GeneralizedCostParametersBuilder wheelchairAccessibility(
+    WheelchairAccessibilityPreferences mode
+  ) {
     accessibilityRequest = mode;
     return this;
   }
@@ -91,7 +95,7 @@ public class McCostParamsBuilder {
     return unpreferredPatterns;
   }
 
-  public McCostParamsBuilder unpreferredPatterns(BitSet patterns) {
+  public GeneralizedCostParametersBuilder unpreferredPatterns(BitSet patterns) {
     this.unpreferredPatterns = patterns;
     return this;
   }
@@ -100,12 +104,12 @@ public class McCostParamsBuilder {
     return unpreferredCost;
   }
 
-  public McCostParamsBuilder unpreferredCost(DoubleFunction<Double> unpreferredCost) {
+  public GeneralizedCostParametersBuilder unpreferredCost(DoubleFunction<Double> unpreferredCost) {
     this.unpreferredCost = unpreferredCost;
     return this;
   }
 
-  public McCostParams build() {
-    return new McCostParams(this);
+  public GeneralizedCostParameters build() {
+    return new GeneralizedCostParameters(this);
   }
 }
