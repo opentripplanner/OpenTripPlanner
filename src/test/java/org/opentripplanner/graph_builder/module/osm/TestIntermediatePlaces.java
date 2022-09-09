@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -242,13 +242,15 @@ public class TestIntermediatePlaces {
     TraverseModeSet modes,
     boolean arriveBy
   ) {
-    RoutingRequest request = new RoutingRequest(modes);
+    // TODO VIA - Why is input modes no longer set in the request
+    RouteRequest request = new RouteRequest();
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
     for (GenericLocation intermediateLocation : via) {
-      request.addIntermediatePlace(intermediateLocation);
+      // TODO VIA - Replace with a RouteViaRequest
+      //options.addIntermediatePlace(intermediateLocation);
     }
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
       var routingContext = new RoutingContext(request, graph, temporaryVertices);
@@ -304,14 +306,14 @@ public class TestIntermediatePlaces {
   }
 
   // Check that the start time and end time of each leg are consistent
-  private void validateLegsTemporally(RoutingRequest request, Itinerary itinerary) {
+  private void validateLegsTemporally(RouteRequest request, Itinerary itinerary) {
     Instant departTime;
     Instant arriveTime;
-    if (request.arriveBy) {
+    if (request.arriveBy()) {
       departTime = itinerary.getLegs().get(0).getStartTime().toInstant();
-      arriveTime = request.getDateTime();
+      arriveTime = request.dateTime();
     } else {
-      departTime = request.getDateTime();
+      departTime = request.dateTime();
       arriveTime = itinerary.getLegs().get(itinerary.getLegs().size() - 1).getEndTime().toInstant();
     }
     long sumOfDuration = 0;

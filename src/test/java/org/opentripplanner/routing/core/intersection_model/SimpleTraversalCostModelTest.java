@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -30,7 +30,7 @@ public class SimpleTraversalCostModelTest {
 
   private Graph graph;
 
-  private RoutingRequest options;
+  private RouteRequest options;
 
   public SimpleIntersectionTraversalCostModel costModel;
 
@@ -40,11 +40,12 @@ public class SimpleTraversalCostModelTest {
     costModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.RIGHT_HAND_TRAFFIC);
 
     // Initialize the routing request.
-    options = new RoutingRequest();
-    options.carSpeed = 1.0;
-    options.walkSpeed = 1.0;
-    options.carDecelerationSpeed = (2.0);
-    options.carAccelerationSpeed = (2.0);
+    options = new RouteRequest();
+    var pref = options.preferences();
+    pref.car().setSpeed(1.0);
+    pref.walk().setSpeed(1.0);
+    pref.car().setDecelerationSpeed(2.0);
+    pref.car().setAccelerationSpeed(2.0);
     options.setStreetSubRequestModes(TraverseModeSet.allModes());
   }
 
@@ -97,12 +98,12 @@ public class SimpleTraversalCostModelTest {
 
     assertEquals(
       1.6875,
-      costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, options, 40, 40),
+      costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       0.5625,
-      costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, options, 40, 40),
+      costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
 
@@ -110,28 +111,12 @@ public class SimpleTraversalCostModelTest {
 
     assertEquals(
       0.5625,
-      leftHandDriveCostModel.computeTraversalCost(
-        v2,
-        e1,
-        e2,
-        TraverseMode.BICYCLE,
-        options,
-        40,
-        40
-      ),
+      leftHandDriveCostModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       1.6875,
-      leftHandDriveCostModel.computeTraversalCost(
-        v2,
-        e2,
-        e1,
-        TraverseMode.BICYCLE,
-        options,
-        40,
-        40
-      ),
+      leftHandDriveCostModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
   }
@@ -184,7 +169,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -218,7 +202,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -255,7 +238,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -296,7 +278,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -337,7 +318,6 @@ public class SimpleTraversalCostModelTest {
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );

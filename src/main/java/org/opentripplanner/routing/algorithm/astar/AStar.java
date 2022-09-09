@@ -58,7 +58,7 @@ public class AStar {
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
     this.traverseVisitor = traverseVisitor;
-    this.arriveBy = rctx.opt.arriveBy;
+    this.arriveBy = rctx.opt.arriveBy();
     this.terminationStrategy = terminationStrategy;
     this.timeout = timeout;
 

@@ -18,7 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -49,7 +49,7 @@ public class RaptorPathToItineraryMapper {
 
   private final TransitLayer transitLayer;
 
-  private final RoutingRequest request;
+  private final RouteRequest request;
 
   private final ZonedDateTime transitSearchTimeZero;
 
@@ -68,7 +68,7 @@ public class RaptorPathToItineraryMapper {
     TransitService transitService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
-    RoutingRequest request
+    RouteRequest request
   ) {
     this.graph = graph;
     this.transitLayer = transitLayer;
@@ -260,8 +260,8 @@ public class RaptorPathToItineraryMapper {
     } else {
       // A RoutingRequest with a RoutingContext must be constructed so that the edges
       // may be re-traversed to create the leg(s) from the list of edges.
-      RoutingRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
-      traverseRequest.arriveBy = false;
+      RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
+      traverseRequest.setArriveBy(false);
       RoutingContext routingContext = new RoutingContext(
         traverseRequest,
         graph,

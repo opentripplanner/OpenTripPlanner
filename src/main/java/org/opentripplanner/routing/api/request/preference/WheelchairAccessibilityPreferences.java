@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.preference;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -14,8 +14,7 @@ import java.math.RoundingMode;
  *                                punished. This should be a very high value as you want to only
  *                                include stairs as a last result.
  */
-public record WheelchairAccessibilityRequest(
-  boolean enabled,
+public record WheelchairAccessibilityPreferences(
   WheelchairAccessibilityFeature trip,
   WheelchairAccessibilityFeature stop,
   WheelchairAccessibilityFeature elevator,
@@ -53,8 +52,7 @@ public record WheelchairAccessibilityRequest(
 
   private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
-  public static final WheelchairAccessibilityRequest DEFAULT = new WheelchairAccessibilityRequest(
-    false,
+  public static final WheelchairAccessibilityPreferences DEFAULT = new WheelchairAccessibilityPreferences(
     DEFAULT_TRIP_FEATURE,
     DEFAULT_STOP_FEATURE,
     DEFAULT_ELEVATOR_FEATURE,
@@ -64,31 +62,13 @@ public record WheelchairAccessibilityRequest(
     DEFAULT_STAIRS_RELUCTANCE
   );
 
-  public static WheelchairAccessibilityRequest makeDefault(boolean enabled) {
-    return DEFAULT.withEnabled(enabled);
-  }
-
-  public WheelchairAccessibilityRequest withEnabled(boolean enabled) {
-    return new WheelchairAccessibilityRequest(
-      enabled,
-      trip,
-      stop,
-      elevator,
-      inaccessibleStreetReluctance,
-      maxSlope,
-      slopeExceededReluctance,
-      stairsReluctance
-    );
-  }
-
-  public WheelchairAccessibilityRequest round() {
+  public WheelchairAccessibilityPreferences round() {
     double roundedMaxSlope = BigDecimal
       .valueOf(maxSlope)
       .setScale(3, RoundingMode.HALF_EVEN)
       .round(MathContext.UNLIMITED)
       .doubleValue();
-    return new WheelchairAccessibilityRequest(
-      enabled,
+    return new WheelchairAccessibilityPreferences(
       trip,
       stop,
       elevator,

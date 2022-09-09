@@ -7,7 +7,7 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -23,7 +23,7 @@ public class TestBanning {
   public void testSetBannedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
 
     routingRequest.setBannedRoutesFromString("F__RUT:Route:1");
     routingRequest.setBannedAgenciesFromSting("F:RUT:Agency:2");
@@ -39,7 +39,7 @@ public class TestBanning {
   public void testSetWhiteListedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
 
     routingRequest.setWhiteListedRoutesFromString("F__RUT:Route:1");
     routingRequest.setWhiteListedAgenciesFromSting("F:RUT:Agency:2");

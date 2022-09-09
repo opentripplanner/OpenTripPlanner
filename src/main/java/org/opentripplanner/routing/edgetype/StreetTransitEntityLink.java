@@ -2,7 +2,8 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -67,24 +68,25 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       return null;
     }
 
-    RoutingRequest req = s0.getOptions();
+    RouteRequest req = s0.getOptions();
+    RoutingPreferences pref = s0.getPreferences();
 
     // Do not check here whether any transit modes are selected. A check for the presence of
     // transit modes will instead be done in the following PreBoard edge.
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
 
-    var accessibility = s0.getOptions().wheelchairAccessibility;
-    if (accessibility.enabled()) {
+    if (req.wheelchair()) {
+      var accessibility = pref.wheelchairAccessibility();
       if (
         accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(req.wheelchairAccessibility.stop().unknownCost());
+        s1.incrementWeight(accessibility.stop().unknownCost());
       } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(req.wheelchairAccessibility.stop().inaccessibleCost());
+        s1.incrementWeight(accessibility.stop().inaccessibleCost());
       }
     }
 
@@ -134,7 +136,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       s0.mayKeepRentedVehicleAtDestination() &&
       s0.getOptions().allowKeepingRentedVehicleAtDestination
     ) {
-      s1.incrementWeight(s0.getOptions().keepingRentedVehicleAtDestinationCost);
+      s1.incrementWeight(pref.rental().keepingVehicleAtDestinationCost());
     }
 
     s1.setBackMode(null);
@@ -166,7 +168,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return transitEntityVertex;
   }
 
-  boolean isLeavingStreetNetwork(RoutingRequest req) {
-    return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
+  boolean isLeavingStreetNetwork(RouteRequest req) {
+    return (req.arriveBy() ? fromv : tov) == getTransitEntityVertex();
   }
 }

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -68,7 +68,7 @@ public class TemporaryPartialStreetEdgeTest {
 
   @Test
   public void testTraversal() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.setMode(TraverseMode.CAR);
     RoutingContext routingContext = new RoutingContext(options, graph, v1, v2);
 
@@ -135,14 +135,14 @@ public class TemporaryPartialStreetEdgeTest {
       tempEdges
     );
 
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     options.setMode(TraverseMode.CAR);
     RoutingContext routingContext = new RoutingContext(options, graph, v1, v2);
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;
     graph.setIntersectionTraversalCostModel(new DummyCostModel(turnDurationSecs));
-    options.turnReluctance = (1.0);
+    options.preferences().street().setTurnReluctance(1.0);
 
     State s0 = new State(routingContext);
     State s1 = e1.traverse(s0);
@@ -296,7 +296,6 @@ public class TemporaryPartialStreetEdgeTest {
       StreetEdge from,
       StreetEdge to,
       TraverseMode mode,
-      RoutingRequest options,
       float fromSpeed,
       float toSpeed
     ) {

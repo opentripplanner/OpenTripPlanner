@@ -12,7 +12,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -68,11 +68,11 @@ public class BicycleRoutingTest {
   }
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
-    request.bicycleOptimizeType = BicycleOptimizeType.QUICK;
+    request.setFrom(from);
+    request.setTo(to);
+    request.preferences().bike().setOptimizeType(BicycleOptimizeType.QUICK);
 
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);

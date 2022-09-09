@@ -3,19 +3,21 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class DefaultRoutingRequestType {
 
-  public final RoutingRequest request;
+  public final RouteRequest request;
   public final GraphQLObjectType graphQLType;
 
-  public DefaultRoutingRequestType(RoutingRequest request) {
+  public DefaultRoutingRequestType(RouteRequest request) {
     this.request = request;
     this.graphQLType = createGraphQLType();
   }
 
   private GraphQLObjectType createGraphQLType() {
+    var preferences = request.preferences();
+
     return GraphQLObjectType
       .newObject()
       .name("RoutingParameters")
@@ -26,7 +28,7 @@ public class DefaultRoutingRequestType {
           .name("walkSpeed")
           .description("Max walk speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.walkSpeed)
+          .dataFetcher(env -> preferences.walk().speed())
           .build()
       )
       .field(
@@ -35,7 +37,7 @@ public class DefaultRoutingRequestType {
           .name("bikeSpeed")
           .description("Max bike speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.bikeSpeed)
+          .dataFetcher(env -> preferences.bike().speed())
           .build()
       )
       .field(
@@ -44,7 +46,7 @@ public class DefaultRoutingRequestType {
           .name("carSpeed")
           .description("Max car speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.carSpeed)
+          .dataFetcher(env -> preferences.car().speed())
           .build()
       )
       .field(
@@ -57,7 +59,7 @@ public class DefaultRoutingRequestType {
             "Use filters to limit what is presented to the client."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.maxDirectStreetDuration.toSeconds())
+          .dataFetcher(env -> preferences.street().maxDirectDurationDefaultValue().toSeconds())
           .build()
       )
       .field(
@@ -66,7 +68,7 @@ public class DefaultRoutingRequestType {
           .name("wheelChairAccessible")
           .description("Whether the trip must be wheelchair accessible.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.wheelchairAccessibility.enabled())
+          .dataFetcher(env -> request.wheelchair())
           .build()
       )
       .field(
@@ -75,7 +77,7 @@ public class DefaultRoutingRequestType {
           .name("numItineraries")
           .description("The maximum number of itineraries to return.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.numItineraries)
+          .dataFetcher(env -> request.numItineraries())
           .build()
       )
       .field(
@@ -84,18 +86,20 @@ public class DefaultRoutingRequestType {
           .name("maxSlope")
           .description("The maximum slope of streets for wheelchair trips.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.wheelchairAccessibility.maxSlope())
+          .dataFetcher(env -> preferences.wheelchairAccessibility().maxSlope())
           .build()
       )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("showIntermediateStops")
+          .deprecate("Deprecated. This parameter is always enabled")
           .description(
             "Whether the planner should return intermediate stops lists for transit legs."
           )
+          .deprecate("This parameter is always enabled")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.showIntermediateStops)
+          .dataFetcher(env -> true)
           .build()
       )
       .field(
@@ -106,7 +110,7 @@ public class DefaultRoutingRequestType {
             "An extra penalty added on transfers (i.e. all boardings except the first one)."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.transferCost)
+          .dataFetcher(env -> preferences.transfer().cost())
           .build()
       )
       .field(
@@ -117,7 +121,7 @@ public class DefaultRoutingRequestType {
             "A multiplier for how bad walking is, compared to being in transit for equal lengths of time."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.walkReluctance)
+          .dataFetcher(env -> preferences.walk().reluctance())
           .build()
       )
       .field(
@@ -126,7 +130,7 @@ public class DefaultRoutingRequestType {
           .name("stairsReluctance")
           .description("Used instead of walkReluctance for stairs.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.stairsReluctance)
+          .dataFetcher(env -> preferences.walk().stairsReluctance())
           .build()
       )
       .field(
@@ -135,7 +139,7 @@ public class DefaultRoutingRequestType {
           .name("turnReluctance")
           .description("Multiplicative factor on expected turning time.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.turnReluctance)
+          .dataFetcher(env -> preferences.street().turnReluctance())
           .build()
       )
       .field(
@@ -144,7 +148,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorBoardTime")
           .description("How long does it take to get on an elevator, on average.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.elevatorBoardTime)
+          .dataFetcher(env -> preferences.street().elevatorBoardTime())
           .build()
       )
       .field(
@@ -153,7 +157,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorBoardCost")
           .description("What is the cost of boarding a elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.elevatorBoardCost)
+          .dataFetcher(env -> preferences.street().elevatorBoardCost())
           .build()
       )
       .field(
@@ -162,7 +166,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorHopTime")
           .description("How long does it take to advance one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.elevatorHopTime)
+          .dataFetcher(env -> preferences.street().elevatorHopTime())
           .build()
       )
       .field(
@@ -171,7 +175,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorHopCost")
           .description("What is the cost of travelling one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.elevatorHopCost)
+          .dataFetcher(env -> preferences.street().elevatorHopCost())
           .build()
       )
       .field(
@@ -180,7 +184,7 @@ public class DefaultRoutingRequestType {
           .name("bikeRentalPickupTime")
           .description("Time to rent a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.vehicleRentalPickupTime)
+          .dataFetcher(env -> preferences.rental().pickupTime())
           .build()
       )
       .field(
@@ -189,7 +193,7 @@ public class DefaultRoutingRequestType {
           .name("bikeRentalPickupCost")
           .description("Cost to rent a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.vehicleRentalPickupCost)
+          .dataFetcher(env -> preferences.rental().pickupCost())
           .build()
       )
       .field(
@@ -198,7 +202,7 @@ public class DefaultRoutingRequestType {
           .name("bikeRentalDropOffTime")
           .description("Time to drop-off a rented bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.vehicleRentalDropoffTime)
+          .dataFetcher(env -> preferences.rental().dropoffTime())
           .build()
       )
       .field(
@@ -207,7 +211,7 @@ public class DefaultRoutingRequestType {
           .name("bikeRentalDropOffCost")
           .description("Cost to drop-off a rented bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.vehicleRentalDropoffCost)
+          .dataFetcher(env -> preferences.rental().dropoffCost())
           .build()
       )
       .field(
@@ -216,7 +220,7 @@ public class DefaultRoutingRequestType {
           .name("bikeParkTime")
           .description("Time to park a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.bikeParkTime)
+          .dataFetcher(env -> preferences.bike().parkTime())
           .build()
       )
       .field(
@@ -225,7 +229,7 @@ public class DefaultRoutingRequestType {
           .name("bikeParkCost")
           .description("Cost to park a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.bikeParkCost)
+          .dataFetcher(env -> preferences.bike().parkCost())
           .build()
       )
       .field(
@@ -236,7 +240,7 @@ public class DefaultRoutingRequestType {
             "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.carDropoffTime)
+          .dataFetcher(env -> preferences.car().dropoffTime())
           .build()
       )
       .field(
@@ -247,7 +251,7 @@ public class DefaultRoutingRequestType {
             "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.waitReluctance)
+          .dataFetcher(env -> preferences.transfer().waitReluctance())
           .build()
       )
       .field(
@@ -258,7 +262,7 @@ public class DefaultRoutingRequestType {
             "How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.waitAtBeginningFactor)
+          .dataFetcher(env -> preferences.transfer().waitAtBeginningFactor())
           .build()
       )
       .field(
@@ -269,7 +273,7 @@ public class DefaultRoutingRequestType {
             "This prevents unnecessary transfers by adding a cost for boarding a vehicle."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.walkBoardCost)
+          .dataFetcher(env -> preferences.walk().boardCost())
           .build()
       )
       .field(
@@ -280,7 +284,7 @@ public class DefaultRoutingRequestType {
             "Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.bikeBoardCost)
+          .dataFetcher(env -> preferences.bike().boardCost())
           .build()
       )
       .field(
@@ -291,7 +295,7 @@ public class DefaultRoutingRequestType {
             "Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing to wait for preferred route."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.otherThanPreferredRoutesPenalty)
+          .dataFetcher(env -> preferences.transit().otherThanPreferredRoutesPenalty())
           .build()
       )
       .field(
@@ -302,7 +306,7 @@ public class DefaultRoutingRequestType {
             "A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.transferSlack)
+          .dataFetcher(env -> preferences.transfer().slack())
           .build()
       )
       .field(
@@ -311,7 +315,7 @@ public class DefaultRoutingRequestType {
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> ((RoutingRequest) e.getSource()).boardSlack)
+          .dataFetcher(e -> preferences.transit().boardSlack().defaultValue().toSeconds())
           .build()
       )
       .field(
@@ -320,9 +324,7 @@ public class DefaultRoutingRequestType {
           .name("boardSlackList")
           .description(TransportModeSlack.slackByGroupDescription("boardSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
-          .dataFetcher(e ->
-            TransportModeSlack.mapToApiList(((RoutingRequest) e.getSource()).boardSlackForMode)
-          )
+          .dataFetcher(e -> TransportModeSlack.mapToApiList(preferences.transit().boardSlack()))
           .build()
       )
       .field(
@@ -331,7 +333,7 @@ public class DefaultRoutingRequestType {
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> ((RoutingRequest) e.getSource()).alightSlack)
+          .dataFetcher(e -> preferences.transit().alightSlack().defaultValue().toSeconds())
           .build()
       )
       .field(
@@ -340,9 +342,7 @@ public class DefaultRoutingRequestType {
           .name("alightSlackList")
           .description(TransportModeSlack.slackByGroupDescription("alightSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
-          .dataFetcher(e ->
-            TransportModeSlack.mapToApiList(((RoutingRequest) e.getSource()).alightSlackForMode)
-          )
+          .dataFetcher(e -> TransportModeSlack.mapToApiList(preferences.transit().alightSlack()))
           .build()
       )
       .field(
@@ -351,7 +351,7 @@ public class DefaultRoutingRequestType {
           .name("maxTransfers")
           .description("Maximum number of transfers returned in a trip plan.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> request.maxTransfers)
+          .dataFetcher(env -> preferences.transfer().maxTransfers())
           .build()
       )
       .field(
@@ -378,7 +378,7 @@ public class DefaultRoutingRequestType {
           .name("carDecelerationSpeed")
           .description("The deceleration speed of an automobile, in meters per second per second.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.carDecelerationSpeed)
+          .dataFetcher(env -> preferences.car().decelerationSpeed())
           .build()
       )
       .field(
@@ -387,7 +387,7 @@ public class DefaultRoutingRequestType {
           .name("carAccelerationSpeed")
           .description("The acceleration speed of an automobile, in meters per second per second.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> request.carAccelerationSpeed)
+          .dataFetcher(env -> preferences.car().accelerationSpeed())
           .build()
       )
       .field(
@@ -396,7 +396,7 @@ public class DefaultRoutingRequestType {
           .name("ignoreRealTimeUpdates")
           .description("When true, realtime updates are ignored during this search.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.ignoreRealtimeUpdates)
+          .dataFetcher(env -> preferences.transit().ignoreRealtimeUpdates())
           .build()
       )
       .field(
@@ -407,7 +407,7 @@ public class DefaultRoutingRequestType {
             "When true, service journeys cancelled in scheduled route data will be included during this search."
           )
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.includePlannedCancellations)
+          .dataFetcher(env -> preferences.transit().includePlannedCancellations())
           .build()
       )
       .field(
@@ -450,7 +450,7 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("debugItineraryFilter")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.itineraryFilters.debug)
+          .dataFetcher(env -> preferences.system().itineraryFilters().debug)
           .build()
       )
       /*
@@ -471,8 +471,9 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("onlyTransitTrips")
           .description("Accept only paths that use transit (no street-only paths).")
+          .deprecate("This is replaced by modes input object")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.onlyTransitTrips)
+          .dataFetcher(env -> false)
           .build()
       )
       .field(
@@ -481,7 +482,7 @@ public class DefaultRoutingRequestType {
           .name("disableAlertFiltering")
           .description("Option to disable the default filtering of GTFS-RT alerts by time.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.disableAlertFiltering)
+          .dataFetcher(env -> preferences.system().disableAlertFiltering())
           .build()
       )
       .field(
@@ -492,7 +493,7 @@ public class DefaultRoutingRequestType {
             "Whether to apply the ellipsoid->geoid offset to all elevations in the response."
           )
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.geoidElevation)
+          .dataFetcher(env -> preferences.system().geoidElevation())
           .build()
       )
       /*

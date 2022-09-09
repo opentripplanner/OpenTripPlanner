@@ -14,8 +14,9 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -63,11 +64,11 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct WALK")
   @Test
   public void directWalk() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitModes().build();
-    request.from = p1;
-    request.to = p4;
+    request.setFrom(p1);
+    request.setTo(p4);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -75,12 +76,12 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -88,16 +89,16 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE")
   @Test
   public void directBike() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-    request.bicycleOptimizeType = BicycleOptimizeType.TRIANGLE;
-    request.bikeTriangleSafetyFactor = 0.3;
-    request.bikeTriangleTimeFactor = 0.3;
-    request.bikeTriangleSlopeFactor = 0.4;
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+
+    BikePreferences bikePreferences = request.preferences().bike();
+    bikePreferences.setOptimizeType(BicycleOptimizeType.TRIANGLE);
+    bikePreferences.initOptimizeTriangle(0.3, 0.4, 0.3);
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitModes().build();
-    request.from = p1;
-    request.to = p4;
-    request.arriveBy = true;
+    request.setFrom(p1);
+    request.setTo(p4);
+    request.setArriveBy(true);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -105,7 +106,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Access BIKE_RENTAL")
   @Test
   public void accessBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
     request.modes =
       RequestModes
@@ -116,8 +117,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         .withDirectMode(StreetMode.NOT_SET)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p1;
-    request.to = p3;
+    request.setFrom(p1);
+    request.setTo(p3);
 
     try {
       expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -129,7 +130,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("TRANSIT")
   @Test
   public void transit() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes
@@ -140,8 +141,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         .withDirectMode(StreetMode.NOT_SET)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p3;
-    request.to = p1;
+    request.setFrom(p3);
+    request.setTo(p1);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

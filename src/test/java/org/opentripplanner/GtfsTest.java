@@ -23,8 +23,10 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -65,24 +67,28 @@ public abstract class GtfsTest {
     int legCount
   ) {
     final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
+    RoutingPreferences preferences = routingRequest.preferences();
+
     routingRequest.setNumItineraries(1);
 
     routingRequest.setArriveBy(dateTime < 0);
     routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
     if (fromVertex != null && !fromVertex.isEmpty()) {
-      routingRequest.from =
-        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
+      routingRequest.setFrom(
+        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex)
+      );
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      routingRequest.to =
-        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex);
+      routingRequest.setTo(
+        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex)
+      );
     }
     if (onTripId != null && !onTripId.isEmpty()) {
       routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
     }
-    routingRequest.setWheelchairAccessible(wheelchairAccessible);
-    routingRequest.transferCost = (preferLeastTransfers ? 300 : 0);
+    routingRequest.setWheelchair(wheelchairAccessible);
+    preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
     routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
       routingRequest.setBannedRoutes(List.of(new FeedScopedId(feedId.getId(), excludedRoute)));
@@ -90,14 +96,15 @@ public abstract class GtfsTest {
     if (excludedStop != null && !excludedStop.isEmpty()) {
       throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
     }
-    routingRequest.setOtherThanPreferredRoutesPenalty(0);
+    preferences.transit().setOtherThanPreferredRoutesPenalty(0);
+
     // The walk board cost is set low because it interferes with test 2c1.
     // As long as boarding has a very low cost, waiting should not be "better" than riding
     // since this makes interlining _worse_ than alighting and re-boarding the same line.
     // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
-    routingRequest.setWaitReluctance(1);
-    routingRequest.setWalkBoardCost(30);
-    routingRequest.transferSlack = 0;
+    preferences.transfer().setWaitReluctance(1);
+    preferences.walk().setBoardCost(30);
+    preferences.transfer().setSlack(0);
 
     RoutingResponse res = serverContext.routingService().route(routingRequest);
     List<Itinerary> itineraries = res.getTripPlan().itineraries;

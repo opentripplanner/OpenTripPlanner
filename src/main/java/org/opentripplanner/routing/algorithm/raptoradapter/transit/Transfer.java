@@ -8,7 +8,8 @@ import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -35,37 +36,40 @@ public class Transfer {
     this.edges = null;
   }
 
-  public static RoutingRequest prepareTransferRoutingRequest(RoutingRequest request) {
-    RoutingRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
+  public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
+    RouteRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
 
-    rr.arriveBy = false;
+    var transferPreferences = rr.preferences();
+
+    rr.setArriveBy(false);
     rr.setDateTime(Instant.ofEpochSecond(0));
-    rr.from = null;
-    rr.to = null;
+    rr.setFrom(null);
+    rr.setTo(null);
 
-    // Some of the values are rounded to ease caching in RaptorRequestTransferCache
-    rr.bikeTriangleSafetyFactor = roundTo(request.bikeTriangleSafetyFactor, 1);
-    rr.bikeTriangleSlopeFactor = roundTo(request.bikeTriangleSlopeFactor, 1);
-    rr.bikeTriangleTimeFactor = 1.0 - rr.bikeTriangleSafetyFactor - rr.bikeTriangleSlopeFactor;
-    rr.bikeSwitchCost = roundTo100(request.bikeSwitchCost);
-    rr.bikeSwitchTime = roundTo100(request.bikeSwitchTime);
+    var bikePreferences = transferPreferences.bike();
+    var walkPreferences = transferPreferences.walk();
+    var streetPreferences = transferPreferences.street();
+
+    // Some values are rounded to ease caching in RaptorRequestTransferCache
+    bikePreferences.setSwitchCost(roundTo100(bikePreferences.switchCost()));
+    bikePreferences.setSwitchTime(roundTo100(bikePreferences.switchTime()));
 
     // it's a record (immutable) so can be safely reused
-    rr.wheelchairAccessibility = request.wheelchairAccessibility;
+    transferPreferences.setWheelchairAccessibility(request.preferences().wheelchairAccessibility());
 
-    rr.walkSpeed = roundToHalf(request.walkSpeed);
-    rr.bikeSpeed = roundToHalf(request.bikeSpeed);
+    walkPreferences.setSpeed(roundToHalf(walkPreferences.speed()));
+    bikePreferences.setSpeed(roundToHalf(bikePreferences.speed()));
 
-    rr.walkReluctance = roundTo(request.walkReluctance, 1);
-    rr.stairsReluctance = roundTo(request.stairsReluctance, 1);
-    rr.stairsTimeFactor = roundTo(request.stairsTimeFactor, 1);
-    rr.turnReluctance = roundTo(request.turnReluctance, 1);
-    rr.walkSafetyFactor = roundTo(request.walkSafetyFactor, 1);
+    walkPreferences.setReluctance(roundTo(walkPreferences.reluctance(), 1));
+    walkPreferences.setStairsReluctance(roundTo(walkPreferences.stairsReluctance(), 1));
+    walkPreferences.setStairsTimeFactor(roundTo(walkPreferences.stairsTimeFactor(), 1));
+    streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
+    walkPreferences.setSafetyFactor(roundTo(walkPreferences.safetyFactor(), 1));
 
-    rr.elevatorBoardCost = roundTo100(request.elevatorBoardCost);
-    rr.elevatorBoardTime = roundTo100(request.elevatorBoardTime);
-    rr.elevatorHopCost = roundTo100(request.elevatorHopCost);
-    rr.elevatorHopTime = roundTo100(request.elevatorHopTime);
+    streetPreferences.setElevatorBoardCost(roundTo100(streetPreferences.elevatorBoardCost()));
+    streetPreferences.setElevatorBoardTime(roundTo100(streetPreferences.elevatorBoardTime()));
+    streetPreferences.setElevatorHopCost(roundTo100(streetPreferences.elevatorHopCost()));
+    streetPreferences.setElevatorHopTime(roundTo100(streetPreferences.elevatorHopTime()));
 
     return rr;
   }
@@ -96,14 +100,14 @@ public class Transfer {
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(RoutingContext routingContext) {
-    RoutingRequest routingRequest = routingContext.opt;
+    RoutingPreferences routingPreferences = routingContext.opt.preferences();
     if (edges == null || edges.isEmpty()) {
-      double durationSeconds = distanceMeters / routingRequest.walkSpeed;
+      double durationSeconds = distanceMeters / routingPreferences.walk().speed();
       return Optional.of(
         new TransferWithDuration(
           this,
           (int) Math.ceil(durationSeconds),
-          RaptorCostConverter.toRaptorCost(durationSeconds * routingRequest.walkReluctance)
+          RaptorCostConverter.toRaptorCost(durationSeconds * routingPreferences.walk().reluctance())
         )
       );
     }

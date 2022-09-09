@@ -26,7 +26,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -233,11 +233,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     GenericLocation to,
     OtpServerRequestContext serverContext
   ) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
 
     var time = dateTime.atZone(ZoneId.of("America/New_York"));
     var additionalSearchDays = AdditionalSearchDays.defaults(time);
@@ -266,7 +266,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .filter(s -> s instanceof AreaStop)
       .findFirst()
       .orElseThrow();
-    var r = new RoutingRequest();
+    var r = new RouteRequest();
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, r)) {
       RoutingContext routingContext = new RoutingContext(r, graph, temporaryVertices);
 

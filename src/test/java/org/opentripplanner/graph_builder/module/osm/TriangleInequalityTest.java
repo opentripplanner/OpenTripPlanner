@@ -19,7 +19,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -173,7 +173,7 @@ public class TriangleInequalityTest {
     checkTriangleInequality(modes);
   }
 
-  private GraphPath getPath(RoutingRequest options, Edge startBackEdge, Vertex u, Vertex v) {
+  private GraphPath getPath(RouteRequest options, Edge startBackEdge, Vertex u, Vertex v) {
     return AStarBuilder
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
@@ -190,15 +190,15 @@ public class TriangleInequalityTest {
     assertNotNull(start);
     assertNotNull(end);
 
-    RoutingRequest prototypeOptions = new RoutingRequest();
+    RouteRequest prototypeOptions = new RouteRequest();
 
     // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions.stairsReluctance = (1.0);
-    prototypeOptions.setNonTransitReluctance(1.0);
-    prototypeOptions.turnReluctance = (1.0);
-    prototypeOptions.carSpeed = 1.0;
-    prototypeOptions.walkSpeed = 1.0;
-    prototypeOptions.bikeSpeed = 1.0;
+    prototypeOptions.preferences().walk().setStairsReluctance(1.0);
+    prototypeOptions.preferences().setNonTransitReluctance(1.0);
+    prototypeOptions.preferences().street().setTurnReluctance(1.0);
+    prototypeOptions.preferences().car().setSpeed(1.0);
+    prototypeOptions.preferences().walk().setSpeed(1.0);
+    prototypeOptions.preferences().bike().setSpeed(1.0);
 
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 

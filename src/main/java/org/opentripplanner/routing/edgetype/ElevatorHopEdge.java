@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -82,20 +83,21 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public State traverse(State s0) {
-    RoutingRequest request = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
+    RouteRequest request = s0.getOptions();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
-    if (request.wheelchairAccessibility.enabled()) {
+    if (request.wheelchair()) {
       if (
         wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
-        request.wheelchairAccessibility.elevator().onlyConsiderAccessible()
+        preferences.wheelchairAccessibility().elevator().onlyConsiderAccessible()
       ) {
         return null;
       } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(request.wheelchairAccessibility.elevator().unknownCost());
+        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().unknownCost());
       } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(request.wheelchairAccessibility.elevator().inaccessibleCost());
+        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().inaccessibleCost());
       }
     }
 
@@ -114,10 +116,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     }
 
     s1.incrementWeight(
-      this.travelTime > 0 ? this.travelTime : (request.elevatorHopCost * this.levels)
+      this.travelTime > 0 ? this.travelTime : (preferences.street().elevatorHopCost() * this.levels)
     );
     s1.incrementTimeInSeconds(
-      this.travelTime > 0 ? this.travelTime : (int) (request.elevatorHopTime * this.levels)
+      this.travelTime > 0
+        ? this.travelTime
+        : (int) (preferences.street().elevatorHopTime() * this.levels)
     );
     return s1.makeState();
   }

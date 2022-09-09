@@ -22,7 +22,7 @@ import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -189,7 +189,7 @@ public class TestHalfEdges {
     int nVertices = graph.getVertices().size();
     int nEdges = graph.getEdges().size();
 
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
 
     HashSet<Edge> turns = new HashSet<>();
     turns.add(left);
@@ -286,7 +286,7 @@ public class TestHalfEdges {
      * that (b) it is not preferred to riding a tiny bit longer.
      */
 
-    options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+    options = new RouteRequest(new TraverseModeSet(TraverseMode.BICYCLE));
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
         "start1",
@@ -368,7 +368,7 @@ public class TestHalfEdges {
 
   @Test
   public void testRouteToSameEdge() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
     HashSet<Edge> turns = new HashSet<>();
@@ -418,7 +418,7 @@ public class TestHalfEdges {
 
   @Test
   public void testRouteToSameEdgeBackwards() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
     // Sits only on the leftmost edge, not on its reverse.
@@ -495,7 +495,7 @@ public class TestHalfEdges {
 
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
-    RoutingRequest req = new RoutingRequest();
+    RouteRequest req = new RouteRequest();
     State traversedOne = new State(start, req, null);
     State currentState;
     for (Edge e : start.getOutgoing()) {
@@ -528,7 +528,7 @@ public class TestHalfEdges {
       StreetNotesService.WHEELCHAIR_MATCHER
     );
 
-    req.setWheelchairAccessible(true);
+    req.setWheelchair(true);
 
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -557,7 +557,7 @@ public class TestHalfEdges {
 
   @Test
   public void testStreetLocationFinder() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     StreetVertexIndex finder = graph.getStreetIndex();
     GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
@@ -589,7 +589,7 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+    RouteRequest biking = new RouteRequest(new TraverseModeSet(TraverseMode.BICYCLE));
     TemporaryStreetLocation end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.008, -74.0),
       biking,
@@ -607,9 +607,9 @@ public class TestHalfEdges {
   @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
-    RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
-    walking.from = new GenericLocation(40.004, -74.0);
-    walking.to = new GenericLocation(40.008, -74.0);
+    RouteRequest walking = new RouteRequest(TraverseMode.WALK);
+    walking.setFrom(new GenericLocation(40.004, -74.0));
+    walking.setTo(new GenericLocation(40.008, -74.0));
     try (var container = new TemporaryVerticesContainer(graph, walking)) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());

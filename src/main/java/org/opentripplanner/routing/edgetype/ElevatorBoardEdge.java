@@ -3,7 +3,6 @@ package org.opentripplanner.routing.edgetype;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -47,9 +46,10 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
       return null;
     }
 
-    RoutingRequest options = s0.getOptions();
-    s1.incrementWeight(options.elevatorBoardCost);
-    s1.incrementTimeInSeconds(options.elevatorBoardTime);
+    var streetPreferences = s0.getPreferences().street();
+
+    s1.incrementWeight(streetPreferences.elevatorBoardCost());
+    s1.incrementTimeInSeconds(streetPreferences.elevatorBoardTime());
 
     return s1.makeState();
   }

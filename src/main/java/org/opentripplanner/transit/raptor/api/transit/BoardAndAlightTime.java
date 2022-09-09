@@ -76,7 +76,7 @@ public class BoardAndAlightTime {
       .addText(" ")
       .addServiceTime(alightTime())
       .addText("(")
-      .addDuration(alightTime() - boardTime())
+      .addDurationSec(alightTime() - boardTime())
       .addText(") ~ ")
       .addObj(trip.pattern().stopIndex(alightStopPos))
       .addText("]")

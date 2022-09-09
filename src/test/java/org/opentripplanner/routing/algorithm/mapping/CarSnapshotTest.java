@@ -11,7 +11,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 @ExtendWith(SnapshotExtension.class)
@@ -62,12 +62,12 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_TO_PARK")
   @Test
   public void directCarPark() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_TO_PARK).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -75,12 +75,12 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (with walking both ends)")
   @Test
   public void directCarPickupWithWalking() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
-    request.from = p3;
-    request.to = p4;
+    request.setFrom(p3);
+    request.setTo(p4);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -88,13 +88,13 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (with walking both ends) - arriveBy")
   @Test
   public void directCarPickupWithWalkingArriveBy() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 16, 54);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 16, 54);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
-    request.from = p3;
-    request.to = p4;
-    request.arriveBy = true;
+    request.setFrom(p3);
+    request.setTo(p4);
+    request.setArriveBy(true);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -102,13 +102,13 @@ public class CarSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct CAR_PICKUP (without walking at either end)")
   @Test
   public void directCarPickupWithoutWalking() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
-    request.walkSpeed = 1;
+    request.setFrom(p1);
+    request.setTo(p2);
+    request.preferences().walk().setSpeed(1.0);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

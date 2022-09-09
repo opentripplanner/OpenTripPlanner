@@ -12,7 +12,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -58,12 +58,12 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -80,13 +80,13 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")
   @Test
   public void directBikeRentalArrivingAtDestinationWithDepartAt() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.allowKeepingRentedVehicleAtDestination = true;
-    request.from = p1;
-    request.to = p2;
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -94,14 +94,14 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with arriveBy")
   @Test
   public void directBikeRentalArrivingAtDestinationWithArriveBy() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).clearTransitModes().build();
     request.allowKeepingRentedVehicleAtDestination = true;
-    request.from = p1;
-    request.to = p2;
-    request.arriveBy = true;
+    request.setFrom(p1);
+    request.setTo(p2);
+    request.setArriveBy(true);
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -109,7 +109,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Access BIKE_RENTAL")
   @Test
   public void accessBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
     request.modes =
       RequestModes
@@ -120,8 +120,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         .withTransferMode(StreetMode.WALK)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p1;
-    request.to = p3;
+    request.setFrom(p1);
+    request.setTo(p3);
 
     try {
       expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -133,7 +133,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Egress BIKE_RENTAL")
   @Test
   public void egressBikeRental() {
-    RoutingRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.modes =
       RequestModes
@@ -144,8 +144,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         .withDirectMode(StreetMode.NOT_SET)
         .withTransitModes(MainAndSubMode.all())
         .build();
-    request.from = p3;
-    request.to = p1;
+    request.setFrom(p3);
+    request.setTo(p1);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

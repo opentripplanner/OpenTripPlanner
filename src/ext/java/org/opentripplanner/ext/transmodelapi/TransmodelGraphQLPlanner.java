@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -23,8 +22,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -44,10 +44,9 @@ public class TransmodelGraphQLPlanner {
     PlanResponse response = new PlanResponse();
     TransmodelRequestContext ctx = environment.getContext();
     OtpServerRequestContext serverContext = ctx.getServerContext();
-    RoutingRequest request = null;
+    RouteRequest request = null;
     try {
       request = createRequest(environment);
-
       RoutingResponse res = ctx.getRoutingService().route(request);
 
       response.plan = res.getTripPlan();
@@ -61,7 +60,7 @@ public class TransmodelGraphQLPlanner {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
-    Locale locale = request == null ? serverContext.defaultLocale() : request.locale;
+    Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult
       .<PlanResponse>newResult()
       .data(response)
@@ -86,67 +85,69 @@ public class TransmodelGraphQLPlanner {
     return new GenericLocation(name, stopId, lat, lon);
   }
 
-  private RoutingRequest createRequest(DataFetchingEnvironment environment) {
+  private RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
-    RoutingRequest request = serverContext.defaultRoutingRequest();
+    RouteRequest request = serverContext.defaultRouteRequest();
+    RoutingPreferences preferences = request.preferences();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
-    callWith.argument("locale", (String v) -> request.locale = Locale.forLanguageTag(v));
+    callWith.argument("locale", (String v) -> request.setLocale(Locale.forLanguageTag(v)));
 
-    callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
-    callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
+    callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
+    callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
 
     callWith.argument(
       "dateTime",
       millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
-    callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
-    callWith.argument("pageCursor", request::setPageCursor);
-    callWith.argument("timetableView", (Boolean v) -> request.timetableView = v);
-    callWith.argument("wheelchairAccessible", request::setWheelchairAccessible);
+    callWith.argument(
+      "searchWindow",
+      (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))
+    );
+    callWith.argument("pageCursor", request::setPageCursorFromEncoded);
+    callWith.argument("timetableView", request::setTimetableView);
+    callWith.argument("wheelchairAccessible", request::setWheelchair);
     callWith.argument("numTripPatterns", request::setNumItineraries);
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
     //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
     //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
-    callWith.argument("walkBoardCost", request::setWalkBoardCost);
-    callWith.argument("walkReluctance", request::setNonTransitReluctance);
-    callWith.argument("waitReluctance", request::setWaitReluctance);
-    callWith.argument("walkBoardCost", request::setWalkBoardCost);
-    callWith.argument("waitReluctance", request::setWaitReluctance);
-    callWith.argument("waitAtBeginningFactor", request::setWaitAtBeginningFactor);
-    callWith.argument("walkSpeed", (Double v) -> request.walkSpeed = v);
-    callWith.argument("bikeSpeed", (Double v) -> request.bikeSpeed = v);
-    callWith.argument("bikeSwitchTime", (Integer v) -> request.bikeSwitchTime = v);
-    callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
+    callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
+    callWith.argument("walkReluctance", preferences::setNonTransitReluctance);
+    callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
+    callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
+    callWith.argument("walkSpeed", preferences.walk()::setSpeed);
+    callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
+    callWith.argument("bikeSwitchTime", preferences.bike()::setSwitchTime);
+    callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
     //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
     BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
 
     if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-      // Arguments: [ safety, slope, time ]
+      // Arguments: [ time, slope, safety ]
       final double[] args = new double[3];
 
-      callWith.argument("triangleFactors.safety", (Double v) -> args[0] = v);
+      callWith.argument("triangleFactors.time", (Double v) -> args[0] = v);
       callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
-      callWith.argument("triangleFactors.time", (Double v) -> args[2] = v);
+      callWith.argument("triangleFactors.safety", (Double v) -> args[2] = v);
 
-      request.setTriangleNormalized(args[0], args[1], args[2]);
+      preferences.bike().initOptimizeTriangle(args[0], args[1], args[2]);
     }
 
     if (bicycleOptimizeType != null) {
-      request.bicycleOptimizeType = bicycleOptimizeType;
+      preferences.bike().setOptimizeType(bicycleOptimizeType);
     }
 
     callWith.argument("arriveBy", request::setArriveBy);
-    request.showIntermediateStops = true;
-    callWith.argument(
-      "vias",
-      (List<Map<String, Object>> v) ->
-        request.intermediatePlaces =
-          v.stream().map(this::toGenericLocation).collect(Collectors.toList())
-    );
+    // TODO VIA: 2022-08-24 refactor
+    //    callWith.argument(
+    //      "vias",
+    //      (List<Map<String, Object>> v) ->
+    //        request.intermediatePlaces =
+    //          v.stream().map(this::toGenericLocation).collect(Collectors.toList())
+    //    );
 
     callWith.argument(
       "preferred.authorities",
@@ -169,7 +170,7 @@ public class TransmodelGraphQLPlanner {
 
     callWith.argument(
       "preferred.otherThanPreferredLinesPenalty",
-      request::setOtherThanPreferredRoutesPenalty
+      preferences.transit()::setOtherThanPreferredRoutesPenalty
     );
     callWith.argument(
       "preferred.lines",
@@ -194,25 +195,31 @@ public class TransmodelGraphQLPlanner {
         request.setBannedTrips(mapIDsToDomain(serviceJourneys))
     );
 
-    //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
-    //        callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
+    // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
+    // callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
 
-    //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
+    // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
     // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
-    //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-    callWith.argument("debugItineraryFilter", (Boolean v) -> request.itineraryFilters.debug = v);
+    // callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
+    callWith.argument(
+      "debugItineraryFilter",
+      (Boolean v) -> preferences.system().itineraryFilters().debug = v
+    );
 
-    callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
+    callWith.argument("transferPenalty", (Integer v) -> preferences.transfer().setCost(v));
 
-    //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
-    //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
+    // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
+    // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
     RequestModes modes = getModes(environment, callWith);
     if (modes != null) {
       request.modes = modes;
     }
-
-    ItineraryFiltersInputType.mapToRequest(environment, callWith, request.itineraryFilters);
+    ItineraryFiltersInputType.mapToRequest(
+      environment,
+      callWith,
+      preferences.system().itineraryFilters()
+    );
 
     /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
@@ -229,30 +236,40 @@ public class TransmodelGraphQLPlanner {
 
     if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
-      request.bikeSpeed = 4.3;
+      preferences.bike().setSpeed(4.3);
     }
 
-    callWith.argument("minimumTransferTime", (Integer v) -> request.transferSlack = v);
-    callWith.argument("transferSlack", (Integer v) -> request.transferSlack = v);
-    callWith.argument("boardSlackDefault", (Integer v) -> request.boardSlack = v);
-    callWith.argument(
-      "boardSlackList",
-      (Object v) -> request.boardSlackForMode = TransportModeSlack.mapToDomain(v)
-    );
-    callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
-    callWith.argument(
-      "alightSlackList",
-      (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v)
-    );
-    callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
+    // One of those arguments has been deprecated. That's why we are mapping same thing twice.
+    callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
+    callWith.argument("transferSlack", preferences.transfer()::setSlack);
+
+    preferences
+      .transit()
+      .withBoardSlack(builder -> {
+        callWith.argument("boardSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "boardSlackList",
+          (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+    preferences
+      .transit()
+      .withAlightSlack(builder -> {
+        callWith.argument("alightSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "alightSlackList",
+          (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+    callWith.argument("maximumTransfers", preferences.transfer()::setMaxTransfers);
     callWith.argument(
       "useBikeRentalAvailabilityInformation",
-      (Boolean v) -> request.useVehicleRentalAvailabilityInformation = v
+      preferences.rental()::setUseAvailabilityInformation
     );
-    callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);
+    callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
     callWith.argument(
       "includePlannedCancellations",
-      (Boolean v) -> request.includePlannedCancellations = v
+      preferences.transit()::setIncludePlannedCancellations
     );
     //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 

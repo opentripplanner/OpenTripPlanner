@@ -42,7 +42,7 @@ public class ItineraryFilterParameters {
    * linear function of the generalized-cost of an itinerary.
    * <p>
    * Transit itineraries with a cost higher than the value produced by this function plus wait cost
-   * at the beginning or end multiplied by {@link RoutingRequest#waitAtBeginningFactor} for any
+   * at the beginning or end multiplied by {@link RouteRequest#waitAtBeginningFactor} for any
    * other itinerary are dropped from the result set. Non-transit itineraries is excluded from the
    * filter.
    * <ul>

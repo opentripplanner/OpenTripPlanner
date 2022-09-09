@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.vehicle_rental;
 
 import java.util.Set;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -80,7 +80,7 @@ public interface VehicleRentalPlace {
   /** Deep links for this rental station or individual vehicle */
   VehicleRentalStationUris getRentalUris();
 
-  default boolean networkIsNotAllowed(RoutingRequest options) {
+  default boolean networkIsNotAllowed(RouteRequest options) {
     if (
       getNetwork() == null &&
       (

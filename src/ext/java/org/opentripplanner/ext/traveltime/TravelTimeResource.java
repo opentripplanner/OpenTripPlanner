@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import javax.media.jai.RasterFactory;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -54,7 +55,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
@@ -81,7 +82,7 @@ public class TravelTimeResource {
 
   private static final SimpleFeatureType contourSchema = makeContourSchema();
 
-  private final RoutingRequest routingRequest;
+  private final RouteRequest routingRequest;
   private final RaptorRoutingRequestTransitData requestTransitDataProvider;
   private final Instant startTime;
   private final Instant endTime;
@@ -100,15 +101,19 @@ public class TravelTimeResource {
   ) {
     this.graph = serverContext.graph();
     this.transitService = serverContext.transitService();
-    routingRequest = serverContext.defaultRoutingRequest();
-    routingRequest.from = LocationStringParser.fromOldStyleString(location);
+    routingRequest = serverContext.defaultRouteRequest();
+    routingRequest.setFrom(LocationStringParser.fromOldStyleString(location));
     if (modes != null) {
       routingRequest.modes = new QualifiedModeSet(modes).getRequestModes();
     }
+
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
-        routingRequest.getMaxAccessEgressDuration(routingRequest.modes.accessMode)
+        routingRequest
+          .preferences()
+          .street()
+          .maxAccessEgressDuration(routingRequest.modes.accessMode)
       );
 
     if (time != null) {
@@ -124,7 +129,7 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
+    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
@@ -213,9 +218,12 @@ public class TravelTimeResource {
   }
 
   private ZSampleGrid<WTWD> getSampleGrid() {
-    final RoutingRequest accessRequest = routingRequest.clone();
+    final RouteRequest accessRequest = routingRequest.clone();
 
-    accessRequest.maxAccessEgressDuration = traveltimeRequest.maxAccessDuration;
+    accessRequest
+      .preferences()
+      .street()
+      .initMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of());
 
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
@@ -236,7 +244,7 @@ public class TravelTimeResource {
   }
 
   private Collection<AccessEgress> getAccess(
-    RoutingRequest accessRequest,
+    RouteRequest accessRequest,
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(

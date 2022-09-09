@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -74,7 +74,7 @@ public class StreetVehicleParkingLink extends Edge {
     return 0;
   }
 
-  private boolean hasBannedTags(RoutingRequest options, VehicleParking vehicleParking) {
+  private boolean hasBannedTags(RouteRequest options, VehicleParking vehicleParking) {
     if (options.bannedVehicleParkingTags.isEmpty()) {
       return false;
     }
@@ -82,7 +82,7 @@ public class StreetVehicleParkingLink extends Edge {
     return vehicleParking.getTags().stream().anyMatch(options.bannedVehicleParkingTags::contains);
   }
 
-  private boolean hasMissingRequiredTags(RoutingRequest options, VehicleParking vehicleParking) {
+  private boolean hasMissingRequiredTags(RouteRequest options, VehicleParking vehicleParking) {
     if (options.requiredVehicleParkingTags.isEmpty()) {
       return false;
     }

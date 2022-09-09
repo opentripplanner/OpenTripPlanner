@@ -8,7 +8,7 @@ import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -16,21 +16,27 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class McCostParamsMapper {
 
   public static McCostParams map(
-    RoutingRequest request,
+    RouteRequest request,
     List<? extends DefaultTripPattern> patternIndex
   ) {
     McCostParamsBuilder builder = new McCostParamsBuilder();
+    var preferences = request.preferences();
 
-    builder.transferCost(request.transferCost).waitReluctanceFactor(request.waitReluctance);
+    builder
+      .transferCost(preferences.transfer().cost())
+      .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
     if (request.modes.transferMode == StreetMode.BIKE) {
-      builder.boardCost(request.bikeBoardCost);
+      builder.boardCost(preferences.bike().boardCost());
     } else {
-      builder.boardCost(request.walkBoardCost);
+      builder.boardCost(preferences.walk().boardCost());
     }
-    builder.transitReluctanceFactors(mapTransitReluctance(request.transitReluctanceForMode()));
 
-    builder.wheelchairAccessibility(request.wheelchairAccessibility);
+    builder.transitReluctanceFactors(
+      mapTransitReluctance(preferences.transit().reluctanceForMode())
+    );
+    builder.wheelchairEnabled(request.wheelchair());
+    builder.wheelchairAccessibility(preferences.wheelchairAccessibility());
 
     final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
     final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
@@ -49,7 +55,7 @@ public class McCostParamsMapper {
         }
       }
       builder.unpreferredPatterns(unpreferredPatterns);
-      builder.unpreferredCost(request.unpreferredCost);
+      builder.unpreferredCost(preferences.transit().unpreferredCost());
     }
 
     return builder.build();

@@ -3,7 +3,8 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -83,26 +84,27 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       return null;
     }
 
-    RoutingRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
+    RouteRequest request = s0.getOptions();
 
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     int time = traversalTime;
 
     if (time == 0) {
       if (distance > 0) {
-        time = (int) (distance * options.walkSpeed);
+        time = (int) (distance * preferences.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time = (int) (0.4 * Math.abs(steps) * options.walkSpeed);
+        time = (int) (0.4 * Math.abs(steps) * preferences.walk().speed());
       }
     }
 
     if (time > 0) {
       double weight = time;
-      if (options.wheelchairAccessibility.enabled()) {
+      if (request.wheelchair()) {
         weight *=
           StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-            options,
+            preferences,
             slope,
             wheelchairAccessible,
             isStairs()
@@ -110,7 +112,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       } else {
         weight *=
           StreetEdgeReluctanceCalculator.computeReluctance(
-            options,
+            preferences,
             TraverseMode.WALK,
             s0.getNonTransitMode() == TraverseMode.BICYCLE,
             isStairs()

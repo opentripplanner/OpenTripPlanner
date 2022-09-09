@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -47,7 +47,7 @@ public class RoutingService {
     this.graphFinder = serverContext.graphFinder();
   }
 
-  public RoutingResponse route(RoutingRequest request) {
+  public RoutingResponse route(RouteRequest request) {
     RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
   }
