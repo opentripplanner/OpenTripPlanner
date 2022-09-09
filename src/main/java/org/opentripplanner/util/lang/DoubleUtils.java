@@ -7,17 +7,10 @@ import javax.annotation.Nullable;
 public class DoubleUtils {
 
   /**
-   * Useful for coordinates, round of to ~ 1 cm.
+   * Round to a decimal number with 1 digits precision
    */
-  public static Double roundTo7Decimals(@Nullable Double value) {
-    return value == null ? null : roundTo7Decimals(value.doubleValue());
-  }
-
-  /**
-   * Useful for coordinates, round of to ~ 1 cm.
-   */
-  public static double roundTo7Decimals(double value) {
-    return roundToNDecimals(value, 7);
+  public static double roundTo1Decimal(double value) {
+    return roundToNDecimals(value, 1);
   }
 
   /**
@@ -32,6 +25,27 @@ public class DoubleUtils {
    */
   public static double roundTo2Decimals(double value) {
     return roundToNDecimals(value, 2);
+  }
+
+  /**
+   * Round to a decimal number with 3 digits precision
+   */
+  public static double roundTo3Decimals(double value) {
+    return roundToNDecimals(value, 3);
+  }
+
+  /**
+   * Useful for coordinates, round of to ~ 1 cm.
+   */
+  public static Double roundTo7Decimals(@Nullable Double value) {
+    return value == null ? null : roundTo7Decimals(value.doubleValue());
+  }
+
+  /**
+   * Useful for coordinates, round of to ~ 1 cm.
+   */
+  public static double roundTo7Decimals(double value) {
+    return roundToNDecimals(value, 7);
   }
 
   public static double roundToNDecimals(double value, int places) {

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
 import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
 
 /**
  * Mutable version of the {@link GeneralizedCostParameters}.
@@ -15,7 +15,7 @@ public class GeneralizedCostParametersBuilder {
   private double[] transitReluctanceFactors;
   private double waitReluctanceFactor;
   private boolean wheelchairEnabled;
-  private WheelchairAccessibilityPreferences accessibilityRequest;
+  private WheelchairAccessibilityFeature wheelchairAccessibility;
   private BitSet unpreferredPatterns;
   private DoubleFunction<Double> unpreferredCost;
 
@@ -29,7 +29,7 @@ public class GeneralizedCostParametersBuilder {
     this.transitReluctanceFactors = other.transitReluctanceFactors();
     this.waitReluctanceFactor = other.waitReluctanceFactor();
     this.wheelchairEnabled = other.wheelchairEnabled();
-    this.accessibilityRequest = other.accessibilityRequirements();
+    this.wheelchairAccessibility = other.wheelchairAccessibility();
     this.unpreferredPatterns = other.unpreferredPatterns();
   }
 
@@ -75,8 +75,8 @@ public class GeneralizedCostParametersBuilder {
     return wheelchairEnabled;
   }
 
-  public WheelchairAccessibilityPreferences wheelchairAccessibility() {
-    return accessibilityRequest;
+  public WheelchairAccessibilityFeature wheelchairAccessibility() {
+    return wheelchairAccessibility;
   }
 
   public GeneralizedCostParametersBuilder wheelchairEnabled(boolean wheelchairEnabled) {
@@ -85,9 +85,9 @@ public class GeneralizedCostParametersBuilder {
   }
 
   public GeneralizedCostParametersBuilder wheelchairAccessibility(
-    WheelchairAccessibilityPreferences mode
+    WheelchairAccessibilityFeature wheelchairAccessibility
   ) {
-    accessibilityRequest = mode;
+    this.wheelchairAccessibility = wheelchairAccessibility;
     return this;
   }
 

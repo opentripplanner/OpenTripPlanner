@@ -12,27 +12,28 @@ import org.opentripplanner.test.support.VariableSource;
 class WheelchairAccessibilityPreferencesTest {
 
   static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(0.08333333, 0.083),
-    Arguments.of(0.083, 0.083),
-    Arguments.of(0.0834, 0.083),
-    Arguments.of(0.0835, 0.084),
-    Arguments.of(0.11111, 0.111)
+    Arguments.of(0.33333333333, 0.33, 0.333),
+    Arguments.of(0.77777777777, 0.78, 0.778)
   );
 
-  @ParameterizedTest(name = "maxSlope of {0} should be rounded to {1}")
+  @ParameterizedTest(
+    name = "Normalize value of {0} to rounded value {1} (maxSlope) and {2} (reluctance fields)"
+  )
   @VariableSource("testCases")
-  void shouldRoundTo3DecimalPlaces(double raw, double rounded) {
+  void testConstructorNormalization(double raw, double rounded2, double rounded3) {
     var roundedRequest = new WheelchairAccessibilityPreferences(
       ofOnlyAccessible(),
       ofOnlyAccessible(),
       ofOnlyAccessible(),
-      1,
       raw,
-      1,
-      1
-    )
-      .round();
+      raw,
+      raw,
+      raw
+    );
 
-    assertEquals(roundedRequest.maxSlope(), rounded);
+    assertEquals(roundedRequest.maxSlope(), rounded3);
+    assertEquals(roundedRequest.stairsReluctance(), rounded2);
+    assertEquals(roundedRequest.inaccessibleStreetReluctance(), rounded2);
+    assertEquals(roundedRequest.slopeExceededReluctance(), rounded2);
   }
 }

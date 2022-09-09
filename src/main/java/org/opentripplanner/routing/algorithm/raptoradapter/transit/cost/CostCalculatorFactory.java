@@ -17,7 +17,7 @@ public class CostCalculatorFactory {
       calculator =
         new WheelchairCostCalculator<>(
           calculator,
-          generalizedCostParameters.accessibilityRequirements()
+          generalizedCostParameters.wheelchairAccessibility()
         );
     }
 

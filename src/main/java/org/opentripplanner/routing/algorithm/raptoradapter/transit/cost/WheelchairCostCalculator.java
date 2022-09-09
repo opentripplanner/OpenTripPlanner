@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -14,10 +14,10 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
 
   public WheelchairCostCalculator(
     @Nonnull CostCalculator<T> delegate,
-    @Nonnull WheelchairAccessibilityPreferences requirements
+    @Nonnull WheelchairAccessibilityFeature wheelchairAccessibility
   ) {
     this.delegate = delegate;
-    this.wheelchairBoardingCost = createWheelchairCost(requirements);
+    this.wheelchairBoardingCost = createWheelchairCost(wheelchairAccessibility);
   }
 
   @Override
@@ -77,19 +77,15 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
   /**
    * Create the wheelchair costs for boarding a trip with all possible accessibility values
    */
-  private static int[] createWheelchairCost(WheelchairAccessibilityPreferences requirements) {
+  private static int[] createWheelchairCost(WheelchairAccessibilityFeature requirements) {
     int[] costIndex = new int[WheelchairAccessibility.values().length];
 
     for (var it : WheelchairAccessibility.values()) {
       costIndex[it.ordinal()] =
         switch (it) {
-          case POSSIBLE -> 0;
-          case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(
-            requirements.trip().unknownCost()
-          );
-          case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(
-            requirements.trip().inaccessibleCost()
-          );
+          case POSSIBLE -> CostCalculator.ZERO_COST;
+          case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.unknownCost());
+          case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(requirements.inaccessibleCost());
         };
     }
     return costIndex;
