@@ -12,7 +12,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.PathwayNode;
 
 public class PathwayNodeMapperTest {
@@ -39,8 +39,7 @@ public class PathwayNodeMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final WheelchairAccessibility WHEELCHAIR_BOARDING_ENUM =
-    WheelchairAccessibility.POSSIBLE;
+  private static final Accessibility WHEELCHAIR_BOARDING_ENUM = Accessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -83,7 +82,7 @@ public class PathwayNodeMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairAccessibility());
+    assertEquals(Accessibility.POSSIBLE, result.getWheelchairAccessibility());
   }
 
   @Test
@@ -103,7 +102,7 @@ public class PathwayNodeMapperTest {
     assertNull(result.getDescription());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
+    assertEquals(Accessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
   @Test

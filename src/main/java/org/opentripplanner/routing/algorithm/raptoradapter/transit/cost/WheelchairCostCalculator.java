@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
@@ -78,9 +78,9 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
    * Create the wheelchair costs for boarding a trip with all possible accessibility values
    */
   private static int[] createWheelchairCost(AccessibilityPreferences requirements) {
-    int[] costIndex = new int[WheelchairAccessibility.values().length];
+    int[] costIndex = new int[Accessibility.values().length];
 
-    for (var it : WheelchairAccessibility.values()) {
+    for (var it : Accessibility.values()) {
       costIndex[it.ordinal()] =
         switch (it) {
           case POSSIBLE -> CostCalculator.ZERO_COST;

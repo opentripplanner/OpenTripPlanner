@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 class EntranceTest {
 
@@ -23,8 +23,7 @@ class EntranceTest {
 
   public static final WgsCoordinate COORDINATE = new WgsCoordinate(0, 0);
   private static final StopLevel LEVEL = new StopLevel("level", 0);
-  private static final WheelchairAccessibility WHEELCHAIR_ACCESSIBILITY =
-    WheelchairAccessibility.POSSIBLE;
+  private static final Accessibility WHEELCHAIR_ACCESSIBILITY = Accessibility.POSSIBLE;
   private static final Entrance subject = Entrance
     .of(TransitModelForTest.id(ID))
     .withName(NAME)

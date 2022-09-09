@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
 import java.util.Arrays;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
@@ -22,14 +22,14 @@ public class TestTripSchedule implements DefaultTripSchedule {
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final Accessibility wheelchairBoarding;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
     int transitReluctanceIndex,
-    WheelchairAccessibility wheelchairBoarding
+    Accessibility wheelchairBoarding
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -77,7 +77,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
   }
 
   @Override
-  public WheelchairAccessibility wheelchairBoarding() {
+  public Accessibility wheelchairBoarding() {
     return wheelchairBoarding;
   }
 
@@ -108,7 +108,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
-    private WheelchairAccessibility wheelchairBoarding = NO_INFORMATION;
+    private Accessibility wheelchairBoarding = NO_INFORMATION;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -174,7 +174,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
       return this;
     }
 
-    public TestTripSchedule.Builder wheelchairBoarding(WheelchairAccessibility wcb) {
+    public TestTripSchedule.Builder wheelchairBoarding(Accessibility wcb) {
       this.wheelchairBoarding = wcb;
       return this;
     }

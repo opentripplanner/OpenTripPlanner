@@ -8,8 +8,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
@@ -99,7 +99,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     if (wheelchairEnabled) {
       if (
         wheelchairPreferences.trip().onlyConsiderAccessible() &&
-        tripTimes.getWheelchairAccessibility() != WheelchairAccessibility.POSSIBLE
+        tripTimes.getWheelchairAccessibility() != Accessibility.POSSIBLE
       ) {
         return false;
       }

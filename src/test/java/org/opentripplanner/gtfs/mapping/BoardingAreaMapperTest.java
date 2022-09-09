@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -84,7 +84,7 @@ public class BoardingAreaMapperTest {
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
-    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairAccessibility());
+    assertEquals(Accessibility.POSSIBLE, result.getWheelchairAccessibility());
     assertEquals(PARENT_STOP, result.getParentStop());
   }
 
@@ -103,7 +103,7 @@ public class BoardingAreaMapperTest {
     assertEquals(BoardingAreaMapper.DEFAULT_NAME, result.getName().toString());
     assertEquals(PARENT_STOP, result.getParentStop());
     assertNull(result.getCode());
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
+    assertEquals(Accessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
   @Test

@@ -16,8 +16,8 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
@@ -31,17 +31,17 @@ public class EnumTypes {
     .name("WheelchairBoarding")
     .value(
       "noInformation",
-      WheelchairAccessibility.NO_INFORMATION,
+      Accessibility.NO_INFORMATION,
       "There is no accessibility information for the stopPlace/quay."
     )
     .value(
       "possible",
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       "Boarding wheelchair-accessible serviceJourneys is possible at this stopPlace/quay."
     )
     .value(
       "notPossible",
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       "Wheelchair boarding/alighting is not possible at this stop."
     )
     .build();

@@ -1,14 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 public class WheelchairAccessibilityMapper {
 
-  static WheelchairAccessibility map(int gtfsCode) {
+  static Accessibility map(int gtfsCode) {
     return switch (gtfsCode) {
-      case 0 -> WheelchairAccessibility.NO_INFORMATION;
-      case 1 -> WheelchairAccessibility.POSSIBLE;
-      case 2 -> WheelchairAccessibility.NOT_POSSIBLE;
+      case 0 -> Accessibility.NO_INFORMATION;
+      case 1 -> Accessibility.POSSIBLE;
+      case 2 -> Accessibility.NOT_POSSIBLE;
       default -> throw new IllegalArgumentException(
         "Unknown GTFS WheelChairBoardingType: " + gtfsCode
       );

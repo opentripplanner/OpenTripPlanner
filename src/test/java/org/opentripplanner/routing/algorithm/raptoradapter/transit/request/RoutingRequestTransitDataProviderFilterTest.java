@@ -18,10 +18,10 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -58,9 +58,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   @ParameterizedTest
   @ValueSource(strings = { "true", "false" })
   public void testWheelchairAccess(boolean wheelchair) {
-    var wheelchairBoarding = wheelchair
-      ? WheelchairAccessibility.POSSIBLE
-      : WheelchairAccessibility.NOT_POSSIBLE;
+    var wheelchairBoarding = wheelchair ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE;
 
     var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchairBoarding, 0.0, 0.0);
     var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchairBoarding, 0.0, 0.0);
@@ -145,7 +143,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       null
     );
 
@@ -172,7 +170,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       TransmodelTransportSubmode.LOCAL_BUS.getValue(),
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       null
     );
 
@@ -198,7 +196,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       null
     );
 
@@ -225,7 +223,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       null
     );
 
@@ -252,7 +250,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       null
     );
 
@@ -279,7 +277,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       TripAlteration.PLANNED
     );
 
@@ -306,7 +304,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       TripAlteration.PLANNED
     );
 
@@ -322,9 +320,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     assertFalse(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip));
 
-    realTimeWheelchairAccessibleTrip.updateWheelchairAccessibility(
-      WheelchairAccessibility.POSSIBLE
-    );
+    realTimeWheelchairAccessibleTrip.updateWheelchairAccessibility(Accessibility.POSSIBLE);
 
     assertTrue(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip));
   }
@@ -337,7 +333,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       TripAlteration.CANCELLATION
     );
     TripTimes tripTimesWithReplaced = createTestTripTimes(
@@ -346,7 +342,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       TripAlteration.REPLACED
     );
 
@@ -437,7 +433,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       TripAlteration.PLANNED
     );
     TripTimes failingTripTimes1 = createTestTripTimes(
@@ -446,7 +442,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.ALLOWED,
       TransitMode.RAIL,
       null,
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       TripAlteration.PLANNED
     );
     TripTimes failingTripTimes2 = createTestTripTimes(
@@ -455,7 +451,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.RAIL,
       null,
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       TripAlteration.CANCELLATION
     );
     TripTimes failingTripTimes3 = createTestTripTimes(
@@ -464,7 +460,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.NOT_ALLOWED,
       TransitMode.RAIL,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       TripAlteration.CANCELLATION
     );
     TripTimes failingTripTimes4 = createTestTripTimes(
@@ -473,7 +469,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.NOT_POSSIBLE,
+      Accessibility.NOT_POSSIBLE,
       TripAlteration.PLANNED
     );
     TripTimes failingTripTimes5 = createTestTripTimes(
@@ -482,7 +478,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       BikeAccess.ALLOWED,
       TransitMode.BUS,
       null,
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       TripAlteration.CANCELLATION
     );
 
@@ -546,7 +542,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     BikeAccess bikeAccess,
     TransitMode mode,
     String submode,
-    WheelchairAccessibility wheelchairBoarding,
+    Accessibility wheelchairBoarding,
     TripAlteration tripAlteration
   ) {
     Trip trip = Trip

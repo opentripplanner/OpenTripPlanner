@@ -6,10 +6,10 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -36,7 +36,7 @@ class QuayMapper {
     Station parentStation,
     Collection<FareZone> fareZones,
     T2<TransitMode, String> transitMode,
-    WheelchairAccessibility wheelchair
+    Accessibility wheelchair
   ) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 

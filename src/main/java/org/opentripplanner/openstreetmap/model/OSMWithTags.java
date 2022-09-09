@@ -9,10 +9,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -101,13 +101,13 @@ public class OSMWithTags {
   /**
    * Returns the level of wheelchair access of the element.
    */
-  public WheelchairAccessibility getWheelchairAccessibility() {
+  public Accessibility getWheelchairAccessibility() {
     if (isTagTrue("wheelchair")) {
-      return WheelchairAccessibility.POSSIBLE;
+      return Accessibility.POSSIBLE;
     } else if (isTagFalse("wheelchair")) {
-      return WheelchairAccessibility.NOT_POSSIBLE;
+      return Accessibility.NOT_POSSIBLE;
     } else {
-      return WheelchairAccessibility.NO_INFORMATION;
+      return Accessibility.NO_INFORMATION;
     }
   }
 
