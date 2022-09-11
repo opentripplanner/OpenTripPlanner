@@ -1,63 +1,41 @@
 package org.opentripplanner.routing.api.request.preference;
 
 // TODO VIA: Javadoc
+
 import java.io.Serializable;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BikePreferences implements Cloneable, Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BikePreferences.class);
-
-  private BicycleOptimizeType optimizeType = BicycleOptimizeType.SAFE;
-
-  private double speed = 5;
+  private double speed;
 
   // TODO VIA: Is this part of transit preferences
-  private int boardCost = 60 * 10;
-  private double walkingSpeed = 1.33;
-  private double walkingReluctance = 5.0;
-  private double reluctance = 2.0;
-
+  private double reluctance;
+  private int boardCost;
+  private double walkingSpeed;
+  private double walkingReluctance;
   private int switchTime;
   private int switchCost;
-  private int parkTime = 60;
-  /** Cost of parking a bike. */
-  private int parkCost = 120;
-  private TimeSlopeSafetyTriangle optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
+  private int parkTime;
+  private int parkCost;
+  private BicycleOptimizeType optimizeType;
+  private TimeSlopeSafetyTriangle optimizeTriangle;
 
-  public BikePreferences clone() {
-    try {
-      return (BikePreferences) super.clone();
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
+  public BikePreferences() {
+    this.speed = 5;
+    this.reluctance = 2.0;
+    this.boardCost = 60 * 10;
+    this.walkingSpeed = 1.33;
+    this.walkingReluctance = 5.0;
+    this.switchTime = 0;
+    this.switchCost = 0;
+    this.parkTime = 60;
+    /** Cost of parking a bike. */
+    this.parkCost = 120;
+    this.optimizeType = BicycleOptimizeType.SAFE;
+    this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
   }
 
-  /**
-   * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
-   */
-  public BicycleOptimizeType optimizeType() {
-    return optimizeType;
-  }
-
-  public void setOptimizeType(BicycleOptimizeType optimizeType) {
-    this.optimizeType = optimizeType;
-  }
-
-  public TimeSlopeSafetyTriangle optimizeTriangle() {
-    return optimizeTriangle;
-  }
-
-  /**
-   * Sets the bicycle optimize triangle routing parameters. See {@link TimeSlopeSafetyTriangle}
-   * for details.
-   */
-  public void initOptimizeTriangle(double time, double slope, double safety) {
-    this.optimizeTriangle = new TimeSlopeSafetyTriangle(time, slope, safety);
-  }
 
   /**
    * Default: 5 m/s, ~11 mph, a random bicycling speed
@@ -68,6 +46,14 @@ public class BikePreferences implements Cloneable, Serializable {
 
   public void setSpeed(double speed) {
     this.speed = speed;
+  }
+
+  public double reluctance() {
+    return reluctance;
+  }
+
+  public void setReluctance(double reluctance) {
+    this.reluctance = reluctance;
   }
 
   /**
@@ -111,14 +97,6 @@ public class BikePreferences implements Cloneable, Serializable {
     this.walkingReluctance = walkingReluctance;
   }
 
-  public void setReluctance(double reluctance) {
-    this.reluctance = reluctance;
-  }
-
-  public double reluctance() {
-    return reluctance;
-  }
-
   /** Time to get on and off your own bike */
   public int switchTime() {
     return switchTime;
@@ -146,11 +124,45 @@ public class BikePreferences implements Cloneable, Serializable {
     this.parkTime = parkTime;
   }
 
+  /** Cost of parking a bike. */
+  public int parkCost() {
+    return parkCost;
+  }
+
   public void setParkCost(int parkCost) {
     this.parkCost = parkCost;
   }
 
-  public int parkCost() {
-    return parkCost;
+  /**
+   * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
+   */
+  public BicycleOptimizeType optimizeType() {
+    return optimizeType;
+  }
+
+  public void setOptimizeType(BicycleOptimizeType optimizeType) {
+    this.optimizeType = optimizeType;
+  }
+
+  public TimeSlopeSafetyTriangle optimizeTriangle() {
+    return optimizeTriangle;
+  }
+
+  /**
+   * Sets the bicycle optimize triangle routing parameters. See {@link TimeSlopeSafetyTriangle}
+   * for details.
+   */
+  public void initOptimizeTriangle(double time, double slope, double safety) {
+    this.optimizeTriangle = new TimeSlopeSafetyTriangle(time, slope, safety);
+  }
+
+
+  public BikePreferences clone() {
+    try {
+      return (BikePreferences) super.clone();
+    } catch (CloneNotSupportedException e) {
+      /* this will never happen since our super is the cloneable object */
+      throw new RuntimeException(e);
+    }
   }
 }
