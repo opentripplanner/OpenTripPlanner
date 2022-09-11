@@ -98,7 +98,7 @@ public class TurnCostTest {
     });
     preferences.bike().setSpeed(1.0);
     preferences.street().setTurnReluctance(1.0);
-    preferences.setNonTransitReluctance(1.0);
+    preferences.setAllStreetReluctance(1.0);
 
     // Turn costs are all 0 by default.
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));

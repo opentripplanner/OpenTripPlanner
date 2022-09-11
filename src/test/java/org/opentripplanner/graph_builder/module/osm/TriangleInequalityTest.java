@@ -199,7 +199,7 @@ public class TriangleInequalityTest {
         walk.setStairsReluctance(1.0);
         walk.setSpeed(1.0);
       });
-    prototypeOptions.preferences().setNonTransitReluctance(1.0);
+    prototypeOptions.preferences().setAllStreetReluctance(1.0);
     prototypeOptions.preferences().street().setTurnReluctance(1.0);
     prototypeOptions.preferences().car().setSpeed(1.0);
     prototypeOptions.preferences().bike().setSpeed(1.0);

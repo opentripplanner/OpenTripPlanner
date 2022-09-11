@@ -23,8 +23,11 @@ public class RoutingPreferences implements Cloneable, Serializable {
   private VehicleParkingPreferences parking = new VehicleParkingPreferences();
   private SystemPreferences system = new SystemPreferences();
 
-  // TODO VIA: Rename to setStreetReluctance and move to StreetPreferences
-  public void setNonTransitReluctance(double streetReluctance) {
+  /**
+   * This set the reluctance for bike, walk, car and bikeWalking (x2.7) - all in one go. These
+   * parameters can be set individually.
+   */
+  public void setAllStreetReluctance(double streetReluctance) {
     if (streetReluctance > 0) {
       this.bike.setReluctance(streetReluctance);
       this.walk = this.walk.copyOf().setReluctance(streetReluctance).build();

@@ -393,7 +393,7 @@ public class StreetEdgeTest {
     var bikePreferences = request.preferences().bike();
     bikePreferences.setOptimizeType(BicycleOptimizeType.TRIANGLE);
     bikePreferences.setSpeed(SPEED);
-    request.preferences().setNonTransitReluctance(1);
+    request.preferences().setAllStreetReluctance(1);
 
     bikePreferences.initOptimizeTriangle(1, 0, 0);
     State startState = new State(v1, request, null);
