@@ -99,7 +99,7 @@ public class TurnRestrictionTest {
     var request = new RouteRequest();
     var preferences = request.preferences();
     preferences.car().setSpeed(1.0);
-    preferences.walk().setSpeed(1.0);
+    preferences.withWalk(w -> w.setSpeed(1.0));
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
@@ -126,7 +126,7 @@ public class TurnRestrictionTest {
   @Test
   public void testForwardAsPedestrian() {
     var request = new RouteRequest(TraverseMode.WALK);
-    request.preferences().walk().setSpeed(1.0);
+    request.preferences().withWalk(w -> w.setSpeed(1.0));
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()

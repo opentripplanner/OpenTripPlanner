@@ -194,12 +194,6 @@ public class RoutingRequestMapper {
     request.requiredVehicleParkingTags =
       c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
 
-    preferences
-      .walk()
-      .setStairsReluctance(c.asDouble("stairsReluctance", preferences.walk().stairsReluctance()));
-    preferences
-      .walk()
-      .setStairsTimeFactor(c.asDouble("stairsTimeFactor", preferences.walk().stairsTimeFactor()));
     preferences.transfer().setCost(c.asInt("transferPenalty", preferences.transfer().cost()));
     preferences.transfer().setSlack(c.asInt("transferSlack", preferences.transfer().slack()));
     preferences
@@ -242,12 +236,14 @@ public class RoutingRequestMapper {
       .setWaitReluctance(
         c.asDouble("waitReluctance", preferences.transfer().waitAtBeginningFactor())
       );
-    preferences.walk().setBoardCost(c.asInt("walkBoardCost", preferences.walk().boardCost()));
-    preferences.walk().setReluctance(c.asDouble("walkReluctance", preferences.walk().reluctance()));
-    preferences.walk().setSpeed(c.asDouble("walkSpeed", preferences.walk().speed()));
-    preferences
-      .walk()
-      .setSafetyFactor(c.asDouble("walkSafetyFactor", preferences.walk().safetyFactor()));
+    preferences.withWalk(walk -> {
+      walk.setSpeed(c.asDouble("walkSpeed", walk.speed()));
+      walk.setReluctance(c.asDouble("walkReluctance", walk.reluctance()));
+      walk.setBoardCost(c.asInt("walkBoardCost", walk.boardCost()));
+      walk.setStairsReluctance(c.asDouble("stairsReluctance", walk.stairsReluctance()));
+      walk.setStairsTimeFactor(c.asDouble("stairsTimeFactor", walk.stairsTimeFactor()));
+      walk.setSafetyFactor(c.asDouble("walkSafetyFactor", walk.safetyFactor()));
+    });
 
     preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
     request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));

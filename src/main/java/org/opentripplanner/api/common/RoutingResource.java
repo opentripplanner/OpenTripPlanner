@@ -766,9 +766,20 @@ public abstract class RoutingResource {
       preferences.car().setReluctance(carReluctance);
     }
 
-    if (walkReluctance != null) {
-      preferences.walk().setReluctance(walkReluctance);
-    }
+    preferences.withWalk(walk -> {
+      if (walkReluctance != null) {
+        walk.setReluctance(walkReluctance);
+      }
+      if (walkSpeed != null) {
+        walk.setSpeed(walkSpeed);
+      }
+      if (walkBoardCost != null) {
+        walk.setBoardCost(walkBoardCost);
+      }
+      if (walkSafetyFactor != null) {
+        walk.setSafetyFactor(walkSafetyFactor);
+      }
+    });
 
     if (waitReluctance != null) {
       preferences.transfer().setWaitReluctance(waitReluctance);
@@ -776,10 +787,6 @@ public abstract class RoutingResource {
 
     if (waitAtBeginningFactor != null) {
       preferences.transfer().setWaitAtBeginningFactor(waitAtBeginningFactor);
-    }
-
-    if (walkSpeed != null) {
-      preferences.walk().setSpeed(walkSpeed);
     }
 
     if (bikeSpeed != null) {
@@ -874,14 +881,8 @@ public abstract class RoutingResource {
     if (unpreferredAgencies != null) {
       request.setUnpreferredAgenciesFromString(unpreferredAgencies);
     }
-    if (walkBoardCost != null) {
-      preferences.walk().setBoardCost(walkBoardCost);
-    }
     if (bikeBoardCost != null) {
       preferences.bike().setBoardCost(bikeBoardCost);
-    }
-    if (walkSafetyFactor != null) {
-      preferences.walk().setSafetyFactor(walkSafetyFactor);
     }
     if (bannedRoutes != null) {
       request.setBannedRoutesFromString(bannedRoutes);

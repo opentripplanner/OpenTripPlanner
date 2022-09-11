@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.core.TraverseMode;
 
@@ -10,7 +11,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   private TransitPreferences transit = new TransitPreferences();
   private TransferPreferences transfer = new TransferPreferences();
-  private WalkPreferences walk = new WalkPreferences();
+  private WalkPreferences walk = WalkPreferences.DEFAULT;
   private StreetPreferences street = new StreetPreferences();
 
   @Nonnull
@@ -26,7 +27,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   public void setNonTransitReluctance(double streetReluctance) {
     if (streetReluctance > 0) {
       this.bike.setReluctance(streetReluctance);
-      this.walk.setReluctance(streetReluctance);
+      this.walk = this.walk.copyOf().setReluctance(streetReluctance).build();
       this.car.setReluctance(streetReluctance);
       this.bike.setWalkingReluctance(streetReluctance * 2.7);
     }
@@ -42,6 +43,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   public WalkPreferences walk() {
     return walk;
+  }
+
+  public RoutingPreferences withWalk(Consumer<WalkPreferences.Builder> body) {
+    var builder = walk.copyOf();
+    body.accept(builder);
+    this.walk = builder.build();
+    return this;
   }
 
   public StreetPreferences street() {
@@ -94,20 +102,20 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   public RoutingPreferences clone() {
     try {
-      // TODO VIA: 2022-09-06 Skipping WheelchairAccessibilityRequest
-
       var clone = (RoutingPreferences) super.clone();
 
       clone.transit = transit.clone();
       clone.transfer = transfer.clone();
-      clone.walk = walk.clone();
       clone.street = street.clone();
-      clone.wheelchair = wheelchair;
       clone.bike = bike.clone();
       clone.car = car.clone();
       clone.rental = rental.clone();
       clone.parking = parking.clone();
       clone.system = system.clone();
+
+      // The following immutable types can be skipped
+      // - walk
+      // - wheelchair
 
       return clone;
     } catch (CloneNotSupportedException e) {

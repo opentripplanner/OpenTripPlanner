@@ -2,6 +2,7 @@ package org.opentripplanner.util.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,5 +44,11 @@ class DoubleUtilsTest {
     assertEquals(DoubleUtils.roundTo1Decimal(Double.NaN), Double.NaN);
     assertEquals(DoubleUtils.roundTo2Decimals(Double.NEGATIVE_INFINITY), Double.NEGATIVE_INFINITY);
     assertEquals(DoubleUtils.roundTo3Decimals(Double.POSITIVE_INFINITY), Double.POSITIVE_INFINITY);
+  }
+
+  @Test
+  void testEquals() {
+    assertTrue(DoubleUtils.doubleEquals(1.2, 1.2));
+    assertTrue(DoubleUtils.doubleEquals(-1.2, -1.2));
   }
 }

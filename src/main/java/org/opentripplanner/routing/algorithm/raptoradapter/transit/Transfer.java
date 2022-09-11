@@ -47,7 +47,6 @@ public class Transfer {
     rr.setTo(null);
 
     var bikePreferences = transferPreferences.bike();
-    var walkPreferences = transferPreferences.walk();
     var streetPreferences = transferPreferences.street();
 
     // Some values are rounded to ease caching in RaptorRequestTransferCache
@@ -57,14 +56,17 @@ public class Transfer {
     // it's a record (immutable) so can be safely reused
     transferPreferences.setWheelchair(request.preferences().wheelchair());
 
-    walkPreferences.setSpeed(roundToHalf(walkPreferences.speed()));
+    transferPreferences.withWalk(walk -> {
+      walk.setSpeed(roundToHalf(walk.speed()));
+      walk.setReluctance(roundTo(walk.reluctance(), 1));
+      walk.setStairsReluctance(roundTo(walk.stairsReluctance(), 1));
+      walk.setStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1));
+      walk.setSafetyFactor(roundTo(walk.safetyFactor(), 1));
+    });
+
     bikePreferences.setSpeed(roundToHalf(bikePreferences.speed()));
 
-    walkPreferences.setReluctance(roundTo(walkPreferences.reluctance(), 1));
-    walkPreferences.setStairsReluctance(roundTo(walkPreferences.stairsReluctance(), 1));
-    walkPreferences.setStairsTimeFactor(roundTo(walkPreferences.stairsTimeFactor(), 1));
     streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
-    walkPreferences.setSafetyFactor(roundTo(walkPreferences.safetyFactor(), 1));
 
     streetPreferences.setElevatorBoardCost(roundTo100(streetPreferences.elevatorBoardCost()));
     streetPreferences.setElevatorBoardTime(roundTo100(streetPreferences.elevatorBoardTime()));

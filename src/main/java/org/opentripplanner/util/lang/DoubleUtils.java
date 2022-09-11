@@ -54,4 +54,14 @@ public class DoubleUtils {
     }
     return BigDecimal.valueOf(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
   }
+
+  /**
+   * Compare two doubles for equality - this is equivalent of
+   * <pre>
+   * Double.compare(a, b) == 0
+   * </pre>
+   */
+  public static boolean doubleEquals(double a, double b) {
+    return Double.compare(a, b) == 0;
+  }
 }

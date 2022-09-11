@@ -108,7 +108,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
       RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
     request.setFrom(p1);
     request.setTo(p2);
-    request.preferences().walk().setSpeed(1.0);
+    request.preferences().withWalk(w -> w.setSpeed(1.0));
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

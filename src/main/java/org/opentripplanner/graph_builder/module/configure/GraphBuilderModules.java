@@ -225,7 +225,7 @@ public class GraphBuilderModules {
       graph,
       transitModel,
       issueStore,
-      config.maxTransferDurationSeconds * new WalkPreferences().speed()
+      config.maxTransferDurationSeconds * WalkPreferences.DEFAULT.speed()
     );
   }
 

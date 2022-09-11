@@ -619,10 +619,14 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeReluctance", preferences.bike()::setReluctance);
       callWith.argument("bikeWalkingReluctance", preferences.bike()::setWalkingReluctance);
       callWith.argument("carReluctance", preferences.car()::setReluctance);
-      callWith.argument("walkReluctance", preferences.walk()::setReluctance);
+      preferences.withWalk(b -> {
+        callWith.argument("walkReluctance", b::setReluctance);
+        callWith.argument("walkSpeed", b::setSpeed);
+        callWith.argument("walkBoardCost", b::setBoardCost);
+        callWith.argument("walkSafetyFactor", b::setSafetyFactor);
+      });
       callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
-      callWith.argument("walkSpeed", preferences.walk()::setSpeed);
       callWith.argument("bikeWalkingSpeed", preferences.bike()::setWalkingSpeed);
       callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
       callWith.argument("bikeSwitchTime", preferences.bike()::setSwitchTime);
@@ -686,7 +690,6 @@ public class LegacyGraphQLQueryTypeImpl
         "unpreferred.unpreferredRouteCost",
         preferences.transit()::setUnpreferredCostString
       );
-      callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
       callWith.argument("bikeBoardCost", preferences.bike()::setBoardCost);
       callWith.argument("banned.routes", request::setBannedRoutesFromString);
       callWith.argument("banned.agencies", request::setBannedAgenciesFromSting);
@@ -783,7 +786,6 @@ public class LegacyGraphQLQueryTypeImpl
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
       callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
-      callWith.argument("walkSafetyFactor", preferences.walk()::setSafetyFactor);
 
       callWith.argument(
         "locale",

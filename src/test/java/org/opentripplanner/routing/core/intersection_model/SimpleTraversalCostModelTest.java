@@ -43,7 +43,7 @@ public class SimpleTraversalCostModelTest {
     options = new RouteRequest();
     var pref = options.preferences();
     pref.car().setSpeed(1.0);
-    pref.walk().setSpeed(1.0);
+    pref.withWalk(w -> w.setSpeed(1.0));
     pref.car().setDecelerationSpeed(2.0);
     pref.car().setAccelerationSpeed(2.0);
     options.setStreetSubRequestModes(TraverseModeSet.allModes());

@@ -77,7 +77,7 @@ public class StreetGraphFinder implements GraphFinder {
     // TODO make a function that builds normal routing requests from profile requests
     RouteRequest rr = new RouteRequest(TraverseMode.WALK);
     rr.setFrom(new GenericLocation(null, null, lat, lon));
-    rr.preferences().walk().setSpeed(1);
+    rr.preferences().withWalk(it -> it.setSpeed(1));
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.

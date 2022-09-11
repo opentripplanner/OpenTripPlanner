@@ -50,13 +50,17 @@ public class StreetEdgeTest {
 
     proto = new RouteRequest();
     proto.preferences().car().setSpeed(15.0f);
-    proto.preferences().walk().setSpeed(1.0);
     proto.preferences().bike().setSpeed(5.0f);
     proto.preferences().bike().setWalkingSpeed(0.8);
     proto.preferences().bike().setReluctance(1.0);
     proto.preferences().car().setReluctance(1.0);
-    proto.preferences().walk().setReluctance(1.0);
-    proto.preferences().walk().setStairsReluctance(1.0);
+    proto
+      .preferences()
+      .withWalk(walk -> {
+        walk.setSpeed(1.0);
+        walk.setReluctance(1.0);
+        walk.setStairsReluctance(1.0);
+      });
     proto.preferences().street().setTurnReluctance(1.0);
     proto.setStreetSubRequestModes(TraverseModeSet.allModes());
   }
