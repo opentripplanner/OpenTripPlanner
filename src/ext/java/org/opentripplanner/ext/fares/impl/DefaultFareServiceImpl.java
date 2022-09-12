@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
@@ -88,6 +88,10 @@ public class DefaultFareServiceImpl implements FareService {
 
   public void addFareRules(FareType fareType, Collection<FareRuleSet> fareRules) {
     fareRulesPerType.put(fareType, new ArrayList<>(fareRules));
+  }
+
+  public Map<FareType, Collection<FareRuleSet>> getFareRulesPerType() {
+    return fareRulesPerType;
   }
 
   @Override
@@ -278,7 +282,7 @@ public class DefaultFareServiceImpl implements FareService {
     return r;
   }
 
-  private FareAndId getBestFareAndId(
+  protected FareAndId getBestFareAndId(
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
@@ -357,7 +361,7 @@ public class DefaultFareServiceImpl implements FareService {
     return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
   }
 
-  private float getFarePrice(FareAttribute fare, FareType type) {
+  protected float getFarePrice(FareAttribute fare, FareType type) {
     switch (type) {
       case senior:
         if (fare.getSeniorPrice() >= 0) {

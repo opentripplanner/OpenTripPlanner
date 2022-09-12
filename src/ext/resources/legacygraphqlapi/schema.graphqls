@@ -3240,7 +3240,7 @@ type TicketType implements Node {
     Ticket type ID in format `FeedId:TicketTypeId`. Ticket type IDs are usually
     combination of ticket zones where the ticket is valid.
     """
-    fareId: ID!
+    fareId: String!
 
     """Price of the ticket in currency that is specified in `currency` field"""
     price: Float

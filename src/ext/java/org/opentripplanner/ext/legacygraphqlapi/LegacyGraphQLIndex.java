@@ -64,6 +64,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopRe
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStoptimeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStoptimesInPatternImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLSystemNoticeImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLTicketTypeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLTranslatedStringImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLTripImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLUnknownImpl;
@@ -138,6 +139,7 @@ class LegacyGraphQLIndex {
         .type(IntrospectionTypeWiring.build(LegacyGraphQLstopAtDistanceImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStoptimeImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLStoptimesInPatternImpl.class))
+        .type(IntrospectionTypeWiring.build(LegacyGraphQLTicketTypeImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLTranslatedStringImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLTripImpl.class))
         .type(IntrospectionTypeWiring.build(LegacyGraphQLSystemNoticeImpl.class))
@@ -193,7 +195,8 @@ class LegacyGraphQLIndex {
     LegacyGraphQLRequestContext requestContext = new LegacyGraphQLRequestContext(
       serverContext,
       serverContext.routingService(),
-      serverContext.transitService()
+      serverContext.transitService(),
+      serverContext.graph().getFareService()
     );
 
     ExecutionInput executionInput = ExecutionInput

@@ -26,7 +26,7 @@ public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> type() {
-    return environment -> (String) getSource(environment).get("name");
+    return environment -> getSource(environment).get("name").toString();
   }
 
   private Map<String, Object> getSource(DataFetchingEnvironment environment) {

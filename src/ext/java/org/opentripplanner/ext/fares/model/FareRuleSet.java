@@ -1,10 +1,11 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.ext.fares.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.ext.fares.model.RouteOriginDestination;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareRuleSet implements Serializable {
@@ -13,6 +14,8 @@ public class FareRuleSet implements Serializable {
 
   private final Set<FeedScopedId> routes;
   private final Set<P2<String>> originDestinations;
+
+  private final Set<RouteOriginDestination> routeOriginDestinations;
   private final Set<String> contains;
   private final FareAttribute fareAttribute;
   private final Set<FeedScopedId> trips;
@@ -21,6 +24,7 @@ public class FareRuleSet implements Serializable {
     this.fareAttribute = fareAttribute;
     routes = new HashSet<>();
     originDestinations = new HashSet<>();
+    routeOriginDestinations = new HashSet<>();
     contains = new HashSet<>();
     trips = new HashSet<>();
   }
@@ -33,8 +37,24 @@ public class FareRuleSet implements Serializable {
     return originDestinations;
   }
 
+  /**
+   * Used for checking ticket validity on HSL special routes on which some tickets are valid
+   * outside their normal validity zones
+   */
+  public void addRouteOriginDestination(String route, String origin, String destination) {
+    routeOriginDestinations.add(new RouteOriginDestination(route, origin, destination));
+  }
+
+  public Set<RouteOriginDestination> getRouteOriginDestinations() {
+    return routeOriginDestinations;
+  }
+
   public void addContains(String containsId) {
     contains.add(containsId);
+  }
+
+  public Set<String> getContains() {
+    return contains;
   }
 
   public void addRoute(FeedScopedId route) {
