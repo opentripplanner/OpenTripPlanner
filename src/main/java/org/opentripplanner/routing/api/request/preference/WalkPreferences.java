@@ -9,7 +9,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The walk preferences contain all speed, reluctance, cost and factor preferences for walking
- * related to street and transit routing search. The values are normalized(rounded) so the class
+ * related to street and transit routing. The values are normalized(rounded) so the class
  * can used as a cache key.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD SAFE.

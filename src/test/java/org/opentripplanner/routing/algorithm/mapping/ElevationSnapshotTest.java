@@ -16,7 +16,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -91,9 +90,12 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directBike() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    BikePreferences bikePreferences = request.preferences().bike();
-    bikePreferences.setOptimizeType(BicycleOptimizeType.TRIANGLE);
-    bikePreferences.initOptimizeTriangle(0.3, 0.4, 0.3);
+    request
+      .preferences()
+      .withBike(bike -> {
+        bike.setOptimizeType(BicycleOptimizeType.TRIANGLE);
+        bike.withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3));
+      });
 
     request.modes = RequestModes.of().withDirectMode(StreetMode.BIKE).clearTransitModes().build();
     request.setFrom(p1);

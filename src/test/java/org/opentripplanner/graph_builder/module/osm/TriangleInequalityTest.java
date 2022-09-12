@@ -202,7 +202,7 @@ public class TriangleInequalityTest {
     prototypeOptions.preferences().setAllStreetReluctance(1.0);
     prototypeOptions.preferences().street().setTurnReluctance(1.0);
     prototypeOptions.preferences().car().setSpeed(1.0);
-    prototypeOptions.preferences().bike().setSpeed(1.0);
+    prototypeOptions.preferences().withBike(it -> it.setSpeed(1.0));
 
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 

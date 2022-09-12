@@ -96,7 +96,7 @@ public class TurnCostTest {
       walk.setSpeed(1.0);
       walk.setStairsReluctance(1.0);
     });
-    preferences.bike().setSpeed(1.0);
+    preferences.withBike(bike -> bike.setSpeed(1.0));
     preferences.street().setTurnReluctance(1.0);
     preferences.setAllStreetReluctance(1.0);
 

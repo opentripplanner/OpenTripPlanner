@@ -17,7 +17,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   @Nonnull
   private WheelchairPreferences wheelchair = WheelchairPreferences.DEFAULT;
 
-  private BikePreferences bike = new BikePreferences();
+  private BikePreferences bike = BikePreferences.DEFAULT;
   private CarPreferences car = new CarPreferences();
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
   private VehicleParkingPreferences parking = new VehicleParkingPreferences();
@@ -29,10 +29,10 @@ public class RoutingPreferences implements Cloneable, Serializable {
    */
   public void setAllStreetReluctance(double streetReluctance) {
     if (streetReluctance > 0) {
-      this.bike.setReluctance(streetReluctance);
-      this.walk = this.walk.copyOf().setReluctance(streetReluctance).build();
+      withWalk(it -> it.setReluctance(streetReluctance));
+      withBike(it -> it.setReluctance(streetReluctance).setWalkingReluctance(streetReluctance * 2.7)
+      );
       this.car.setReluctance(streetReluctance);
-      this.bike.setWalkingReluctance(streetReluctance * 2.7);
     }
   }
 
@@ -75,6 +75,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
     return bike;
   }
 
+  public RoutingPreferences withBike(Consumer<BikePreferences.Builder> body) {
+    var builder = bike.copyOf();
+    body.accept(builder);
+    this.bike = builder.build();
+    return this;
+  }
+
   public CarPreferences car() {
     return car;
   }
@@ -110,15 +117,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
       clone.transit = transit.clone();
       clone.transfer = transfer.clone();
       clone.street = street.clone();
-      clone.bike = bike.clone();
       clone.car = car.clone();
       clone.rental = rental.clone();
       clone.parking = parking.clone();
       clone.system = system.clone();
 
-      // The following immutable types can be skipped
-      // - walk
-      // - wheelchair
+      // The following immutable types can be skipped:
+      // - walk, bike, wheelchair
 
       return clone;
     } catch (CloneNotSupportedException e) {

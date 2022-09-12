@@ -72,7 +72,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setMode(TraverseMode.BICYCLE);
-    req.preferences().bike().setReluctance(bikeReluctance);
+    req.preferences().withBike(bike -> bike.setReluctance(bikeReluctance));
 
     State result = traverse(edge, req);
     assertNotNull(result);

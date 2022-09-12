@@ -44,10 +44,27 @@ public class RoutingRequestMapper {
       c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
     request.bannedVehicleRentalNetworks =
       c.asTextSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
-    preferences.bike().setBoardCost(c.asInt("bikeBoardCost", preferences.bike().boardCost()));
-    preferences.bike().setParkTime(c.asInt("bikeParkTime", preferences.bike().parkTime()));
-    preferences.bike().setParkCost(c.asInt("bikeParkCost", preferences.bike().parkCost()));
-    preferences.bike().setReluctance(c.asDouble("bikeReluctance", preferences.bike().reluctance()));
+
+    preferences.withBike(bike -> {
+      bike.setSpeed(c.asDouble("bikeSpeed", bike.speed()));
+      bike.setReluctance(c.asDouble("bikeReluctance", bike.reluctance()));
+      bike.setBoardCost(c.asInt("bikeBoardCost", bike.boardCost()));
+      bike.setParkTime(c.asInt("bikeParkTime", bike.parkTime()));
+      bike.setParkCost(c.asInt("bikeParkCost", bike.parkCost()));
+      bike.setWalkingSpeed(c.asDouble("bikeWalkingSpeed", bike.walkingSpeed()));
+      bike.setWalkingReluctance(c.asDouble("bikeWalkingReluctance", bike.walkingReluctance()));
+      bike.setSwitchTime(c.asInt("bikeSwitchTime", bike.switchTime()));
+      bike.setSwitchCost(c.asInt("bikeSwitchCost", bike.switchCost()));
+      bike.setOptimizeType(c.asEnum("optimize", bike.optimizeType()));
+
+      bike.withOptimizeTriangle(it ->
+        it
+          .withTime(c.asDouble("bikeTriangleTimeFactor", it.time()))
+          .withSlope(c.asDouble("bikeTriangleSlopeFactor", it.slope()))
+          .withSafety(c.asDouble("bikeTriangleSafetyFactor", it.safety()))
+      );
+    });
+
     preferences
       .rental()
       .setDropoffCost(c.asInt("bikeRentalDropoffCost", preferences.rental().dropoffCost()));
@@ -60,24 +77,6 @@ public class RoutingRequestMapper {
     preferences
       .rental()
       .setPickupTime(c.asInt("bikeRentalPickupTime", preferences.rental().pickupTime()));
-    preferences.bike().setSpeed(c.asDouble("bikeSpeed", preferences.bike().speed()));
-    preferences
-      .bike()
-      .initOptimizeTriangle(
-        c.asDouble("bikeTriangleTimeFactor", preferences.bike().optimizeTriangle().time()),
-        c.asDouble("bikeTriangleSlopeFactor", preferences.bike().optimizeTriangle().slope()),
-        c.asDouble("bikeTriangleSafetyFactor", preferences.bike().optimizeTriangle().safety())
-      );
-    preferences.bike().setSwitchTime(c.asInt("bikeSwitchTime", preferences.bike().switchTime()));
-    preferences.bike().setSwitchCost(c.asInt("bikeSwitchCost", preferences.bike().switchCost()));
-    preferences
-      .bike()
-      .setWalkingReluctance(
-        c.asDouble("bikeWalkingReluctance", preferences.bike().walkingReluctance())
-      );
-    preferences
-      .bike()
-      .setWalkingSpeed(c.asDouble("bikeWalkingSpeed", preferences.bike().walkingSpeed()));
     request.allowKeepingRentedVehicleAtDestination =
       c.asBoolean(
         "allowKeepingRentedBicycleAtDestination",
@@ -180,7 +179,6 @@ public class RoutingRequestMapper {
         c.asInt("nonpreferredTransferPenalty", preferences.transfer().nonpreferredCost())
       );
     request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
-    preferences.bike().setOptimizeType(c.asEnum("optimize", preferences.bike().optimizeType()));
     preferences
       .transit()
       .setOtherThanPreferredRoutesPenalty(
