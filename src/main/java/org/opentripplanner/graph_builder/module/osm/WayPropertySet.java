@@ -115,12 +115,12 @@ public class WayPropertySet {
     WayProperties result = rightResult
       .mutate()
       .bicycleSafety(
-        rightResult.getBicycleSafetyFeatures().first,
-        leftResult.getBicycleSafetyFeatures().second
+        rightResult.getBicycleSafetyFeatures().forward(),
+        leftResult.getBicycleSafetyFeatures().back()
       )
       .walkSafety(
-        rightResult.getWalkSafetyFeatures().first,
-        leftResult.getWalkSafetyFeatures().second
+        rightResult.getWalkSafetyFeatures().forward(),
+        leftResult.getWalkSafetyFeatures().back()
       )
       .build();
 
@@ -436,19 +436,19 @@ public class WayPropertySet {
     List<WayProperties> mixins,
     boolean right
   ) {
-    P2<Double> bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
-    double firstBicycle = bicycleSafetyFeatures.first;
-    double secondBicycle = bicycleSafetyFeatures.second;
-    P2<Double> walkSafetyFeatures = result.getWalkSafetyFeatures();
-    double firstWalk = walkSafetyFeatures.first;
-    double secondWalk = walkSafetyFeatures.second;
+    SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
+    double firstBicycle = bicycleSafetyFeatures.forward();
+    double secondBicycle = bicycleSafetyFeatures.back();
+    SafetyFeatures walkSafetyFeatures = result.getWalkSafetyFeatures();
+    double firstWalk = walkSafetyFeatures.forward();
+    double secondWalk = walkSafetyFeatures.back();
     for (WayProperties properties : mixins) {
       if (right) {
-        secondBicycle *= properties.getBicycleSafetyFeatures().second;
-        secondWalk *= properties.getWalkSafetyFeatures().second;
+        secondBicycle *= properties.getBicycleSafetyFeatures().back();
+        secondWalk *= properties.getWalkSafetyFeatures().back();
       } else {
-        firstBicycle *= properties.getBicycleSafetyFeatures().first;
-        firstWalk *= properties.getWalkSafetyFeatures().first;
+        firstBicycle *= properties.getBicycleSafetyFeatures().forward();
+        firstWalk *= properties.getWalkSafetyFeatures().forward();
       }
     }
     return result

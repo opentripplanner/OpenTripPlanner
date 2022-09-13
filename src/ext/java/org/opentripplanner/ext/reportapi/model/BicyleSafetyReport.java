@@ -33,8 +33,8 @@ public class BicyleSafetyReport {
         buf.addText(p.getProperties().getPermission().toString());
 
         var safetyProps = p.getProperties().getBicycleSafetyFeatures();
-        buf.addNumber(safetyProps.first);
-        buf.addNumber(safetyProps.second);
+        buf.addNumber(safetyProps.forward());
+        buf.addNumber(safetyProps.back());
         buf.newLine();
       });
 
