@@ -7,11 +7,12 @@ import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StreetLegBuilder {
 
-  private LegMode mode;
+  private TraverseMode mode;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
   private Place from;
@@ -54,7 +55,7 @@ public class StreetLegBuilder {
     return new StreetLeg(this);
   }
 
-  public LegMode getMode() {
+  public TraverseMode getMode() {
     return mode;
   }
 
@@ -118,7 +119,7 @@ public class StreetLegBuilder {
     return streetNotes;
   }
 
-  public StreetLegBuilder withMode(LegMode mode) {
+  public StreetLegBuilder withMode(TraverseMode mode) {
     this.mode = mode;
     return this;
   }

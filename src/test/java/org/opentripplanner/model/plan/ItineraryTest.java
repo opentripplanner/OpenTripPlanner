@@ -11,7 +11,9 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class ItineraryTest implements PlanTestConstants {
 
@@ -32,7 +34,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertSameLocation(A, result.firstLeg().getFrom());
     assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_05), result.firstLeg().getEndTime());
-    assertEquals(LegMode.WALK, result.firstLeg().getMode());
+    assertEquals(TraverseMode.WALK, result.getStreetLeg(0).getMode());
     assertEquals(420.0d, result.firstLeg().getDistanceMeters(), 1E-3);
     assertSameLocation(B, result.lastLeg().getTo());
 
@@ -56,7 +58,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertSameLocation(B, result.firstLeg().getTo());
     assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_10), result.firstLeg().getEndTime());
-    assertEquals(LegMode.BUS, result.firstLeg().getMode());
+    assertEquals(TransitMode.BUS, result.getTransitLeg(0).getMode());
     assertEquals(TransitModelForTest.id("55"), result.firstLeg().getTrip().getId());
     assertEquals(7500, result.firstLeg().getDistanceMeters(), 1E-3);
 
@@ -80,7 +82,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertSameLocation(B, result.firstLeg().getTo());
     assertEquals(newTime(T11_05), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_15), result.firstLeg().getEndTime());
-    assertEquals(LegMode.RAIL, result.firstLeg().getMode());
+    assertEquals(TransitMode.RAIL, result.getTransitLeg(0).getMode());
     assertEquals(TransitModelForTest.id("20"), result.firstLeg().getTrip().getId());
     assertEquals(15_000, result.firstLeg().getDistanceMeters(), 1E-3);
 

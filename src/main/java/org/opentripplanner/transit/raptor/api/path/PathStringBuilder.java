@@ -83,7 +83,7 @@ public class PathStringBuilder {
     return start().append(modeName).space().append(trip).space().time(fromTime, toTime).end();
   }
 
-  public PathStringBuilder other(String modeName, ZonedDateTime fromTime, ZonedDateTime toTime) {
+  public PathStringBuilder street(String modeName, ZonedDateTime fromTime, ZonedDateTime toTime) {
     return start().append(modeName).space().time(fromTime, toTime).end();
   }
 

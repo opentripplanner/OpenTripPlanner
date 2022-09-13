@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.function.Function;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.plan.AbsoluteDirection;
-import org.opentripplanner.model.plan.LegMode;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.transfer.TransferPriority;
@@ -15,6 +14,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -257,22 +257,22 @@ public class EnumTypes {
   public static GraphQLEnumType LEG_MODE = GraphQLEnumType
     .newEnum()
     .name("Mode")
-    .value("air", LegMode.AIRPLANE)
-    .value("bicycle", LegMode.BICYCLE)
-    .value("bus", LegMode.BUS)
-    .value("cableway", LegMode.CABLE_CAR)
-    .value("water", LegMode.FERRY)
-    .value("funicular", LegMode.FUNICULAR)
-    .value("lift", LegMode.GONDOLA)
-    .value("rail", LegMode.RAIL)
-    .value("metro", LegMode.SUBWAY)
-    .value("tram", LegMode.TRAM)
-    .value("trolleybus", LegMode.TROLLEYBUS)
-    .value("monorail", LegMode.MONORAIL)
-    .value("coach", LegMode.COACH)
-    .value("foot", LegMode.WALK)
-    .value("car", LegMode.CAR)
-    .value("scooter", LegMode.SCOOTER)
+    .value("air", TransitMode.AIRPLANE)
+    .value("bicycle", TraverseMode.BICYCLE)
+    .value("bus", TransitMode.BUS)
+    .value("cableway", TransitMode.CABLE_CAR)
+    .value("water", TransitMode.FERRY)
+    .value("funicular", TransitMode.FUNICULAR)
+    .value("lift", TransitMode.GONDOLA)
+    .value("rail", TransitMode.RAIL)
+    .value("metro", TransitMode.SUBWAY)
+    .value("tram", TransitMode.TRAM)
+    .value("trolleybus", TransitMode.TROLLEYBUS)
+    .value("monorail", TransitMode.MONORAIL)
+    .value("coach", TransitMode.COACH)
+    .value("foot", TraverseMode.WALK)
+    .value("car", TraverseMode.CAR)
+    .value("scooter", TraverseMode.SCOOTER)
     .build();
 
   public static GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType

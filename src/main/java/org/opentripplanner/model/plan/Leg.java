@@ -100,13 +100,17 @@ public interface Leg {
   }
 
   /**
+   * Check is this instance has the same type and mode as the given other.
+   */
+  boolean hasSameMode(Leg other);
+
+  /**
    * Return {@code true} if to legs are the same. The mode must match and the time must overlap.
    * For transit the trip ID must match and board/alight position must overlap. (Two trips with
    * different service-date can overlap in time, so we use boarding-/alight-position to verify).
    */
   default boolean isPartiallySameLeg(Leg other) {
-    // Assert both legs have the same mode
-    if (getMode() != other.getMode()) {
+    if (!hasSameMode(other)) {
       return false;
     }
 
@@ -185,11 +189,6 @@ public interface Leg {
   default WheelchairAccessibility getTripWheelchairAccessibility() {
     return null;
   }
-
-  /**
-   * The mode (e.g., <code>Walk</code>) used when traversing this leg.
-   */
-  LegMode getMode();
 
   /**
    * The date and time this leg begins.

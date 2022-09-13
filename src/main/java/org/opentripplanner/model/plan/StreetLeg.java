@@ -3,12 +3,14 @@ package org.opentripplanner.model.plan;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -19,7 +21,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public class StreetLeg implements Leg {
 
-  private final LegMode mode;
+  private final TraverseMode mode;
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final double distanceMeters;
@@ -42,12 +44,7 @@ public class StreetLeg implements Leg {
   private final Float accessibilityScore;
 
   public StreetLeg(StreetLegBuilder builder) {
-    if (builder.getMode().isTransit()) {
-      throw new IllegalArgumentException(
-        "To create a transit leg use the other classes implementing Leg."
-      );
-    }
-    this.mode = builder.getMode();
+    this.mode = Objects.requireNonNull(builder.getMode());
     this.startTime = builder.getStartTime();
     this.endTime = builder.getEndTime();
     this.distanceMeters = DoubleUtils.roundTo2Decimals(builder.getDistanceMeters());
@@ -78,7 +75,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public boolean isWalkingLeg() {
-    return mode == LegMode.WALK;
+    return mode == TraverseMode.WALK;
   }
 
   @Override
@@ -86,8 +83,7 @@ public class StreetLeg implements Leg {
     return true;
   }
 
-  @Override
-  public LegMode getMode() {
+  public TraverseMode getMode() {
     return mode;
   }
 
@@ -182,6 +178,11 @@ public class StreetLeg implements Leg {
   @Override
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  @Override
+  public boolean hasSameMode(Leg other) {
+    return other instanceof StreetLeg oSL && mode.equals(oSL.mode);
   }
 
   @Override
