@@ -10,8 +10,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTraversalCalculator;
 
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
@@ -743,7 +743,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
   }
 
   @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new NorwayIntersectionTraversalCostModel(drivingDirection);
+  public IntersectionTraversalCalculator getIntersectionTraversalCostModel() {
+    return new NorwayIntersectionTraversalCalculator(drivingDirection);
   }
 }

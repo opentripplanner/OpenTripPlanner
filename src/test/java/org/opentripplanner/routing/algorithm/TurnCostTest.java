@@ -16,7 +16,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -99,7 +99,7 @@ public class TurnCostTest {
     preferences.walk().setStairsReluctance(1.0);
 
     // Turn costs are all 0 by default.
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));
+    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCalculator(0.0));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class TurnCostTest {
   @Test
   public void testForwardDefaultConstTurnCosts() {
     RouteRequest options = proto.clone();
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCalculator(10.0));
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     // Since we traverse 3 intersections, the total cost should be 330.
@@ -162,7 +162,7 @@ public class TurnCostTest {
   @Test
   public void testForwardCarConstTurnCosts() {
     RouteRequest options = proto.clone();
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCalculator(10.0));
     options.setMode(TraverseMode.CAR);
 
     // Without turn costs, this path costs 3x100 + 1x50 = 350.

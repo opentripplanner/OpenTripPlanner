@@ -8,23 +8,23 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SimpleIntersectionTraversalCostModel
-  extends AbstractIntersectionTraversalCostModel
+public class SimpleIntersectionTraversalCalculator
+  extends AbstractIntersectionTraversalCalculator
   implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(
-    SimpleIntersectionTraversalCostModel.class
+    SimpleIntersectionTraversalCalculator.class
   );
   private final DrivingDirection drivingDirection;
 
-  private final double acrossTrafficBicyleTurnMultiplier = getSafeBicycleTurnModifier() * 3;
+  private final double acrossTrafficBicycleTurnMultiplier = getSafeBicycleTurnModifier() * 3;
 
-  public SimpleIntersectionTraversalCostModel(DrivingDirection drivingDirection) {
+  public SimpleIntersectionTraversalCalculator(DrivingDirection drivingDirection) {
     this.drivingDirection = drivingDirection;
   }
 
   @Override
-  public double computeTraversalCost(
+  public double computeTraversalDuration(
     IntersectionVertex v,
     StreetEdge from,
     StreetEdge to,
@@ -32,17 +32,17 @@ public class SimpleIntersectionTraversalCostModel
     float fromSpeed,
     float toSpeed
   ) {
-    // If the vertex is free-flowing then (by definition) there is no cost to traverse it.
+    // If the vertex is free-flowing then (by definition) there is no duration to traverse it.
     if (v.inferredFreeFlowing()) {
       return 0;
     }
 
     if (mode.isDriving()) {
-      return computeDrivingTraversalCost(v, from, to);
+      return computeDrivingTraversalDuration(v, from, to);
     } else if (mode.isCycling()) {
-      return computeCyclingTraversalCost(v, from, to, fromSpeed, toSpeed);
+      return computeCyclingTraversalDuration(v, from, to, fromSpeed, toSpeed);
     } else {
-      return computeNonDrivingTraversalCost(from, to, toSpeed);
+      return computeNonDrivingTraversalDuration(from, to, toSpeed);
     }
   }
 
@@ -109,10 +109,10 @@ public class SimpleIntersectionTraversalCostModel
   }
 
   /**
-   * Since doing a left turn on a bike is quite dangerous we add a cost for it
+   * Since doing a left turn on a bike is quite dangerous we add a duration for it
    **/
-  public double getAcrossTrafficBicyleTurnMultiplier() {
-    return acrossTrafficBicyleTurnMultiplier;
+  public double getAcrossTrafficBicycleTurnMultiplier() {
+    return acrossTrafficBicycleTurnMultiplier;
   }
 
   /**
@@ -150,18 +150,22 @@ public class SimpleIntersectionTraversalCostModel
     }
   }
 
-  private double computeDrivingTraversalCost(IntersectionVertex v, StreetEdge from, StreetEdge to) {
-    double turnCost = 0;
+  private double computeDrivingTraversalDuration(
+    IntersectionVertex v,
+    StreetEdge from,
+    StreetEdge to
+  ) {
+    double turnDuration = 0;
 
     int turnAngle = calculateTurnAngle(from, to);
     if (v.trafficLight) {
       // Use constants that apply when there are stop lights.
       if (isSafeTurn(turnAngle)) {
-        turnCost = getExpectedRightAtLightTimeSec();
+        turnDuration = getExpectedRightAtLightTimeSec();
       } else if (isTurnAcrossTraffic(turnAngle)) {
-        turnCost = getExpectedLeftAtLightTimeSec();
+        turnDuration = getExpectedLeftAtLightTimeSec();
       } else {
-        turnCost = getExpectedStraightAtLightTimeSec();
+        turnDuration = getExpectedStraightAtLightTimeSec();
       }
     } else {
       //assume highway vertex
@@ -171,18 +175,18 @@ public class SimpleIntersectionTraversalCostModel
 
       // Use constants that apply when no stop lights.
       if (isSafeTurn(turnAngle)) {
-        turnCost = getExpectedRightNoLightTimeSec();
+        turnDuration = getExpectedRightNoLightTimeSec();
       } else if (isTurnAcrossTraffic(turnAngle)) {
-        turnCost = getExpectedLeftNoLightTimeSec();
+        turnDuration = getExpectedLeftNoLightTimeSec();
       } else {
-        turnCost = getExpectedStraightNoLightTimeSec();
+        turnDuration = getExpectedStraightNoLightTimeSec();
       }
     }
 
-    return turnCost;
+    return turnDuration;
   }
 
-  private double computeCyclingTraversalCost(
+  private double computeCyclingTraversalDuration(
     IntersectionVertex v,
     StreetEdge from,
     StreetEdge to,
@@ -190,14 +194,14 @@ public class SimpleIntersectionTraversalCostModel
     float toSpeed
   ) {
     var turnAngle = calculateTurnAngle(from, to);
-    final var baseCost = computeNonDrivingTraversalCost(from, to, toSpeed);
+    final var baseDuration = computeNonDrivingTraversalDuration(from, to, toSpeed);
 
     if (isTurnAcrossTraffic(turnAngle)) {
-      return baseCost * getAcrossTrafficBicyleTurnMultiplier();
+      return baseDuration * getAcrossTrafficBicycleTurnMultiplier();
     } else if (isSafeTurn(turnAngle)) {
-      return baseCost * getSafeBicycleTurnModifier();
+      return baseDuration * getSafeBicycleTurnModifier();
     } else {
-      return baseCost;
+      return baseDuration;
     }
   }
 

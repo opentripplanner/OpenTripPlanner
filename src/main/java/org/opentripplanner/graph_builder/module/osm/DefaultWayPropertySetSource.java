@@ -9,8 +9,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCalculator;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -632,8 +632,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
   }
 
   @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
+  public IntersectionTraversalCalculator getIntersectionTraversalCostModel() {
+    return new SimpleIntersectionTraversalCalculator(drivingDirection);
   }
 
   public void populateNotesAndNames(WayPropertySet props) {

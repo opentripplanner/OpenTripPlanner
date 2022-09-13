@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM streets can be traversed
@@ -42,7 +42,7 @@ public interface WayPropertySetSource {
 
   DrivingDirection drivingDirection();
 
-  IntersectionTraversalCostModel getIntersectionTraversalCostModel();
+  IntersectionTraversalCalculator getIntersectionTraversalCostModel();
 
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
     return (

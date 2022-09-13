@@ -24,8 +24,8 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -53,7 +53,7 @@ public class Graph implements Serializable {
   public static final DrivingDirection DEFAULT_DRIVING_DIRECTION =
     DrivingDirection.RIGHT_HAND_TRAFFIC;
 
-  public static final IntersectionTraversalCostModel DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL = new SimpleIntersectionTraversalCostModel(
+  public static final IntersectionTraversalCalculator DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL = new SimpleIntersectionTraversalCalculator(
     DEFAULT_DRIVING_DIRECTION
   );
 
@@ -122,7 +122,7 @@ public class Graph implements Serializable {
 
   private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
 
-  private IntersectionTraversalCostModel intersectionTraversalCostModel =
+  private IntersectionTraversalCalculator intersectionTraversalCalculator =
     DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
 
   /**
@@ -472,14 +472,14 @@ public class Graph implements Serializable {
     this.drivingDirection = drivingDirection;
   }
 
-  public IntersectionTraversalCostModel getIntersectionTraversalModel() {
-    return intersectionTraversalCostModel;
+  public IntersectionTraversalCalculator getIntersectionTraversalModel() {
+    return intersectionTraversalCalculator;
   }
 
   public void setIntersectionTraversalCostModel(
-    IntersectionTraversalCostModel intersectionTraversalCostModel
+    IntersectionTraversalCalculator intersectionTraversalCalculator
   ) {
-    this.intersectionTraversalCostModel = intersectionTraversalCostModel;
+    this.intersectionTraversalCalculator = intersectionTraversalCalculator;
   }
 
   public LuceneIndex getLuceneIndex() {

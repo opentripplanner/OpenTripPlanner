@@ -7,8 +7,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BIC
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCalculator;
 
 /**
  * OSM way properties for German roads. Speed limits where adjusted to German regulation and some
@@ -100,7 +100,7 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
   }
 
   @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
+  public IntersectionTraversalCalculator getIntersectionTraversalCostModel() {
+    return new SimpleIntersectionTraversalCalculator(drivingDirection);
   }
 }

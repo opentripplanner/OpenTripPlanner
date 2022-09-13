@@ -2,9 +2,9 @@ package org.opentripplanner.routing.core.intersection_model;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
-public class NorwayIntersectionTraversalCostModel extends SimpleIntersectionTraversalCostModel {
+public class NorwayIntersectionTraversalCalculator extends SimpleIntersectionTraversalCalculator {
 
-  public NorwayIntersectionTraversalCostModel(
+  public NorwayIntersectionTraversalCalculator(
     WayPropertySetSource.DrivingDirection drivingDirection
   ) {
     super(drivingDirection);

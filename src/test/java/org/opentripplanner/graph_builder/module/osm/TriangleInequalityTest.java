@@ -23,7 +23,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -200,7 +200,7 @@ public class TriangleInequalityTest {
     prototypeOptions.preferences().walk().setSpeed(1.0);
     prototypeOptions.preferences().bike().setSpeed(1.0);
 
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCalculator(10.0));
 
     if (traverseModes != null) {
       prototypeOptions.setStreetSubRequestModes(traverseModes);

@@ -15,7 +15,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -141,7 +141,7 @@ public class TemporaryPartialStreetEdgeTest {
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;
-    graph.setIntersectionTraversalCostModel(new DummyCostModel(turnDurationSecs));
+    graph.setIntersectionTraversalCostModel(new DummyCalculator(turnDurationSecs));
     options.preferences().street().setTurnReluctance(1.0);
 
     State s0 = new State(routingContext);
@@ -167,7 +167,7 @@ public class TemporaryPartialStreetEdgeTest {
     assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
 
     // All intersections take 0 seconds now.
-    graph.setIntersectionTraversalCostModel(new DummyCostModel(0.0));
+    graph.setIntersectionTraversalCostModel(new DummyCalculator(0.0));
 
     State s0NoCost = new State(routingContext);
     State s1NoCost = e1.traverse(s0NoCost);
@@ -282,16 +282,16 @@ public class TemporaryPartialStreetEdgeTest {
   /**
    * Dummy cost model. Returns what you put in.
    */
-  private static class DummyCostModel implements IntersectionTraversalCostModel {
+  private static class DummyCalculator implements IntersectionTraversalCalculator {
 
     private final double turnCostSecs;
 
-    public DummyCostModel(double turnCostSecs) {
+    public DummyCalculator(double turnCostSecs) {
       this.turnCostSecs = turnCostSecs;
     }
 
     @Override
-    public double computeTraversalCost(
+    public double computeTraversalDuration(
       IntersectionVertex v,
       StreetEdge from,
       StreetEdge to,

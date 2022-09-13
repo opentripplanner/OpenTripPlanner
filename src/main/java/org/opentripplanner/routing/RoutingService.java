@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.Driving
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -142,7 +142,7 @@ public class RoutingService {
   }
 
   /** {@link Graph#getIntersectionTraversalModel()} */
-  public IntersectionTraversalCostModel getIntersectionTraversalModel() {
+  public IntersectionTraversalCalculator getIntersectionTraversalModel() {
     return this.graph.getIntersectionTraversalModel();
   }
 

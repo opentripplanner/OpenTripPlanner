@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCalculator;
 
 /**
  * OSM way properties for the Atlanta, Georgia, USA area.
@@ -37,7 +37,7 @@ public class AtlantaWayPropertySetSource implements WayPropertySetSource {
   }
 
   @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
+  public IntersectionTraversalCalculator getIntersectionTraversalCostModel() {
+    return new SimpleIntersectionTraversalCalculator(drivingDirection);
   }
 }
