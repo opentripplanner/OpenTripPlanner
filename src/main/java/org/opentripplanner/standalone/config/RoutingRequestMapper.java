@@ -8,6 +8,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
+import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculatorType;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
@@ -258,6 +260,20 @@ public class RoutingRequestMapper {
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
+    preferences
+      .street()
+      .setDrivingDirection(
+        mapDrivingDirection(c.path("drivingDirection"), preferences.street().drivingDirection())
+      );
+    preferences
+      .street()
+      .setIntersectionTraversalCalculator(
+        mapIntersectionTraversalCalculator(
+          c.path("intersectionTraversalCostModel"),
+          preferences.street().intersectionTraversalCalculator()
+        )
+      );
+
     var unpreferred = c.path("unpreferred");
     request.setUnpreferredRoutes(
       unpreferred.asFeedScopedIdSet("routes", dft.getUnpreferredRoutes())
@@ -278,5 +294,25 @@ public class RoutingRequestMapper {
       c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor()),
       c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())
     );
+  }
+
+  private static DrivingDirection mapDrivingDirection(
+    NodeAdapter input,
+    DrivingDirection defaultValue
+  ) {
+    if (input.isEmpty()) {
+      return defaultValue;
+    }
+    return DrivingDirection.get(input.asText());
+  }
+
+  private static IntersectionTraversalCalculatorType mapIntersectionTraversalCalculator(
+    NodeAdapter input,
+    IntersectionTraversalCalculatorType defaultValue
+  ) {
+    if (input.isEmpty()) {
+      return defaultValue;
+    }
+    return IntersectionTraversalCalculatorType.valueOf(input.asText());
   }
 }

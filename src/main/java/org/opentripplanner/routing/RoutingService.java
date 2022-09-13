@@ -5,11 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -134,16 +132,6 @@ public class RoutingService {
   /** {@link Graph#getVehicleParkingService()} */
   public VehicleParkingService getVehicleParkingService() {
     return this.graph.getVehicleParkingService();
-  }
-
-  /** {@link Graph#getDrivingDirection()} */
-  public DrivingDirection getDrivingDirection() {
-    return this.graph.getDrivingDirection();
-  }
-
-  /** {@link Graph#getIntersectionTraversalModel()} */
-  public IntersectionTraversalCalculator getIntersectionTraversalModel() {
-    return this.graph.getIntersectionTraversalModel();
   }
 
   /** {@link GraphFinder#findClosestStops(double, double, double)} */

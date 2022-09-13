@@ -1,20 +1,14 @@
 package org.opentripplanner.routing.core.intersection_model;
 
 import java.io.Serializable;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SimpleIntersectionTraversalCalculator
   extends AbstractIntersectionTraversalCalculator
   implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-    SimpleIntersectionTraversalCalculator.class
-  );
   private final DrivingDirection drivingDirection;
 
   private final double acrossTrafficBicycleTurnMultiplier = getSafeBicycleTurnModifier() * 3;
@@ -40,7 +34,7 @@ public class SimpleIntersectionTraversalCalculator
     if (mode.isDriving()) {
       return computeDrivingTraversalDuration(v, from, to);
     } else if (mode.isCycling()) {
-      return computeCyclingTraversalDuration(v, from, to, fromSpeed, toSpeed);
+      return computeCyclingTraversalDuration(from, to, toSpeed);
     } else {
       return computeNonDrivingTraversalDuration(from, to, toSpeed);
     }
@@ -123,14 +117,10 @@ public class SimpleIntersectionTraversalCalculator
    * traffic countries (UK, Japan) this is a left turn.
    */
   protected boolean isSafeTurn(int turnAngle) {
-    switch (drivingDirection) {
-      case RIGHT_HAND_TRAFFIC:
-        return isRightTurn(turnAngle);
-      case LEFT_HAND_TRAFFIC:
-        return isLeftTurn(turnAngle);
-      default:
-        throw new RuntimeException("New driving direction introduced!");
-    }
+    return switch (drivingDirection) {
+      case RIGHT_HAND_TRAFFIC -> isRightTurn(turnAngle);
+      case LEFT_HAND_TRAFFIC -> isLeftTurn(turnAngle);
+    };
   }
 
   /**
@@ -140,14 +130,10 @@ public class SimpleIntersectionTraversalCalculator
    * this is a right turn.
    */
   protected boolean isTurnAcrossTraffic(int turnAngle) {
-    switch (drivingDirection) {
-      case RIGHT_HAND_TRAFFIC:
-        return isLeftTurn(turnAngle);
-      case LEFT_HAND_TRAFFIC:
-        return isRightTurn(turnAngle);
-      default:
-        throw new RuntimeException("New driving direction introduced!");
-    }
+    return switch (drivingDirection) {
+      case RIGHT_HAND_TRAFFIC -> isLeftTurn(turnAngle);
+      case LEFT_HAND_TRAFFIC -> isRightTurn(turnAngle);
+    };
   }
 
   private double computeDrivingTraversalDuration(
@@ -155,17 +141,15 @@ public class SimpleIntersectionTraversalCalculator
     StreetEdge from,
     StreetEdge to
   ) {
-    double turnDuration = 0;
-
     int turnAngle = calculateTurnAngle(from, to);
     if (v.trafficLight) {
       // Use constants that apply when there are stop lights.
       if (isSafeTurn(turnAngle)) {
-        turnDuration = getExpectedRightAtLightTimeSec();
+        return getExpectedRightAtLightTimeSec();
       } else if (isTurnAcrossTraffic(turnAngle)) {
-        turnDuration = getExpectedLeftAtLightTimeSec();
+        return getExpectedLeftAtLightTimeSec();
       } else {
-        turnDuration = getExpectedStraightAtLightTimeSec();
+        return getExpectedStraightAtLightTimeSec();
       }
     } else {
       //assume highway vertex
@@ -175,24 +159,16 @@ public class SimpleIntersectionTraversalCalculator
 
       // Use constants that apply when no stop lights.
       if (isSafeTurn(turnAngle)) {
-        turnDuration = getExpectedRightNoLightTimeSec();
+        return getExpectedRightNoLightTimeSec();
       } else if (isTurnAcrossTraffic(turnAngle)) {
-        turnDuration = getExpectedLeftNoLightTimeSec();
+        return getExpectedLeftNoLightTimeSec();
       } else {
-        turnDuration = getExpectedStraightNoLightTimeSec();
+        return getExpectedStraightNoLightTimeSec();
       }
     }
-
-    return turnDuration;
   }
 
-  private double computeCyclingTraversalDuration(
-    IntersectionVertex v,
-    StreetEdge from,
-    StreetEdge to,
-    float fromSpeed,
-    float toSpeed
-  ) {
+  private double computeCyclingTraversalDuration(StreetEdge from, StreetEdge to, float toSpeed) {
     var turnAngle = calculateTurnAngle(from, to);
     final var baseDuration = computeNonDrivingTraversalDuration(from, to, toSpeed);
 

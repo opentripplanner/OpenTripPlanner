@@ -1044,8 +1044,7 @@ public class StreetEdge
       if (options.arriveBy() && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
         turnDuration =
           s0
-            .getRoutingContext()
-            .graph.getIntersectionTraversalModel()
+            .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
               this,
@@ -1057,8 +1056,7 @@ public class StreetEdge
       } else if (!options.arriveBy() && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
         turnDuration =
           s0
-            .getRoutingContext()
-            .graph.getIntersectionTraversalModel()
+            .intersectionTraversalCalculator()
             .computeTraversalDuration(
               traversedVertex,
               backPSE,

@@ -8,10 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -30,23 +27,12 @@ public class SimpleIntersectionTraversalCalculatorTest {
 
   private Graph graph;
 
-  private RouteRequest options;
-
   public SimpleIntersectionTraversalCalculator calculator;
 
   @BeforeEach
   public void before() {
     graph = new Graph();
     calculator = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT_HAND_TRAFFIC);
-
-    // Initialize the routing request.
-    options = new RouteRequest();
-    var pref = options.preferences();
-    pref.car().setSpeed(1.0);
-    pref.walk().setSpeed(1.0);
-    pref.car().setDecelerationSpeed(2.0);
-    pref.car().setAccelerationSpeed(2.0);
-    options.setStreetSubRequestModes(TraverseModeSet.allModes());
   }
 
   @Test

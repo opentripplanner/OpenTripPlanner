@@ -24,6 +24,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -41,6 +42,9 @@ public class TriangleInequalityTest {
 
   private static Graph graph;
   private static TransitModel transitModel;
+  private final IntersectionTraversalCalculator calculator = new ConstantIntersectionTraversalCalculator(
+    10.0
+  );
 
   private Vertex start;
   private Vertex end;
@@ -178,6 +182,7 @@ public class TriangleInequalityTest {
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
       .setContext(new RoutingContext(options, graph, u, v))
+      .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
   }
@@ -200,8 +205,6 @@ public class TriangleInequalityTest {
     prototypeOptions.preferences().walk().setSpeed(1.0);
     prototypeOptions.preferences().bike().setSpeed(1.0);
 
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCalculator(10.0));
-
     if (traverseModes != null) {
       prototypeOptions.setStreetSubRequestModes(traverseModes);
     }
@@ -210,6 +213,7 @@ public class TriangleInequalityTest {
       .oneToOne()
       .setDominanceFunction(new DominanceFunction.EarliestArrival())
       .setContext(new RoutingContext(prototypeOptions, graph, start, end))
+      .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(end);
