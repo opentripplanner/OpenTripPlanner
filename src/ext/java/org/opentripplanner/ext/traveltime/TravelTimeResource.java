@@ -113,7 +113,8 @@ public class TravelTimeResource {
         routingRequest
           .preferences()
           .street()
-          .maxAccessEgressDuration(routingRequest.modes.accessMode)
+          .maxAccessEgressDuration()
+          .valueOf(routingRequest.modes.accessMode)
       );
 
     if (time != null) {

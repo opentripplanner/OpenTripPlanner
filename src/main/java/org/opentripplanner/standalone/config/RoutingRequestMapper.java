@@ -103,7 +103,7 @@ public class RoutingRequestMapper {
       .initMaxAccessEgressDuration(
         c.asDuration(
           "maxAccessEgressDuration",
-          preferences.street().maxAccessEgressDurationDefaultValue()
+          preferences.street().maxAccessEgressDuration().defaultValue()
         ),
         c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );

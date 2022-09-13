@@ -43,7 +43,7 @@ public class AccessEgressRouter {
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       rctx.graph,
       transitService,
-      nearbyRequest.preferences().street().maxAccessEgressDuration(streetMode),
+      nearbyRequest.preferences().street().maxAccessEgressDuration().valueOf(streetMode),
       true
     );
     List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
