@@ -14,7 +14,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
@@ -30,7 +29,6 @@ class ItineraryResultMapper {
 
   private static final Map<String, String> AGENCY_NAMES_SHORT = new HashMap<>();
 
-  private final boolean skipCost;
   private final String testCaseId;
 
   static {
@@ -68,8 +66,7 @@ class ItineraryResultMapper {
     AGENCY_NAMES_SHORT.put("Østfold kollektivtrafikk", "ØstKol");
   }
 
-  private ItineraryResultMapper(boolean skipCost, String testCaseId) {
-    this.skipCost = skipCost;
+  private ItineraryResultMapper(String testCaseId) {
     this.testCaseId = testCaseId;
   }
 
@@ -97,10 +94,9 @@ class ItineraryResultMapper {
 
   static Collection<Result> map(
     final String testCaseId,
-    Collection<org.opentripplanner.model.plan.Itinerary> itineraries,
-    boolean skipCost
+    Collection<org.opentripplanner.model.plan.Itinerary> itineraries
   ) {
-    var mapper = new ItineraryResultMapper(skipCost, testCaseId);
+    var mapper = new ItineraryResultMapper(testCaseId);
     return itineraries.stream().map(mapper::map).collect(Collectors.toList());
   }
 

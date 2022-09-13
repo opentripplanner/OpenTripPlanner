@@ -39,7 +39,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
         .getLegs()
         .stream()
         .filter(StreetLeg.class::isInstance)
-        .map(it -> (StreetLeg) it)
+        .map(StreetLeg.class::cast)
         .filter(l -> l.getMode() == TraverseMode.CAR)
         .mapToDouble(l -> l.getDuration().toSeconds())
         .sum();
