@@ -10,7 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opentripplanner.ext.reportapi.model.BicyleSafetyReport;
+import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -55,7 +55,7 @@ public class ReportResource {
     @DefaultValue("default") @QueryParam("osmWayPropertySet") String osmWayPropertySet
   ) {
     return Response
-      .ok(BicyleSafetyReport.makeCsv(osmWayPropertySet))
+      .ok(BicycleSafetyReport.makeCsv(osmWayPropertySet))
       .header(
         "Content-Disposition",
         "attachment; filename=\"" + osmWayPropertySet + "-bicycle-safety.csv\""
