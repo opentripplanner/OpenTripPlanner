@@ -33,6 +33,7 @@ class DurationForEnumTest {
   @Test
   void defaultValue() {
     assertEquals(DEFAULT, subject.defaultValue());
+    assertEquals(DEFAULT.toSeconds(), subject.defaultValueSeconds());
   }
 
   @Test

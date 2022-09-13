@@ -161,7 +161,7 @@ public class RoutingRequestMapper {
       .initMaxDirectDuration(
         c.asDuration(
           "maxDirectStreetDuration",
-          preferences.street().maxDirectDurationDefaultValue()
+          preferences.street().maxDirectDuration().defaultValue()
         ),
         c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );

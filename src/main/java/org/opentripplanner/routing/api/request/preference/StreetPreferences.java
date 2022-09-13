@@ -103,12 +103,15 @@ public class StreetPreferences implements Cloneable, Serializable {
    * optimal. Use itinerary-filters to limit what is presented to the client.
    * <p>
    * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others.
+   * intensive than others. A default value is applied if the mode specific value do not exist.
    */
-  public Duration maxDirectDurationDefaultValue() {
-    return maxDirectDuration.defaultValue();
+  public DurationForEnum<StreetMode> maxDirectDuration() {
+    return maxDirectDuration;
   }
 
+  /**
+   * Utility method to get maxDirectDuration for a given mode. See {@link #maxDirectDuration()}.
+   */
   public Duration maxDirectDuration(StreetMode mode) {
     return maxDirectDuration.valueOf(mode);
   }
