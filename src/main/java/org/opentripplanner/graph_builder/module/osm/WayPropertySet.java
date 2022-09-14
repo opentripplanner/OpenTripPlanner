@@ -358,7 +358,7 @@ public class WayPropertySet {
 
   /**
    * A custom defaultWalkSafetyForPermission can only be set once. The given function should
-   *    * provide a default for each permission.
+   * provide a default for each permission.
    */
   public void setDefaultWalkSafetyForPermission(
     Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
