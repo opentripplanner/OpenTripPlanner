@@ -3220,7 +3220,11 @@ type Stoptime {
     the trip (e.g. on routes which run on loops), so this value should be used
     instead of `tripHeadsign` to display the headsign relevant to the user.
     """
-    headsign: String
+    headsign(
+        """If translated headsign is found from gtfs translation.txt and wanted language is not same as
+    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+    """
+    language: String): String
 }
 
 """Stoptimes grouped by pattern"""
@@ -3290,9 +3294,12 @@ type Trip implements Node {
     """List of dates when this trip is in service. Format: YYYYMMDD"""
     activeDates: [String]
     tripShortName: String
-
     """Headsign of the vehicle when running on this trip"""
-    tripHeadsign: String
+    tripHeadsign(
+        """If translated headsign is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+        """
+        language: String): String
 
     """
     Short name of the route this trip is running. See field `shortName` of Route.
