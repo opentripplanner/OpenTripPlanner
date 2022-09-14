@@ -930,8 +930,8 @@ public abstract class RoutingResource {
     if (minTransferTime != null) {
       int alightAndBoardSlack =
         (
-          (int) transitPref.boardSlack().defaultValue().toSeconds() +
-          (int) transitPref.alightSlack().defaultValue().toSeconds()
+          transitPref.boardSlack().defaultValueSeconds() +
+          transitPref.alightSlack().defaultValueSeconds()
         );
       if (alightAndBoardSlack > minTransferTime) {
         throw new IllegalArgumentException(

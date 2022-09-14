@@ -81,7 +81,7 @@ public class DirectStreetRouter {
     double distanceLimit;
     StreetMode mode = request.modes.directMode;
 
-    double durationLimit = preferences.street().maxDirectDuration(mode).toSeconds();
+    double durationLimit = preferences.street().maxDirectDuration().valueOf(mode).toSeconds();
 
     if (mode.includesDriving()) {
       distanceLimit = durationLimit * preferences.car().speed();

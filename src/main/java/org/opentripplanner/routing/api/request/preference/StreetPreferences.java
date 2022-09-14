@@ -74,21 +74,16 @@ public class StreetPreferences implements Cloneable, Serializable {
     this.elevatorHopCost = elevatorHopCost;
   }
 
-  /** @see #maxAccessEgressDuration(StreetMode) */
-  public Duration maxAccessEgressDurationDefaultValue() {
-    return maxAccessEgressDuration.defaultValue();
-  }
-
   /**
    * This is the maximum duration for access/egress per street mode for street searches. This is a
    * performance limit and should therefore be set high. Results close to the limit are not
-   * guaranteed to be optimal. Use* itinerary-filters to limit what is presented to the client.
+   * guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client.
    * <p>
    * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others.
+   * intensive than others. A default value is applied if the mode specific value do not exist.
    */
-  public Duration maxAccessEgressDuration(StreetMode mode) {
-    return maxAccessEgressDuration.valueOf(mode);
+  public DurationForEnum<StreetMode> maxAccessEgressDuration() {
+    return maxAccessEgressDuration;
   }
 
   public void initMaxAccessEgressDuration(Duration defaultValue, Map<StreetMode, Duration> values) {
@@ -103,14 +98,10 @@ public class StreetPreferences implements Cloneable, Serializable {
    * optimal. Use itinerary-filters to limit what is presented to the client.
    * <p>
    * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others.
+   * intensive than others. A default value is applied if the mode specific value do not exist.
    */
-  public Duration maxDirectDurationDefaultValue() {
-    return maxDirectDuration.defaultValue();
-  }
-
-  public Duration maxDirectDuration(StreetMode mode) {
-    return maxDirectDuration.valueOf(mode);
+  public DurationForEnum<StreetMode> maxDirectDuration() {
+    return maxDirectDuration;
   }
 
   public void initMaxDirectDuration(Duration defaultValue, Map<StreetMode, Duration> valuePerMode) {
