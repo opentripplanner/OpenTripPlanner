@@ -61,6 +61,9 @@ public class RequestModes {
     );
   }
 
+  /**
+   * Return a mode builder with the defaults set.
+   */
   public static RequestModesBuilder of() {
     return DEFAULTS.copyOf();
   }
@@ -69,6 +72,10 @@ public class RequestModes {
     return new RequestModesBuilder(this);
   }
 
+  /**
+   * Return the default set of modes with WALK for all street modes and all transit modes set.
+   * Tip: Use the {@link #of()} to change the defaults.
+   */
   public static RequestModes defaultRequestModes() {
     return DEFAULTS;
   }

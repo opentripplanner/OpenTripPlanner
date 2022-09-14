@@ -94,18 +94,13 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkingOnly() {
-    RequestModes modes = RequestModes.defaultRequestModes().copyOf().clearTransitModes().build();
+    RequestModes modes = RequestModes.of().clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
   @Test
   public void testTriangleInequalityDrivingOnly() {
-    RequestModes modes = RequestModes
-      .defaultRequestModes()
-      .copyOf()
-      .withDirectMode(CAR)
-      .clearTransitModes()
-      .build();
+    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -117,12 +112,7 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkBike() {
-    RequestModes modes = RequestModes
-      .defaultRequestModes()
-      .copyOf()
-      .withDirectMode(BIKE)
-      .clearTransitModes()
-      .build();
+    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -133,18 +123,13 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkingOnlyBasicSPT() {
-    RequestModes modes = RequestModes.defaultRequestModes().copyOf().clearTransitModes().build();
+    RequestModes modes = RequestModes.of().clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
   @Test
   public void testTriangleInequalityDrivingOnlyBasicSPT() {
-    RequestModes modes = RequestModes
-      .defaultRequestModes()
-      .copyOf()
-      .withDirectMode(CAR)
-      .clearTransitModes()
-      .build();
+    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -156,12 +141,7 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkBikeBasicSPT() {
-    RequestModes modes = RequestModes
-      .defaultRequestModes()
-      .copyOf()
-      .withDirectMode(BIKE)
-      .clearTransitModes()
-      .build();
+    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -172,18 +152,13 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkingOnlyMultiSPT() {
-    RequestModes modes = RequestModes.defaultRequestModes().copyOf().clearTransitModes().build();
+    RequestModes modes = RequestModes.of().clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
   @Test
   public void testTriangleInequalityDrivingOnlyMultiSPT() {
-    RequestModes modes = RequestModes
-      .defaultRequestModes()
-      .copyOf()
-      .withDirectMode(CAR)
-      .clearTransitModes()
-      .build();
+    RequestModes modes = RequestModes.of().withDirectMode(CAR).clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -195,12 +170,7 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkBikeMultiSPT() {
-    RequestModes modes = RequestModes
-      .defaultRequestModes()
-      .copyOf()
-      .withDirectMode(BIKE)
-      .clearTransitModes()
-      .build();
+    RequestModes modes = RequestModes.of().withDirectMode(BIKE).clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
