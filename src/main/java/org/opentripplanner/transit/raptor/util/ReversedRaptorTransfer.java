@@ -1,30 +1,15 @@
 package org.opentripplanner.transit.raptor.util;
 
+import org.opentripplanner.transit.raptor.api.transit.AbstractRaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
-public class ReversedRaptorTransfer implements RaptorTransfer {
+public class ReversedRaptorTransfer extends AbstractRaptorTransfer {
 
-  private final int stopIndex;
   private final RaptorTransfer transfer;
 
   public ReversedRaptorTransfer(int fromStopIndex, RaptorTransfer transfer) {
-    this.stopIndex = fromStopIndex;
+    super(fromStopIndex, transfer.durationInSeconds(), transfer.generalizedCost());
     this.transfer = transfer;
-  }
-
-  @Override
-  public int stop() {
-    return stopIndex;
-  }
-
-  @Override
-  public int generalizedCost() {
-    return transfer.generalizedCost();
-  }
-
-  @Override
-  public int durationInSeconds() {
-    return transfer.durationInSeconds();
   }
 
   @Override

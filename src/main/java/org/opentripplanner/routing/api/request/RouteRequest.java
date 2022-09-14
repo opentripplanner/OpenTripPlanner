@@ -114,11 +114,6 @@ public class RouteRequest implements Cloneable, Serializable {
     to = new GenericLocation(null, null);
   }
 
-  public RouteRequest(TraverseModeSet streetSubRequestModes) {
-    this();
-    this.setStreetSubRequestModes(streetSubRequestModes);
-  }
-
   public RouteRequest(TraverseMode mode) {
     this();
     this.setStreetSubRequestModes(new TraverseModeSet(mode));
@@ -205,7 +200,7 @@ public class RouteRequest implements Cloneable, Serializable {
         arriveBy = false;
       }
       this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
-      journey.setModes(journey.modes().copy().withDirectMode(StreetMode.NOT_SET).build());
+      journey.setModes(journey.modes().copyOf().withDirectMode(StreetMode.NOT_SET).build());
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }

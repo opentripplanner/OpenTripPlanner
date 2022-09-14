@@ -31,8 +31,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.RouteMatcher;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -95,7 +93,6 @@ public abstract class GtfsTest {
     }
     routingRequest.setWheelchair(wheelchairAccessible);
     preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
-    routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK));
     RequestModesBuilder requestModesBuilder = RequestModes
       .of()
       .withDirectMode(NOT_SET)

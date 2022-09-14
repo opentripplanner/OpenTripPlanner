@@ -286,7 +286,7 @@ public class TestHalfEdges {
      * that (b) it is not preferred to riding a tiny bit longer.
      */
 
-    options = new RouteRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+    options = new RouteRequest(TraverseMode.BICYCLE);
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
         "start1",
@@ -589,7 +589,7 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    RouteRequest biking = new RouteRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+    RouteRequest biking = new RouteRequest(TraverseMode.BICYCLE);
     TemporaryStreetLocation end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.008, -74.0),
       biking,
