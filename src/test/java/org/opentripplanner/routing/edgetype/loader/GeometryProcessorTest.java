@@ -333,7 +333,6 @@ public class GeometryProcessorTest {
     GraphPath path;
 
     RouteRequest options = new RouteRequest();
-    options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRANSIT));
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
 
     // U to V - original stop times - shouldn't be used

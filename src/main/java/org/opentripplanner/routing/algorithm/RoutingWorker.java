@@ -90,7 +90,7 @@ public class RoutingWorker {
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(request.modes);
 
     request.modes =
-      request.modes.copy().withDirectMode(emptyDirectModeHandler.resolveDirectMode()).build();
+      request.modes.copyOf().withDirectMode(emptyDirectModeHandler.resolveDirectMode()).build();
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -154,7 +154,7 @@ public class RoutingWorker {
 
     // Restore original directMode.
     request.modes =
-      request.modes.copy().withDirectMode(emptyDirectModeHandler.originalDirectMode()).build();
+      request.modes.copyOf().withDirectMode(emptyDirectModeHandler.originalDirectMode()).build();
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).

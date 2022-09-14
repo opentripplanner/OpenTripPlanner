@@ -3,6 +3,8 @@ package org.opentripplanner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
+import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -23,15 +25,15 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.RouteMatcher;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -61,12 +63,11 @@ public abstract class GtfsTest {
     String onTripId,
     boolean wheelchairAccessible,
     boolean preferLeastTransfers,
-    TraverseMode preferredMode,
+    TransitMode preferredMode,
     String excludedRoute,
     String excludedStop,
     int legCount
   ) {
-    final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
     RouteRequest routingRequest = new RouteRequest();
     RoutingPreferences preferences = routingRequest.preferences();
 
@@ -89,7 +90,18 @@ public abstract class GtfsTest {
     }
     routingRequest.setWheelchair(wheelchairAccessible);
     preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
-    routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
+    RequestModesBuilder requestModesBuilder = routingRequest.modes
+      .copyOf()
+      .withDirectMode(NOT_SET)
+      .withAccessMode(WALK)
+      .withTransferMode(WALK)
+      .withEgressMode(WALK);
+    if (preferredMode != null) {
+      requestModesBuilder.withTransitMode(preferredMode);
+    } else {
+      requestModesBuilder.withTransitModes(MainAndSubMode.all());
+    }
+    routingRequest.modes = requestModesBuilder.build();
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
       routingRequest.setBannedRoutes(List.of(new FeedScopedId(feedId.getId(), excludedRoute)));
     }

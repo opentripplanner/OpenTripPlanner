@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.TraverseModeMapper;
+import org.opentripplanner.api.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
@@ -42,7 +42,7 @@ public class ApiRouterInfo {
     this.buildTime = Date.from(graph.buildTime);
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
-    this.transitModes = TraverseModeMapper.mapToApi(transitService.getTransitModes());
+    this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
     this.envelope = graph.getEnvelope();
     this.hasParkRide = graph.hasParkRide;
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);

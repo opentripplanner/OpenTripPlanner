@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -22,7 +21,6 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -227,11 +225,6 @@ public class RouteRequest implements Cloneable, Serializable {
     to = new GenericLocation(null, null);
   }
 
-  public RouteRequest(TraverseModeSet streetSubRequestModes) {
-    this();
-    this.setStreetSubRequestModes(streetSubRequestModes);
-  }
-
   public RouteRequest(TraverseMode mode) {
     this();
     this.setStreetSubRequestModes(new TraverseModeSet(mode));
@@ -434,7 +427,7 @@ public class RouteRequest implements Cloneable, Serializable {
         arriveBy = false;
       }
       setDateTime(arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime);
-      modes = modes.copy().withDirectMode(StreetMode.NOT_SET).build();
+      modes = modes.copyOf().withDirectMode(StreetMode.NOT_SET).build();
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }
