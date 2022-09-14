@@ -108,7 +108,7 @@ public class GTFSToOtpTransitServiceMapper {
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
     routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
     directionMapper = new DirectionMapper(issueStore);
-    tripMapper = new TripMapper(routeMapper, directionMapper);
+    tripMapper = new TripMapper(routeMapper, directionMapper, translationHelper);
     bookingRuleMapper = new BookingRuleMapper();
     stopTimeMapper =
       new StopTimeMapper(
@@ -116,7 +116,8 @@ public class GTFSToOtpTransitServiceMapper {
         locationMapper,
         locationGroupMapper,
         tripMapper,
-        bookingRuleMapper
+        bookingRuleMapper,
+        translationHelper
       );
     frequencyMapper = new FrequencyMapper(tripMapper);
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);

@@ -121,7 +121,7 @@ public class LegMapper {
     }
 
     api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();
-    api.headsign = domain.getHeadsign();
+    api.headsign = i18NStringMapper.mapToApi(domain.getHeadsign());
     api.serviceDate = LocalDateMapper.mapToApi(domain.getServiceDate());
     api.routeBrandingUrl = domain.getRouteBrandingUrl();
     if (addIntermediateStops) {

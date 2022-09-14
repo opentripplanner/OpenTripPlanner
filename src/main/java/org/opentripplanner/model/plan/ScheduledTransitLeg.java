@@ -20,6 +20,7 @@ import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -223,7 +224,7 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   @Override
-  public String getHeadsign() {
+  public I18NString getHeadsign() {
     return tripTimes.getHeadsign(boardStopPosInPattern);
   }
 
@@ -374,6 +375,7 @@ public class ScheduledTransitLeg implements Leg {
    */
   @Override
   public String toString() {
+    String headsign = getHeadsign() != null ? getHeadsign().toString() : null;
     return ToStringBuilder
       .of(ScheduledTransitLeg.class)
       .addObj("from", getFrom())
@@ -387,7 +389,7 @@ public class ScheduledTransitLeg implements Leg {
       .addObjOp("agencyId", getAgency(), AbstractTransitEntity::getId)
       .addObjOp("routeId", getRoute(), AbstractTransitEntity::getId)
       .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
-      .addStr("headsign", getHeadsign())
+      .addStr("headsign", headsign)
       .addObj("serviceDate", serviceDate)
       .addObj("legGeometry", legGeometry)
       .addCol("transitAlerts", transitAlerts)

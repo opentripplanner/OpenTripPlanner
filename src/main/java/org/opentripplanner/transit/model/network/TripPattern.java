@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -388,7 +389,7 @@ public final class TripPattern
     return originalTripPattern;
   }
 
-  public String getTripHeadsign() {
+  public I18NString getTripHeadsign() {
     var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
     if (tripTimes == null) {
       return null;
@@ -396,7 +397,7 @@ public final class TripPattern
     return tripTimes.getTrip().getHeadsign();
   }
 
-  public String getStopHeadsign(int stopIndex) {
+  public I18NString getStopHeadsign(int stopIndex) {
     var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
     if (tripTimes == null) {
       return null;

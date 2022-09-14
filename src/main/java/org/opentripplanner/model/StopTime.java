@@ -2,6 +2,7 @@
 package org.opentripplanner.model;
 
 import java.util.List;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -30,7 +31,7 @@ public final class StopTime implements Comparable<StopTime> {
 
   private int stopSequence;
 
-  private String stopHeadsign;
+  private I18NString stopHeadsign;
 
   private List<String> headsignVias;
 
@@ -177,11 +178,11 @@ public final class StopTime implements Comparable<StopTime> {
     this.timepoint = MISSING_VALUE;
   }
 
-  public String getStopHeadsign() {
+  public I18NString getStopHeadsign() {
     return stopHeadsign;
   }
 
-  public void setStopHeadsign(String headSign) {
+  public void setStopHeadsign(I18NString headSign) {
     this.stopHeadsign = headSign;
   }
 

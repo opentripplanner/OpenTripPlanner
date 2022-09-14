@@ -3,6 +3,8 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.MapUtils;
 
@@ -11,12 +13,23 @@ class TripMapper {
 
   private final RouteMapper routeMapper;
   private final DirectionMapper directionMapper;
+  private TranslationHelper translationHelper;
 
   private final Map<org.onebusaway.gtfs.model.Trip, Trip> mappedTrips = new HashMap<>();
 
   TripMapper(RouteMapper routeMapper, DirectionMapper directionMapper) {
     this.routeMapper = routeMapper;
     this.directionMapper = directionMapper;
+  }
+
+  TripMapper(
+    RouteMapper routeMapper,
+    DirectionMapper directionMapper,
+    TranslationHelper translationHelper
+  ) {
+    this.routeMapper = routeMapper;
+    this.directionMapper = directionMapper;
+    this.translationHelper = translationHelper;
   }
 
   Collection<Trip> map(Collection<org.onebusaway.gtfs.model.Trip> trips) {
@@ -37,7 +50,17 @@ class TripMapper {
     lhs.withRoute(routeMapper.map(rhs.getRoute()));
     lhs.withServiceId(AgencyAndIdMapper.mapAgencyAndId(rhs.getServiceId()));
     lhs.withShortName(rhs.getTripShortName());
-    lhs.withHeadsign(rhs.getTripHeadsign());
+    I18NString tripHeadsign = null;
+    if (rhs.getTripHeadsign() != null) {
+      tripHeadsign =
+        translationHelper.getTranslation(
+          org.onebusaway.gtfs.model.Trip.class,
+          "tripHeadsign",
+          rhs.getId().getId(),
+          rhs.getTripHeadsign()
+        );
+    }
+    lhs.withHeadsign(tripHeadsign);
     lhs.withDirection(directionMapper.map(rhs.getDirectionId(), lhs.getId()));
     lhs.withGtfsBlockId(rhs.getBlockId());
     lhs.withShapeId(AgencyAndIdMapper.mapAgencyAndId(rhs.getShapeId()));

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.timetable;
 
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
@@ -16,7 +17,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
   private String shortName;
   private TransitMode mode;
   private String netexSubmode;
-  private String headsign;
+  private I18NString headsign;
   private FeedScopedId shapeId;
   private Direction direction;
   private BikeAccess bikesAllowed;
@@ -112,11 +113,11 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     return this;
   }
 
-  public String getHeadsign() {
+  public I18NString getHeadsign() {
     return headsign;
   }
 
-  public TripBuilder withHeadsign(String headsign) {
+  public TripBuilder withHeadsign(I18NString headsign) {
     this.headsign = headsign;
     return this;
   }

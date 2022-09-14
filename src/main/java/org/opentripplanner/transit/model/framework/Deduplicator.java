@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -23,6 +24,8 @@ public class Deduplicator implements Serializable {
   private final Map<BitSet, BitSet> canonicalBitSets = new HashMap<>();
   private final Map<IntArray, IntArray> canonicalIntArrays = new HashMap<>();
   private final Map<String, String> canonicalStrings = new HashMap<>();
+  private final Map<I18NString, I18NString> canonicalI18nStrings = new HashMap<>();
+  private final Map<i18NStringArray, i18NStringArray> canonicalI18StringArrays = new HashMap<>();
   private final Map<StringArray, StringArray> canonicalStringArrays = new HashMap<>();
   private final Map<String2DArray, String2DArray> canonicalString2DArrays = new HashMap<>();
   private final Map<Class<?>, Map<?, ?>> canonicalObjects = new HashMap<>();
@@ -39,6 +42,8 @@ public class Deduplicator implements Serializable {
     canonicalIntArrays.clear();
     canonicalStrings.clear();
     canonicalStringArrays.clear();
+    canonicalI18nStrings.clear();
+    canonicalI18StringArrays.clear();
     canonicalString2DArrays.clear();
     canonicalObjects.clear();
     canonicalLists.clear();
@@ -85,6 +90,16 @@ public class Deduplicator implements Serializable {
   }
 
   @Nullable
+  public I18NString deduplicateString(I18NString original) {
+    if (original == null) {
+      return null;
+    }
+    I18NString canonical = canonicalI18nStrings.putIfAbsent(original, original);
+    incrementEffectCounter(I18NString.class);
+    return canonical == null ? original : canonical;
+  }
+
+  @Nullable
   public String[] deduplicateStringArray(String[] original) {
     if (original == null) {
       return null;
@@ -95,6 +110,20 @@ public class Deduplicator implements Serializable {
       canonicalStringArrays.put(canonical, canonical);
     }
     incrementEffectCounter(StringArray.class);
+    return canonical.array;
+  }
+
+  @Nullable
+  public I18NString[] deduplicateStringArray(I18NString[] original) {
+    if (original == null) {
+      return null;
+    }
+    i18NStringArray canonical = canonicalI18StringArrays.get(new i18NStringArray(original, false));
+    if (canonical == null) {
+      canonical = new i18NStringArray(original, true);
+      canonicalI18StringArrays.put(canonical, canonical);
+    }
+    incrementEffectCounter(i18NStringArray.class);
     return canonical.array;
   }
 
@@ -170,7 +199,12 @@ public class Deduplicator implements Serializable {
       .addObj("IntArray", sizeAndCount(canonicalIntArrays.size(), IntArray.class))
       .addObj("String", sizeAndCount(canonicalStrings.size(), String.class))
       .addObj("StringArray", sizeAndCount(canonicalStringArrays.size(), StringArray.class))
-      .addObj("String2DArray", sizeAndCount(canonicalString2DArrays.size(), String2DArray.class));
+      .addObj("String2DArray", sizeAndCount(canonicalString2DArrays.size(), String2DArray.class))
+      .addObj("I18NString", sizeAndCount(canonicalI18nStrings.size(), I18NString.class))
+      .addObj(
+        "I18NStringArray",
+        sizeAndCount(canonicalI18StringArrays.size(), i18NStringArray.class)
+      );
 
     canonicalObjects.forEach((k, v) -> builder.addObj(k.getSimpleName(), sizeAndCount(v.size(), k))
     );
@@ -262,6 +296,38 @@ public class Deduplicator implements Serializable {
       }
       StringArray that = (StringArray) other;
       return Arrays.equals(array, that.array);
+    }
+  }
+
+  private class i18NStringArray implements Serializable {
+
+    private static final long serialVersionUID = 29311571L;
+
+    final I18NString[] array;
+
+    i18NStringArray(I18NString[] array, boolean deduplicateStrings) {
+      if (deduplicateStrings) {
+        this.array = new I18NString[array.length];
+        for (int i = 0; i < array.length; i++) {
+          this.array[i] = deduplicateString(array[i]);
+        }
+      } else {
+        this.array = array;
+      }
+    }
+
+    @Override
+    public int hashCode() {
+      return Arrays.hashCode(array);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (!(other instanceof i18NStringArray)) {
+        return false;
+      }
+      i18NStringArray that = (i18NStringArray) other;
+      return (Arrays.equals(array, that.array));
     }
   }
 
