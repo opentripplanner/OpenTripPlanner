@@ -160,7 +160,8 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<String> headsign() {
-    return environment -> getSource(environment).getTripHeadsign();
+    return environment ->
+      getSource(environment).getTripHeadsign().toString(environment.getLocale());
   }
 
   @Override

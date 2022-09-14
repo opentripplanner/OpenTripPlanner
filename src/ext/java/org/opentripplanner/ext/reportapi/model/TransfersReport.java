@@ -3,6 +3,7 @@ package org.opentripplanner.ext.reportapi.model;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.util.List;
+import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
@@ -154,7 +155,7 @@ public class TransfersReport {
       r.type = "Trip";
       r.entityId = trip.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
-      r.trip = trip.getHeadsign();
+      r.trip = trip.getHeadsign() != null ? trip.getHeadsign().toString() : null;
       var stop = ptn.getStop(tp.getStopPositionInPattern());
       addLocation(r, ptn, stop, trip, boarding);
     } else if (p instanceof RouteStopTransferPoint rp) {

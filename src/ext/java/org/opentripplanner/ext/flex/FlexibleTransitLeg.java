@@ -15,6 +15,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -115,7 +116,7 @@ public class FlexibleTransitLeg implements Leg {
   }
 
   @Override
-  public String getHeadsign() {
+  public I18NString getHeadsign() {
     return getTrip().getHeadsign();
   }
 

@@ -546,6 +546,7 @@ public class StopPlaceType {
 
   private static String destinationDisplayPerLine(TripTimeOnDate t) {
     Trip trip = t.getTrip();
-    return trip == null ? t.getHeadsign() : trip.getRoute().getId() + "|" + t.getHeadsign();
+    String headsign = t.getHeadsign() != null ? t.getHeadsign().toString() : null;
+    return trip == null ? headsign : trip.getRoute().getId() + "|" + headsign;
   }
 }

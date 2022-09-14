@@ -2931,6 +2931,25 @@ public class LegacyGraphQLTypes {
     TRIPS,
   }
 
+  public static class LegacyGraphQLStoptimeHeadsignArgs {
+
+    private String language;
+
+    public LegacyGraphQLStoptimeHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public static class LegacyGraphQLTransportModeInput {
 
     private LegacyGraphQLMode mode;
@@ -3051,6 +3070,25 @@ public class LegacyGraphQLTypes {
 
     public void setLegacyGraphQLServiceDate(String serviceDate) {
       this.serviceDate = serviceDate;
+    }
+  }
+
+  public static class LegacyGraphQLTripTripHeadsignArgs {
+
+    private String language;
+
+    public LegacyGraphQLTripTripHeadsignArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
     }
   }
 

@@ -26,6 +26,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -672,7 +673,7 @@ public class TimetableHelper {
               NaturalLanguageStringStructure destinationDisplay = estimatedCall
                 .getDestinationDisplaies()
                 .get(0);
-              stopTime.setStopHeadsign(destinationDisplay.getValue());
+              stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
             }
 
             modifiedStops.add(stopTime);

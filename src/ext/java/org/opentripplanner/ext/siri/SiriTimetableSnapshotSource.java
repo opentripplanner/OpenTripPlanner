@@ -31,6 +31,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -606,9 +607,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       estimatedVehicleJourney.getDestinationNames() != null &&
       !estimatedVehicleJourney.getDestinationNames().isEmpty()
     ) {
-      tripBuilder.withHeadsign(
+      NonLocalizedString str = new NonLocalizedString(
         "" + estimatedVehicleJourney.getDestinationNames().get(0).getValue()
       );
+      tripBuilder.withHeadsign(str);
     }
 
     tripBuilder.withOperator(operator);
@@ -682,10 +684,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         NaturalLanguageStringStructure destinationDisplay = estimatedCall
           .getDestinationDisplaies()
           .get(0);
-        stopTime.setStopHeadsign(destinationDisplay.getValue());
+        stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
       } else if (tripBuilder.getHeadsign() == null) {
         // Fallback to empty string
-        stopTime.setStopHeadsign("");
+        stopTime.setStopHeadsign(new NonLocalizedString(""));
       }
 
       if (i == 0) {
