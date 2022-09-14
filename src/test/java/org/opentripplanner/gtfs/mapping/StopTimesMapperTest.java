@@ -70,7 +70,8 @@ public class StopTimesMapperTest {
       new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
       new DirectionMapper(ISSUE_STORE)
     ),
-    bookingRuleMapper
+    bookingRuleMapper,
+    new TranslationHelper()
   );
 
   static {
@@ -112,7 +113,7 @@ public class StopTimesMapperTest {
     assertEquals(ROUTE_SHORT_NAME, result.getRouteShortName());
     assertEquals(SHAPE_DIST_TRAVELED, result.getShapeDistTraveled(), 0.0001d);
     assertNotNull(result.getStop());
-    assertEquals(HEAD_SIGN, result.getStopHeadsign());
+    assertEquals(HEAD_SIGN, result.getStopHeadsign().toString());
     assertEquals(STOP_SEQUENCE, result.getStopSequence());
     assertEquals(TIMEPOINT, result.getTimepoint());
     assertNotNull(result.getTrip());

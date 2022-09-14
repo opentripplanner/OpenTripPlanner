@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
@@ -22,7 +23,7 @@ class TripTest {
     WheelchairAccessibility.POSSIBLE;
   public static final Route ROUTE = TransitModelForTest.route("routeId").build();
   private static final Direction DIRECTION = Direction.INBOUND;
-  public static final String HEAD_SIGN = "head sign";
+  public static final NonLocalizedString HEAD_SIGN = new NonLocalizedString("head sign");
   private static final BikeAccess BIKE_ACCESS = BikeAccess.ALLOWED;
   private static final TransitMode TRANSIT_MODE = TransitMode.BUS;
   private static final String BLOCK_ID = "blockId";
@@ -113,7 +114,7 @@ class TripTest {
       )
     );
     assertFalse(subject.sameAs(subject.copy().withDirection(Direction.OUTBOUND).build()));
-    assertFalse(subject.sameAs(subject.copy().withHeadsign("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withHeadsign(new NonLocalizedString("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withBikesAllowed(BikeAccess.NOT_ALLOWED).build()));
     assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));
     assertFalse(subject.sameAs(subject.copy().withGtfsBlockId("X").build()));

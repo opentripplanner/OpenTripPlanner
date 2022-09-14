@@ -12,6 +12,8 @@ import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 @SuppressWarnings("StringOperationCanBeSimplified")
@@ -23,8 +25,14 @@ public class DeduplicatorTest {
   private static final int[] INT_ARRAY_2 = new int[] { 1, 0, 7 };
   private static final String STRING = new String(new char[] { 'A', 'b', 'b', 'a' });
   private static final String STRING_2 = new String("Abba");
+  private static final I18NString I18NString = new NonLocalizedString(
+    new String(new char[] { 'A', 'b', 'b', 'a' })
+  );
+  private static final I18NString I18NSTRING_2 = new NonLocalizedString("Abba");
   private static final String[] STRING_ARRAY = { "Alf" };
   private static final String[] STRING_ARRAY_2 = { "Alf" };
+  private static final I18NString[] I18NSTRING_ARRAY = { new NonLocalizedString("Alf") };
+  private static final I18NString[] I18NSTRING_ARRAY_2 = { new NonLocalizedString("Alf") };
   private static final String[][] STRING_2D_ARRAY = new String[][] {
     { "test_1", "test_2" },
     { "test_3", "test_4" },
@@ -72,7 +80,7 @@ public class DeduplicatorTest {
     subject.reset();
 
     assertEquals(
-      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
   }
@@ -84,7 +92,7 @@ public class DeduplicatorTest {
     assertSame(INT_ARRAY, subject.deduplicateIntArray(INT_ARRAY_2));
 
     assertEquals(
-      "Deduplicator{BitSet: 0(0), IntArray: 1(2), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
+      "Deduplicator{BitSet: 0(0), IntArray: 1(2), String: 0(0), StringArray: 0(0), String2DArray: 0(0), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
 
@@ -100,13 +108,28 @@ public class DeduplicatorTest {
     assertSame(STRING, subject.deduplicateString(STRING_2));
 
     assertEquals(
-      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(2), StringArray: 0(0), String2DArray: 0(0)}",
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(2), StringArray: 0(0), String2DArray: 0(0), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
 
     subject.reset();
     // After reset the "new" value is used
-    assertSame(STRING_2, subject.deduplicateString(STRING_2));
+    assertSame(STRING_2, subject.deduplicateString(STRING_2).toString());
+  }
+
+  @Test
+  public void deduplicateI18NString() {
+    assertSame(I18NString, subject.deduplicateString(I18NString));
+    assertSame(I18NString, subject.deduplicateString(I18NSTRING_2));
+
+    assertEquals(
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0), I18NString: 1(2), I18NStringArray: 0(0)}",
+      subject.toString()
+    );
+
+    subject.reset();
+    // After reset the "new" value is used
+    assertEquals(STRING_2, subject.deduplicateString(STRING_2));
   }
 
   @Test
@@ -116,7 +139,7 @@ public class DeduplicatorTest {
     assertSame(BIT_SET, subject.deduplicateBitSet(BIT_SET_2));
 
     assertEquals(
-      "Deduplicator{BitSet: 1(2), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
+      "Deduplicator{BitSet: 1(2), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
 
@@ -132,7 +155,7 @@ public class DeduplicatorTest {
     assertSame(deduplicatedArray, subject.deduplicateStringArray(STRING_ARRAY_2));
 
     assertEquals(
-      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(1), StringArray: 1(2), String2DArray: 0(0)}",
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(1), StringArray: 1(2), String2DArray: 0(0), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
 
@@ -142,13 +165,29 @@ public class DeduplicatorTest {
   }
 
   @Test
+  public void deduplicateI18NStringArray() {
+    var deduplicatedArray = subject.deduplicateStringArray(I18NSTRING_ARRAY);
+
+    assertSame(deduplicatedArray, subject.deduplicateStringArray(I18NSTRING_ARRAY_2));
+
+    assertEquals(
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0), I18NString: 1(1), I18NStringArray: 1(2)}",
+      subject.toString()
+    );
+
+    subject.reset();
+    // After reset the "new" value is used
+    assertNotSame(deduplicatedArray, subject.deduplicateStringArray(I18NSTRING_ARRAY_2));
+  }
+
+  @Test
   public void deduplicateString2DArray() {
     var deduplicatedArray = subject.deduplicateString2DArray(STRING_2D_ARRAY);
 
     assertSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
 
     assertEquals(
-      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 4(4), StringArray: 2(2), String2DArray: 1(2)}",
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 4(4), StringArray: 2(2), String2DArray: 1(2), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
 
@@ -201,7 +240,7 @@ public class DeduplicatorTest {
   @Test
   public void testToStringForEmptyDeduplicator() {
     assertEquals(
-      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
+      "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0), I18NString: 0(0), I18NStringArray: 0(0)}",
       subject.toString()
     );
   }
@@ -212,6 +251,8 @@ public class DeduplicatorTest {
     subject.deduplicateIntArray(INT_ARRAY);
     subject.deduplicateString(STRING);
     subject.deduplicateStringArray(STRING_ARRAY);
+    subject.deduplicateString(I18NString);
+    subject.deduplicateStringArray(I18NSTRING_ARRAY);
     subject.deduplicateObject(DATE_CL, DATE);
     subject.deduplicateImmutableList(DATE_CL, DATE_LIST);
 
@@ -222,6 +263,8 @@ public class DeduplicatorTest {
       "String: 2(2), " +
       "StringArray: 1(1), " +
       "String2DArray: 0(0), " +
+      "I18NString: 2(2), " +
+      "I18NStringArray: 1(1), " +
       "LocalDate: 1(2), " +
       "List<LocalDate>: 1(1)" +
       "}",
