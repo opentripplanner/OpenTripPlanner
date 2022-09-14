@@ -226,7 +226,7 @@ public class FlexIntegrationTest {
     request.setNumItineraries(10);
     request.setSearchWindow(Duration.ofHours(2));
 
-    var modes = request.modes.copy();
+    var modes = request.modes.copyOf();
     modes.withEgressMode(FLEXIBLE);
 
     if (onlyDirect) {

@@ -62,10 +62,10 @@ public class RequestModes {
   }
 
   public static RequestModesBuilder of() {
-    return DEFAULTS.copy();
+    return DEFAULTS.copyOf();
   }
 
-  public RequestModesBuilder copy() {
+  public RequestModesBuilder copyOf() {
     return new RequestModesBuilder(this);
   }
 

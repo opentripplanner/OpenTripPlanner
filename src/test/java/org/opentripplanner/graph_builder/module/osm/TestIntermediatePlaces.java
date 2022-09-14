@@ -86,14 +86,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().clearTransitModes().build(),
+      RequestModes.defaultRequestModes().copyOf().clearTransitModes().build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().clearTransitModes().build(),
+      RequestModes.defaultRequestModes().copyOf().clearTransitModes().build(),
       true
     );
   }
@@ -109,14 +109,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().clearTransitModes().build(),
+      RequestModes.defaultRequestModes().copyOf().clearTransitModes().build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().clearTransitModes().build(),
+      RequestModes.defaultRequestModes().copyOf().clearTransitModes().build(),
       true
     );
   }
@@ -134,14 +134,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().withDirectMode(CAR).clearTransitModes().build(),
+      RequestModes.defaultRequestModes().copyOf().withDirectMode(CAR).clearTransitModes().build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().withDirectMode(CAR).clearTransitModes().build(),
+      RequestModes.defaultRequestModes().copyOf().withDirectMode(CAR).clearTransitModes().build(),
       true
     );
   }
@@ -178,14 +178,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().withDirectMode(NOT_SET).build(),
+      RequestModes.defaultRequestModes().copyOf().withDirectMode(NOT_SET).build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      RequestModes.defaultRequestModes().copy().withDirectMode(NOT_SET).build(),
+      RequestModes.defaultRequestModes().copyOf().withDirectMode(NOT_SET).build(),
       true
     );
   }

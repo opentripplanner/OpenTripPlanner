@@ -23,10 +23,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -97,7 +94,7 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkingOnly() {
-    RequestModes modes = RequestModes.defaultRequestModes().copy().clearTransitModes().build();
+    RequestModes modes = RequestModes.defaultRequestModes().copyOf().clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -105,7 +102,7 @@ public class TriangleInequalityTest {
   public void testTriangleInequalityDrivingOnly() {
     RequestModes modes = RequestModes
       .defaultRequestModes()
-      .copy()
+      .copyOf()
       .withDirectMode(CAR)
       .clearTransitModes()
       .build();
@@ -122,7 +119,7 @@ public class TriangleInequalityTest {
   public void testTriangleInequalityWalkBike() {
     RequestModes modes = RequestModes
       .defaultRequestModes()
-      .copy()
+      .copyOf()
       .withDirectMode(BIKE)
       .clearTransitModes()
       .build();
@@ -136,7 +133,7 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkingOnlyBasicSPT() {
-    RequestModes modes = RequestModes.defaultRequestModes().copy().clearTransitModes().build();
+    RequestModes modes = RequestModes.defaultRequestModes().copyOf().clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -144,7 +141,7 @@ public class TriangleInequalityTest {
   public void testTriangleInequalityDrivingOnlyBasicSPT() {
     RequestModes modes = RequestModes
       .defaultRequestModes()
-      .copy()
+      .copyOf()
       .withDirectMode(CAR)
       .clearTransitModes()
       .build();
@@ -161,7 +158,7 @@ public class TriangleInequalityTest {
   public void testTriangleInequalityWalkBikeBasicSPT() {
     RequestModes modes = RequestModes
       .defaultRequestModes()
-      .copy()
+      .copyOf()
       .withDirectMode(BIKE)
       .clearTransitModes()
       .build();
@@ -175,7 +172,7 @@ public class TriangleInequalityTest {
 
   @Test
   public void testTriangleInequalityWalkingOnlyMultiSPT() {
-    RequestModes modes = RequestModes.defaultRequestModes().copy().clearTransitModes().build();
+    RequestModes modes = RequestModes.defaultRequestModes().copyOf().clearTransitModes().build();
     checkTriangleInequality(modes);
   }
 
@@ -183,7 +180,7 @@ public class TriangleInequalityTest {
   public void testTriangleInequalityDrivingOnlyMultiSPT() {
     RequestModes modes = RequestModes
       .defaultRequestModes()
-      .copy()
+      .copyOf()
       .withDirectMode(CAR)
       .clearTransitModes()
       .build();
@@ -200,7 +197,7 @@ public class TriangleInequalityTest {
   public void testTriangleInequalityWalkBikeMultiSPT() {
     RequestModes modes = RequestModes
       .defaultRequestModes()
-      .copy()
+      .copyOf()
       .withDirectMode(BIKE)
       .clearTransitModes()
       .build();
