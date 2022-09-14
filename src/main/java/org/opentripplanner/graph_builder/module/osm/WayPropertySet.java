@@ -62,7 +62,7 @@ public class WayPropertySet {
 
   public WayPropertySet() {
     /* sensible defaults */
-    defaultProperties = withModes(ALL).build();
+    defaultProperties = withModes(ALL).build(DEFAULT_SAFETY_RESOLVER, DEFAULT_SAFETY_RESOLVER);
     defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
     wayProperties = new ArrayList<>();
     creativeNamers = new ArrayList<>();
@@ -74,6 +74,14 @@ public class WayPropertySet {
     maxSpeedPattern = Pattern.compile("^([0-9][.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
     defaultWalkSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
     defaultBicycleSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
+  }
+
+  public Function<StreetTraversalPermission, Double> getDefaultWalkSafetyForPermission() {
+    return defaultWalkSafetyForPermission;
+  }
+
+  public Function<StreetTraversalPermission, Double> getDefaultBicycleSafetyForPermission() {
+    return defaultBicycleSafetyForPermission;
   }
 
   /**
@@ -122,7 +130,7 @@ public class WayPropertySet {
         rightResult.getWalkSafetyFeatures().forward(),
         leftResult.getWalkSafetyFeatures().back()
       )
-      .build();
+      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
 
     /* apply mixins */
     if (leftMixins.size() > 0) {
@@ -363,7 +371,7 @@ public class WayPropertySet {
       defaultProperties
         .mutate()
         .walkSafety(defaultWalkSafetyForPermission.apply(defaultProperties.getPermission()))
-        .build();
+        .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
   }
 
   /**
@@ -381,11 +389,11 @@ public class WayPropertySet {
       defaultProperties
         .mutate()
         .bicycleSafety(defaultBicycleSafetyForPermission.apply(defaultProperties.getPermission()))
-        .build();
+        .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
   }
 
   public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
-    setMixinProperties(spec, properties.build());
+    setMixinProperties(spec, properties.build(DEFAULT_SAFETY_RESOLVER, DEFAULT_SAFETY_RESOLVER));
   }
 
   public void setMixinProperties(String spec, WayProperties properties) {
@@ -455,6 +463,6 @@ public class WayPropertySet {
       .mutate()
       .bicycleSafety(firstBicycle, secondBicycle)
       .walkSafety(firstWalk, secondWalk)
-      .build();
+      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
   }
 }

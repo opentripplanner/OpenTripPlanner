@@ -4,17 +4,14 @@ import java.util.function.Function;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * Builder for {@link WayProperties}. 1.0 is used as the default value for bicycle and walk safety
- * if they are unset.
+ * Builder for {@link WayProperties}. Default value for bicycle and walk safety is set when
+ * {@link WayProperties} is built.
  */
 public class WayPropertiesBuilder {
 
-  private static final SafetyFeatures defaultSafetyFeatures = new SafetyFeatures(1.0, 1.0);
   private final StreetTraversalPermission permission;
-  private SafetyFeatures bicycleSafetyFeatures = defaultSafetyFeatures;
-  private SafetyFeatures walkSafetyFeatures = defaultSafetyFeatures;
-  private boolean hasCustomBicycleSafetyFeatures = false;
-  private boolean hasCustomWalkSafetyFeatures = false;
+  private SafetyFeatures bicycleSafetyFeatures = null;
+  private SafetyFeatures walkSafetyFeatures = null;
 
   public WayPropertiesBuilder(StreetTraversalPermission permission) {
     this.permission = permission;
@@ -34,7 +31,6 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety) {
     this.bicycleSafetyFeatures = new SafetyFeatures(bicycleSafety, bicycleSafety);
-    this.hasCustomBicycleSafetyFeatures = true;
     return this;
   }
 
@@ -44,7 +40,6 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety, double bicycleSafetyBack) {
     this.bicycleSafetyFeatures = new SafetyFeatures(bicycleSafety, bicycleSafetyBack);
-    this.hasCustomBicycleSafetyFeatures = true;
     return this;
   }
 
@@ -56,7 +51,6 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder walkSafety(double walkSafety) {
     this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafety);
-    this.hasCustomWalkSafetyFeatures = true;
     return this;
   }
 
@@ -66,7 +60,6 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder walkSafety(double walkSafety, double walkSafetyBack) {
     this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafetyBack);
-    this.hasCustomWalkSafetyFeatures = true;
     return this;
   }
 
@@ -82,18 +75,14 @@ public class WayPropertiesBuilder {
     return walkSafetyFeatures;
   }
 
-  public WayProperties build() {
-    return new WayProperties(this);
-  }
-
   public WayProperties build(
     Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission,
     Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
   ) {
-    if (!hasCustomBicycleSafetyFeatures) {
+    if (bicycleSafetyFeatures == null) {
       bicycleSafety(defaultBicycleSafetyForPermission.apply(permission));
     }
-    if (!hasCustomWalkSafetyFeatures) {
+    if (walkSafetyFeatures == null) {
       walkSafety(defaultWalkSafetyForPermission.apply(permission));
     }
     return new WayProperties(this);
