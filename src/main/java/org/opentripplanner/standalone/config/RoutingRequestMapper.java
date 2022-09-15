@@ -114,7 +114,7 @@ public class RoutingRequestMapper {
       .initMaxAccessEgressDuration(
         c.asDuration(
           "maxAccessEgressDuration",
-          preferences.street().maxAccessEgressDurationDefaultValue()
+          preferences.street().maxAccessEgressDuration().defaultValue()
         ),
         c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
@@ -172,7 +172,7 @@ public class RoutingRequestMapper {
       .initMaxDirectDuration(
         c.asDuration(
           "maxDirectStreetDuration",
-          preferences.street().maxDirectDurationDefaultValue()
+          preferences.street().maxDirectDuration().defaultValue()
         ),
         c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );

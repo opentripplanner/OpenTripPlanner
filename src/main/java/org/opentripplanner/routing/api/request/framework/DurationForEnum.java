@@ -50,6 +50,15 @@ public class DurationForEnum<E extends Enum<?>> implements Serializable {
     return defaultValue;
   }
 
+  /**
+   * Utility method to get {@link #defaultValue} as an number in unit seconds. Equivalent to
+   * {@code (int) defaultValue.toSeconds()}. The downcast is safe since we only allow days, hours,
+   * and so on in the duration.
+   */
+  public int defaultValueSeconds() {
+    return (int) defaultValue.toSeconds();
+  }
+
   public Duration valueOf(E type) {
     return valueForEnum[type.ordinal()];
   }
