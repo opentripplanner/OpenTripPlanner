@@ -32,6 +32,9 @@ class FareAttributeMapper {
       .setYouthPrice(rhs.getYouthPrice())
       .setSeniorPrice(rhs.getSeniorPrice());
 
+    if (rhs.getAgencyId() != null) {
+      builder.setAgency(rhs.getAgencyId());
+    }
     if (rhs.isTransfersSet()) {
       builder.setTransfers(rhs.getTransfers());
     }
