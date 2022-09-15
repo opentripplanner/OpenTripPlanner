@@ -36,7 +36,7 @@ public class StateData implements Cloneable {
   // TODO VIA - this will be folded into an AStarRequest in the future
   public IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
     IntersectionTraversalModel.SIMPLE,
-    DrivingDirection.RIGHT_HAND_TRAFFIC
+    DrivingDirection.RIGHT
   );
 
   /**

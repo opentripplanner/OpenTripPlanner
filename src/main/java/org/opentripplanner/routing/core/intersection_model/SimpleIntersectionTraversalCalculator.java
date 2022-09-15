@@ -118,8 +118,8 @@ public class SimpleIntersectionTraversalCalculator
    */
   protected boolean isSafeTurn(int turnAngle) {
     return switch (drivingDirection) {
-      case RIGHT_HAND_TRAFFIC -> isRightTurn(turnAngle);
-      case LEFT_HAND_TRAFFIC -> isLeftTurn(turnAngle);
+      case RIGHT -> isRightTurn(turnAngle);
+      case LEFT -> isLeftTurn(turnAngle);
     };
   }
 
@@ -131,8 +131,8 @@ public class SimpleIntersectionTraversalCalculator
    */
   protected boolean isTurnAcrossTraffic(int turnAngle) {
     return switch (drivingDirection) {
-      case RIGHT_HAND_TRAFFIC -> isLeftTurn(turnAngle);
-      case LEFT_HAND_TRAFFIC -> isRightTurn(turnAngle);
+      case RIGHT -> isLeftTurn(turnAngle);
+      case LEFT -> isRightTurn(turnAngle);
     };
   }
 

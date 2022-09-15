@@ -32,7 +32,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
   @BeforeEach
   public void before() {
     graph = new Graph();
-    calculator = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT_HAND_TRAFFIC);
+    calculator = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT);
   }
 
   @Test
@@ -70,9 +70,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
 
     // and on the left hand side
 
-    var leftHandDriveCostModel = new SimpleIntersectionTraversalCalculator(
-      DrivingDirection.LEFT_HAND_TRAFFIC
-    );
+    var leftHandDriveCostModel = new SimpleIntersectionTraversalCalculator(DrivingDirection.LEFT);
     int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2);
     assertEquals(270, leftHandDriveAngle);
 
