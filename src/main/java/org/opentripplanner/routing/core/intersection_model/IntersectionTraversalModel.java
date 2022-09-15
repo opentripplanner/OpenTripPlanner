@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core.intersection_model;
 
-public enum IntersectionTraversalCostModel {
+public enum IntersectionTraversalModel {
   NORWAY,
-  SIMPLE
+  SIMPLE,
 }

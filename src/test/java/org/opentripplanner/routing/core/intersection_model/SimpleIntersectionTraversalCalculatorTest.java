@@ -17,7 +17,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
- * Tests for SimpleIntersectionTraversalCostModel.
+ * Tests for SimpleIntersectionTraversalModel.
  * <p>
  * TODO(flamholz): add tests for traversal with traffic lights and without a car.
  *

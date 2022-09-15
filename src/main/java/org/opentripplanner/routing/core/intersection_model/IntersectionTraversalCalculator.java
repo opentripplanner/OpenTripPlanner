@@ -28,10 +28,10 @@ public interface IntersectionTraversalCalculator {
   );
 
   static IntersectionTraversalCalculator create(
-    IntersectionTraversalCostModel intersectionTraversalCostModel,
+    IntersectionTraversalModel intersectionTraversalModel,
     DrivingDirection drivingDirection
   ) {
-    return switch (intersectionTraversalCostModel) {
+    return switch (intersectionTraversalModel) {
       case NORWAY -> new NorwayIntersectionTraversalCalculator(drivingDirection);
       case SIMPLE -> new SimpleIntersectionTraversalCalculator(drivingDirection);
     };

@@ -129,7 +129,7 @@ public class AStarBuilder {
       final StreetPreferences streetPreferences = routingContext.opt.preferences().street();
       intersectionTraversalCalculator =
         IntersectionTraversalCalculator.create(
-          streetPreferences.intersectionTraversalCostModel(),
+          streetPreferences.intersectionTraversalModel(),
           streetPreferences.drivingDirection()
         );
     }

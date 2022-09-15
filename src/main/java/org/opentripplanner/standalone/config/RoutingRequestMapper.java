@@ -265,10 +265,10 @@ public class RoutingRequestMapper {
       );
     preferences
       .street()
-      .setIntersectionTraversalCostModel(
+      .setIntersectionTraversalModel(
         c.asEnum(
-          "intersectionTraversalCostModel",
-          dft.preferences().street().intersectionTraversalCostModel()
+          "intersectionTraversalModel",
+          dft.preferences().street().intersectionTraversalModel()
         )
       );
 

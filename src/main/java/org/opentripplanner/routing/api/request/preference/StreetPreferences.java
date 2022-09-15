@@ -6,7 +6,7 @@ import java.util.Map;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
 
 // TODO VIA: Javadoc
 // Direct street search
@@ -33,9 +33,8 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   private double turnReluctance = 1.0;
 
-  private DrivingDirection drivingDirection = DrivingDirection.RIGHT_HAND_TRAFFIC;
-  private IntersectionTraversalCostModel intersectionTraversalCostModel =
-    IntersectionTraversalCostModel.SIMPLE;
+  private DrivingDirection drivingDirection = DrivingDirection.RIGHT;
+  private IntersectionTraversalModel intersectionTraversalModel = IntersectionTraversalModel.SIMPLE;
 
   /** What is the cost of boarding an elevator? */
   public int elevatorBoardCost() {
@@ -135,7 +134,7 @@ public class StreetPreferences implements Cloneable, Serializable {
     this.turnReluctance = turnReluctance;
   }
 
-  /** The driving direction to use for the intersectionTraversalCostModel */
+  /** The driving direction to use in the intersection traversal calculation */
   public DrivingDirection drivingDirection() {
     return drivingDirection;
   }
@@ -145,12 +144,12 @@ public class StreetPreferences implements Cloneable, Serializable {
   }
 
   /** This is the model that computes the costs of turns. */
-  public IntersectionTraversalCostModel intersectionTraversalCostModel() {
-    return intersectionTraversalCostModel;
+  public IntersectionTraversalModel intersectionTraversalModel() {
+    return intersectionTraversalModel;
   }
 
-  public void setIntersectionTraversalCostModel(IntersectionTraversalCostModel model) {
-    this.intersectionTraversalCostModel = model;
+  public void setIntersectionTraversalModel(IntersectionTraversalModel model) {
+    this.intersectionTraversalModel = model;
   }
 
   public StreetPreferences clone() {
