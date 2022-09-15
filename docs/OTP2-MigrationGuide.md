@@ -68,7 +68,12 @@ of this type:
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
 
-Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` nodes.
+Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` 
+nodes.
+
+Since v2.2, `osmWayPropertySet` was renamed `osmTagMapping` and is part of the individual osm 
+source. The driving direction and intersection cost model were decoupled for the tag mapping and can
+be configured using `drivingDirection` and `intersectionTraversalModel` inside `routingDefaults`.
 
 OTP2 records the "parentStation" relationship between stops and stations in its internal transit
 model, based on the GTFS and/or NeTEx input. This enables OTP to search from all stop in a station
