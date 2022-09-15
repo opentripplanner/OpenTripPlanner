@@ -66,13 +66,8 @@ public class AStar {
     this.spt = new ShortestPathTree(dominanceFunction);
     this.heuristic.initialize(rctx);
 
-    // Priority Queue.
-    // The queue is self-resizing, so we initialize it to have size = O(sqrt(|V|)) << |V|.
-    // For reference, a random, undirected search on a uniform 2d grid will examine roughly sqrt(|V|) vertices
-    // before reaching its target.
-    int initialSize = rctx.graph.getVertices().size();
-    initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
-    this.pq = new BinHeap<>(initialSize);
+    // Initialized with a reasonable size, see #4445
+    this.pq = new BinHeap<>(1000);
     this.nVisited = 0;
     this.targetAcceptedStates = new ArrayList<>();
 
