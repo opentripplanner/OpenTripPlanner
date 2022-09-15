@@ -154,8 +154,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     var preferences = options.preferences();
 
     preferences.withBike(it -> it.setParkCost(120).setParkTime(60));
-    preferences.car().setParkCost(240);
-    preferences.car().setParkTime(180);
+    preferences.withCar(it -> it.setParkCost(240).setParkTime(180));
     options.setWheelchair(requireWheelChairAccessible);
     options.journey().parking().setBannedTags(bannedTags);
     options.journey().parking().setRequiredTags(requiredTags);

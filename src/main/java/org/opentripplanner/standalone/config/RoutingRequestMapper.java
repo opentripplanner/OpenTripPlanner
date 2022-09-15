@@ -117,23 +117,18 @@ public class RoutingRequestMapper {
         ),
         c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
-    preferences
-      .car()
-      .setAccelerationSpeed(
-        c.asDouble("carAccelerationSpeed", preferences.car().accelerationSpeed())
-      );
-    preferences
-      .car()
-      .setDecelerationSpeed(
-        c.asDouble("carDecelerationSpeed", preferences.car().decelerationSpeed())
-      );
-    preferences.car().setDropoffTime(c.asInt("carDropoffTime", preferences.car().dropoffTime()));
-    preferences.car().setParkCost(c.asInt("carParkCost", preferences.car().parkCost()));
-    preferences.car().setParkTime(c.asInt("carParkTime", preferences.car().parkTime()));
-    preferences.car().setPickupCost(c.asInt("carPickupCost", preferences.car().pickupCost()));
-    preferences.car().setPickupTime(c.asInt("carPickupTime", preferences.car().pickupTime()));
-    preferences.car().setReluctance(c.asDouble("carReluctance", preferences.car().reluctance()));
-    preferences.car().setSpeed(c.asDouble("carSpeed", preferences.car().speed()));
+    preferences.withCar(car -> {
+      var cDft = preferences.car();
+      car.setSpeed(c.asDouble("carSpeed", cDft.speed()));
+      car.setReluctance(c.asDouble("carReluctance", cDft.reluctance()));
+      car.setDropoffTime(c.asInt("carDropoffTime", cDft.dropoffTime()));
+      car.setParkCost(c.asInt("carParkCost", cDft.parkCost()));
+      car.setParkTime(c.asInt("carParkTime", cDft.parkTime()));
+      car.setPickupCost(c.asInt("carPickupCost", cDft.pickupCost()));
+      car.setPickupTime(c.asInt("carPickupTime", cDft.pickupTime()));
+      car.setAccelerationSpeed(c.asDouble("carAccelerationSpeed", cDft.accelerationSpeed()));
+      car.setDecelerationSpeed(c.asDouble("carDecelerationSpeed", cDft.decelerationSpeed()));
+    });
 
     preferences
       .system()

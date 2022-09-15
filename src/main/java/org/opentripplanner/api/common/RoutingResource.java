@@ -755,9 +755,18 @@ public abstract class RoutingResource {
       request.setNumItineraries(numItineraries);
     }
 
-    if (carReluctance != null) {
-      preferences.car().setReluctance(carReluctance);
-    }
+    preferences.withCar(car -> {
+      if (carReluctance != null) {
+        car.setReluctance(carReluctance);
+      }
+      if (carParkCost != null) {
+        car.setParkCost(carParkCost);
+      }
+
+      if (carParkTime != null) {
+        car.setParkTime(carParkTime);
+      }
+    });
 
     preferences.withWalk(walk -> {
       if (walkReluctance != null) {
@@ -822,14 +831,6 @@ public abstract class RoutingResource {
 
     if (bannedVehicleRentalNetworks != null) {
       request.journey().rental().setBannedNetworks(bannedVehicleRentalNetworks);
-    }
-
-    if (carParkCost != null) {
-      preferences.car().setParkCost(carParkCost);
-    }
-
-    if (carParkTime != null) {
-      preferences.car().setParkTime(carParkTime);
     }
 
     if (bannedVehicleParkingTags != null) {

@@ -17,7 +17,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   private WheelchairPreferences wheelchair = WheelchairPreferences.DEFAULT;
 
   private BikePreferences bike = BikePreferences.DEFAULT;
-  private CarPreferences car = new CarPreferences();
+  private CarPreferences car = CarPreferences.DEFAULT;
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
   private VehicleParkingPreferences parking = new VehicleParkingPreferences();
   private SystemPreferences system = new SystemPreferences();
@@ -31,7 +31,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
       withWalk(it -> it.setReluctance(streetReluctance));
       withBike(it -> it.setReluctance(streetReluctance).setWalkingReluctance(streetReluctance * 2.7)
       );
-      this.car.setReluctance(streetReluctance);
+      withCar(it -> it.setReluctance(streetReluctance));
     }
   }
 
@@ -85,6 +85,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
     return car;
   }
 
+  public RoutingPreferences withCar(Consumer<CarPreferences.Builder> body) {
+    var builder = car.copyOf();
+    body.accept(builder);
+    this.car = builder.build();
+    return this;
+  }
+
   public VehicleRentalPreferences rental() {
     return rental;
   }
@@ -116,13 +123,12 @@ public class RoutingPreferences implements Cloneable, Serializable {
       clone.transit = transit.clone();
       clone.transfer = transfer.clone();
       clone.street = street.clone();
-      clone.car = car.clone();
       clone.rental = rental.clone();
       clone.parking = parking.clone();
       clone.system = system.clone();
 
       // The following immutable types can be skipped:
-      // - walk, bike, wheelchair
+      // - walk, bike, car, wheelchair
 
       return clone;
     } catch (CloneNotSupportedException e) {

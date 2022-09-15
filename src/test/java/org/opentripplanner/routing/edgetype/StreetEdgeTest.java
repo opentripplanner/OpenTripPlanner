@@ -52,8 +52,7 @@ public class StreetEdgeTest {
     pref.street().setTurnReluctance(1.0);
     pref.withWalk(it -> it.setSpeed(1.0).setReluctance(1.0).setStairsReluctance(1.0));
     pref.withBike(it -> it.setSpeed(5.0f).setReluctance(1.0).setWalkingSpeed(0.8));
-    pref.car().setSpeed(15.0f);
-    pref.car().setReluctance(1.0);
+    pref.withCar(it -> it.setSpeed(15.0f).setReluctance(1.0));
 
     proto.setStreetSubRequestModes(TraverseModeSet.allModes());
   }

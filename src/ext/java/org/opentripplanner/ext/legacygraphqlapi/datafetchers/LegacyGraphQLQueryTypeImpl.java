@@ -647,7 +647,8 @@ public class LegacyGraphQLQueryTypeImpl
         }
       });
 
-      callWith.argument("carReluctance", preferences.car()::setReluctance);
+      preferences.withCar(car -> callWith.argument("carReluctance", car::setReluctance));
+
       preferences.withWalk(b -> {
         callWith.argument("walkReluctance", b::setReluctance);
         callWith.argument("walkSpeed", b::setSpeed);

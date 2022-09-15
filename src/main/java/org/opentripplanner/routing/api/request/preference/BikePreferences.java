@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
+
 import java.io.Serializable;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -45,11 +47,11 @@ public class BikePreferences implements Serializable {
   }
 
   private BikePreferences(Builder builder) {
-    this.speed = builder.speed;
-    this.reluctance = builder.reluctance;
+    this.speed = roundTo2Decimals(builder.speed);
+    this.reluctance = roundTo2Decimals(builder.reluctance);
     this.boardCost = builder.boardCost;
-    this.walkingSpeed = builder.walkingSpeed;
-    this.walkingReluctance = builder.walkingReluctance;
+    this.walkingSpeed = roundTo2Decimals(builder.walkingSpeed);
+    this.walkingReluctance = roundTo2Decimals(builder.walkingReluctance);
     this.switchTime = builder.switchTime;
     this.switchCost = builder.switchCost;
     this.parkTime = builder.parkTime;
