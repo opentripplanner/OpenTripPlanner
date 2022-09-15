@@ -11,6 +11,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeu
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -52,6 +53,7 @@ public class AStar {
     SkipEdgeStrategy skipEdgeStrategy,
     TraverseVisitor traverseVisitor,
     RouteRequest request,
+    StreetMode streetMode,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     SearchTerminationStrategy terminationStrategy,
@@ -69,7 +71,7 @@ public class AStar {
     this.timeout = timeout;
 
     this.spt = new ShortestPathTree(dominanceFunction);
-    this.heuristic.initialize(request, fromVertices, toVertices);
+    this.heuristic.initialize(request, streetMode, fromVertices, toVertices);
 
     // Initialized with a reasonable size, see #4445
     this.pq = new BinHeap<>(1000);

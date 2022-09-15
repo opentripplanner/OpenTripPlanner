@@ -15,9 +15,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.util.PolylineEncoder;
@@ -147,9 +147,13 @@ public class SplitEdgeTurnRestrictionsTest {
     request.setFrom(from);
     request.setTo(to);
 
-    request.streetSubRequestModes = new TraverseModeSet(TraverseMode.CAR);
-
-    var temporaryVertices = new TemporaryVerticesContainer(graph, request);
+    request.journey().direct().setMode(StreetMode.CAR);
+    var temporaryVertices = new TemporaryVerticesContainer(
+      graph,
+      request,
+      StreetMode.CAR,
+      StreetMode.CAR
+    );
     var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 

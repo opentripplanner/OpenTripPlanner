@@ -81,6 +81,7 @@ public class GraphPathFinder {
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setRequest(request)
+      .setStreetRequest(request.journey().direct())
       .setFrom(from)
       .setTo(to)
       .setDataOverlayContext(dataOverlayContext)
@@ -117,10 +118,6 @@ public class GraphPathFinder {
       vertexContainer.getFromVertices(),
       vertexContainer.getToVertices()
     );
-  }
-
-  public List<GraphPath> graphPathFinderEntryPoint(RouteRequest request, Vertex from, Vertex to) {
-    return graphPathFinderEntryPoint(request, Set.of(from), Set.of(to));
   }
 
   public List<GraphPath> graphPathFinderEntryPoint(

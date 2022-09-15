@@ -23,9 +23,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -227,6 +227,7 @@ public class TestHalfEdges {
     ShortestPathTree spt1 = AStarBuilder
       .oneToOne()
       .setRequest(options)
+      .setStreetRequest(options.journey().direct())
       .setFrom(br)
       .setTo(end)
       .getShortestPathTree();
@@ -237,6 +238,7 @@ public class TestHalfEdges {
     ShortestPathTree spt2 = AStarBuilder
       .oneToOne()
       .setRequest(options)
+      .setStreetRequest(options.journey().direct())
       .setFrom(tr)
       .setTo(end)
       .getShortestPathTree();
@@ -251,6 +253,7 @@ public class TestHalfEdges {
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
       .setRequest(options)
+      .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -266,7 +269,13 @@ public class TestHalfEdges {
 
     options.setArriveBy(true);
     spt =
-      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
+      AStarBuilder
+        .oneToOne()
+        .setRequest(options)
+        .setStreetRequest(options.journey().direct())
+        .setFrom(start)
+        .setTo(end)
+        .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from start to end (looking back)");
@@ -287,7 +296,8 @@ public class TestHalfEdges {
      * that (b) it is not preferred to riding a tiny bit longer.
      */
 
-    options = new RouteRequest(TraverseMode.BICYCLE);
+    options = new RouteRequest();
+    options.journey().direct().setMode(StreetMode.BIKE);
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
         "start1",
@@ -308,7 +318,13 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
+      AStarBuilder
+        .oneToOne()
+        .setRequest(options)
+        .setStreetRequest(options.journey().direct())
+        .setFrom(start)
+        .setTo(end)
+        .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom along the right");
@@ -402,6 +418,7 @@ public class TestHalfEdges {
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
       .setRequest(options)
+      .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -453,6 +470,7 @@ public class TestHalfEdges {
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
       .setRequest(options)
+      .setStreetRequest(options.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -495,7 +513,7 @@ public class TestHalfEdges {
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
     RouteRequest req = new RouteRequest();
-    State traversedOne = new State(start, req);
+    State traversedOne = new State(start, req, req.journey().direct().mode());
     State currentState;
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
@@ -539,7 +557,7 @@ public class TestHalfEdges {
         tempEdges
       );
 
-    traversedOne = new State(start, req);
+    traversedOne = new State(start, req, req.journey().direct().mode());
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
       if (currentState != null) {
@@ -556,7 +574,6 @@ public class TestHalfEdges {
 
   @Test
   public void testStreetLocationFinder() {
-    RouteRequest options = new RouteRequest();
     StreetVertexIndex finder = graph.getStreetIndex();
     GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
@@ -566,7 +583,7 @@ public class TestHalfEdges {
     // test that the closest vertex finder returns the closest vertex
     TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.00, -74.00),
-      options,
+      StreetMode.WALK,
       true,
       tempEdges
     );
@@ -575,7 +592,7 @@ public class TestHalfEdges {
     // test that the closest vertex finder correctly splits streets
     TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.004, -74.01),
-      options,
+      StreetMode.WALK,
       false,
       tempEdges
     );
@@ -588,10 +605,9 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    RouteRequest biking = new RouteRequest(TraverseMode.BICYCLE);
     TemporaryStreetLocation end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.008, -74.0),
-      biking,
+      StreetMode.BIKE,
       true,
       tempEdges
     );
@@ -606,10 +622,17 @@ public class TestHalfEdges {
   @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
-    RouteRequest walking = new RouteRequest(TraverseMode.WALK);
+    RouteRequest walking = new RouteRequest();
     walking.setFrom(new GenericLocation(40.004, -74.0));
     walking.setTo(new GenericLocation(40.008, -74.0));
-    try (var container = new TemporaryVerticesContainer(graph, walking)) {
+    try (
+      var container = new TemporaryVerticesContainer(
+        graph,
+        walking,
+        StreetMode.WALK,
+        StreetMode.WALK
+      )
+    ) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
       ShortestPathTree spt = AStarBuilder

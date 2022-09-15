@@ -11,6 +11,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -214,7 +215,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
   }
 
   private State traverse(StreetEdge edge, RouteRequest req) {
-    var state = new State(V1, req);
+    var state = new State(V1, req, StreetMode.WALK);
 
     assertEquals(0, state.weight);
     return edge.traverse(state);

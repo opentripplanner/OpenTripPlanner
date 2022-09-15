@@ -56,6 +56,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Acces
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -225,7 +226,14 @@ public class TravelTimeResource {
       .street()
       .initMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of());
 
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        accessRequest,
+        accessRequest.journey().access().mode(),
+        StreetMode.NOT_SET
+      )
+    ) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
 
       var arrivals = route(accessList).getArrivals();
@@ -233,6 +241,7 @@ public class TravelTimeResource {
       var spt = AStarBuilder
         .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
         .setRequest(routingRequest)
+        .setStreetRequest(accessRequest.journey().access())
         .setVerticesContainer(temporaryVertices)
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
         .setInitialStates(getInitialStates(arrivals, temporaryVertices))
@@ -250,7 +259,7 @@ public class TravelTimeResource {
       accessRequest,
       temporaryVertices,
       transitService,
-      routingRequest.journey().access().mode(),
+      routingRequest.journey().access(),
       null,
       false
     );
@@ -263,9 +272,13 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StateData stateData = StateData.getInitialStateData(routingRequest);
+    StateData stateData = StateData.getInitialStateData(
+      routingRequest,
+      routingRequest.journey().egress().mode()
+    );
 
     for (var vertex : temporaryVertices.getFromVertices()) {
+      // TODO StateData should be of direct mode here
       initialStates.add(new State(vertex, startTime, stateData));
     }
 

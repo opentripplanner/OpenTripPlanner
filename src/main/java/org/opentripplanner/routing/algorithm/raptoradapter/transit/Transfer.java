@@ -36,7 +36,7 @@ public class Transfer {
   }
 
   public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
-    RouteRequest rr = request.getStreetSearchRequest(request.journey().transfer().mode());
+    RouteRequest rr = request.clone();
 
     var transferPreferences = rr.preferences();
 
@@ -67,9 +67,6 @@ public class Transfer {
         .setSwitchTime(roundTo100(bike.switchTime()))
         .setSpeed(roundToHalf(bike.speed()))
     );
-
-    // it's a record (immutable) so can be safely reused
-    transferPreferences.setWheelchair(request.preferences().wheelchair());
 
     streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
 
@@ -119,7 +116,11 @@ public class Transfer {
       );
     }
 
-    StateEditor se = new StateEditor(request, edges.get(0).getFromVertex());
+    StateEditor se = new StateEditor(
+      request,
+      request.journey().transfer().mode(),
+      edges.get(0).getFromVertex()
+    );
     se.setTimeSeconds(0);
 
     State s = se.makeState();

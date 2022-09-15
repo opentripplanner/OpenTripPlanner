@@ -14,6 +14,8 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -126,7 +128,7 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsPedestrian() {
-    var request = new RouteRequest(TraverseMode.WALK);
+    var request = new RouteRequest();
     request.preferences().withWalk(w -> w.setSpeed(1.0));
 
     ShortestPathTree tree = AStarBuilder
@@ -155,12 +157,13 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsCar() {
-    var request = new RouteRequest(TraverseMode.CAR);
+    var request = new RouteRequest();
     request.preferences().car().setSpeed(1.0);
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setRequest(request)
+      .setStreetRequest(new StreetRequest(StreetMode.CAR))
       .setFrom(topRight)
       .setTo(bottomLeft)
       .getShortestPathTree();

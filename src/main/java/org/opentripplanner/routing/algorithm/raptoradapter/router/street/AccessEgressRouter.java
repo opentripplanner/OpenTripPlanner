@@ -2,13 +2,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
@@ -32,23 +30,21 @@ public class AccessEgressRouter {
     RouteRequest request,
     TemporaryVerticesContainer verticesContainer,
     TransitService transitService,
-    StreetMode streetMode,
+    StreetRequest streetRequest,
     DataOverlayContext dataOverlayContext,
     boolean fromTarget
   ) {
-    //TODO: Investigate why this is needed for flex
-    RouteRequest nearbyRequest = request.getStreetSearchRequest(streetMode);
-
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       transitService,
-      nearbyRequest.preferences().street().maxAccessEgressDuration().valueOf(streetMode),
+      request.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode()),
       dataOverlayContext,
       true
     );
     List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
       fromTarget ? verticesContainer.getToVertices() : verticesContainer.getFromVertices(),
       fromTarget,
-      nearbyRequest
+      request,
+      streetRequest
     );
 
     LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");

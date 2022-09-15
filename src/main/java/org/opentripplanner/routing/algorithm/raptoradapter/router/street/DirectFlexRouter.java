@@ -23,25 +23,29 @@ public class DirectFlexRouter {
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
-    RouteRequest directRequest = request.getStreetSearchRequest(request.journey().direct().mode());
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        request,
+        request.journey().direct().mode(),
+        request.journey().direct().mode()
+      )
     ) {
       // Prepare access/egress transfers
       Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-        directRequest,
+        request,
         temporaryVertices,
         serverContext.transitService(),
-        StreetMode.WALK,
-        serverContext.dataOverlayContext(directRequest),
+        request.journey().direct(),
+        serverContext.dataOverlayContext(request),
         false
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
-        directRequest,
+        request,
         temporaryVertices,
         serverContext.transitService(),
-        StreetMode.WALK,
-        serverContext.dataOverlayContext(directRequest),
+        request.journey().direct(),
+        serverContext.dataOverlayContext(request),
         true
       );
 
@@ -49,8 +53,8 @@ public class DirectFlexRouter {
         serverContext.graph(),
         serverContext.transitService(),
         serverContext.routerConfig().flexParameters(request.preferences()),
-        directRequest.dateTime(),
-        directRequest.arriveBy(),
+        request.dateTime(),
+        request.arriveBy(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,

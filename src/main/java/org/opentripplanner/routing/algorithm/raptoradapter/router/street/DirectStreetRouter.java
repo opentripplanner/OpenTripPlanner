@@ -23,9 +23,14 @@ public class DirectStreetRouter {
       return Collections.emptyList();
     }
 
-    RouteRequest directRequest = request.getStreetSearchRequest(request.journey().direct().mode());
+    RouteRequest directRequest = request.clone();
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        directRequest,
+        request.journey().direct().mode(),
+        request.journey().direct().mode()
+      )
     ) {
       if (!straightLineDistanceIsWithinLimit(directRequest, temporaryVertices)) {
         return Collections.emptyList();

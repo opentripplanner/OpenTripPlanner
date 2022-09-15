@@ -776,12 +776,12 @@ public class LegacyGraphQLQueryTypeImpl
         (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
       );
 
-      if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
-        //slower bike speed for bike sharing, based on empirical evidence from DC.
-        // TODO - There should be a separate speed preference for rented bike, setting this
-        //      - here will cause the different APIs to behave differently
-        preferences.withBike(b -> b.setSpeed(4.3));
-      }
+      // if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
+      // slower bike speed for bike sharing, based on empirical evidence from DC.
+      // TODO - There should be a separate speed preference for rented bike, setting this
+      //      - here will cause the different APIs to behave differently
+      //  preferences.withBike(b -> b.setSpeed(4.3));
+      // }
 
       callWith.argument(
         "boardSlack",

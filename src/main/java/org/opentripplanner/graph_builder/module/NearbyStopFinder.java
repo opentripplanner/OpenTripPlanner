@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -98,6 +99,7 @@ public class NearbyStopFinder {
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
     RouteRequest routingRequest,
+    StreetRequest streetRequest,
     boolean reverseDirection
   ) {
     /* Track the closest stop on each pattern passing nearby. */
@@ -109,7 +111,8 @@ public class NearbyStopFinder {
     /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
     for (NearbyStop nearbyStop : findNearbyStops(
       vertex,
-      routingRequest.clone(),
+      routingRequest,
+      streetRequest,
       reverseDirection
     )) {
       StopLocation ts1 = nearbyStop.stop;
@@ -155,10 +158,16 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
     RouteRequest routingRequest,
+    StreetRequest streetRequest,
     boolean reverseDirection
   ) {
     if (useStreets) {
-      return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest);
+      return findNearbyStopsViaStreets(
+        Set.of(vertex),
+        reverseDirection,
+        routingRequest,
+        streetRequest
+      );
     } else {
       return findNearbyStopsViaDirectTransfers(vertex);
     }
@@ -175,11 +184,13 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RouteRequest routingRequest
+    RouteRequest originalRequest,
+    StreetRequest streetRequest
   ) {
+    RouteRequest request = originalRequest.clone();
     List<NearbyStop> stopsFound = new ArrayList<>();
 
-    routingRequest.setArriveBy(reverseDirection);
+    request.setArriveBy(reverseDirection);
 
     /* Add the origin vertices if they are stops */
     for (Vertex vertex : originVertices) {
@@ -189,21 +200,22 @@ public class NearbyStopFinder {
             tsv.getStop(),
             0,
             Collections.emptyList(),
-            new State(vertex, routingRequest)
+            new State(vertex, request, streetRequest.mode())
           )
         );
       }
     }
 
     // Return only the origin vertices if there are no valid street modes
-    if (!routingRequest.streetSubRequestModes.isValid()) {
+    if (streetRequest.mode() == StreetMode.NOT_SET) {
       return stopsFound;
     }
 
     ShortestPathTree spt = AStarBuilder
-      .allDirections(getSkipEdgeStrategy(reverseDirection, routingRequest))
+      .allDirections(getSkipEdgeStrategy(reverseDirection, request))
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
-      .setRequest(routingRequest)
+      .setRequest(request)
+      .setStreetRequest(streetRequest)
       .setFrom(reverseDirection ? null : originVertices)
       .setTo(reverseDirection ? originVertices : null)
       .setDataOverlayContext(dataOverlayContext)

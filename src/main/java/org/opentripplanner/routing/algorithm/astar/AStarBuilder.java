@@ -15,6 +15,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
@@ -39,6 +40,7 @@ public class AStarBuilder {
   private Collection<State> initialStates;
   private IntersectionTraversalCalculator intersectionTraversalCalculator;
   private DataOverlayContext dataOverlayContext;
+  private StreetRequest streetRequest = new StreetRequest();
 
   public AStarBuilder(
     RemainingWeightHeuristic remainingWeightHeuristic,
@@ -74,6 +76,11 @@ public class AStarBuilder {
 
   public AStarBuilder setRequest(RouteRequest request) {
     this.routeRequest = request;
+    return this;
+  }
+
+  public AStarBuilder setStreetRequest(StreetRequest streetRequest) {
+    this.streetRequest = streetRequest;
     return this;
   }
 
@@ -158,7 +165,7 @@ public class AStarBuilder {
     if (this.initialStates != null) {
       initialStates = this.initialStates;
     } else {
-      initialStates = State.getInitialStates(routeRequest, origin);
+      initialStates = State.getInitialStates(routeRequest, streetRequest.mode(), origin);
 
       if (originBackEdge != null) {
         for (var state : initialStates) {
@@ -186,6 +193,7 @@ public class AStarBuilder {
       skipEdgeStrategy,
       traverseVisitor,
       routeRequest,
+      streetRequest.mode(),
       origin,
       destination,
       terminationStrategy,

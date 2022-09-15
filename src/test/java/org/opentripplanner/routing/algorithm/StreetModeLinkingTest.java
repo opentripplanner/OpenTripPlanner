@@ -94,15 +94,13 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   @Test
   public void testCarParkLinking() {
     var setup = (BiFunction<Double, Double, Consumer<RouteRequest>>) (
-      Double latitude,
-      Double longitude
-    ) -> {
-      return (RouteRequest rr) -> {
+        Double latitude,
+        Double longitude
+      ) ->
+      (RouteRequest rr) -> {
         rr.setFrom(new GenericLocation(latitude, longitude));
         rr.setTo(new GenericLocation(latitude, longitude));
-        rr.parkAndRide = true;
       };
-    };
 
     assertLinking(setup.apply(47.501, 19.00), "A1A2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
     assertLinking(setup.apply(47.501, 19.01), "B1B2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
@@ -197,14 +195,21 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     StreetMode... streetModes
   ) {
     for (final StreetMode streetMode : streetModes) {
-      var routingRequest = new RouteRequest().getStreetSearchRequest(streetMode);
+      var routingRequest = new RouteRequest();
 
       consumer.accept(routingRequest);
 
       // Remove to, so that origin and destination are different
       routingRequest.setTo(new GenericLocation(null, null));
 
-      try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
+      try (
+        var temporaryVertices = new TemporaryVerticesContainer(
+          graph,
+          routingRequest,
+          streetMode,
+          streetMode
+        )
+      ) {
         if (fromStreetName != null) {
           assertFromLink(
             fromStreetName,
@@ -214,14 +219,21 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         }
       }
 
-      routingRequest = new RouteRequest().getStreetSearchRequest(streetMode);
+      routingRequest = new RouteRequest();
 
       consumer.accept(routingRequest);
 
       // Remove from, so that origin and destination are different
       routingRequest.setFrom(new GenericLocation(null, null));
 
-      try (var temporaryVertices = new TemporaryVerticesContainer(graph, routingRequest)) {
+      try (
+        var temporaryVertices = new TemporaryVerticesContainer(
+          graph,
+          routingRequest,
+          streetMode,
+          streetMode
+        )
+      ) {
         if (toStreetName != null) {
           assertToLink(
             toStreetName,

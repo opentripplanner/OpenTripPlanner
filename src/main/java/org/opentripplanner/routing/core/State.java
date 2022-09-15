@@ -8,6 +8,7 @@ import java.util.Set;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
@@ -50,9 +51,9 @@ public class State implements Cloneable {
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(Vertex vertex, RouteRequest opt) {
+  public State(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.dateTime(), StateData.getInitialStateData(opt));
+    this(vertex, opt.dateTime(), StateData.getInitialStateData(opt, streetMode));
   }
 
   /**
@@ -75,9 +76,13 @@ public class State implements Cloneable {
    * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
    * states must be created from a parent and associated with an edge.
    */
-  public static Collection<State> getInitialStates(RouteRequest request, Set<Vertex> vertices) {
+  public static Collection<State> getInitialStates(
+    RouteRequest request,
+    StreetMode streetMode,
+    Set<Vertex> vertices
+  ) {
     Collection<State> states = new ArrayList<>();
-    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request);
+    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, streetMode);
     for (Vertex vertex : vertices) {
       for (StateData stateData : initialStateDatas) {
         states.add(new State(vertex, request.dateTime(), stateData));
@@ -165,15 +170,16 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = stateData.opt.parkAndRide;
+    boolean parkAndRide = stateData.streetMode.includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
     if (stateData.opt.arriveBy()) {
-      vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
+      vehicleRentingOk = !stateData.streetMode.includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.opt.vehicleRental || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
+        !stateData.streetMode.includesRenting() ||
+        (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;
@@ -250,6 +256,10 @@ public class State implements Cloneable {
 
   public RouteRequest getOptions() {
     return stateData.opt;
+  }
+
+  public StreetMode getStreetMode() {
+    return stateData.streetMode;
   }
 
   public RoutingPreferences getPreferences() {
@@ -405,7 +415,7 @@ public class State implements Cloneable {
     // It is distributed symmetrically over all preboard and prealight edges.
     var reversedRequest = stateData.opt.copyOfReversed();
     reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(reversedRequest);
+    var newStateData = StateData.getInitialStateData(reversedRequest, stateData.streetMode);
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.

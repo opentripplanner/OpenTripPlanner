@@ -255,12 +255,16 @@ public class RaptorPathToItineraryMapper {
           .build()
       );
     } else {
-      // A RoutingRequest with a RoutingContext must be constructed so that the edges
-      // may be re-traversed to create the leg(s) from the list of edges.
+      // A RoutingRequest must be constructed so that the edges may be re-traversed to create the
+      // leg(s) from the list of edges.
       RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
       traverseRequest.setArriveBy(false);
 
-      StateEditor se = new StateEditor(traverseRequest, edges.get(0).getFromVertex());
+      StateEditor se = new StateEditor(
+        traverseRequest,
+        request.journey().transfer().mode(),
+        edges.get(0).getFromVertex()
+      );
       se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
 
       State s = se.makeState();

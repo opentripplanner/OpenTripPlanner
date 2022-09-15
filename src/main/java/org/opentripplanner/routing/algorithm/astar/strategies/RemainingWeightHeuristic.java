@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.astar.strategies;
 import java.io.Serializable;
 import java.util.Set;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -16,7 +17,12 @@ public interface RemainingWeightHeuristic extends Serializable {
    * computeForwardWeight/computeReverseWeight. We may want to start from multiple origin states, so
    * initialization cannot depend on the origin vertex or state.
    */
-  void initialize(RouteRequest request, Set<Vertex> fromVertices, Set<Vertex> toVertices);
+  void initialize(
+    RouteRequest request,
+    StreetMode streetMode,
+    Set<Vertex> fromVertices,
+    Set<Vertex> toVertices
+  );
 
   double estimateRemainingWeight(State s);
 }

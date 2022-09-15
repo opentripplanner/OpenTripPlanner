@@ -81,7 +81,7 @@ public class RaptorRequestTransferCache {
 
   /**
    * This contains an extract of the parameters which may influence transfers. The possible values
-   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RoutingRequest, RoutingPreferences)}.
+   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RouteRequest)}.
    * <p>
    * TODO VIA: the bikeWalking options are not used.
    * TODO VIA: Should we use StreetPreferences instead?
@@ -91,6 +91,7 @@ public class RaptorRequestTransferCache {
     private final StreetMode transferMode;
     private final BicycleOptimizeType optimize;
     private final TimeSlopeSafetyTriangle bikeOptimizeTimeSlopeSafety;
+    private final boolean wheelchair;
     private final WheelchairPreferences wheelchairPreferences;
     private final double walkSpeed;
     private final double bikeSpeed;
@@ -114,6 +115,7 @@ public class RaptorRequestTransferCache {
       this.bikeOptimizeTimeSlopeSafety = preferences.bike().optimizeTriangle();
       this.bikeSwitchCost = preferences.bike().switchCost();
       this.bikeSwitchTime = preferences.bike().switchTime();
+      this.wheelchair = routingRequest.wheelchair();
       this.wheelchairPreferences = preferences.wheelchair();
 
       this.walkSpeed = preferences.walk().speed();
@@ -136,6 +138,7 @@ public class RaptorRequestTransferCache {
         transferMode,
         optimize,
         bikeOptimizeTimeSlopeSafety,
+        wheelchair,
         wheelchairPreferences,
         walkSpeed,
         bikeSpeed,
@@ -169,6 +172,7 @@ public class RaptorRequestTransferCache {
         Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
         Double.compare(that.turnReluctance, turnReluctance) == 0 &&
         Objects.equals(that.bikeOptimizeTimeSlopeSafety, bikeOptimizeTimeSlopeSafety) &&
+        wheelchair == that.wheelchair &&
         wheelchairPreferences.equals(that.wheelchairPreferences) &&
         elevatorBoardCost == that.elevatorBoardCost &&
         elevatorBoardTime == that.elevatorBoardTime &&

@@ -252,7 +252,14 @@ public class TestIntermediatePlaces {
       // TODO VIA - Replace with a RouteViaRequest
       //options.addIntermediatePlace(intermediateLocation);
     }
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        request,
+        request.journey().access().mode(),
+        request.journey().egress().mode()
+      )
+    ) {
       List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(request, temporaryVertices);
 
       assertNotNull(paths);

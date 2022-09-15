@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -34,7 +35,7 @@ public class FlexAccessEgressRouter {
         request,
         verticesContainer,
         transitService,
-        StreetMode.WALK,
+        new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         false
       )
@@ -45,7 +46,7 @@ public class FlexAccessEgressRouter {
         request,
         verticesContainer,
         transitService,
-        StreetMode.WALK,
+        new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         true
       )

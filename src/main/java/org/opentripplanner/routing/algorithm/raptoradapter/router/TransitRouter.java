@@ -156,32 +156,41 @@ public class TransitRouter {
     var accessList = new ArrayList<AccessEgress>();
     var egressList = new ArrayList<AccessEgress>();
 
-    var accessCalculator = (Runnable) () -> {
-      debugTimingAggregator.startedAccessCalculating();
-      accessList.addAll(getAccessEgresses(accessEgressMapper, false));
-      debugTimingAggregator.finishedAccessCalculating();
-    };
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        request,
+        request.journey().access().mode(),
+        request.journey().egress().mode()
+      )
+    ) {
+      var accessCalculator = (Runnable) () -> {
+        debugTimingAggregator.startedAccessCalculating();
+        accessList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, false));
+        debugTimingAggregator.finishedAccessCalculating();
+      };
 
-    var egressCalculator = (Runnable) () -> {
-      debugTimingAggregator.startedEgressCalculating();
-      egressList.addAll(getAccessEgresses(accessEgressMapper, true));
-      debugTimingAggregator.finishedEgressCalculating();
-    };
+      var egressCalculator = (Runnable) () -> {
+        debugTimingAggregator.startedEgressCalculating();
+        egressList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, true));
+        debugTimingAggregator.finishedEgressCalculating();
+      };
 
-    if (OTPFeature.ParallelRouting.isOn()) {
-      try {
-        CompletableFuture
-          .allOf(
-            CompletableFuture.runAsync(accessCalculator),
-            CompletableFuture.runAsync(egressCalculator)
-          )
-          .join();
-      } catch (CompletionException e) {
-        RoutingValidationException.unwrapAndRethrowCompletionException(e);
+      if (OTPFeature.ParallelRouting.isOn()) {
+        try {
+          CompletableFuture
+            .allOf(
+              CompletableFuture.runAsync(accessCalculator),
+              CompletableFuture.runAsync(egressCalculator)
+            )
+            .join();
+        } catch (CompletionException e) {
+          RoutingValidationException.unwrapAndRethrowCompletionException(e);
+        }
+      } else {
+        accessCalculator.run();
+        egressCalculator.run();
       }
-    } else {
-      accessCalculator.run();
-      egressCalculator.run();
     }
 
     verifyAccessEgress(accessList, egressList);
@@ -191,45 +200,42 @@ public class TransitRouter {
 
   private Collection<AccessEgress> getAccessEgresses(
     AccessEgressMapper accessEgressMapper,
+    TemporaryVerticesContainer temporaryVertices,
     boolean isEgress
   ) {
-    var results = new ArrayList<AccessEgress>();
-    var mode = isEgress ? request.journey().egress().mode() : request.journey().access().mode();
+    var streetRequest = isEgress ? request.journey().egress() : request.journey().access();
 
     // Prepare access/egress lists
-    RouteRequest accessRequest = request.getStreetSearchRequest(mode);
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest)
-    ) {
-      if (!isEgress) {
-        accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
-      }
+    RouteRequest accessRequest = request.clone();
 
-      var nearbyStops = AccessEgressRouter.streetSearch(
+    if (!isEgress) {
+      accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
+    }
+
+    var nearbyStops = AccessEgressRouter.streetSearch(
+      accessRequest,
+      temporaryVertices,
+      serverContext.transitService(),
+      streetRequest,
+      serverContext.dataOverlayContext(accessRequest),
+      isEgress
+    );
+
+    var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
+
+    // Special handling of flex accesses
+    if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
+      var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
         temporaryVertices,
-        serverContext.transitService(),
-        mode,
+        serverContext,
+        additionalSearchDays,
+        serverContext.routerConfig().flexParameters(accessRequest.preferences()),
         serverContext.dataOverlayContext(accessRequest),
         isEgress
       );
 
-      results.addAll(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
-
-      // Special handling of flex accesses
-      if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
-        var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
-          accessRequest,
-          temporaryVertices,
-          serverContext,
-          additionalSearchDays,
-          serverContext.routerConfig().flexParameters(accessRequest.preferences()),
-          serverContext.dataOverlayContext(accessRequest),
-          isEgress
-        );
-
-        results.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, isEgress));
-      }
+      results.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, isEgress));
     }
 
     return results;

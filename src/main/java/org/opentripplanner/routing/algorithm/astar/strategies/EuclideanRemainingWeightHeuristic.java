@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.astar.strategies;
 import java.util.Set;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.VehicleRentalState;
@@ -24,9 +25,14 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
   //      not work correctly.
   @Override
-  public void initialize(RouteRequest request, Set<Vertex> fromVertices, Set<Vertex> toVertices) {
+  public void initialize(
+    RouteRequest request,
+    StreetMode streetMode,
+    Set<Vertex> fromVertices,
+    Set<Vertex> toVertices
+  ) {
     Vertex target = toVertices.iterator().next();
-    maxStreetSpeed = getStreetSpeedUpperBound(request);
+    maxStreetSpeed = getStreetSpeedUpperBound(request.preferences(), streetMode);
     walkingSpeed = request.preferences().walk().speed();
     arriveBy = request.arriveBy();
 
@@ -42,14 +48,12 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   }
 
   /** @return The highest speed for all possible road-modes. */
-  private double getStreetSpeedUpperBound(RouteRequest request) {
-    RoutingPreferences preferences = request.preferences();
-
+  private double getStreetSpeedUpperBound(RoutingPreferences preferences, StreetMode streetMode) {
     // Assume carSpeed > bikeSpeed > walkSpeed
-    if (request.streetSubRequestModes.getCar()) {
+    if (streetMode.includesDriving()) {
       return preferences.car().speed();
     }
-    if (request.streetSubRequestModes.getBicycle()) {
+    if (streetMode.includesBiking()) {
       return preferences.bike().speed();
     }
     return preferences.walk().speed();

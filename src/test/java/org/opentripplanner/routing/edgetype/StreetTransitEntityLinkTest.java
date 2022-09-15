@@ -9,6 +9,7 @@ import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.State;
@@ -93,6 +94,6 @@ class StreetTransitEntityLinkTest {
       .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
     var edge = new StreetTransitStopLink(from, to);
-    return edge.traverse(new State(from, req));
+    return edge.traverse(new State(from, req, StreetMode.BIKE));
   }
 }
