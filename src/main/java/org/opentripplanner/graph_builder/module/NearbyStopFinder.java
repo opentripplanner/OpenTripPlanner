@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
@@ -63,6 +64,7 @@ public class NearbyStopFinder {
   private final TransitService transitService;
 
   private final Duration durationLimit;
+  private final DataOverlayContext dataOverlayContext;
 
   private DirectGraphFinder directGraphFinder;
 
@@ -72,7 +74,7 @@ public class NearbyStopFinder {
    * the graph.
    */
   public NearbyStopFinder(Graph graph, TransitService transitService, Duration durationLimit) {
-    this(graph, transitService, durationLimit, graph.hasStreets);
+    this(graph, transitService, durationLimit, null, graph.hasStreets);
   }
 
   /**
@@ -85,10 +87,12 @@ public class NearbyStopFinder {
     Graph graph,
     TransitService transitService,
     Duration durationLimit,
+    DataOverlayContext dataOverlayContext,
     boolean useStreets
   ) {
     this.graph = graph;
     this.transitService = transitService;
+    this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
     this.durationLimit = durationLimit;
 
@@ -222,6 +226,7 @@ public class NearbyStopFinder {
       .allDirections(getSkipEdgeStrategy(reverseDirection, routingRequest))
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
+      .setDataOverlayContext(dataOverlayContext)
       .getShortestPathTree();
 
     // Only used if OTPFeature.FlexRouting.isOn()

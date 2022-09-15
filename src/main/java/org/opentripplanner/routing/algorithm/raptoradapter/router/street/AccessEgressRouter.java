@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -32,6 +33,7 @@ public class AccessEgressRouter {
     RoutingContext rctx,
     TransitService transitService,
     StreetMode streetMode,
+    DataOverlayContext dataOverlayContext,
     boolean fromTarget
   ) {
     final RouteRequest rr = rctx.opt;
@@ -44,6 +46,7 @@ public class AccessEgressRouter {
       rctx.graph,
       transitService,
       nearbyRequest.preferences().street().maxAccessEgressDuration().valueOf(streetMode),
+      dataOverlayContext,
       true
     );
     List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(

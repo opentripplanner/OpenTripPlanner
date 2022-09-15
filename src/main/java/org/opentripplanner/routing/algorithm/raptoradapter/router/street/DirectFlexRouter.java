@@ -39,12 +39,14 @@ public class DirectFlexRouter {
         routingContext,
         serverContext.transitService(),
         StreetMode.WALK,
+        serverContext.dataOverlayContext(directRequest),
         false
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
         routingContext,
         serverContext.transitService(),
         StreetMode.WALK,
+        serverContext.dataOverlayContext(directRequest),
         true
       );
 

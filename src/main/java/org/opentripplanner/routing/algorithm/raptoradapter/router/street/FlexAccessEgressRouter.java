@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
@@ -20,14 +21,27 @@ public class FlexAccessEgressRouter {
     TransitService transitService,
     AdditionalSearchDays searchDays,
     FlexParameters params,
+    DataOverlayContext dataOverlayContext,
     boolean isEgress
   ) {
     Collection<NearbyStop> accessStops = !isEgress
-      ? AccessEgressRouter.streetSearch(routingContext, transitService, StreetMode.WALK, false)
+      ? AccessEgressRouter.streetSearch(
+        routingContext,
+        transitService,
+        StreetMode.WALK,
+        dataOverlayContext,
+        false
+      )
       : List.of();
 
     Collection<NearbyStop> egressStops = isEgress
-      ? AccessEgressRouter.streetSearch(routingContext, transitService, StreetMode.WALK, true)
+      ? AccessEgressRouter.streetSearch(
+        routingContext,
+        transitService,
+        StreetMode.WALK,
+        dataOverlayContext,
+        true
+      )
       : List.of();
 
     FlexRouter flexRouter = new FlexRouter(

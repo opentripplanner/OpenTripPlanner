@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
@@ -14,6 +15,7 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.util.OTPFeature;
 
 public class DirectStreetRouter {
 
@@ -39,7 +41,8 @@ public class DirectStreetRouter {
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.traverseVisitor(),
-        serverContext.routerConfig().streetRoutingTimeout()
+        serverContext.routerConfig().streetRoutingTimeout(),
+        serverContext.dataOverlayContext(request)
       );
       List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(routingContext);
 

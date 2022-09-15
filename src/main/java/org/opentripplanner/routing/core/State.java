@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -370,6 +371,10 @@ public class State implements Cloneable {
 
   public IntersectionTraversalCalculator intersectionTraversalCalculator() {
     return stateData.intersectionTraversalCalculator;
+  }
+
+  public DataOverlayContext dataOverlayContext() {
+    return stateData.dataOverlayContext;
   }
 
   protected State clone() {

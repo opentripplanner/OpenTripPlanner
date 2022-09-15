@@ -2,12 +2,10 @@ package org.opentripplanner.routing.core;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.OTPFeature;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions,
@@ -28,11 +26,6 @@ public class RoutingContext {
   public final Set<Vertex> fromVertices;
 
   public final Set<Vertex> toVertices;
-
-  /**
-   * DataOverlay Sandbox module context.
-   */
-  public DataOverlayContext dataOverlayContext;
 
   /* CONSTRUCTORS */
 
@@ -75,12 +68,5 @@ public class RoutingContext {
     this.graph = graph;
     this.fromVertices = routingRequest.arriveBy() ? to : from;
     this.toVertices = routingRequest.arriveBy() ? from : to;
-    this.dataOverlayContext =
-      OTPFeature.DataOverlay.isOnElseNull(() ->
-        new DataOverlayContext(
-          graph.dataOverlayParameterBindings,
-          routingRequest.preferences().system().dataOverlay()
-        )
-      );
   }
 }

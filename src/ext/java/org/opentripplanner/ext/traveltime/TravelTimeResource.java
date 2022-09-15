@@ -252,6 +252,7 @@ public class TravelTimeResource {
       new RoutingContext(accessRequest, graph, temporaryVertices),
       transitService,
       routingRequest.journey().access().mode(),
+      null,
       false
     );
     return new AccessEgressMapper().mapNearbyStops(accessStops, false);

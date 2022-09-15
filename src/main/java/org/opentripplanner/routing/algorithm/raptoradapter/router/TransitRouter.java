@@ -217,6 +217,7 @@ public class TransitRouter {
         routingContext,
         serverContext.transitService(),
         mode,
+        serverContext.dataOverlayContext(accessRequest),
         isEgress
       );
 
@@ -229,6 +230,7 @@ public class TransitRouter {
           serverContext.transitService(),
           additionalSearchDays,
           serverContext.routerConfig().flexParameters(accessRequest.preferences()),
+          serverContext.dataOverlayContext(accessRequest),
           isEgress
         );
 

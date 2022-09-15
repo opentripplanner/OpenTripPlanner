@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
@@ -59,6 +60,8 @@ public class StateData implements Cloneable {
 
   /** This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
   protected boolean enteredNoThroughTrafficArea;
+
+  public DataOverlayContext dataOverlayContext;
 
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(RouteRequest options) {

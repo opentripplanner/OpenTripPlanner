@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -48,9 +49,20 @@ public class GraphPathFinder {
 
   private final Duration streetRoutingTimeout;
 
+  private final DataOverlayContext dataOverlayContext;
+
   public GraphPathFinder(@Nullable TraverseVisitor traverseVisitor, Duration streetRoutingTimeout) {
+    this(traverseVisitor, streetRoutingTimeout, null);
+  }
+
+  public GraphPathFinder(
+    @Nullable TraverseVisitor traverseVisitor,
+    Duration streetRoutingTimeout,
+    @Nullable DataOverlayContext dataOverlayContext
+  ) {
     this.traverseVisitor = traverseVisitor;
     this.streetRoutingTimeout = streetRoutingTimeout;
+    this.dataOverlayContext = dataOverlayContext;
   }
 
   /**
@@ -73,6 +85,7 @@ public class GraphPathFinder {
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
+      .setDataOverlayContext(dataOverlayContext)
       .setTimeout(streetRoutingTimeout);
 
     // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback

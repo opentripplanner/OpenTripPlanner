@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
@@ -31,6 +32,7 @@ public class AStarBuilder {
   private Edge originBackEdge;
   private Collection<State> initialStates;
   private IntersectionTraversalCalculator intersectionTraversalCalculator;
+  private DataOverlayContext dataOverlayContext;
 
   public AStarBuilder(
     RemainingWeightHeuristic remainingWeightHeuristic,
@@ -92,6 +94,11 @@ public class AStarBuilder {
     return this;
   }
 
+  public AStarBuilder setDataOverlayContext(DataOverlayContext dataOverlayContext) {
+    this.dataOverlayContext = dataOverlayContext;
+    return this;
+  }
+
   public AStarBuilder setOriginBackEdge(Edge originBackEdge) {
     this.originBackEdge = originBackEdge;
     return this;
@@ -136,6 +143,7 @@ public class AStarBuilder {
 
     for (var state : initialStates) {
       state.stateData.intersectionTraversalCalculator = intersectionTraversalCalculator;
+      state.stateData.dataOverlayContext = dataOverlayContext;
     }
 
     return new AStar(
