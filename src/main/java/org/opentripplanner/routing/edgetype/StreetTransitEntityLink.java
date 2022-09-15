@@ -93,7 +93,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     switch (s0.getNonTransitMode()) {
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
-        if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
+        if (req.parkAndRide && !s0.isVehicleParked()) {
           return null;
         }
         // Forbid taking a (station) rental vehicle in the station. This allows taking along
@@ -102,7 +102,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
           s0.isRentingVehicleFromStation() &&
           !(
             s0.mayKeepRentedVehicleAtDestination() &&
-            s0.getOptions().allowKeepingRentedVehicleAtDestination
+            req.journey().rental().allowArrivingInRentedVehicleAtDestination()
           )
         ) {
           return null;
@@ -111,7 +111,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         break;
       case CAR:
         // Forbid taking your own car in the station if bike P+R activated.
-        if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
+        if (req.parkAndRide && !s0.isVehicleParked()) {
           return null;
         }
         // For Kiss & Ride allow dropping of the passenger before entering the station
@@ -134,9 +134,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (
       s0.isRentingVehicleFromStation() &&
       s0.mayKeepRentedVehicleAtDestination() &&
-      s0.getOptions().allowKeepingRentedVehicleAtDestination
+      req.journey().rental().allowArrivingInRentedVehicleAtDestination()
     ) {
-      s1.incrementWeight(pref.rental().keepingVehicleAtDestinationCost());
+      s1.incrementWeight(pref.rental().arrivingInRentalVehicleAtDestinationCost());
     }
 
     s1.setBackMode(null);

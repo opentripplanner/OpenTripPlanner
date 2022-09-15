@@ -92,7 +92,7 @@ public class GbfsStationInformationMapper {
           )
         : null;
 
-    rentalStation.isKeepingVehicleRentalAtDestinationAllowed =
+    rentalStation.isArrivingInRentalVehicleAtDestinationAllowed =
       allowKeepingRentedVehicleAtDestination;
 
     GBFSRentalUris rentalUris = station.getRentalUris();

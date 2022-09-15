@@ -76,7 +76,7 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.modes.transitModes.isEmpty()) {
+    if (request.journey().transit().modes().isEmpty()) {
       return new TransitRouterResult(List.of(), null);
     }
 
@@ -196,7 +196,7 @@ public class TransitRouter {
     boolean isEgress
   ) {
     var results = new ArrayList<AccessEgress>();
-    var mode = isEgress ? request.modes.egressMode : request.modes.accessMode;
+    var mode = isEgress ? request.journey().egress().mode() : request.journey().access().mode();
 
     // Prepare access/egress lists
     RouteRequest accessRequest = request.getStreetSearchRequest(mode);
@@ -210,7 +210,7 @@ public class TransitRouter {
       );
 
       if (!isEgress) {
-        accessRequest.allowKeepingRentedVehicleAtDestination = false;
+        accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(

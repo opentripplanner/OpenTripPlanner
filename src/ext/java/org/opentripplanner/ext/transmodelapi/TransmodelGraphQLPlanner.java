@@ -29,6 +29,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -141,7 +142,7 @@ public class TransmodelGraphQLPlanner {
     }
 
     callWith.argument("arriveBy", request::setArriveBy);
-    // TODO VIA: 2022-08-24 refactor
+    // TODO VIA (Skånetrafiken): 2022-08-24 refactor
     //    callWith.argument(
     //      "vias",
     //      (List<Map<String, Object>> v) ->
@@ -151,21 +152,23 @@ public class TransmodelGraphQLPlanner {
 
     callWith.argument(
       "preferred.authorities",
-      (Collection<String> authorities) -> request.setPreferredAgencies(mapIDsToDomain(authorities))
+      (Collection<String> authorities) ->
+        request.journey().transit().setPreferredAgencies(mapIDsToDomain(authorities))
     );
     callWith.argument(
       "unpreferred.authorities",
       (Collection<String> authorities) ->
-        request.setUnpreferredAgencies(mapIDsToDomain(authorities))
+        request.journey().transit().setUnpreferredAgencies(mapIDsToDomain(authorities))
     );
     callWith.argument(
       "whiteListed.authorities",
       (Collection<String> authorities) ->
-        request.setWhiteListedAgencies(mapIDsToDomain(authorities))
+        request.journey().transit().setWhiteListedAgencies(mapIDsToDomain(authorities))
     );
     callWith.argument(
       "banned.authorities",
-      (Collection<String> authorities) -> request.setBannedAgencies(mapIDsToDomain(authorities))
+      (Collection<String> authorities) ->
+        request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
     );
 
     callWith.argument(
@@ -174,25 +177,30 @@ public class TransmodelGraphQLPlanner {
     );
     callWith.argument(
       "preferred.lines",
-      (List<String> lines) -> request.setPreferredRoutes(mapIDsToDomain(lines))
+      (List<String> lines) -> request.journey().transit().setPreferredRoutes(mapIDsToDomain(lines))
     );
     callWith.argument(
       "unpreferred.lines",
-      (List<String> lines) -> request.setUnpreferredRoutes(mapIDsToDomain(lines))
+      (List<String> lines) ->
+        request.journey().transit().setUnpreferredRoutes(mapIDsToDomain(lines))
     );
     callWith.argument(
       "whiteListed.lines",
-      (List<String> lines) -> request.setWhiteListedRoutes(mapIDsToDomain(lines))
+      (List<String> lines) ->
+        request
+          .journey()
+          .transit()
+          .setWhiteListedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
     );
     callWith.argument(
       "banned.lines",
-      (List<String> lines) -> request.setBannedRoutes(mapIDsToDomain(lines))
+      (List<String> lines) ->
+        request.journey().transit().setBannedRoutes(RouteMatcher.idMatcher(mapIDsToDomain(lines)))
     );
-
     callWith.argument(
       "banned.serviceJourneys",
       (Collection<String> serviceJourneys) ->
-        request.setBannedTrips(mapIDsToDomain(serviceJourneys))
+        request.journey().transit().setBannedTrips(mapIDsToDomain(serviceJourneys))
     );
 
     // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
@@ -213,7 +221,7 @@ public class TransmodelGraphQLPlanner {
 
     RequestModes modes = getModes(environment, callWith);
     if (modes != null) {
-      request.modes = modes;
+      request.journey().setModes(modes);
     }
     ItineraryFiltersInputType.mapToRequest(
       environment,

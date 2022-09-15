@@ -224,7 +224,7 @@ public class GroupByDistanceTest implements PlanTestConstants {
     var subject = new GroupByDistance(itinerary, 0.5);
 
     assertEquals(
-      "GroupByDistance{streetOnly, keySet: [StreetLeg{mode: BICYCLE, start: 11:00:00, end: 11:00:00}]}",
+      "GroupByDistance{streetOnly, keySet: [StreetLeg{start: 11:00:00, end: 11:00:00, mode: BICYCLE}]}",
       subject.toString()
     );
 
@@ -232,7 +232,7 @@ public class GroupByDistanceTest implements PlanTestConstants {
     subject = new GroupByDistance(itinerary, 0.5);
 
     assertEquals(
-      "GroupByDistance{keySet: [ScheduledTransitLeg{mode: BUS, start: 11:10:00, end: 11:10:00, tripId: F:11}]}",
+      "GroupByDistance{keySet: [ScheduledTransitLeg{start: 11:10:00, end: 11:10:00, mode: BUS, tripId: F:11}]}",
       subject.toString()
     );
   }

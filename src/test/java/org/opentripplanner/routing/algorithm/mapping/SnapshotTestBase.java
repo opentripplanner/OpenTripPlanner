@@ -42,6 +42,7 @@ import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -144,7 +145,9 @@ public abstract class SnapshotTestBase {
 
       for (int j = 0; j < itinerary.getLegs().size(); j++) {
         Leg leg = itinerary.getLegs().get(j);
-        String mode = leg.getMode().isTransit() ? "T" : leg.getMode().name().substring(0, 1);
+        String mode = (leg instanceof StreetLeg stLeg)
+          ? stLeg.getMode().name().substring(0, 1)
+          : "T";
         System.out.printf(
           " - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n",
           j,
@@ -274,15 +277,15 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    var transitModes = mapModes(request.modes.transitModes);
+    var transitModes = mapModes(request.journey().transit().modes());
 
     var modes = Stream
       .concat(
         Stream
           .of(
-            asQualifiedMode(request.modes.directMode, false),
-            asQualifiedMode(request.modes.accessMode, false),
-            asQualifiedMode(request.modes.egressMode, true)
+            asQualifiedMode(request.journey().direct().mode(), false),
+            asQualifiedMode(request.journey().access().mode(), false),
+            asQualifiedMode(request.journey().egress().mode(), true)
           )
           .filter(Objects::nonNull)
           .map(QualifiedMode::toString),

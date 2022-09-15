@@ -151,7 +151,7 @@ public class TransferPreferences implements Cloneable, Serializable {
 
   public TransferPreferences clone() {
     try {
-      // TODO VIA: 2022-08-26 not cloning TransferOptimizationParameters (that's how it was before)
+      // TODO VIA (Thomas): 2022-08-26 not cloning TransferOptimizationParameters (that's how it was before)
 
       var clone = (TransferPreferences) super.clone();
 

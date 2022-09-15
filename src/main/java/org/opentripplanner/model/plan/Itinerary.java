@@ -153,7 +153,7 @@ public class Itinerary {
 
   /** Get the first transit leg if one exist */
   public Optional<Leg> firstTransitLeg() {
-    return getLegs().stream().filter(Leg::isTransitLeg).findFirst();
+    return getLegs().stream().filter(TransitLeg.class::isInstance).findFirst();
   }
 
   /**
@@ -252,15 +252,15 @@ public class Itinerary {
       buf.sep();
       if (leg.isWalkingLeg()) {
         buf.walk((int) leg.getDuration().toSeconds());
-      } else if (leg.isTransitLeg()) {
+      } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
-          leg.getMode().name(),
-          leg.getTrip().logName(),
-          leg.getStartTime(),
-          leg.getEndTime()
+          transitLeg.getMode().name(),
+          transitLeg.getTrip().logName(),
+          transitLeg.getStartTime(),
+          transitLeg.getEndTime()
         );
-      } else {
-        buf.other(leg.getMode().name(), leg.getStartTime(), leg.getEndTime());
+      } else if (leg instanceof StreetLeg streetLeg) {
+        buf.street(streetLeg.getMode().name(), leg.getStartTime(), leg.getEndTime());
       }
 
       buf.sep();
@@ -333,6 +333,26 @@ public class Itinerary {
    */
   public List<Leg> getLegs() {
     return legs;
+  }
+
+  /**
+   * Retrieve a transit leg by its index in the itinerary, starting from 0. This is useful in test
+   * where you may assume leg N is a transit leg.
+   *
+   * @throws ClassCastException if the leg is not a TransitLeg
+   */
+  public TransitLeg getTransitLeg(int index) {
+    return (TransitLeg) legs.get(index);
+  }
+
+  /**
+   * Retrieve a street leg by its index in the itinerary, starting from 0. This is useful in test
+   * where you may assume leg N is a transit leg.
+   *
+   * @throws ClassCastException if the leg is not a StreetLeg
+   */
+  public StreetLeg getStreetLeg(int index) {
+    return (StreetLeg) legs.get(index);
   }
 
   public void setLegs(List<Leg> legs) {
@@ -467,7 +487,7 @@ public class Itinerary {
   }
 
   /**
-   * If {@link RouteRequest#allowKeepingRentedVehicleAtDestination}
+   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
    */
   public boolean isArrivedAtDestinationWithRentedVehicle() {

@@ -5,7 +5,6 @@ import java.io.Serializable;
 // TODO VIA: Javadoc
 public class VehicleParkingPreferences implements Cloneable, Serializable {
 
-  // TODO VIA: What should the default be
   private boolean useAvailabilityInformation = false;
 
   /**

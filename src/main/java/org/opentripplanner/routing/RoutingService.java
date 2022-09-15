@@ -7,6 +7,8 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -26,10 +28,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
+// TODO VIA: 2022-08-29 javadocs
 /**
  * Entry point for requests towards the routing API.
  */
-public class RoutingService {
+public class RoutingService implements org.opentripplanner.routing.api.request.RoutingService {
 
   private final OtpServerRequestContext serverContext;
   private final Graph graph;
@@ -45,9 +48,15 @@ public class RoutingService {
     this.graphFinder = serverContext.graphFinder();
   }
 
+  @Override
   public RoutingResponse route(RouteRequest request) {
     RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
+  }
+
+  @Override
+  public RoutingResponse route(RouteViaRequest request, RoutingPreferences preferences) {
+    throw new RuntimeException("Not implemented");
   }
 
   /** {@link Graph#getVertex(String)} */

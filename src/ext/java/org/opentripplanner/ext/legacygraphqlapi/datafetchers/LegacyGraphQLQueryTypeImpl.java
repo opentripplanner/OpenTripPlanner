@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceImpl;
@@ -599,8 +600,14 @@ public class LegacyGraphQLQueryTypeImpl
 
       CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
-      callWith.argument("fromPlace", request::setFromString);
-      callWith.argument("toPlace", request::setToString);
+      callWith.argument(
+        "fromPlace",
+        (String from) -> request.setFrom(LocationStringParser.fromOldStyleString(from))
+      );
+      callWith.argument(
+        "toPlace",
+        (String to) -> request.setTo(LocationStringParser.fromOldStyleString(to))
+      );
 
       callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
       callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
@@ -632,11 +639,11 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
       callWith.argument(
         "allowKeepingRentedBicycleAtDestination",
-        (Boolean v) -> request.allowKeepingRentedVehicleAtDestination = v
+        request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
       );
       callWith.argument(
         "keepingRentedBicycleAtDestinationCost",
-        preferences.rental()::setKeepingVehicleAtDestinationCost
+        preferences.rental()::setArrivingInRentalVehicleAtDestinationCost
       );
 
       callWith.argument(
@@ -658,7 +665,7 @@ public class LegacyGraphQLQueryTypeImpl
         (Boolean v) -> preferences.system().itineraryFilters().debug = v
       );
       callWith.argument("arriveBy", request::setArriveBy);
-      // TODO VIA: 2022-08-24 I'm just commenting this out since we have to refactor it anyway
+      // TODO VIA (HSL): 2022-08-24 I'm just commenting this out since we have to refactor it anyway
       //      callWith.argument(
       //        "intermediatePlaces",
       //        (List<Map<String, Object>> v) ->
@@ -667,15 +674,28 @@ public class LegacyGraphQLQueryTypeImpl
       //              .stream()
       //              .map(LegacyGraphQLQueryTypeImpl::toGenericLocation)
       //              .collect(Collectors.toList())
-      //      )
-      callWith.argument("preferred.routes", request::setPreferredRoutesFromString);
+      //      );
+      callWith.argument(
+        "preferred.routes",
+        request.journey().transit()::setPreferredRoutesFromString
+      );
       callWith.argument(
         "preferred.otherThanPreferredRoutesPenalty",
         preferences.transit()::setOtherThanPreferredRoutesPenalty
       );
-      callWith.argument("preferred.agencies", request::setPreferredAgenciesFromString);
-      callWith.argument("unpreferred.routes", request::setUnpreferredRoutesFromString);
-      callWith.argument("unpreferred.agencies", request::setUnpreferredAgenciesFromString);
+      callWith.argument(
+        "preferred.agencies",
+        request.journey().transit()::setPreferredAgenciesFromString
+      );
+      callWith.argument(
+        "unpreferred.routes",
+        request.journey().transit()::setUnpreferredRoutesFromString
+      );
+      callWith.argument(
+        "unpreferred.agencies",
+        request.journey().transit()::setUnpreferredAgenciesFromString
+      );
+      // This is deprecated, if both are set, the proper one will override this
       callWith.argument(
         "unpreferred.useUnpreferredRoutesPenalty",
         (Integer v) ->
@@ -691,9 +711,9 @@ public class LegacyGraphQLQueryTypeImpl
       );
       callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
       callWith.argument("bikeBoardCost", preferences.bike()::setBoardCost);
-      callWith.argument("banned.routes", request::setBannedRoutesFromString);
-      callWith.argument("banned.agencies", request::setBannedAgenciesFromSting);
-      callWith.argument("banned.trips", request::setBannedTripsFromString);
+      callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
+      callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
+      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
       callWith.argument("transferPenalty", preferences.transfer()::setCost);
@@ -734,7 +754,7 @@ public class LegacyGraphQLQueryTypeImpl
             )
             .collect(Collectors.toSet());
 
-        request.modes = modes.getRequestModes();
+        request.journey().setModes(modes.getRequestModes());
       }
 
       if (hasArgument(environment, "allowedTicketTypes")) {
@@ -742,17 +762,20 @@ public class LegacyGraphQLQueryTypeImpl
         // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
       }
 
+      var vehicleRental = request.journey().rental();
+
+      // Deprecated, the next one will override this, if both are set
       callWith.argument(
         "allowedBikeRentalNetworks",
-        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
       );
       callWith.argument(
         "allowedVehicleRentalNetworks",
-        (Collection<String> v) -> request.allowedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
       );
       callWith.argument(
         "bannedVehicleRentalNetworks",
-        (Collection<String> v) -> request.bannedVehicleRentalNetworks = new HashSet<>(v)
+        (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
       );
 
       if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
@@ -775,14 +798,6 @@ public class LegacyGraphQLQueryTypeImpl
 
       preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
-      callWith.argument(
-        "startTransitStopId",
-        (String v) -> request.startingTransitStopId = FeedScopedId.parseId(v)
-      );
-      callWith.argument(
-        "startTransitTripId",
-        (String v) -> request.startingTransitTripId = FeedScopedId.parseId(v)
-      );
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
       callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);

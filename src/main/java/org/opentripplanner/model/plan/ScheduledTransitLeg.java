@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -19,7 +20,7 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
@@ -38,7 +39,7 @@ import org.opentripplanner.util.time.ServiceDateUtils;
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle.
  */
-public class ScheduledTransitLeg implements Leg {
+public class ScheduledTransitLeg implements TransitLeg {
 
   protected final TripTimes tripTimes;
   protected final TripPattern tripPattern;
@@ -115,11 +116,6 @@ public class ScheduledTransitLeg implements Leg {
     return ServiceDateUtils.asStartOfService(serviceDate, zoneId).toInstant();
   }
 
-  @Override
-  public boolean isTransitLeg() {
-    return true;
-  }
-
   public boolean isScheduledTransitLeg() {
     return true;
   }
@@ -162,8 +158,9 @@ public class ScheduledTransitLeg implements Leg {
   }
 
   @Override
-  public TraverseMode getMode() {
-    return TraverseMode.fromTransitMode(getTrip().getMode());
+  @Nonnull
+  public TransitMode getMode() {
+    return getTrip().getMode();
   }
 
   @Override

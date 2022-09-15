@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.api.request.preference;
 
-// TODO VIA: Javadoc
 import java.io.Serializable;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO VIA (Thomas): Javadoc
 public class BikePreferences implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(BikePreferences.class);
@@ -14,7 +14,7 @@ public class BikePreferences implements Cloneable, Serializable {
 
   private double speed = 5;
 
-  // TODO VIA: Is this part of transit preferences
+  // TODO VIA (Thomas): Is this part of transit preferences
   private int boardCost = 60 * 10;
   private double walkingSpeed = 1.33;
   private double walkingReluctance = 5.0;
@@ -25,6 +25,7 @@ public class BikePreferences implements Cloneable, Serializable {
   private int parkTime = 60;
   /** Cost of parking a bike. */
   private int parkCost = 120;
+
   private TimeSlopeSafetyTriangle optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
 
   public BikePreferences clone() {

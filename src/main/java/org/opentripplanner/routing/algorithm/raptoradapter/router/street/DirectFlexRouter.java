@@ -21,10 +21,10 @@ public class DirectFlexRouter {
     RouteRequest request,
     AdditionalSearchDays additionalSearchDays
   ) {
-    if (!StreetMode.FLEXIBLE.equals(request.modes.directMode)) {
+    if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
-    RouteRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+    RouteRequest directRequest = request.getStreetSearchRequest(request.journey().direct().mode());
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
     ) {

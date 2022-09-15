@@ -355,7 +355,7 @@ public class TripQuery {
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
-          .defaultValue(preferences.transit().boardSlack().defaultValue().toSeconds())
+          .defaultValue(preferences.transit().boardSlack().defaultValueSeconds())
           .build()
       )
       .argument(
@@ -377,7 +377,7 @@ public class TripQuery {
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
-          .defaultValue(preferences.transit().alightSlack().defaultValue().toSeconds())
+          .defaultValue(preferences.transit().alightSlack().defaultValueSeconds())
           .build()
       )
       .argument(

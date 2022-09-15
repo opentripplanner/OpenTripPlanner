@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.network.Route;
  * only. Support for other matching expression can be easily added later on.
  */
 
-// TODO VIA - Cleanup this class - Depends on Model, contains parsing logic
+// TODO VIA Part 2 - Cleanup this class - Depends on Model, contains parsing logic
 public class RouteMatcher implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 8066547338465440312L;

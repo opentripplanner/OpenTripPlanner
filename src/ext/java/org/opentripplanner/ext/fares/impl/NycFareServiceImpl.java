@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
@@ -339,8 +340,8 @@ public class NycFareServiceImpl implements FareService {
       Ride ride = new Ride();
       ride.classifier = NycRideClassifier.WALK;
       return ride;
-    } else if (leg.isTransitLeg()) {
-      Ride ride = rideForTransitPathLeg(leg);
+    } else if (leg instanceof TransitLeg transitLeg) {
+      Ride ride = rideForTransitPathLeg(transitLeg);
       Route route = leg.getRoute();
       int routeType = route.getGtfsType();
 
@@ -387,15 +388,15 @@ public class NycFareServiceImpl implements FareService {
     return out;
   }
 
-  private static Ride rideForTransitPathLeg(Leg leg) {
+  private static Ride rideForTransitPathLeg(TransitLeg transitLeg) {
     Ride ride = new Ride();
-    ride.firstStop = leg.getFrom().stop;
-    ride.lastStop = leg.getTo().stop;
+    ride.firstStop = transitLeg.getFrom().stop;
+    ride.lastStop = transitLeg.getTo().stop;
 
     ride.startZone = ride.firstStop.getFirstZoneAsString();
     ride.endZone = ride.lastStop.getFirstZoneAsString();
 
-    var zones = leg
+    var zones = transitLeg
       .getIntermediateStops()
       .stream()
       .map(stopArrival -> stopArrival.place.stop.getFirstZoneAsString())
@@ -406,15 +407,15 @@ public class NycFareServiceImpl implements FareService {
     );
 
     ride.zones = zones;
-    ride.agency = leg.getRoute().getAgency().getId();
-    ride.route = leg.getRoute().getId();
-    ride.trip = leg.getTrip().getId();
+    ride.agency = transitLeg.getRoute().getAgency().getId();
+    ride.route = transitLeg.getRoute().getId();
+    ride.trip = transitLeg.getTrip().getId();
 
-    ride.startTime = leg.getStartTime();
-    ride.endTime = leg.getEndTime();
+    ride.startTime = transitLeg.getStartTime();
+    ride.endTime = transitLeg.getEndTime();
 
     // In the default fare service, we classify rides by mode.
-    ride.classifier = leg.getMode();
+    ride.classifier = transitLeg.getMode();
     return ride;
   }
 

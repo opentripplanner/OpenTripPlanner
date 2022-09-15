@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /**
@@ -33,11 +33,13 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements ItineraryDeleti
       var containsTransit = itinerary
         .getLegs()
         .stream()
-        .anyMatch(l -> l != null && l.getMode().isTransit());
+        .anyMatch(l -> l != null && l.isTransitLeg());
 
       double carDuration = itinerary
         .getLegs()
         .stream()
+        .filter(StreetLeg.class::isInstance)
+        .map(StreetLeg.class::cast)
         .filter(l -> l.getMode() == TraverseMode.CAR)
         .mapToDouble(l -> l.getDuration().toSeconds())
         .sum();

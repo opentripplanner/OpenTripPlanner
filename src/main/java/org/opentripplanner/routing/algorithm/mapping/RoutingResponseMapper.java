@@ -38,7 +38,7 @@ public class RoutingResponseMapper {
     var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
     var factory = mapIntoPageCursorFactory(
-      request.getItinerariesSortOrder(),
+      request.itinerariesSortOrder(),
       transitSearchTimeZero,
       searchParams,
       searchWindowForNextSearch,
