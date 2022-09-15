@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences.DEFAULT;
 
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
 import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 

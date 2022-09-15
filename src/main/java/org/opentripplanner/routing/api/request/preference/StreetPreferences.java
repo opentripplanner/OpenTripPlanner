@@ -6,7 +6,7 @@ import java.util.Map;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculatorType;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 
 // TODO VIA: Javadoc
 // Direct street search
@@ -34,8 +34,8 @@ public class StreetPreferences implements Cloneable, Serializable {
   private double turnReluctance = 1.0;
 
   private DrivingDirection drivingDirection = DrivingDirection.RIGHT_HAND_TRAFFIC;
-  private IntersectionTraversalCalculatorType intersectionTraversalCalculator =
-    IntersectionTraversalCalculatorType.simple;
+  private IntersectionTraversalCostModel intersectionTraversalCostModel =
+    IntersectionTraversalCostModel.SIMPLE;
 
   /** What is the cost of boarding an elevator? */
   public int elevatorBoardCost() {
@@ -145,14 +145,12 @@ public class StreetPreferences implements Cloneable, Serializable {
   }
 
   /** This is the model that computes the costs of turns. */
-  public IntersectionTraversalCalculatorType intersectionTraversalCalculator() {
-    return intersectionTraversalCalculator;
+  public IntersectionTraversalCostModel intersectionTraversalCostModel() {
+    return intersectionTraversalCostModel;
   }
 
-  public void setIntersectionTraversalCalculator(
-    IntersectionTraversalCalculatorType intersectionTraversalCalculator
-  ) {
-    this.intersectionTraversalCalculator = intersectionTraversalCalculator;
+  public void setIntersectionTraversalCostModel(IntersectionTraversalCostModel model) {
+    this.intersectionTraversalCostModel = model;
   }
 
   public StreetPreferences clone() {

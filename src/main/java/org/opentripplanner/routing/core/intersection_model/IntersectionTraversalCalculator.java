@@ -27,13 +27,13 @@ public interface IntersectionTraversalCalculator {
     float toSpeed
   );
 
-  static IntersectionTraversalCalculator fromConfig(
-    IntersectionTraversalCalculatorType intersectionTraversalCostModel,
+  static IntersectionTraversalCalculator create(
+    IntersectionTraversalCostModel intersectionTraversalCostModel,
     DrivingDirection drivingDirection
   ) {
     return switch (intersectionTraversalCostModel) {
-      case norway -> new NorwayIntersectionTraversalCalculator(drivingDirection);
-      case simple -> new SimpleIntersectionTraversalCalculator(drivingDirection);
+      case NORWAY -> new NorwayIntersectionTraversalCalculator(drivingDirection);
+      case SIMPLE -> new SimpleIntersectionTraversalCalculator(drivingDirection);
     };
   }
 }
