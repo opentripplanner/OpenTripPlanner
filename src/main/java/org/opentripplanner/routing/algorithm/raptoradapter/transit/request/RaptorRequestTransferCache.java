@@ -85,9 +85,10 @@ public class RaptorRequestTransferCache {
 
   /**
    * This contains an extract of the parameters which may influence transfers. The possible values
-   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RouteRequest)}.
+   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RoutingRequest, RoutingPreferences)}.
    * <p>
-   * TODO: the bikeWalking options are not used.
+   * TODO VIA: the bikeWalking options are not used.
+   * TODO VIA: Should we use StreetPreferences instead?
    */
   private static class StreetRelevantOptions {
 
@@ -111,7 +112,7 @@ public class RaptorRequestTransferCache {
     public StreetRelevantOptions(RouteRequest routingRequest) {
       var preferences = routingRequest.preferences();
 
-      this.transferMode = routingRequest.modes.transferMode;
+      this.transferMode = routingRequest.journey().transfer().mode();
 
       this.optimize = preferences.bike().optimizeType();
       this.bikeOptimizeTimeSlopeSafety = preferences.bike().optimizeTriangle();

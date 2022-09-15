@@ -159,8 +159,8 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     preferences.car().setParkCost(240);
     preferences.car().setParkTime(180);
     options.setWheelchair(requireWheelChairAccessible);
-    options.bannedVehicleParkingTags = bannedTags;
-    options.requiredVehicleParkingTags = requiredTags;
+    options.journey().parking().setBannedTags(bannedTags);
+    options.journey().parking().setRequiredTags(requiredTags);
     options.setArriveBy(arriveBy);
 
     var tree = AStarBuilder

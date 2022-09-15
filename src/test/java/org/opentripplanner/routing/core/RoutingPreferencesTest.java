@@ -9,7 +9,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void shouldCloneObjectFields() {
-    // TODO VIA: There are more objects that are cloned
+    // TODO VIA (Thomas): There are more objects that are cloned - check freezing
     var pref = new RoutingPreferences();
 
     var clone = pref.clone();

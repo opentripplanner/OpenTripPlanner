@@ -3,17 +3,10 @@ package org.opentripplanner.routing.algorithm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
@@ -31,7 +24,6 @@ import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
@@ -68,37 +60,11 @@ public abstract class GraphRoutingTest {
 
   public static final String TEST_VEHICLE_RENTAL_NETWORK = "test network";
 
-  public static String graphPathToString(GraphPath graphPath) {
-    return graphPath.states
-      .stream()
-      .flatMap(s ->
-        Stream.of(
-          s.getBackEdge() != null ? s.getBackEdge().getDefaultName() : null,
-          s.getVertex().getDefaultName()
-        )
-      )
-      .filter(Objects::nonNull)
-      .collect(Collectors.joining(" - "));
-  }
-
   protected TestOtpModel modelOf(Builder builder) {
     builder.build();
     Graph graph = builder.graph();
     TransitModel transitModel = builder.transitModel();
     return new TestOtpModel(graph, transitModel).index();
-  }
-
-  protected GraphPath routeParkAndRide(
-    Graph graph,
-    StreetVertex from,
-    StreetVertex to,
-    TraverseModeSet traverseModeSet
-  ) {
-    RouteRequest request = new RouteRequest(traverseModeSet);
-    RoutingContext rctx = new RoutingContext(request, graph, from, to);
-    request.parkAndRide = true;
-
-    return AStarBuilder.oneToOne().setContext(rctx).getShortestPathTree().getPath(to);
   }
 
   public abstract static class Builder {
@@ -317,10 +283,6 @@ public abstract class GraphRoutingTest {
       return new TemporaryFreeEdge(from, to);
     }
 
-    public List<TemporaryFreeEdge> biLink(StreetVertex from, TemporaryVertex to) {
-      return List.of(link(from, to), link(to, from));
-    }
-
     // -- Vehicle rental
     public VehicleRentalPlace vehicleRentalStationEntity(
       String id,
@@ -338,7 +300,7 @@ public abstract class GraphRoutingTest {
       final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
       vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
       vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
-      vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
+      vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed = false;
       return vehicleRentalStation;
     }
 

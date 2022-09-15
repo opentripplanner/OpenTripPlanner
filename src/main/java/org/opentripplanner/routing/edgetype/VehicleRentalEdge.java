@@ -29,7 +29,6 @@ public class VehicleRentalEdge extends Edge {
     }
 
     var options = s0.getOptions();
-    var preferences = s0.getPreferences();
 
     if (
       !options.allowedRentalFormFactors.isEmpty() &&
@@ -43,9 +42,11 @@ public class VehicleRentalEdge extends Edge {
     VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
     String network = station.getNetwork();
+    var preferences = s0.getPreferences();
     boolean realtimeAvailability = preferences.rental().useAvailabilityInformation();
+    var vehicleRental = options.journey().rental();
 
-    if (station.networkIsNotAllowed(s0.getOptions())) {
+    if (station.networkIsNotAllowed(vehicleRental)) {
       return null;
     }
 
@@ -95,7 +96,7 @@ public class VehicleRentalEdge extends Edge {
           // and so here it is checked if this bicycle could have been kept at the destination
           if (
             s0.mayKeepRentedVehicleAtDestination() &&
-            !station.isKeepingVehicleRentalAtDestinationAllowed()
+            !station.isArrivingInRentalVehicleAtDestinationAllowed()
           ) {
             return null;
           }
@@ -124,8 +125,8 @@ public class VehicleRentalEdge extends Edge {
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
-              options.allowKeepingRentedVehicleAtDestination &&
-              station.isKeepingVehicleRentalAtDestinationAllowed();
+              vehicleRental.allowArrivingInRentedVehicleAtDestination() &&
+              station.isArrivingInRentalVehicleAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
           }
           pickedUp = true;

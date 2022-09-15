@@ -8,6 +8,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
+import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
@@ -27,6 +29,8 @@ public class RoutingRequestMapper {
     LOG.debug("Loading default routing parameters from JSON.");
     RouteRequest request = new RouteRequest();
     RoutingPreferences preferences = request.preferences();
+    VehicleRentalRequest vehicleRental = request.journey().rental();
+    VehicleParkingRequest vehicleParking = request.journey().parking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
@@ -37,13 +41,16 @@ public class RoutingRequestMapper {
         c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
         c.asEnumMap("alightSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
       );
-    request.allowedVehicleRentalNetworks =
-      c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
+    vehicleRental.setAllowedNetworks(
+      c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
+    );
     request.setArriveBy(c.asBoolean("arriveBy", dft.arriveBy()));
-    request.bannedVehicleParkingTags =
-      c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
-    request.bannedVehicleRentalNetworks =
-      c.asTextSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
+    vehicleParking.setBannedTags(
+      c.asTextSet("bannedVehicleParkingTags", vehicleParking.bannedTags())
+    );
+    vehicleRental.setBannedNetworks(
+      c.asTextSet("bannedVehicleRentalNetworks", vehicleRental.bannedNetworks())
+    );
     preferences.bike().setBoardCost(c.asInt("bikeBoardCost", preferences.bike().boardCost()));
     preferences.bike().setParkTime(c.asInt("bikeParkTime", preferences.bike().parkTime()));
     preferences.bike().setParkCost(c.asInt("bikeParkCost", preferences.bike().parkCost()));
@@ -78,17 +85,21 @@ public class RoutingRequestMapper {
     preferences
       .bike()
       .setWalkingSpeed(c.asDouble("bikeWalkingSpeed", preferences.bike().walkingSpeed()));
-    request.allowKeepingRentedVehicleAtDestination =
-      c.asBoolean(
-        "allowKeepingRentedBicycleAtDestination",
-        dft.allowKeepingRentedVehicleAtDestination
+    request
+      .journey()
+      .rental()
+      .setAllowArrivingInRentedVehicleAtDestination(
+        c.asBoolean(
+          "allowKeepingRentedBicycleAtDestination",
+          request.journey().rental().allowArrivingInRentedVehicleAtDestination()
+        )
       );
     preferences
       .rental()
-      .setKeepingVehicleAtDestinationCost(
+      .setArrivingInRentalVehicleAtDestinationCost(
         c.asDouble(
           "keepingRentedBicycleAtDestinationCost",
-          preferences.rental().keepingVehicleAtDestinationCost()
+          preferences.rental().arrivingInRentalVehicleAtDestinationCost()
         )
       );
     preferences
@@ -103,7 +114,7 @@ public class RoutingRequestMapper {
       .initMaxAccessEgressDuration(
         c.asDuration(
           "maxAccessEgressDuration",
-          preferences.street().maxAccessEgressDurationDefaultValue()
+          preferences.street().maxAccessEgressDuration().defaultValue()
         ),
         c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
@@ -161,7 +172,7 @@ public class RoutingRequestMapper {
       .initMaxDirectDuration(
         c.asDuration(
           "maxDirectStreetDuration",
-          preferences.street().maxDirectDurationDefaultValue()
+          preferences.street().maxDirectDuration().defaultValue()
         ),
         c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
       );
@@ -172,7 +183,7 @@ public class RoutingRequestMapper {
         c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
       );
 
-    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes());
+    request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
 
     preferences
       .transfer()
@@ -191,8 +202,9 @@ public class RoutingRequestMapper {
       );
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
     request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
-    request.requiredVehicleParkingTags =
-      c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
+    vehicleParking.setRequiredTags(
+      c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
+    );
 
     preferences
       .walk()
@@ -258,14 +270,23 @@ public class RoutingRequestMapper {
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
-    var unpreferred = c.path("unpreferred");
-    request.setUnpreferredRoutes(
-      unpreferred.asFeedScopedIdSet("routes", dft.getUnpreferredRoutes())
-    );
+    request
+      .journey()
+      .transit()
+      .setUnpreferredRoutes(
+        c
+          .path("unpreferred")
+          .asFeedScopedIdList("routes", request.journey().transit().unpreferredRoutes())
+      );
 
-    request.setUnpreferredAgencies(
-      unpreferred.asFeedScopedIdSet("agencies", dft.getUnpreferredAgencies())
-    );
+    request
+      .journey()
+      .transit()
+      .setUnpreferredAgencies(
+        c
+          .path("unpreferred")
+          .asFeedScopedIdList("agencies", request.journey().transit().unpreferredRoutes())
+      );
 
     return request;
   }

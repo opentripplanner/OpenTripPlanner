@@ -11,6 +11,8 @@ import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegMapper {
@@ -89,16 +91,16 @@ public class LegMapper {
     api.distance = round3Decimals(domain.getDistanceMeters());
     api.generalizedCost = domain.getGeneralizedCost();
     api.pathway = domain.getPathwayId() != null;
-    api.mode = TraverseModeMapper.mapToApi(domain.getMode());
     api.agencyTimeZoneOffset = domain.getAgencyTimeZoneOffset();
-    api.transitLeg = domain.isTransitLeg();
 
-    if (domain.isTransitLeg()) {
+    if (domain instanceof TransitLeg trLeg) {
+      api.transitLeg = true;
       var agency = domain.getAgency();
       api.agencyId = FeedScopedIdMapper.mapToApi(agency.getId());
       api.agencyName = agency.getName();
       api.agencyUrl = agency.getUrl();
       api.agencyBrandingUrl = agency.getBrandingUrl();
+      api.mode = ModeMapper.mapToApi(trLeg.getMode());
 
       var route = domain.getRoute();
       api.route = i18NStringMapper.mapToApi(route.getLongName());
@@ -113,11 +115,16 @@ public class LegMapper {
       api.tripId = FeedScopedIdMapper.mapToApi(trip.getId());
       api.tripShortName = trip.getShortName();
       api.tripBlockId = trip.getGtfsBlockId();
-    } else if (domain.getPathwayId() != null) {
-      api.route = FeedScopedIdMapper.mapToApi(domain.getPathwayId());
-    } else {
-      // TODO OTP2 - This should be set to the street name according to the JavaDoc
-      api.route = "";
+    } else if (domain instanceof StreetLeg streetLeg) {
+      api.transitLeg = false;
+      api.mode = ModeMapper.mapToApi(streetLeg.getMode());
+
+      if (domain.getPathwayId() != null) {
+        api.route = FeedScopedIdMapper.mapToApi(domain.getPathwayId());
+      } else {
+        // TODO OTP2 - This should be set to the street name according to the JavaDoc
+        api.route = "";
+      }
     }
 
     api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();

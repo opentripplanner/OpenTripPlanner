@@ -30,7 +30,7 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletio
       var containsTransit = itinerary
         .getLegs()
         .stream()
-        .anyMatch(l -> l != null && l.getMode().isTransit());
+        .anyMatch(l -> l != null && l.isTransitLeg());
 
       double bikeRentalDistance = itinerary
         .getLegs()

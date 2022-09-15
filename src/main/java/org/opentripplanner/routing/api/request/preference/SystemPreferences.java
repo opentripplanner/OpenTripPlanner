@@ -96,7 +96,7 @@ public class SystemPreferences implements Cloneable, Serializable {
 
   public SystemPreferences clone() {
     try {
-      // TODO VIA: 2022-08-26 leaving out dataOverlay (that's how it was before)
+      // TODO VIA (Thomas): 2022-08-26 leaving out dataOverlay (that's how it was before)
 
       var clone = (SystemPreferences) super.clone();
 

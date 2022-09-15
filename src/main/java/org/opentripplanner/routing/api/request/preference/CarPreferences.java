@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
-// TODO VIA: Javadoc
+// TODO VIA (Thomas): Javadoc
 import java.io.Serializable;
 
 public class CarPreferences implements Cloneable, Serializable {
