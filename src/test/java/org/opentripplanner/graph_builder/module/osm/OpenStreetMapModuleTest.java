@@ -26,7 +26,6 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -318,7 +317,7 @@ public class OpenStreetMapModuleTest {
 
     loader.buildGraph();
 
-    RouteRequest request = new RouteRequest(new TraverseModeSet(TraverseMode.WALK));
+    RouteRequest request = new RouteRequest(TraverseMode.WALK);
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
     //It tests if it is possible to route over area without visibility calculations

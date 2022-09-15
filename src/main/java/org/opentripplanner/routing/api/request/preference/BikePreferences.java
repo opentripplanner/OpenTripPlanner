@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.api.request.preference;
 
-// TODO VIA: Javadoc
-
 import java.io.Serializable;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.core.BicycleOptimizeType;

@@ -23,8 +23,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -332,7 +330,6 @@ public class GeometryProcessorTest {
     GraphPath path;
 
     RouteRequest options = new RouteRequest();
-    options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRANSIT));
     options.setDateTime(TestUtils.dateInstant("America/New_York", 2009, 8, 7, 0, 0, 0));
 
     // U to V - original stop times - shouldn't be used

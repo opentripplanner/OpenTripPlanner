@@ -26,7 +26,7 @@ public class GeneralizedCostParametersMapper {
       .transferCost(preferences.transfer().cost())
       .waitReluctanceFactor(preferences.transfer().waitReluctance());
 
-    if (request.modes.transferMode == StreetMode.BIKE) {
+    if (request.journey().transfer().mode() == StreetMode.BIKE) {
       builder.boardCost(preferences.bike().boardCost());
     } else {
       builder.boardCost(preferences.walk().boardCost());
@@ -38,8 +38,12 @@ public class GeneralizedCostParametersMapper {
     builder.wheelchairEnabled(request.wheelchair());
     builder.wheelchairAccessibility(preferences.wheelchair().trip());
 
-    final Set<FeedScopedId> unpreferredRoutes = request.getUnpreferredRoutes();
-    final Set<FeedScopedId> unpreferredAgencies = request.getUnpreferredAgencies();
+    final Set<FeedScopedId> unpreferredRoutes = Set.copyOf(
+      request.journey().transit().unpreferredRoutes()
+    );
+    final Set<FeedScopedId> unpreferredAgencies = Set.copyOf(
+      request.journey().transit().unpreferredAgencies()
+    );
 
     if (!unpreferredRoutes.isEmpty() || !unpreferredAgencies.isEmpty()) {
       final BitSet unpreferredPatterns = new BitSet();

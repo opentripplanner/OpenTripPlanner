@@ -22,7 +22,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -805,21 +804,24 @@ public abstract class RoutingResource {
     });
 
     if (allowKeepingRentedBicycleAtDestination != null) {
-      request.allowKeepingRentedVehicleAtDestination = allowKeepingRentedBicycleAtDestination;
+      request
+        .journey()
+        .rental()
+        .setAllowArrivingInRentedVehicleAtDestination(allowKeepingRentedBicycleAtDestination);
     }
 
     if (keepingRentedBicycleAtDestinationCost != null) {
       preferences
         .rental()
-        .setKeepingVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
+        .setArrivingInRentalVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
     }
 
     if (allowedVehicleRentalNetworks != null) {
-      request.allowedVehicleRentalNetworks = allowedVehicleRentalNetworks;
+      request.journey().rental().setAllowedNetworks(allowedVehicleRentalNetworks);
     }
 
     if (bannedVehicleRentalNetworks != null) {
-      request.bannedVehicleRentalNetworks = bannedVehicleRentalNetworks;
+      request.journey().rental().setBannedNetworks(bannedVehicleRentalNetworks);
     }
 
     if (carParkCost != null) {
@@ -831,51 +833,51 @@ public abstract class RoutingResource {
     }
 
     if (bannedVehicleParkingTags != null) {
-      request.bannedVehicleParkingTags = bannedVehicleParkingTags;
+      request.journey().parking().setBannedTags(bannedVehicleParkingTags);
     }
 
     if (requiredVehicleParkingTags != null) {
-      request.requiredVehicleParkingTags = requiredVehicleParkingTags;
+      request.journey().parking().setRequiredTags(requiredVehicleParkingTags);
     }
 
     if (arriveBy != null) {
       request.setArriveBy(arriveBy);
     }
 
-    // TODO VIA: 2022-08-24 should we just skip this step?
+    // TODO VIA (Leonard): 2022-08-24 should we just skip this step?
     // It will be refactored anyway
     //    if (intermediatePlaces != null) {
     //      request.setIntermediatePlacesFromStrings(intermediatePlaces);
     //    }
     if (preferredRoutes != null) {
-      request.setPreferredRoutesFromString(preferredRoutes);
+      request.journey().transit().setPreferredRoutesFromString(preferredRoutes);
     }
     if (otherThanPreferredRoutesPenalty != null) {
       preferences.transit().setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
     }
     if (preferredAgencies != null) {
-      request.setPreferredAgenciesFromString(preferredAgencies);
+      request.journey().transit().setPreferredAgenciesFromString(preferredAgencies);
     }
     if (unpreferredRoutes != null) {
-      request.setUnpreferredRoutesFromString(unpreferredRoutes);
+      request.journey().transit().setUnpreferredRoutesFromString(unpreferredRoutes);
     }
     if (unpreferredAgencies != null) {
-      request.setUnpreferredAgenciesFromString(unpreferredAgencies);
+      request.journey().transit().setUnpreferredAgenciesFromString(unpreferredAgencies);
     }
     if (bannedRoutes != null) {
-      request.setBannedRoutesFromString(bannedRoutes);
+      request.journey().transit().setBannedRoutesFromString(bannedRoutes);
     }
     if (whiteListedRoutes != null) {
-      request.setWhiteListedRoutesFromString(whiteListedRoutes);
+      request.journey().transit().setWhiteListedRoutesFromString(whiteListedRoutes);
     }
     if (bannedAgencies != null) {
-      request.setBannedAgenciesFromSting(bannedAgencies);
+      request.journey().transit().setBannedAgenciesFromSting(bannedAgencies);
     }
     if (whiteListedAgencies != null) {
-      request.setWhiteListedAgenciesFromSting(whiteListedAgencies);
+      request.journey().transit().setWhiteListedAgenciesFromSting(whiteListedAgencies);
     }
     if (bannedTrips != null) {
-      request.setBannedTripsFromString(bannedTrips);
+      request.journey().transit().setBannedTripsFromString(bannedTrips);
     }
     // The "Least transfers" optimization is accomplished via an increased transfer penalty.
     // See comment on RoutingRequest.transferPentalty.
@@ -885,7 +887,7 @@ public abstract class RoutingResource {
 
     /* Temporary code to get bike/car parking and renting working. */
     if (modes != null && !modes.qModes.isEmpty()) {
-      request.modes = modes.getRequestModes();
+      request.journey().setModes(modes.getRequestModes());
     }
 
     if (request.vehicleRental && bikeSpeed == null) {
@@ -906,8 +908,8 @@ public abstract class RoutingResource {
     if (minTransferTime != null) {
       int alightAndBoardSlack =
         (
-          (int) transitPref.boardSlack().defaultValue().toSeconds() +
-          (int) transitPref.alightSlack().defaultValue().toSeconds()
+          transitPref.boardSlack().defaultValueSeconds() +
+          transitPref.alightSlack().defaultValueSeconds()
         );
       if (alightAndBoardSlack > minTransferTime) {
         throw new IllegalArgumentException(
@@ -927,14 +929,6 @@ public abstract class RoutingResource {
 
     preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
-    if (startTransitStopId != null && !startTransitStopId.isEmpty()) {
-      request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
-    }
-
-    if (startTransitTripId != null && !startTransitTripId.isEmpty()) {
-      request.startingTransitTripId = FeedScopedId.parseId(startTransitTripId);
-    }
-
     if (ignoreRealtimeUpdates != null) {
       preferences.transit().setIgnoreRealtimeUpdates(ignoreRealtimeUpdates);
     }
@@ -951,7 +945,12 @@ public abstract class RoutingResource {
       preferences.system().itineraryFilters().debug = debugItineraryFilter;
     }
 
-    request.raptorDebugging.withStops(debugRaptorStops).withPath(debugRaptorPath);
+    request
+      .journey()
+      .transit()
+      .raptorDebugging()
+      .withStops(debugRaptorStops)
+      .withPath(debugRaptorPath);
 
     if (useVehicleParkingAvailabilityInformation != null) {
       preferences.parking().setUseAvailabilityInformation(useVehicleParkingAvailabilityInformation);

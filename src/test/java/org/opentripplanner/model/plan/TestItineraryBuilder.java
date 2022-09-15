@@ -415,21 +415,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return leg;
   }
 
+  private double speed(TransitMode mode) {
+    return switch (mode) {
+      case BUS -> BUS_SPEED;
+      case RAIL -> RAIL_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
+  }
+
   private double speed(TraverseMode mode) {
-    switch (mode) {
-      case WALK:
-        return WALK_SPEED;
-      case BICYCLE:
-        return BICYCLE_SPEED;
-      case BUS:
-        return BUS_SPEED;
-      case RAIL:
-        return RAIL_SPEED;
-      case CAR:
-        return CAR_SPEED;
-      default:
-        throw new IllegalStateException("Unsupported mode: " + mode);
-    }
+    return switch (mode) {
+      case WALK -> WALK_SPEED;
+      case BICYCLE -> BICYCLE_SPEED;
+      case CAR -> CAR_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
   }
 
   private int cost(float reluctance, int durationSeconds) {

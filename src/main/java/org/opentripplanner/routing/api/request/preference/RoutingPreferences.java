@@ -5,8 +5,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.core.TraverseMode;
 
-// TODO VIA: Javadoc
-// * User/trip cost/time/slack/reluctance search config.
+/** User/trip cost/time/slack/reluctance search config. */
 public class RoutingPreferences implements Cloneable, Serializable {
 
   private TransitPreferences transit = new TransitPreferences();

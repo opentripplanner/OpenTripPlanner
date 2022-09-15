@@ -13,12 +13,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -43,7 +45,7 @@ public class CsvFileIO {
   private final String feedId;
 
   public CsvFileIO(File dir, String testSetName, String feedId) {
-    this.feedId = feedId;
+    this.feedId = Objects.requireNonNull(feedId);
     testCasesFile = new File(dir, testSetName + ".csv");
     expectedResultsFile = new File(dir, testSetName + "-expected-results.csv");
     expectedResultsOutputFile = new File(dir, testSetName + "-results.csv");
@@ -258,7 +260,7 @@ public class CsvFileIO {
         parseTime(csvReader.get("startTime")),
         parseTime(csvReader.get("endTime")),
         str2Col(csvReader.get("agencies")),
-        str2Col(csvReader.get("modes"), TraverseMode::valueOf),
+        str2Col(csvReader.get("modes"), CsvFileIO::parseMode),
         str2Col(csvReader.get("routes")),
         str2Col(csvReader.get("stops")),
         csvReader.get("details")
@@ -273,5 +275,13 @@ public class CsvFileIO {
 
   private boolean isCommentOrEmpty(String line) {
     return line.startsWith("#") || line.matches("[\\s,;|]*");
+  }
+
+  private static Enum<?> parseMode(String mode) {
+    try {
+      return TransitMode.valueOf(mode);
+    } catch (IllegalArgumentException ignore) {
+      return TraverseMode.valueOf(mode);
+    }
   }
 }

@@ -271,7 +271,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRentalFromStationWantToKeepCantKeep() {
-    ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = false;
+    ((VehicleRentalStation) B1.getStation()).isArrivingInRentalVehicleAtDestinationAllowed = false;
 
     assertPath(
       S1,
@@ -306,7 +306,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeep() {
-    ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = true;
+    ((VehicleRentalStation) B1.getStation()).isArrivingInRentalVehicleAtDestinationAllowed = true;
 
     assertPath(
       S1,
@@ -341,7 +341,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeepButCostly() {
-    ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = true;
+    ((VehicleRentalStation) B1.getStation()).isArrivingInRentalVehicleAtDestinationAllowed = true;
     int keepRentedBicycleAtDestinationCost = 1000;
 
     assertPath(
@@ -434,8 +434,8 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> allowedNetworks
   ) {
     Consumer<RouteRequest> setter = options -> {
-      options.allowedVehicleRentalNetworks = allowedNetworks;
-      options.bannedVehicleRentalNetworks = bannedNetworks;
+      options.journey().rental().setAllowedNetworks(allowedNetworks);
+      options.journey().rental().setBannedNetworks(bannedNetworks);
     };
 
     assertEquals(
@@ -458,8 +458,8 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> allowedNetworks
   ) {
     Consumer<RouteRequest> setter = options -> {
-      options.allowedVehicleRentalNetworks = allowedNetworks;
-      options.bannedVehicleRentalNetworks = bannedNetworks;
+      options.journey().rental().setAllowedNetworks(allowedNetworks);
+      options.journey().rental().setBannedNetworks(bannedNetworks);
     };
 
     assertEquals(
@@ -582,8 +582,14 @@ public class BikeRentalTest extends GraphRoutingTest {
       arriveBy,
       options -> {
         options.preferences().rental().setUseAvailabilityInformation(useAvailabilityInformation);
-        options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
-        options.preferences().rental().setKeepingVehicleAtDestinationCost(keepRentedBicycleCost);
+        options
+          .journey()
+          .rental()
+          .setAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
+        options
+          .preferences()
+          .rental()
+          .setArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
       }
     );
   }

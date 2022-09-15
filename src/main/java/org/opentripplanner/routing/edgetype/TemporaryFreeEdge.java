@@ -35,9 +35,9 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
     if (
       s0.isRentingVehicleFromStation() &&
       s0.mayKeepRentedVehicleAtDestination() &&
-      s0.getOptions().allowKeepingRentedVehicleAtDestination
+      s0.getOptions().journey().rental().allowArrivingInRentedVehicleAtDestination()
     ) {
-      s1.incrementWeight(s0.getPreferences().rental().keepingVehicleAtDestinationCost());
+      s1.incrementWeight(s0.getPreferences().rental().arrivingInRentalVehicleAtDestinationCost());
     }
 
     return s1.makeState();

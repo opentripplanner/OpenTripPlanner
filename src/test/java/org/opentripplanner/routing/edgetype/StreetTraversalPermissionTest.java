@@ -42,20 +42,15 @@ public class StreetTraversalPermissionTest {
     StreetTraversalPermission perm1 = StreetTraversalPermission.ALL;
     assertTrue(perm1.allows(TraverseMode.CAR));
     assertTrue(perm1.allows(TraverseMode.WALK));
-
-    // StreetTraversalPermission is not used for public transit.
-    assertFalse(perm1.allows(TraverseMode.TRANSIT));
   }
 
   @Test
   public void testAllowsTraverseModeSet() {
-    StreetTraversalPermission perm1 = StreetTraversalPermission.BICYCLE_AND_CAR;
-    assertTrue(perm1.allows(TraverseModeSet.allModes()));
-    assertTrue(perm1.allows(new TraverseModeSet(TraverseMode.CAR, TraverseMode.BICYCLE)));
-    assertTrue(
-      perm1.allows(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.RAIL, TraverseMode.FERRY))
-    );
-    assertFalse(perm1.allows(new TraverseModeSet(TraverseMode.WALK)));
+    StreetTraversalPermission perm = StreetTraversalPermission.BICYCLE_AND_CAR;
+    assertTrue(perm.allows(TraverseModeSet.allModes()));
+    assertTrue(perm.allows(new TraverseModeSet(TraverseMode.CAR, TraverseMode.BICYCLE)));
+    assertTrue(perm.allows(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertFalse(perm.allows(new TraverseModeSet(TraverseMode.WALK)));
   }
 
   @Test

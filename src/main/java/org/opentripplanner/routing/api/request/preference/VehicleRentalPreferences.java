@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
+import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
 // TODO VIA: Javadoc
 public class VehicleRentalPreferences implements Cloneable, Serializable {
@@ -10,9 +11,8 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
   private int dropoffTime = 30;
   private int dropoffCost = 30;
 
-  // TODO VIA: What should the default be
   private boolean useAvailabilityInformation = false;
-  private double keepingVehicleAtDestinationCost = 0;
+  private double arrivingInRentalVehicleAtDestinationCost = 0;
 
   /** Time to rent a vehicle */
   public int pickupTime() {
@@ -70,14 +70,16 @@ public class VehicleRentalPreferences implements Cloneable, Serializable {
   /**
    * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
    *
-   * @see VehicleRentalRequest#allowKeepingRentedVehicleAtDestination
+   * @see VehicleRentalRequest#allowArrivingInRentedVehicleAtDestination()
    */
-  public double keepingVehicleAtDestinationCost() {
-    return keepingVehicleAtDestinationCost;
+  public double arrivingInRentalVehicleAtDestinationCost() {
+    return arrivingInRentalVehicleAtDestinationCost;
   }
 
-  public void setKeepingVehicleAtDestinationCost(double keepingVehicleAtDestinationCost) {
-    this.keepingVehicleAtDestinationCost = keepingVehicleAtDestinationCost;
+  public void setArrivingInRentalVehicleAtDestinationCost(
+    double arrivingInRentalVehicleAtDestinationCost
+  ) {
+    this.arrivingInRentalVehicleAtDestinationCost = arrivingInRentalVehicleAtDestinationCost;
   }
 
   public VehicleRentalPreferences clone() {

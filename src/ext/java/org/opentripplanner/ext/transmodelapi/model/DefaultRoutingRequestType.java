@@ -58,8 +58,8 @@ public class DefaultRoutingRequestType {
             "This is a performance limit and should therefore be set high. " +
             "Use filters to limit what is presented to the client."
           )
-          .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.street().maxDirectDurationDefaultValue().toSeconds())
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(env -> preferences.street().maxDirectDuration().defaultValueSeconds())
           .build()
       )
       .field(
@@ -315,7 +315,7 @@ public class DefaultRoutingRequestType {
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> preferences.transit().boardSlack().defaultValue().toSeconds())
+          .dataFetcher(e -> preferences.transit().boardSlack().defaultValueSeconds())
           .build()
       )
       .field(
@@ -333,7 +333,7 @@ public class DefaultRoutingRequestType {
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
-          .dataFetcher(e -> preferences.transit().alightSlack().defaultValue().toSeconds())
+          .dataFetcher(e -> preferences.transit().alightSlack().defaultValueSeconds())
           .build()
       )
       .field(
