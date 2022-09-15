@@ -300,7 +300,7 @@ public abstract class GraphRoutingTest {
       final RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(network);
       vehicleRentalStation.vehicleTypesAvailable = Map.of(vehicleType, 2);
       vehicleRentalStation.vehicleSpacesAvailable = Map.of(vehicleType, 2);
-      vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed = false;
+      vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed = false;
       return vehicleRentalStation;
     }
 

@@ -244,7 +244,7 @@ public class TestIntermediatePlaces {
     boolean arriveBy
   ) {
     RouteRequest request = new RouteRequest();
-    request.modes = modes;
+    request.journey().setModes(modes);
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
     request.setFrom(from);

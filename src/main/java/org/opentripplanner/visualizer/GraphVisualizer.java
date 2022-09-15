@@ -469,7 +469,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
     RouteRequest options = new RouteRequest();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
-    options.modes = qualifiedModeSet.getRequestModes();
+    options.journey().setModes(qualifiedModeSet.getRequestModes());
     var preferences = options.preferences();
 
     options.setArriveBy(arriveByCheckBox.isSelected());

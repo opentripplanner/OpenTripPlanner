@@ -299,16 +299,18 @@ public class NearbyStopFinder {
     if (
       !reverseDirection &&
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)
+      VehicleToStopSkipEdgeStrategy.applicableModes.contains(
+        routingRequest.journey().access().mode()
+      )
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
-        routingRequest.modes.transitModes.stream().map(MainAndSubMode::mainMode).toList()
+        routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
       );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      routingRequest.modes.accessMode == StreetMode.BIKE
+      routingRequest.journey().access().mode() == StreetMode.BIKE
     ) {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);

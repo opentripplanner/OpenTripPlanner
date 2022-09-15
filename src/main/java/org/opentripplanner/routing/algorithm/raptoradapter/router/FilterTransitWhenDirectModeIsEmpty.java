@@ -58,6 +58,10 @@ public class FilterTransitWhenDirectModeIsEmpty {
     this.originalDirectMode = modes.directMode;
   }
 
+  public FilterTransitWhenDirectModeIsEmpty(StreetMode originalDirectMode) {
+    this.originalDirectMode = originalDirectMode;
+  }
+
   public StreetMode resolveDirectMode() {
     return directSearchNotSet() ? StreetMode.WALK : originalDirectMode;
   }

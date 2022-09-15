@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 
@@ -64,8 +64,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   public void directCarPark() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes =
-      RequestModes.of().withDirectMode(StreetMode.CAR_TO_PARK).clearTransitModes().build();
+    // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
+    // maybe we should implement similar pattern for new models?
+    request.journey().direct().setMode(StreetMode.CAR_TO_PARK);
+    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -77,8 +79,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   public void directCarPickupWithWalking() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes =
-      RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
+    // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
+    // maybe we should implement similar pattern for new models?
+    request.journey().direct().setMode(StreetMode.CAR_PICKUP);
+    request.journey().transit().setModes(List.of());
     request.setFrom(p3);
     request.setTo(p4);
 
@@ -90,8 +94,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   public void directCarPickupWithWalkingArriveBy() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 16, 54);
 
-    request.modes =
-      RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
+    // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
+    // maybe we should implement similar pattern for new models?
+    request.journey().direct().setMode(StreetMode.CAR_PICKUP);
+    request.journey().transit().setModes(List.of());
     request.setFrom(p3);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -104,8 +110,10 @@ public class CarSnapshotTest extends SnapshotTestBase {
   public void directCarPickupWithoutWalking() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.modes =
-      RequestModes.of().withDirectMode(StreetMode.CAR_PICKUP).clearTransitModes().build();
+    // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
+    // maybe we should implement similar pattern for new models?
+    request.journey().direct().setMode(StreetMode.CAR_PICKUP);
+    request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p2);
     request.preferences().walk().setSpeed(1.0);

@@ -223,8 +223,12 @@ public class NodeAdapterTest {
   public void asFeedScopedIdSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12', 'A:23']}");
     assertEquals(
-      Set.of(new FeedScopedId("A", "23"), new FeedScopedId("B", "12")),
-      subject.asFeedScopedIdSet("routes", Set.of())
+      List.of(
+        new FeedScopedId("A", "23"),
+        new FeedScopedId("B", "12"),
+        new FeedScopedId("A", "23")
+      ),
+      subject.asFeedScopedIdList("routes", List.of())
     );
   }
 

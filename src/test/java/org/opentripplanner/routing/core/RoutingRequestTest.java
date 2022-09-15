@@ -30,7 +30,7 @@ public class RoutingRequestTest {
 
   @Test
   public void testIntermediatePlaces() {
-    // TODO VIA: those methods no longer exist (we will refactor them later). What should we do with this test?
+    // TODO VIA - Part 2: those methods no longer exist (we will refactor them later). What should we do with this test?
     //    RoutingRequest req = new RoutingRequest();
     //    assertFalse(req.hasIntermediatePlaces());
     //
@@ -50,14 +50,17 @@ public class RoutingRequestTest {
 
   @Test
   public void shouldCloneObjectFields() {
-    var req = new RouteRequest();
+    // TODO VIA (Thomas): There are more objects that are cloned - check freezing
+    RouteRequest request = new RouteRequest();
 
-    var clone = req.clone();
+    var clone = request.clone();
 
-    assertNotSame(clone, req);
-    assertNotSame(clone.raptorDebugging, req.raptorDebugging);
-
-    assertEquals(50, req.numItineraries());
+    assertNotSame(clone, request);
+    assertNotSame(
+      clone.journey().transit().raptorDebugging(),
+      request.journey().transit().raptorDebugging()
+    );
+    assertEquals(50, request.numItineraries());
     assertEquals(50, clone.numItineraries());
   }
 

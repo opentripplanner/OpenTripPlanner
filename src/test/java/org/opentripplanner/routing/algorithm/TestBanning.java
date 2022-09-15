@@ -6,8 +6,11 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
+import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -23,12 +26,17 @@ public class TestBanning {
   public void testSetBannedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    RouteRequest routingRequest = new RouteRequest();
+    final TransitRequest transit = new TransitRequest();
+    transit.setBannedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
+    transit.setBannedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
 
-    routingRequest.setBannedRoutesFromString("F__RUT:Route:1");
-    routingRequest.setBannedAgenciesFromSting("F:RUT:Agency:2");
-
-    Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
+    Collection<FeedScopedId> bannedRoutes = RoutingRequestTransitDataProviderFilter.bannedRoutes(
+      Set.copyOf(transit.bannedAgencies()),
+      transit.bannedRoutes(),
+      Set.copyOf(transit.whiteListedAgencies()),
+      transit.whiteListedRoutes(),
+      routes
+    );
 
     assertEquals(2, bannedRoutes.size());
     assertTrue(bannedRoutes.contains(id("RUT:Route:1")));
@@ -39,12 +47,17 @@ public class TestBanning {
   public void testSetWhiteListedOnRequest() {
     Collection<Route> routes = getTestRoutes();
 
-    RouteRequest routingRequest = new RouteRequest();
+    TransitRequest transit = new TransitRequest();
+    transit.setWhiteListedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
+    transit.setWhiteListedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
 
-    routingRequest.setWhiteListedRoutesFromString("F__RUT:Route:1");
-    routingRequest.setWhiteListedAgenciesFromSting("F:RUT:Agency:2");
-
-    Collection<FeedScopedId> bannedRoutes = routingRequest.getBannedRoutes(routes);
+    Collection<FeedScopedId> bannedRoutes = RoutingRequestTransitDataProviderFilter.bannedRoutes(
+      Set.copyOf(transit.bannedAgencies()),
+      transit.bannedRoutes(),
+      Set.copyOf(transit.whiteListedAgencies()),
+      transit.whiteListedRoutes(),
+      routes
+    );
 
     assertEquals(1, bannedRoutes.size());
     assertTrue(bannedRoutes.contains(id("RUT:Route:2")));

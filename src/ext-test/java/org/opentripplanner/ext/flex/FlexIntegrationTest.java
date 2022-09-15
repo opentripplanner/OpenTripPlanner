@@ -226,14 +226,14 @@ public class FlexIntegrationTest {
     request.setNumItineraries(10);
     request.setSearchWindow(Duration.ofHours(2));
 
-    var modes = request.modes.copyOf();
+    var modes = request.journey().modes().copyOf();
     modes.withEgressMode(FLEXIBLE);
 
     if (onlyDirect) {
       modes.withDirectMode(FLEXIBLE);
       modes.clearTransitModes();
     }
-    request.modes = modes.build();
+    request.journey().setModes(modes.build());
 
     var result = service.route(request);
     var itineraries = result.getTripPlan().itineraries;

@@ -4,8 +4,7 @@ import java.io.Serializable;
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.core.TraverseMode;
 
-// TODO VIA: Javadoc
-// * User/trip cost/time/slack/reluctance search config.
+/** User/trip cost/time/slack/reluctance search config. */
 public class RoutingPreferences implements Cloneable, Serializable {
 
   private TransitPreferences transit = new TransitPreferences();
@@ -23,7 +22,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   private VehicleParkingPreferences parking = new VehicleParkingPreferences();
   private SystemPreferences system = new SystemPreferences();
 
-  // TODO VIA: Rename to setStreetReluctance and move to StreetPreferences
+  // TODO VIA (Thomas): Rename to setStreetReluctance
   public void setNonTransitReluctance(double streetReluctance) {
     if (streetReluctance > 0) {
       this.bike.setReluctance(streetReluctance);

@@ -8,7 +8,7 @@ public class WalkPreferences implements Cloneable, Serializable {
   private double speed = 1.33;
   private double reluctance = 2.0;
 
-  // TODO VIA: Is this part of transit preferences
+  // TODO VIA (Thomas): Is this part of transit preferences
   private int boardCost = 60 * 10;
   private double stairsReluctance = 2.0;
   private double stairsTimeFactor = 3.0;

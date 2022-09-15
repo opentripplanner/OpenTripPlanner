@@ -37,7 +37,7 @@ public class Transfer {
   }
 
   public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
-    RouteRequest rr = request.getStreetSearchRequest(request.modes.transferMode);
+    RouteRequest rr = request.getStreetSearchRequest(request.journey().transfer().mode());
 
     var transferPreferences = rr.preferences();
 

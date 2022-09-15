@@ -204,7 +204,7 @@ public class TriangleInequalityTest {
     graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
 
     if (modes != null) {
-      prototypeOptions.modes = modes;
+      prototypeOptions.journey().setModes(modes);
     }
 
     ShortestPathTree tree = AStarBuilder

@@ -25,10 +25,12 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -86,12 +88,13 @@ public abstract class GtfsTest {
       );
     }
     if (onTripId != null && !onTripId.isEmpty()) {
-      routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
+      // TODO VIA - set different on-board request
+      //routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
     }
     routingRequest.setWheelchair(wheelchairAccessible);
     preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
-    RequestModesBuilder requestModesBuilder = routingRequest.modes
-      .copyOf()
+    RequestModesBuilder requestModesBuilder = RequestModes
+      .of()
       .withDirectMode(NOT_SET)
       .withAccessMode(WALK)
       .withTransferMode(WALK)
@@ -101,9 +104,14 @@ public abstract class GtfsTest {
     } else {
       requestModesBuilder.withTransitModes(MainAndSubMode.all());
     }
-    routingRequest.modes = requestModesBuilder.build();
+    routingRequest.journey().setModes(requestModesBuilder.build());
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      routingRequest.setBannedRoutes(List.of(new FeedScopedId(feedId.getId(), excludedRoute)));
+      routingRequest
+        .journey()
+        .transit()
+        .setBannedRoutes(
+          RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
+        );
     }
     if (excludedStop != null && !excludedStop.isEmpty()) {
       throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");

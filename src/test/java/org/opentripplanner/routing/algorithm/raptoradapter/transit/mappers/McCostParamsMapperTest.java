@@ -41,7 +41,7 @@ class McCostParamsMapperTest {
   @Test
   public void shouldExtractRoutesFromAgencies() {
     var routingRequest = new RouteRequest();
-    routingRequest.setUnpreferredAgencies(List.of(unpreferredAgency));
+    routingRequest.journey().transit().setUnpreferredAgencies(List.of(unpreferredAgency));
 
     BitSet unpreferredPatterns = McCostParamsMapper
       .map(routingRequest, data.getPatterns())
@@ -58,7 +58,7 @@ class McCostParamsMapperTest {
   @Test
   public void dealWithEmptyList() {
     var routingRequest = new RouteRequest();
-    routingRequest.setUnpreferredAgencies(List.of(agencyWithNoRoutes));
+    routingRequest.journey().transit().setUnpreferredAgencies(List.of(agencyWithNoRoutes));
 
     assertEquals(
       new BitSet(),

@@ -165,7 +165,7 @@ public class TransitPreferences implements Cloneable, Serializable {
 
   public TransitPreferences clone() {
     try {
-      // TODO VIA: 2022-08-26 skipping unpreferredRouteCost (that's how it was before)
+      // TODO VIA (Thomas): 2022-08-26 skipping unpreferredRouteCost (that's how it was before)
       var clone = (TransitPreferences) super.clone();
 
       clone.boardSlack = this.boardSlack;

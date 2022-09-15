@@ -346,7 +346,7 @@ public class ConstantsForTests {
         station.vehicleTypesAvailable = availability;
         station.vehicleSpacesAvailable = availability;
         station.realTimeData = false;
-        station.isKeepingVehicleRentalAtDestinationAllowed = true;
+        station.isArrivingInRentalVehicleAtDestinationAllowed = true;
 
         VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(graph, station);
         new VehicleRentalEdge(stationVertex, vehicleType.formFactor);

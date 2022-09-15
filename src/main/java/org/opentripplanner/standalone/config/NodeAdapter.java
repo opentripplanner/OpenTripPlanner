@@ -329,8 +329,8 @@ public class NodeAdapter {
     return ids;
   }
 
-  public Set<FeedScopedId> asFeedScopedIdSet(String paramName, Set<FeedScopedId> defaultValues) {
-    return Set.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
+  public List<FeedScopedId> asFeedScopedIdList(String paramName, List<FeedScopedId> defaultValues) {
+    return List.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
   }
 
   public Locale asLocale(String paramName, Locale defaultValue) {
