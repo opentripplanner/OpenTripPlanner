@@ -15,7 +15,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -141,10 +141,11 @@ public class TemporaryPartialStreetEdgeTest {
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;
-    graph.setIntersectionTraversalCostModel(new DummyCostModel(turnDurationSecs));
+    var calculator = new ConstantIntersectionTraversalCalculator(turnDurationSecs);
     options.preferences().street().setTurnReluctance(1.0);
 
     State s0 = new State(routingContext);
+    s0.stateData.intersectionTraversalCalculator = calculator;
     State s1 = e1.traverse(s0);
     State s2 = e2.traverse(s1);
     State s3 = e3.traverse(s2);
@@ -153,6 +154,7 @@ public class TemporaryPartialStreetEdgeTest {
     Edge partialE2Second = start.getOutgoing().iterator().next();
 
     State partialS0 = new State(routingContext);
+    partialS0.stateData.intersectionTraversalCalculator = calculator;
     State partialS1 = e1.traverse(partialS0);
     State partialS2A = partialE2First.traverse(partialS1);
     State partialS2B = partialE2Second.traverse(partialS2A);
@@ -167,14 +169,16 @@ public class TemporaryPartialStreetEdgeTest {
     assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
 
     // All intersections take 0 seconds now.
-    graph.setIntersectionTraversalCostModel(new DummyCostModel(0.0));
+    calculator = new ConstantIntersectionTraversalCalculator();
 
     State s0NoCost = new State(routingContext);
+    s0NoCost.stateData.intersectionTraversalCalculator = calculator;
     State s1NoCost = e1.traverse(s0NoCost);
     State s2NoCost = e2.traverse(s1NoCost);
     State s3NoCost = e3.traverse(s2NoCost);
 
     State partialS0NoCost = new State(routingContext);
+    partialS0NoCost.stateData.intersectionTraversalCalculator = calculator;
     State partialS1NoCost = e1.traverse(partialS0NoCost);
     State partialS2ANoCost = partialE2First.traverse(partialS1NoCost);
     State partialS2BNoCost = partialE2Second.traverse(partialS2ANoCost);
@@ -277,29 +281,5 @@ public class TemporaryPartialStreetEdgeTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     return new StreetEdge(vA, vB, geom, name, length, perm, false);
-  }
-
-  /**
-   * Dummy cost model. Returns what you put in.
-   */
-  private static class DummyCostModel implements IntersectionTraversalCostModel {
-
-    private final double turnCostSecs;
-
-    public DummyCostModel(double turnCostSecs) {
-      this.turnCostSecs = turnCostSecs;
-    }
-
-    @Override
-    public double computeTraversalCost(
-      IntersectionVertex v,
-      StreetEdge from,
-      StreetEdge to,
-      TraverseMode mode,
-      float fromSpeed,
-      float toSpeed
-    ) {
-      return this.turnCostSecs;
-    }
   }
 }

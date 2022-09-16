@@ -193,13 +193,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     osmdb.postLoad();
 
     LOG.info(
-      "Using OSM way configuration from {}. Setting driving direction of the graph to {}.",
-      wayPropertySetSource.getClass().getSimpleName(),
-      wayPropertySetSource.drivingDirection()
-    );
-    graph.setDrivingDirection(wayPropertySetSource.drivingDirection());
-    graph.setIntersectionTraversalCostModel(
-      wayPropertySetSource.getIntersectionTraversalCostModel()
+      "Using OSM way configuration from {}.",
+      wayPropertySetSource.getClass().getSimpleName()
     );
 
     LOG.info("Building street graph from OSM");

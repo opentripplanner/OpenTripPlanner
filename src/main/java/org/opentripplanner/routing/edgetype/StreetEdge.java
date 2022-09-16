@@ -1021,7 +1021,7 @@ public class StreetEdge
       RouteRequest backOptions = s0.getOptions();
       RoutingPreferences backPreferences = s0.getPreferences();
       double backSpeed = backPSE.calculateSpeed(backPreferences, backMode, backWalkingBike);
-      final double realTurnCost; // Units are seconds.
+      final double turnDuration; // Units are seconds.
 
       // Apply turn restrictions
       if (options.arriveBy() && !canTurnOnto(backPSE, s0, backMode)) {
@@ -1042,11 +1042,10 @@ public class StreetEdge
        * the backEdge, rather than of the current edge.
        */
       if (options.arriveBy() && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
-        realTurnCost =
+        turnDuration =
           s0
-            .getRoutingContext()
-            .graph.getIntersectionTraversalModel()
-            .computeTraversalCost(
+            .intersectionTraversalCalculator()
+            .computeTraversalDuration(
               traversedVertex,
               this,
               backPSE,
@@ -1055,11 +1054,10 @@ public class StreetEdge
               (float) backSpeed
             );
       } else if (!options.arriveBy() && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
-        realTurnCost =
+        turnDuration =
           s0
-            .getRoutingContext()
-            .graph.getIntersectionTraversalModel()
-            .computeTraversalCost(
+            .intersectionTraversalCalculator()
+            .computeTraversalDuration(
               traversedVertex,
               backPSE,
               this,
@@ -1069,17 +1067,16 @@ public class StreetEdge
             );
       } else {
         // In case this is a temporary edge not connected to an IntersectionVertex
-        LOG.debug("Not computing turn cost for edge {}", this);
-        realTurnCost = 0;
+        LOG.debug("Not computing turn duration for edge {}", this);
+        turnDuration = 0;
       }
 
       if (!traverseMode.isDriving()) {
-        s1.incrementWalkDistance(realTurnCost / 100); // just a tie-breaker
+        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
-      int turnTime = (int) Math.ceil(realTurnCost);
-      roundedTime += turnTime;
-      weight += options.preferences().street().turnReluctance() * realTurnCost;
+      roundedTime += (int) Math.ceil(turnDuration);
+      weight += options.preferences().street().turnReluctance() * turnDuration;
     }
 
     if (!traverseMode.isDriving()) {

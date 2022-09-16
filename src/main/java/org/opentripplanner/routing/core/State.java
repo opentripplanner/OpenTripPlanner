@@ -7,6 +7,7 @@ import java.util.List;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -365,6 +366,10 @@ public class State implements Cloneable {
 
   public boolean mayKeepRentedVehicleAtDestination() {
     return stateData.mayKeepRentedVehicleAtDestination;
+  }
+
+  public IntersectionTraversalCalculator intersectionTraversalCalculator() {
+    return stateData.intersectionTraversalCalculator;
   }
 
   protected State clone() {

@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
@@ -9,8 +8,6 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -48,7 +45,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
   private final WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
   private final WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE)
     .build();
-  private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
   /* Populate properties on existing WayPropertySet */
   public void populateProperties(WayPropertySet props) {
@@ -624,16 +620,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
     props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
     props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
-  }
-
-  @Override
-  public DrivingDirection drivingDirection() {
-    return drivingDirection;
-  }
-
-  @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
   }
 
   public void populateNotesAndNames(WayPropertySet props) {

@@ -45,8 +45,8 @@ public class ShortestPathTree {
 
   public ShortestPathTree(DominanceFunction dominanceFunction) {
     this.dominanceFunction = dominanceFunction;
-    // TODO: Calculate the initial size based on the search properties
-    stateSets = new IdentityHashMap<>();
+    // Initialized with a reasonable size, see #4445
+    stateSets = new IdentityHashMap<>(10_000);
   }
 
   /** @return a list of GraphPaths, sometimes empty but never null. */

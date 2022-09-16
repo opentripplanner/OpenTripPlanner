@@ -10,8 +10,10 @@ import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeu
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -28,6 +30,7 @@ public class AStarBuilder {
   private Duration timeout;
   private Edge originBackEdge;
   private Collection<State> initialStates;
+  private IntersectionTraversalCalculator intersectionTraversalCalculator;
 
   public AStarBuilder(
     RemainingWeightHeuristic remainingWeightHeuristic,
@@ -82,6 +85,13 @@ public class AStarBuilder {
     return this;
   }
 
+  public AStarBuilder setIntersectionTraversalCalculator(
+    IntersectionTraversalCalculator intersectionTraversalCalculator
+  ) {
+    this.intersectionTraversalCalculator = intersectionTraversalCalculator;
+    return this;
+  }
+
   public AStarBuilder setOriginBackEdge(Edge originBackEdge) {
     this.originBackEdge = originBackEdge;
     return this;
@@ -113,6 +123,19 @@ public class AStarBuilder {
           state.backEdge = originBackEdge;
         }
       }
+    }
+
+    if (intersectionTraversalCalculator == null) {
+      final StreetPreferences streetPreferences = routingContext.opt.preferences().street();
+      intersectionTraversalCalculator =
+        IntersectionTraversalCalculator.create(
+          streetPreferences.intersectionTraversalModel(),
+          streetPreferences.drivingDirection()
+        );
+    }
+
+    for (var state : initialStates) {
+      state.stateData.intersectionTraversalCalculator = intersectionTraversalCalculator;
     }
 
     return new AStar(
