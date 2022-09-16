@@ -108,7 +108,7 @@ the code more robust and error prune.
 ### Recods
 
 You may use records, but avoid using records if you can not encapsulate it properly. Be especially
-aware of arrays fields (can not be protected) and collections (remember to make a defencive copy).
+aware of arrays fields (can not be protected) and collections (remember to make a defensive copy).
 If you need to override `equals` and `hashCode`, then it is probably not worth it.
 Be aware that `equals` compare references, not the value of a field. Consider overriding `toString`.
 
