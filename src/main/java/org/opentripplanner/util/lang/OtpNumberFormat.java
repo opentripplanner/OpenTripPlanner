@@ -16,8 +16,16 @@ public class OtpNumberFormat {
   private DecimalFormat decimalFormat;
   private DecimalFormat coordinateFormat;
 
-  /** Used to format integer cost types like generalized-cost used by Raptor. */
+  /**
+   * Used to format integer cost types used in OTP in "transit seconds", not centi-seconds as used
+   * by Raptor.
+   */
   public static String formatCost(int cost) {
+    return "$" + cost;
+  }
+
+  /** Used to format integer cost types like generalized-cost used by Raptor. */
+  public static String formatCostCenti(int cost) {
     if (Math.abs(cost) >= 1_000_000 || cost % 100 == 0) {
       return "$" + cost / 100;
     }
@@ -26,7 +34,7 @@ public class OtpNumberFormat {
 
   /** Used to format integer cost types with a given unit. */
   public static String formatCost(int cost, String unit) {
-    return formatCost(cost) + unit;
+    return formatCostCenti(cost) + unit;
   }
 
   public String formatCoordinate(Number value) {
