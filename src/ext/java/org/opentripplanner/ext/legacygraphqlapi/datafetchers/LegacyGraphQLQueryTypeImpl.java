@@ -656,7 +656,6 @@ public class LegacyGraphQLQueryTypeImpl
         callWith.argument("walkSafetyFactor", b::setSafetyFactor);
       });
       callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
-      callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
       callWith.argument(
         "allowKeepingRentedBicycleAtDestination",
         request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
