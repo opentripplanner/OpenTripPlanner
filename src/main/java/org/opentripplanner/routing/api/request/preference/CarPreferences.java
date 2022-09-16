@@ -4,6 +4,7 @@ import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -236,6 +237,11 @@ public class CarPreferences implements Serializable {
 
     public Builder withDecelerationSpeed(double decelerationSpeed) {
       this.decelerationSpeed = decelerationSpeed;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 

@@ -6,6 +6,7 @@ import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -209,6 +210,11 @@ public class TransferPreferences implements Serializable {
 
     public Builder withMaxTransfers(Integer maxTransfers) {
       this.maxTransfers = maxTransfers;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 

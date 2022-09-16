@@ -4,6 +4,7 @@ import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -224,6 +225,11 @@ public class WalkPreferences implements Serializable {
       } else {
         this.safetyFactor = safetyFactor;
       }
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 

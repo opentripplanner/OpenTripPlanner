@@ -44,9 +44,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   }
 
   public RoutingPreferences withTransfer(Consumer<TransferPreferences.Builder> body) {
-    var builder = transfer.copyOf();
-    body.accept(builder);
-    this.transfer = builder.build();
+    this.transfer = transfer.copyOf().apply(body).build();
     return this;
   }
 
@@ -55,9 +53,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   }
 
   public RoutingPreferences withWalk(Consumer<WalkPreferences.Builder> body) {
-    var builder = walk.copyOf();
-    body.accept(builder);
-    this.walk = builder.build();
+    this.walk = walk.copyOf().apply(body).build();
     return this;
   }
 
@@ -82,9 +78,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   }
 
   public RoutingPreferences withBike(Consumer<BikePreferences.Builder> body) {
-    var builder = bike.copyOf();
-    body.accept(builder);
-    this.bike = builder.build();
+    this.bike = bike.copyOf().apply(body).build();
     return this;
   }
 
@@ -93,9 +87,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
   }
 
   public RoutingPreferences withCar(Consumer<CarPreferences.Builder> body) {
-    var builder = car.copyOf();
-    body.accept(builder);
-    this.car = builder.build();
+    this.car = car.copyOf().apply(body).build();
     return this;
   }
 
