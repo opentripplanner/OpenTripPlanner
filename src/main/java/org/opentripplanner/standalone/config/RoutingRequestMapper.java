@@ -270,22 +270,33 @@ public class RoutingRequestMapper {
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
+    preferences
+      .street()
+      .setDrivingDirection(
+        c.asEnum("drivingDirection", dft.preferences().street().drivingDirection())
+      );
+    preferences
+      .street()
+      .setIntersectionTraversalModel(
+        c.asEnum(
+          "intersectionTraversalModel",
+          dft.preferences().street().intersectionTraversalModel()
+        )
+      );
+
+    NodeAdapter unpreferred = c.path("unpreferred");
     request
       .journey()
       .transit()
       .setUnpreferredRoutes(
-        c
-          .path("unpreferred")
-          .asFeedScopedIdList("routes", request.journey().transit().unpreferredRoutes())
+        unpreferred.asFeedScopedIdList("routes", request.journey().transit().unpreferredRoutes())
       );
 
     request
       .journey()
       .transit()
       .setUnpreferredAgencies(
-        c
-          .path("unpreferred")
-          .asFeedScopedIdList("agencies", request.journey().transit().unpreferredRoutes())
+        unpreferred.asFeedScopedIdList("agencies", request.journey().transit().unpreferredRoutes())
       );
 
     return request;

@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
 /**
@@ -29,6 +32,12 @@ public class StateData implements Cloneable {
   protected RouteRequest opt;
 
   protected RoutingContext rctx;
+
+  // TODO VIA - this will be folded into an AStarRequest in the future
+  public IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
+    IntersectionTraversalModel.SIMPLE,
+    DrivingDirection.RIGHT
+  );
 
   /**
    * The preferred mode, which may differ from backMode when for example walking with a bike. It may

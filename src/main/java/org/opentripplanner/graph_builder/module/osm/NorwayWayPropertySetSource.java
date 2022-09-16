@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -9,9 +8,6 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTraversalCostModel;
 
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
@@ -23,8 +19,6 @@ import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTra
  * @see DefaultWayPropertySetSource
  */
 public class NorwayWayPropertySetSource implements WayPropertySetSource {
-
-  private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -735,15 +729,5 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
     props.setSlopeOverride(new OSMSpecifier("location=underground"), true);
     props.setSlopeOverride(new OSMSpecifier("indoor=yes"), true);
-  }
-
-  @Override
-  public DrivingDirection drivingDirection() {
-    return drivingDirection;
-  }
-
-  @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new NorwayIntersectionTraversalCostModel(drivingDirection);
   }
 }

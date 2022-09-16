@@ -1,15 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 
 /**
  * OSM way properties for Finnish roads. FinlandWayPropertySetSource is derived from
@@ -24,8 +20,6 @@ import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTra
  * @see DefaultWayPropertySetSource
  */
 public class FinlandWayPropertySetSource implements WayPropertySetSource {
-
-  private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -96,15 +90,5 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
-  }
-
-  @Override
-  public DrivingDirection drivingDirection() {
-    return drivingDirection;
-  }
-
-  @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
   }
 }
