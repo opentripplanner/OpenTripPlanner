@@ -22,9 +22,10 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -66,14 +67,14 @@ public class BarrierRoutingTest {
       from,
       to,
       BICYCLE,
-      rr -> rr.bikeWalkingReluctance = 1,
+      rr -> rr.preferences().bike().setWalkingReluctance(1),
       itineraries ->
         itineraries
           .stream()
           .flatMap(i ->
             Stream.of(
               () -> assertEquals(1, i.getLegs().size()),
-              () -> assertEquals(BICYCLE, i.getLegs().get(0).getMode()),
+              () -> assertEquals(TraverseMode.BICYCLE, i.getStreetLeg(0).getMode()),
               () ->
                 assertEquals(
                   List.of(false, true, false, true, false),
@@ -141,7 +142,12 @@ public class BarrierRoutingTest {
           .stream()
           .flatMap(i -> i.getLegs().stream())
           .map(l ->
-            () -> assertEquals(traverseMode, l.getMode(), "Allow only " + traverseMode + " legs")
+            () ->
+              assertEquals(
+                traverseMode,
+                (l instanceof StreetLeg s) ? s.getMode() : null,
+                "Allow only " + traverseMode + " legs"
+              )
           )
     );
   }
@@ -151,13 +157,13 @@ public class BarrierRoutingTest {
     GenericLocation from,
     GenericLocation to,
     TraverseMode traverseMode,
-    Consumer<RoutingRequest> options,
+    Consumer<RouteRequest> options,
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
     request.streetSubRequestModes = new TraverseModeSet(traverseMode);
 
     options.accept(request);

@@ -254,29 +254,25 @@ public class EnumTypes {
     )
     .build();
 
-  public static GraphQLEnumType MODE = GraphQLEnumType
+  public static GraphQLEnumType LEG_MODE = GraphQLEnumType
     .newEnum()
     .name("Mode")
-    .value("air", TraverseMode.AIRPLANE)
+    .value("air", TransitMode.AIRPLANE)
     .value("bicycle", TraverseMode.BICYCLE)
-    .value("bus", TraverseMode.BUS)
-    .value("cableway", TraverseMode.CABLE_CAR)
-    .value("water", TraverseMode.FERRY)
-    .value("funicular", TraverseMode.FUNICULAR)
-    .value("lift", TraverseMode.GONDOLA)
-    .value("rail", TraverseMode.RAIL)
-    .value("metro", TraverseMode.SUBWAY)
-    .value("tram", TraverseMode.TRAM)
-    .value("coach", TraverseMode.BUS)
-    .description("NOT IMPLEMENTED")
-    .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
+    .value("bus", TransitMode.BUS)
+    .value("cableway", TransitMode.CABLE_CAR)
+    .value("water", TransitMode.FERRY)
+    .value("funicular", TransitMode.FUNICULAR)
+    .value("lift", TransitMode.GONDOLA)
+    .value("rail", TransitMode.RAIL)
+    .value("metro", TransitMode.SUBWAY)
+    .value("tram", TransitMode.TRAM)
+    .value("trolleybus", TransitMode.TROLLEYBUS)
+    .value("monorail", TransitMode.MONORAIL)
+    .value("coach", TransitMode.COACH)
     .value("foot", TraverseMode.WALK)
     .value("car", TraverseMode.CAR)
     .value("scooter", TraverseMode.SCOOTER)
-    // TODO OTP2 - Car park no added
-    // .value("car_park", TraverseMode.CAR_PARK, "Combine with foot and transit for park and ride.")
-    // .value("car_dropoff", TraverseMode.CAR_DROPOFF, "Combine with foot and transit for kiss and ride.")
-    // .value("car_pickup", TraverseMode.CAR_PICKUP, "Combine with foot and transit for ride and kiss.")
     .build();
 
   public static GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType

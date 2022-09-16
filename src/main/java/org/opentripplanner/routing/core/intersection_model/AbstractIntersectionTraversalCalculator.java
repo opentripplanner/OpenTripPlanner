@@ -1,39 +1,41 @@
 package org.opentripplanner.routing.core.intersection_model;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
- * Abstract turn cost model provides various methods most implementations will use.
+ * Abstract turn calculator model provides various methods most implementations will use.
  *
  * @author avi
  */
-public abstract class AbstractIntersectionTraversalCostModel
-  implements IntersectionTraversalCostModel {
+public abstract class AbstractIntersectionTraversalCalculator
+  implements IntersectionTraversalCalculator {
 
-  /** Factor by which absolute turn angles are divided to get turn costs for non-driving scenarios. */
-  protected double nonDrivingTurnCostFactor = 1.0 / 20.0;
+  /** Factor by which absolute turn angles are divided to get turn durations for non-driving scenarios. */
+  protected double nonDrivingTurnDurationFactor = 1.0 / 20.0;
 
   /* Concrete subclasses must implement this */
   @Override
-  public abstract double computeTraversalCost(
+  public abstract double computeTraversalDuration(
     IntersectionVertex v,
     StreetEdge from,
     StreetEdge to,
     TraverseMode mode,
-    RoutingRequest options,
     float fromSpeed,
     float toSpeed
   );
 
   /**
-   * Computes the turn cost in seconds for non-driving traversal modes.
+   * Computes the turn duration in seconds for non-driving traversal modes.
    * <p>
    * TODO(flamholz): this should probably account for whether there is a traffic light?
    */
-  protected double computeNonDrivingTraversalCost(StreetEdge from, StreetEdge to, float toSpeed) {
+  protected double computeNonDrivingTraversalDuration(
+    StreetEdge from,
+    StreetEdge to,
+    float toSpeed
+  ) {
     int outAngle = to.getOutAngle();
     int inAngle = from.getInAngle();
     int turnCost = Math.abs(outAngle - inAngle);
@@ -41,8 +43,8 @@ public abstract class AbstractIntersectionTraversalCostModel
       turnCost = 360 - turnCost;
     }
 
-    // NOTE: This makes the turn cost lower the faster you're going
-    return (this.nonDrivingTurnCostFactor * turnCost) / toSpeed;
+    // NOTE: This makes the turn duration lower the faster you're going
+    return (this.nonDrivingTurnDurationFactor * turnCost) / toSpeed;
   }
 
   /**

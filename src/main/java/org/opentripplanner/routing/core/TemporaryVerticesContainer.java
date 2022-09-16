@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -31,21 +31,21 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 public class TemporaryVerticesContainer implements AutoCloseable {
 
   private final Graph graph;
-  private final RoutingRequest opt;
+  private final RouteRequest opt;
   private final Set<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
 
-  public TemporaryVerticesContainer(Graph graph, RoutingRequest opt) {
+  public TemporaryVerticesContainer(Graph graph, RouteRequest opt) {
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
     StreetVertexIndex index = this.graph.getStreetIndex();
     this.opt = opt;
-    fromVertices = index.getVerticesForLocation(opt.from, opt, false, tempEdges);
-    toVertices = index.getVerticesForLocation(opt.to, opt, true, tempEdges);
+    fromVertices = index.getVerticesForLocation(opt.from(), opt, false, tempEdges);
+    toVertices = index.getVerticesForLocation(opt.to(), opt, true, tempEdges);
 
-    checkIfVerticesFound(opt.arriveBy);
+    checkIfVerticesFound(opt.arriveBy());
 
     if (fromVertices != null && toVertices != null) {
       for (Vertex fromVertex : fromVertices) {
@@ -83,16 +83,16 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     var to = arriveBy ? fromVertices : toVertices;
 
     // check that vertices where found if from-location was specified
-    if (opt.from.isSpecified() && isDisconnected(from, true)) {
+    if (opt.from().isSpecified() && isDisconnected(from, true)) {
       routingErrors.add(
-        new RoutingError(getRoutingErrorCodeForDisconnected(opt.from), InputField.FROM_PLACE)
+        new RoutingError(getRoutingErrorCodeForDisconnected(opt.from()), InputField.FROM_PLACE)
       );
     }
 
     // check that vertices where found if to-location was specified
-    if (opt.to.isSpecified() && isDisconnected(to, false)) {
+    if (opt.to().isSpecified() && isDisconnected(to, false)) {
       routingErrors.add(
-        new RoutingError(getRoutingErrorCodeForDisconnected(opt.to), InputField.TO_PLACE)
+        new RoutingError(getRoutingErrorCodeForDisconnected(opt.to()), InputField.TO_PLACE)
       );
     }
 
@@ -119,7 +119,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
     // Not connected if linking did not create incoming/outgoing edges depending on the
     // direction and the end.
-    Predicate<Vertex> isNotConnected = (isFrom == opt.arriveBy) ? hasNoIncoming : hasNoOutgoing;
+    Predicate<Vertex> isNotConnected = (isFrom == opt.arriveBy()) ? hasNoIncoming : hasNoOutgoing;
 
     return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
   }

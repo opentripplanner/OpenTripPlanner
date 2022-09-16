@@ -1,41 +1,40 @@
 package org.opentripplanner.routing.core.intersection_model;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
- * The cost of traversing an intersection is constant.
+ * The duration of traversing an intersection is constant.
  */
-public class ConstantIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel {
+public class ConstantIntersectionTraversalCalculator
+  extends AbstractIntersectionTraversalCalculator {
 
-  private final double cost;
+  private final double duration;
 
   /**
    * All traversal costs are equal to the passed-in constant.
    */
-  public ConstantIntersectionTraversalCostModel(double cost) {
-    this.cost = cost;
+  public ConstantIntersectionTraversalCalculator(double duration) {
+    this.duration = duration;
   }
 
   /**
    * Convenience constructor for no cost.
    */
-  public ConstantIntersectionTraversalCostModel() {
+  public ConstantIntersectionTraversalCalculator() {
     this(0.0);
   }
 
   @Override
-  public double computeTraversalCost(
+  public double computeTraversalDuration(
     IntersectionVertex v,
     StreetEdge from,
     StreetEdge to,
     TraverseMode mode,
-    RoutingRequest options,
     float fromSpeed,
     float toSpeed
   ) {
-    return cost;
+    return duration;
   }
 }

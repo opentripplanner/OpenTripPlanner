@@ -19,8 +19,9 @@ import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.ComposingSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.DurationSkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -107,7 +108,7 @@ public class NearbyStopFinder {
    */
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
-    RoutingRequest routingRequest,
+    RouteRequest routingRequest,
     boolean reverseDirection
   ) {
     /* Track the closest stop on each pattern passing nearby. */
@@ -164,7 +165,7 @@ public class NearbyStopFinder {
    */
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
-    RoutingRequest routingRequest,
+    RouteRequest routingRequest,
     boolean reverseDirection
   ) {
     if (useStreets) {
@@ -185,7 +186,7 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RoutingRequest routingRequest
+    RouteRequest routingRequest
   ) {
     List<NearbyStop> stopsFound = new ArrayList<>();
 
@@ -277,15 +278,14 @@ public class NearbyStopFinder {
 
   private List<NearbyStop> findNearbyStopsViaDirectTransfers(Vertex vertex) {
     // It make sense for the directGraphFinder to use meters as a limit, so we convert first
-    double limitMeters =
-      durationLimit.toSeconds() * new RoutingRequest(TraverseMode.WALK).walkSpeed;
+    double limitMeters = durationLimit.toSeconds() * new WalkPreferences().speed();
     Coordinate c0 = vertex.getCoordinate();
     return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
   }
 
   private SkipEdgeStrategy getSkipEdgeStrategy(
     boolean reverseDirection,
-    RoutingRequest routingRequest
+    RouteRequest routingRequest
   ) {
     var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
 
@@ -299,16 +299,18 @@ public class NearbyStopFinder {
     if (
       !reverseDirection &&
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      VehicleToStopSkipEdgeStrategy.applicableModes.contains(routingRequest.modes.accessMode)
+      VehicleToStopSkipEdgeStrategy.applicableModes.contains(
+        routingRequest.journey().access().mode()
+      )
     ) {
       var strategy = new VehicleToStopSkipEdgeStrategy(
         transitService::getRoutesForStop,
-        routingRequest.modes.transitModes.stream().map(MainAndSubMode::mainMode).toList()
+        routingRequest.journey().transit().modes().stream().map(MainAndSubMode::mainMode).toList()
       );
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);
     } else if (
       OTPFeature.VehicleToStopHeuristics.isOn() &&
-      routingRequest.modes.accessMode == StreetMode.BIKE
+      routingRequest.journey().access().mode() == StreetMode.BIKE
     ) {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
       return new ComposingSkipEdgeStrategy(strategy, durationSkipEdgeStrategy);

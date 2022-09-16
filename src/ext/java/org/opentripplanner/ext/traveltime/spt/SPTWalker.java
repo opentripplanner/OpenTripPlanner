@@ -68,14 +68,14 @@ public class SPTWalker {
           }
 
           // Compute speed along edge
-          double speedAlongEdge = s0.getOptions().walkSpeed;
+          double speedAlongEdge = s0.getPreferences().walk().speed();
           if (e instanceof StreetEdge se) {
             /*
              * Compute effective speed, taking into account end state mode (car, bike,
              * walk...) and edge properties (car max speed, slope, etc...)
              */
             TraverseMode mode = s0.getNonTransitMode();
-            speedAlongEdge = se.calculateSpeed(s0.getOptions(), mode, s0.isBackWalkingBike());
+            speedAlongEdge = se.calculateSpeed(s0.getPreferences(), mode, s0.isBackWalkingBike());
             if (mode != TraverseMode.CAR) {
               speedAlongEdge *= se.getEffectiveBikeDistance() / se.getDistanceMeters();
             }

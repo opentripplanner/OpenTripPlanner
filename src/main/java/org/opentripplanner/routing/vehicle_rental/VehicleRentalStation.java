@@ -52,7 +52,7 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
   // OTP internal data
   public boolean allowOverloading = false;
-  public boolean isKeepingVehicleRentalAtDestinationAllowed = false;
+  public boolean isArrivingInRentalVehicleAtDestinationAllowed = false;
   public boolean realTimeData = true;
 
   @Override
@@ -158,8 +158,8 @@ public class VehicleRentalStation implements VehicleRentalPlace {
   }
 
   @Override
-  public boolean isKeepingVehicleRentalAtDestinationAllowed() {
-    return isKeepingVehicleRentalAtDestinationAllowed;
+  public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
+    return isArrivingInRentalVehicleAtDestinationAllowed;
   }
 
   @Override

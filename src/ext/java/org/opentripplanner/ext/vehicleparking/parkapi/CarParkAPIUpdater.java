@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.time.ZoneId;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 
@@ -13,10 +12,9 @@ public class CarParkAPIUpdater extends ParkAPIUpdater {
 
   public CarParkAPIUpdater(
     ParkAPIUpdaterParameters parameters,
-    OpeningHoursCalendarService openingHoursCalendarService,
-    ZoneId zoneId
+    OpeningHoursCalendarService openingHoursCalendarService
   ) {
-    super(parameters, openingHoursCalendarService, zoneId);
+    super(parameters, openingHoursCalendarService);
   }
 
   @Override

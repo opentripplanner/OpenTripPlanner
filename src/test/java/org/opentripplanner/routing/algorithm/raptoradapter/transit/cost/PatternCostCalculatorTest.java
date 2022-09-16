@@ -17,7 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
 import org.opentripplanner.routing.api.request.RequestFunctions;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -73,10 +73,14 @@ public class PatternCostCalculatorTest {
   @Test
   @DisplayName("cost mapper should create penalty map")
   public void testMcCostParameterMapping() {
-    RoutingRequest routingRequest = new RoutingRequest();
-    routingRequest.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-    routingRequest.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
-    routingRequest.setUnpreferredCost("300 + 1.0 x");
+    RouteRequest routingRequest = new RouteRequest();
+
+    routingRequest.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+    routingRequest.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+    routingRequest
+      .preferences()
+      .transit()
+      .setUnpreferredCost(RequestFunctions.parse("300 + 1.0 x"));
 
     var data = new TestTransitData();
     final TestTripPattern unpreferredRoutePattern = pattern(true, false);
@@ -213,31 +217,35 @@ public class PatternCostCalculatorTest {
         .build();
     }
 
-    RoutingRequest createRoutingRequest() {
-      RoutingRequest request = new RoutingRequest();
+    RouteRequest createRoutingRequest() {
+      var request = new RouteRequest();
+      var preferences = request.preferences();
 
-      request.unpreferredCost =
-        RequestFunctions.createLinearFunction(
-          UNPREFERRED_ROUTE_PENALTY,
-          UNPREFERRED_ROUTE_RELUCTANCE
+      preferences
+        .transit()
+        .setUnpreferredCost(
+          RequestFunctions.createLinearFunction(
+            UNPREFERRED_ROUTE_PENALTY,
+            UNPREFERRED_ROUTE_RELUCTANCE
+          )
         );
-      request.walkBoardCost = BOARD_COST_SEC;
-      request.transferCost = TRANSFER_COST_SEC;
-      request.waitReluctance = WAIT_RELUCTANCE_FACTOR;
+      preferences.walk().setBoardCost(BOARD_COST_SEC);
+      preferences.transfer().setCost(TRANSFER_COST_SEC);
+      preferences.transfer().setWaitReluctance(WAIT_RELUCTANCE_FACTOR);
 
       if (prefAgency) {
         // TODO
-        request.setPreferredAgencies(List.of());
+        request.journey().transit().setUnpreferredAgencies(List.of());
       }
       if (prefRoute) {
         // TODO
-        request.setPreferredRoutes(List.of());
+        request.journey().transit().setUnpreferredRoutes(List.of());
       }
       if (unPrefAgency) {
-        request.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+        request.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
       }
       if (unPrefRoute) {
-        request.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+        request.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
       }
       return request;
     }

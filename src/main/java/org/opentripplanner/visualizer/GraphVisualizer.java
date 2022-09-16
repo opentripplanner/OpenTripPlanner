@@ -56,14 +56,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.api.parameter.ApiRequestMode;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -438,40 +440,54 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       searchDate.setText("Format: " + DATE_FORMAT.toString());
       return;
     }
-    TraverseModeSet modeSet = new TraverseModeSet();
-    modeSet.setWalk(walkCheckBox.isSelected());
-    modeSet.setBicycle(bikeCheckBox.isSelected());
-    modeSet.setFerry(ferryCheckBox.isSelected());
-    modeSet.setRail(trainCheckBox.isSelected());
-    modeSet.setTram(trainCheckBox.isSelected());
-    modeSet.setSubway(trainCheckBox.isSelected());
-    modeSet.setFunicular(trainCheckBox.isSelected());
-    modeSet.setGondola(trainCheckBox.isSelected());
-    modeSet.setBus(busCheckBox.isSelected());
-    modeSet.setCableCar(busCheckBox.isSelected());
-    modeSet.setCar(carCheckBox.isSelected());
-    // must set generic transit mode last, and only when it is checked
-    // otherwise 'false' will clear trainish and busish
-    if (transitCheckBox.isSelected()) modeSet.setTransit(true);
-    RoutingRequest options = new RoutingRequest(modeSet);
+    List<String> modes = new ArrayList<>();
+    if (walkCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.WALK.name());
+    }
+    if (bikeCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.BICYCLE.name());
+    }
+    if (carCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.CAR.name());
+    }
+    if (ferryCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.FERRY.name());
+    }
+    if (trainCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.RAIL.name());
+      modes.add(ApiRequestMode.TRAM.name());
+      modes.add(ApiRequestMode.SUBWAY.name());
+      modes.add(ApiRequestMode.FUNICULAR.name());
+      modes.add(ApiRequestMode.GONDOLA.name());
+    }
+    if (busCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.BUS.name());
+      modes.add(ApiRequestMode.CABLE_CAR.name());
+    }
+    if (transitCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.TRANSIT.name());
+    }
+    RouteRequest options = new RouteRequest();
+    QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
+    options.journey().setModes(qualifiedModeSet.getRequestModes());
+    var preferences = options.preferences();
+
     options.setArriveBy(arriveByCheckBox.isSelected());
-    options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+    preferences.walk().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
     // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-    options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
+    preferences.bike().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
     // there should be a ui element for walk distance and optimize type
-    options.setBicycleOptimizeType(getSelectedOptimizeType());
+    preferences.bike().setOptimizeType(getSelectedOptimizeType());
     options.setDateTime(when);
-    options.setFromString(from);
-    options.setToString(to);
-    options.walkSpeed = Float.parseFloat(walkSpeed.getText());
-    options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
-    options.numItineraries = 1;
+    options.setFrom(LocationStringParser.fromOldStyleString(from));
+    options.setTo(LocationStringParser.fromOldStyleString(to));
+    preferences.walk().setSpeed(Float.parseFloat(walkSpeed.getText()));
+    preferences.bike().setSpeed(Float.parseFloat(bikeSpeed.getText()));
+    options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);
-    System.out.println("\tModes: " + modeSet);
+    System.out.println("\tModes: " + qualifiedModeSet);
     System.out.println("\tOptions: " + options);
-
-    options.numItineraries = (Integer.parseInt(this.nPaths.getText()));
 
     // apply callback if the options call for it
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){

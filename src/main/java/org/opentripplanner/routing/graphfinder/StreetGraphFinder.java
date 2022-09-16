@@ -8,7 +8,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -75,9 +75,9 @@ public class StreetGraphFinder implements GraphFinder {
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
-    RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-    rr.from = new GenericLocation(null, null, lat, lon);
-    rr.walkSpeed = 1;
+    RouteRequest rr = new RouteRequest(TraverseMode.WALK);
+    rr.setFrom(new GenericLocation(null, null, lat, lon));
+    rr.preferences().walk().setSpeed(1);
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.

@@ -9,9 +9,9 @@ import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.PO
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -92,15 +92,19 @@ class StreetTransitEntityLinkTest {
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     WheelchairAccessibilityFeature feature;
     if (onlyAccessible) {
       feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
     } else {
       feature = WheelchairAccessibilityFeature.ofCost(100, 100);
     }
-    req.wheelchairAccessibility =
-      new WheelchairAccessibilityRequest(true, feature, feature, feature, 25, 8, 10, 25);
+    req.setWheelchair(true);
+    req
+      .preferences()
+      .setWheelchairAccessibility(
+        new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25)
+      );
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);

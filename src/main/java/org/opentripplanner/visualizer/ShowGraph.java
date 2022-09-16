@@ -610,11 +610,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       Edge e = s.getBackEdge();
       if (e == null) continue;
 
-      if (mode != null && mode.isTransit()) {
-        stroke(200, 050, 000);
-        strokeWeight(6);
-        drawEdge(e);
-      }
+      // TODO Add support for crating transit edges on the fly
+      //      if (mode != null && mode.isTransit()) {
+      //        stroke(200, 050, 000);
+      //        strokeWeight(6);
+      //        drawEdge(e);
+      //      }
       if (e instanceof StreetEdge) {
         StreetTraversalPermission stp = ((StreetEdge) e).getPermission();
         if (stp == StreetTraversalPermission.PEDESTRIAN) {

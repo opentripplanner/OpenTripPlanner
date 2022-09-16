@@ -13,7 +13,7 @@ import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -42,7 +42,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final Duration radiusByDuration;
 
-  private final List<RoutingRequest> transferRequests;
+  private final List<RouteRequest> transferRequests;
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
@@ -52,7 +52,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransitModel transitModel,
     DataImportIssueStore issueStore,
     Duration radiusByDuration,
-    List<RoutingRequest> transferRequests
+    List<RouteRequest> transferRequests
   ) {
     this.graph = graph;
     this.transitModel = transitModel;
@@ -108,8 +108,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         RegularStop stop = ts0.getStop();
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        for (RoutingRequest transferProfile : transferRequests) {
-          RoutingRequest streetRequest = Transfer.prepareTransferRoutingRequest(transferProfile);
+        for (RouteRequest transferProfile : transferRequests) {
+          RouteRequest streetRequest = Transfer.prepareTransferRoutingRequest(transferProfile);
 
           for (NearbyStop sd : findNearbyStops(nearbyStopFinder, ts0, streetRequest, false)) {
             // Skip the origin stop, loop transfers are not needed.
@@ -178,16 +178,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private static Iterable<NearbyStop> findNearbyStops(
     NearbyStopFinder nearbyStopFinder,
     Vertex vertex,
-    RoutingRequest routingRequest,
+    RouteRequest request,
     boolean reverseDirection
   ) {
     return OTPFeature.ConsiderPatternsForDirectTransfers.isOn()
-      ? nearbyStopFinder.findNearbyStopsConsideringPatterns(
-        vertex,
-        routingRequest,
-        reverseDirection
-      )
-      : nearbyStopFinder.findNearbyStops(vertex, routingRequest, reverseDirection);
+      ? nearbyStopFinder.findNearbyStopsConsideringPatterns(vertex, request, reverseDirection)
+      : nearbyStopFinder.findNearbyStops(vertex, request, reverseDirection);
   }
 
   private static class TransferKey {

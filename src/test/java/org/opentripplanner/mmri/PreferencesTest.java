@@ -1,13 +1,14 @@
 package org.opentripplanner.mmri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.core.TraverseMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class PreferencesTest extends GtfsTest {
 

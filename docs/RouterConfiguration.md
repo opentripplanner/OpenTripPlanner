@@ -392,7 +392,7 @@ Common to all updater entries that connect to a network resource is the `url` fi
 // router-config.json
 {
     // Routing defaults are any public field or setter in the Java class
-    // org.opentripplanner.routing.api.request.RoutingRequest
+    // org.opentripplanner.routing.api.request.RouteRequest
     "routingDefaults": {
         "numItineraries": 6,
         "walkSpeed": 2.0,

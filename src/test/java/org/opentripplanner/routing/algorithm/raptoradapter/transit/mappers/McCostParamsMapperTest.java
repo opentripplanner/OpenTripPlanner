@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.agency;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
@@ -10,10 +9,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
@@ -43,8 +40,8 @@ class McCostParamsMapperTest {
 
   @Test
   public void shouldExtractRoutesFromAgencies() {
-    var routingRequest = new RoutingRequest();
-    routingRequest.setUnpreferredAgencies(List.of(unpreferredAgency));
+    var routingRequest = new RouteRequest();
+    routingRequest.journey().transit().setUnpreferredAgencies(List.of(unpreferredAgency));
 
     BitSet unpreferredPatterns = McCostParamsMapper
       .map(routingRequest, data.getPatterns())
@@ -60,8 +57,8 @@ class McCostParamsMapperTest {
 
   @Test
   public void dealWithEmptyList() {
-    var routingRequest = new RoutingRequest();
-    routingRequest.setUnpreferredAgencies(List.of(agencyWithNoRoutes));
+    var routingRequest = new RouteRequest();
+    routingRequest.journey().transit().setUnpreferredAgencies(List.of(agencyWithNoRoutes));
 
     assertEquals(
       new BitSet(),

@@ -7,7 +7,6 @@
     "carSpeed": 40,
     "wheelchairAccessible": false,
     "numItineraries": 12,
-    "showIntermediateStops": false,
     "transferPenalty": 0,
     "walkReluctance": 4.0,
     "bikeReluctance": 5.0,

@@ -6,7 +6,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -15,7 +15,7 @@ import org.opentripplanner.routing.graph.Vertex;
 
 public abstract class MatchState {
 
-  private static final RoutingRequest traverseOptions = new RoutingRequest(TraverseMode.CAR);
+  private static final RouteRequest traverseOptions = new RouteRequest(TraverseMode.CAR);
 
   protected static final double NEW_SEGMENT_PENALTY = 0.1;
 

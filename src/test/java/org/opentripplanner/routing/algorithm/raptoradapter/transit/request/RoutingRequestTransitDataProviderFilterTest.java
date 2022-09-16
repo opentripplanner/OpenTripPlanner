@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -48,12 +48,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
     0
   );
 
-  private static final WheelchairAccessibilityRequest DEFAULT_ACCESSIBILITY =
-    WheelchairAccessibilityRequest.DEFAULT;
-
-  private static final WheelchairAccessibilityRequest ENABLED_ACCESSIBILITY = WheelchairAccessibilityRequest.makeDefault(
-    true
-  );
+  private static final WheelchairAccessibilityPreferences DEFAULT_ACCESSIBILITY =
+    WheelchairAccessibilityPreferences.DEFAULT;
 
   /**
    * Test filter for wheelchair access.
@@ -86,7 +82,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      WheelchairAccessibilityRequest.makeDefault(true),
+      true,
+      DEFAULT_ACCESSIBILITY,
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -109,6 +106,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
@@ -126,6 +124,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
     var filter = new RoutingRequestTransitDataProviderFilter(
+      false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
@@ -152,6 +151,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     );
 
     var filter = new RoutingRequestTransitDataProviderFilter(
+      false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
@@ -205,6 +205,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
+      false,
       DEFAULT_ACCESSIBILITY,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
@@ -231,7 +232,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       true,
-      DEFAULT_ACCESSIBILITY,
+      true,
+      WheelchairAccessibilityPreferences.DEFAULT,
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -257,7 +259,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      ENABLED_ACCESSIBILITY,
+      true,
+      WheelchairAccessibilityPreferences.DEFAULT,
       false,
       MainAndSubMode.all(),
       Set.of(),
@@ -283,7 +286,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      ENABLED_ACCESSIBILITY,
+      true,
+      WheelchairAccessibilityPreferences.DEFAULT,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -309,7 +313,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      ENABLED_ACCESSIBILITY,
+      true,
+      WheelchairAccessibilityPreferences.DEFAULT,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -349,7 +354,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
     // Given
     var filter1 = new RoutingRequestTransitDataProviderFilter(
       false,
-      DEFAULT_ACCESSIBILITY,
+      false,
+      WheelchairAccessibilityPreferences.DEFAULT,
       true,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -368,6 +374,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     // Given
     var filter2 = new RoutingRequestTransitDataProviderFilter(
+      false,
       false,
       DEFAULT_ACCESSIBILITY,
       false,
@@ -482,7 +489,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     var filter = new RoutingRequestTransitDataProviderFilter(
       true,
-      WheelchairAccessibilityRequest.makeDefault(true),
+      true,
+      DEFAULT_ACCESSIBILITY,
       false,
       List.of(new MainAndSubMode(TransitMode.BUS)),
       Set.of(),
@@ -504,7 +512,8 @@ public class RoutingRequestTransitDataProviderFilterTest {
   ) {
     var filter = new RoutingRequestTransitDataProviderFilter(
       false,
-      WheelchairAccessibilityRequest.makeDefault(false),
+      false,
+      DEFAULT_ACCESSIBILITY,
       false,
       allowedModes,
       Set.of(),

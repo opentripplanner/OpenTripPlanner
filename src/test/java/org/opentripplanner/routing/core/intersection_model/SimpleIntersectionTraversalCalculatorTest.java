@@ -8,10 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,32 +17,22 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
- * Tests for SimpleIntersectionTraversalCostModel.
+ * Tests for SimpleIntersectionTraversalModel.
  * <p>
  * TODO(flamholz): add tests for traversal with traffic lights and without a car.
  *
  * @author avi
  */
-public class SimpleTraversalCostModelTest {
+public class SimpleIntersectionTraversalCalculatorTest {
 
   private Graph graph;
 
-  private RoutingRequest options;
-
-  public SimpleIntersectionTraversalCostModel costModel;
+  public SimpleIntersectionTraversalCalculator calculator;
 
   @BeforeEach
   public void before() {
     graph = new Graph();
-    costModel = new SimpleIntersectionTraversalCostModel(DrivingDirection.RIGHT_HAND_TRAFFIC);
-
-    // Initialize the routing request.
-    options = new RoutingRequest();
-    options.carSpeed = 1.0;
-    options.walkSpeed = 1.0;
-    options.carDecelerationSpeed = (2.0);
-    options.carAccelerationSpeed = (2.0);
-    options.setStreetSubRequestModes(TraverseModeSet.allModes());
+    calculator = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT);
   }
 
   @Test
@@ -76,16 +63,14 @@ public class SimpleTraversalCostModelTest {
 
     // calculate the angle for driving on the right hand side
 
-    int rightHandDriveAngle = costModel.calculateTurnAngle(e1, e2);
+    int rightHandDriveAngle = calculator.calculateTurnAngle(e1, e2);
     assertEquals(270, rightHandDriveAngle);
-    assertTrue(costModel.isTurnAcrossTraffic(rightHandDriveAngle));
-    assertFalse(costModel.isSafeTurn(rightHandDriveAngle));
+    assertTrue(calculator.isTurnAcrossTraffic(rightHandDriveAngle));
+    assertFalse(calculator.isSafeTurn(rightHandDriveAngle));
 
     // and on the left hand side
 
-    var leftHandDriveCostModel = new SimpleIntersectionTraversalCostModel(
-      DrivingDirection.LEFT_HAND_TRAFFIC
-    );
+    var leftHandDriveCostModel = new SimpleIntersectionTraversalCalculator(DrivingDirection.LEFT);
     int leftHandDriveAngle = leftHandDriveCostModel.calculateTurnAngle(e1, e2);
     assertEquals(270, leftHandDriveAngle);
 
@@ -97,12 +82,12 @@ public class SimpleTraversalCostModelTest {
 
     assertEquals(
       1.6875,
-      costModel.computeTraversalCost(v2, e1, e2, TraverseMode.BICYCLE, options, 40, 40),
+      calculator.computeTraversalDuration(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       0.5625,
-      costModel.computeTraversalCost(v2, e2, e1, TraverseMode.BICYCLE, options, 40, 40),
+      calculator.computeTraversalDuration(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
 
@@ -110,28 +95,12 @@ public class SimpleTraversalCostModelTest {
 
     assertEquals(
       0.5625,
-      leftHandDriveCostModel.computeTraversalCost(
-        v2,
-        e1,
-        e2,
-        TraverseMode.BICYCLE,
-        options,
-        40,
-        40
-      ),
+      leftHandDriveCostModel.computeTraversalDuration(v2, e1, e2, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
     assertEquals(
       1.6875,
-      leftHandDriveCostModel.computeTraversalCost(
-        v2,
-        e2,
-        e1,
-        TraverseMode.BICYCLE,
-        options,
-        40,
-        40
-      ),
+      leftHandDriveCostModel.computeTraversalDuration(v2, e2, e1, TraverseMode.BICYCLE, 40, 40),
       0.1
     );
   }
@@ -152,9 +121,9 @@ public class SimpleTraversalCostModelTest {
     StreetEdge fromEdge = edge(u, v, 1.0, false);
     StreetEdge toEdge = edge(v, w, 1.0, false);
 
-    int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge);
-    assertFalse(costModel.isSafeTurn(turnAngle));
-    assertFalse(costModel.isTurnAcrossTraffic(turnAngle));
+    int turnAngle = calculator.calculateTurnAngle(fromEdge, toEdge);
+    assertFalse(calculator.isSafeTurn(turnAngle));
+    assertFalse(calculator.isTurnAcrossTraffic(turnAngle));
     // AKA is a straight ahead.
   }
 
@@ -179,12 +148,11 @@ public class SimpleTraversalCostModelTest {
     float toSpeed = 1.0f;
     TraverseMode mode = TraverseMode.CAR;
 
-    double traversalCost = costModel.computeTraversalCost(
+    double traversalCost = calculator.computeTraversalDuration(
       v,
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -213,12 +181,11 @@ public class SimpleTraversalCostModelTest {
     float toSpeed = 1.0f;
     TraverseMode mode = TraverseMode.CAR;
 
-    double traversalCost = costModel.computeTraversalCost(
+    double traversalCost = calculator.computeTraversalDuration(
       v,
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -250,12 +217,11 @@ public class SimpleTraversalCostModelTest {
     float toSpeed = 1.0f;
     TraverseMode mode = TraverseMode.CAR;
 
-    double traversalCost = costModel.computeTraversalCost(
+    double traversalCost = calculator.computeTraversalDuration(
       v,
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -283,20 +249,19 @@ public class SimpleTraversalCostModelTest {
     // 3rd edge prevents inferral of free-flowingness
     StreetEdge extraEdge = edge(v, u, 1.0, false);
 
-    int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge);
-    assertTrue(costModel.isSafeTurn(turnAngle));
-    assertFalse(costModel.isTurnAcrossTraffic(turnAngle));
+    int turnAngle = calculator.calculateTurnAngle(fromEdge, toEdge);
+    assertTrue(calculator.isSafeTurn(turnAngle));
+    assertFalse(calculator.isTurnAcrossTraffic(turnAngle));
 
     float fromSpeed = 1.0f;
     float toSpeed = 1.0f;
     TraverseMode mode = TraverseMode.CAR;
 
-    double traversalCost = costModel.computeTraversalCost(
+    double traversalCost = calculator.computeTraversalDuration(
       v,
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );
@@ -324,20 +289,19 @@ public class SimpleTraversalCostModelTest {
     // 3rd edge prevents inferral of free-flowingness
     StreetEdge extraEdge = edge(v, u, 1.0, false);
 
-    int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge);
-    assertFalse(costModel.isSafeTurn(turnAngle));
-    assertTrue(costModel.isTurnAcrossTraffic(turnAngle));
+    int turnAngle = calculator.calculateTurnAngle(fromEdge, toEdge);
+    assertFalse(calculator.isSafeTurn(turnAngle));
+    assertTrue(calculator.isTurnAcrossTraffic(turnAngle));
 
     float fromSpeed = 1.0f;
     float toSpeed = 1.0f;
     TraverseMode mode = TraverseMode.CAR;
 
-    double traversalCost = costModel.computeTraversalCost(
+    double traversalCost = calculator.computeTraversalDuration(
       v,
       fromEdge,
       toEdge,
       mode,
-      options,
       fromSpeed,
       toSpeed
     );

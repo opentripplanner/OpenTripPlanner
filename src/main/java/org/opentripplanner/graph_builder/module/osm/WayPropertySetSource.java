@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM streets can be traversed
@@ -39,10 +38,6 @@ public interface WayPropertySetSource {
   }
 
   void populateProperties(WayPropertySet wayPropertySet);
-
-  DrivingDirection drivingDirection();
-
-  IntersectionTraversalCostModel getIntersectionTraversalCostModel();
 
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
     return (
@@ -91,18 +86,5 @@ public interface WayPropertySetSource {
   default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
-  }
-
-  enum DrivingDirection {
-    /**
-     * Specifies that cars go on the right hand side of the road. This is true for the US mainland
-     * Europe.
-     */
-    RIGHT_HAND_TRAFFIC,
-    /**
-     * Specifies that cars go on the left hand side of the road. This is true for the UK, Japan and
-     * Australia.
-     */
-    LEFT_HAND_TRAFFIC,
   }
 }

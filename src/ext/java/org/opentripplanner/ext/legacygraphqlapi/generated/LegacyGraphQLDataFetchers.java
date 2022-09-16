@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -24,7 +25,6 @@ import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRe
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -843,7 +843,7 @@ public class LegacyGraphQLDataFetchers {
   public interface LegacyGraphQLTicketType {
     public DataFetcher<String> currency();
 
-    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> fareId();
+    public DataFetcher<String> fareId();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 

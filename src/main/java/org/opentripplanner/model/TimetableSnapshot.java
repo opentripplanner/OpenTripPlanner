@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -175,9 +176,13 @@ public class TimetableSnapshot {
    * @param pattern          trip pattern
    * @param updatedTripTimes updated trip times
    * @param serviceDate      service day for which this update is valid
-   * @return whether or not the update was actually applied
+   * @return whether the update was actually applied
    */
-  public boolean update(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
+  public Optional<UpdateError> update(
+    TripPattern pattern,
+    TripTimes updatedTripTimes,
+    LocalDate serviceDate
+  ) {
     // Preconditions
     Objects.requireNonNull(pattern);
     Objects.requireNonNull(serviceDate);
@@ -230,7 +235,7 @@ public class TimetableSnapshot {
 
     // The time tables are finished during the commit
 
-    return true;
+    return UpdateError.noError();
   }
 
   /**
@@ -281,7 +286,7 @@ public class TimetableSnapshot {
   /**
    * Clear all data of snapshot for the provided feed id
    *
-   * @param feedId feed id to clear the snapshop for
+   * @param feedId feed id to clear the snapshot for
    */
   public void clear(String feedId) {
     if (readOnly) {

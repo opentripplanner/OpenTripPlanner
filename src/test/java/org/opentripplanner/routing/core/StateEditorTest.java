@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -14,7 +14,7 @@ public class StateEditorTest {
   @Test
   public final void testIncrementTimeInSeconds() {
     Graph graph = new Graph();
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
@@ -27,7 +27,7 @@ public class StateEditorTest {
   @Test
   public final void testWeightIncrement() {
     Graph graph = new Graph();
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
@@ -40,7 +40,7 @@ public class StateEditorTest {
   @Test
   public final void testNanWeightIncrement() {
     Graph graph = new Graph();
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 
@@ -53,7 +53,7 @@ public class StateEditorTest {
   @Test
   public final void testInfinityWeightIncrement() {
     Graph graph = new Graph();
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
     StateEditor stateEditor = new StateEditor(routingContext, null);
 

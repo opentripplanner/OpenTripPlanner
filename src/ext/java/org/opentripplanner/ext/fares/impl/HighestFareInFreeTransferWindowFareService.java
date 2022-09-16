@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 

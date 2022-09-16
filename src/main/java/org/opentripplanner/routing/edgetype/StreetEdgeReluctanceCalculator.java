@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.TraverseMode;
 
 class StreetEdgeReluctanceCalculator {
@@ -13,18 +13,18 @@ class StreetEdgeReluctanceCalculator {
    * see {@link #computeWheelchairReluctance(RoutingRequest, double, boolean, boolean)}.
    */
   static double computeReluctance(
-    RoutingRequest req,
+    RoutingPreferences pref,
     TraverseMode traverseMode,
     boolean walkingBike,
     boolean edgeIsStairs
   ) {
     if (edgeIsStairs) {
-      return req.stairsReluctance;
+      return pref.walk().stairsReluctance();
     } else {
       return switch (traverseMode) {
-        case WALK -> walkingBike ? req.bikeWalkingReluctance : req.walkReluctance;
-        case BICYCLE -> req.bikeReluctance;
-        case CAR -> req.carReluctance;
+        case WALK -> walkingBike ? pref.bike().walkingReluctance() : pref.walk().reluctance();
+        case BICYCLE -> pref.bike().reluctance();
+        case CAR -> pref.car().reluctance();
         default -> throw new IllegalArgumentException(
           "getReluctance(): Invalid mode " + traverseMode
         );
@@ -33,15 +33,15 @@ class StreetEdgeReluctanceCalculator {
   }
 
   static double computeWheelchairReluctance(
-    RoutingRequest request,
+    RoutingPreferences preferences,
     double maxSlope,
     boolean edgeWheelchairAccessible,
     boolean stairs
   ) {
-    var wheelchair = request.wheelchairAccessibility;
+    var wheelchair = preferences.wheelchairAccessibility();
     // Add reluctance if street is not wheelchair accessible
     double reluctance = edgeWheelchairAccessible ? 1.0 : wheelchair.inaccessibleStreetReluctance();
-    reluctance *= request.walkReluctance;
+    reluctance *= preferences.walk().reluctance();
 
     // Add reluctance for stairs
     if (stairs) {
