@@ -216,10 +216,6 @@ public abstract class RoutingResource {
   @QueryParam("waitReluctance")
   protected Double waitReluctance;
 
-  /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-  @QueryParam("waitAtBeginningFactor")
-  protected Double waitAtBeginningFactor;
-
   /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
   @QueryParam("walkSpeed")
   protected Double walkSpeed;
@@ -785,10 +781,6 @@ public abstract class RoutingResource {
 
     if (waitReluctance != null) {
       preferences.transfer().setWaitReluctance(waitReluctance);
-    }
-
-    if (waitAtBeginningFactor != null) {
-      preferences.transfer().setWaitAtBeginningFactor(waitAtBeginningFactor);
     }
 
     preferences.withBike(bike -> {
