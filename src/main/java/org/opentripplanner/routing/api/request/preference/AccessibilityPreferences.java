@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import java.util.Objects;
+import org.opentripplanner.util.lang.ToStringBuilder;
+
 /**
  * Preferences for how to treat trips or stops with accessibility restrictions, like wheelchair
  * accessibility.
@@ -61,5 +64,35 @@ public class AccessibilityPreferences {
    */
   public int inaccessibleCost() {
     return inaccessibleCost;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AccessibilityPreferences that = (AccessibilityPreferences) o;
+    return (
+      onlyConsiderAccessible == that.onlyConsiderAccessible &&
+      unknownCost == that.unknownCost &&
+      inaccessibleCost == that.inaccessibleCost
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(onlyConsiderAccessible, unknownCost, inaccessibleCost);
+  }
+
+  @Override
+  public String toString() {
+    if (onlyConsiderAccessible) {
+      return "OnlyConsiderAccessible";
+    }
+
+    return ToStringBuilder
+      .of(AccessibilityPreferences.class)
+      .addCost("unknownCost", unknownCost, NOT_SET)
+      .addCost("inaccessibleCost", inaccessibleCost, NOT_SET)
+      .toString();
   }
 }
