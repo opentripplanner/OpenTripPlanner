@@ -1,8 +1,10 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -137,6 +139,43 @@ public class BikePreferences implements Serializable {
 
   public TimeSlopeSafetyTriangle optimizeTriangle() {
     return optimizeTriangle;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BikePreferences that = (BikePreferences) o;
+    return (
+      doubleEquals(that.speed, speed) &&
+      doubleEquals(that.reluctance, reluctance) &&
+      boardCost == that.boardCost &&
+      doubleEquals(that.walkingSpeed, walkingSpeed) &&
+      doubleEquals(that.walkingReluctance, walkingReluctance) &&
+      switchTime == that.switchTime &&
+      switchCost == that.switchCost &&
+      parkTime == that.parkTime &&
+      parkCost == that.parkCost &&
+      optimizeType == that.optimizeType &&
+      optimizeTriangle.equals(that.optimizeTriangle)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      speed,
+      reluctance,
+      boardCost,
+      walkingSpeed,
+      walkingReluctance,
+      switchTime,
+      switchCost,
+      parkTime,
+      parkCost,
+      optimizeType,
+      optimizeTriangle
+    );
   }
 
   @Override
@@ -286,6 +325,11 @@ public class BikePreferences implements Serializable {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 
