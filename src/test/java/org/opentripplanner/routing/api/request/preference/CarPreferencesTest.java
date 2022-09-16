@@ -20,15 +20,15 @@ class CarPreferencesTest {
 
   private final CarPreferences subject = CarPreferences
     .of()
-    .setSpeed(SPEED)
-    .setReluctance(RELUCTANCE)
-    .setParkTime(PARK_TIME)
-    .setParkCost(PARK_COST)
-    .setPickupTime(PICKUP_TIME)
-    .setPickupCost(PICKUP_COST)
-    .setDropoffTime(DROPOFF_TIME)
-    .setAccelerationSpeed(ACCELERATION_SPEED)
-    .setDecelerationSpeed(DECELERATION_SPEED)
+    .withSpeed(SPEED)
+    .withReluctance(RELUCTANCE)
+    .withParkTime(PARK_TIME)
+    .withParkCost(PARK_COST)
+    .withPickupTime(PICKUP_TIME)
+    .withPickupCost(PICKUP_COST)
+    .withDropoffTime(DROPOFF_TIME)
+    .withAccelerationSpeed(ACCELERATION_SPEED)
+    .withDecelerationSpeed(DECELERATION_SPEED)
     .build();
 
   @Test
@@ -82,8 +82,8 @@ class CarPreferencesTest {
     assertSame(subject, subject.copyOf().build());
 
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.copyOf().setSpeed(0.0).build();
-    var copy = other.copyOf().setSpeed(SPEED).build();
+    var other = subject.copyOf().withSpeed(0.0).build();
+    var copy = other.copyOf().withSpeed(SPEED).build();
 
     assertEquals(subject, copy);
     assertEquals(subject.hashCode(), copy.hashCode());

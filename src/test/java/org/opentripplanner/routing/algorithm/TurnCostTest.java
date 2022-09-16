@@ -94,7 +94,7 @@ public class TurnCostTest {
     // Make a prototype routing request.
     proto = new RouteRequest();
     var preferences = proto.preferences();
-    preferences.withCar(it -> it.setSpeed(1.0));
+    preferences.withCar(it -> it.withSpeed(1.0));
     preferences.withWalk(walk -> {
       walk.setSpeed(1.0);
       walk.setStairsReluctance(1.0);

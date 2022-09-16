@@ -207,7 +207,7 @@ public class TriangleInequalityTest {
       });
     prototypeOptions.preferences().setAllStreetReluctance(1.0);
     prototypeOptions.preferences().street().setTurnReluctance(1.0);
-    prototypeOptions.preferences().withCar(it -> it.setSpeed(1.0));
+    prototypeOptions.preferences().withCar(it -> it.withSpeed(1.0));
     prototypeOptions.preferences().withBike(it -> it.setSpeed(1.0));
 
     if (modes != null) {

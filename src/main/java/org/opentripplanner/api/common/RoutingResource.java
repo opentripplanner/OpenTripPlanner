@@ -753,14 +753,14 @@ public abstract class RoutingResource {
 
     preferences.withCar(car -> {
       if (carReluctance != null) {
-        car.setReluctance(carReluctance);
+        car.withReluctance(carReluctance);
       }
       if (carParkCost != null) {
-        car.setParkCost(carParkCost);
+        car.withParkCost(carParkCost);
       }
 
       if (carParkTime != null) {
-        car.setParkTime(carParkTime);
+        car.withParkTime(carParkTime);
       }
     });
 

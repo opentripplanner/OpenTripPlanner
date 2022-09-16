@@ -31,7 +31,7 @@ public class RoutingPreferences implements Cloneable, Serializable {
       withWalk(it -> it.setReluctance(streetReluctance));
       withBike(it -> it.setReluctance(streetReluctance).setWalkingReluctance(streetReluctance * 2.7)
       );
-      withCar(it -> it.setReluctance(streetReluctance));
+      withCar(it -> it.withReluctance(streetReluctance));
     }
   }
 

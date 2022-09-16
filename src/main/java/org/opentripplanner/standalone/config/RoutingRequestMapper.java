@@ -119,15 +119,15 @@ public class RoutingRequestMapper {
       );
     preferences.withCar(car -> {
       var cDft = preferences.car();
-      car.setSpeed(c.asDouble("carSpeed", cDft.speed()));
-      car.setReluctance(c.asDouble("carReluctance", cDft.reluctance()));
-      car.setDropoffTime(c.asInt("carDropoffTime", cDft.dropoffTime()));
-      car.setParkCost(c.asInt("carParkCost", cDft.parkCost()));
-      car.setParkTime(c.asInt("carParkTime", cDft.parkTime()));
-      car.setPickupCost(c.asInt("carPickupCost", cDft.pickupCost()));
-      car.setPickupTime(c.asInt("carPickupTime", cDft.pickupTime()));
-      car.setAccelerationSpeed(c.asDouble("carAccelerationSpeed", cDft.accelerationSpeed()));
-      car.setDecelerationSpeed(c.asDouble("carDecelerationSpeed", cDft.decelerationSpeed()));
+      car.withSpeed(c.asDouble("carSpeed", cDft.speed()));
+      car.withReluctance(c.asDouble("carReluctance", cDft.reluctance()));
+      car.withDropoffTime(c.asInt("carDropoffTime", cDft.dropoffTime()));
+      car.withParkCost(c.asInt("carParkCost", cDft.parkCost()));
+      car.withParkTime(c.asInt("carParkTime", cDft.parkTime()));
+      car.withPickupCost(c.asInt("carPickupCost", cDft.pickupCost()));
+      car.withPickupTime(c.asInt("carPickupTime", cDft.pickupTime()));
+      car.withAccelerationSpeed(c.asDouble("carAccelerationSpeed", cDft.accelerationSpeed()));
+      car.withDecelerationSpeed(c.asDouble("carDecelerationSpeed", cDft.decelerationSpeed()));
     });
 
     preferences

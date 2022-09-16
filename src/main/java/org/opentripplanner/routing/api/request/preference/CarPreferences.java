@@ -194,47 +194,47 @@ public class CarPreferences implements Serializable {
       this.decelerationSpeed = original.decelerationSpeed;
     }
 
-    public Builder setSpeed(double speed) {
+    public Builder withSpeed(double speed) {
       this.speed = speed;
       return this;
     }
 
-    public Builder setReluctance(double reluctance) {
+    public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
       return this;
     }
 
-    public Builder setParkTime(int parkTime) {
+    public Builder withParkTime(int parkTime) {
       this.parkTime = parkTime;
       return this;
     }
 
-    public Builder setParkCost(int parkCost) {
+    public Builder withParkCost(int parkCost) {
       this.parkCost = parkCost;
       return this;
     }
 
-    public Builder setPickupTime(int pickupTime) {
+    public Builder withPickupTime(int pickupTime) {
       this.pickupTime = pickupTime;
       return this;
     }
 
-    public Builder setPickupCost(int pickupCost) {
+    public Builder withPickupCost(int pickupCost) {
       this.pickupCost = pickupCost;
       return this;
     }
 
-    public Builder setDropoffTime(int dropoffTime) {
+    public Builder withDropoffTime(int dropoffTime) {
       this.dropoffTime = dropoffTime;
       return this;
     }
 
-    public Builder setAccelerationSpeed(double accelerationSpeed) {
+    public Builder withAccelerationSpeed(double accelerationSpeed) {
       this.accelerationSpeed = accelerationSpeed;
       return this;
     }
 
-    public Builder setDecelerationSpeed(double decelerationSpeed) {
+    public Builder withDecelerationSpeed(double decelerationSpeed) {
       this.decelerationSpeed = decelerationSpeed;
       return this;
     }
