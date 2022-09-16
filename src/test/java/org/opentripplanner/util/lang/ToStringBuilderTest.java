@@ -60,6 +60,19 @@ public class ToStringBuilderTest {
   }
 
   @Test
+  public void addCost() {
+    assertEquals(
+      "ToStringBuilderTest{a: $30, c: $33.33}",
+      subject()
+        .addCost("a", 30, 0)
+        .addCost("b", 7, 7)
+        .addCostCenti("c", 3333, 0)
+        .addCostCenti("d", 7, 7)
+        .toString()
+    );
+  }
+
+  @Test
   public void addBool() {
     assertEquals(
       "ToStringBuilderTest{a: true, b: false}",

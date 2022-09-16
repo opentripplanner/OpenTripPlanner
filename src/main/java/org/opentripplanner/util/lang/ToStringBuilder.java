@@ -81,6 +81,14 @@ public class ToStringBuilder {
     return addIfNotNull(name, num, n -> numFormat.formatNumber(n, unit));
   }
 
+  public ToStringBuilder addCost(String name, Integer cost, Integer ignoreValue) {
+    return addIfNotIgnored(name, cost, ignoreValue, OtpNumberFormat::formatCost);
+  }
+
+  public ToStringBuilder addCostCenti(String name, Integer cost, Integer ignoreValue) {
+    return addIfNotIgnored(name, cost, ignoreValue, OtpNumberFormat::formatCostCenti);
+  }
+
   public ToStringBuilder addBool(String name, Boolean value) {
     return addIfNotNull(name, value);
   }
