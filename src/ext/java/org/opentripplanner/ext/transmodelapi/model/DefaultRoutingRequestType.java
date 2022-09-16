@@ -257,17 +257,6 @@ public class DefaultRoutingRequestType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("waitAtBeginningFactor")
-          .description(
-            "How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)."
-          )
-          .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.transfer().waitAtBeginningFactor())
-          .build()
-      )
-      .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
           .name("walkBoardCost")
           .description(
             "This prevents unnecessary transfers by adding a cost for boarding a vehicle."

@@ -121,7 +121,6 @@ public class TransmodelGraphQLPlanner {
     });
     callWith.argument("walkReluctance", preferences::setAllStreetReluctance);
     callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
-    callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
 
     preferences.withBike(bike -> {
       callWith.argument("bikeSpeed", bike::setSpeed);
