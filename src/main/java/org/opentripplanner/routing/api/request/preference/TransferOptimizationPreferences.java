@@ -1,6 +1,10 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
+
 import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -24,9 +28,10 @@ public class TransferOptimizationPreferences
 
   public TransferOptimizationPreferences(Builder builder) {
     this.optimizeTransferWaitTime = builder.optimizeTransferWaitTime;
-    this.minSafeWaitTimeFactor = builder.minSafeWaitTimeFactor;
-    this.backTravelWaitTimeFactor = builder.backTravelWaitTimeFactor;
-    this.extraStopBoardAlightCostsFactor = builder.extraStopBoardAlightCostsFactor;
+    this.minSafeWaitTimeFactor = roundTo2Decimals(builder.minSafeWaitTimeFactor);
+    this.backTravelWaitTimeFactor = roundTo2Decimals(builder.backTravelWaitTimeFactor);
+    this.extraStopBoardAlightCostsFactor =
+      roundTo2Decimals(builder.extraStopBoardAlightCostsFactor);
   }
 
   public static Builder of() {
@@ -60,6 +65,29 @@ public class TransferOptimizationPreferences
   @Override
   public boolean optimizeTransferPriority() {
     return OTPFeature.TransferConstraints.isOn();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransferOptimizationPreferences that = (TransferOptimizationPreferences) o;
+    return (
+      optimizeTransferWaitTime == that.optimizeTransferWaitTime &&
+      doubleEquals(that.minSafeWaitTimeFactor, minSafeWaitTimeFactor) &&
+      doubleEquals(that.backTravelWaitTimeFactor, backTravelWaitTimeFactor) &&
+      doubleEquals(that.extraStopBoardAlightCostsFactor, extraStopBoardAlightCostsFactor)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      optimizeTransferWaitTime,
+      minSafeWaitTimeFactor,
+      backTravelWaitTimeFactor,
+      extraStopBoardAlightCostsFactor
+    );
   }
 
   @Override

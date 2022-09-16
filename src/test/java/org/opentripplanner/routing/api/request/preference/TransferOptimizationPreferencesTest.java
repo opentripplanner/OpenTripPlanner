@@ -2,6 +2,8 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences.DEFAULT;
 
@@ -35,15 +37,6 @@ class TransferOptimizationPreferencesTest {
   }
 
   @Test
-  void testToString() {
-    assertEquals("TransferOptimizationPreferences{}", DEFAULT.toString());
-    assertEquals(
-      "TransferOptimizationPreferences{skipOptimizeWaitTime, minSafeWaitTimeFactor: 7.0, backTravelWaitTimeFactor: 1.2, extraStopBoardAlightCostsFactor: 100.0}",
-      subject.toString()
-    );
-  }
-
-  @Test
   void optimizeTransferWaitTime() {
     assertTrue(DEFAULT.optimizeTransferWaitTime());
     assertFalse(subject.optimizeTransferWaitTime());
@@ -65,5 +58,33 @@ class TransferOptimizationPreferencesTest {
   void extraStopBoardAlightCostsFactor() {
     assertEquals(0.0, DEFAULT.extraStopBoardAlightCostsFactor());
     assertEquals(EXTRA_STOP_BOARD_ALIGHT_COSTS_FACTOR, subject.extraStopBoardAlightCostsFactor());
+  }
+
+  @Test
+  void testToString() {
+    assertEquals("TransferOptimizationPreferences{}", DEFAULT.toString());
+    assertEquals(
+      "TransferOptimizationPreferences{skipOptimizeWaitTime, minSafeWaitTimeFactor: 7.0, backTravelWaitTimeFactor: 1.2, extraStopBoardAlightCostsFactor: 100.0}",
+      subject.toString()
+    );
+  }
+
+  @Test
+  void testCopyOfEqualsAndHashCode() {
+    // Return same object if no value is set
+    assertSame(
+      TransferOptimizationPreferences.DEFAULT,
+      TransferOptimizationPreferences.of().build()
+    );
+    assertSame(subject, subject.copyOf().build());
+
+    // Create a copy, make a change and set it back again to force creating a new object
+    var other = subject.copyOf().withMinSafeWaitTimeFactor(0.0).build();
+    var copy = other.copyOf().withMinSafeWaitTimeFactor(MIN_SAFE_WAIT_TIME_FACTOR).build();
+
+    assertEquals(subject, copy);
+    assertEquals(subject.hashCode(), copy.hashCode());
+    assertNotEquals(subject, other);
+    assertNotEquals(subject.hashCode(), other.hashCode());
   }
 }

@@ -79,6 +79,7 @@ class CarPreferencesTest {
   @Test
   void testCopyOfEqualsAndHashCode() {
     // Return same object if no value is set
+    assertSame(CarPreferences.DEFAULT, CarPreferences.of().build());
     assertSame(subject, subject.copyOf().build());
 
     // Create a copy, make a change and set it back again to force creating a new object
