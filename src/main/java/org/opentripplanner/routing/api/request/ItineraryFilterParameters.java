@@ -38,19 +38,7 @@ public class ItineraryFilterParameters {
   public double groupedOtherThanSameLegsMaxCostMultiplier;
 
   /**
-   * A relative maximum limit for the generalized cost for transit itineraries. The limit is a
-   * linear function of the generalized-cost of an itinerary.
-   * <p>
-   * Transit itineraries with a cost higher than the value produced by this function plus wait cost
-   * at the beginning or end multiplied by {@link RouteRequest#waitAtBeginningFactor} for any
-   * other itinerary are dropped from the result set. Non-transit itineraries is excluded from the
-   * filter.
-   * <ul>
-   * <li>To set a filter to be 1 hours plus 2 times the lowest cost use:
-   * {@code 3600 + 2.0 x}
-   * <li>To set an absolute value(3000) use: {@code 3000 + 0x}
-   * </ul>
-   * The default is {@code 900 + 1.5x} - 15 minutes plus 1.5 times the lowest cost.
+   * A relative maximum limit for the generalized cost for transit itineraries.
    */
   public TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
 

@@ -233,14 +233,7 @@ public class RoutingRequestMapper {
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     preferences
       .transfer()
-      .setWaitAtBeginningFactor(
-        c.asDouble("waitAtBeginningFactor", preferences.transfer().waitAtBeginningFactor())
-      );
-    preferences
-      .transfer()
-      .setWaitReluctance(
-        c.asDouble("waitReluctance", preferences.transfer().waitAtBeginningFactor())
-      );
+      .setWaitReluctance(c.asDouble("waitReluctance", preferences.transfer().waitReluctance()));
     preferences.withWalk(walk -> {
       walk.setSpeed(c.asDouble("walkSpeed", walk.speed()));
       walk.setReluctance(c.asDouble("walkReluctance", walk.reluctance()));

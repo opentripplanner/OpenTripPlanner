@@ -11,9 +11,6 @@ public class TransferPreferences implements Cloneable, Serializable {
   private int nonpreferredCost = 180;
   private double waitReluctance = 1.0;
 
-  @Deprecated
-  private double waitAtBeginningFactor = 0.4;
-
   private TransferOptimizationParameters optimization = TransferOptimizationPreferences.DEFAULT;
   private Integer maxTransfers = 12;
 
@@ -24,7 +21,6 @@ public class TransferPreferences implements Cloneable, Serializable {
     this.slack = other.slack;
     this.nonpreferredCost = other.nonpreferredCost;
     this.waitReluctance = other.waitReluctance;
-    this.waitAtBeginningFactor = other.waitAtBeginningFactor;
     this.optimization = other.optimization;
     this.maxTransfers = other.maxTransfers;
   }
@@ -104,21 +100,6 @@ public class TransferPreferences implements Cloneable, Serializable {
 
   public void setWaitReluctance(double waitReluctance) {
     this.waitReluctance = waitReluctance;
-  }
-
-  public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
-    this.waitAtBeginningFactor = waitAtBeginningFactor;
-  }
-
-  /**
-   * How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first
-   * boarding)
-   *
-   * @deprecated TODO OTP2 Probably a regression, but I'm not sure it worked correctly in OTP 1.X
-   * either. It could be a part of itinerary-filtering after a Raptor search.
-   */
-  public double waitAtBeginningFactor() {
-    return waitAtBeginningFactor;
   }
 
   /** Configure the transfer optimization */
