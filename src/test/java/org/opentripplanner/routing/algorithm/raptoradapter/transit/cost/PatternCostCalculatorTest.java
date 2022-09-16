@@ -233,8 +233,9 @@ public class PatternCostCalculatorTest {
           )
         );
       preferences.withWalk(w -> w.setBoardCost(BOARD_COST_SEC));
-      preferences.transfer().setCost(TRANSFER_COST_SEC);
-      preferences.transfer().setWaitReluctance(WAIT_RELUCTANCE_FACTOR);
+      preferences.withTransfer(tx -> {
+        tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
+      });
 
       if (prefAgency) {
         // TODO

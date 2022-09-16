@@ -92,7 +92,18 @@ public abstract class GtfsTest {
       //routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
     }
     routingRequest.setWheelchair(wheelchairAccessible);
-    preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
+    preferences.withTransfer(tx -> {
+      tx.withSlack(0);
+      tx.withWaitReluctance(1);
+      tx.withCost(preferLeastTransfers ? 300 : 0);
+    });
+
+    // The walk board cost is set low because it interferes with test 2c1.
+    // As long as boarding has a very low cost, waiting should not be "better" than riding
+    // since this makes interlining _worse_ than alighting and re-boarding the same line.
+    // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
+    preferences.withWalk(w -> w.setBoardCost(30));
+
     RequestModesBuilder requestModesBuilder = RequestModes
       .of()
       .withDirectMode(NOT_SET)
@@ -117,14 +128,6 @@ public abstract class GtfsTest {
       throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
     }
     preferences.transit().setOtherThanPreferredRoutesPenalty(0);
-
-    // The walk board cost is set low because it interferes with test 2c1.
-    // As long as boarding has a very low cost, waiting should not be "better" than riding
-    // since this makes interlining _worse_ than alighting and re-boarding the same line.
-    // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
-    preferences.transfer().setWaitReluctance(1);
-    preferences.withWalk(w -> w.setBoardCost(30));
-    preferences.transfer().setSlack(0);
 
     RoutingResponse res = serverContext.routingService().route(routingRequest);
     List<Itinerary> itineraries = res.getTripPlan().itineraries;

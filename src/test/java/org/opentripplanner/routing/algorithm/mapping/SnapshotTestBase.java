@@ -115,7 +115,7 @@ public abstract class SnapshotTestBase {
       )
     );
 
-    request.preferences().transfer().setMaxTransfers(6);
+    request.preferences().withTransfer(tx -> tx.withMaxTransfers(6));
     request.setNumItineraries(6);
     request.setSearchWindow(Duration.ofHours(5));
 

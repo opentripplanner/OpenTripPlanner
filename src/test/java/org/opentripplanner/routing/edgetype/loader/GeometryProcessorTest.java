@@ -306,7 +306,7 @@ public class GeometryProcessorTest {
     Vertex destination = graph.getVertex(feedId + ":T");
     RouteRequest options = new RouteRequest();
     // test is designed such that transfers must be instantaneous
-    options.preferences().transfer().setSlack(0);
+    options.preferences().withTransfer(tx -> tx.withSlack(0));
     LocalDateTime ldt = LocalDateTime.of(2009, 10, 2, 8, 30, 0);
     ZonedDateTime startTime = ZonedDateTime.of(ldt, ZoneId.of("America/New_York"));
     options.setDateTime(startTime.toInstant());

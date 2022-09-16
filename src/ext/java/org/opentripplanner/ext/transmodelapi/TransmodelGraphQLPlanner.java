@@ -120,7 +120,6 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("walkSpeed", b::setSpeed);
     });
     callWith.argument("walkReluctance", preferences::setAllStreetReluctance);
-    callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
 
     preferences.withBike(bike -> {
       callWith.argument("bikeSpeed", bike::setSpeed);
@@ -136,6 +135,18 @@ public class TransmodelGraphQLPlanner {
         });
       }
     });
+
+    preferences.withTransfer(transfer -> {
+      callWith.argument("transferPenalty", transfer::withCost);
+
+      // 'minimumTransferTime' is deprecated, that's why we are mapping 'slack' twice.
+      callWith.argument("minimumTransferTime", transfer::withSlack);
+      callWith.argument("transferSlack", transfer::withSlack);
+
+      callWith.argument("waitReluctance", transfer::withWaitReluctance);
+      callWith.argument("maximumTransfers", transfer::withMaxTransfers);
+    });
+
     //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
     callWith.argument("arriveBy", request::setArriveBy);
@@ -221,8 +232,6 @@ public class TransmodelGraphQLPlanner {
       (Boolean v) -> preferences.system().itineraryFilters().debug = v
     );
 
-    callWith.argument("transferPenalty", (Integer v) -> preferences.transfer().setCost(v));
-
     // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
     // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
@@ -256,10 +265,6 @@ public class TransmodelGraphQLPlanner {
       preferences.withBike(b -> b.setSpeed(4.3));
     }
 
-    // One of those arguments has been deprecated. That's why we are mapping same thing twice.
-    callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
-    callWith.argument("transferSlack", preferences.transfer()::setSlack);
-
     preferences
       .transit()
       .withBoardSlack(builder -> {
@@ -278,7 +283,6 @@ public class TransmodelGraphQLPlanner {
           (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
         );
       });
-    callWith.argument("maximumTransfers", preferences.transfer()::setMaxTransfers);
     callWith.argument(
       "useBikeRentalAvailabilityInformation",
       preferences.rental()::setUseAvailabilityInformation

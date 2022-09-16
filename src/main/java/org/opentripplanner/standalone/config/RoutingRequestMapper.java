@@ -179,11 +179,15 @@ public class RoutingRequestMapper {
 
     request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
 
-    preferences
-      .transfer()
-      .setNonpreferredCost(
-        c.asInt("nonpreferredTransferPenalty", preferences.transfer().nonpreferredCost())
-      );
+    preferences.withTransfer(tx -> {
+      var txDft = preferences.transfer();
+      tx.withNonpreferredCost(c.asInt("nonpreferredTransferPenalty", txDft.nonpreferredCost()));
+      tx.withCost(c.asInt("transferPenalty", txDft.cost()));
+      tx.withSlack(c.asInt("transferSlack", txDft.slack()));
+      tx.withWaitReluctance(c.asDouble("waitReluctance", txDft.waitReluctance()));
+      tx.withOptimization(mapTransferOptimization(c.path("transferOptimization")));
+    });
+
     request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
     preferences
       .transit()
@@ -199,8 +203,6 @@ public class RoutingRequestMapper {
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
 
-    preferences.transfer().setCost(c.asInt("transferPenalty", preferences.transfer().cost()));
-    preferences.transfer().setSlack(c.asInt("transferSlack", preferences.transfer().slack()));
     preferences
       .transit()
       .setReluctanceForMode(
@@ -231,9 +233,6 @@ public class RoutingRequestMapper {
         c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredCost())
       );
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
-    preferences
-      .transfer()
-      .setWaitReluctance(c.asDouble("waitReluctance", preferences.transfer().waitReluctance()));
     preferences.withWalk(walk -> {
       walk.setSpeed(c.asDouble("walkSpeed", walk.speed()));
       walk.setReluctance(c.asDouble("walkReluctance", walk.reluctance()));
@@ -245,8 +244,6 @@ public class RoutingRequestMapper {
 
     preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
     request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));
-
-    preferences.transfer().setOptimization(mapTransferOptimization(c.path("transferOptimization")));
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
@@ -284,11 +281,18 @@ public class RoutingRequestMapper {
 
   private static TransferOptimizationPreferences mapTransferOptimization(NodeAdapter c) {
     var dft = TransferOptimizationPreferences.DEFAULT;
-    return new TransferOptimizationPreferences(
-      c.asBoolean("optimizeTransferWaitTime", dft.optimizeTransferWaitTime()),
-      c.asDouble("minSafeWaitTimeFactor", dft.minSafeWaitTimeFactor()),
-      c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor()),
-      c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())
-    );
+    return TransferOptimizationPreferences
+      .of()
+      .withOptimizeTransferWaitTime(
+        c.asBoolean("optimizeTransferWaitTime", dft.optimizeTransferWaitTime())
+      )
+      .withMinSafeWaitTimeFactor(c.asDouble("minSafeWaitTimeFactor", dft.minSafeWaitTimeFactor()))
+      .withBackTravelWaitTimeFactor(
+        c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor())
+      )
+      .withExtraStopBoardAlightCostsFactor(
+        c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())
+      )
+      .build();
   }
 }

@@ -9,7 +9,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 public class RoutingPreferences implements Cloneable, Serializable {
 
   private TransitPreferences transit = new TransitPreferences();
-  private TransferPreferences transfer = new TransferPreferences();
+  private TransferPreferences transfer = TransferPreferences.DEFAULT;
   private WalkPreferences walk = WalkPreferences.DEFAULT;
   private StreetPreferences street = new StreetPreferences();
 
@@ -41,6 +41,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   public TransferPreferences transfer() {
     return transfer;
+  }
+
+  public RoutingPreferences withTransfer(Consumer<TransferPreferences.Builder> body) {
+    var builder = transfer.copyOf();
+    body.accept(builder);
+    this.transfer = builder.build();
+    return this;
   }
 
   public WalkPreferences walk() {
@@ -121,14 +128,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
       var clone = (RoutingPreferences) super.clone();
 
       clone.transit = transit.clone();
-      clone.transfer = transfer.clone();
       clone.street = street.clone();
       clone.rental = rental.clone();
       clone.parking = parking.clone();
       clone.system = system.clone();
 
       // The following immutable types can be skipped:
-      // - walk, bike, car, wheelchair
+      // - transfer, walk, bike, car, wheelchair
 
       return clone;
     } catch (CloneNotSupportedException e) {

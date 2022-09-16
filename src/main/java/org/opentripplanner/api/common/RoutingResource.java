@@ -779,10 +779,6 @@ public abstract class RoutingResource {
       }
     });
 
-    if (waitReluctance != null) {
-      preferences.transfer().setWaitReluctance(waitReluctance);
-    }
-
     preferences.withBike(bike -> {
       setIfNotNull(bikeSpeed, bike::setSpeed);
       setIfNotNull(bikeReluctance, bike::setReluctance);
@@ -801,6 +797,47 @@ public abstract class RoutingResource {
           setIfNotNull(triangleSlopeFactor, triangle::withSlope);
           setIfNotNull(triangleSafetyFactor, triangle::withSafety);
         });
+      }
+    });
+
+    var transitPref = preferences.transit();
+
+    if (boardSlack != null) {
+      transitPref.withBoardSlack(b -> b.withDefaultSec(boardSlack));
+    }
+
+    if (alightSlack != null) {
+      transitPref.withBoardSlack(b -> b.withDefaultSec(alightSlack));
+    }
+
+    preferences.withTransfer(transfer -> {
+      if (waitReluctance != null) {
+        transfer.withWaitReluctance(waitReluctance);
+      }
+      if (transferPenalty != null) {
+        transfer.withCost(transferPenalty);
+      }
+
+      if (minTransferTime != null) {
+        int alightAndBoardSlack =
+          (
+            transitPref.boardSlack().defaultValueSeconds() +
+            transitPref.alightSlack().defaultValueSeconds()
+          );
+        if (alightAndBoardSlack > minTransferTime) {
+          throw new IllegalArgumentException(
+            "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
+          );
+        }
+        transfer.withSlack(minTransferTime - alightAndBoardSlack);
+      }
+
+      if (nonpreferredTransferPenalty != null) {
+        transfer.withNonpreferredCost(nonpreferredTransferPenalty);
+      }
+
+      if (maxTransfers != null) {
+        transfer.withMaxTransfers(maxTransfers);
       }
     });
 
@@ -872,11 +909,6 @@ public abstract class RoutingResource {
     if (bannedTrips != null) {
       request.journey().transit().setBannedTripsFromString(bannedTrips);
     }
-    // The "Least transfers" optimization is accomplished via an increased transfer penalty.
-    // See comment on RoutingRequest.transferPentalty.
-    if (transferPenalty != null) {
-      preferences.transfer().setCost(transferPenalty);
-    }
 
     /* Temporary code to get bike/car parking and renting working. */
     if (modes != null && !modes.qModes.isEmpty()) {
@@ -886,38 +918,6 @@ public abstract class RoutingResource {
     if (request.vehicleRental && bikeSpeed == null) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
       preferences.withBike(bike -> bike.setSpeed(4.3));
-    }
-
-    var transitPref = preferences.transit();
-
-    if (boardSlack != null) {
-      transitPref.withBoardSlack(b -> b.withDefaultSec(boardSlack));
-    }
-
-    if (alightSlack != null) {
-      transitPref.withBoardSlack(b -> b.withDefaultSec(alightSlack));
-    }
-
-    if (minTransferTime != null) {
-      int alightAndBoardSlack =
-        (
-          transitPref.boardSlack().defaultValueSeconds() +
-          transitPref.alightSlack().defaultValueSeconds()
-        );
-      if (alightAndBoardSlack > minTransferTime) {
-        throw new IllegalArgumentException(
-          "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
-        );
-      }
-      preferences.transfer().setSlack(minTransferTime - alightAndBoardSlack);
-    }
-
-    if (nonpreferredTransferPenalty != null) {
-      preferences.transfer().setNonpreferredCost(nonpreferredTransferPenalty);
-    }
-
-    if (maxTransfers != null) {
-      preferences.transfer().setMaxTransfers(maxTransfers);
     }
 
     preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());

@@ -17,7 +17,6 @@ public class RoutingPreferencesTest {
 
     assertNotSame(pref, clone);
     assertNotSame(pref.transit(), clone.transit());
-    assertNotSame(pref.transfer(), clone.transfer());
     assertNotSame(pref.street(), clone.street());
     assertNotSame(pref.rental(), clone.rental());
     assertNotSame(pref.parking(), clone.parking());
@@ -27,9 +26,10 @@ public class RoutingPreferencesTest {
     assertNotSame(pref.transit().raptorOptions(), clone.transit().raptorOptions());
 
     // Immutable classes should not change
-    assertSame(pref.walk(), clone.walk());
-    assertSame(pref.bike(), clone.bike());
     assertSame(pref.car(), clone.car());
+    assertSame(pref.bike(), clone.bike());
+    assertSame(pref.walk(), clone.walk());
+    assertSame(pref.transfer(), clone.transfer());
     assertSame(pref.wheelchair(), clone.wheelchair());
   }
 }

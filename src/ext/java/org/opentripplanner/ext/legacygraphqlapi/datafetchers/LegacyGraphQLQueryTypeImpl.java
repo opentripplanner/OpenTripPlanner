@@ -655,7 +655,6 @@ public class LegacyGraphQLQueryTypeImpl
         callWith.argument("walkBoardCost", b::setBoardCost);
         callWith.argument("walkSafetyFactor", b::setSafetyFactor);
       });
-      callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
       callWith.argument(
         "allowKeepingRentedBicycleAtDestination",
         request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
@@ -733,7 +732,13 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
       // callWith.argument("banned.stops", request::setBannedStops);
       // callWith.argument("banned.stopsHard", request::setBannedStopsHard);
-      callWith.argument("transferPenalty", preferences.transfer()::setCost);
+      preferences.withTransfer(tx -> {
+        callWith.argument("transferPenalty", tx::withCost);
+        callWith.argument("minTransferTime", tx::withSlack);
+        callWith.argument("waitReluctance", tx::withWaitReluctance);
+        callWith.argument("maxTransfers", tx::withMaxTransfers);
+        callWith.argument("nonpreferredTransferPenalty", tx::withNonpreferredCost);
+      });
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
@@ -791,10 +796,6 @@ public class LegacyGraphQLQueryTypeImpl
         "alightSlack",
         (Integer sec) -> preferences.transit().withAlightSlack(b -> b.withDefaultSec(sec))
       );
-      callWith.argument("minTransferTime", preferences.transfer()::setSlack);
-      callWith.argument("nonpreferredTransferPenalty", preferences.transfer()::setNonpreferredCost);
-
-      callWith.argument("maxTransfers", preferences.transfer()::setMaxTransfers);
 
       preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
