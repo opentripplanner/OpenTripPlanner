@@ -54,11 +54,11 @@ public class Transfer {
 
     transferPreferences.withWalk(walk ->
       walk
-        .setSpeed(roundToHalf(walk.speed()))
-        .setReluctance(roundTo(walk.reluctance(), 1))
-        .setStairsReluctance(roundTo(walk.stairsReluctance(), 1))
-        .setStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1))
-        .setSafetyFactor(roundTo(walk.safetyFactor(), 1))
+        .withSpeed(roundToHalf(walk.speed()))
+        .withReluctance(roundTo(walk.reluctance(), 1))
+        .withStairsReluctance(roundTo(walk.stairsReluctance(), 1))
+        .withStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1))
+        .withSafetyFactor(roundTo(walk.safetyFactor(), 1))
     );
 
     // Some values are rounded to ease caching in RaptorRequestTransferCache

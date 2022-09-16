@@ -234,12 +234,12 @@ public class RoutingRequestMapper {
       );
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     preferences.withWalk(walk -> {
-      walk.setSpeed(c.asDouble("walkSpeed", walk.speed()));
-      walk.setReluctance(c.asDouble("walkReluctance", walk.reluctance()));
-      walk.setBoardCost(c.asInt("walkBoardCost", walk.boardCost()));
-      walk.setStairsReluctance(c.asDouble("stairsReluctance", walk.stairsReluctance()));
-      walk.setStairsTimeFactor(c.asDouble("stairsTimeFactor", walk.stairsTimeFactor()));
-      walk.setSafetyFactor(c.asDouble("walkSafetyFactor", walk.safetyFactor()));
+      walk.withSpeed(c.asDouble("walkSpeed", walk.speed()));
+      walk.withReluctance(c.asDouble("walkReluctance", walk.reluctance()));
+      walk.withBoardCost(c.asInt("walkBoardCost", walk.boardCost()));
+      walk.withStairsReluctance(c.asDouble("stairsReluctance", walk.stairsReluctance()));
+      walk.withStairsTimeFactor(c.asDouble("stairsTimeFactor", walk.stairsTimeFactor()));
+      walk.withSafetyFactor(c.asDouble("walkSafetyFactor", walk.safetyFactor()));
     });
 
     preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));

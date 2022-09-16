@@ -171,7 +171,7 @@ public class WalkPreferences implements Serializable {
       return speed;
     }
 
-    public Builder setSpeed(double speed) {
+    public Builder withSpeed(double speed) {
       this.speed = speed;
       return this;
     }
@@ -180,7 +180,7 @@ public class WalkPreferences implements Serializable {
       return reluctance;
     }
 
-    public Builder setReluctance(double reluctance) {
+    public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
       return this;
     }
@@ -189,7 +189,7 @@ public class WalkPreferences implements Serializable {
       return boardCost;
     }
 
-    public Builder setBoardCost(int boardCost) {
+    public Builder withBoardCost(int boardCost) {
       this.boardCost = boardCost;
       return this;
     }
@@ -198,7 +198,7 @@ public class WalkPreferences implements Serializable {
       return stairsReluctance;
     }
 
-    public Builder setStairsReluctance(double stairsReluctance) {
+    public Builder withStairsReluctance(double stairsReluctance) {
       this.stairsReluctance = stairsReluctance;
       return this;
     }
@@ -207,7 +207,7 @@ public class WalkPreferences implements Serializable {
       return stairsTimeFactor;
     }
 
-    public Builder setStairsTimeFactor(double stairsTimeFactor) {
+    public Builder withStairsTimeFactor(double stairsTimeFactor) {
       this.stairsTimeFactor = stairsTimeFactor;
       return this;
     }
@@ -216,7 +216,7 @@ public class WalkPreferences implements Serializable {
       return safetyFactor;
     }
 
-    public Builder setSafetyFactor(double safetyFactor) {
+    public Builder withSafetyFactor(double safetyFactor) {
       if (safetyFactor < 0) {
         this.safetyFactor = 0;
       } else if (safetyFactor > 1) {

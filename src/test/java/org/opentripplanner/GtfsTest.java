@@ -102,7 +102,7 @@ public abstract class GtfsTest {
     // As long as boarding has a very low cost, waiting should not be "better" than riding
     // since this makes interlining _worse_ than alighting and re-boarding the same line.
     // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
-    preferences.withWalk(w -> w.setBoardCost(30));
+    preferences.withWalk(w -> w.withBoardCost(30));
 
     RequestModesBuilder requestModesBuilder = RequestModes
       .of()

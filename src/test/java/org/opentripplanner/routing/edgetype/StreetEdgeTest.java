@@ -50,7 +50,7 @@ public class StreetEdgeTest {
     proto = new RouteRequest();
     var pref = proto.preferences();
     pref.street().setTurnReluctance(1.0);
-    pref.withWalk(it -> it.setSpeed(1.0).setReluctance(1.0).setStairsReluctance(1.0));
+    pref.withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0));
     pref.withBike(it -> it.setSpeed(5.0f).setReluctance(1.0).setWalkingSpeed(0.8));
     pref.withCar(it -> it.withSpeed(15.0f).withReluctance(1.0));
 

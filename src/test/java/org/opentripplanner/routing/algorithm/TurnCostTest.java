@@ -96,8 +96,8 @@ public class TurnCostTest {
     var preferences = proto.preferences();
     preferences.withCar(it -> it.withSpeed(1.0));
     preferences.withWalk(walk -> {
-      walk.setSpeed(1.0);
-      walk.setStairsReluctance(1.0);
+      walk.withSpeed(1.0);
+      walk.withStairsReluctance(1.0);
     });
     preferences.withBike(bike -> bike.setSpeed(1.0));
     preferences.street().setTurnReluctance(1.0);

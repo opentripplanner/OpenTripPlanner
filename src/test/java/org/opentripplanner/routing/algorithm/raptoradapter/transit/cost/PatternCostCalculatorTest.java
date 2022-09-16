@@ -232,7 +232,7 @@ public class PatternCostCalculatorTest {
             UNPREFERRED_ROUTE_RELUCTANCE
           )
         );
-      preferences.withWalk(w -> w.setBoardCost(BOARD_COST_SEC));
+      preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));
       preferences.withTransfer(tx -> {
         tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
       });

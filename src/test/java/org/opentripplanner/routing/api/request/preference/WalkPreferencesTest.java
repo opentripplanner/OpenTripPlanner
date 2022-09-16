@@ -19,12 +19,12 @@ class WalkPreferencesTest {
 
   private final WalkPreferences subject = WalkPreferences
     .of()
-    .setSpeed(SPEED)
-    .setReluctance(RELUCTANCE)
-    .setBoardCost(BOARD_COST)
-    .setStairsReluctance(STAIRS_RELUCTANCE)
-    .setStairsTimeFactor(STAIRS_TIME_FACTOR)
-    .setSafetyFactor(SAFETY_FACTOR)
+    .withSpeed(SPEED)
+    .withReluctance(RELUCTANCE)
+    .withBoardCost(BOARD_COST)
+    .withStairsReluctance(STAIRS_RELUCTANCE)
+    .withStairsTimeFactor(STAIRS_TIME_FACTOR)
+    .withSafetyFactor(SAFETY_FACTOR)
     .build();
 
   @Test
@@ -60,7 +60,7 @@ class WalkPreferencesTest {
   @Test
   void testEqualsAndHAshCode() {
     // By changing the speed back and forth we force the builder to create a new instance
-    var copy = subject.copyOf().setSpeed(10.0).build().copyOf().setSpeed(SPEED).build();
+    var copy = subject.copyOf().withSpeed(10.0).build().copyOf().withSpeed(SPEED).build();
 
     assertNotSame(copy, subject);
     assertEquals(copy, subject);
@@ -68,12 +68,12 @@ class WalkPreferencesTest {
 
     var others = Stream
       .of(
-        subject.copyOf().setSpeed(1),
-        subject.copyOf().setReluctance(1),
-        subject.copyOf().setBoardCost(1),
-        subject.copyOf().setStairsReluctance(1),
-        subject.copyOf().setStairsTimeFactor(1),
-        subject.copyOf().setSafetyFactor(1)
+        subject.copyOf().withSpeed(1),
+        subject.copyOf().withReluctance(1),
+        subject.copyOf().withBoardCost(1),
+        subject.copyOf().withStairsReluctance(1),
+        subject.copyOf().withStairsTimeFactor(1),
+        subject.copyOf().withSafetyFactor(1)
       )
       .map(WalkPreferences.Builder::build)
       .toList();

@@ -474,8 +474,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     options.setArriveBy(arriveByCheckBox.isSelected());
     preferences.withWalk(walk -> {
-      walk.setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-      walk.setSpeed(Float.parseFloat(walkSpeed.getText()));
+      walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+      walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
     });
     preferences.withBike(bike ->
       bike

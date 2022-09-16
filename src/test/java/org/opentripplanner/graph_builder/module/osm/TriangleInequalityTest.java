@@ -202,8 +202,8 @@ public class TriangleInequalityTest {
     prototypeOptions
       .preferences()
       .withWalk(walk -> {
-        walk.setStairsReluctance(1.0);
-        walk.setSpeed(1.0);
+        walk.withStairsReluctance(1.0);
+        walk.withSpeed(1.0);
       });
     prototypeOptions.preferences().setAllStreetReluctance(1.0);
     prototypeOptions.preferences().street().setTurnReluctance(1.0);

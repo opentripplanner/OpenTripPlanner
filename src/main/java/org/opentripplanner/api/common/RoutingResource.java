@@ -766,16 +766,16 @@ public abstract class RoutingResource {
 
     preferences.withWalk(walk -> {
       if (walkReluctance != null) {
-        walk.setReluctance(walkReluctance);
+        walk.withReluctance(walkReluctance);
       }
       if (walkSpeed != null) {
-        walk.setSpeed(walkSpeed);
+        walk.withSpeed(walkSpeed);
       }
       if (walkBoardCost != null) {
-        walk.setBoardCost(walkBoardCost);
+        walk.withBoardCost(walkBoardCost);
       }
       if (walkSafetyFactor != null) {
-        walk.setSafetyFactor(walkSafetyFactor);
+        walk.withSafetyFactor(walkSafetyFactor);
       }
     });
 
