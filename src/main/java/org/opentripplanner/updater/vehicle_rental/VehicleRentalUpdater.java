@@ -26,6 +26,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.UpdaterConstructionException;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
@@ -64,8 +65,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     // Adding a vehicle rental station service needs a graph writer runnable
     this.service = vehicleRentalStationService;
 
-    // Do any setup if needed
-    source.setup();
+    try {
+      // Do any setup if needed
+      source.setup();
+    } catch (UpdaterConstructionException e) {
+      LOG.warn("Unable to setup updater: {}", parameters.getConfigRef(), e);
+    }
 
     if (pollingPeriodSeconds() <= 0) {
       LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);

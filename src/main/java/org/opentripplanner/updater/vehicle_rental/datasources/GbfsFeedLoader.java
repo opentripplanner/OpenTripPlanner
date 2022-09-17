@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_rental.datasources;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -14,6 +13,7 @@ import org.entur.gbfs.v2_2.gbfs.GBFS;
 import org.entur.gbfs.v2_2.gbfs.GBFSFeed;
 import org.entur.gbfs.v2_2.gbfs.GBFSFeedName;
 import org.entur.gbfs.v2_2.gbfs.GBFSFeeds;
+import org.opentripplanner.updater.UpdaterConstructionException;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class GbfsFeedLoader {
     try {
       uri = new URI(url);
     } catch (URISyntaxException e) {
-      throw new RuntimeException("Invalid url " + url);
+      throw new UpdaterConstructionException("Invalid url " + url);
     }
 
     if (!url.endsWith("gbfs.json")) {
@@ -54,7 +54,9 @@ public class GbfsFeedLoader {
     // Fetch autoconfiguration file
     GBFS data = fetchFeed(uri, httpHeaders, GBFS.class);
     if (data == null) {
-      throw new RuntimeException("Could not fetch the feed auto-configuration file from " + uri);
+      throw new UpdaterConstructionException(
+        "Could not fetch the feed auto-configuration file from " + uri
+      );
     }
 
     // Pick first language if none defined
@@ -62,14 +64,16 @@ public class GbfsFeedLoader {
       ? data.getFeedsData().values().iterator().next()
       : data.getFeedsData().get(languageCode);
     if (feeds == null) {
-      throw new RuntimeException("Language " + languageCode + " does not exist in feed " + uri);
+      throw new UpdaterConstructionException(
+        "Language " + languageCode + " does not exist in feed " + uri
+      );
     }
 
     // Create updater for each file
     for (GBFSFeed feed : feeds.getFeeds()) {
       GBFSFeedName feedName = feed.getName();
       if (feedUpdaters.containsKey(feedName)) {
-        throw new RuntimeException(
+        throw new UpdaterConstructionException(
           "Feed contains duplicate url for feed " +
           feedName +
           ". " +
