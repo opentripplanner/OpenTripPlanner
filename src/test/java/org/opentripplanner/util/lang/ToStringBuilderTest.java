@@ -152,6 +152,16 @@ public class ToStringBuilderTest {
   }
 
   @Test
+  public void addCollectionIgnoreDefault() {
+    var dftValue = List.of("A", "B");
+    var list = List.of("A", "B");
+    var other = List.of("A");
+    assertEquals("ToStringBuilderTest{c: null}", subject().addCol("c", null, dftValue).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addCol("c", list, dftValue).toString());
+    assertEquals("ToStringBuilderTest{c: [A]}", subject().addCol("c", other, dftValue).toString());
+  }
+
+  @Test
   public void addCollectionWithCustomToStringOperation() {
     Function<?, String> op = e -> {
       // Should not happen for null and empty collection
@@ -229,6 +239,7 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{t: 2012-01-28T22:45:12Z}",
       subject().addDateTime("t", time).toString()
     );
+    assertEquals("ToStringBuilderTest{}", subject().addDateTime("t", null).toString());
   }
 
   @Test

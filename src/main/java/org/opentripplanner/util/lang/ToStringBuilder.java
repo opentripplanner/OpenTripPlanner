@@ -152,6 +152,10 @@ public class ToStringBuilder {
     return addIfNotNull(name, c == null || c.isEmpty() ? null : c);
   }
 
+  public ToStringBuilder addCol(String name, Collection<?> c, Collection<?> ignoreValue) {
+    return addIfNotIgnored(name, c, ignoreValue, Objects::toString);
+  }
+
   /**
    * Add collection if not null or not empty, all elements are added using the given custom
    * {@code toStingOp}.

@@ -38,8 +38,7 @@ public class TransitPreferences implements Serializable {
     this.unpreferredCost = createLinearFunction(0.0, DEFAULT_ROUTE_RELUCTANCE);
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
-    // TODO VIA - THE RaptorOptions need to be immutable
-    this.raptor = new RaptorPreferences();
+    this.raptor = RaptorPreferences.DEFAULT;
   }
 
   private TransitPreferences(Builder builder) {
@@ -197,7 +196,7 @@ public class TransitPreferences implements Serializable {
         "includePlannedCancellations",
         includePlannedCancellations != DEFAULT.includePlannedCancellations
       )
-      .addObj("raptorOptions", raptor, DEFAULT.raptor)
+      .addObj("raptor", raptor, DEFAULT.raptor)
       .toString();
   }
 
@@ -275,8 +274,8 @@ public class TransitPreferences implements Serializable {
       return this;
     }
 
-    public Builder withRaptor(Consumer<RaptorPreferences> body) {
-      body.accept(raptor);
+    public Builder withRaptor(Consumer<RaptorPreferences.Builder> body) {
+      this.raptor = raptor.copyOf().apply(body).build();
       return this;
     }
 
