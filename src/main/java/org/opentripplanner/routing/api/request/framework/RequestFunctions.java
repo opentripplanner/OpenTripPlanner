@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.framework;
 
 import java.io.Serializable;
 import java.util.function.DoubleFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
  * This is a factory for creating functions which can be used as parameters in the {@link

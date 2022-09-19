@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
-import static org.opentripplanner.routing.api.request.RequestFunctions.createLinearFunction;
+import static org.opentripplanner.routing.api.request.framework.RequestFunctions.createLinearFunction;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

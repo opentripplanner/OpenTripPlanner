@@ -12,7 +12,7 @@ import java.util.BitSet;
 import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.raptor.RaptorService;

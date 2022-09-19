@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 

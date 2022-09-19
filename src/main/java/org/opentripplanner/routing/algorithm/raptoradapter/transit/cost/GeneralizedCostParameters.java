@@ -4,8 +4,8 @@ import java.util.BitSet;
 import java.util.Objects;
 import java.util.function.DoubleFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.util.lang.ToStringBuilder;
 

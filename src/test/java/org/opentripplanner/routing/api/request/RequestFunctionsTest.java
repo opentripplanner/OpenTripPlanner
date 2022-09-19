@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class RequestFunctionsTest {
 

@@ -6,7 +6,7 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class DoubleFunctionScalarFactory {
 
