@@ -234,7 +234,7 @@ public class TransitPreferences implements Serializable {
     }
 
     public Builder withBoardSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
-      this.boardSlack = this.boardSlack.copyOf(body);
+      this.boardSlack = this.boardSlack.copyOf().apply(body).build();
       return this;
     }
 
@@ -243,7 +243,7 @@ public class TransitPreferences implements Serializable {
     }
 
     public Builder withAlightSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
-      this.alightSlack = this.alightSlack.copyOf(body);
+      this.alightSlack = this.alightSlack.copyOf().apply(body).build();
       return this;
     }
 

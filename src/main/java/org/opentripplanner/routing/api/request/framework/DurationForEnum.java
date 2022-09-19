@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request.framework;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.function.Consumer;
 import org.opentripplanner.util.lang.ObjectUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
@@ -38,10 +37,6 @@ public class DurationForEnum<E extends Enum<?>> implements Serializable {
 
   public DurationForEnumBuilder<E> copyOf() {
     return new DurationForEnumBuilder<>(this);
-  }
-
-  public DurationForEnum<E> copyOf(Consumer<DurationForEnumBuilder<E>> body) {
-    return copyOf().apply(body).build();
   }
 
   Class<E> type() {
