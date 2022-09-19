@@ -179,10 +179,29 @@ public class TransmodelGraphQLPlanner {
         request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
     );
 
-    callWith.argument(
-      "preferred.otherThanPreferredLinesPenalty",
-      preferences.transit()::setOtherThanPreferredRoutesPenalty
-    );
+    preferences.withTransit(tr -> {
+      callWith.argument(
+        "preferred.otherThanPreferredLinesPenalty",
+        tr::setOtherThanPreferredRoutesPenalty
+      );
+      tr.withBoardSlack(builder -> {
+        callWith.argument("boardSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "boardSlackList",
+          (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+      tr.withAlightSlack(builder -> {
+        callWith.argument("alightSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "alightSlackList",
+          (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+      callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
+      callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
+    });
+
     callWith.argument(
       "preferred.lines",
       (List<String> lines) -> request.journey().transit().setPreferredRoutes(mapIDsToDomain(lines))
@@ -265,32 +284,9 @@ public class TransmodelGraphQLPlanner {
       preferences.withBike(b -> b.setSpeed(4.3));
     }
 
-    preferences
-      .transit()
-      .withBoardSlack(builder -> {
-        callWith.argument("boardSlackDefault", builder::withDefaultSec);
-        callWith.argument(
-          "boardSlackList",
-          (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
-        );
-      });
-    preferences
-      .transit()
-      .withAlightSlack(builder -> {
-        callWith.argument("alightSlackDefault", builder::withDefaultSec);
-        callWith.argument(
-          "alightSlackList",
-          (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
-        );
-      });
     callWith.argument(
       "useBikeRentalAvailabilityInformation",
       preferences.rental()::setUseAvailabilityInformation
-    );
-    callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
-    callWith.argument(
-      "includePlannedCancellations",
-      preferences.transit()::setIncludePlannedCancellations
     );
     //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 

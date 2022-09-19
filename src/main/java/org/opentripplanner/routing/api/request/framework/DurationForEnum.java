@@ -36,10 +36,12 @@ public class DurationForEnum<E extends Enum<?>> implements Serializable {
     return new DurationForEnumBuilder<>(type);
   }
 
+  public DurationForEnumBuilder<E> copyOf() {
+    return new DurationForEnumBuilder<>(this);
+  }
+
   public DurationForEnum<E> copyOf(Consumer<DurationForEnumBuilder<E>> body) {
-    var builder = new DurationForEnumBuilder<>(this);
-    body.accept(builder);
-    return builder.build();
+    return copyOf().apply(body).build();
   }
 
   Class<E> type() {

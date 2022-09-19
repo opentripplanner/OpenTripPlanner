@@ -35,12 +35,28 @@ public class RoutingRequestMapper {
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    preferences
-      .transit()
-      .initAlightSlack(
-        c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
+    preferences.withTransit(tr -> {
+      var dftTr = preferences.transit();
+      tr.initAlightSlack(
+        c.asDuration2("alightSlack", dftTr.alightSlack().defaultValue(), SECONDS),
         c.asEnumMap("alightSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
       );
+      tr.initBoardSlack(
+        c.asDuration2("boardSlack", dftTr.boardSlack().defaultValue(), SECONDS),
+        c.asEnumMap("boardSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
+      );
+      tr.setIgnoreRealtimeUpdates(
+        c.asBoolean("ignoreRealtimeUpdates", dftTr.ignoreRealtimeUpdates())
+      );
+      tr.setOtherThanPreferredRoutesPenalty(
+        c.asInt("otherThanPreferredRoutesPenalty", dftTr.otherThanPreferredRoutesPenalty())
+      );
+      tr.setReluctanceForMode(
+        c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble)
+      );
+      tr.setUnpreferredCost(c.asLinearFunction("unpreferredRouteCost", dftTr.unpreferredCost()));
+    });
+
     vehicleRental.setAllowedNetworks(
       c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
     );
@@ -101,12 +117,6 @@ public class RoutingRequestMapper {
           preferences.rental().arrivingInRentalVehicleAtDestinationCost()
         )
       );
-    preferences
-      .transit()
-      .initBoardSlack(
-        c.asDuration2("boardSlack", preferences.transit().boardSlack().defaultValue(), SECONDS),
-        c.asEnumMap("boardSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
-      );
 
     preferences
       .street()
@@ -153,11 +163,6 @@ public class RoutingRequestMapper {
     preferences
       .system()
       .setGeoidElevation(c.asBoolean("geoidElevation", preferences.system().geoidElevation()));
-    preferences
-      .transit()
-      .setIgnoreRealtimeUpdates(
-        c.asBoolean("ignoreRealtimeUpdates", preferences.transit().ignoreRealtimeUpdates())
-      );
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
     request.setLocale(c.asLocale("locale", dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
@@ -189,25 +194,12 @@ public class RoutingRequestMapper {
     });
 
     request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
-    preferences
-      .transit()
-      .setOtherThanPreferredRoutesPenalty(
-        c.asInt(
-          "otherThanPreferredRoutesPenalty",
-          preferences.transit().otherThanPreferredRoutesPenalty()
-        )
-      );
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
     request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
     vehicleParking.setRequiredTags(
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
 
-    preferences
-      .transit()
-      .setReluctanceForMode(
-        c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble)
-      );
     preferences
       .street()
       .setTurnReluctance(c.asDouble("turnReluctance", preferences.street().turnReluctance()));
@@ -226,11 +218,6 @@ public class RoutingRequestMapper {
           "useVehicleParkingAvailabilityInformation",
           preferences.parking().useAvailabilityInformation()
         )
-      );
-    preferences
-      .transit()
-      .setUnpreferredCost(
-        c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredCost())
       );
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     preferences.withWalk(walk -> {

@@ -79,8 +79,7 @@ public class PatternCostCalculatorTest {
     routingRequest.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
     routingRequest
       .preferences()
-      .transit()
-      .setUnpreferredCost(RequestFunctions.parse("300 + 1.0 x"));
+      .withTransit(tr -> tr.setUnpreferredCost(RequestFunctions.parse("300 + 1.0 x")));
 
     var data = new TestTransitData();
     final TestTripPattern unpreferredRoutePattern = pattern(true, false);
@@ -224,14 +223,14 @@ public class PatternCostCalculatorTest {
       var request = new RouteRequest();
       var preferences = request.preferences();
 
-      preferences
-        .transit()
-        .setUnpreferredCost(
+      preferences.withTransit(transit ->
+        transit.setUnpreferredCost(
           RequestFunctions.createLinearFunction(
             UNPREFERRED_ROUTE_PENALTY,
             UNPREFERRED_ROUTE_RELUCTANCE
           )
-        );
+        )
+      );
       preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));
       preferences.withTransfer(tx -> {
         tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);

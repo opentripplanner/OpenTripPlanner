@@ -91,8 +91,7 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   public void initMaxAccessEgressDuration(Duration defaultValue, Map<StreetMode, Duration> values) {
     this.maxAccessEgressDuration =
-      maxAccessEgressDuration.copyOf(builder -> builder.withDefault(defaultValue).withValues(values)
-      );
+      maxAccessEgressDuration.copyOf().withDefault(defaultValue).withValues(values).build();
   }
 
   /**
@@ -109,9 +108,7 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   public void initMaxDirectDuration(Duration defaultValue, Map<StreetMode, Duration> valuePerMode) {
     this.maxDirectDuration =
-      this.maxDirectDuration.copyOf(builder ->
-          builder.withDefault(defaultValue).withValues(valuePerMode)
-        );
+      this.maxDirectDuration.copyOf().withDefault(defaultValue).withValues(valuePerMode).build();
   }
 
   /** Multiplicative factor on expected turning time. */

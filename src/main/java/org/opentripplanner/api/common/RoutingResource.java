@@ -800,15 +800,25 @@ public abstract class RoutingResource {
       }
     });
 
-    var transitPref = preferences.transit();
+    preferences.withTransit(tr -> {
+      if (boardSlack != null) {
+        tr.withBoardSlack(b -> b.withDefaultSec(boardSlack));
+      }
+      if (alightSlack != null) {
+        tr.withBoardSlack(b -> b.withDefaultSec(alightSlack));
+      }
+      if (otherThanPreferredRoutesPenalty != null) {
+        tr.setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
+      }
+      if (ignoreRealtimeUpdates != null) {
+        tr.setIgnoreRealtimeUpdates(ignoreRealtimeUpdates);
+      }
+    });
 
-    if (boardSlack != null) {
-      transitPref.withBoardSlack(b -> b.withDefaultSec(boardSlack));
-    }
-
-    if (alightSlack != null) {
-      transitPref.withBoardSlack(b -> b.withDefaultSec(alightSlack));
-    }
+    // This depends on the initialization of transfer preferences above
+    int boardAndAlightSlack =
+      preferences.transit().boardSlack().defaultValueSeconds() +
+      preferences.transit().alightSlack().defaultValueSeconds();
 
     preferences.withTransfer(transfer -> {
       if (waitReluctance != null) {
@@ -819,17 +829,12 @@ public abstract class RoutingResource {
       }
 
       if (minTransferTime != null) {
-        int alightAndBoardSlack =
-          (
-            transitPref.boardSlack().defaultValueSeconds() +
-            transitPref.alightSlack().defaultValueSeconds()
-          );
-        if (alightAndBoardSlack > minTransferTime) {
+        if (boardAndAlightSlack > minTransferTime) {
           throw new IllegalArgumentException(
             "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
           );
         }
-        transfer.withSlack(minTransferTime - alightAndBoardSlack);
+        transfer.withSlack(minTransferTime - boardAndAlightSlack);
       }
 
       if (nonpreferredTransferPenalty != null) {
@@ -882,9 +887,6 @@ public abstract class RoutingResource {
     if (preferredRoutes != null) {
       request.journey().transit().setPreferredRoutesFromString(preferredRoutes);
     }
-    if (otherThanPreferredRoutesPenalty != null) {
-      preferences.transit().setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
-    }
     if (preferredAgencies != null) {
       request.journey().transit().setPreferredAgenciesFromString(preferredAgencies);
     }
@@ -921,10 +923,6 @@ public abstract class RoutingResource {
     }
 
     preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
-
-    if (ignoreRealtimeUpdates != null) {
-      preferences.transit().setIgnoreRealtimeUpdates(ignoreRealtimeUpdates);
-    }
 
     if (disableAlertFiltering != null) {
       preferences.system().setDisableAlertFiltering(disableAlertFiltering);

@@ -6,9 +6,10 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /** User/trip cost/time/slack/reluctance search config. */
+@SuppressWarnings("UnusedReturnValue")
 public class RoutingPreferences implements Cloneable, Serializable {
 
-  private TransitPreferences transit = new TransitPreferences();
+  private TransitPreferences transit = TransitPreferences.DEFAULT;
   private TransferPreferences transfer = TransferPreferences.DEFAULT;
   private WalkPreferences walk = WalkPreferences.DEFAULT;
   private StreetPreferences street = new StreetPreferences();
@@ -37,6 +38,11 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   public TransitPreferences transit() {
     return transit;
+  }
+
+  public RoutingPreferences withTransit(Consumer<TransitPreferences.Builder> body) {
+    transit = transit.copyOf().apply(body).build();
+    return this;
   }
 
   public TransferPreferences transfer() {
@@ -119,14 +125,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
     try {
       var clone = (RoutingPreferences) super.clone();
 
-      clone.transit = transit.clone();
       clone.street = street.clone();
       clone.rental = rental.clone();
       clone.parking = parking.clone();
       clone.system = system.clone();
 
       // The following immutable types can be skipped:
-      // - transfer, walk, bike, car, wheelchair
+      // - transfer, walk, bike, car, wheelchair, transit
 
       return clone;
     } catch (CloneNotSupportedException e) {

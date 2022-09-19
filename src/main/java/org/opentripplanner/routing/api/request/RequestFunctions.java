@@ -35,7 +35,7 @@ public class RequestFunctions {
    * <p>
    * {@code a + b x}
    * <p>
-   * where {@code a} is the constant and {@code b} is the coefficient in:
+   * where {@code a} is the constant and {@code b} is the coefficient.
    *
    * @throws RuntimeException if the input is not parsable.
    */

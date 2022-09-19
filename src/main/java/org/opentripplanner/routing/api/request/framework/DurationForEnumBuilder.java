@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.framework;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 public class DurationForEnumBuilder<E extends Enum<?>> {
@@ -35,7 +36,7 @@ public class DurationForEnumBuilder<E extends Enum<?>> {
   }
 
   DurationForEnumBuilder(Class<E> type) {
-    this(type, null, null);
+    this(type, Duration.ZERO, null);
   }
 
   Class<E> type() {
@@ -70,6 +71,11 @@ public class DurationForEnumBuilder<E extends Enum<?>> {
     for (Map.Entry<E, Duration> e : values.entrySet()) {
       with(e.getKey(), e.getValue());
     }
+    return this;
+  }
+
+  public DurationForEnumBuilder<E> apply(Consumer<DurationForEnumBuilder<E>> body) {
+    body.accept(this);
     return this;
   }
 

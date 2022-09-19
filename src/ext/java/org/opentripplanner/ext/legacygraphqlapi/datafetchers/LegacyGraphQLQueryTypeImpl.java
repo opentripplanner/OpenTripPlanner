@@ -665,20 +665,6 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       callWith.argument(
-        "modeWeight",
-        (Map<String, Object> v) ->
-          preferences
-            .transit()
-            .setReluctanceForMode(
-              v
-                .entrySet()
-                .stream()
-                .collect(
-                  Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
-                )
-            )
-      );
-      callWith.argument(
         "debugItineraryFilter",
         (Boolean v) -> preferences.system().itineraryFilters().debug = v
       );
@@ -693,14 +679,49 @@ public class LegacyGraphQLQueryTypeImpl
       //              .map(LegacyGraphQLQueryTypeImpl::toGenericLocation)
       //              .collect(Collectors.toList())
       //      );
+
       callWith.argument(
         "preferred.routes",
         request.journey().transit()::setPreferredRoutesFromString
       );
-      callWith.argument(
-        "preferred.otherThanPreferredRoutesPenalty",
-        preferences.transit()::setOtherThanPreferredRoutesPenalty
-      );
+
+      preferences.withTransit(tr -> {
+        callWith.argument(
+          "boardSlack",
+          (Integer sec) -> tr.withBoardSlack(b -> b.withDefaultSec(sec))
+        );
+        callWith.argument(
+          "alightSlack",
+          (Integer sec) -> tr.withAlightSlack(b -> b.withDefaultSec(sec))
+        );
+        callWith.argument(
+          "preferred.otherThanPreferredRoutesPenalty",
+          tr::setOtherThanPreferredRoutesPenalty
+        );
+        // This is deprecated, if both are set, the proper one will override this
+        callWith.argument(
+          "unpreferred.useUnpreferredRoutesPenalty",
+          (Integer v) ->
+            tr.setUnpreferredCostString(
+              RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
+            )
+        );
+        callWith.argument("unpreferred.unpreferredRouteCost", tr::setUnpreferredCostString);
+        callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
+        callWith.argument(
+          "modeWeight",
+          (Map<String, Object> modeWeights) ->
+            tr.setReluctanceForMode(
+              modeWeights
+                .entrySet()
+                .stream()
+                .collect(
+                  Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
+                )
+            )
+        );
+      });
+
       callWith.argument(
         "preferred.agencies",
         request.journey().transit()::setPreferredAgenciesFromString
@@ -712,20 +733,6 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument(
         "unpreferred.agencies",
         request.journey().transit()::setUnpreferredAgenciesFromString
-      );
-      // This is deprecated, if both are set, the proper one will override this
-      callWith.argument(
-        "unpreferred.useUnpreferredRoutesPenalty",
-        (Integer v) ->
-          preferences
-            .transit()
-            .setUnpreferredCostString(
-              RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
-            )
-      );
-      callWith.argument(
-        "unpreferred.unpreferredRouteCost",
-        preferences.transit()::setUnpreferredCostString
       );
       callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
       callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
@@ -788,20 +795,7 @@ public class LegacyGraphQLQueryTypeImpl
         preferences.withBike(b -> b.setSpeed(4.3));
       }
 
-      callWith.argument(
-        "boardSlack",
-        (Integer sec) -> preferences.transit().withBoardSlack(b -> b.withDefaultSec(sec))
-      );
-      callWith.argument(
-        "alightSlack",
-        (Integer sec) -> preferences.transit().withAlightSlack(b -> b.withDefaultSec(sec))
-      );
-
       preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
-
-      //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
-      //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
-      callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
 
       callWith.argument(
         "locale",

@@ -127,7 +127,7 @@ public abstract class GtfsTest {
     if (excludedStop != null && !excludedStop.isEmpty()) {
       throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
     }
-    preferences.transit().setOtherThanPreferredRoutesPenalty(0);
+    preferences.withTransit(tr -> tr.setOtherThanPreferredRoutesPenalty(0));
 
     RoutingResponse res = serverContext.routingService().route(routingRequest);
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
