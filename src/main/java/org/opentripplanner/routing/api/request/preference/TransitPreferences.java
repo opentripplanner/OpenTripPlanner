@@ -13,7 +13,6 @@ import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.api.request.RaptorOptions;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.api.request.framework.DurationForEnumBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -233,7 +232,7 @@ public class TransitPreferences implements Serializable {
       withBoardSlack(builder -> builder.withDefault(defaultValue).withValues(values));
     }
 
-    public Builder withBoardSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
+    public Builder withBoardSlack(Consumer<DurationForEnum.Builder<TransitMode>> body) {
       this.boardSlack = this.boardSlack.copyOf().apply(body).build();
       return this;
     }
@@ -242,7 +241,7 @@ public class TransitPreferences implements Serializable {
       withAlightSlack(builder -> builder.withDefault(defaultValue).withValues(values));
     }
 
-    public Builder withAlightSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
+    public Builder withAlightSlack(Consumer<DurationForEnum.Builder<TransitMode>> body) {
       this.alightSlack = this.alightSlack.copyOf().apply(body).build();
       return this;
     }

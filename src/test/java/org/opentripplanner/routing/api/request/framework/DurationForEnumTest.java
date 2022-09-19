@@ -3,8 +3,8 @@ package org.opentripplanner.routing.api.request.framework;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -65,10 +65,14 @@ class DurationForEnumTest {
   }
 
   @Test
-  void toChangeTheBuilderAfterTheBuildMethodIsCalledIsNotAllowed() {
+  void reuseBuilderToMakeDiffrentObjects() {
     var builder = DurationForEnum.of(StreetMode.class);
-    builder.build();
-    assertThrows(IllegalStateException.class, () -> builder.with(StreetMode.WALK, WALK_VALUE));
+    var defaultValue = builder.build();
+    builder.with(StreetMode.WALK, D10s);
+    var withWalkSet = builder.build();
+
+    assertNotSame(defaultValue, withWalkSet);
+    assertEquals(D10s, withWalkSet.valueOf(StreetMode.WALK));
   }
 
   @Test
