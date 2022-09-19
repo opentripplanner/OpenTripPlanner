@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serial;
 import java.io.Serializable;
