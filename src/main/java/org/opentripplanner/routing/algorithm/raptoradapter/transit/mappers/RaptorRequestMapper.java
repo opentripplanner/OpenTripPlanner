@@ -72,7 +72,7 @@ public class RaptorRequestMapper {
     if (request.pageCursor() == null) {
       int time = relativeTime(request.dateTime());
 
-      int timeLimit = relativeTime(preferences.transit().raptorOptions().getTimeLimit());
+      int timeLimit = relativeTime(preferences.transit().raptor().getTimeLimit());
 
       if (request.arriveBy()) {
         searchParams.latestArrivalTime(time);
@@ -98,7 +98,7 @@ public class RaptorRequestMapper {
       searchParams.maxNumberOfTransfers(preferences.transfer().maxTransfers());
     }
 
-    for (Optimization optimization : preferences.transit().raptorOptions().getOptimizations()) {
+    for (Optimization optimization : preferences.transit().raptor().getOptimizations()) {
       if (optimization.is(PARALLEL)) {
         if (isMultiThreadedEnbled) {
           builder.enableOptimization(optimization);
@@ -108,8 +108,8 @@ public class RaptorRequestMapper {
       }
     }
 
-    builder.profile(preferences.transit().raptorOptions().getProfile());
-    builder.searchDirection(preferences.transit().raptorOptions().getSearchDirection());
+    builder.profile(preferences.transit().raptor().getProfile());
+    builder.searchDirection(preferences.transit().raptor().getSearchDirection());
 
     builder
       .profile(RaptorProfile.MULTI_CRITERIA)

@@ -29,7 +29,7 @@ public class TransitPreferences implements Serializable {
   private final DoubleFunction<Double> unpreferredCost;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
-  private final RaptorOptions raptorOptions;
+  private final RaptorPreferences raptor;
 
   private TransitPreferences() {
     this.boardSlack = this.alightSlack = DurationForEnum.of(TransitMode.class).build();
@@ -39,7 +39,7 @@ public class TransitPreferences implements Serializable {
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
     // TODO VIA - THE RaptorOptions need to be immutable
-    this.raptorOptions = new RaptorOptions();
+    this.raptor = new RaptorPreferences();
   }
 
   private TransitPreferences(Builder builder) {
@@ -50,7 +50,7 @@ public class TransitPreferences implements Serializable {
     this.unpreferredCost = requireNonNull(builder.unpreferredCost);
     this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
     this.includePlannedCancellations = builder.includePlannedCancellations;
-    this.raptorOptions = requireNonNull(builder.raptorOptions);
+    this.raptor = requireNonNull(builder.raptor);
   }
 
   public static Builder of() {
@@ -141,8 +141,8 @@ public class TransitPreferences implements Serializable {
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
-  public RaptorOptions raptorOptions() {
-    return raptorOptions;
+  public RaptorPreferences raptor() {
+    return raptor;
   }
 
   @Override
@@ -158,7 +158,7 @@ public class TransitPreferences implements Serializable {
       alightSlack.equals(that.alightSlack) &&
       reluctanceForMode.equals(that.reluctanceForMode) &&
       unpreferredCost.equals(that.unpreferredCost) &&
-      raptorOptions.equals(that.raptorOptions)
+      raptor.equals(that.raptor)
     );
   }
 
@@ -172,7 +172,7 @@ public class TransitPreferences implements Serializable {
       unpreferredCost,
       ignoreRealtimeUpdates,
       includePlannedCancellations,
-      raptorOptions
+      raptor
     );
   }
 
@@ -197,7 +197,7 @@ public class TransitPreferences implements Serializable {
         "includePlannedCancellations",
         includePlannedCancellations != DEFAULT.includePlannedCancellations
       )
-      .addObj("raptorOptions", raptorOptions, DEFAULT.raptorOptions)
+      .addObj("raptorOptions", raptor, DEFAULT.raptor)
       .toString();
   }
 
@@ -213,7 +213,7 @@ public class TransitPreferences implements Serializable {
     private DoubleFunction<Double> unpreferredCost;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
-    private RaptorOptions raptorOptions;
+    private RaptorPreferences raptor;
 
     public Builder(TransitPreferences original) {
       this.original = original;
@@ -224,7 +224,7 @@ public class TransitPreferences implements Serializable {
       this.unpreferredCost = original.unpreferredCost;
       this.ignoreRealtimeUpdates = original.ignoreRealtimeUpdates;
       this.includePlannedCancellations = original.includePlannedCancellations;
-      this.raptorOptions = original.raptorOptions;
+      this.raptor = original.raptor;
     }
 
     public void initBoardSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
@@ -275,8 +275,8 @@ public class TransitPreferences implements Serializable {
       return this;
     }
 
-    public Builder withRaptorOptions(Consumer<RaptorOptions> body) {
-      body.accept(raptorOptions);
+    public Builder withRaptor(Consumer<RaptorPreferences> body) {
+      body.accept(raptor);
       return this;
     }
 

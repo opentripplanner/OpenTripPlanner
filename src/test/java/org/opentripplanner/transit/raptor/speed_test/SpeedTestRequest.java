@@ -50,7 +50,7 @@ public class SpeedTestRequest {
       request.setDateTime(time(input.departureTime()));
       request.setArriveBy(false);
       if (input.arrivalTime() != TestCase.NOT_SET) {
-        pref.transit().raptorOptions().withTimeLimit(time(input.arrivalTime()));
+        pref.transit().raptor().withTimeLimit(time(input.arrivalTime()));
       }
     } else if (input.arrivalTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.arrivalTime()));
@@ -68,7 +68,7 @@ public class SpeedTestRequest {
 
     pref
       .transit()
-      .raptorOptions()
+      .raptor()
       .withProfile(profile.raptorProfile())
       .withOptimizations(profile.optimizations())
       .withSearchDirection(profile.direction());

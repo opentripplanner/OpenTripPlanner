@@ -15,7 +15,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 /**
  * Set of optimizations to use with Raptor. These are available here for testing purposes.
  */
-public class RaptorOptions implements Serializable {
+public class RaptorPreferences implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
@@ -34,9 +34,9 @@ public class RaptorOptions implements Serializable {
    */
   private Instant timeLimit = null;
 
-  public RaptorOptions() {}
+  public RaptorPreferences() {}
 
-  public RaptorOptions(RaptorOptions other) {
+  public RaptorPreferences(RaptorPreferences other) {
     withOptimizations(other.optimizations);
     withProfile(other.profile);
     withSearchDirection(other.searchDirection);
@@ -47,7 +47,7 @@ public class RaptorOptions implements Serializable {
     return optimizations;
   }
 
-  public RaptorOptions withOptimizations(Collection<Optimization> optimizations) {
+  public RaptorPreferences withOptimizations(Collection<Optimization> optimizations) {
     Objects.requireNonNull(optimizations);
     this.optimizations.clear();
     this.optimizations.addAll(optimizations);
@@ -58,7 +58,7 @@ public class RaptorOptions implements Serializable {
     return profile;
   }
 
-  public RaptorOptions withProfile(RaptorProfile profile) {
+  public RaptorPreferences withProfile(RaptorProfile profile) {
     Objects.requireNonNull(profile);
     this.profile = profile;
     return this;
@@ -68,7 +68,7 @@ public class RaptorOptions implements Serializable {
     return searchDirection;
   }
 
-  public RaptorOptions withSearchDirection(SearchDirection searchDirection) {
+  public RaptorPreferences withSearchDirection(SearchDirection searchDirection) {
     Objects.requireNonNull(searchDirection);
     this.searchDirection = searchDirection;
     return this;
@@ -78,7 +78,7 @@ public class RaptorOptions implements Serializable {
     return timeLimit;
   }
 
-  public RaptorOptions withTimeLimit(Instant timeLimit) {
+  public RaptorPreferences withTimeLimit(Instant timeLimit) {
     this.timeLimit = timeLimit;
     return this;
   }
@@ -86,7 +86,7 @@ public class RaptorOptions implements Serializable {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(RaptorOptions.class)
+      .of(RaptorPreferences.class)
       .addCol("optimizations", optimizations)
       .addEnum("profile", profile)
       .addEnum("searchDirection", searchDirection)

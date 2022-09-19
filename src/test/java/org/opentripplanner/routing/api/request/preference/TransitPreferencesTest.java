@@ -41,7 +41,7 @@ class TransitPreferencesTest {
     .setReluctanceForMode(RELUCTANCE_FOR_MODE)
     .setOtherThanPreferredRoutesPenalty(OTHER_THAN_PREFERRED_ROUTES_PENALTY)
     .setUnpreferredCost(UNPREFERRED_COST)
-    .withRaptorOptions(b -> b.withSearchDirection(RAPTOR_SEARCH_DIRECTION))
+    .withRaptor(b -> b.withSearchDirection(RAPTOR_SEARCH_DIRECTION))
     .withBoardSlack(b -> b.withDefault(D45s).with(TransitMode.AIRPLANE, D35m))
     .withAlightSlack(b -> b.withDefault(D15s).with(TransitMode.AIRPLANE, D25m))
     .setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
@@ -89,7 +89,7 @@ class TransitPreferencesTest {
 
   @Test
   void raptorOptions() {
-    assertEquals(RAPTOR_SEARCH_DIRECTION, subject.raptorOptions().getSearchDirection());
+    assertEquals(RAPTOR_SEARCH_DIRECTION, subject.raptor().getSearchDirection());
   }
 
   @Test
