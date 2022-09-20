@@ -2,16 +2,16 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.POSSIBLE;
+import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
+import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
@@ -93,18 +93,16 @@ class StreetTransitEntityLinkTest {
       .build();
 
     var req = new RouteRequest();
-    WheelchairAccessibilityFeature feature;
+    AccessibilityPreferences feature;
     if (onlyAccessible) {
-      feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
+      feature = AccessibilityPreferences.ofOnlyAccessible();
     } else {
-      feature = WheelchairAccessibilityFeature.ofCost(100, 100);
+      feature = AccessibilityPreferences.ofCost(100, 100);
     }
     req.setWheelchair(true);
     req
       .preferences()
-      .setWheelchairAccessibility(
-        new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25)
-      );
+      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);

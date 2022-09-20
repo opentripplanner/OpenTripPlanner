@@ -16,8 +16,8 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -77,7 +77,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
-  public WheelchairAccessibility getTripWheelchairAccessibility() {
+  public Accessibility getTripWheelchairAccessibility() {
     return edge.getFlexTrip().getTrip().getWheelchairBoarding();
   }
 

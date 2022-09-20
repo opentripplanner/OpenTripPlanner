@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class PreferencesTest extends GtfsTest {
 

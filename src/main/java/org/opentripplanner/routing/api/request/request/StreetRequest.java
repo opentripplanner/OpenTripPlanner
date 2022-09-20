@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
-import java.time.Duration;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 // TODO VIA: Javadoc

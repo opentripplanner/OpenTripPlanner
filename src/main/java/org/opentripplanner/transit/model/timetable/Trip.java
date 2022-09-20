@@ -8,9 +8,9 @@ import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
@@ -32,7 +32,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
 
   private final Direction direction;
   private final BikeAccess bikesAllowed;
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final Accessibility wheelchairBoarding;
 
   private final String gtfsBlockId;
   private final String gtfsFareId;
@@ -53,7 +53,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
     this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
     this.wheelchairBoarding =
-      requireNonNullElse(builder.getWheelchairBoarding(), WheelchairAccessibility.NO_INFORMATION);
+      requireNonNullElse(builder.getWheelchairBoarding(), Accessibility.NO_INFORMATION);
     this.netexAlteration = requireNonNullElse(builder.getNetexAlteration(), TripAlteration.PLANNED);
 
     // Optional fields
@@ -139,7 +139,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   @Nonnull
-  public WheelchairAccessibility getWheelchairBoarding() {
+  public Accessibility getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 

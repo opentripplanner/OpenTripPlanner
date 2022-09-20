@@ -49,7 +49,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
     var req = new RouteRequest();
-    req.preferences().walk().setReluctance(walkReluctance);
+    req.preferences().withWalk(w -> w.setReluctance(walkReluctance));
     State result = traverse(edge, req);
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
@@ -72,7 +72,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setMode(TraverseMode.BICYCLE);
-    req.preferences().bike().setReluctance(bikeReluctance);
+    req.preferences().withBike(bike -> bike.setReluctance(bikeReluctance));
 
     State result = traverse(edge, req);
     assertNotNull(result);
@@ -119,7 +119,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     edge.setStairs(true);
 
     var req = new RouteRequest();
-    req.preferences().walk().setStairsReluctance(stairsReluctance);
+    req.preferences().withWalk(w -> w.setStairsReluctance(stairsReluctance));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);
@@ -153,7 +153,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     edge.setWalkSafetyFactor(2);
 
     var req = new RouteRequest();
-    req.preferences().walk().setSafetyFactor(walkSafetyFactor);
+    req.preferences().withWalk(w -> w.setSafetyFactor(walkSafetyFactor));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);

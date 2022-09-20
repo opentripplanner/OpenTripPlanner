@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
@@ -18,8 +18,7 @@ class TripTest {
 
   private static final String ID = "1";
   private static final String SHORT_NAME = "name";
-  private static final WheelchairAccessibility WHEELCHAIR_ACCESSIBILITY =
-    WheelchairAccessibility.POSSIBLE;
+  private static final Accessibility WHEELCHAIR_ACCESSIBILITY = Accessibility.POSSIBLE;
   public static final Route ROUTE = TransitModelForTest.route("routeId").build();
   private static final Direction DIRECTION = Direction.INBOUND;
   public static final String HEAD_SIGN = "head sign";
@@ -103,9 +102,7 @@ class TripTest {
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withShortName("X").build()));
     assertFalse(
-      subject.sameAs(
-        subject.copy().withWheelchairBoarding(WheelchairAccessibility.NOT_POSSIBLE).build()
-      )
+      subject.sameAs(subject.copy().withWheelchairBoarding(Accessibility.NOT_POSSIBLE).build())
     );
     assertFalse(
       subject.sameAs(

@@ -23,9 +23,9 @@ import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -134,7 +134,7 @@ public class QuayType {
           .dataFetcher(environment ->
             Objects.requireNonNullElse(
               (((StopLocation) environment.getSource()).getWheelchairAccessibility()),
-              WheelchairAccessibility.NO_INFORMATION
+              Accessibility.NO_INFORMATION
             )
           )
           .build()

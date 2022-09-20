@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.OptionalInt;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   private RealTimeState realTimeState = RealTimeState.SCHEDULED;
 
-  public WheelchairAccessibility wheelchairAccessibility;
+  public Accessibility wheelchairAccessibility;
 
   /**
    * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. The
@@ -399,11 +399,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     arrivalTimes[stop] = scheduledArrivalTimes[stop] + timeShift + delay;
   }
 
-  public WheelchairAccessibility getWheelchairAccessibility() {
+  public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }
 
-  public void updateWheelchairAccessibility(WheelchairAccessibility wheelchairAccessibility) {
+  public void updateWheelchairAccessibility(Accessibility wheelchairAccessibility) {
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 

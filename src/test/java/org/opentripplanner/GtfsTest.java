@@ -123,7 +123,7 @@ public abstract class GtfsTest {
     // since this makes interlining _worse_ than alighting and re-boarding the same line.
     // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
     preferences.transfer().setWaitReluctance(1);
-    preferences.walk().setBoardCost(30);
+    preferences.withWalk(w -> w.setBoardCost(30));
     preferences.transfer().setSlack(0);
 
     RoutingResponse res = serverContext.routingService().route(routingRequest);

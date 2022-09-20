@@ -116,7 +116,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     request.journey().transit().setModes(List.of());
     request.setFrom(p1);
     request.setTo(p2);
-    request.preferences().walk().setSpeed(1.0);
+    request.preferences().withWalk(w -> w.setSpeed(1.0));
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -28,18 +29,38 @@ public class TimeSlopeSafetyTriangleTest {
   @ParameterizedTest(name = "Time/slope/safety: | {0} {1} {2} || {3} {4} {5} |  {6}")
   @VariableSource("testCases")
   public void test(
-    double inTi,
-    double inSl,
-    double inSa,
-    double expTi,
-    double expSl,
-    double expSa,
+    double inTime,
+    double inSlope,
+    double inSafety,
+    double expTime,
+    double expSlope,
+    double expSafety,
     String description
   ) {
-    var subject = new TimeSlopeSafetyTriangle(inTi, inSl, inSa);
-    assertEquals(expTi, subject.time(), DELTA, description);
-    assertEquals(expSl, subject.slope(), DELTA, description);
-    assertEquals(expSa, subject.safety(), DELTA, description);
+    var subject = TimeSlopeSafetyTriangle
+      .of()
+      .withTime(inTime)
+      .withSlope(inSlope)
+      .withSafety(inSafety)
+      .build();
+    assertEquals(expTime, subject.time(), DELTA, description);
+    assertEquals(expSlope, subject.slope(), DELTA, description);
+    assertEquals(expSafety, subject.safety(), DELTA, description);
+  }
+
+  @Test
+  public void testBuildWithDefaultValue() {
+    // Set som arbitrary values for the default instance
+    var expected = TimeSlopeSafetyTriangle
+      .of()
+      .withTime(1.0)
+      .withSlope(2.0)
+      .withSafety(3.0)
+      .build();
+    // then the default should be returned if no value is set
+    var result = TimeSlopeSafetyTriangle.of().buildOrDefault(expected);
+
+    assertSame(expected, result);
   }
 
   @Test

@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+import org.opentripplanner.util.lang.DoubleUtils;
 
 /**
  * @param slopeExceededReluctance What factor should be given to street edges, which are over the
@@ -14,33 +12,19 @@ import java.math.RoundingMode;
  *                                punished. This should be a very high value as you want to only
  *                                include stairs as a last result.
  */
-public record WheelchairAccessibilityPreferences(
-  WheelchairAccessibilityFeature trip,
-  WheelchairAccessibilityFeature stop,
-  WheelchairAccessibilityFeature elevator,
+public record WheelchairPreferences(
+  AccessibilityPreferences trip,
+  AccessibilityPreferences stop,
+  AccessibilityPreferences elevator,
   double inaccessibleStreetReluctance,
   double maxSlope,
   double slopeExceededReluctance,
   double stairsReluctance
 ) {
-  private static final WheelchairAccessibilityFeature DEFAULT_TRIP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
-  private static final WheelchairAccessibilityFeature DEFAULT_STOP_FEATURE = WheelchairAccessibilityFeature.ofOnlyAccessible();
-
-  /**
-   * It's very common for elevators in OSM to have unknown wheelchair accessibility since they are
-   * assumed to be so for that reason they only have a small default penalty for unknown
-   * accessibility
-   */
-  private static final WheelchairAccessibilityFeature DEFAULT_ELEVATOR_FEATURE = WheelchairAccessibilityFeature.ofCost(
-    20,
-    3600
-  );
-
   /**
    * Default reluctance for traversing a street that is tagged with wheelchair=no. Since most
    * streets have no accessibility information, we don't have a separate cost for unknown.
    */
-
   private static final int DEFAULT_INACCESSIBLE_STREET_RELUCTANCE = 25;
 
   /**
@@ -52,9 +36,19 @@ public record WheelchairAccessibilityPreferences(
 
   private static final int DEFAULT_STAIRS_RELUCTANCE = 100;
 
-  public static final WheelchairAccessibilityPreferences DEFAULT = new WheelchairAccessibilityPreferences(
-    DEFAULT_TRIP_FEATURE,
-    DEFAULT_STOP_FEATURE,
+  /**
+   * It's very common for elevators in OSM to have unknown wheelchair accessibility since they are
+   * assumed to be so for that reason they only have a small default penalty for unknown
+   * accessibility
+   */
+  private static final AccessibilityPreferences DEFAULT_ELEVATOR_FEATURE = AccessibilityPreferences.ofCost(
+    20,
+    3600
+  );
+
+  public static final WheelchairPreferences DEFAULT = new WheelchairPreferences(
+    AccessibilityPreferences.ofOnlyAccessible(),
+    AccessibilityPreferences.ofOnlyAccessible(),
     DEFAULT_ELEVATOR_FEATURE,
     DEFAULT_INACCESSIBLE_STREET_RELUCTANCE,
     DEFAULT_MAX_SLOPE,
@@ -62,20 +56,21 @@ public record WheelchairAccessibilityPreferences(
     DEFAULT_STAIRS_RELUCTANCE
   );
 
-  public WheelchairAccessibilityPreferences round() {
-    double roundedMaxSlope = BigDecimal
-      .valueOf(maxSlope)
-      .setScale(3, RoundingMode.HALF_EVEN)
-      .round(MathContext.UNLIMITED)
-      .doubleValue();
-    return new WheelchairAccessibilityPreferences(
-      trip,
-      stop,
-      elevator,
-      inaccessibleStreetReluctance,
-      roundedMaxSlope,
-      slopeExceededReluctance,
-      stairsReluctance
-    );
+  public WheelchairPreferences(
+    AccessibilityPreferences trip,
+    AccessibilityPreferences stop,
+    AccessibilityPreferences elevator,
+    double inaccessibleStreetReluctance,
+    double maxSlope,
+    double slopeExceededReluctance,
+    double stairsReluctance
+  ) {
+    this.trip = trip;
+    this.stop = stop;
+    this.elevator = elevator;
+    this.inaccessibleStreetReluctance = DoubleUtils.roundTo2Decimals(inaccessibleStreetReluctance);
+    this.maxSlope = DoubleUtils.roundTo3Decimals(maxSlope);
+    this.slopeExceededReluctance = DoubleUtils.roundTo2Decimals(slopeExceededReluctance);
+    this.stairsReluctance = DoubleUtils.roundTo2Decimals(stairsReluctance);
   }
 }

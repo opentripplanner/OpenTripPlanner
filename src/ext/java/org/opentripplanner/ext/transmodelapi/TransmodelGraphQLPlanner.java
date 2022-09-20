@@ -114,32 +114,29 @@ public class TransmodelGraphQLPlanner {
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
     //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
     //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
-    callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
-    callWith.argument("walkReluctance", preferences::setNonTransitReluctance);
+    preferences.withWalk(b -> {
+      callWith.argument("walkBoardCost", b::setBoardCost);
+      callWith.argument("walkSpeed", b::setSpeed);
+    });
+    callWith.argument("walkReluctance", preferences::setAllStreetReluctance);
     callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
     callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
-    callWith.argument("walkSpeed", preferences.walk()::setSpeed);
-    callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
-    callWith.argument("bikeSwitchTime", preferences.bike()::setSwitchTime);
-    callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
+
+    preferences.withBike(bike -> {
+      callWith.argument("bikeSpeed", bike::setSpeed);
+      callWith.argument("bikeSwitchTime", bike::setSwitchTime);
+      callWith.argument("bikeSwitchCost", bike::setSwitchCost);
+      callWith.argument("bicycleOptimisationMethod", bike::setOptimizeType);
+
+      if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+        bike.withOptimizeTriangle(triangle -> {
+          callWith.argument("triangle.timeFactor", triangle::withTime);
+          callWith.argument("triangle.slopeFactor", triangle::withSlope);
+          callWith.argument("triangle.safetyFactor", triangle::withSafety);
+        });
+      }
+    });
     //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
-
-    BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
-
-    if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-      // Arguments: [ time, slope, safety ]
-      final double[] args = new double[3];
-
-      callWith.argument("triangleFactors.time", (Double v) -> args[0] = v);
-      callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
-      callWith.argument("triangleFactors.safety", (Double v) -> args[2] = v);
-
-      preferences.bike().initOptimizeTriangle(args[0], args[1], args[2]);
-    }
-
-    if (bicycleOptimizeType != null) {
-      preferences.bike().setOptimizeType(bicycleOptimizeType);
-    }
 
     callWith.argument("arriveBy", request::setArriveBy);
     // TODO VIA (Skånetrafiken): 2022-08-24 refactor
@@ -244,7 +241,9 @@ public class TransmodelGraphQLPlanner {
 
     if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
-      preferences.bike().setSpeed(4.3);
+      // TODO - There should be a separate speed preference for rented bike, setting this
+      //      - here will cause the different APIs to behave differently
+      preferences.withBike(b -> b.setSpeed(4.3));
     }
 
     // One of those arguments has been deprecated. That's why we are mapping same thing twice.

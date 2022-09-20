@@ -9,15 +9,15 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 class ElevatorHopEdgeTest {
 
@@ -26,36 +26,34 @@ class ElevatorHopEdgeTest {
   Vertex to = new SimpleVertex(graph, "to", 0, 0);
 
   static Stream<Arguments> noTraverse = Stream
-    .of(WheelchairAccessibility.NO_INFORMATION, WheelchairAccessibility.NOT_POSSIBLE)
+    .of(Accessibility.NO_INFORMATION, Accessibility.NOT_POSSIBLE)
     .map(Arguments::of);
 
   @ParameterizedTest(name = "{0} should be allowed to traverse when requesting onlyAccessible")
   @VariableSource("noTraverse")
-  public void shouldNotTraverse(WheelchairAccessibility wheelchair) {
+  public void shouldNotTraverse(Accessibility wheelchair) {
     var req = new RouteRequest();
-    WheelchairAccessibilityFeature feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
+    AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
     req.setWheelchair(true);
     req
       .preferences()
-      .setWheelchairAccessibility(
-        new WheelchairAccessibilityPreferences(feature, feature, feature, 25, 8, 10, 25)
-      );
+      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
     State result = traverse(wheelchair, req);
     assertNull(result);
   }
 
   static Stream<Arguments> all = Stream.of(
     // no extra cost
-    Arguments.of(WheelchairAccessibility.POSSIBLE, 20),
+    Arguments.of(Accessibility.POSSIBLE, 20),
     // low extra cost
-    Arguments.of(WheelchairAccessibility.NO_INFORMATION, 40),
+    Arguments.of(Accessibility.NO_INFORMATION, 40),
     // high extra cost
-    Arguments.of(WheelchairAccessibility.NOT_POSSIBLE, 3620)
+    Arguments.of(Accessibility.NOT_POSSIBLE, 3620)
   );
 
   @ParameterizedTest(name = "{0} should allowed to traverse with a cost of {1}")
   @VariableSource("all")
-  public void allowByDefault(WheelchairAccessibility wheelchair, double expectedCost) {
+  public void allowByDefault(Accessibility wheelchair, double expectedCost) {
     var req = new RouteRequest();
     var result = traverse(wheelchair, req);
     assertNotNull(result);
@@ -67,7 +65,7 @@ class ElevatorHopEdgeTest {
     assertEquals(expectedCost, wheelchairResult.weight);
   }
 
-  private State traverse(WheelchairAccessibility wheelchair, RouteRequest req) {
+  private State traverse(Accessibility wheelchair, RouteRequest req) {
     var edge = new ElevatorHopEdge(from, to, StreetTraversalPermission.ALL, wheelchair);
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);

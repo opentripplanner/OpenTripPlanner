@@ -13,9 +13,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
@@ -253,10 +253,7 @@ public final class TripPattern
 
   /** Returns whether a given stop is wheelchair-accessible. */
   public boolean wheelchairAccessible(int stopIndex) {
-    return (
-      stopPattern.getStop(stopIndex).getWheelchairAccessibility() ==
-      WheelchairAccessibility.POSSIBLE
-    );
+    return (stopPattern.getStop(stopIndex).getWheelchairAccessibility() == Accessibility.POSSIBLE);
   }
 
   public PickDrop getAlightType(int stopIndex) {

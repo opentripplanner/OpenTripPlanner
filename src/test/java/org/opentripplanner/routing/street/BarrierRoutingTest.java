@@ -67,7 +67,7 @@ public class BarrierRoutingTest {
       from,
       to,
       BICYCLE,
-      rr -> rr.preferences().bike().setWalkingReluctance(1),
+      rr -> rr.preferences().withBike(it -> it.setWalkingReluctance(1d)),
       itineraries ->
         itineraries
           .stream()

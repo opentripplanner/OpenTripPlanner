@@ -11,7 +11,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 
@@ -95,7 +95,7 @@ public class RaptorRequestTransferCache {
     private final StreetMode transferMode;
     private final BicycleOptimizeType optimize;
     private final TimeSlopeSafetyTriangle bikeOptimizeTimeSlopeSafety;
-    private final WheelchairAccessibilityPreferences wheelchairAccessibility;
+    private final WheelchairPreferences wheelchairPreferences;
     private final double walkSpeed;
     private final double bikeSpeed;
     private final double walkReluctance;
@@ -118,7 +118,7 @@ public class RaptorRequestTransferCache {
       this.bikeOptimizeTimeSlopeSafety = preferences.bike().optimizeTriangle();
       this.bikeSwitchCost = preferences.bike().switchCost();
       this.bikeSwitchTime = preferences.bike().switchTime();
-      this.wheelchairAccessibility = preferences.wheelchairAccessibility().round();
+      this.wheelchairPreferences = preferences.wheelchair();
 
       this.walkSpeed = preferences.walk().speed();
       this.bikeSpeed = preferences.bike().speed();
@@ -140,7 +140,7 @@ public class RaptorRequestTransferCache {
         transferMode,
         optimize,
         bikeOptimizeTimeSlopeSafety,
-        wheelchairAccessibility,
+        wheelchairPreferences,
         walkSpeed,
         bikeSpeed,
         walkReluctance,
@@ -173,7 +173,7 @@ public class RaptorRequestTransferCache {
         Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
         Double.compare(that.turnReluctance, turnReluctance) == 0 &&
         Objects.equals(that.bikeOptimizeTimeSlopeSafety, bikeOptimizeTimeSlopeSafety) &&
-        wheelchairAccessibility.equals(that.wheelchairAccessibility) &&
+        wheelchairPreferences.equals(that.wheelchairPreferences) &&
         elevatorBoardCost == that.elevatorBoardCost &&
         elevatorBoardTime == that.elevatorBoardTime &&
         elevatorHopCost == that.elevatorHopCost &&

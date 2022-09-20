@@ -43,13 +43,13 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
     this.transitFactors =
       transitReluctanceFactors == null
-        ? new SingleValueFactorStrategy(McCostParams.DEFAULT_TRANSIT_RELUCTANCE)
+        ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
         : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
     this.stopTransferCost = stopTransferCost;
   }
 
-  public DefaultCostCalculator(McCostParams params, int[] stopTransferCost) {
+  public DefaultCostCalculator(GeneralizedCostParameters params, int[] stopTransferCost) {
     this(
       params.boardCost(),
       params.transferCost(),

@@ -1,19 +1,55 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
+
 import java.io.Serializable;
+import java.util.Objects;
+import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
-// TODO VIA: Javadoc
-public class WalkPreferences implements Cloneable, Serializable {
+/**
+ * The walk preferences contain all speed, reluctance, cost and factor preferences for walking
+ * related to street and transit routing. The values are normalized(rounded) so the class
+ * can used as a cache key.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD SAFE.
+ */
+public class WalkPreferences implements Serializable {
 
-  private double speed = 1.33;
-  private double reluctance = 2.0;
+  public static final WalkPreferences DEFAULT = new WalkPreferences();
 
-  // TODO VIA (Thomas): Is this part of transit preferences
-  private int boardCost = 60 * 10;
-  private double stairsReluctance = 2.0;
-  private double stairsTimeFactor = 3.0;
+  private final double speed;
+  private final double reluctance;
+  private final int boardCost;
+  private final double stairsReluctance;
+  private final double stairsTimeFactor;
+  private final double safetyFactor;
 
-  private double safetyFactor = 1.0;
+  private WalkPreferences() {
+    this.speed = 1.33;
+    this.reluctance = 2.0;
+    this.boardCost = 60 * 10;
+    this.stairsReluctance = 2.0;
+    this.stairsTimeFactor = 3.0;
+    this.safetyFactor = 1.0;
+  }
+
+  private WalkPreferences(Builder builder) {
+    this.speed = DoubleUtils.roundTo2Decimals(builder.speed);
+    this.reluctance = DoubleUtils.roundTo2Decimals(builder.reluctance);
+    this.boardCost = builder.boardCost;
+    this.stairsReluctance = DoubleUtils.roundTo2Decimals(builder.stairsReluctance);
+    this.stairsTimeFactor = DoubleUtils.roundTo2Decimals(builder.stairsTimeFactor);
+    this.safetyFactor = DoubleUtils.roundTo2Decimals(builder.safetyFactor);
+  }
+
+  public static Builder of() {
+    return new Builder(DEFAULT);
+  }
+
+  public Builder copyOf() {
+    return new Builder(this);
+  }
 
   /**
    * Human walk speed along streets, in meters per second.
@@ -23,10 +59,6 @@ public class WalkPreferences implements Cloneable, Serializable {
    */
   public double speed() {
     return speed;
-  }
-
-  public void setSpeed(double speed) {
-    this.speed = speed;
   }
 
   /**
@@ -42,10 +74,6 @@ public class WalkPreferences implements Cloneable, Serializable {
     return reluctance;
   }
 
-  public void setReluctance(double reluctance) {
-    this.reluctance = reluctance;
-  }
-
   /**
    * This prevents unnecessary transfers by adding a cost for boarding a vehicle. This is in
    * addition to the cost of the transfer(walking) and waiting-time. It is also in addition to the
@@ -55,17 +83,9 @@ public class WalkPreferences implements Cloneable, Serializable {
     return boardCost;
   }
 
-  public void setBoardCost(int boardCost) {
-    this.boardCost = boardCost;
-  }
-
   /** Used instead of walk reluctance for stairs */
   public double stairsReluctance() {
     return stairsReluctance;
-  }
-
-  public void setStairsReluctance(double stairsReluctance) {
-    this.stairsReluctance = stairsReluctance;
   }
 
   /**
@@ -79,20 +99,6 @@ public class WalkPreferences implements Cloneable, Serializable {
     return stairsTimeFactor;
   }
 
-  public void setStairsTimeFactor(double stairsTimeFactor) {
-    this.stairsTimeFactor = stairsTimeFactor;
-  }
-
-  public void setSafetyFactor(double walkSafetyFactor) {
-    if (walkSafetyFactor < 0) {
-      this.safetyFactor = 0;
-    } else if (walkSafetyFactor > 1) {
-      this.safetyFactor = 1;
-    } else {
-      this.safetyFactor = walkSafetyFactor;
-    }
-  }
-
   /**
    * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
    * If the value is set to be 0, safety is ignored.
@@ -101,14 +107,129 @@ public class WalkPreferences implements Cloneable, Serializable {
     return safetyFactor;
   }
 
-  public WalkPreferences clone() {
-    try {
-      var clone = (WalkPreferences) super.clone();
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    WalkPreferences that = (WalkPreferences) o;
+    return (
+      doubleEquals(that.speed, speed) &&
+      doubleEquals(that.reluctance, reluctance) &&
+      boardCost == that.boardCost &&
+      doubleEquals(that.stairsReluctance, stairsReluctance) &&
+      doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
+      doubleEquals(that.safetyFactor, safetyFactor)
+    );
+  }
 
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      speed,
+      reluctance,
+      boardCost,
+      stairsReluctance,
+      stairsTimeFactor,
+      safetyFactor
+    );
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(WalkPreferences.class)
+      .addNum("speed", speed, DEFAULT.speed)
+      .addNum("reluctance", reluctance, DEFAULT.reluctance)
+      .addNum("boardCost", boardCost, DEFAULT.boardCost)
+      .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
+      .addNum("stairsTimeFactor", stairsTimeFactor, DEFAULT.stairsTimeFactor)
+      .addNum("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
+      .toString();
+  }
+
+  public static class Builder {
+
+    private final WalkPreferences original;
+    private double speed;
+    private double reluctance;
+    private int boardCost;
+    private double stairsReluctance;
+    private double stairsTimeFactor;
+    private double safetyFactor;
+
+    public Builder(WalkPreferences original) {
+      this.original = original;
+      this.speed = original.speed;
+      this.reluctance = original.reluctance;
+      this.boardCost = original.boardCost;
+      this.stairsReluctance = original.stairsReluctance;
+      this.stairsTimeFactor = original.stairsTimeFactor;
+      this.safetyFactor = original.safetyFactor;
+    }
+
+    public double speed() {
+      return speed;
+    }
+
+    public Builder setSpeed(double speed) {
+      this.speed = speed;
+      return this;
+    }
+
+    public double reluctance() {
+      return reluctance;
+    }
+
+    public Builder setReluctance(double reluctance) {
+      this.reluctance = reluctance;
+      return this;
+    }
+
+    public int boardCost() {
+      return boardCost;
+    }
+
+    public Builder setBoardCost(int boardCost) {
+      this.boardCost = boardCost;
+      return this;
+    }
+
+    public double stairsReluctance() {
+      return stairsReluctance;
+    }
+
+    public Builder setStairsReluctance(double stairsReluctance) {
+      this.stairsReluctance = stairsReluctance;
+      return this;
+    }
+
+    public double stairsTimeFactor() {
+      return stairsTimeFactor;
+    }
+
+    public Builder setStairsTimeFactor(double stairsTimeFactor) {
+      this.stairsTimeFactor = stairsTimeFactor;
+      return this;
+    }
+
+    public double safetyFactor() {
+      return safetyFactor;
+    }
+
+    public Builder setSafetyFactor(double safetyFactor) {
+      if (safetyFactor < 0) {
+        this.safetyFactor = 0;
+      } else if (safetyFactor > 1) {
+        this.safetyFactor = 1;
+      } else {
+        this.safetyFactor = safetyFactor;
+      }
+      return this;
+    }
+
+    public WalkPreferences build() {
+      var newObj = new WalkPreferences(this);
+      return original.equals(newObj) ? original : newObj;
     }
   }
 }

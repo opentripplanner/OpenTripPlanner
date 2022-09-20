@@ -9,8 +9,8 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -25,23 +25,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final T transitEntityVertex;
 
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
-  public StreetTransitEntityLink(
-    StreetVertex fromv,
-    T tov,
-    WheelchairAccessibility wheelchairAccessibility
-  ) {
+  public StreetTransitEntityLink(StreetVertex fromv, T tov, Accessibility wheelchairAccessibility) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public StreetTransitEntityLink(
-    T fromv,
-    StreetVertex tov,
-    WheelchairAccessibility wheelchairAccessibility
-  ) {
+  public StreetTransitEntityLink(T fromv, StreetVertex tov, Accessibility wheelchairAccessibility) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairAccessibility = wheelchairAccessibility;
@@ -77,15 +69,15 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     StateEditor s1 = s0.edit(this);
 
     if (req.wheelchair()) {
-      var accessibility = pref.wheelchairAccessibility();
+      var accessibility = pref.wheelchair();
       if (
         accessibility.stop().onlyConsiderAccessible() &&
-        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
+        wheelchairAccessibility != Accessibility.POSSIBLE
       ) {
         return null;
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
+      } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
         s1.incrementWeight(accessibility.stop().unknownCost());
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
+      } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
         s1.incrementWeight(accessibility.stop().inaccessibleCost());
       }
     }

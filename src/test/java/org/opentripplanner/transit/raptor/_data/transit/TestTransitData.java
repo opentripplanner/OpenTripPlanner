@@ -12,7 +12,7 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParametersBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
@@ -54,7 +54,7 @@ public class TestTransitData
   private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
-  private final McCostParamsBuilder costParamsBuilder = new McCostParamsBuilder();
+  private final GeneralizedCostParametersBuilder costParamsBuilder = new GeneralizedCostParametersBuilder();
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersFromStop(int fromStop) {
@@ -265,7 +265,7 @@ public class TestTransitData
     return this;
   }
 
-  public McCostParamsBuilder mcCostParamsBuilder() {
+  public GeneralizedCostParametersBuilder mcCostParamsBuilder() {
     return costParamsBuilder;
   }
 

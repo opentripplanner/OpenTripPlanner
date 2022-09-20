@@ -133,7 +133,7 @@ public class RoutingWorker {
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       request.wheelchair(),
-      request.preferences().wheelchairAccessibility().maxSlope(),
+      request.preferences().wheelchair().maxSlope(),
       serverContext.graph().getFareService(),
       serverContext.transitService().getTransitAlertService(),
       serverContext.transitService()::getMultiModalStationForStation
