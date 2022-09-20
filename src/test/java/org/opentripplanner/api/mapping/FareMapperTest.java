@@ -1,9 +1,9 @@
 package org.opentripplanner.api.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
+import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -29,6 +29,6 @@ class FareMapperTest implements PlanTestConstants {
     var apiMoney = apiFare.fare().get(FareType.regular.name());
     assertEquals(500, apiMoney.cents());
     assertEquals("USD", apiMoney.currency().currency());
-    assertNull(apiFare.details().get(FareType.regular.name()));
+    assertEquals(List.of(), apiFare.details().get(FareType.regular.name()));
   }
 }

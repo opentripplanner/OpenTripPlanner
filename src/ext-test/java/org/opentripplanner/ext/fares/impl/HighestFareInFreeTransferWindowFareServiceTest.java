@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -8,18 +8,14 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.api.mapping.FareMapper;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -45,14 +41,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     float expectedFare
   ) {
     var fares = fareService.getCost(i);
-    Assertions.assertEquals(
-      Money.usDollars(Math.round(expectedFare * 100)),
-      fares.getFare(FareType.regular)
-    );
+    assertEquals(Money.usDollars(Math.round(expectedFare * 100)), fares.getFare(FareType.regular));
 
-    // i think that returning an empty list would be the better option but it's here for backwards
-    // compat
-    fares.getTypes().forEach(t -> assertNull(fares.getDetails(t)));
+    fares.getTypes().forEach(t -> assertEquals(List.of(), fares.getDetails(t)));
   }
 
   private static List<Arguments> createTestCases() {
