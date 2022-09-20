@@ -3,11 +3,11 @@ package org.opentripplanner.api.mapping;
 import com.google.common.collect.Multimap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -103,9 +103,14 @@ public class FareMapper {
       .getTypes()
       .stream()
       .map(key -> {
-        var money = fare.getDetails(key).stream().map(this::toApiFareComponent).toList();
+        var details = fare.getDetails(key);
+        if (details == null) {
+          return null;
+        }
+        var money = details.stream().map(this::toApiFareComponent).toList();
         return new SimpleEntry<>(key, money);
       })
+      .filter(Objects::nonNull)
       .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
   }
 
