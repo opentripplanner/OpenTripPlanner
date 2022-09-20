@@ -35,9 +35,9 @@ public class RouterConfig implements Serializable {
   );
 
   /**
-   * The raw JsonNode three kept for reference and (de)serialization.
+   * The node adaptor kept for reference and (de)serialization.
    */
-  private final JsonNode rawJson;
+  private final NodeAdapter root;
   private final String configVersion;
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
@@ -49,20 +49,19 @@ public class RouterConfig implements Serializable {
   private final FlexConfig flexConfig;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
-    NodeAdapter adapter = new NodeAdapter(node, source);
-    this.rawJson = node;
-    this.configVersion = adapter.asText("configVersion", null);
-    this.requestLogFile = adapter.asText("requestLogFile", null);
-    this.transmodelApi = new TransmodelAPIConfig(adapter.path("transmodelApi"));
-    this.streetRoutingTimeout = parseStreetRoutingTimeout(adapter);
-    this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
-    this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-    this.updatersParameters = new UpdatersConfig(adapter);
-    this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
-    this.flexConfig = new FlexConfig(adapter.path("flex"));
+    this.root = new NodeAdapter(node, source);
+    this.configVersion = root.asText("configVersion", null);
+    this.requestLogFile = root.asText("requestLogFile", null);
+    this.transmodelApi = new TransmodelAPIConfig(root.path("transmodelApi"));
+    this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
+    this.transitConfig = new TransitRoutingConfig(root.path("transit"));
+    this.routingRequestDefaults = mapRoutingRequest(root.path("routingDefaults"));
+    this.updatersParameters = new UpdatersConfig(root);
+    this.vectorTileLayers = new VectorTileConfig(root.path("vectorTileLayers").asList());
+    this.flexConfig = new FlexConfig(root.path("flex"));
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      adapter.logAllUnusedParameters(LOG::warn);
+      root.logAllUnusedParameters(LOG::warn);
     }
   }
 
@@ -128,16 +127,16 @@ public class RouterConfig implements Serializable {
    * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
    */
   public boolean isDefault() {
-    return this.rawJson.isMissingNode();
+    return root.isEmpty();
   }
 
   public String toJson() {
-    return rawJson.isMissingNode() ? "" : rawJson.toString();
+    return root.isEmpty() ? "" : root.toJson();
   }
 
   public String toString() {
-    // Print ONLY the values set, not deafult values
-    return rawJson.toPrettyString();
+    // Print ONLY the values set, not default values
+    return root.toPrettyString();
   }
 
   /**

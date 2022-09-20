@@ -80,9 +80,9 @@ public class BuildConfig implements OtpDataStoreConfig {
   private static final String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
 
   /**
-   * The raw JsonNode three kept for reference and (de)serialization.
+   * The root adaptor kept for reference and (de)serialization.
    */
-  private final JsonNode rawJson;
+  private final NodeAdapter root;
 
   /**
    * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
@@ -464,77 +464,76 @@ public class BuildConfig implements OtpDataStoreConfig {
    * that class is more type safe, it seems simpler to just list out the parameters by name here.
    */
   public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
-    NodeAdapter c = new NodeAdapter(node, source);
-    rawJson = node;
+    this.root = new NodeAdapter(node, source);
 
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    areaVisibility = c.asBoolean("areaVisibility", false);
-    banDiscouragedWalking = c.asBoolean("banDiscouragedWalking", false);
-    banDiscouragedBiking = c.asBoolean("banDiscouragedBiking", false);
-    configVersion = c.asText("configVersion", null);
-    dataImportReport = c.asBoolean("dataImportReport", false);
+    areaVisibility = root.asBoolean("areaVisibility", false);
+    banDiscouragedWalking = root.asBoolean("banDiscouragedWalking", false);
+    banDiscouragedBiking = root.asBoolean("banDiscouragedBiking", false);
+    configVersion = root.asText("configVersion", null);
+    dataImportReport = root.asBoolean("dataImportReport", false);
     distanceBetweenElevationSamples =
-      c.asDouble(
+      root.asDouble(
         "distanceBetweenElevationSamples",
         CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
       );
-    elevationBucket = S3BucketConfig.fromConfig(c.path("elevationBucket"));
-    elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
-    embedRouterConfig = c.asBoolean("embedRouterConfig", true);
-    extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
-    includeEllipsoidToGeoidDifference = c.asBoolean("includeEllipsoidToGeoidDifference", false);
-    pruningThresholdIslandWithStops = c.asInt("islandWithStopsMaxSize", 5);
-    pruningThresholdIslandWithoutStops = c.asInt("islandWithoutStopsMaxSize", 40);
-    matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
-    maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
-    maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
-    blockBasedInterlining = c.asBoolean("blockBasedInterlining", true);
+    elevationBucket = S3BucketConfig.fromConfig(root.path("elevationBucket"));
+    elevationUnitMultiplier = root.asDouble("elevationUnitMultiplier", 1);
+    embedRouterConfig = root.asBoolean("embedRouterConfig", true);
+    extraEdgesStopPlatformLink = root.asBoolean("extraEdgesStopPlatformLink", false);
+    includeEllipsoidToGeoidDifference = root.asBoolean("includeEllipsoidToGeoidDifference", false);
+    pruningThresholdIslandWithStops = root.asInt("islandWithStopsMaxSize", 5);
+    pruningThresholdIslandWithoutStops = root.asInt("islandWithoutStopsMaxSize", 40);
+    matchBusRoutesToStreets = root.asBoolean("matchBusRoutesToStreets", false);
+    maxDataImportIssuesPerFile = root.asInt("maxDataImportIssuesPerFile", 1000);
+    maxInterlineDistance = root.asInt("maxInterlineDistance", 200);
+    blockBasedInterlining = root.asBoolean("blockBasedInterlining", true);
     maxTransferDurationSeconds =
-      c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
-    maxStopToShapeSnapDistance = c.asDouble("maxStopToShapeSnapDistance", 150);
-    multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
-    osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
-    platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
-    readCachedElevations = c.asBoolean("readCachedElevations", true);
-    staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-    staticParkAndRide = c.asBoolean("staticParkAndRide", true);
-    streets = c.asBoolean("streets", true);
-    subwayAccessTime = c.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    transit = c.asBoolean("transit", true);
-    transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
-    transitServiceEnd = c.asDateOrRelativePeriod("transitServiceEnd", "P3Y");
-    writeCachedElevations = c.asBoolean("writeCachedElevations", false);
-    maxAreaNodes = c.asInt("maxAreaNodes", 500);
-    maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
-    boardingLocationTags = c.asTextSet("boardingLocationTags", Set.of("ref"));
-    discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
-    transitModelTimeZone = c.asZoneId("transitModelTimeZone", null);
+      root.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
+    maxStopToShapeSnapDistance = root.asDouble("maxStopToShapeSnapDistance", 150);
+    multiThreadElevationCalculations = root.asBoolean("multiThreadElevationCalculations", false);
+    osmCacheDataInMem = root.asBoolean("osmCacheDataInMem", false);
+    platformEntriesLinking = root.asBoolean("platformEntriesLinking", false);
+    readCachedElevations = root.asBoolean("readCachedElevations", true);
+    staticBikeParkAndRide = root.asBoolean("staticBikeParkAndRide", false);
+    staticParkAndRide = root.asBoolean("staticParkAndRide", true);
+    streets = root.asBoolean("streets", true);
+    subwayAccessTime = root.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+    transit = root.asBoolean("transit", true);
+    transitServiceStart = root.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
+    transitServiceEnd = root.asDateOrRelativePeriod("transitServiceEnd", "P3Y");
+    writeCachedElevations = root.asBoolean("writeCachedElevations", false);
+    maxAreaNodes = root.asInt("maxAreaNodes", 500);
+    maxElevationPropagationMeters = root.asInt("maxElevationPropagationMeters", 2000);
+    boardingLocationTags = root.asTextSet("boardingLocationTags", Set.of("ref"));
+    discardMinTransferTimes = root.asBoolean("discardMinTransferTimes", false);
+    transitModelTimeZone = root.asZoneId("transitModelTimeZone", null);
 
-    var localFileNamePatternsConfig = c.path("localFileNamePatterns");
+    var localFileNamePatternsConfig = root.path("localFileNamePatterns");
     gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
     netexLocalFilePattern = localFileNamePatternsConfig.asPattern("netex", DEFAULT_NETEX_PATTERN);
     osmLocalFilePattern = localFileNamePatternsConfig.asPattern("osm", DEFAULT_OSM_PATTERN);
     demLocalFilePattern = localFileNamePatternsConfig.asPattern("dem", DEFAULT_DEM_PATTERN);
 
-    gsCredentials = c.asText("gsCredentials", null);
-    graph = c.asUri("graph", null);
-    streetGraph = c.asUri("streetGraph", null);
-    buildReportDir = c.asUri("buildReportDir", null);
+    gsCredentials = root.asText("gsCredentials", null);
+    graph = root.asUri("graph", null);
+    streetGraph = root.asUri("streetGraph", null);
+    buildReportDir = root.asUri("buildReportDir", null);
 
-    osm = new OsmExtractsConfig(c.path("osm"));
-    dem = new DemExtractsConfig((c.path("dem")));
-    transitFeeds = new TransitFeedsConfig(c.path("transitFeeds"));
+    osm = new OsmExtractsConfig(root.path("osm"));
+    dem = new DemExtractsConfig((root.path("dem")));
+    transitFeeds = new TransitFeedsConfig(root.path("transitFeeds"));
 
     // List of complex parameters
-    fareServiceFactory = FaresConfiguration.fromConfig(c.asRawNode("fares"));
-    customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
-    netexDefaults = new NetexDefaultsConfig(c.path("netexDefaults"));
-    osmDefaults = new OsmDefaultsConfig(c.path("osmDefaults"));
-    dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
+    fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
+    customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
+    netexDefaults = new NetexDefaultsConfig(root.path("netexDefaults"));
+    osmDefaults = new OsmDefaultsConfig(root.path("osmDefaults"));
+    dataOverlay = DataOverlayConfigMapper.map(root.path("dataOverlay"));
 
-    if (c.path("transferRequests").isNonEmptyArray()) {
+    if (root.path("transferRequests").isNonEmptyArray()) {
       transferRequests =
-        c
+        root
           .path("transferRequests")
           .asList()
           .stream()
@@ -545,7 +544,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     }
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      c.logAllUnusedParameters(LOG::warn);
+      root.logAllUnusedParameters(LOG::warn);
     }
   }
 
@@ -615,11 +614,11 @@ public class BuildConfig implements OtpDataStoreConfig {
    * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
    */
   public boolean isDefault() {
-    return rawJson.isMissingNode();
+    return root.isEmpty();
   }
 
   public String toJson() {
-    return rawJson.isMissingNode() ? "" : rawJson.toString();
+    return root.isEmpty() ? "" : root.toJson();
   }
 
   public ServiceDateInterval getTransitServicePeriod() {

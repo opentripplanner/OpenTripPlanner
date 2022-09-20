@@ -14,7 +14,7 @@ public class OtpConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
 
-  public final JsonNode rawConfig;
+  public final NodeAdapter root;
 
   public final Map<OTPFeature, Boolean> otpFeatures;
 
@@ -32,13 +32,13 @@ public class OtpConfig {
   public final String configVersion;
 
   OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
-    this.rawConfig = otpConfig;
-    NodeAdapter adapter = new NodeAdapter(otpConfig, source);
+    this.root = new NodeAdapter(otpConfig, source);
 
-    this.configVersion = adapter.asText("configVersion", null);
-    this.otpFeatures = adapter.asEnumMap("otpFeatures", OTPFeature.class, NodeAdapter::asBoolean);
+    this.configVersion = root.asText("configVersion", null);
+    this.otpFeatures = root.asEnumMap("otpFeatures", OTPFeature.class, NodeAdapter::asBoolean);
+
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      adapter.logAllUnusedParameters(LOG::warn);
+      root.logAllUnusedParameters(LOG::warn);
     }
   }
 }

@@ -29,7 +29,7 @@ public class NodeAdapterTest {
   @Test
   public void testAsRawNode() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
-    assertFalse(subject.asRawNode("anObject").has("withText"));
+    assertFalse(subject.rawNode("anObject").has("withText"));
   }
 
   @Test

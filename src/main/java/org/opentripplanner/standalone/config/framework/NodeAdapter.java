@@ -188,6 +188,10 @@ public class NodeAdapter {
     return param(paramName).asText(defaultValue);
   }
 
+  /**
+   * WARNING! Avoid using this method - it bypasses the build in typesafe parsing support. Only
+   * use it to provide custom parsing.
+   */
   public String asText() {
     return json.asText();
   }
@@ -533,10 +537,20 @@ public class NodeAdapter {
 
   /**
    * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
-   * track of unused parameters and can not generate documentation for these.
+   * track of unused parameters and can not generate documentation for this parameter.
    */
-  public JsonNode asRawNode(String paramName) {
+  public JsonNode rawNode(String paramName) {
     return param(paramName);
+  }
+
+  /** Return the node as a JSON string. */
+  public String toJson() {
+    return json.toString();
+  }
+
+  /** Return the node as a pretty JSON string. */
+  public String toPrettyString() {
+    return json.toPrettyString();
   }
 
   /* private methods */
