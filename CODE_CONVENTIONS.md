@@ -103,9 +103,9 @@ TODO See issue 4002 - Document when implemented
 ## Records, POJOs and Builders
 
 We prefer immutable typesafe types over flexibility and "short" class definitions. This make
-the code more robust and error prune.
+the code more robust and less error-prune.
 
-### Recods
+### Records
 
 You may use records, but avoid using records if you can not encapsulate it properly. Be especially
 aware of arrays fields (can not be protected) and collections (remember to make a defensive copy).
@@ -122,8 +122,11 @@ OTP used a simple builder pattern in many places, especially when creating immut
   should be private (or package local) to enforce the use of the factory methods.
 - If the class have more than 5 fields avoid using an inner class builder, instead create a builder
   in the same package.
-- Validate all fields in the constructor, especially null checks. Prefer default values over
-  null-checks. All business logic using the type can rely on its validity.
+- Make all fields in the main class final to enforce immutability.
+- Consider using utility methods for parameter checking, like `Objects#requireNonNull` and 
+  `ObjectUtils.ifNotNull`.
+- Validate all fields in the main type constructor(i.e. not in the builder), especially null checks. 
+  Prefer default values over null-checks. All business logic using the type can rely on its validity.
 - You may keep the original instance in the builder to avoid creating a new object if nothing 
   changed. This prevents polluting the heap for long-lived objects and make comparison very fast.
 - There is no need to provide all get accessors in the Builder if not needed.
@@ -150,12 +153,13 @@ public class A {
   }
 
   private A(Builder builder) {
-    if(age < 0 || age > 150) {
-      throw new IllegalArgumentException("Age is out of range[0..150]: " + age);
-    }
     this.names = List.copyOf(builder.names);
     this.age = builder.age;
     this.nested = builder.nested();
+
+    if(age < 0 || age > 150) {
+      throw new IllegalArgumentException("Age is out of range[0..150]: " + age);
+    }
   }
 
   public static A.Builder of() { return DEFAULT.copyOf(); }
