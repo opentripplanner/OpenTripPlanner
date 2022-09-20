@@ -95,10 +95,6 @@ trip = Trip.of(id).withName("The Express").build();
 stop = stop.copyOf().withPrivateCode("TEX").build();
 ```
 
-#### Updaters run with a context(editor)
-
-TODO See issue 4002 - Document when implemented
-
 
 ## Records, POJOs and Builders
 
