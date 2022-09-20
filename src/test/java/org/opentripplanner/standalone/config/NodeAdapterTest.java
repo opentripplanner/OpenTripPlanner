@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
@@ -18,10 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
-import org.slf4j.Logger;
 
 public class NodeAdapterTest {
 
@@ -83,12 +82,6 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 5 }");
     assertEquals(5, subject.asLong("key", -1));
     assertEquals(-1, subject.asLong("missingField", -1));
-  }
-
-  @Test
-  public void requiredAsLong() {
-    NodeAdapter subject = newNodeAdapterForTest("{ }");
-    assertThrows(OtpAppException.class, () -> subject.asLong("missingField"));
   }
 
   @Test
@@ -157,9 +150,9 @@ public class NodeAdapterTest {
     );
 
     // Assert unknown parameter is logged at warning level and with full pathname
-    Logger log = Mockito.mock(Logger.class);
-    subject.logAllUnusedParameters(log);
-    Mockito.verify(log).warn(Mockito.anyString(), Mockito.eq("key.unknown:7"), Mockito.eq("Test"));
+    var buf = new StringBuilder();
+    subject.logAllUnusedParameters(buf::append);
+    assertEquals("Unexpected config parameter: 'key.unknown:7' in 'Test'", buf.toString());
   }
 
   @Test
@@ -415,6 +408,26 @@ public class NodeAdapterTest {
     assertFalse(subject.path("bar").isNonEmptyArray());
     assertFalse(subject.path("foobar").isNonEmptyArray());
     assertFalse(subject.path("missing").isNonEmptyArray());
+  }
+
+  @Test
+  public void deduplicateChildren() {
+    NodeAdapter subject = newNodeAdapterForTest("{ foo : { enabled: true } }");
+    assertSame(subject.path("foo"), subject.path("foo"));
+  }
+
+  @Test
+  public void unusedParams() {
+    // Given: two parameters a and b
+    NodeAdapter subject = newNodeAdapterForTest("{ foo : { a: true, b: false } }");
+    var buf = new StringBuilder();
+
+    // When: Access ONLY parameter 'a', but not 'b'
+    assertTrue(subject.path("foo").asBoolean("a"));
+
+    // Then: expect 'b' to be unused
+    subject.logAllUnusedParameters(buf::append);
+    assertEquals("Unexpected config parameter: 'foo.b:false' in 'Test'", buf.toString());
   }
 
   private enum AnEnum {
