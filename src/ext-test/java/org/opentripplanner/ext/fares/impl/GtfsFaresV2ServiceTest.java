@@ -26,6 +26,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   String LEG_GROUP1 = "leg-group1";
   String LEG_GROUP2 = "leg-group2";
   String LEG_GROUP3 = "leg-group3";
+  String LEG_GROUP4 = "leg-group4";
+  String LEG_GROUP5 = "leg-group5";
   int ID = 100;
   String expressNetwork = "express";
   String localNetwork = "local";
@@ -230,15 +232,26 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       null
     );
 
+    FareProduct freeTransferToOuter = new FareProduct(
+      new FeedScopedId(FEED_ID, "free-transfer-from-anywhere-to-outer"),
+      "Single ticket with free transfer any zone to the outer zone",
+      Money.euros(1000),
+      null,
+      null,
+      null
+    );
+
     GtfsFaresV2Service service = new GtfsFaresV2Service(
       List.of(
-        new FareLegRule(LEG_GROUP1, null, null, null, single),
         new FareLegRule(LEG_GROUP2, null, INNER_ZONE, INNER_ZONE, freeTransferFromInnerToOuter),
-        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, single)
+        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, single),
+        new FareLegRule(LEG_GROUP4, null, null, null, single),
+        new FareLegRule(LEG_GROUP5, null, INNER_ZONE, OUTER_ZONE, singleToOuter)
       ),
       List.of(
         new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer),
-        new FareTransferRule(LEG_GROUP2, LEG_GROUP3, 1, null, freeTransfer)
+        new FareTransferRule(LEG_GROUP2, LEG_GROUP3, 1, null, freeTransfer),
+        new FareTransferRule(LEG_GROUP4, LEG_GROUP4, 1, null, freeTransfer)
       ),
       Multimaps.forMap(
         Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
@@ -257,6 +270,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       var i1 = newItinerary(A, 0)
         .walk(20, INNER_ZONE_STOP)
         .bus(ID, 0, 50, INNER_ZONE_STOP)
+        .walk(53, OUTER_ZONE_STOP)
         .bus(ID, 55, 70, OUTER_ZONE_STOP)
         .build();
       var result = service.getProducts(i1);
