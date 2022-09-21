@@ -505,8 +505,8 @@ public class NodeAdapter {
   }
 
   /**
-   * Log unused parameters for the entire configuration file/noe tree. Call this method for thew
-   * root adapter for each config file read.
+   * Log unused parameters for the entire configuration file/node tree. Only call this method for the
+   * root adapter, once for each config file read.
    */
   public void logAllUnusedParameters(Consumer<String> logger) {
     for (String p : unusedParams()) {
