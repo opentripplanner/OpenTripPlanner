@@ -27,20 +27,23 @@ public record FareProduct(
       (
         transitLegs.size() == 1 ||
         coversDuration(i.getTransitDuration()) ||
-        coversWithTransfers(i, transferRules)
+        coversItineraryWithFreeTransfers(i, transferRules)
       )
     );
   }
 
-  private boolean coversWithTransfers(Itinerary i, List<FareTransferRule> transferRules) {
-    var feedId = i
+  private boolean coversItineraryWithFreeTransfers(
+    Itinerary i,
+    List<FareTransferRule> transferRules
+  ) {
+    var feedIdsInItinerary = i
       .getScheduledTransitLegs()
       .stream()
       .map(l -> l.getAgency().getId().getFeedId())
       .collect(Collectors.toSet());
 
     return (
-      feedId.size() == 1 &&
+      feedIdsInItinerary.size() == 1 &&
       transferRules.stream().anyMatch(r -> r.fareProduct().amount.cents() == 0)
     );
   }

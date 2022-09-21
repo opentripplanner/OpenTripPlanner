@@ -23,8 +23,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
-  String LEG_GROUP1 = "legroup1";
-  String LEG_GROUP2 = "legroup2";
+  String LEG_GROUP1 = "leg-group1";
+  String LEG_GROUP2 = "leg-group2";
+  String LEG_GROUP3 = "leg-group3";
   int ID = 100;
   String expressNetwork = "express";
   String localNetwork = "local";
@@ -157,6 +158,29 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     assertEquals(Set.of(expressPass), result.itineraryProducts());
   }
 
+  /**
+   * Because we use both the local and the express network, there is no product covering both.
+   */
+  @Test
+  void separateFares() {
+    Itinerary i1 = newItinerary(A, 0)
+      .walk(20, A)
+      .faresV2Rail(ID, 0, 50, B, localNetwork)
+      .faresV2Rail(ID, 60, 100, C, expressNetwork)
+      .build();
+
+    var result = service.getProducts(i1);
+    assertEquals(0, result.itineraryProducts().size());
+
+    var localLeg = i1.getLegs().get(1);
+    var localLegProducts = result.getProducts(localLeg);
+    assertEquals(Set.of(localPass), localLegProducts);
+
+    var expressLeg = i1.getLegs().get(2);
+    var expressProducts = result.getProducts(expressLeg);
+    assertEquals(Set.of(expressPass), expressProducts);
+  }
+
   @Nested
   public class AreaId {
 
@@ -194,43 +218,49 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     }
   }
 
-  /**
-   * Because we use both the local and the express network, there is no product covering both.
-   */
-  @Test
-  void separateFares() {
-    Itinerary i1 = newItinerary(A, 0)
-      .walk(20, A)
-      .faresV2Rail(ID, 0, 50, B, localNetwork)
-      .faresV2Rail(ID, 60, 100, C, expressNetwork)
-      .build();
-
-    var result = service.getProducts(i1);
-    assertEquals(0, result.itineraryProducts().size());
-
-    var localLeg = i1.getLegs().get(1);
-    var localLegProducts = result.getProducts(localLeg);
-    assertEquals(Set.of(localPass), localLegProducts);
-
-    var expressLeg = i1.getLegs().get(2);
-    var expressProducts = result.getProducts(expressLeg);
-    assertEquals(Set.of(expressPass), expressProducts);
-  }
-
   @Nested
-  class FareLegGroups {
+  class Transfers {
+
+    FareProduct freeTransferFromInnerToOuter = new FareProduct(
+      new FeedScopedId(FEED_ID, "free-transfer-from-inner-to-outer"),
+      "Single ticket with free transfer from the inner to the outer zone",
+      Money.euros(500),
+      null,
+      null,
+      null
+    );
 
     GtfsFaresV2Service service = new GtfsFaresV2Service(
-      List.of(new FareLegRule(LEG_GROUP1, null, null, null, single)),
-      List.of(new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer)),
-      Multimaps.forMap(Map.of())
+      List.of(
+        new FareLegRule(LEG_GROUP1, null, null, null, single),
+        new FareLegRule(LEG_GROUP2, null, INNER_ZONE, INNER_ZONE, freeTransferFromInnerToOuter),
+        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, single)
+      ),
+      List.of(
+        new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer),
+        new FareTransferRule(LEG_GROUP2, LEG_GROUP3, 1, null, freeTransfer)
+      ),
+      Multimaps.forMap(
+        Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
+      )
     );
 
     @Test
-    void addFreeTransferInSameGroup() {
-      Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
+    void freeTransferInSameGroup() {
+      var i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
       var result = service.getProducts(i1);
       assertEquals(Set.of(single), result.itineraryProducts());
+    }
+
+    @Test
+    void freeTransferIntoAnotherGroup() {
+      var i1 = newItinerary(A, 0)
+        .walk(20, INNER_ZONE_STOP)
+        .bus(ID, 0, 50, INNER_ZONE_STOP)
+        .bus(ID, 55, 70, OUTER_ZONE_STOP)
+        .build();
+      var result = service.getProducts(i1);
+      assertEquals(Set.of(freeTransferFromInnerToOuter), result.itineraryProducts());
     }
   }
 }
