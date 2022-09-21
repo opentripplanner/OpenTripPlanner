@@ -91,24 +91,64 @@ public final class GtfsFaresV2Service implements Serializable {
       .stream()
       .map(LegProducts::products)
       .collect(Collectors.toSet());
-    
+
     return distinctProductWithTransferSets
       .stream()
-      .flatMap(p -> p.stream().filter(ps -> ps.coversItinerary(itinerary)))
-      .map(LegProducts.ProductWithTransfer::product)
+      .flatMap(p -> p.stream().filter(ps -> coversItinerary(itinerary, ps)))
+      .map(LegProducts.ProductWithTransfer::legRule)
+      .map(FareLegRule::fareProduct)
       .collect(Collectors.toSet());
+  }
+
+  private boolean coversItinerary(Itinerary i, LegProducts.ProductWithTransfer pwt) {
+    var transitLegs = i.getScheduledTransitLegs();
+    var allLegsInProductFeed = transitLegs
+      .stream()
+      .allMatch(leg -> leg.getAgency().getId().getFeedId().equals(pwt.legRule().feedId()));
+
+    return (
+      allLegsInProductFeed &&
+      (
+        transitLegs.size() == 1 ||
+        (
+          pwt.product().coversDuration(i.getTransitDuration()) &&
+          appliesToAllLegs(pwt.legRule(), transitLegs)
+        ) ||
+        coversItineraryWithFreeTransfers(i, pwt)
+      )
+    );
+  }
+
+  private boolean appliesToAllLegs(FareLegRule legRule, List<ScheduledTransitLeg> transitLegs) {
+    return transitLegs.stream().allMatch(leg -> legMatchesRule(leg, legRule));
+  }
+
+  private boolean coversItineraryWithFreeTransfers(
+    Itinerary i,
+    LegProducts.ProductWithTransfer pwt
+  ) {
+    var feedIdsInItinerary = i
+      .getScheduledTransitLegs()
+      .stream()
+      .map(l -> l.getAgency().getId().getFeedId())
+      .collect(Collectors.toSet());
+
+    return (
+      feedIdsInItinerary.size() == 1 &&
+      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().amount().cents() == 0)
+    );
   }
 
   private boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
       leg.getAgency().getId().getFeedId().equals(rule.feedId()) &&
-      filterByNetworkId(leg, rule) &&
+      matchesNetworkId(leg, rule) &&
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      filterByArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      filterByArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules)
+      matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
+      matchesArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules)
     );
   }
 
@@ -126,13 +166,13 @@ public final class GtfsFaresV2Service implements Serializable {
 
     var products = legRules
       .stream()
-      .map(p -> {
+      .map(rule -> {
         var transferRulesToNextLeg = transferRulesForLeg
           .stream()
-          .filter(t -> t.fromLegGroup().equals(p.legGroupId()))
+          .filter(t -> t.fromLegGroup().equals(rule.legGroupId()))
           .filter(t -> transferRuleMatchesNextLeg(nextLeg, t))
           .toList();
-        return new LegProducts.ProductWithTransfer(p.fareProduct(), transferRulesToNextLeg);
+        return new LegProducts.ProductWithTransfer(rule, transferRulesToNextLeg);
       })
       .collect(Collectors.toSet());
 
@@ -155,7 +195,7 @@ public final class GtfsFaresV2Service implements Serializable {
     return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 
-  private boolean filterByArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
+  private boolean matchesArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
     var stopAreas = this.stopAreas.get(stop.getId());
     return (
       (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
@@ -167,7 +207,7 @@ public final class GtfsFaresV2Service implements Serializable {
    * Get the fare products that match the network_id. If the network id of the product is null it
    * depends on the presence/absence of other rules with that network id.
    */
-  private boolean filterByNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
+  private boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg
       .getRoute()
       .getGroupsOfRoutes()

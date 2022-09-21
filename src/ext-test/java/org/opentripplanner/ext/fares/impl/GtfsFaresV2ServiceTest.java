@@ -232,9 +232,9 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       null
     );
 
-    FareProduct freeTransferToOuter = new FareProduct(
+    FareProduct freeTransferSingle = new FareProduct(
       new FeedScopedId(FEED_ID, "free-transfer-from-anywhere-to-outer"),
-      "Single ticket with free transfer any zone to the outer zone",
+      "Single ticket with free transfer any zone",
       Money.euros(1000),
       null,
       null,
@@ -245,7 +245,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       List.of(
         new FareLegRule(LEG_GROUP2, null, INNER_ZONE, INNER_ZONE, freeTransferFromInnerToOuter),
         new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, single),
-        new FareLegRule(LEG_GROUP4, null, null, null, single),
+        new FareLegRule(LEG_GROUP4, null, null, null, freeTransferSingle),
         new FareLegRule(LEG_GROUP5, null, INNER_ZONE, OUTER_ZONE, singleToOuter)
       ),
       List.of(
@@ -262,7 +262,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     void freeTransferInSameGroup() {
       var i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
       var result = service.getProducts(i1);
-      assertEquals(Set.of(single), result.itineraryProducts());
+      assertEquals(Set.of(freeTransferSingle), result.itineraryProducts());
     }
 
     @Test

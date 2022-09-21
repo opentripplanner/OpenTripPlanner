@@ -16,38 +16,6 @@ public record FareProduct(
   RiderCategory category,
   FareContainer container
 ) {
-  public boolean coversItinerary(Itinerary i, List<FareTransferRule> transferRules) {
-    var transitLegs = i.getScheduledTransitLegs();
-    var allLegsInProductFeed = transitLegs
-      .stream()
-      .allMatch(leg -> leg.getAgency().getId().getFeedId().equals(id.getFeedId()));
-
-    return (
-      allLegsInProductFeed &&
-      (
-        transitLegs.size() == 1 ||
-        coversDuration(i.getTransitDuration()) ||
-        coversItineraryWithFreeTransfers(i, transferRules)
-      )
-    );
-  }
-
-  private boolean coversItineraryWithFreeTransfers(
-    Itinerary i,
-    List<FareTransferRule> transferRules
-  ) {
-    var feedIdsInItinerary = i
-      .getScheduledTransitLegs()
-      .stream()
-      .map(l -> l.getAgency().getId().getFeedId())
-      .collect(Collectors.toSet());
-
-    return (
-      feedIdsInItinerary.size() == 1 &&
-      transferRules.stream().anyMatch(r -> r.fareProduct().amount.cents() == 0)
-    );
-  }
-
   public boolean coversDuration(Duration journeyDuration) {
     return Objects.nonNull(duration) && duration.toSeconds() > journeyDuration.toSeconds();
   }
