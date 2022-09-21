@@ -127,7 +127,7 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
   }
 
   private RaptorResponse<T> createAndRunDynamicRRWorker(RaptorRequest<T> request) {
-    LOG.debug("Main request: " + request.toString());
+    LOG.debug("Main request: {}", request);
     Worker<T> worker;
 
     // Create worker

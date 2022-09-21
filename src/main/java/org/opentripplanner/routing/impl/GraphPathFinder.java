@@ -125,7 +125,7 @@ public class GraphPathFinder {
     }
 
     if (paths == null || paths.size() == 0) {
-      LOG.debug("Path not found: " + request.from() + " : " + request.to());
+      LOG.debug("Path not found: {} : {}", request.from(), request.to());
       throw new PathNotFoundException();
     }
 

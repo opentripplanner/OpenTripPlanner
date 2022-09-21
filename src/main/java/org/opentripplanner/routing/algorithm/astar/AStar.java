@@ -97,7 +97,7 @@ public class AStar {
     // print debug info
     if (verbose) {
       double w = pq.peek_min_key();
-      LOG.debug("pq min key = " + w);
+      LOG.debug("pq min key = {}", w);
     }
 
     // get the lowest-weight state in the queue
@@ -120,7 +120,7 @@ public class AStar {
     Vertex u_vertex = u.getVertex();
 
     if (verbose) {
-      LOG.debug("   vertex " + u_vertex);
+      LOG.debug("   vertex {}", u_vertex);
     }
 
     Collection<Edge> edges = arriveBy ? u_vertex.getIncoming() : u_vertex.getOutgoing();
@@ -146,17 +146,13 @@ public class AStar {
         double estimate = v.getWeight() + remaining_w;
 
         if (verbose) {
-          LOG.debug("      edge " + edge);
+          LOG.debug("      edge {}", edge);
           LOG.debug(
-            "      " +
-            u.getWeight() +
-            " -> " +
-            v.getWeight() +
-            "(w) + " +
-            remaining_w +
-            "(heur) = " +
-            estimate +
-            " vert = " +
+            "      {} -> {}(w) + {}(heur) = {} vert = {}",
+            u.getWeight(),
+            v.getWeight(),
+            remaining_w,
+            estimate,
             v.getVertex()
           );
         }

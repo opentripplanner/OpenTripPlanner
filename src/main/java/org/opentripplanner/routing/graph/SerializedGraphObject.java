@@ -222,7 +222,7 @@ public class SerializedGraphObject implements Serializable {
   }
 
   private void save(OutputStream outputStream, String graphName, long size) {
-    LOG.info("Writing graph " + graphName + " ...");
+    LOG.info("Writing graph {}  ...", graphName);
     outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
     Kryo kryo = KryoBuilder.create();
     Output output = new Output(outputStream);

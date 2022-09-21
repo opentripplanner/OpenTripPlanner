@@ -124,7 +124,7 @@ public class WayPropertySet {
       (leftMixins.size() == 0 || rightMixins.size() == 0)
     ) {
       String all_tags = dumpTags(way);
-      LOG.debug("Used default permissions: " + all_tags);
+      LOG.debug("Used default permissions: {}", all_tags);
     }
     return result;
   }

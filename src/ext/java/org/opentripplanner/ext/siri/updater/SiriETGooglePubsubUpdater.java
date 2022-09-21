@@ -278,7 +278,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     EstimatedTimetableMessageReceiver receiver
   ) throws IOException {
     if (dataInitializationUrl != null) {
-      LOG.info("Fetching initial data from " + dataInitializationUrl);
+      LOG.info("Fetching initial data from {}", dataInitializationUrl);
       final long t1 = System.currentTimeMillis();
 
       final InputStream data = HttpUtils.getData(

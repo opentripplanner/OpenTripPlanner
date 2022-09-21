@@ -94,7 +94,7 @@ public class UpdaterConfigurator {
   public static void shutdownGraph(TransitModel transitModel) {
     GraphUpdaterManager updaterManager = transitModel.getUpdaterManager();
     if (updaterManager != null) {
-      LOG.info("Stopping updater manager with " + updaterManager.numberOfUpdaters() + " updaters.");
+      LOG.info("Stopping updater manager with {} updaters.", updaterManager.numberOfUpdaters());
       updaterManager.stop();
     }
   }

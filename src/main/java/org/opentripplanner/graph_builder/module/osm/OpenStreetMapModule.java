@@ -187,7 +187,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
-      LOG.info("Gathering OSM from provider: " + provider);
+      LOG.info("Gathering OSM from provider: {}", provider);
       provider.readOSM(osmdb);
     }
     osmdb.postLoad();
