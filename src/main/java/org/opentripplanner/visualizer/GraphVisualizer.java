@@ -250,15 +250,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
     super();
-    LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
     this.graph = graph;
     this.streetRoutingTimeout = streetRoutingTimeout;
-    init();
   }
 
   public void run() {
+    LOG.info("Starting up graph visualizer...");
+    this.init();
     this.setVisible(true);
   }
 
