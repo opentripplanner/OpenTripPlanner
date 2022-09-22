@@ -324,7 +324,9 @@ public class TransitModel implements Serializable {
       Collection<ZoneId> zones = getAgencyTimeZones();
       if (zones.size() > 1) {
         throw new IllegalStateException(
-          "The graph contains agencies with different time zones. Please configure the one to be used in the build-config.json"
+          "The graph contains agencies with different time zones: %s. Please configure the one to be used in the build-config.json".formatted(
+              zones
+            )
         );
       }
     }
