@@ -1,17 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
+import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapNullableId;
 
-import com.google.common.collect.Maps;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareTransferRuleMapper {
 
@@ -45,8 +41,8 @@ public class FareTransferRuleMapper {
           duration = Duration.ofSeconds(rhs.getDurationLimit());
         }
         return new FareTransferRule(
-          rhs.getFromLegGroupId().getId(),
-          rhs.getToLegGroupId().getId(),
+          mapNullableId(rhs.getFromLegGroupId()),
+          mapNullableId(rhs.getToLegGroupId()),
           rhs.getTransferCount(),
           duration,
           p

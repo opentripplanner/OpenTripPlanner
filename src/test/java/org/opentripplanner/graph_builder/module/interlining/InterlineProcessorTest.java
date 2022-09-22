@@ -2,11 +2,11 @@ package org.opentripplanner.graph_builder.module.interlining;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.transfer.DefaultTransferService;
@@ -28,12 +28,7 @@ class InterlineProcessorTest implements PlanTestConstants {
   @Test
   void run() {
     var transferService = new DefaultTransferService();
-    var processor = new InterlineProcessor(
-      transferService,
-      List.of(),
-      100,
-      DataImportIssueStore.noop()
-    );
+    var processor = new InterlineProcessor(transferService, List.of(), 100, noopIssueStore());
 
     var createdTransfers = processor.run(patterns);
     assertEquals(1, createdTransfers.size());
@@ -56,7 +51,7 @@ class InterlineProcessorTest implements PlanTestConstants {
       transferService,
       List.of(notAllowed),
       100,
-      DataImportIssueStore.noop()
+      noopIssueStore()
     );
 
     var createdTransfers = processor.run(patterns);

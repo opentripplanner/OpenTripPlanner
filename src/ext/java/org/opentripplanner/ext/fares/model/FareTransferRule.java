@@ -5,8 +5,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public record FareTransferRule(
-  @Nonnull String fromLegGroup,
-  @Nonnull String toLegGroup,
+  @Nullable String fromLegGroup,
+  @Nullable String toLegGroup,
   int transferCount,
   @Nullable Duration timeLimit,
   @Nonnull FareProduct fareProduct

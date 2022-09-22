@@ -21,7 +21,6 @@ public class FareProductMapper {
   private final Set<FareProduct> mappedFareProducts = new HashSet<>();
 
   public FareProduct map(org.onebusaway.gtfs.model.FareProduct rhs) {
-    var id = AgencyAndIdMapper.mapAgencyAndId(rhs.getId());
     var currency = Currency.getInstance(rhs.getCurrency());
     var price = new Money(
       currency,
