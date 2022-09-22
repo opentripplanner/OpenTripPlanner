@@ -11,6 +11,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
+import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -60,6 +61,16 @@ public class ReportResource {
         "Content-Disposition",
         "attachment; filename=\"" + osmWayPropertySet + "-bicycle-safety.csv\""
       )
+      .build();
+  }
+
+  @GET
+  @Path("/graph.json")
+  public Response stats(@Context OtpServerRequestContext serverRequestContext) {
+    return Response
+      .status(Response.Status.OK)
+      .entity(GraphReportBuilder.build(serverRequestContext))
+      .type("application/json")
       .build();
   }
 }
