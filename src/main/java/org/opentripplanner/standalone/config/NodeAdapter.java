@@ -91,9 +91,9 @@ public class NodeAdapter {
     // Count elements starting at 1
     int i = 1;
     for (JsonNode node : json) {
-      String pName = "[" + i + "]";
-      NodeAdapter child = new NodeAdapter(node, source, fullPath(pName));
-      childrenByName.put(pName, child);
+      String arrayElementName = "[" + i + "]";
+      NodeAdapter child = new NodeAdapter(node, source, fullPath(arrayElementName));
+      childrenByName.put(arrayElementName, child);
       result.add(child);
       ++i;
     }
