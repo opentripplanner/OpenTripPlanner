@@ -64,7 +64,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonDataSource<VehicleRen
       station.longitude = Double.parseDouble(coordinates[1].trim());
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      log.warn("Error parsing bike rental station " + station.id, e);
+      log.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
     if (!node.path("operative").asText().equals("true")) {

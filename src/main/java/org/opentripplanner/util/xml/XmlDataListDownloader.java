@@ -72,7 +72,7 @@ public class XmlDataListDownloader<T> {
         inputStream = url2.openStream();
       }
       if (inputStream == null) {
-        LOG.warn("Failed to get data from url " + url);
+        LOG.warn("Failed to get data from url {}", url);
         return null;
       } else if (zip) {
         ZipInputStream zipInputStream = new ZipInputStream(inputStream);
@@ -81,12 +81,12 @@ public class XmlDataListDownloader<T> {
       }
       return parseXML(inputStream);
     } catch (IOException e) {
-      LOG.warn("Error reading XML feed from " + url, e);
+      LOG.warn("Error reading XML feed from {}", url, e);
       return null;
     } catch (ParserConfigurationException e) {
       throw new RuntimeException(e);
     } catch (SAXException e) {
-      LOG.warn("Error parsing XML feed from " + url + "(bad XML of some sort)", e);
+      LOG.warn("Error parsing XML feed from {} (bad XML of some sort)", url, e);
       return null;
     }
   }

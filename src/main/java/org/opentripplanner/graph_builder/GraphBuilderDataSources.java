@@ -215,7 +215,7 @@ public class GraphBuilderDataSources {
     LOG.info("Existing files expected to be read or written:");
     for (FileType type : FileType.values()) {
       for (DataSource source : inputData.get(type)) {
-        LOG.info(BULLET_POINT + source.detailedInfo());
+        LOG.info(BULLET_POINT + "{}", source.detailedInfo());
       }
     }
 
@@ -223,7 +223,7 @@ public class GraphBuilderDataSources {
       LOG.info("Files excluded due to command line switches or unknown type:");
       for (FileType type : FileType.values()) {
         for (DataSource source : skipData.get(type)) {
-          LOG.info(BULLET_POINT + source.detailedInfo());
+          LOG.info(BULLET_POINT + "{}", source.detailedInfo());
         }
       }
     }

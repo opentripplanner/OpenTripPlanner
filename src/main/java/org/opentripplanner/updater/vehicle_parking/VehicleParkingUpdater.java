@@ -73,7 +73,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
   @Override
   protected void runPolling() throws Exception {
-    LOG.debug("Updating vehicle parkings from " + source);
+    LOG.debug("Updating vehicle parkings from {}", source);
     if (!source.update()) {
       LOG.debug("No updates");
       return;

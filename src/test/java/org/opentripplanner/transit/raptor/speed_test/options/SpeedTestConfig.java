@@ -46,7 +46,7 @@ public class SpeedTestConfig {
   public static SpeedTestConfig config(File dir) {
     var json = new ConfigLoader(dir).loadJsonByFilename(FILE_NAME);
     SpeedTestConfig config = new SpeedTestConfig(json);
-    LOG.info("SpeedTest config loaded: " + config);
+    LOG.info("SpeedTest config loaded: {}", config);
     return config;
   }
 

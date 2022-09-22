@@ -475,7 +475,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (!success) {
-      LOG.info("Pattern not updated for trip " + trip.getId());
+      LOG.info("Pattern not updated for trip {}", trip.getId());
     }
     return success;
   }

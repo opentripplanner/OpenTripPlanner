@@ -129,7 +129,7 @@ public class HslParkToVehicleParkingMapper {
         )
         .build();
     } catch (Exception e) {
-      log.warn("Error parsing park " + vehicleParkId, e);
+      log.warn("Error parsing park {}", vehicleParkId, e);
       return null;
     }
   }

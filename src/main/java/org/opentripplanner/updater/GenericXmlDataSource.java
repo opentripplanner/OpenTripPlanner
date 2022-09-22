@@ -43,7 +43,7 @@ public abstract class GenericXmlDataSource<T> implements DataSource<T> {
       }
       return true;
     }
-    LOG.info("Can't update entities from: " + url + ", keeping current list.");
+    LOG.info("Can't update entities from: {}, keeping current list.", url);
     return false;
   }
 

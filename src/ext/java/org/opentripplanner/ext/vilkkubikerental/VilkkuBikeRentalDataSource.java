@@ -50,7 +50,7 @@ public class VilkkuBikeRentalDataSource extends GenericXmlDataSource<VehicleRent
       station.latitude = getCoordinate(attributes.get("latitude"));
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      LOG.warn("Error parsing bike rental station location " + station.id, e);
+      LOG.warn("Error parsing bike rental station location {}", station.id, e);
       return null;
     }
 

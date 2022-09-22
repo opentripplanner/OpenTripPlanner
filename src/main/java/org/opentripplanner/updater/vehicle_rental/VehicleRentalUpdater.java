@@ -100,7 +100,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   @Override
   protected void runPolling() {
-    LOG.debug("Updating vehicle rental stations from " + source);
+    LOG.debug("Updating vehicle rental stations from {}", source);
     if (!source.update()) {
       LOG.debug("No updates");
       return;

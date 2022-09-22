@@ -40,12 +40,12 @@ public class GtfsRealtimeHttpVehiclePositionSource implements VehiclePositionSou
   public List<VehiclePosition> getPositions() {
     try (InputStream is = HttpUtils.openInputStream(url.toString(), defaultHeaders)) {
       if (is == null) {
-        LOG.warn("Failed to get data from url " + url);
+        LOG.warn("Failed to get data from url {}", url);
         return List.of();
       }
       return this.getPositions(is);
     } catch (IOException e) {
-      LOG.warn("Error reading vehicle positions from " + url, e);
+      LOG.warn("Error reading vehicle positions from {}", url, e);
     }
     return List.of();
   }

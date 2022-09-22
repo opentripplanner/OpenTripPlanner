@@ -101,7 +101,7 @@ public class ShortestPathTree {
     List<Integer> nStates = new ArrayList<>(histogram.elementSet());
     Collections.sort(nStates);
     for (Integer nState : nStates) {
-      LOG.info(nState + " states: " + histogram.count(nState) + " vertices.");
+      LOG.info("{} states: {} vertices.", nState, histogram.count(nState));
     }
   }
 

@@ -67,8 +67,8 @@ public enum OTPFeature {
   }
 
   public static void logFeatureSetup() {
-    LOG.info("Features turned on: \n\t" + valuesAsString(true));
-    LOG.info("Features turned off: \n\t" + valuesAsString(false));
+    LOG.info("Features turned on: \n\t{}", valuesAsString(true));
+    LOG.info("Features turned off: \n\t{}", valuesAsString(false));
   }
 
   /**
