@@ -243,7 +243,6 @@ public class SerializedGraphObject implements Serializable {
     var nEdges = f.formatNumber(graph.countEdges());
 
     LOG.info("Graph loaded.   |V|={} |E|={}", nVertices, nEdges);
-    LOG.info("Transit loaded. |Stops|={} |Patterns|={}", nStops, nPatterns);
     LOG.info(
       "Transit loaded. |Stops|={} |Patterns|={} |ConstrainedTransfers|={}",
       nStops,
