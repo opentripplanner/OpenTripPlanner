@@ -237,11 +237,18 @@ public class SerializedGraphObject implements Serializable {
   private static void logSerializationCompleteStatus(Graph graph, TransitModel transitModel) {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
+    var nTransfers = f.formatNumber(transitModel.getTransferService().listAll().size());
     var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 
     LOG.info("Graph loaded.   |V|={} |E|={}", nVertices, nEdges);
     LOG.info("Transit loaded. |Stops|={} |Patterns|={}", nStops, nPatterns);
+    LOG.info(
+      "Transit loaded. |Stops|={} |Patterns|={} |ConstrainedTransfers|={}",
+      nStops,
+      nPatterns,
+      nTransfers
+    );
   }
 }
