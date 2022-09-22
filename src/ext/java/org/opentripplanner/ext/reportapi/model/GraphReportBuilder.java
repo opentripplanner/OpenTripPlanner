@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.reportapi.model;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -14,65 +14,64 @@ public class GraphReportBuilder {
     var graph = context.graph();
     var constrainedTransfers = transitService.getTransferService().listAll();
 
-    var constrainedTransfersByType = constrainedTransfers
-      .stream()
-      .collect(
-        Collectors.groupingBy(transfer -> {
-          var transferConstraint = transfer.getTransferConstraint();
-          if (transferConstraint.isMinTransferTimeSet()) {
-            return "minTransferTime";
-          } else if (transferConstraint.isStaySeated()) {
-            return "staySeated";
-          } else if (transferConstraint.isGuaranteed()) {
-            return "guaranteed";
-          } else if (transferConstraint.isNotAllowed()) {
-            return "notAllowed";
-          } else return "unknown";
-        })
-      );
+    var constrainedTransferCounts = countValues(
+      constrainedTransfers,
+      transfer -> {
+        var transferConstraint = transfer.getTransferConstraint();
+        if (transferConstraint.isMinTransferTimeSet()) {
+          return "minTransferTime";
+        } else if (transferConstraint.isStaySeated()) {
+          return "staySeated";
+        } else if (transferConstraint.isGuaranteed()) {
+          return "guaranteed";
+        } else if (transferConstraint.isNotAllowed()) {
+          return "notAllowed";
+        } else return "unknown";
+      }
+    );
 
-    var stopsByType = transitService
-      .listStopLocations()
-      .stream()
-      .collect(
-        Collectors.groupingBy(stop -> {
-          var className = stop.getClass().getSimpleName();
-          // lower case first letter
-          return Character.toLowerCase(className.charAt(0)) + className.substring(1);
-        })
-      );
+    var stopCounts = countValues(
+      transitService.listStopLocations(),
+      GraphReportBuilder::firstLetterToLowerCase
+    );
 
-    Map<String, Integer> constrainedTransferCounts = countMapValues(constrainedTransfersByType);
-    Map<String, Integer> stopCounts = countMapValues(stopsByType);
+    var edgeTypes = countValues(graph.getEdges(), GraphReportBuilder::firstLetterToLowerCase);
+    var vertexTypes = countValues(graph.getVertices(), GraphReportBuilder::firstLetterToLowerCase);
 
     return new GraphStats(
-      new StreetStats(graph.countEdges(), graph.countVertices()),
+      new StreetStats(edgeTypes, vertexTypes),
       new TransitStats(
         stopCounts,
         transitService.getAllTripPatterns().size(),
         transitService.getAllRoutes().size(),
-        new ConstrainedTransferStats(constrainedTransfers.size(), constrainedTransferCounts)
+        constrainedTransferCounts
       )
     );
   }
 
   @Nonnull
-  private static <T> Map<String, Integer> countMapValues(Map<String, List<T>> input) {
+  private static String firstLetterToLowerCase(Object instance) {
+    var className = instance.getClass().getSimpleName();
+    return Character.toLowerCase(className.charAt(0)) + className.substring(1);
+  }
+
+  @Nonnull
+  private static <T> TypeStats countValues(Collection<T> input, Function<T, String> classify) {
     Map<String, Integer> result = new HashMap<>();
-    input.forEach((key, value) -> result.put(key, value.size()));
-    return result;
+    input.forEach(item -> {
+      var classification = classify.apply(item);
+      var count = result.getOrDefault(classification, 0);
+      result.put(classification, ++count);
+    });
+
+    return new TypeStats(input.size(), result);
   }
 
   record GraphStats(StreetStats street, TransitStats transit) {}
 
-  record StreetStats(int edges, int vertices) {}
+  record StreetStats(TypeStats edges, TypeStats vertices) {}
 
-  record TransitStats(
-    Map<String, Integer> stops,
-    int patterns,
-    int routes,
-    ConstrainedTransferStats constrainedTransfers
-  ) {}
+  record TransitStats(TypeStats stops, int patterns, int routes, TypeStats constrainedTransfers) {}
 
-  record ConstrainedTransferStats(int total, Map<String, Integer> types) {}
+  record TypeStats(int total, Map<String, Integer> types) {}
 }
