@@ -223,7 +223,6 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("whiteListed")
-          .description("Whitelisted")
           .description(
             "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
           )
