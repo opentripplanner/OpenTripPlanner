@@ -69,7 +69,7 @@ public class ItineraryFares {
   }
 
   public List<FareComponent> getDetails(FareType type) {
-    return details.get(type);
+    return details.getOrDefault(type, List.of());
   }
 
   public Set<FareType> getTypes() {
