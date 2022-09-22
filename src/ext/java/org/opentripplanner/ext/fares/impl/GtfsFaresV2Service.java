@@ -23,9 +23,12 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class GtfsFaresV2Service implements Serializable {
 
+  private static final Logger LOG = LoggerFactory.getLogger(GtfsFaresV2Service.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
   private final Multimap<FeedScopedId, String> stopAreas;
@@ -169,6 +172,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .map(rule -> {
         var transferRulesToNextLeg = transferRulesForLeg
           .stream()
+          .filter(GtfsFaresV2Service::checkForWildcards)
           .filter(t -> t.fromLegGroup().equals(rule.legGroupId()))
           .filter(t -> transferRuleMatchesNextLeg(nextLeg, t))
           .toList();
@@ -177,6 +181,16 @@ public final class GtfsFaresV2Service implements Serializable {
       .collect(Collectors.toSet());
 
     return new LegProducts(leg, nextLeg, products);
+  }
+
+  private static boolean checkForWildcards(FareTransferRule t) {
+    if (Objects.isNull(t.fromLegGroup()) || Objects.isNull(t.toLegGroup())) {
+      LOG.error(
+        "Transfer rule {} contains a wildcard leg group reference. These are not supported yet.",
+        t
+      );
+      return false;
+    } else return true;
   }
 
   private boolean transferRuleMatchesNextLeg(

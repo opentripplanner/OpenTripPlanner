@@ -251,7 +251,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       List.of(
         new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer),
         new FareTransferRule(LEG_GROUP2, LEG_GROUP3, 1, null, freeTransfer),
-        new FareTransferRule(LEG_GROUP4, LEG_GROUP4, 1, null, freeTransfer)
+        new FareTransferRule(LEG_GROUP4, LEG_GROUP4, 1, null, freeTransfer),
+        new FareTransferRule(null, LEG_GROUP5, 1, null, freeTransfer)
       ),
       Multimaps.forMap(
         Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
