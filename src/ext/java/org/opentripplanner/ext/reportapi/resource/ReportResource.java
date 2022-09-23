@@ -2,6 +2,10 @@ package org.opentripplanner.ext.reportapi.resource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,6 +27,9 @@ public class ReportResource {
 
   private final TransferService transferService;
   private final TransitService transitService;
+
+  @Nullable
+  private static CachedStats cachedStats;
 
   @SuppressWarnings("unused")
   public ReportResource(@Context OtpServerRequestContext requestContext) {
@@ -66,11 +73,23 @@ public class ReportResource {
 
   @GET
   @Path("/graph.json")
-  public Response stats(@Context OtpServerRequestContext serverRequestContext) {
+  public synchronized Response stats(@Context OtpServerRequestContext serverRequestContext) {
+    // since the computation is pretty expensive only allow it every 5 minutes
+    if (cachedStats == null || cachedStats.hasExpired(Instant.now())) {
+      var stats = GraphReportBuilder.build(serverRequestContext);
+      cachedStats = new CachedStats(Instant.now(), stats);
+    }
+
     return Response
       .status(Response.Status.OK)
-      .entity(GraphReportBuilder.build(serverRequestContext))
+      .entity(cachedStats.stats())
       .type("application/json")
       .build();
+  }
+
+  private record CachedStats(Instant creationTime, GraphReportBuilder.GraphStats stats) {
+    public boolean hasExpired(Instant time) {
+      return this.creationTime.plus(Duration.ofMinutes(5)).isBefore(time);
+    }
   }
 }

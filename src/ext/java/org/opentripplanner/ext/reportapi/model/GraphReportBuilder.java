@@ -67,7 +67,7 @@ public class GraphReportBuilder {
     return new TypeStats(input.size(), result);
   }
 
-  record GraphStats(StreetStats street, TransitStats transit) {}
+  public record GraphStats(StreetStats street, TransitStats transit) {}
 
   record StreetStats(TypeStats edges, TypeStats vertices) {}
 
