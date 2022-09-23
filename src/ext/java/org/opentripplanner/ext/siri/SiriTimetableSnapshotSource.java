@@ -571,12 +571,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
     Route route = transitModel.getTransitModelIndex().getRouteForId(routeId);
 
+    T2<TransitMode, String> transitMode = getTransitMode(
+      estimatedVehicleJourney.getVehicleModes(),
+      replacedRoute
+    );
+
     if (route == null) { // Route is unknown - create new
       var routeBuilder = Route.of(routeId);
-      T2<TransitMode, String> transitMode = getTransitMode(
-        estimatedVehicleJourney.getVehicleModes(),
-        replacedRoute
-      );
       routeBuilder.withMode(transitMode.first);
       routeBuilder.withNetexSubmode(transitMode.second);
       routeBuilder.withOperator(operator);
@@ -611,6 +612,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     var tripBuilder = Trip.of(tripId);
     tripBuilder.withRoute(route);
+
+    if (!route.getMode().equals(transitMode.first)) {
+      // Trip overrides default TransitMode specified in the Route - needs to be set on Trip
+      tripBuilder.withMode(transitMode.first);
+      tripBuilder.withNetexSubmode(transitMode.second);
+    }
 
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
