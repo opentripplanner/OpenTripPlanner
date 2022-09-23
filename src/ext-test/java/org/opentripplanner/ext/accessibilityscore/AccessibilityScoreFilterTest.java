@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public class AccessibilityScoreFilterTest implements PlanTestConstants {
@@ -38,7 +38,7 @@ public class AccessibilityScoreFilterTest implements PlanTestConstants {
 
     input.forEach(i -> assertNull(i.getAccessibilityScore()));
 
-    var filter = new AccessibilityScoreFilter(WheelchairAccessibilityRequest.DEFAULT.maxSlope());
+    var filter = new AccessibilityScoreFilter(WheelchairPreferences.DEFAULT.maxSlope());
     var filtered = filter.filter(input);
 
     filtered.forEach(i -> {

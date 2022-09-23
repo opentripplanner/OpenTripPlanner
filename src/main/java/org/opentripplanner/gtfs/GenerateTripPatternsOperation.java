@@ -10,21 +10,21 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
+import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +41,7 @@ public class GenerateTripPatternsOperation {
   private final DataImportIssueStore issueStore;
   private final Deduplicator deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
+  private GeometryProcessor geometryProcessor;
 
   private final Multimap<StopPattern, TripPattern> tripPatterns;
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
@@ -53,12 +54,14 @@ public class GenerateTripPatternsOperation {
     OtpTransitServiceBuilder builder,
     DataImportIssueStore issueStore,
     Deduplicator deduplicator,
-    Set<FeedScopedId> calendarServiceIds
+    Set<FeedScopedId> calendarServiceIds,
+    GeometryProcessor geometryProcessor
   ) {
     this.transitDaoBuilder = builder;
     this.issueStore = issueStore;
     this.deduplicator = deduplicator;
     this.calendarServiceIds = calendarServiceIds;
+    this.geometryProcessor = geometryProcessor;
     this.tripPatterns = transitDaoBuilder.getTripPatterns();
   }
 
@@ -105,15 +108,6 @@ public class GenerateTripPatternsOperation {
 
   private void buildTripPatternForTrip(Trip trip) {
     // TODO: move to a validator module
-    // Check that the mode is supported
-    if (trip.getRoute().getMode() == null) {
-      issueStore.add(
-        new GTFSModeNotSupported(trip, Integer.toString(trip.getRoute().getGtfsType()))
-      );
-      return;
-    }
-
-    // TODO: move to a validator module
     if (!calendarServiceIds.contains(trip.getServiceId())) {
       issueStore.add(new TripUndefinedService(trip));
       return; // Invalid trip, skip it, it will break later
@@ -135,19 +129,18 @@ public class GenerateTripPatternsOperation {
     StopPattern stopPattern = new StopPattern(stopTimes);
 
     Direction direction = trip.getDirection();
-    TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(), direction);
+    TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip, direction);
 
     // Create a TripTimes object for this list of stoptimes, which form one trip.
     TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
 
     // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
     List<Frequency> frequencies = frequenciesForTrip.get(trip);
-    if (frequencies != null && !(frequencies.isEmpty())) {
+    if (!frequencies.isEmpty()) {
       for (Frequency freq : frequencies) {
         tripPattern.add(new FrequencyEntry(freq, tripTimes));
         freqCount++;
       }
-      // TODO replace: createGeometry(graph, trip, stopTimes, hops);
     }
     // This trip was not frequency-based. Add the TripTimes directly to the TripPattern's scheduled timetable.
     else {
@@ -158,16 +151,22 @@ public class GenerateTripPatternsOperation {
 
   private TripPattern findOrCreateTripPattern(
     StopPattern stopPattern,
-    Route route,
+    Trip trip,
     Direction direction
   ) {
+    Route route = trip.getRoute();
     for (TripPattern tripPattern : tripPatterns.get(stopPattern)) {
       if (tripPattern.getRoute().equals(route) && tripPattern.getDirection().equals(direction)) {
         return tripPattern;
       }
     }
     FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
-    TripPattern tripPattern = new TripPattern(patternId, route, stopPattern);
+    TripPattern tripPattern = TripPattern
+      .of(patternId)
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .withHopGeometries(geometryProcessor.createHopGeometries(trip))
+      .build();
     tripPatterns.put(stopPattern, tripPattern);
     return tripPattern;
   }

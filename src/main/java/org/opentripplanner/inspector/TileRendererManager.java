@@ -9,7 +9,7 @@ import org.locationtech.jts.geom.util.AffineTransformation;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.inspector.TileRenderer.TileRenderContext;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,16 +31,17 @@ public class TileRendererManager {
 
   private final Graph graph;
 
-  public TileRendererManager(Graph graph, RoutingRequest routingRequest) {
+  public TileRendererManager(Graph graph, RoutingPreferences routingPreferences) {
     this.graph = graph;
 
     // Register layers.
     renderers.put("bike-safety", new EdgeVertexTileRenderer(new BikeSafetyEdgeRenderer()));
+    renderers.put("walk-safety", new EdgeVertexTileRenderer(new WalkSafetyEdgeRenderer()));
     renderers.put("thru-traffic", new EdgeVertexTileRenderer(new NoThruTrafficEdgeRenderer()));
     renderers.put("traversal", new EdgeVertexTileRenderer(new TraversalPermissionsEdgeRenderer()));
     renderers.put(
       "wheelchair",
-      new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingRequest))
+      new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingPreferences))
     );
     renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
     renderers.put("pathways", new EdgeVertexTileRenderer(new PathwayEdgeRenderer()));

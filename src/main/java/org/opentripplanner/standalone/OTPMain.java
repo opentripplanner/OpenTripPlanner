@@ -6,17 +6,15 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
-import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.configure.OTPAppConstruction;
-import org.opentripplanner.standalone.configure.OTPApplicationFactory;
+import org.opentripplanner.standalone.configure.ConstructApplication;
+import org.opentripplanner.standalone.configure.LoadApplication;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.ThrowableUtils;
 import org.slf4j.Logger;
@@ -102,83 +100,79 @@ public class OTPMain {
    *
    * @throws RuntimeException if an error occurs while loading the graph.
    */
-  private static void startOTPServer(CommandLineParameters params) {
+  private static void startOTPServer(CommandLineParameters cli) {
+    boolean graphAvailable = false;
     LOG.info(
       "Searching for configuration and input files in {}",
-      params.getBaseDirectory().getAbsolutePath()
+      cli.getBaseDirectory().getAbsolutePath()
     );
 
-    Graph graph = null;
-    TransitModel transitModel = null;
-    OTPAppConstruction app = new OTPAppConstruction(params);
-    var factory = app.getFactory();
-    var datastore = factory.datastore();
-    var configModel = factory.configModel();
+    // Init loading phase (Separate DI scope)
+    var loadApp = new LoadApplication(cli);
+    var config = loadApp.config();
 
     // Validate data sources, command line arguments and config before loading and
     // processing input data to fail early
-    app.validateConfigAndDataSources();
+    loadApp.validateConfigAndDataSources();
+
+    ConstructApplication app = null;
 
     /* Load graph from disk if one is not present from build. */
-    if (params.doLoadGraph() || params.doLoadStreetGraph()) {
-      DataSource inputGraph = params.doLoadGraph()
-        ? datastore.getGraph()
-        : datastore.getStreetGraph();
-      SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
-      graph = obj.graph;
-      transitModel = obj.transitModel;
-      configModel.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+    if (cli.doLoadGraph() || cli.doLoadStreetGraph()) {
+      SerializedGraphObject obj = SerializedGraphObject.load(loadApp.getInputGraphDataStore());
+      app = loadApp.appConstruction(obj);
+      config.updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+      graphAvailable = true;
+    } else {
+      app = loadApp.appConstruction();
     }
 
     /* Start graph builder if requested. */
-    if (params.doBuildStreet() || params.doBuildTransit()) {
+    if (cli.doBuildStreet() || cli.doBuildTransit()) {
       // Abort building a graph if the file can not be saved
       SerializedGraphObject.verifyTheOutputGraphIsWritableIfDataSourceExist(
         app.graphOutputDataSource()
       );
 
-      GraphBuilder graphBuilder = app.createGraphBuilder(graph);
+      GraphBuilder graphBuilder = app.createGraphBuilder();
       if (graphBuilder != null) {
         graphBuilder.run();
-        // Hand off the graph to the server as the default graph
-        graph = graphBuilder.getGraph();
-        transitModel = graphBuilder.getTransitModel();
+        graphAvailable = true;
       } else {
         throw new IllegalStateException("An error occurred while building the graph.");
       }
       // Store graph and config used to build it, also store router-config for easy deployment
       // with using the embedded router config.
       new SerializedGraphObject(
-        graph,
-        transitModel,
-        configModel.buildConfig(),
-        configModel.routerConfig()
+        app.graph(),
+        app.transitModel(),
+        config.buildConfig(),
+        config.routerConfig()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator
-      LOG.info("Memory optimized {}", graph.deduplicator.toString());
+      LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
     }
 
-    if (graph == null) {
+    if (!graphAvailable) {
       LOG.error("Nothing to do, no graph loaded or build. Exiting.");
       System.exit(101);
     }
 
-    if (params.doServe()) {
-      app.updateModel(graph, transitModel);
-      startOtpWebServer(params, app);
+    if (cli.doServe()) {
+      startOtpWebServer(cli, app);
     } else {
       LOG.info("Done building graph. Exiting.");
     }
   }
 
-  private static void startOtpWebServer(CommandLineParameters params, OTPAppConstruction app) {
+  private static void startOtpWebServer(CommandLineParameters params, ConstructApplication app) {
     // Index graph for travel search
     app.transitModel().index();
-    app.graph().index();
+    app.graph().index(app.transitModel().getStopModel());
 
     // publishing the config version info make it available to the APIs
-    setOtpConfigVersionsOnServerInfo(app.getFactory());
+    setOtpConfigVersionsOnServerInfo(app);
 
     /* Start visualizer if requested. */
     if (params.visualize) {
@@ -192,10 +186,7 @@ public class OTPMain {
     if (params.doServe()) {
       GrizzlyServer grizzlyServer = app.createGrizzlyServer();
 
-      registerShutdownHookToGracefullyShutDownServer(
-        app.transitModel(),
-        app.raptorTuningParameters()
-      );
+      registerShutdownHookToGracefullyShutDownServer(app.transitModel(), app.raptorConfig());
 
       // Loop to restart server on uncaught fatal exceptions.
       while (true) {
@@ -208,7 +199,7 @@ public class OTPMain {
             ThrowableUtils.detailedString(throwable)
           );
         }
-        logLocationOfRequestLog(app.getFactory().configModel().routerConfig().requestLogFile());
+        logLocationOfRequestLog(app.routerConfig().requestLogFile());
       }
     }
   }
@@ -227,7 +218,7 @@ public class OTPMain {
   ) {
     var hook = new Thread(() -> {
       LOG.info("OTP shutdown started...");
-      GraphUpdaterConfigurator.shutdownGraph(transitModel);
+      UpdaterConfigurator.shutdownGraph(transitModel);
       raptorConfig.shutdown();
       WeakCollectionCleaner.DEFAULT.exit();
       DeferredAuthorityFactory.exit();
@@ -243,10 +234,9 @@ public class OTPMain {
     }
   }
 
-  private static void setOtpConfigVersionsOnServerInfo(OTPApplicationFactory factory) {
-    var c = factory.configModel();
-    projectInfo().otpConfigVersion = c.otpConfig().configVersion;
-    projectInfo().buildConfigVersion = c.buildConfig().configVersion;
-    projectInfo().routerConfigVersion = c.routerConfig().getConfigVersion();
+  private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {
+    projectInfo().otpConfigVersion = app.otpConfig().configVersion;
+    projectInfo().buildConfigVersion = app.buildConfig().configVersion;
+    projectInfo().routerConfigVersion = app.routerConfig().getConfigVersion();
   }
 }

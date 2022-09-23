@@ -17,6 +17,12 @@ mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.Sp
 
 The results will be displayed on the console.
 
+### Instrumentation
+
+Each run on CI is instrumented with Java Flight Recorder. The results are then saved as an artifact
+and can be downloaded. IntelliJ for example can display a very useful flame graph from those jrf files
+that shows bottlenecks in the code.
+
 ### Configure the test
 
 - Pick a valid "testDate" for your data set and set it in the speed-test-config.json.
@@ -37,3 +43,7 @@ If the link above do not work you should be able to find it on the ENTUR web:
 
 - [Tidied GTFS data](https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip)
 - [BW OSM data](https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf)
+ 
+#### Germany
+
+- [Tidied GTFS data](https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip)

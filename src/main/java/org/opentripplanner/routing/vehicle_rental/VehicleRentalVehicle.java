@@ -115,7 +115,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Override
-  public boolean isKeepingVehicleRentalAtDestinationAllowed() {
+  public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
     return false;
   }
 

@@ -135,4 +135,8 @@ public class BinHeap<T> {
     prio = Arrays.copyOf(prio, capacity + 1);
     elem = Arrays.copyOf(elem, capacity + 1);
   }
+
+  public int getCapacity() {
+    return capacity;
+  }
 }

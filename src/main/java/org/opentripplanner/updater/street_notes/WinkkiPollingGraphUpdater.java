@@ -3,6 +3,7 @@ package org.opentripplanner.updater.street_notes;
 import java.util.Date;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 /**
@@ -22,8 +23,8 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
 
-  public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
-    super(config);
+  public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config, Graph graph) {
+    super(config, graph);
   }
 
   protected StreetNote getNote(SimpleFeature feature) {

@@ -6,10 +6,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**

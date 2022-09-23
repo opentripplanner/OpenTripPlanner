@@ -16,18 +16,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Pathway;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -44,9 +42,6 @@ public class OtpTransitServiceImplTest {
     OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
-    FareRule rule = createFareRule();
-    builder.getFareAttributes().add(rule.getFare());
-    builder.getFareRules().add(rule);
     builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
     subject = builder.build();
@@ -60,25 +55,6 @@ public class OtpTransitServiceImplTest {
     assertEquals(1, agencies.size());
     assertEquals("agency", agency.getId().getId());
     assertEquals("Fake Agency", agency.getName());
-  }
-
-  @Test
-  public void testGetAllFareAttributes() {
-    Collection<FareAttribute> fareAttributes = subject.getAllFareAttributes();
-
-    assertEquals(1, fareAttributes.size());
-    assertEquals("FareAttribute{F:FA}", first(fareAttributes).toString());
-  }
-
-  @Test
-  public void testGetAllFareRules() {
-    Collection<FareRule> fareRules = subject.getAllFareRules();
-
-    assertEquals(1, fareRules.size());
-    assertEquals(
-      "FareRule{originId: Zone A, containsId: Zone B, destinationId: Zone C}",
-      first(fareRules).toString()
-    );
   }
 
   @Test
@@ -118,7 +94,7 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStations() {
-    Collection<Station> stations = subject.getAllStations();
+    Collection<Station> stations = subject.stopModel().listStations();
 
     assertEquals(1, stations.size());
     assertEquals("Station{F:station station}", first(stations).toString());
@@ -126,10 +102,10 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetAllStops() {
-    Collection<Stop> stops = subject.getAllStops();
+    Collection<RegularStop> stops = subject.stopModel().listRegularStops();
 
     assertEquals(22, stops.size());
-    assertEquals("Stop{F:A A}", first(stops).toString());
+    assertEquals("RegularStop{F:A A}", first(stops).toString());
   }
 
   @Test
@@ -156,14 +132,16 @@ public class OtpTransitServiceImplTest {
 
   @Test
   public void testGetStopForId() {
-    Stop stop = subject.getStopForId(TransitModelForTest.id("P"));
-    assertEquals("Stop{F:P P}", stop.toString());
+    RegularStop stop = subject.stopModel().getRegularStop(TransitModelForTest.id("P"));
+    assertEquals("RegularStop{F:P P}", stop.toString());
   }
 
   @Test
   public void testGetStopsForStation() {
-    List<StopLocation> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
-    assertEquals("[Stop{F:A A}]", stops.toString());
+    List<StopLocation> stops = new ArrayList<>(
+      subject.stopModel().getStationById(STATION_ID).getChildStops()
+    );
+    assertEquals("[RegularStop{F:A A}]", stops.toString());
   }
 
   @Test
@@ -179,7 +157,7 @@ public class OtpTransitServiceImplTest {
   public void testGetStopTimesForTrip() {
     List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
     assertEquals(
-      "[Stop{F:A A}, Stop{F:B B}, Stop{F:C C}]",
+      "[RegularStop{F:A A}, RegularStop{F:B B}, RegularStop{F:C C}]",
       stopTimes.stream().map(StopTime::getStop).toList().toString()
     );
   }
@@ -195,16 +173,6 @@ public class OtpTransitServiceImplTest {
   @Test
   public void testHasActiveTransit() {
     assertTrue(subject.hasActiveTransit());
-  }
-
-  private static FareRule createFareRule() {
-    FareAttribute fa = new FareAttribute(TransitModelForTest.id("FA"));
-    FareRule rule = new FareRule();
-    rule.setOriginId("Zone A");
-    rule.setContainsId("Zone B");
-    rule.setDestinationId("Zone C");
-    rule.setFare(fa);
-    return rule;
   }
 
   private static String removeFeedScope(String text) {

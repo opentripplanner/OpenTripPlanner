@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.framework;
 
 public abstract class AbstractEntityBuilder<
-  E extends TransitEntity2<E, B>, B extends AbstractEntityBuilder<E, B>
+  E extends AbstractTransitEntity<E, B>, B extends AbstractEntityBuilder<E, B>
 >
   extends AbstractBuilder<E, B>
   implements TransitEntityBuilder<E, B> {

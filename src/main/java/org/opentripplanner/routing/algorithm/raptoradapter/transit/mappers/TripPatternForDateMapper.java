@@ -11,12 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +37,11 @@ public class TripPatternForDateMapper {
 
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
 
-  private final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
-
   /**
    * @param serviceCodesRunningForDate - READ ONLY
-   * @param newTripPatternForOld       - READ ONLY
    */
-  TripPatternForDateMapper(
-    Map<LocalDate, TIntSet> serviceCodesRunningForDate,
-    Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld
-  ) {
+  TripPatternForDateMapper(Map<LocalDate, TIntSet> serviceCodesRunningForDate) {
     this.serviceCodesRunningForDate = Collections.unmodifiableMap(serviceCodesRunningForDate);
-    this.newTripPatternForOld = Collections.unmodifiableMap(newTripPatternForOld);
   }
 
   /**
@@ -62,8 +53,6 @@ public class TripPatternForDateMapper {
    */
   public TripPatternForDate map(Timetable timetable, LocalDate serviceDate) {
     TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
-
-    TripPattern oldTripPattern = timetable.getPattern();
 
     List<TripTimes> times = new ArrayList<>();
 
@@ -109,7 +98,7 @@ public class TripPatternForDateMapper {
     }
 
     return new TripPatternForDate(
-      newTripPatternForOld.get(oldTripPattern),
+      timetable.getPattern().getRoutingTripPattern(),
       times,
       frequencies,
       serviceDate

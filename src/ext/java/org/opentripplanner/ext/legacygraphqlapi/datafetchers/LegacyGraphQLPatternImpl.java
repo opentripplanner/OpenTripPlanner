@@ -13,20 +13,21 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
@@ -185,7 +186,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<String> semanticHash() {
-    return environment -> getSource(environment).semanticHashString(null);
+    return environment -> SemanticHash.forTripPattern(getSource(environment), null);
   }
 
   @Override
@@ -208,7 +209,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
       try {
         TIntSet services = getTransitService(environment)
-          .getServicesRunningForDate(ServiceDateUtils.parseString(serviceDate));
+          .getServiceCodesRunningForDate(ServiceDateUtils.parseString(serviceDate));
         return getSource(environment)
           .getScheduledTimetable()
           .getTripTimes()

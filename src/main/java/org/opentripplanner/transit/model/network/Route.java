@@ -5,26 +5,28 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 
-public final class Route extends TransitEntity2<Route, RouteBuilder> implements LogInfo {
+public final class Route extends AbstractTransitEntity<Route, RouteBuilder> implements LogInfo {
 
   private final Agency agency;
   private final Operator operator;
   private final Branding branding;
   private final List<GroupOfRoutes> groupsOfRoutes;
   private final String shortName;
-  private final String longName;
+  private final I18NString longName;
   private final TransitMode mode;
   // TODO: consolidate gtfsType and netexSubmode
   private final Integer gtfsType;
@@ -37,7 +39,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   private final String textColor;
   private final BikeAccess bikesAllowed;
 
-  public Route(RouteBuilder builder) {
+  Route(RouteBuilder builder) {
     super(builder.getId());
     // Required fields
     this.agency = requireNonNull(builder.getAgency());
@@ -127,7 +129,7 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
   }
 
   @Nullable
-  public String getLongName() {
+  public I18NString getLongName() {
     return longName;
   }
 
@@ -186,12 +188,18 @@ public final class Route extends TransitEntity2<Route, RouteBuilder> implements 
 
   /** @return the route's short name, or the long name if the short name is null. */
   @Nonnull
+  public String getName(Locale locale) {
+    return shortName == null ? longName.toString(locale) : shortName;
+  }
+
+  /** @return the route's short name, or the long name if the short name is null. */
+  @Nonnull
   public String getName() {
-    return shortName == null ? longName : shortName;
+    return shortName == null ? longName.toString() : shortName;
   }
 
   @Override
   public String logName() {
-    return getName();
+    return mode.name() + " " + getName();
   }
 }

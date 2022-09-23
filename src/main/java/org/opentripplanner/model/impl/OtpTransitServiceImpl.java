@@ -10,32 +10,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
-import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * A in-memory implementation of {@link OtpTransitService}. It's super fast for most methods, but
@@ -48,23 +39,15 @@ import org.slf4j.LoggerFactory;
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceImpl.class);
-
   private final Collection<Agency> agencies;
 
   private final Collection<Operator> operators;
 
-  private final Collection<FareAttribute> fareAttributes;
-
-  private final Collection<FareRule> fareRules;
-
   private final Collection<FeedInfo> feedInfos;
 
-  private final Collection<GroupOfStations> groupsOfStations;
+  private final StopModel stopModel;
 
-  private final Collection<MultiModalStation> multiModalStations;
-
-  private final ImmutableListMultimap<TransitEntity, Notice> noticeAssignments;
+  private final ImmutableListMultimap<AbstractTransitEntity, Notice> noticeAssignments;
 
   private final Collection<Pathway> pathways;
 
@@ -72,19 +55,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId;
 
-  private final Map<FeedScopedId, Station> stationsById;
-
-  private final Map<FeedScopedId, Stop> stopsById;
-
   private final Map<FeedScopedId, Entrance> entrancesById;
 
   private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
 
   private final Map<FeedScopedId, BoardingArea> boardingAreasById;
-
-  private final Map<FeedScopedId, FlexStopLocation> locationsById;
-
-  private final Map<FeedScopedId, FlexLocationGroup> locationGroupsById;
 
   private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
@@ -94,30 +69,23 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
   private final Collection<Trip> trips;
 
-  private final Collection<FlexTrip> flexTrips;
+  private final Collection<FlexTrip<?, ?>> flexTrips;
 
   /**
    * Create a read only version of the {@link OtpTransitService}.
    */
   OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
     this.agencies = immutableList(builder.getAgenciesById().values());
-    this.fareAttributes = immutableList(builder.getFareAttributes());
-    this.fareRules = immutableList(builder.getFareRules());
     this.feedInfos = immutableList(builder.getFeedInfos());
-    this.groupsOfStations = builder.getGroupsOfStationsById().values();
-    this.multiModalStations = builder.getMultiModalStationsById().values();
+    this.stopModel = builder.stopModelBuilder().build();
     this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());
     this.serviceIds = immutableList(builder.findAllServiceIds());
     this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
-    this.stationsById = builder.getStations().asImmutableMap();
-    this.stopsById = builder.getStops().asImmutableMap();
     this.entrancesById = builder.getEntrances().asImmutableMap();
     this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
     this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
-    this.locationsById = builder.getLocations().asImmutableMap();
-    this.locationGroupsById = builder.getLocationGroups().asImmutableMap();
     this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
     this.transfers = immutableList(builder.getTransfers());
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
@@ -136,28 +104,13 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Collection<FareAttribute> getAllFareAttributes() {
-    return fareAttributes;
-  }
-
-  @Override
-  public Collection<FareRule> getAllFareRules() {
-    return fareRules;
-  }
-
-  @Override
   public Collection<FeedInfo> getAllFeedInfos() {
     return feedInfos;
   }
 
   @Override
-  public Collection<GroupOfStations> getAllGroupsOfStations() {
-    return immutableList(groupsOfStations);
-  }
-
-  @Override
-  public Collection<MultiModalStation> getAllMultiModalStations() {
-    return immutableList(multiModalStations);
+  public StopModel stopModel() {
+    return stopModel;
   }
 
   /**
@@ -165,7 +118,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
    * since some entities have String, while other have FeedScopeId ids.
    */
   @Override
-  public Multimap<TransitEntity, Notice> getNoticeAssignments() {
+  public Multimap<AbstractTransitEntity, Notice> getNoticeAssignments() {
     return noticeAssignments;
   }
 
@@ -189,26 +142,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Station getStationForId(FeedScopedId id) {
-    return stationsById.get(id);
-  }
-
-  @Override
-  public Stop getStopForId(FeedScopedId id) {
-    return stopsById.get(id);
-  }
-
-  @Override
-  public Collection<Station> getAllStations() {
-    return immutableList(stationsById.values());
-  }
-
-  @Override
-  public Collection<Stop> getAllStops() {
-    return immutableList(stopsById.values());
-  }
-
-  @Override
   public Collection<Entrance> getAllEntrances() {
     return immutableList(entrancesById.values());
   }
@@ -221,16 +154,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public Collection<BoardingArea> getAllBoardingAreas() {
     return immutableList(boardingAreasById.values());
-  }
-
-  @Override
-  public Collection<FlexStopLocation> getAllLocations() {
-    return immutableList(locationsById.values());
-  }
-
-  @Override
-  public Collection<FlexLocationGroup> getAllLocationGroups() {
-    return immutableList(locationGroupsById.values());
   }
 
   @Override
@@ -254,7 +177,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
   }
 
   @Override
-  public Collection<FlexTrip> getAllFlexTrips() {
+  public Collection<FlexTrip<?, ?>> getAllFlexTrips() {
     return flexTrips;
   }
 

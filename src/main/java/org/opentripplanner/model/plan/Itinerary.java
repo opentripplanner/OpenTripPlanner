@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -20,14 +22,14 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class Itinerary {
 
   /* final primitive properties */
-  private final int durationSeconds;
-  private final int transitTimeSeconds;
+  private final Duration duration;
+  private final Duration transitDuration;
   private final int numberOfTransfers;
-  private final int waitingTimeSeconds;
+  private final Duration waitingDuration;
   private final double nonTransitDistanceMeters;
   private final boolean walkOnly;
   private final boolean streetOnly;
-  private final int nonTransitTimeSeconds;
+  private final Duration nonTransitDuration;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
@@ -47,19 +49,19 @@ public class Itinerary {
   private final List<SystemNotice> systemNotices = new ArrayList<>();
   private List<Leg> legs;
 
-  private Fare fare = new Fare();
+  private ItineraryFares fare = ItineraryFares.empty();
 
   public Itinerary(List<Leg> legs) {
     setLegs(legs);
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
-    this.durationSeconds = totals.totalDurationSeconds;
+    this.duration = totals.totalDuration;
     this.numberOfTransfers = totals.transfers();
-    this.transitTimeSeconds = totals.transitTimeSeconds;
-    this.nonTransitTimeSeconds = totals.nonTransitTimeSeconds;
+    this.transitDuration = totals.transitDuration;
+    this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.waitingTimeSeconds = totals.waitingTimeSeconds;
+    this.waitingDuration = totals.walkingDuration;
     this.walkOnly = totals.walkOnly;
     this.streetOnly = totals.streetOnly;
     this.setElevationGained(totals.totalElevationGained);
@@ -109,8 +111,8 @@ public class Itinerary {
   /**
    * This is the amount of time used to travel. {@code waitingTime} is NOT included.
    */
-  public int effectiveDurationSeconds() {
-    return getTransitTimeSeconds() + getNonTransitTimeSeconds();
+  public Duration effectiveDuration() {
+    return getTransitDuration().plus(getNonTransitDuration());
   }
 
   /**
@@ -134,9 +136,11 @@ public class Itinerary {
     return isStreetOnly();
   }
 
-  /** TRUE if alt least one leg is a transit leg. */
+  /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
-    return getTransitTimeSeconds() > 0;
+    return legs
+      .stream()
+      .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
   }
 
   public Leg firstLeg() {
@@ -149,7 +153,7 @@ public class Itinerary {
 
   /** Get the first transit leg if one exist */
   public Optional<Leg> firstTransitLeg() {
-    return getLegs().stream().filter(Leg::isTransitLeg).findFirst();
+    return getLegs().stream().filter(TransitLeg.class::isInstance).findFirst();
   }
 
   /**
@@ -212,11 +216,11 @@ public class Itinerary {
       .addTime("start", firstLeg().getStartTime())
       .addTime("end", lastLeg().getEndTime())
       .addNum("nTransfers", numberOfTransfers, -1)
-      .addDurationSec("duration", durationSeconds)
+      .addDuration("duration", duration)
       .addNum("generalizedCost", generalizedCost)
-      .addDurationSec("nonTransitTime", nonTransitTimeSeconds)
-      .addDurationSec("transitTime", transitTimeSeconds)
-      .addDurationSec("waitingTime", waitingTimeSeconds)
+      .addDuration("nonTransitTime", nonTransitDuration)
+      .addDuration("transitTime", transitDuration)
+      .addDuration("waitingTime", waitingDuration)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
       .addNum("elevationLost", elevationLost, 0.0)
@@ -247,16 +251,16 @@ public class Itinerary {
     for (Leg leg : legs) {
       buf.sep();
       if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration());
-      } else if (leg.isTransitLeg()) {
+        buf.walk((int) leg.getDuration().toSeconds());
+      } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
-          leg.getMode().name(),
-          leg.getTrip().logName(),
-          leg.getStartTime(),
-          leg.getEndTime()
+          transitLeg.getMode().name(),
+          transitLeg.getTrip().logName(),
+          transitLeg.getStartTime(),
+          transitLeg.getEndTime()
         );
-      } else {
-        buf.other(leg.getMode().name(), leg.getStartTime(), leg.getEndTime());
+      } else if (leg instanceof StreetLeg streetLeg) {
+        buf.street(streetLeg.getMode().name(), leg.getStartTime(), leg.getEndTime());
       }
 
       buf.sep();
@@ -269,15 +273,15 @@ public class Itinerary {
   }
 
   /** Total duration of the itinerary in seconds */
-  public int getDurationSeconds() {
-    return durationSeconds;
+  public Duration getDuration() {
+    return duration;
   }
 
   /**
    * How much time is spent on transit, in seconds.
    */
-  public int getTransitTimeSeconds() {
-    return transitTimeSeconds;
+  public Duration getTransitDuration() {
+    return transitDuration;
   }
 
   /**
@@ -290,8 +294,8 @@ public class Itinerary {
   /**
    * How much time is spent waiting for transit to arrive, in seconds.
    */
-  public int getWaitingTimeSeconds() {
-    return waitingTimeSeconds;
+  public Duration getWaitingDuration() {
+    return waitingDuration;
   }
 
   /**
@@ -331,6 +335,26 @@ public class Itinerary {
     return legs;
   }
 
+  /**
+   * Retrieve a transit leg by its index in the itinerary, starting from 0. This is useful in test
+   * where you may assume leg N is a transit leg.
+   *
+   * @throws ClassCastException if the leg is not a TransitLeg
+   */
+  public TransitLeg getTransitLeg(int index) {
+    return (TransitLeg) legs.get(index);
+  }
+
+  /**
+   * Retrieve a street leg by its index in the itinerary, starting from 0. This is useful in test
+   * where you may assume leg N is a transit leg.
+   *
+   * @throws ClassCastException if the leg is not a StreetLeg
+   */
+  public StreetLeg getStreetLeg(int index) {
+    return (StreetLeg) legs.get(index);
+  }
+
   public void setLegs(List<Leg> legs) {
     this.legs = List.copyOf(legs);
   }
@@ -363,8 +387,8 @@ public class Itinerary {
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
-  public int getNonTransitTimeSeconds() {
-    return nonTransitTimeSeconds;
+  public Duration getNonTransitDuration() {
+    return nonTransitDuration;
   }
 
   /**
@@ -463,7 +487,7 @@ public class Itinerary {
   }
 
   /**
-   * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
+   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
    */
   public boolean isArrivedAtDestinationWithRentedVehicle() {
@@ -477,13 +501,45 @@ public class Itinerary {
   }
 
   /**
+   * Get the index of a leg when you want to reference it in an API response, for example when you
+   * want to say that a fare is valid for legs 2 and 3.
+   */
+  public int getLegIndex(Leg leg) {
+    var index = legs.indexOf(leg);
+    // the filter pipeline can also modify the identity of Leg instances. that's why we not only
+    // check that but also the start and end point as a replacement for the identity.
+    if (index > -1) {
+      return index;
+    } else {
+      for (int i = 0; i < legs.size() - 1; i++) {
+        var currentLeg = legs.get(i);
+        if (
+          currentLeg.getFrom().sameLocation(leg.getFrom()) &&
+          currentLeg.getTo().sameLocation(leg.getTo())
+        ) {
+          return i;
+        }
+      }
+      return -1;
+    }
+  }
+
+  /**
    * The cost of this trip
    */
-  public Fare getFare() {
+  public ItineraryFares getFares() {
     return fare;
   }
 
-  public void setFare(Fare fare) {
+  public void setFare(ItineraryFares fare) {
     this.fare = fare;
+  }
+
+  public List<ScheduledTransitLeg> getScheduledTransitLegs() {
+    return getLegs()
+      .stream()
+      .filter(ScheduledTransitLeg.class::isInstance)
+      .map(ScheduledTransitLeg.class::cast)
+      .toList();
   }
 }

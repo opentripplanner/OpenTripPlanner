@@ -56,7 +56,7 @@ config:
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
     PageInfo: Object
-    Pattern: org.opentripplanner.model.TripPattern#TripPattern
+    Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
     PickupDropoffType: String
     Place: org.opentripplanner.model.plan.StopArrival#StopArrival
     placeAtDistance: org.opentripplanner.routing.graphfinder.PlaceAtDistance#PlaceAtDistance
@@ -77,7 +77,7 @@ config:
     StopOnTrip: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel#LegacyGraphQLStopOnTripModel
     Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
-    TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
+    TicketType: org.opentripplanner.ext.fares.model.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.transit.model.timetable.Trip#Trip
     Unknown: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel#LegacyGraphQLUnknownModel

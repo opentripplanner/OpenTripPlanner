@@ -31,7 +31,7 @@ public class HslParkUtilizationToPatchMapper {
       );
       return new HslParkPatch(vehicleParkId, capacityType, spacesAvailable);
     } catch (Exception e) {
-      log.warn("Error parsing park utilization" + vehicleParkId, e);
+      log.warn("Error parsing park utilization {}", vehicleParkId, e);
       return null;
     }
   }

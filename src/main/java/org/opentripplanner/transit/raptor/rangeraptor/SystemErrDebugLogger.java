@@ -19,7 +19,7 @@ import org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.PatternRideView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
-import org.opentripplanner.transit.raptor.util.IntUtils;
+import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.lang.TableFormatter;

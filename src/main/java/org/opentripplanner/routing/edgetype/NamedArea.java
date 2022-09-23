@@ -11,13 +11,13 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class NamedArea implements Serializable {
 
-  private static final long serialVersionUID = 3570078249065754760L;
-
   private Geometry originalEdges;
 
   private I18NString name;
 
   private double bicycleSafetyMultiplier;
+
+  private double walkSafetyMultiplier;
 
   private int streetClass;
 
@@ -45,6 +45,14 @@ public class NamedArea implements Serializable {
 
   public void setBicycleSafetyMultiplier(double bicycleSafetyMultiplier) {
     this.bicycleSafetyMultiplier = bicycleSafetyMultiplier;
+  }
+
+  public double getWalkSafetyMultiplier() {
+    return walkSafetyMultiplier;
+  }
+
+  public void setWalkSafetyMultiplier(double walkSafetyMultiplier) {
+    this.walkSafetyMultiplier = walkSafetyMultiplier;
   }
 
   public StreetTraversalPermission getPermission() {

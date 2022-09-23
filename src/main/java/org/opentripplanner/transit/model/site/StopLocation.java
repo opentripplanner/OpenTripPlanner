@@ -3,14 +3,15 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.util.lang.ObjectUtils;
@@ -21,8 +22,19 @@ import org.opentripplanner.util.lang.ObjectUtils;
  * transit. StopLocations are referred to in stop times.
  */
 public interface StopLocation extends LogInfo {
+  AtomicInteger INDEX_COUNTER = new AtomicInteger(0);
+
   /** The ID for the StopLocation */
   FeedScopedId getId();
+
+  /**
+   * This is the OTP internal <em>synthetic key</em>, used to reference a StopLocation inside OTP.  This is used
+   * to optimize routing, we do not access the stop instance only keep the {code index}. The index will not change.
+   * <p>
+   * Do NOT expose this index in the APIs, it is not guaranteed to be the same across different OTP instances,
+   * use the {code id} for external references.
+   */
+  int getIndex();
 
   /** Name of the StopLocation, if provided */
   @Nullable
@@ -79,8 +91,8 @@ public interface StopLocation extends LogInfo {
   }
 
   @Nonnull
-  default WheelchairAccessibility getWheelchairAccessibility() {
-    return WheelchairAccessibility.NO_INFORMATION;
+  default Accessibility getWheelchairAccessibility() {
+    return Accessibility.NO_INFORMATION;
   }
 
   /**
@@ -89,7 +101,10 @@ public interface StopLocation extends LogInfo {
    */
   @Nullable
   default String getFirstZoneAsString() {
-    return getFareZones().stream().map(t -> t.getId().getId()).findFirst().orElse(null);
+    for (FareZone t : getFareZones()) {
+      return t.getId().getId();
+    }
+    return null;
   }
 
   /**
@@ -126,5 +141,26 @@ public interface StopLocation extends LogInfo {
   @Override
   default String logName() {
     return ObjectUtils.ifNotNull(getName(), Object::toString, null);
+  }
+
+  /**
+   * Get the parent station id if such exists. Otherwise, return the stop id.
+   */
+  default FeedScopedId getStationOrStopId() {
+    if (this instanceof StationElement<?, ?> stationElement && stationElement.isPartOfStation()) {
+      return stationElement.getParentStation().getId();
+    }
+    return getId();
+  }
+
+  static int indexCounter() {
+    return INDEX_COUNTER.get();
+  }
+
+  /**
+   * Use this ONLY when deserializing the graph. Sets the counter value to the highest recorded value
+   */
+  static void initIndexCounter(int indexCounter) {
+    INDEX_COUNTER.set(indexCounter);
   }
 }

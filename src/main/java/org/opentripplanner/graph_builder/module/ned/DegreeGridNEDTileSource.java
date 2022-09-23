@@ -31,8 +31,6 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
   private static final Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
-  private Graph graph;
-
   private File cacheDirectory;
 
   public String awsAccessKey;
@@ -45,7 +43,6 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
   @Override
   public void fetchData(Graph graph, File cacheDirectory) {
-    this.graph = graph;
     this.cacheDirectory = cacheDirectory;
 
     HashSet<P2<Integer>> tiles = new HashSet<>();
@@ -104,7 +101,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
           "Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set"
         );
       }
-      log.info("Downloading NED degree tile " + path);
+      log.info("Downloading NED degree tile {}", path);
       // download the file from S3.
       AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
       String key = formatLatLon(x, y) + ".tiff";

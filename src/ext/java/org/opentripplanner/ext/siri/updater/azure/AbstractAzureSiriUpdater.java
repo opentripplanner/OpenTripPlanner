@@ -1,18 +1,25 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
-import com.azure.messaging.servicebus.*;
+import com.azure.messaging.servicebus.ServiceBusClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusErrorContext;
+import com.azure.messaging.servicebus.ServiceBusException;
+import com.azure.messaging.servicebus.ServiceBusFailureReason;
+import com.azure.messaging.servicebus.ServiceBusProcessorClient;
+import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.*;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
@@ -22,18 +29,21 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
-  private boolean isPrimed = false;
-  protected WriteToGraphCallback saveResultOnGraph;
-  protected SiriTimetableSnapshotSource snapshotSource;
   private final String configRef;
-
-  private ServiceBusProcessorClient eventProcessor;
+  private final String serviceBusUrl;
+  private final SiriFuzzyTripMatcher fuzzyTripMatcher;
   private final Consumer<ServiceBusReceivedMessageContext> messageConsumer = this::messageConsumer;
   private final Consumer<ServiceBusErrorContext> errorConsumer = this::errorConsumer;
+  private final String topicName;
+
+  protected WriteToGraphCallback saveResultOnGraph;
+  private ServiceBusProcessorClient eventProcessor;
   private ServiceBusAdministrationAsyncClient serviceBusAdmin;
-  protected final String topicName;
+  private boolean isPrimed = false;
   private String subscriptionName;
-  private final String serviceBusUrl;
+
+  protected final boolean fuzzyTripMatching;
+
   protected String feedId;
 
   /**
@@ -45,15 +55,15 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
    */
   protected int timeout;
 
-  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config) {
+  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
     this.configRef = config.getConfigRef();
-
     this.serviceBusUrl = config.getServiceBusUrl();
     this.topicName = config.getTopicName();
-
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
     this.feedId = config.getFeedId();
+    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
+    this.fuzzyTripMatching = config.isFuzzyTripMatching();
   }
 
   /**
@@ -74,16 +84,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph, TransitModel transitModel) throws Exception {
-    snapshotSource =
-      transitModel.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
-  }
-
-  @Override
   public void run() throws Exception {
-    Preconditions.checkNotNull(topicName, "'topic' must be set");
-    Preconditions.checkNotNull(serviceBusUrl, "'servicebus-url' must be set");
-    Preconditions.checkNotNull(feedId, "'feedId' must be set");
+    Objects.requireNonNull(topicName, "'topic' must be set");
+    Objects.requireNonNull(serviceBusUrl, "'servicebus-url' must be set");
+    Objects.requireNonNull(feedId, "'feedId' must be set");
     Preconditions.checkState(feedId.length() > 0, "'feedId' must be set");
 
     // In Kubernetes this should be the POD identifier
@@ -163,6 +167,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   @Override
   public String getConfigRef() {
     return this.configRef;
+  }
+
+  SiriFuzzyTripMatcher fuzzyTripMatcher() {
+    return fuzzyTripMatcher;
   }
 
   /**

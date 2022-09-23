@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,47 +16,44 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.TestUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TestHalfEdges {
 
-  //@Rule
-  //public final ExpectedException exception = ExpectedException.none();
-
-  Graph graph;
+  private Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
   private IntersectionVertex br, tr, bl, tl;
   private TransitStopVertex station1;
@@ -75,9 +71,8 @@ public class TestHalfEdges {
   @BeforeEach
   public void setUp() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    transitModel = new TransitModel(new StopModel(), deduplicator);
     // a 0.1 degree x 0.1 degree square
     tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
     tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
@@ -166,27 +161,21 @@ public class TestHalfEdges {
         true
       );
 
-    Stop s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
+    var s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
+    var s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
 
-    Stop s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
+    transitModel.mergeStopModels(StopModel.of().withRegularStop(s1).withRegularStop(s2).build());
 
-    station1 =
-      new TransitStopVertexBuilder()
-        .withGraph(graph)
-        .withStop(s1)
-        .withTransitModel(transitModel)
-        .build();
-    station2 =
-      new TransitStopVertexBuilder()
-        .withGraph(graph)
-        .withStop(s2)
-        .withTransitModel(transitModel)
-        .build();
+    station1 = new TransitStopVertexBuilder().withGraph(graph).withStop(s1).build();
+    station2 = new TransitStopVertexBuilder().withGraph(graph).withStop(s2).build();
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 
     //Linkers aren't run otherwise in testNetworkLinker
     graph.hasStreets = true;
+
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
   }
 
   @Test
@@ -199,7 +188,7 @@ public class TestHalfEdges {
     int nVertices = graph.getVertices().size();
     int nEdges = graph.getEdges().size();
 
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
 
     HashSet<Edge> turns = new HashSet<>();
     turns.add(left);
@@ -296,7 +285,7 @@ public class TestHalfEdges {
      * that (b) it is not preferred to riding a tiny bit longer.
      */
 
-    options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+    options = new RouteRequest(TraverseMode.BICYCLE);
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
         "start1",
@@ -378,7 +367,7 @@ public class TestHalfEdges {
 
   @Test
   public void testRouteToSameEdge() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
     HashSet<Edge> turns = new HashSet<>();
@@ -428,7 +417,7 @@ public class TestHalfEdges {
 
   @Test
   public void testRouteToSameEdgeBackwards() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
     // Sits only on the leftmost edge, not on its reverse.
@@ -505,7 +494,7 @@ public class TestHalfEdges {
 
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
-    RoutingRequest req = new RoutingRequest();
+    RouteRequest req = new RouteRequest();
     State traversedOne = new State(start, req, null);
     State currentState;
     for (Edge e : start.getOutgoing()) {
@@ -538,7 +527,7 @@ public class TestHalfEdges {
       StreetNotesService.WHEELCHAIR_MATCHER
     );
 
-    req.setWheelchairAccessible(true);
+    req.setWheelchair(true);
 
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -567,14 +556,12 @@ public class TestHalfEdges {
 
   @Test
   public void testStreetLocationFinder() {
-    RoutingRequest options = new RoutingRequest();
-    transitModel.index();
-    graph.index();
+    RouteRequest options = new RouteRequest();
     StreetVertexIndex finder = graph.getStreetIndex();
+    GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
-    GenericLocation loc = new GenericLocation(40.01, -74.005000001);
-    assertTrue(finder.getNearbyTransitStops(loc.getCoordinate(), 100).size() > 0);
+    assertTrue(graphFinder.findClosestStops(40.01, -74.005000001, 100).size() > 0);
 
     // test that the closest vertex finder returns the closest vertex
     TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
@@ -601,7 +588,7 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+    RouteRequest biking = new RouteRequest(TraverseMode.BICYCLE);
     TemporaryStreetLocation end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.008, -74.0),
       biking,
@@ -619,9 +606,9 @@ public class TestHalfEdges {
   @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
-    RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
-    walking.from = new GenericLocation(40.004, -74.0);
-    walking.to = new GenericLocation(40.008, -74.0);
+    RouteRequest walking = new RouteRequest(TraverseMode.WALK);
+    walking.setFrom(new GenericLocation(40.004, -74.0));
+    walking.setTo(new GenericLocation(40.008, -74.0));
     try (var container = new TemporaryVerticesContainer(graph, walking)) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
@@ -640,8 +627,7 @@ public class TestHalfEdges {
   @Test
   public void testNetworkLinker() {
     int numVerticesBefore = graph.getVertices().size();
-    StreetLinkerModule ttsnm = new StreetLinkerModule();
-    ttsnm.buildGraph(graph, transitModel, new HashMap<>());
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
     int numVerticesAfter = graph.getVertices().size();
     assertEquals(4, numVerticesAfter - numVerticesBefore);
     Collection<Edge> outgoing = station1.getOutgoing();

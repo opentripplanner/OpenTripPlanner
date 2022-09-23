@@ -2,9 +2,9 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,14 +20,14 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -38,12 +38,16 @@ import org.opentripplanner.transit.service.TransitModel;
 class OsmBoardingLocationsModuleTest {
 
   File file = new File(ConstantsForTests.HERRENBERG_OSM);
-  Stop platform = TransitModelForTest
+  RegularStop platform = TransitModelForTest
     .stop("de:08115:4512:4:101")
     .withCoordinate(48.59328, 8.86128)
     .build();
-  Stop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
-  Stop floatingBusStop = TransitModelForTest.stopForTest("floating-bus-stop", 48.59417, 8.86464);
+  RegularStop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
+  RegularStop floatingBusStop = TransitModelForTest.stopForTest(
+    "floating-bus-stop",
+    48.59417,
+    8.86464
+  );
 
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(
@@ -67,16 +71,13 @@ class OsmBoardingLocationsModuleTest {
   @VariableSource("testCases")
   void addAndLinkBoardingLocations(boolean skipVisibility, Set<String> linkedVertices) {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
-    var extra = new HashMap<Class<?>, Object>();
+    var graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
 
     var provider = new OpenStreetMapProvider(file, false);
     var floatingBusVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(floatingBusStop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.BUS))
       .build();
     var floatingBoardingLocation = new OsmBoardingLocationVertex(
@@ -87,23 +88,30 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network"),
       Set.of(floatingBusVertex.getStop().getId().getId())
     );
-    var osmModule = new OpenStreetMapModule(List.of(provider), Set.of("ref", "ref:IFOPT"));
+    var osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of("ref", "ref:IFOPT"),
+      graph,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     osmModule.skipVisibility = skipVisibility;
 
-    osmModule.buildGraph(graph, transitModel, extra);
+    osmModule.buildGraph();
 
     var platformVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(platform)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
     var busVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(busStop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.BUS))
       .build();
+
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
 
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
@@ -111,8 +119,7 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    var boardingLocationsModule = new OsmBoardingLocationsModule();
-    boardingLocationsModule.buildGraph(graph, transitModel, extra);
+    new OsmBoardingLocationsModule(graph, transitModel).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
@@ -132,7 +139,7 @@ class OsmBoardingLocationsModuleTest {
       .stream()
       .filter(b -> b.references.contains(busStop.getId().getId()))
       .findFirst()
-      .get();
+      .orElseThrow();
 
     assertConnections(
       busBoardingLocation,
@@ -179,7 +186,7 @@ class OsmBoardingLocationsModuleTest {
       .stream()
       .flatMap(c -> Stream.concat(c.getIncoming().stream(), c.getOutgoing().stream()))
       .filter(StreetEdge.class::isInstance)
-      .forEach(e -> assertEquals("101;102", e.getName().toString()));
+      .forEach(e -> assertEquals("Platform 101;102", e.getName().toString()));
   }
 
   private void assertConnections(

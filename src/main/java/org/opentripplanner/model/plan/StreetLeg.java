@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
@@ -43,19 +44,14 @@ public class StreetLeg implements Leg {
   private final Float accessibilityScore;
 
   public StreetLeg(StreetLegBuilder builder) {
-    if (builder.getMode().isTransit()) {
-      throw new IllegalArgumentException(
-        "To create a transit leg use the other classes implementing Leg."
-      );
-    }
-    this.mode = builder.getMode();
+    this.mode = Objects.requireNonNull(builder.getMode());
     this.startTime = builder.getStartTime();
     this.endTime = builder.getEndTime();
     this.distanceMeters = DoubleUtils.roundTo2Decimals(builder.getDistanceMeters());
     this.from = builder.getFrom();
     this.to = builder.getTo();
     this.generalizedCost = builder.getGeneralizedCost();
-    this.legElevation = normalizeElevation(builder.getElevation());
+    this.legElevation = builder.getElevation();
     this.legGeometry = builder.getGeometry();
     this.walkSteps = builder.getWalkSteps();
     this.elevationGained = calculateElevationGained(legElevation);
@@ -79,7 +75,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public boolean isWalkingLeg() {
-    return mode.isWalking();
+    return mode == TraverseMode.WALK;
   }
 
   @Override
@@ -87,7 +83,6 @@ public class StreetLeg implements Leg {
     return true;
   }
 
-  @Override
   public TraverseMode getMode() {
     return mode;
   }
@@ -127,9 +122,16 @@ public class StreetLeg implements Leg {
     return legGeometry;
   }
 
-  @Override
-  public List<P2<Double>> getLegElevation() {
+  List<P2<Double>> getRawLegElevation() {
     return legElevation;
+  }
+
+  /**
+   * Get elevation profile, with values rounded to two decimals.
+   */
+  @Override
+  public List<P2<Double>> getRoundedLegElevation() {
+    return normalizeElevation(legElevation);
   }
 
   @Override
@@ -176,6 +178,11 @@ public class StreetLeg implements Leg {
   @Override
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  @Override
+  public boolean hasSameMode(Leg other) {
+    return other instanceof StreetLeg oSL && mode.equals(oSL.mode);
   }
 
   @Override

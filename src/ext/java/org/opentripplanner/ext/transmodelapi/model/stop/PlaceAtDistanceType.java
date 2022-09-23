@@ -15,10 +15,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.service.TransitService;
 
 public class PlaceAtDistanceType {
@@ -80,7 +80,7 @@ public class PlaceAtDistanceType {
       List<PlaceAtDistance> stations = places
         .stream()
         // Find all stops
-        .filter(p -> p.place() instanceof Stop)
+        .filter(p -> p.place() instanceof RegularStop)
         // Get their parent stations (possibly including multimodal parents)
         .flatMap(p -> getStopPlaces(p, multiModalMode, transitService))
         // Sort by distance
@@ -94,7 +94,10 @@ public class PlaceAtDistanceType {
       if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
         // Remove quays if only stop places are requested
         places =
-          places.stream().filter(p -> !(p.place() instanceof Stop)).collect(Collectors.toList());
+          places
+            .stream()
+            .filter(p -> !(p.place() instanceof RegularStop))
+            .collect(Collectors.toList());
       }
     }
     places.sort(Comparator.comparing(PlaceAtDistance::distance));
@@ -108,7 +111,7 @@ public class PlaceAtDistanceType {
     String multiModalMode,
     TransitService transitService
   ) {
-    Station stopPlace = ((Stop) p.place()).getParentStation();
+    Station stopPlace = ((RegularStop) p.place()).getParentStation();
 
     if (stopPlace == null) {
       return Stream.of();

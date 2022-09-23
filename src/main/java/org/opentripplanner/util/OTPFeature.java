@@ -18,6 +18,7 @@ public enum OTPFeature {
   APIServerInfo(true),
   APIGraphInspectorTile(true),
   APIUpdaterStatus(true),
+  ConsiderPatternsForDirectTransfers(true),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
@@ -33,6 +34,7 @@ public enum OTPFeature {
   // Sandbox extension features - Must be turned OFF by default
   ActuatorAPI(false),
   DataOverlay(false),
+  FaresV2(false),
   FlexRouting(false),
   GoogleCloudStorage(false),
   ReportApi(false),
@@ -65,8 +67,8 @@ public enum OTPFeature {
   }
 
   public static void logFeatureSetup() {
-    LOG.info("Features turned on: \n\t" + valuesAsString(true));
-    LOG.info("Features turned off: \n\t" + valuesAsString(false));
+    LOG.info("Features turned on: \n\t{}", valuesAsString(true));
+    LOG.info("Features turned off: \n\t{}", valuesAsString(false));
   }
 
   /**

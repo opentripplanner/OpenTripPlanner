@@ -14,11 +14,12 @@ public class TransferMapperTest {
 
   private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
-  public static final DataImportIssueStore ISSUE_STORE = new DataImportIssueStore(false);
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
 
   private static final RouteMapper ROUTE_MAPPER = new RouteMapper(
     new AgencyMapper(FEED_ID),
-    ISSUE_STORE
+    ISSUE_STORE,
+    new TranslationHelper()
   );
 
   private static final TripMapper TRIP_MAPPER = new TripMapper(
@@ -55,7 +56,7 @@ public class TransferMapperTest {
 
   private static final Transfer TRANSFER = new Transfer();
 
-  private static final DataImportIssueStore issueStore = new DataImportIssueStore(true);
+  private static final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
 
   private final TransferMapper subject = new TransferMapper(
     ROUTE_MAPPER,

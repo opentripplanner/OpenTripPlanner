@@ -16,11 +16,11 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.DisjointSet;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ class AreaGroup {
       for (int i = 0; i < mp.getNumGeometries(); ++i) {
         Geometry poly = mp.getGeometryN(i);
         if (!(poly instanceof Polygon)) {
-          LOG.warn("Unexpected non-polygon when merging areas: " + poly);
+          LOG.warn("Unexpected non-polygon when merging areas: {}", poly);
           continue;
         }
         outermostRings.add(toRing((Polygon) poly, nodeMap));
@@ -81,7 +81,7 @@ class AreaGroup {
     } else if (u instanceof Polygon) {
       outermostRings.add(toRing((Polygon) u, nodeMap));
     } else {
-      LOG.warn("Unexpected non-polygon when merging areas: " + u);
+      LOG.warn("Unexpected non-polygon when merging areas: {}", u);
     }
   }
 

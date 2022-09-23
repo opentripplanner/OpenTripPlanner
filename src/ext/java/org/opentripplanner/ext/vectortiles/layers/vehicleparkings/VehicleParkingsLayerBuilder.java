@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
@@ -16,6 +15,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 

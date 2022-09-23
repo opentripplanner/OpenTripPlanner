@@ -7,24 +7,24 @@ import java.util.List;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class DirectFlexRouter {
 
   public static List<Itinerary> route(
-    OtpServerContext serverContext,
-    RoutingRequest request,
+    OtpServerRequestContext serverContext,
+    RouteRequest request,
     AdditionalSearchDays additionalSearchDays
   ) {
-    if (!StreetMode.FLEXIBLE.equals(request.modes.directMode)) {
+    if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
-    RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+    RouteRequest directRequest = request.getStreetSearchRequest(request.journey().direct().mode());
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
     ) {
@@ -51,9 +51,9 @@ public class DirectFlexRouter {
       FlexRouter flexRouter = new FlexRouter(
         serverContext.graph(),
         serverContext.transitService(),
-        serverContext.routerConfig().flexParameters(request),
-        directRequest.getDateTime(),
-        directRequest.arriveBy,
+        serverContext.routerConfig().flexParameters(request.preferences()),
+        directRequest.dateTime(),
+        directRequest.arriveBy(),
         additionalSearchDays.additionalSearchDaysInPast(),
         additionalSearchDays.additionalSearchDaysInFuture(),
         accessStops,

@@ -8,11 +8,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public final class PathwayNodeBuilder
   extends StationElementBuilder<PathwayNode, PathwayNodeBuilder> {
 
-  public PathwayNodeBuilder(FeedScopedId id) {
+  PathwayNodeBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public PathwayNodeBuilder(PathwayNode original) {
+  PathwayNodeBuilder(PathwayNode original) {
     super(original);
   }
 

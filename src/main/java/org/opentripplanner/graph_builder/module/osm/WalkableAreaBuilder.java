@@ -18,7 +18,6 @@ import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -30,7 +29,7 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -48,6 +47,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
@@ -77,8 +77,6 @@ public class WalkableAreaBuilder {
 
   private final OSMDatabase osmdb;
 
-  private final WayPropertySet wayPropertySet;
-
   private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
   // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
@@ -94,7 +92,6 @@ public class WalkableAreaBuilder {
   public WalkableAreaBuilder(
     Graph graph,
     OSMDatabase osmdb,
-    WayPropertySet wayPropertySet,
     Handler handler,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
@@ -103,7 +100,6 @@ public class WalkableAreaBuilder {
   ) {
     this.graph = graph;
     this.osmdb = osmdb;
-    this.wayPropertySet = wayPropertySet;
     this.handler = handler;
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
@@ -388,7 +384,7 @@ public class WalkableAreaBuilder {
     } else {
       mode = TraverseMode.CAR;
     }
-    RoutingRequest options = new RoutingRequest(mode);
+    RouteRequest options = new RouteRequest(mode);
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree spt = AStarBuilder
@@ -478,7 +474,10 @@ public class WalkableAreaBuilder {
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
 
-      float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity, false);
+      float carSpeed = areaEntity
+        .getOsmProvider()
+        .getWayPropertySet()
+        .getCarSpeedForWay(areaEntity, false);
 
       double length = SphericalDistanceLibrary.distance(
         startEndpoint.getCoordinate(),
@@ -551,7 +550,10 @@ public class WalkableAreaBuilder {
       backStreet.setStreetClass(cls);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+        WayProperties wayData = areaEntity
+          .getOsmProvider()
+          .getWayPropertySet()
+          .getDataForWay(areaEntity);
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
@@ -637,12 +639,18 @@ public class WalkableAreaBuilder {
       namedArea.setName(name);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = wayPropertySet.getDataForWay(areaEntity);
+        WayProperties wayData = areaEntity
+          .getOsmProvider()
+          .getWayPropertySet()
+          .getDataForWay(areaEntity);
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      Double safety = wayPropertiesCache.get(areaEntity).getSafetyFeatures().first;
-      namedArea.setBicycleSafetyMultiplier(safety);
+      Double bicycleSafety = wayPropertiesCache.get(areaEntity).getBicycleSafetyFeatures().first;
+      namedArea.setBicycleSafetyMultiplier(bicycleSafety);
+
+      Double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().first;
+      namedArea.setWalkSafetyMultiplier(walkSafety);
 
       namedArea.setOriginalEdges(intersection);
 

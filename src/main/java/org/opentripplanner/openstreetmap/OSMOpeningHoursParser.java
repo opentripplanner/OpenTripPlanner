@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -44,7 +45,7 @@ public class OSMOpeningHoursParser {
 
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
-  private final ZoneId zoneId;
+  private final Supplier<ZoneId> zoneIdSupplier;
 
   private final DataImportIssueStore issueStore;
 
@@ -77,12 +78,19 @@ public class OSMOpeningHoursParser {
 
   public OSMOpeningHoursParser(
     OpeningHoursCalendarService openingHoursCalendarService,
-    ZoneId zoneId,
+    DataImportIssueStore issueStore
+  ) {
+    this(openingHoursCalendarService, () -> null, issueStore);
+  }
+
+  public OSMOpeningHoursParser(
+    OpeningHoursCalendarService openingHoursCalendarService,
+    Supplier<ZoneId> zoneIdSupplier,
     DataImportIssueStore issueStore
   ) {
     this.openingHoursCalendarService = openingHoursCalendarService;
     // TODO, zoneId should depend on the coordinates of the object
-    this.zoneId = zoneId;
+    this.zoneIdSupplier = zoneIdSupplier;
     this.issueStore = issueStore;
   }
 
@@ -92,16 +100,29 @@ public class OSMOpeningHoursParser {
   ) {
     this.openingHoursCalendarService = openingHoursCalendarService;
     // TODO, zoneId should depend on the coordinates of the object
-    this.zoneId = zoneId;
+    this.zoneIdSupplier = () -> zoneId;
     this.issueStore = null;
+  }
+
+  public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link)
+    throws OpeningHoursParseException {
+    ZoneId zoneId = zoneIdSupplier.get();
+    if (zoneId == null) {
+      return null;
+    }
+    return parseOpeningHours(openingHoursTag, id, link, zoneId);
   }
 
   /**
    * Builds a {@link OHCalendar} by parsing rules from OSM format opening hours.
    * Currently, doesn't have support for all types of rules.
    */
-  public OHCalendar parseOpeningHours(String openingHoursTag, String id, String link)
-    throws OpeningHoursParseException {
+  public OHCalendar parseOpeningHours(
+    String openingHoursTag,
+    String id,
+    String link,
+    ZoneId zoneId
+  ) throws OpeningHoursParseException {
     var calendarBuilder = openingHoursCalendarService.newBuilder(zoneId);
     var parser = new OpeningHoursParser(new ByteArrayInputStream(openingHoursTag.getBytes()));
     var rules = parser.rules(false);

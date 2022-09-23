@@ -6,7 +6,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
@@ -16,19 +16,19 @@ public class TripPlanMapper {
   /** This is a utility class with static method only. */
   private TripPlanMapper() {}
 
-  public static TripPlan mapTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
+  public static TripPlan mapTripPlan(RouteRequest request, List<Itinerary> itineraries) {
     Place from;
     Place to;
 
     if (itineraries.isEmpty()) {
-      from = placeFromGeoLocation(request.from, new LocalizedString("origin"));
-      to = placeFromGeoLocation(request.to, new LocalizedString("destination"));
+      from = placeFromGeoLocation(request.from(), new LocalizedString("origin"));
+      to = placeFromGeoLocation(request.to(), new LocalizedString("destination"));
     } else {
       List<Leg> legs = itineraries.get(0).getLegs();
       from = legs.get(0).getFrom();
       to = legs.get(legs.size() - 1).getTo();
     }
-    return new TripPlan(from, to, request.getDateTime(), itineraries);
+    return new TripPlan(from, to, request.dateTime(), itineraries);
   }
 
   private static Place placeFromGeoLocation(GenericLocation location, I18NString defaultName) {

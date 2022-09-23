@@ -47,7 +47,10 @@ public interface Heuristics {
 
   /**
    * Return the best/minimum required number of transfers from origin to destination.
+   * <p>
+   * Currently unused, but useful for debugging.
    */
+  @SuppressWarnings("unused")
   int bestOverallJourneyNumOfTransfers();
 
   /**

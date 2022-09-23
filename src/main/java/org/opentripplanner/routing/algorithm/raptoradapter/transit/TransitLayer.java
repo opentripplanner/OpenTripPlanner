@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.StopModelIndex;
+import org.opentripplanner.transit.service.StopModel;
 
 public class TransitLayer {
 
@@ -37,13 +37,13 @@ public class TransitLayer {
    */
   private final TransferService transferService;
 
-  private final StopModelIndex stopIndex;
+  private final StopModel stopModel;
 
   private final ZoneId transitDataZoneId;
 
   private final RaptorRequestTransferCache transferCache;
 
-  private final TripPatternMapper tripPatternMapper;
+  private ConstrainedTransfersForPatterns constrainedTransfers;
 
   private final TransferIndexGenerator transferIndexGenerator;
 
@@ -59,10 +59,10 @@ public class TransitLayer {
       transitLayer.tripPatternsRunningOnDate,
       transitLayer.transfersByStopIndex,
       transitLayer.transferService,
-      transitLayer.stopIndex,
+      transitLayer.stopModel,
       transitLayer.transitDataZoneId,
       transitLayer.transferCache,
-      transitLayer.tripPatternMapper,
+      transitLayer.constrainedTransfers,
       transitLayer.transferIndexGenerator,
       transitLayer.stopBoardAlightCosts
     );
@@ -72,35 +72,27 @@ public class TransitLayer {
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
     List<List<Transfer>> transfersByStopIndex,
     TransferService transferService,
-    StopModelIndex stopIndex,
+    StopModel stopModel,
     ZoneId transitDataZoneId,
     RaptorRequestTransferCache transferCache,
-    TripPatternMapper tripPatternMapper,
+    ConstrainedTransfersForPatterns constrainedTransfers,
     TransferIndexGenerator transferIndexGenerator,
     int[] stopBoardAlightCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
-    this.stopIndex = stopIndex;
+    this.stopModel = stopModel;
     this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
-    this.tripPatternMapper = tripPatternMapper;
+    this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
     this.stopBoardAlightCosts = stopBoardAlightCosts;
   }
 
-  public int getIndexByStop(Stop stop) {
-    return stopIndex.indexOf(stop);
-  }
-
   @Nullable
   public StopLocation getStopByIndex(int stop) {
-    return stop == -1 ? null : this.stopIndex.stopByIndex(stop);
-  }
-
-  public StopModelIndex getStopIndex() {
-    return this.stopIndex;
+    return stop == -1 ? null : this.stopModel.stopByIndex(stop);
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
@@ -118,24 +110,20 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopIndex.size();
+    return stopModel.stopIndexSize();
   }
 
-  @Nullable
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {
     List<TripPatternForDate> tripPatternForDate = tripPatternsRunningOnDate.get(runningPeriodDate);
-    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : null;
+    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : new ArrayList<>();
   }
 
-  @Nullable
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
     List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
-    return tripPatternsRunningOnDate != null
-      ? tripPatternsRunningOnDate
-        .stream()
-        .filter(t -> t.getLocalDate().equals(date))
-        .collect(Collectors.toList())
-      : null;
+    return tripPatternsRunningOnDate
+      .stream()
+      .filter(t -> t.getLocalDate().equals(date))
+      .collect(Collectors.toList());
   }
 
   public TransferService getTransferService() {
@@ -150,8 +138,12 @@ public class TransitLayer {
     return transferCache;
   }
 
-  public TripPatternMapper getTripPatternMapper() {
-    return tripPatternMapper;
+  public List<TransferForPatternByStopPos> getForwardConstrainedTransfers() {
+    return constrainedTransfers != null ? constrainedTransfers.forward() : null;
+  }
+
+  public List<TransferForPatternByStopPos> getReverseConstrainedTransfers() {
+    return constrainedTransfers != null ? constrainedTransfers.reverse() : null;
   }
 
   public TransferIndexGenerator getTransferIndexGenerator() {
@@ -171,5 +163,9 @@ public class TransitLayer {
     List<TripPatternForDate> tripPatternForDates
   ) {
     this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
+  }
+
+  public void setConstrainedTransfers(ConstrainedTransfersForPatterns constrainedTransfers) {
+    this.constrainedTransfers = constrainedTransfers;
   }
 }

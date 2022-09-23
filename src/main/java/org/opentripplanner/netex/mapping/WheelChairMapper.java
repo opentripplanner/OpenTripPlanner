@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Optional;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
@@ -11,19 +11,19 @@ public class WheelChairMapper {
 
   /**
    * If input and containing objects are not null, get the LimitationStatusEnumeration and map to
-   * internal {@link WheelchairAccessibility} enumeration.
+   * internal {@link Accessibility} enumeration.
    *
    * @param accessibilityAssessment NeTEx object wrapping information regarding WheelChairBoarding
    * @param defaultValue            If no {@link AccessibilityAssessment} is defined, default to
    *                                this value
-   * @return Mapped enumerator, {@link WheelchairAccessibility#NO_INFORMATION} if no value is found
+   * @return Mapped enumerator, {@link Accessibility#NO_INFORMATION} if no value is found
    */
-  public static WheelchairAccessibility wheelchairAccessibility(
+  public static Accessibility wheelchairAccessibility(
     AccessibilityAssessment accessibilityAssessment,
-    WheelchairAccessibility defaultValue
+    Accessibility defaultValue
   ) {
     if (defaultValue == null) {
-      defaultValue = WheelchairAccessibility.NO_INFORMATION;
+      defaultValue = Accessibility.NO_INFORMATION;
     }
 
     return Optional
@@ -35,20 +35,20 @@ public class WheelChairMapper {
       .orElse(defaultValue);
   }
 
-  public static WheelchairAccessibility fromLimitationStatusEnumeration(
+  public static Accessibility fromLimitationStatusEnumeration(
     LimitationStatusEnumeration wheelChairLimitation
   ) {
     if (wheelChairLimitation == null) {
-      return WheelchairAccessibility.NO_INFORMATION;
+      return Accessibility.NO_INFORMATION;
     }
 
     switch (wheelChairLimitation.value()) {
       case "true":
-        return WheelchairAccessibility.POSSIBLE;
+        return Accessibility.POSSIBLE;
       case "false":
-        return WheelchairAccessibility.NOT_POSSIBLE;
+        return Accessibility.NOT_POSSIBLE;
       default:
-        return WheelchairAccessibility.NO_INFORMATION;
+        return Accessibility.NO_INFORMATION;
     }
   }
 }

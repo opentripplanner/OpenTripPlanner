@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -11,26 +11,26 @@ public interface BikeWalkableEdge {
     return state.getNonTransitMode() == TraverseMode.BICYCLE;
   }
 
-  default void switchToWalkingBike(RoutingRequest options, StateEditor editor) {
+  default void switchToWalkingBike(RoutingPreferences preferences, StateEditor editor) {
     // If this is the first traversed edge than the bikeSwitch cost doesn't need to be applied
     var parentState = editor.getBackState();
     var shouldIncludeCost = !parentState.isBackWalkingBike() && hadBackModeSet(parentState);
 
     editor.setBackWalkingBike(true);
     if (shouldIncludeCost) {
-      editor.incrementWeight(options.bikeSwitchCost);
-      editor.incrementTimeInSeconds(options.bikeSwitchTime);
+      editor.incrementWeight(preferences.bike().switchCost());
+      editor.incrementTimeInSeconds(preferences.bike().switchTime());
     }
   }
 
-  default void switchToBiking(RoutingRequest options, StateEditor editor) {
+  default void switchToBiking(RoutingPreferences preferences, StateEditor editor) {
     var parentState = editor.getBackState();
     var shouldIncludeCost = parentState.isBackWalkingBike();
 
     editor.setBackWalkingBike(false);
     if (shouldIncludeCost) {
-      editor.incrementWeight(options.bikeSwitchCost);
-      editor.incrementTimeInSeconds(options.bikeSwitchTime);
+      editor.incrementWeight(preferences.bike().switchCost());
+      editor.incrementTimeInSeconds(preferences.bike().switchTime());
     }
   }
 
@@ -76,12 +76,12 @@ public interface BikeWalkableEdge {
 
     if (bicycleWalking) {
       if (canSwitchToWalkingBike(s0)) {
-        switchToWalkingBike(s0.getOptions(), editor);
+        switchToWalkingBike(s0.getPreferences(), editor);
       } else {
         return null;
       }
     } else if (mode == TraverseMode.BICYCLE) {
-      switchToBiking(s0.getOptions(), editor);
+      switchToBiking(s0.getPreferences(), editor);
     }
 
     editor.setBackMode(mode);

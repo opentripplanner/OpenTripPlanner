@@ -3,10 +3,10 @@ package org.opentripplanner.transit.model.site;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 
 /**
  * Acts as the supertype for all entities, except stations, created from the GTFS stops table. Most
@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.framework.TransitEntity2;
 public abstract class StationElement<
   E extends StationElement<E, B>, B extends StationElementBuilder<E, B>
 >
-  extends TransitEntity2<E, B> {
+  extends AbstractTransitEntity<E, B> {
 
   private final I18NString name;
 
@@ -26,7 +26,7 @@ public abstract class StationElement<
 
   private final WgsCoordinate coordinate;
 
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
   private final StopLevel level;
 
@@ -37,10 +37,7 @@ public abstract class StationElement<
     // Required fields
     this.name = builder.name();
     this.wheelchairAccessibility =
-      Objects.requireNonNullElse(
-        builder.wheelchairAccessibility(),
-        WheelchairAccessibility.NO_INFORMATION
-      );
+      Objects.requireNonNullElse(builder.wheelchairAccessibility(), Accessibility.NO_INFORMATION);
 
     // Optional fields
     this.coordinate = builder.coordinate();
@@ -103,7 +100,7 @@ public abstract class StationElement<
    * Returns whether this station element is accessible for wheelchair users.
    */
   @Nonnull
-  public WheelchairAccessibility getWheelchairAccessibility() {
+  public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }
 

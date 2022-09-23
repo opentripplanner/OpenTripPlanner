@@ -1,13 +1,12 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.framework;
 
-import static org.opentripplanner.util.lang.AssertUtils.assertHasValue;
+import static org.opentripplanner.util.lang.StringUtils.assertHasValue;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,10 +28,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   private final String id;
 
   public FeedScopedId(@Nonnull String feedId, @Nonnull String id) {
-    this.feedId = feedId;
-    this.id = id;
-    assertHasValue(feedId);
-    assertHasValue(id);
+    this.feedId = assertHasValue(feedId);
+    this.id = assertHasValue(id);
   }
 
   /**
@@ -72,13 +69,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   public static String concatenateId(String feedId, String id) {
     return feedId + ID_SEPARATOR + id;
-  }
-
-  /**
-   * Parses a string consisting of concatenated FeedScopedIds to a Set
-   */
-  public static Set<FeedScopedId> parseSetOfIds(String s) {
-    return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toSet());
   }
 
   /**

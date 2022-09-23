@@ -48,6 +48,14 @@ public class TestTransfer implements RaptorTransfer {
     return new Builder(stop, durationInSeconds).withCost(cost).build();
   }
 
+  public static TestTransfer flexWithOnBoard(int stop, int durationInSeconds, int cost) {
+    return new Builder(stop, durationInSeconds)
+      .withCost(cost)
+      .withNRides(1)
+      .stopReachedOnBoard()
+      .build();
+  }
+
   /**
    * Creates a walk transfer with time restrictions. opening and closing may be specified as seconds
    * since the start of "RAPTOR time" to limit the time periods that the access is traversable,

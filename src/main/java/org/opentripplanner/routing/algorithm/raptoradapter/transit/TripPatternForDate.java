@@ -8,8 +8,9 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
@@ -22,7 +23,7 @@ public class TripPatternForDate {
    * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules. Its
    * TripSchedules remain unchanged.
    */
-  private final TripPatternWithRaptorStopIndexes tripPattern;
+  private final RoutingTripPattern tripPattern;
 
   /**
    * The filtered TripSchedules for only those trips in the TripPattern that are active on the given
@@ -52,14 +53,14 @@ public class TripPatternForDate {
   private final LocalDateTime endOfRunningPeriod;
 
   public TripPatternForDate(
-    TripPatternWithRaptorStopIndexes tripPattern,
+    RoutingTripPattern tripPattern,
     List<TripTimes> tripTimes,
     List<FrequencyEntry> frequencies,
     LocalDate localDate
   ) {
     this.tripPattern = tripPattern;
-    this.tripTimes = new ArrayList<>(tripTimes);
-    this.frequencies = frequencies;
+    this.tripTimes = List.copyOf(tripTimes);
+    this.frequencies = List.copyOf(frequencies);
     this.localDate = localDate;
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
@@ -101,7 +102,7 @@ public class TripPatternForDate {
     return frequencies;
   }
 
-  public TripPatternWithRaptorStopIndexes getTripPattern() {
+  public RoutingTripPattern getTripPattern() {
     return tripPattern;
   }
 
@@ -164,25 +165,28 @@ public class TripPatternForDate {
 
   @Nullable
   public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes);
-    filteredTripTimes.removeIf(Predicate.not(filter));
-
-    List<FrequencyEntry> filteredFrequencies = frequencies
-      .stream()
-      .filter(frequencyEntry -> filter.test(frequencyEntry.tripTimes))
-      .collect(Collectors.toList());
-
-    if (filteredTripTimes.isEmpty()) {
-      if (hasFrequencies()) {
-        if (filteredFrequencies.isEmpty()) {
-          return null;
-        }
-      } else {
-        return null;
+    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes.size());
+    for (TripTimes tripTimes : tripTimes) {
+      if (filter.test(tripTimes)) {
+        filteredTripTimes.add(tripTimes);
       }
     }
 
-    if (tripTimes.size() == filteredTripTimes.size()) {
+    List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.size());
+    for (FrequencyEntry frequencyEntry : frequencies) {
+      if (filter.test(frequencyEntry.tripTimes)) {
+        filteredFrequencies.add(frequencyEntry);
+      }
+    }
+
+    if (filteredTripTimes.isEmpty() && filteredFrequencies.isEmpty()) {
+      return null;
+    }
+
+    if (
+      tripTimes.size() == filteredTripTimes.size() &&
+      frequencies.size() == filteredFrequencies.size()
+    ) {
       return this;
     }
 

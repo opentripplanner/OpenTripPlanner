@@ -29,10 +29,10 @@ public class FrequencyMapperTest {
 
   private static final int LABEL_ONLY = 1;
 
-  public static final DataImportIssueStore ISSUE_STORE = new DataImportIssueStore(false);
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
 
   private static final TripMapper TRIP_MAPPER = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE),
+    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
     new DirectionMapper(ISSUE_STORE)
   );
 

@@ -6,10 +6,10 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
-import org.opentripplanner.transit.model.site.Stop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +20,9 @@ public class TransitStopVertex extends Vertex {
   // Do we actually need a set of modes for each stop?
   // It's nice to have for the index web API but can be generated on demand.
   private final Set<TransitMode> modes;
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
-  private final Stop stop;
+  private final RegularStop stop;
 
   /**
    * For stops that are deep underground, there is a time cost to entering and exiting the stop; all
@@ -36,7 +36,7 @@ public class TransitStopVertex extends Vertex {
    * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is
    *              used.
    */
-  TransitStopVertex(Graph graph, Stop stop, Set<TransitMode> modes) {
+  TransitStopVertex(Graph graph, RegularStop stop, Set<TransitMode> modes) {
     super(graph, stop.getId().toString(), stop.getLon(), stop.getLat(), stop.getName());
     this.stop = stop;
     this.modes = modes != null ? modes : new HashSet<>();
@@ -45,7 +45,7 @@ public class TransitStopVertex extends Vertex {
     graph.expandToInclude(stop.getLon(), stop.getLat());
   }
 
-  public WheelchairAccessibility getWheelchairAccessibility() {
+  public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }
 
@@ -80,7 +80,7 @@ public class TransitStopVertex extends Vertex {
     modes.add(mode);
   }
 
-  public Stop getStop() {
+  public RegularStop getStop() {
     return this.stop;
   }
 

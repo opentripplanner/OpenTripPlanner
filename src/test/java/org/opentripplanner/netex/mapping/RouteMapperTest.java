@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -52,7 +52,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -67,7 +67,7 @@ public class RouteMapperTest {
     Route route = routeMapper.mapRoute(line);
 
     assertEquals(MappingSupport.ID_FACTORY.createId(LINE_ID), route.getId());
-    assertEquals("Line 1", route.getLongName());
+    assertEquals("Line 1", route.getLongName().toString());
     assertEquals("L1", route.getShortName());
   }
 
@@ -90,7 +90,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -116,7 +116,7 @@ public class RouteMapperTest {
     line.setPresentation(new PresentationStructure().withColour(color).withTextColour(textColor));
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -141,7 +141,7 @@ public class RouteMapperTest {
     Line lineWithOutBicycles = createExampleFerry(FERRY_WITHOUT_BICYCLES_ID);
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -166,7 +166,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -195,7 +195,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -228,7 +228,7 @@ public class RouteMapperTest {
       .put(MappingSupport.ID_FACTORY.createId(LINE_ID), createGroupOfRoutes(GOL_ID_2, GOL_NAME_2));
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),

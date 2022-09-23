@@ -8,6 +8,7 @@
 
 - Create initial sandbox implementation (January
   2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3796)
+- Add timeZone parameter to hsl and parkapi updaters (September 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4427)
 
 ## Documentation
 
@@ -37,6 +38,7 @@ All updaters have the following parameters in common:
     "type": "vehicle-parking",
     "sourceType": "hsl-park",
     "feedId": "hslpark",
+    "timeZone": "Europe/Helsinki",
     "facilitiesFrequencySec": 3600,
     "facilitiesUrl": "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
     "utilizationsFrequencySec": 600,
@@ -45,6 +47,8 @@ All updaters have the following parameters in common:
 ```
 
 - `sourceType`: needs to be `"hsl-park"`
+- `timeZone`: must be configured to parse opening hours.
+  The value can be given either as a zone id, or an UTC offset.
 - `facilitiesUrl`: URL that contains the basic information for the parks
 - `facilitiesFrequencySec`: how often should the basic information for parks be refetched. Should be
   more than `utilizationsFrequencySec` and if it's <= 0, parks are only fetched once. Default `600`.
@@ -80,6 +84,7 @@ All updaters have the following parameters in common:
     "type": "vehicle-parking",
     "sourceType": "park-api",
     "feedId": "parkapi",
+    "timeZone": "Europe/Berlin",
     "frequencySec": 600,
     "url": "https://foo.bar",
     "headers": {"Cache-Control": "max-age=604800"},
@@ -89,6 +94,8 @@ All updaters have the following parameters in common:
 
 - `sourceType`: needs to be `"park-api"` if car parks are fetched, `"bicycle-park-api"` if bicycle
   parks.
+- `timeZone`: must be configured to parse opening hours.
+  The value can be given either as a zone id, or an UTC offset.
 - `url`: URL that contains the park data in KML format
 - `frequencySec`: how often park data is refetched. Default `60`.
 - `headers`: Use these headers for requests

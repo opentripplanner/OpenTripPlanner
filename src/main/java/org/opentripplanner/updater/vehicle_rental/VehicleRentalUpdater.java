@@ -26,6 +26,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.UpdaterConstructionException;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
@@ -48,19 +49,35 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
-    DataSource<VehicleRentalPlace> source
+    DataSource<VehicleRentalPlace> source,
+    VertexLinker vertexLinker,
+    VehicleRentalStationService vehicleRentalStationService
   ) throws IllegalArgumentException {
     super(parameters);
     // Configure updater
     LOG.info("Setting up vehicle rental updater.");
 
     this.source = source;
-    if (pollingPeriodSeconds <= 0) {
+
+    // Creation of network linker library will not modify the graph
+    this.linker = vertexLinker;
+
+    // Adding a vehicle rental station service needs a graph writer runnable
+    this.service = vehicleRentalStationService;
+
+    try {
+      // Do any setup if needed
+      source.setup();
+    } catch (UpdaterConstructionException e) {
+      LOG.warn("Unable to setup updater: {}", parameters.getConfigRef(), e);
+    }
+
+    if (pollingPeriodSeconds() <= 0) {
       LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
     } else {
       LOG.info(
         "Creating vehicle-rental updater running every {} seconds: {}",
-        pollingPeriodSeconds,
+        pollingPeriodSeconds(),
         source
       );
     }
@@ -70,19 +87,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
     this.saveResultOnGraph = saveResultOnGraph;
   }
-
-  @Override
-  public void setup(Graph graph, TransitModel transitModel) {
-    // Creation of network linker library will not modify the graph
-    linker = graph.getLinker();
-    // Adding a vehicle rental station service needs a graph writer runnable
-    service = graph.getService(VehicleRentalStationService.class, true);
-    // Do any setup if needed
-    source.setup();
-  }
-
-  @Override
-  public void teardown() {}
 
   @Override
   public String toString() {
@@ -96,7 +100,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   @Override
   protected void runPolling() {
-    LOG.debug("Updating vehicle rental stations from " + source);
+    LOG.debug("Updating vehicle rental stations from {}", source);
     if (!source.update()) {
       LOG.debug("No updates");
       return;

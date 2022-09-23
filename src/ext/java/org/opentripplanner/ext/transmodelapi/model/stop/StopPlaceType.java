@@ -14,6 +14,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -22,23 +24,25 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.StopCollection;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -61,7 +65,16 @@ public class StopPlaceType {
         "Named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location."
       )
       .withInterface(placeInterface)
-      .field(GqlUtil.newTransitIdField())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("id")
+          .type(new GraphQLNonNull(Scalars.GraphQLID))
+          .dataFetcher(env ->
+            TransitIdMapper.mapIDToApi(((MonoOrMultiModalStation) env.getSource()).getId())
+          )
+          .build()
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
@@ -325,16 +338,16 @@ public class StopPlaceType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            int timeRage = environment.getArgument("timeRange");
+            Integer timeRangeInput = environment.getArgument("timeRange");
+            Duration timeRage = Duration.ofSeconds(timeRangeInput.longValue());
 
             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            Long startTimeMs = environment.getArgument("startTime") == null
-              ? 0L
-              : environment.getArgument("startTime");
-            Long startTimeSeconds = startTimeMs / 1000;
+            Instant startTime = environment.containsArgument("startTime")
+              ? Instant.ofEpochMilli(environment.getArgument("startTime"))
+              : Instant.now();
 
             return monoOrMultiModalStation
               .getChildStops()
@@ -342,7 +355,7 @@ public class StopPlaceType {
               .flatMap(singleStop ->
                 getTripTimesForStop(
                   singleStop,
-                  startTimeSeconds,
+                  startTime,
                   timeRage,
                   arrivalDeparture,
                   includeCancelledTrips,
@@ -366,8 +379,8 @@ public class StopPlaceType {
 
   public static Stream<TripTimeOnDate> getTripTimesForStop(
     StopLocation stop,
-    Long startTimeSeconds,
-    int timeRage,
+    Instant startTimeSeconds,
+    Duration timeRage,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancelledTrips,
     int numberOfDepartures,
@@ -457,12 +470,17 @@ public class StopPlaceType {
     String multiModalMode,
     DataFetchingEnvironment environment
   ) {
-    final RoutingService routingService = GqlUtil.getRoutingService(environment);
     final TransitService transitService = GqlUtil.getTransitService(environment);
 
-    Stream<Station> stations = routingService
-      .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
+    Envelope envelope = new Envelope(
+      new Coordinate(minLon, minLat),
+      new Coordinate(maxLon, maxLat)
+    );
+
+    Stream<Station> stations = transitService
+      .findRegularStop(envelope)
       .stream()
+      .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
       .map(StopLocation::getParentStation)
       .filter(Objects::nonNull)
       .distinct();
@@ -514,7 +532,10 @@ public class StopPlaceType {
     }
   }
 
-  public static boolean isStopPlaceInUse(StopCollection station, TransitService transitService) {
+  public static boolean isStopPlaceInUse(
+    StopLocationsGroup station,
+    TransitService transitService
+  ) {
     for (var quay : station.getChildStops()) {
       if (!transitService.getPatternsForStop(quay, true).isEmpty()) {
         return true;

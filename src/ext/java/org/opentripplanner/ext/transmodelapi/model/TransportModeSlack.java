@@ -13,13 +13,16 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.api.request.framework.DurationForEnum;
+import org.opentripplanner.routing.api.request.framework.DurationForEnumBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransportModeSlack {
@@ -99,15 +102,18 @@ public class TransportModeSlack {
 
   public static String slackByGroupDescription(
     String name,
-    Map<TransitMode, Integer> defaultValues
+    DurationForEnum<TransitMode> defaultValues
   ) {
     return slackByGroupDescription(name) + " " + defaultsToString(defaultValues);
   }
 
-  public static List<TransportModeSlack> mapToApiList(Map<TransitMode, Integer> domain) {
+  public static List<TransportModeSlack> mapToApiList(DurationForEnum<TransitMode> domain) {
     // Group modes by slack value
     Multimap<Integer, TransitMode> modesBySlack = ArrayListMultimap.create();
-    domain.forEach((k, v) -> modesBySlack.put(v, k));
+    Arrays
+      .stream(TransitMode.values())
+      .filter(domain::isSet)
+      .forEach(m -> modesBySlack.put((int) domain.valueOf(m).toSeconds(), m));
 
     // Create a new entry for each group of modes
     List<TransportModeSlack> result = new ArrayList<>();
@@ -119,16 +125,19 @@ public class TransportModeSlack {
   }
 
   @SuppressWarnings("unchecked")
-  public static EnumMap<TransitMode, Integer> mapToDomain(Object value) {
-    var result = new EnumMap<TransitMode, Integer>(TransitMode.class);
+  public static void mapIntoDomain(DurationForEnumBuilder<TransitMode> builder, Object value) {
     if (value instanceof List) {
       List<Map<String, Object>> list = (List<Map<String, Object>>) value;
       for (Map<String, Object> map : list) {
         int slack = (Integer) map.get("slack");
-        ((List<TransitMode>) map.get("modes")).forEach(m -> result.put(m, slack));
+        List<TransitMode> modes = (List<TransitMode>) map.get("modes");
+        modes.forEach(m -> builder.with(m, Duration.ofSeconds(slack)));
       }
+    } else {
+      throw new IllegalArgumentException(
+        "Expected List, but got: " + value + " (" + value.getClass() + ")"
+      );
     }
-    return result;
   }
 
   @Override
@@ -155,6 +164,16 @@ public class TransportModeSlack {
   private static String defaultsToString(Map<TransitMode, Integer> byMode) {
     List<String> groups = new ArrayList<>();
     byMode.forEach((m, v) -> groups.add(serializeTransportMode(m) + " : " + v));
+    Collections.sort(groups);
+    return "Defaults: " + groups;
+  }
+
+  private static String defaultsToString(DurationForEnum<TransitMode> byMode) {
+    List<String> groups = new ArrayList<>();
+    Arrays
+      .stream(TransitMode.values())
+      .filter(byMode::isSet)
+      .forEach(m -> groups.add(serializeTransportMode(m) + " : " + byMode.valueOf(m)));
     Collections.sort(groups);
     return "Defaults: " + groups;
   }

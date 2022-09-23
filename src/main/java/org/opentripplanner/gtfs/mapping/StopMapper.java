@@ -7,15 +7,15 @@ import java.util.Map;
 import java.util.function.Function;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopBuilder;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
 
-  private final Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
@@ -25,16 +25,16 @@ class StopMapper {
     this.stationLookUp = stationLookUp;
   }
 
-  Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
+  Collection<RegularStop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
     return MapUtils.mapToList(allStops, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  Stop map(org.onebusaway.gtfs.model.Stop orginal) {
+  RegularStop map(org.onebusaway.gtfs.model.Stop orginal) {
     return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
   }
 
-  private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+  private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(
         "Expected type " +
@@ -45,7 +45,7 @@ class StopMapper {
     }
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
-    StopBuilder builder = Stop
+    RegularStopBuilder builder = RegularStop
       .of(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())

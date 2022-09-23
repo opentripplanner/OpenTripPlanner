@@ -6,22 +6,22 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public final class BoardingAreaBuilder
   extends StationElementBuilder<BoardingArea, BoardingAreaBuilder> {
 
-  private Stop parentStop;
+  private RegularStop parentStop;
 
-  public BoardingAreaBuilder(FeedScopedId id) {
+  BoardingAreaBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public BoardingAreaBuilder(BoardingArea original) {
+  BoardingAreaBuilder(BoardingArea original) {
     super(original);
     this.parentStop = original.getParentStop();
   }
 
-  public Stop parentStop() {
+  public RegularStop parentStop() {
     return parentStop;
   }
 
-  public BoardingAreaBuilder withParentStop(Stop parentStop) {
+  public BoardingAreaBuilder withParentStop(RegularStop parentStop) {
     this.parentStop = parentStop;
     return this;
   }

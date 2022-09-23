@@ -4,6 +4,7 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.time.LocalDate;
@@ -11,18 +12,20 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -202,6 +205,35 @@ public class TestItineraryBuilder implements PlanTestConstants {
     );
   }
 
+  public TestItineraryBuilder faresV2Rail(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    String networkId
+  ) {
+    Route route = RAIL_ROUTE;
+    if (networkId != null) {
+      var builder = RAIL_ROUTE.copy();
+      var group = GroupOfRoutes.of(new FeedScopedId(FEED_ID, networkId)).build();
+      builder.getGroupsOfRoutes().add(group);
+      route = builder.build();
+    }
+
+    return transit(
+      route,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      null,
+      null
+    );
+  }
+
   public Itinerary egress(int walkDuration) {
     walk(walkDuration, null);
     return build();
@@ -303,7 +335,11 @@ public class TestItineraryBuilder implements PlanTestConstants {
     stopTimes.add(toStopTime);
 
     StopPattern stopPattern = new StopPattern(stopTimes);
-    TripPattern tripPattern = new TripPattern(route.getId(), route, stopPattern);
+    TripPattern tripPattern = TripPattern
+      .of(route.getId())
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
@@ -379,21 +415,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return leg;
   }
 
+  private double speed(TransitMode mode) {
+    return switch (mode) {
+      case BUS -> BUS_SPEED;
+      case RAIL -> RAIL_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
+  }
+
   private double speed(TraverseMode mode) {
-    switch (mode) {
-      case WALK:
-        return WALK_SPEED;
-      case BICYCLE:
-        return BICYCLE_SPEED;
-      case BUS:
-        return BUS_SPEED;
-      case RAIL:
-        return RAIL_SPEED;
-      case CAR:
-        return CAR_SPEED;
-      default:
-        throw new IllegalStateException("Unsupported mode: " + mode);
-    }
+    return switch (mode) {
+      case WALK -> WALK_SPEED;
+      case BICYCLE -> BICYCLE_SPEED;
+      case CAR -> CAR_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
   }
 
   private int cost(float reluctance, int durationSeconds) {

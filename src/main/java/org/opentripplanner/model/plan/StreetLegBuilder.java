@@ -41,7 +41,7 @@ public class StreetLegBuilder {
       .withDistanceMeters(leg.getDistanceMeters())
       .withGeneralizedCost(leg.getGeneralizedCost())
       .withGeometry(leg.getLegGeometry())
-      .withElevation(leg.getLegElevation())
+      .withElevation(leg.getRawLegElevation())
       .withWalkSteps(leg.getWalkSteps())
       .withPathwayId(leg.getPathwayId())
       .withWalkingBike(leg.getWalkingBike())

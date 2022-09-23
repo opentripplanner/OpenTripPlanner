@@ -1,8 +1,21 @@
 package org.opentripplanner.updater.stoptime;
 
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_VALID_STOPS;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimaps;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -13,30 +26,38 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import org.opentripplanner.model.StopPattern;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.TripTimesPatch;
+import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,76 +75,92 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Maximum time in seconds since midnight for arrivals and departures
    */
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
+
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
    * might modify this buffer will correctly acquire the lock.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
+
   /**
    * Lock to indicate that buffer is in use
    */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
+
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
    * messages.
    */
-  private final TripPatternCache tripPatternCache = new TripPatternCache();
-  private final ZoneId timeZone;
 
+  private final TripPatternCache tripPatternCache = new TripPatternCache();
+
+  private final ZoneId timeZone;
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
-  public int logFrequency = 2000;
+  private final int logFrequency;
   private int totalSuccessfullyApplied = 0;
+
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern → Timetable map and indexing the new Timetables.
    */
-  public int maxSnapshotFrequency = 1000; // msec
+  private final int maxSnapshotFrequencyMs;
+
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
    * to more than one routing thread if the maximum snapshot frequency is exceeded.
    */
   private volatile TimetableSnapshot snapshot = null;
+
   /** Should expired realtime data be purged from the graph. */
-  public boolean purgeExpiredData = true;
+  private final boolean purgeExpiredData;
+
   protected LocalDate lastPurgeDate = null;
+
   /** Epoch time in milliseconds at which the last snapshot was generated. */
   protected long lastSnapshotTime = -1;
-  public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
-  /**
-   * Defines when delays are propagated to previous stops and if these stops are given
-   * the NO_DATA flag.
-   */
-  BackwardsDelayPropagationType backwardsDelayPropagationType =
-    BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+
   private final Deduplicator deduplicator;
+
   private final Map<FeedScopedId, Integer> serviceCodes;
 
-  public static TimetableSnapshotSource ofTransitModel(final TransitModel transitModel) {
-    return new TimetableSnapshotSource(
-      transitModel.getTimeZone(),
-      new DefaultTransitService(transitModel),
-      transitModel.getTransitLayerUpdater(),
-      transitModel.getDeduplicator(),
-      transitModel.getServiceCodes()
-    );
-  }
+  /**
+   * We inject a provider to retrieve the current service-date(now). This enables us to unit-test
+   * the purgeExpiredData feature.
+   */
+  private final Supplier<LocalDate> localDateNow;
 
   public TimetableSnapshotSource(
-    ZoneId timeZone,
-    TransitService transitService,
-    TransitLayerUpdater transitLayerUpdater,
-    Deduplicator deduplicator,
-    Map<FeedScopedId, Integer> serviceCodes
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel
   ) {
-    this.timeZone = timeZone;
-    this.transitService = transitService;
-    this.transitLayerUpdater = transitLayerUpdater;
-    this.deduplicator = deduplicator;
-    this.serviceCodes = serviceCodes;
+    this(parameters, transitModel, () -> LocalDate.now(transitModel.getTimeZone()));
+  }
+
+  /**
+   * Constructor is package local to allow unit-tests to provide their own clock, not using
+   * system time.
+   */
+  TimetableSnapshotSource(
+    TimetableSnapshotSourceParameters parameters,
+    TransitModel transitModel,
+    Supplier<LocalDate> localDateNow
+  ) {
+    this.timeZone = transitModel.getTimeZone();
+    this.transitService = new DefaultTransitService(transitModel);
+    this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
+    this.deduplicator = transitModel.getDeduplicator();
+    this.serviceCodes = transitModel.getServiceCodes();
+    this.logFrequency = parameters.logFrequency();
+    this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
+    this.purgeExpiredData = parameters.purgeExpiredData();
+    this.localDateNow = localDateNow;
+
+    // Inject this into the transit model
+    transitModel.initTimetableSnapshotProvider(this);
   }
 
   /**
@@ -159,14 +196,18 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * However, multi-feed support is not completed and we currently assume there is only one static
    * feed when matching IDs.
    *
+   * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
+   *                                     if these stops are given the NO_DATA flag.
    * @param fullDataset true if the list with updates represent all updates that are active right
    *                    now, i.e. all previous updates should be disregarded
    * @param updates     GTFS-RT TripUpdate's that should be applied atomically
    */
   public void applyTripUpdates(
-    final boolean fullDataset,
-    final List<TripUpdate> updates,
-    final String feedId
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    BackwardsDelayPropagationType backwardsDelayPropagationType,
+    boolean fullDataset,
+    List<TripUpdate> updates,
+    String feedId
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -177,6 +218,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     bufferLock.lock();
 
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
+    List<UpdateError> errors = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -189,7 +231,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       int uIndex = 0;
       for (TripUpdate tripUpdate : updates) {
         if (!tripUpdate.hasTrip()) {
-          warn(feedId, "", "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
+          debug(feedId, "", "Missing TripDescriptor in gtfs-rt trip update: \n{}", tripUpdate);
           continue;
         }
 
@@ -201,7 +243,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final TripDescriptor tripDescriptor = tripUpdate.getTrip();
 
         if (!tripDescriptor.hasTripId() || tripDescriptor.getTripId().isBlank()) {
-          warn(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
+          debug(feedId, "", "No trip id found for gtfs-rt trip update: \n{}", tripUpdate);
           continue;
         }
 
@@ -212,7 +254,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           try {
             serviceDate = ServiceDateUtils.parseString(tripDescriptor.getStartDate());
           } catch (final ParseException e) {
-            warn(
+            debug(
               tripId,
               "Failed to parse start date in gtfs-rt trip update: {}",
               tripDescriptor.getStartDate()
@@ -233,16 +275,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripDescriptor
         );
 
-        boolean applied =
+        Optional<UpdateError> updateError =
           switch (tripScheduleRelationship) {
-            case SCHEDULED -> handleScheduledTrip(tripUpdate, tripId, serviceDate);
+            case SCHEDULED -> handleScheduledTrip(
+              tripUpdate,
+              tripId,
+              serviceDate,
+              backwardsDelayPropagationType
+            );
             case ADDED -> validateAndHandleAddedTrip(
               tripUpdate,
               tripDescriptor,
               tripId,
               serviceDate
             );
-            case UNSCHEDULED -> handleUnscheduledTrip();
             case CANCELED -> handleCanceledTrip(tripId, serviceDate);
             case REPLACEMENT -> validateAndHandleModifiedTrip(
               tripUpdate,
@@ -250,14 +296,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
               tripId,
               serviceDate
             );
-            case DUPLICATED -> false;
+            case UNSCHEDULED -> UpdateError.optional(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
+            case DUPLICATED -> UpdateError.optional(tripId, NOT_IMPLEMENTED_DUPLICATED);
           };
 
-        if (applied) {
+        updateError.ifPresent(errors::add);
+
+        if (updateError.isEmpty()) {
           successfullyApplied++;
           totalSuccessfullyApplied++;
         } else {
-          warn(tripId, "Failed to apply TripUpdate.");
+          debug(tripId, "Failed to apply TripUpdate.");
           LOG.trace(" Contents: {}", tripUpdate);
           if (failuresByRelationship.containsKey(tripScheduleRelationship)) {
             var c = failuresByRelationship.get(tripScheduleRelationship);
@@ -274,11 +323,29 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
       if (fullDataset) {
         LOG.info(
-          "[feedId: {}] {} of {} update messages were applied successfully",
+          "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
           feedId,
           successfullyApplied,
-          updates.size()
+          updates.size(),
+          DoubleUtils.roundTo2Decimals((double) successfullyApplied / updates.size() * 100)
         );
+
+        var errorIndex = Multimaps.index(errors, UpdateError::errorType);
+
+        errorIndex
+          .keySet()
+          .forEach(key -> {
+            var value = errorIndex.get(key);
+            var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
+            LOG.error(
+              "[feedId: {}] {} failures of type {}: {}",
+              feedId,
+              value.size(),
+              key,
+              tripIds
+            );
+          });
+
         if (!failuresByRelationship.isEmpty()) {
           LOG.info(
             "[feedId: {}] Failures by scheduleRelationship {}",
@@ -305,9 +372,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
     final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+    if (force || now - lastSnapshotTime > maxSnapshotFrequencyMs) {
       if (force || buffer.isDirty()) {
-        LOG.debug("Committing {}", buffer.toString());
+        LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
       } else {
         LOG.debug("Buffer was unchanged, keeping old snapshot.");
@@ -340,21 +407,22 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return tripScheduleRelationship;
   }
 
-  private boolean handleScheduledTrip(
-    final TripUpdate tripUpdate,
-    final FeedScopedId tripId,
-    final LocalDate serviceDate
+  private Optional<UpdateError> handleScheduledTrip(
+    TripUpdate tripUpdate,
+    FeedScopedId tripId,
+    LocalDate serviceDate,
+    BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
     final TripPattern pattern = getPatternForTripId(tripId);
 
     if (pattern == null) {
-      warn(tripId, "No pattern found for tripId, skipping TripUpdate.");
-      return false;
+      debug(tripId, "No pattern found for tripId, skipping TripUpdate.");
+      return UpdateError.optional(tripId, TRIP_NOT_FOUND);
     }
 
     if (tripUpdate.getStopTimeUpdateCount() < 1) {
-      warn(tripId, "TripUpdate contains no updates, skipping.");
-      return false;
+      debug(tripId, "TripUpdate contains no updates, skipping.");
+      return UpdateError.optional(tripId, NO_UPDATES);
     }
 
     // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the sequence of stops has
@@ -362,17 +430,19 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     // Get new TripTimes based on scheduled timetable
-    final TripTimesPatch tripTimesPatch = pattern
+    var result = pattern
       .getScheduledTimetable()
       .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
 
-    if (tripTimesPatch == null) {
-      return false;
+    if (result.isFailure()) {
+      return Optional.of(result.failureValue());
     }
 
-    TripTimes updatedTripTimes = tripTimesPatch.getTripTimes();
+    var tripTimesPatch = result.successValue();
 
     List<Integer> skippedStopIndices = tripTimesPatch.getSkippedStopIndices();
+
+    var updatedTripTimes = tripTimesPatch.getTripTimes();
 
     // Make sure that updated trip times have the correct real time state
     updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
@@ -390,13 +460,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
         newStopPattern,
         trip,
-        serviceCodes,
         pattern
       );
-
-      // Add service code to bitset of pattern if needed (using copy on write)
-      final int serviceCode = serviceCodes.get(trip.getServiceId());
-      newPattern.setServiceCode(serviceCode);
 
       cancelScheduledTrip(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
@@ -411,17 +476,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    *
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @param tripDescriptor GTFS-RT TripDescriptor
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
-  private boolean validateAndHandleAddedTrip(
+  private Optional<UpdateError> validateAndHandleAddedTrip(
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final FeedScopedId tripId,
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(tripUpdate);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(tripUpdate);
+    Objects.requireNonNull(serviceDate);
 
     //
     // Validate added trip
@@ -433,27 +498,27 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     if (trip != null) {
       // TODO: should we support this and add a new instantiation of this trip (making it
       // frequency based)?
-      warn(tripId, "Graph already contains trip id of ADDED trip, skipping.");
-      return false;
+      debug(tripId, "Graph already contains trip id of ADDED trip, skipping.");
+      UpdateError.optional(tripId, TRIP_ALREADY_EXISTS);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      warn(tripId, "ADDED trip doesn't have a start date in TripDescriptor, skipping.");
-      return false;
+      debug(tripId, "ADDED trip doesn't have a start date in TripDescriptor, skipping.");
+      UpdateError.optional(tripId, NO_START_DATE);
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      warn(tripId, "ADDED trip has less then two stops, skipping.");
-      return false;
+      debug(tripId, "ADDED trip has fewer than two stops, skipping.");
+      UpdateError.optional(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
     final var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
-      return false;
+      return UpdateError.optional(tripId, NO_VALID_STOPS);
     }
 
     //
@@ -486,13 +551,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Check non-negative
         if (stopSequence < 0) {
-          warn(tripId, "Trip update contains negative stop sequence, skipping.");
+          debug(tripId, "Trip update contains negative stop sequence, skipping.");
           return null;
         }
 
         // Check whether sequence is increasing
         if (previousStopSequence != null && previousStopSequence > stopSequence) {
-          warn(tripId, "Trip update contains decreasing stop sequence, skipping.");
+          debug(tripId, "Trip update contains decreasing stop sequence, skipping.");
           return null;
         }
         previousStopSequence = stopSequence;
@@ -510,7 +575,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           // Remember stop
           stops.add(stop);
         } else {
-          warn(
+          debug(
             tripId,
             "Graph doesn't contain stop id '{}' of trip update, skipping.",
             stopTimeUpdate.getStopId()
@@ -518,7 +583,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           return null;
         }
       } else {
-        warn(tripId, "Trip update misses a stop id at stop time list index {}, skipping.", index);
+        debug(tripId, "Trip update misses a stop id at stop time list index {}, skipping.", index);
         return null;
       }
 
@@ -527,12 +592,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getArrival().getTime();
         if (previousTime != null && previousTime > time) {
-          warn(tripId, "Trip update contains decreasing times, skipping.");
+          debug(tripId, "Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        warn(tripId, "Trip update misses arrival time, skipping.");
+        debug(tripId, "Trip update misses arrival time, skipping.");
         return null;
       }
 
@@ -541,12 +606,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check for increasing time
         final Long time = stopTimeUpdate.getDeparture().getTime();
         if (previousTime != null && previousTime > time) {
-          warn(tripId, "Trip update contains decreasing times, skipping.");
+          debug(tripId, "Trip update contains decreasing times, skipping.");
           return null;
         }
         previousTime = time;
       } else {
-        warn(tripId, "Trip update misses departure time, skipping.");
+        debug(tripId, "Trip update misses departure time, skipping.");
         return null;
       }
     }
@@ -560,9 +625,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripDescriptor GTFS-RT TripDescriptor
    * @param stops          the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate    service date for added trip
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
-  private boolean handleAddedTrip(
+  private Optional<UpdateError> handleAddedTrip(
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final List<StopLocation> stops,
@@ -570,7 +635,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -610,7 +675,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       builder.withGtfsType(3);
       builder.withMode(TransitMode.BUS);
       // Create route name
-      builder.withLongName(tripDescriptor.getTripId());
+      I18NString longName = NonLocalizedString.ofNullable(tripDescriptor.getTripId());
+      builder.withLongName(longName);
       route = builder.build();
     }
 
@@ -626,12 +692,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       .getServiceIdsOnDate(serviceDate);
     if (serviceIds.isEmpty()) {
       // No service id exists: return error for now
-      warn(
+      debug(
         tripId,
         "ADDED trip has service date {} for which no service id is available, skipping.",
         serviceDate.toString()
       );
-      return false;
+      return UpdateError.optional(tripId, NO_SERVICE_ON_DATE);
     } else {
       // Just use first service id of set
       tripBuilder.withServiceId(serviceIds.iterator().next());
@@ -654,9 +720,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param stops         list of stops corresponding to stop time updates
    * @param serviceDate   service date of trip
    * @param realTimeState real-time state of new trip
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
-  private boolean addTripToGraphAndBuffer(
+  private Optional<UpdateError> addTripToGraphAndBuffer(
     final Trip trip,
     final TripUpdate tripUpdate,
     final List<StopLocation> stops,
@@ -664,7 +730,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final RealTimeState realTimeState
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -689,12 +755,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
         final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          warn(
+          debug(
             trip.getId(),
             "ADDED trip has invalid arrival time (compared to start date in " +
             "TripDescriptor), skipping."
           );
-          return false;
+          return UpdateError.optional(trip.getId(), INVALID_ARRIVAL_TIME);
         }
         stopTime.setArrivalTime((int) arrivalTime);
       }
@@ -703,12 +769,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final long departureTime =
           stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
-          warn(
+          debug(
             trip.getId(),
             "ADDED trip has invalid departure time (compared to start date in " +
             "TripDescriptor), skipping."
           );
-          return false;
+          return UpdateError.optional(trip.getId(), INVALID_DEPARTURE_TIME);
         }
         stopTime.setDepartureTime((int) departureTime);
       }
@@ -732,13 +798,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
       stopPattern,
       trip,
-      serviceCodes,
       originalTripPattern
     );
-
-    // Add service code to bitset of pattern if needed (using copy on write)
-    final int serviceCode = serviceCodes.get(trip.getServiceId());
-    pattern.setServiceCode(serviceCode);
 
     // Create new trip times
     final TripTimes newTripTimes = new TripTimes(trip, stopTimes, deduplicator);
@@ -754,6 +815,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     // Set service code of new trip times
+    final int serviceCode = serviceCodes.get(trip.getServiceId());
     newTripTimes.setServiceCode(serviceCode);
 
     // Make sure that updated trip times have the correct real time state
@@ -789,7 +851,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       final Timetable timetable = pattern.getScheduledTimetable();
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        warn(tripId, "Could not cancel scheduled trip because it's not in the timetable");
+        debug(tripId, "Could not cancel scheduled trip because it's not in the timetable");
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
         newTripTimes.cancelTrip();
@@ -819,13 +881,13 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     boolean success = false;
 
-    final TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
+    final TripPattern pattern = buffer.getRealtimeAddedTripPattern(tripId, serviceDate);
     if (pattern != null) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = buffer.resolve(pattern, serviceDate);
       final int tripIndex = timetable.getTripIndex(tripId);
       if (tripIndex == -1) {
-        warn(tripId, "Could not cancel previously added trip on {}", serviceDate);
+        debug(tripId, "Could not cancel previously added trip on {}", serviceDate);
       } else {
         final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
         newTripTimes.cancelTrip();
@@ -837,28 +899,22 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return success;
   }
 
-  private boolean handleUnscheduledTrip() {
-    // TODO: Handle unscheduled trip
-    LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
-    return false;
-  }
-
   /**
    * Validate and handle GTFS-RT TripUpdate message containing a MODIFIED trip.
    *
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @param tripDescriptor GTFS-RT TripDescriptor
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
-  private boolean validateAndHandleModifiedTrip(
+  private Optional<UpdateError> validateAndHandleModifiedTrip(
     final TripUpdate tripUpdate,
     final TripDescriptor tripDescriptor,
     final FeedScopedId tripId,
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(tripUpdate);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(tripUpdate);
+    Objects.requireNonNull(serviceDate);
 
     //
     // Validate modified trip
@@ -869,15 +925,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (trip == null) {
       // TODO: should we support this and consider it an ADDED trip?
-      warn(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
-      return false;
+      debug(tripId, "Feed does not contain trip id of MODIFIED trip, skipping.");
+      return UpdateError.optional(tripId, TRIP_NOT_FOUND);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      warn(tripId, "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping.");
-      return false;
+      debug(tripId, "REPLACEMENT trip doesn't have a start date in TripDescriptor, skipping.");
+      return UpdateError.optional(tripId, NO_START_DATE);
     } else {
       // Check whether service date is served by trip
       final Set<FeedScopedId> serviceIds = transitService
@@ -885,21 +941,21 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .getServiceIdsOnDate(serviceDate);
       if (!serviceIds.contains(trip.getServiceId())) {
         // TODO: should we support this and change service id of trip?
-        warn(tripId, "REPLACEMENT trip has a service date that is not served by trip, skipping.");
-        return false;
+        debug(tripId, "REPLACEMENT trip has a service date that is not served by trip, skipping.");
+        return UpdateError.optional(tripId, NO_SERVICE_ON_DATE);
       }
     }
 
     // Check whether at least two stop updates exist
     if (tripUpdate.getStopTimeUpdateCount() < 2) {
-      warn(tripId, "REPLACEMENT trip has less then two stops, skipping.");
-      return false;
+      debug(tripId, "REPLACEMENT trip has less then two stops, skipping.");
+      return UpdateError.optional(tripId, TOO_FEW_STOPS);
     }
 
     // Check whether all stop times are available and all stops exist
     var stops = checkNewStopTimeUpdatesAndFindStops(tripId, tripUpdate);
     if (stops == null) {
-      return false;
+      return UpdateError.optional(tripId, NO_VALID_STOPS);
     }
 
     //
@@ -916,16 +972,16 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @param tripUpdate  GTFS-RT TripUpdate message
    * @param stops       the stops of each StopTimeUpdate in the TripUpdate message
    * @param serviceDate service date for modified trip
-   * @return true if successful
+   * @return empty Optional if successful or one containing en error
    */
-  private boolean handleModifiedTrip(
+  private Optional<UpdateError> handleModifiedTrip(
     final Trip trip,
     final TripUpdate tripUpdate,
     final List<StopLocation> stops,
     final LocalDate serviceDate
   ) {
     // Preconditions
-    Preconditions.checkNotNull(stops);
+    Objects.requireNonNull(stops);
     Preconditions.checkArgument(
       tripUpdate.getStopTimeUpdateCount() == stops.size(),
       "number of stop should match the number of stop time updates"
@@ -943,7 +999,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     return addTripToGraphAndBuffer(trip, tripUpdate, stops, serviceDate, RealTimeState.MODIFIED);
   }
 
-  private boolean handleCanceledTrip(FeedScopedId tripId, final LocalDate serviceDate) {
+  private Optional<UpdateError> handleCanceledTrip(
+    FeedScopedId tripId,
+    final LocalDate serviceDate
+  ) {
     // Try to cancel scheduled trip
     final boolean cancelScheduledSuccess = cancelScheduledTrip(tripId, serviceDate);
 
@@ -951,14 +1010,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(tripId, serviceDate);
 
     if (!cancelScheduledSuccess && !cancelPreviouslyAddedSuccess) {
-      warn(tripId, "No pattern found for tripId. Skipping cancellation.");
-      return false;
+      debug(tripId, "No pattern found for tripId. Skipping cancellation.");
+      return UpdateError.optional(tripId, NO_TRIP_FOR_CANCELLATION_FOUND);
     }
-    return true;
+    return UpdateError.noError();
   }
 
   private boolean purgeExpiredData() {
-    final LocalDate today = LocalDate.now(timeZone);
+    final LocalDate today = localDateNow.get();
     // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
     final LocalDate previously = today.minusDays(2); // Just to be safe...
 
@@ -1009,15 +1068,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * @return stop or null if stop doesn't exist
    */
   private StopLocation getStopForStopId(FeedScopedId stopId) {
-    return transitService.getStopForId(stopId);
+    return transitService.getRegularStop(stopId);
   }
 
-  private static void warn(FeedScopedId id, String message, Object... params) {
-    warn(id.getFeedId(), id.getId(), message, params);
+  private static void debug(FeedScopedId id, String message, Object... params) {
+    debug(id.getFeedId(), id.getId(), message, params);
   }
 
-  private static void warn(String feedId, String tripId, String message, Object... params) {
+  private static void debug(String feedId, String tripId, String message, Object... params) {
     String m = "[feedId: %s, tripId: %s] %s".formatted(feedId, tripId, message);
-    LOG.warn(m, params);
+    LOG.debug(m, params);
   }
 }

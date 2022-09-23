@@ -7,17 +7,16 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
-
-  private static final long serialVersionUID = 20120229L;
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(SFBayFareServiceImpl.class);
@@ -65,7 +64,8 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
           bartBlock = null;
         }
         if (agencyId.equals("SFMTA")) {
-          if (ride.getMode().equals(TraverseMode.CABLE_CAR)) {
+          TransitMode mode = (ride instanceof TransitLeg transitLeg) ? transitLeg.getMode() : null;
+          if (mode == TransitMode.CABLE_CAR) {
             // no transfers issued or accepted
             cost += CABLE_CAR_FARE;
           } else if (
@@ -105,7 +105,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
   @Override
   protected boolean populateFare(
-    Fare fare,
+    ItineraryFares fare,
     Currency currency,
     FareType fareType,
     List<Leg> rides,

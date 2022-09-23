@@ -18,14 +18,13 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
@@ -61,8 +60,6 @@ public class AlternativeLegs {
       ? List.of(toStop)
       : toStation.getChildStops();
 
-    TimetableSnapshot timetableSnapshot = transitService.getTimetableSnapshot();
-
     Comparator<ScheduledTransitLeg> legComparator = Comparator.comparing(
       ScheduledTransitLeg::getStartTime
     );
@@ -75,19 +72,12 @@ public class AlternativeLegs {
 
     return origins
       .stream()
-      .flatMap(stop -> transitService.getPatternsForStop(stop, timetableSnapshot).stream())
+      .flatMap(stop -> transitService.getPatternsForStop(stop, true).stream())
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
       .filter(tripPatternPredicate)
       .flatMap(tripPattern -> withBoardingAlightingPositions(origins, destinations, tripPattern))
       .flatMap(t ->
-        generateLegs(
-          transitService,
-          timetableSnapshot,
-          t,
-          leg.getStartTime(),
-          leg.getServiceDate(),
-          searchBackward
-        )
+        generateLegs(transitService, t, leg.getStartTime(), leg.getServiceDate(), searchBackward)
       )
       .filter(Predicate.not(leg::isPartiallySameTransitLeg))
       .sorted(legComparator)
@@ -102,7 +92,6 @@ public class AlternativeLegs {
   @Nonnull
   private static Stream<ScheduledTransitLeg> generateLegs(
     TransitService transitService,
-    TimetableSnapshot timetableSnapshot,
     TripPatternBetweenStops tripPatternBetweenStops,
     ZonedDateTime departureTime,
     LocalDate originalDate,
@@ -129,13 +118,7 @@ public class AlternativeLegs {
     var serviceDates = List.of(originalDate.minusDays(1), originalDate, originalDate.plusDays(1));
 
     for (LocalDate serviceDate : serviceDates) {
-      Timetable timetable;
-      if (timetableSnapshot != null) {
-        timetable = timetableSnapshot.resolve(pattern, serviceDate);
-      } else {
-        timetable = pattern.getScheduledTimetable();
-      }
-
+      Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
       ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
         serviceDate,
         transitService.getTimeZone()
@@ -145,7 +128,7 @@ public class AlternativeLegs {
         departureTime
       );
 
-      var servicesRunning = transitService.getServicesRunningForDate(serviceDate);
+      var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
 
       for (TripTimes tripTimes : timetable.getTripTimes()) {
         if (!servicesRunning.contains(tripTimes.getServiceCode())) {

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -54,7 +54,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     //   D <-> E1
     //   D <-> T2
 
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -98,7 +98,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       B,
       C,
       false,
-      new RoutingRequest(),
+      new RouteRequest(),
       StreetMode.BIKE
     );
 
@@ -112,7 +112,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       B,
       C,
       false,
-      new RoutingRequest(),
+      new RouteRequest(),
       StreetMode.BIKE
     );
 
@@ -271,7 +271,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRentalFromStationWantToKeepCantKeep() {
-    ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = false;
+    ((VehicleRentalStation) B1.getStation()).isArrivingInRentalVehicleAtDestinationAllowed = false;
 
     assertPath(
       S1,
@@ -306,7 +306,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeep() {
-    ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = true;
+    ((VehicleRentalStation) B1.getStation()).isArrivingInRentalVehicleAtDestinationAllowed = true;
 
     assertPath(
       S1,
@@ -341,7 +341,7 @@ public class BikeRentalTest extends GraphRoutingTest {
 
   @Test
   public void testBikeRentalFromStationWantToKeepCanKeepButCostly() {
-    ((VehicleRentalStation) B1.getStation()).isKeepingVehicleRentalAtDestinationAllowed = true;
+    ((VehicleRentalStation) B1.getStation()).isArrivingInRentalVehicleAtDestinationAllowed = true;
     int keepRentedBicycleAtDestinationCost = 1000;
 
     assertPath(
@@ -433,9 +433,9 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> bannedNetworks,
     Set<String> allowedNetworks
   ) {
-    Consumer<RoutingRequest> setter = options -> {
-      options.allowedVehicleRentalNetworks = allowedNetworks;
-      options.bannedVehicleRentalNetworks = bannedNetworks;
+    Consumer<RouteRequest> setter = options -> {
+      options.journey().rental().setAllowedNetworks(allowedNetworks);
+      options.journey().rental().setBannedNetworks(bannedNetworks);
     };
 
     assertEquals(
@@ -457,9 +457,9 @@ public class BikeRentalTest extends GraphRoutingTest {
     Set<String> bannedNetworks,
     Set<String> allowedNetworks
   ) {
-    Consumer<RoutingRequest> setter = options -> {
-      options.allowedVehicleRentalNetworks = allowedNetworks;
-      options.bannedVehicleRentalNetworks = bannedNetworks;
+    Consumer<RouteRequest> setter = options -> {
+      options.journey().rental().setAllowedNetworks(allowedNetworks);
+      options.journey().rental().setBannedNetworks(bannedNetworks);
     };
 
     assertEquals(
@@ -581,9 +581,15 @@ public class BikeRentalTest extends GraphRoutingTest {
       toVertex,
       arriveBy,
       options -> {
-        options.useVehicleRentalAvailabilityInformation = useAvailabilityInformation;
-        options.allowKeepingRentedVehicleAtDestination = keepRentedBicycleCost > 0;
-        options.keepingRentedVehicleAtDestinationCost = keepRentedBicycleCost;
+        options.preferences().rental().setUseAvailabilityInformation(useAvailabilityInformation);
+        options
+          .journey()
+          .rental()
+          .setAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
+        options
+          .preferences()
+          .rental()
+          .setArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
       }
     );
   }
@@ -592,22 +598,24 @@ public class BikeRentalTest extends GraphRoutingTest {
     Vertex fromVertex,
     Vertex toVertex,
     boolean arriveBy,
-    Consumer<RoutingRequest> optionsSetter
+    Consumer<RouteRequest> optionsSetter
   ) {
-    var options = new RoutingRequest();
-    options.arriveBy = arriveBy;
-    options.vehicleRentalPickupTime = 42;
-    options.vehicleRentalPickupCost = 62;
-    options.vehicleRentalDropoffCost = 33;
-    options.vehicleRentalDropoffTime = 15;
+    var request = new RouteRequest();
+    var preferences = request.preferences();
 
-    optionsSetter.accept(options);
+    request.setArriveBy(arriveBy);
+    preferences.rental().setPickupTime(42);
+    preferences.rental().setPickupCost(62);
+    preferences.rental().setDropoffCost(33);
+    preferences.rental().setDropoffTime(15);
+
+    optionsSetter.accept(request);
 
     return runStreetSearchAndCreateDescriptor(
       fromVertex,
       toVertex,
       arriveBy,
-      options,
+      request,
       StreetMode.BIKE_RENTAL
     );
   }
@@ -616,7 +624,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     Vertex fromVertex,
     Vertex toVertex,
     boolean arriveBy,
-    RoutingRequest options,
+    RouteRequest options,
     StreetMode streetMode
   ) {
     var bikeRentalOptions = options.getStreetSearchRequest(streetMode);

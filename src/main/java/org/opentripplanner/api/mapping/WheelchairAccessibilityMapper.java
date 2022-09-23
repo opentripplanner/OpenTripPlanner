@@ -1,10 +1,10 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 public class WheelchairAccessibilityMapper {
 
-  public static Integer mapToApi(WheelchairAccessibility domain) {
+  public static Integer mapToApi(Accessibility domain) {
     if (domain == null) {
       return 0;
     }

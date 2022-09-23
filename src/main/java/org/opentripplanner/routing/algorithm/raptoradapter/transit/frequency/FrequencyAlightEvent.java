@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import java.time.LocalDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
-import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * Represents a result of a {@link TripFrequencyAlightSearch}, with materialized {@link TripTimes}
@@ -13,9 +12,8 @@ final class FrequencyAlightEvent<T extends DefaultTripSchedule>
   extends FrequencyBoardOrAlightEvent<T> {
 
   public FrequencyAlightEvent(
-    RaptorTripPattern raptorTripPattern,
+    TripPatternForDates raptorTripPattern,
     TripTimes tripTimes,
-    TripPattern pattern,
     int stopPositionInPattern,
     int departureTime,
     int headway,
@@ -25,7 +23,6 @@ final class FrequencyAlightEvent<T extends DefaultTripSchedule>
     super(
       raptorTripPattern,
       tripTimes,
-      pattern,
       stopPositionInPattern,
       departureTime,
       offset,

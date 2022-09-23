@@ -139,7 +139,16 @@ public class ValueObjectToStringBuilder {
    * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
    * Duration#toString()}, but without the 'PT' prefix.
    */
-  public ValueObjectToStringBuilder addDuration(Integer durationSeconds) {
+  public ValueObjectToStringBuilder addDuration(Duration duration) {
+    return addIt(duration, DurationUtils::durationToStr);
+  }
+
+  /**
+   * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix.
+   */
+  public ValueObjectToStringBuilder addDurationSec(Integer durationSeconds) {
     return addIt(durationSeconds, DurationUtils::durationToStr);
   }
 

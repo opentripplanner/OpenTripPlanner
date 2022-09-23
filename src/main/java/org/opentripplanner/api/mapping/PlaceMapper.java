@@ -15,14 +15,16 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlaceMapper {
 
   private final Locale locale;
+  private final I18NStringMapper i18NStringMapper;
 
   public PlaceMapper(Locale locale) {
     this.locale = locale;
+    i18NStringMapper = new I18NStringMapper(this.locale);
   }
 
   public List<ApiPlace> mapStopArrivals(Collection<StopArrival> domain) {
@@ -62,8 +64,11 @@ public class PlaceMapper {
       api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());
       api.stopCode = domain.stop.getCode();
       api.platformCode =
-        domain.stop instanceof Stop ? ((Stop) domain.stop).getPlatformCode() : null;
-      api.zoneId = domain.stop instanceof Stop ? ((Stop) domain.stop).getFirstZoneAsString() : null;
+        domain.stop instanceof RegularStop ? ((RegularStop) domain.stop).getPlatformCode() : null;
+      api.zoneId =
+        domain.stop instanceof RegularStop
+          ? ((RegularStop) domain.stop).getFirstZoneAsString()
+          : null;
     }
 
     if (domain.coordinate != null) {
@@ -112,10 +117,10 @@ public class PlaceMapper {
     return ApiVehicleParkingWithEntrance
       .builder()
       .id(FeedScopedIdMapper.mapToApi(vp.getId()))
-      .name(I18NStringMapper.mapToApi(vp.getName(), locale))
+      .name(i18NStringMapper.mapToApi(vp.getName()))
       .entranceId(FeedScopedIdMapper.mapToApi(e.getEntranceId()))
-      .entranceName(I18NStringMapper.mapToApi(e.getName(), locale))
-      .note(I18NStringMapper.mapToApi(vp.getNote(), locale))
+      .entranceName(i18NStringMapper.mapToApi(e.getName()))
+      .note(i18NStringMapper.mapToApi(vp.getNote()))
       .detailsUrl(vp.getDetailsUrl())
       .imageUrl(vp.getImageUrl())
       .tags(new ArrayList<>(vp.getTags()))

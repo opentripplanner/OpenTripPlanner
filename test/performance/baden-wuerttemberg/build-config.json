@@ -1,5 +1,9 @@
 {
-  "osmWayPropertySet": "germany",
+  "osmDefaults": {
+    "osmTagMapping": "germany",
+    "timeZone": "Europe/Berlin"
+  },
   "staticBikeParkAndRide": true,
-  "discardMinTransferTimes": true
+  "discardMinTransferTimes": true,
+  "transitModelTimeZone": "Europe/Berlin"
 }

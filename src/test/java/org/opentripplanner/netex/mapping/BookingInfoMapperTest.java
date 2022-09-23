@@ -31,7 +31,9 @@ public class BookingInfoMapperTest {
   private static final LocalTime FIVE_THIRTY = LocalTime.of(5, 30);
   private static final Duration THIRTY_MINUTES = Duration.ofMinutes(30);
 
-  private final BookingInfoMapper subject = new BookingInfoMapper(new DataImportIssueStore(false));
+  private final BookingInfoMapper subject = new BookingInfoMapper(
+    DataImportIssueStore.noopIssueStore()
+  );
 
   @Test
   public void testMapBookingInfoPrecedence() {

@@ -1,18 +1,20 @@
 package org.opentripplanner.routing.street;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -141,10 +143,10 @@ public class SplitEdgeTurnRestrictionsTest {
   }
 
   private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
 
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.CAR);
 
@@ -165,7 +167,15 @@ public class SplitEdgeTurnRestrictionsTest {
 
     // make sure that we only get CAR legs
     itineraries.forEach(i ->
-      i.getLegs().forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.CAR))
+      i
+        .getLegs()
+        .forEach(l -> {
+          if (l instanceof StreetLeg stLeg) {
+            assertEquals(TraverseMode.CAR, stLeg.getMode());
+          } else {
+            fail("Expected StreetLeg (CAR): " + l);
+          }
+        })
     );
     Geometry geometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
     return PolylineEncoder.encodeGeometry(geometry).points();

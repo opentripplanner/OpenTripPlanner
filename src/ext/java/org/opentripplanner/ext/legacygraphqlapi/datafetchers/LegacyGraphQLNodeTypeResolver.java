@@ -6,10 +6,9 @@ import graphql.language.SelectionSet;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -17,9 +16,10 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
@@ -67,7 +67,7 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     if (o instanceof Route) {
       return schema.getObjectType("Route");
     }
-    if (o instanceof Stop) {
+    if (o instanceof RegularStop) {
       return schema.getObjectType("Stop");
     }
     if (o instanceof Station) {

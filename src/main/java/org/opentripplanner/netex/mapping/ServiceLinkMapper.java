@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import net.opengis.gml._3.LineStringType;
@@ -9,17 +10,17 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.MissingProjectionInServiceLink;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
@@ -35,7 +36,7 @@ class ServiceLinkMapper {
   private final FeedScopedIdFactory idFactory;
   private final ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById;
   private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
-  private final EntityById<Stop> stopById;
+  private final EntityById<RegularStop> stopById;
   private final DataImportIssueStore issueStore;
   private final double maxStopToShapeSnapDistance;
 
@@ -43,7 +44,7 @@ class ServiceLinkMapper {
     FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalMapById<ServiceLink> serviceLinkById,
     ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-    EntityById<Stop> stopById,
+    EntityById<RegularStop> stopById,
     DataImportIssueStore issueStore,
     double maxStopToShapeSnapDistance
   ) {
@@ -55,11 +56,11 @@ class ServiceLinkMapper {
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
   }
 
-  LineString[] getGeometriesByJourneyPattern(
+  List<LineString> getGeometriesByJourneyPattern(
     JourneyPattern journeyPattern,
-    TripPattern tripPattern
+    StopPattern stopPattern
   ) {
-    LineString[] geometries = new LineString[tripPattern.numberOfStops() - 1];
+    LineString[] geometries = new LineString[stopPattern.getSize() - 1];
     if (journeyPattern.getLinksInSequence() != null) {
       List<LinkInLinkSequence_VersionedChildStructure> linksInJourneyPattern = journeyPattern
         .getLinksInSequence()
@@ -73,7 +74,7 @@ class ServiceLinkMapper {
           ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);
 
           if (serviceLink != null) {
-            geometries[i] = mapServiceLink(serviceLink, tripPattern, i);
+            geometries[i] = mapServiceLink(serviceLink, stopPattern, i);
           } else {
             issueStore.add(
               "MissingServiceLink",
@@ -87,17 +88,17 @@ class ServiceLinkMapper {
     }
 
     // Make sure all geometries are generated
-    for (int i = 0; i < tripPattern.numberOfStops() - 1; ++i) {
+    for (int i = 0; i < stopPattern.getSize() - 1; ++i) {
       if (geometries[i] == null) {
-        geometries[i] = createSimpleGeometry(tripPattern.getStop(i), tripPattern.getStop(i + 1));
+        geometries[i] = createSimpleGeometry(stopPattern.getStop(i), stopPattern.getStop(i + 1));
       }
     }
-    return geometries;
+    return Arrays.asList(geometries);
   }
 
   private LineString mapServiceLink(
     ServiceLink serviceLink,
-    TripPattern tripPattern,
+    StopPattern stopPattern,
     int stopIndex
   ) {
     if (
@@ -106,7 +107,7 @@ class ServiceLinkMapper {
     ) {
       issueStore.add(new MissingProjectionInServiceLink(serviceLink.getId()));
       return null;
-    } else if (!isFromToPointRefsValid(serviceLink, tripPattern, stopIndex)) {
+    } else if (!isFromToPointRefsValid(serviceLink, stopPattern, stopIndex)) {
       return null;
     }
 
@@ -131,8 +132,8 @@ class ServiceLinkMapper {
           !isGeometryValid(geometry, serviceLink.getId()) ||
           !areEndpointsWithinTolerance(
             geometry,
-            tripPattern.getStop(stopIndex),
-            tripPattern.getStop(stopIndex + 1),
+            stopPattern.getStop(stopIndex),
+            stopPattern.getStop(stopIndex + 1),
             serviceLink.getId()
           )
         ) {
@@ -163,14 +164,14 @@ class ServiceLinkMapper {
 
   private boolean isFromToPointRefsValid(
     ServiceLink serviceLink,
-    TripPattern tripPattern,
+    StopPattern stopPattern,
     int stopIndex
   ) {
     String fromPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getFromPointRef().getRef());
-    Stop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
+    RegularStop fromPointStop = stopById.get(idFactory.createId(fromPointQuayId));
 
     String toPointQuayId = quayIdByStopPointRef.lookup(serviceLink.getToPointRef().getRef());
-    Stop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
+    RegularStop toPointStop = stopById.get(idFactory.createId(toPointQuayId));
 
     if (fromPointStop == null || toPointStop == null) {
       issueStore.add(
@@ -179,21 +180,21 @@ class ServiceLinkMapper {
         serviceLink
       );
       return false;
-    } else if (!fromPointStop.equals(tripPattern.getStop(stopIndex))) {
+    } else if (!fromPointStop.equals(stopPattern.getStop(stopIndex))) {
       issueStore.add(
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different from point in journey pattern. Link point: %s, journey pattern point: %s",
         serviceLink,
-        tripPattern.getStop(stopIndex).getId().getId(),
+        stopPattern.getStop(stopIndex).getId().getId(),
         fromPointQuayId
       );
       return false;
-    } else if (!toPointStop.equals(tripPattern.getStop(stopIndex + 1))) {
+    } else if (!toPointStop.equals(stopPattern.getStop(stopIndex + 1))) {
       issueStore.add(
         "ServiceLinkQuayMismatch",
         "Service link %s with quays different to point in journey pattern. Link point: %s, journey pattern point: %s",
         serviceLink,
-        tripPattern.getStop(stopIndex).getId().getId(),
+        stopPattern.getStop(stopIndex).getId().getId(),
         toPointQuayId
       );
       return false;

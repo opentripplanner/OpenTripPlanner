@@ -10,19 +10,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.mockito.Mockito;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class TripPatternForDateTest {
 
-  private static final Stop STOP = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
+  private static final RegularStop STOP = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
   private static final TripTimes tripTimes = Mockito.mock(TripTimes.class);
 
   static Stream<Arguments> testCases = Stream
@@ -37,12 +38,12 @@ class TripPatternForDateTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    TripPattern pattern = new TripPattern(TransitModelForTest.id("P1"), route, stopPattern);
-
-    TripPatternWithRaptorStopIndexes tripPattern = new TripPatternWithRaptorStopIndexes(
-      pattern,
-      new int[0]
-    );
+    RoutingTripPattern tripPattern = TripPattern
+      .of(TransitModelForTest.id("P1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build()
+      .getRoutingTripPattern();
 
     var withFrequencies = new TripPatternForDate(
       tripPattern,

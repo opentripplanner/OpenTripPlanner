@@ -7,7 +7,10 @@ import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,18 +24,6 @@ public class GtfsBundle {
 
   private CsvInputSource csvInputSource;
 
-  /**
-   * Create direct transfers between the constituent stops of each parent station. This is different
-   * from "linking stops to parent stations" below.
-   */
-  public boolean parentStationTransfers = false;
-
-  /**
-   * Connect parent station vertices to their constituent stops to allow beginning and ending paths
-   * (itineraries) at them.
-   */
-  public boolean linkStopsToParentStations = false;
-
   public int subwayAccessTime;
 
   private double maxStopToShapeSnapDistance = 150;
@@ -42,8 +33,21 @@ public class GtfsBundle {
     this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
   }
 
-  public GtfsBundle(CompositeDataSource dataSource) {
-    this.dataSource = dataSource;
+  private GtfsBundle(CompositeDataSource compositeDataSource) {
+    this(
+      new ConfiguredDataSource<>(
+        compositeDataSource,
+        new GtfsFeedConfigBuilder().withSource(compositeDataSource.uri()).build()
+      )
+    );
+  }
+
+  public GtfsBundle(ConfiguredDataSource<GtfsFeedConfig> configuredDataSource) {
+    this.dataSource = (CompositeDataSource) configuredDataSource.dataSource();
+    if (configuredDataSource.config().feedId().isPresent()) {
+      this.feedId =
+        new GtfsFeedId.Builder().id(configuredDataSource.config().feedId().get()).build();
+    }
   }
 
   public CsvInputSource getCsvInputSource() {

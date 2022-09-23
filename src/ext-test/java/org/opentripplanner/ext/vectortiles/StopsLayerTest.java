@@ -7,18 +7,16 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class StopsLayerTest {
 
-  private Stop stop;
+  private RegularStop stop;
 
   @BeforeEach
   public void setUp() {
@@ -28,24 +26,14 @@ public class StopsLayerTest {
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
     transitModel.index();
     var transitService = new DefaultTransitService(transitModel);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(transitService);
 
     Map<String, Object> map = new HashMap<>();
-    mapper
-      .map(
-        new TransitStopVertexBuilder()
-          .withGraph(graph)
-          .withStop(stop)
-          .withTransitModel(transitModel)
-          .build()
-      )
-      .forEach(o -> map.put(o.first, o.second));
+    mapper.map(stop).forEach(o -> map.put(o.first, o.second));
 
     assertEquals("F:name", map.get("gtfsId"));
     assertEquals("name", map.get("name"));

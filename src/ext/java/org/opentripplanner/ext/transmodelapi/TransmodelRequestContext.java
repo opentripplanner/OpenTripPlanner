@@ -1,17 +1,17 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
 
 public class TransmodelRequestContext {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final RoutingService routingService;
   private final TransitService transitService;
 
   public TransmodelRequestContext(
-    OtpServerContext serverContext,
+    OtpServerRequestContext serverContext,
     RoutingService routingService,
     TransitService transitService
   ) {
@@ -20,7 +20,7 @@ public class TransmodelRequestContext {
     this.transitService = transitService;
   }
 
-  public OtpServerContext getServerContext() {
+  public OtpServerRequestContext getServerContext() {
     return serverContext;
   }
 

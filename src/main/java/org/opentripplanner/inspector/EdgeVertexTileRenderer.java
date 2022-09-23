@@ -27,12 +27,12 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.operation.buffer.BufferParameters;
 import org.locationtech.jts.operation.buffer.OffsetCurveBuilder;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A TileRenderer implementation which get all edges/vertex in the bounding box of the tile, and
@@ -60,15 +60,15 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     // Grow a bit the envelope to prevent rendering glitches between tiles
     Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
 
-    Collection<Vertex> vertices = context.graph
-      .getStreetIndex()
+    var streetIndex = context.graph.getStreetIndex();
+
+    Collection<Vertex> vertices = streetIndex
       .getVerticesForEnvelope(bboxWithMargins)
       .stream()
       .sorted(evRenderer::vertexSorter)
       .toList();
 
-    Collection<Edge> edges = context.graph
-      .getStreetIndex()
+    Collection<Edge> edges = streetIndex
       .getEdgesForEnvelope(bboxWithMargins)
       .stream()
       .distinct()

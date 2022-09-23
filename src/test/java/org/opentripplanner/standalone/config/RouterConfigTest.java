@@ -17,11 +17,11 @@ class RouterConfigTest {
     c = new NodeAdapter(jsonNodeForTest("{}"), "Test");
     assertEquals(DEFAULT_TIMEOUT, RouterConfig.parseStreetRoutingTimeout(c));
 
-    // New format: 3 seconds
+    // New format: 33 seconds
     c = new NodeAdapter(jsonNodeForTest("{streetRoutingTimeout: '33s'}"), "Test");
     assertEquals(Duration.ofSeconds(33), RouterConfig.parseStreetRoutingTimeout(c));
 
-    // Old format: 3.2 seconds
+    // Old format: 3.7 seconds
     c = new NodeAdapter(jsonNodeForTest("{streetRoutingTimeout: 3.7}"), "Test");
     assertEquals(Duration.ofMillis(3700), RouterConfig.parseStreetRoutingTimeout(c));
 

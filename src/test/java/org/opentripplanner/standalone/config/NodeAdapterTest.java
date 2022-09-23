@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -105,6 +105,12 @@ public class NodeAdapterTest {
   public void requiredAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
     assertThrows(OtpAppException.class, () -> subject.asText("missingField"));
+  }
+
+  @Test
+  public void rawAsText() {
+    NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
+    assertEquals("TEXT", subject.path("aText").asText());
   }
 
   @Test
@@ -214,6 +220,19 @@ public class NodeAdapterTest {
   }
 
   @Test
+  public void asFeedScopedIdSet() {
+    NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12', 'A:23']}");
+    assertEquals(
+      List.of(
+        new FeedScopedId("A", "23"),
+        new FeedScopedId("B", "12"),
+        new FeedScopedId("A", "23")
+      ),
+      subject.asFeedScopedIdList("routes", List.of())
+    );
+  }
+
+  @Test
   public void asDateOrRelativePeriod() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");
@@ -240,10 +259,24 @@ public class NodeAdapterTest {
 
   @Test
   public void asDuration() {
-    NodeAdapter subject = newNodeAdapterForTest("{ key1 : 'PT1s', key2 : '4d3h2m1s' }");
-    assertEquals("PT1S", subject.asDuration("key1", null).toString());
-    assertEquals("PT99H2M1S", subject.asDuration("key2", null).toString());
+    NodeAdapter subject = newNodeAdapterForTest("{ k1:'PT1s', k2:'3h2m1s', k3:7 }");
+
+    // as required duration
+    assertEquals("PT1S", subject.asDuration("k1").toString());
+    assertEquals("PT3H2M1S", subject.asDuration("k2").toString());
+
+    // as optional duration
+    assertEquals("PT1S", subject.asDuration("k1", null).toString());
     assertEquals("PT3H", subject.asDuration("missing-key", D3h).toString());
+
+    // as required duration v2 (with unit)
+    assertEquals("PT1S", subject.asDuration("k1").toString());
+    assertEquals("PT7S", subject.asDuration2("k3", ChronoUnit.SECONDS).toString());
+
+    // as optional duration v2 (with unit)
+    assertEquals("PT1S", subject.asDuration2("k1", null, ChronoUnit.SECONDS).toString());
+    assertEquals("PT7S", subject.asDuration2("k3", null, ChronoUnit.SECONDS).toString());
+    assertEquals("PT3H", subject.asDuration2("missing-key", D3h, ChronoUnit.SECONDS).toString());
   }
 
   @Test

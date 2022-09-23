@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageCursorFactory;
 import org.opentripplanner.model.plan.pagecursor.PageType;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
@@ -25,7 +25,7 @@ public class RoutingResponseMapper {
   private static final Logger LOG = LoggerFactory.getLogger(RoutingResponseMapper.class);
 
   public static RoutingResponse map(
-    RoutingRequest request,
+    RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
     SearchParams searchParams,
     Duration searchWindowForNextSearch,
@@ -38,19 +38,19 @@ public class RoutingResponseMapper {
     var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
     var factory = mapIntoPageCursorFactory(
-      request.getItinerariesSortOrder(),
+      request.itinerariesSortOrder(),
       transitSearchTimeZero,
       searchParams,
       searchWindowForNextSearch,
       firstRemovedItinerary,
-      request.pageCursor == null ? null : request.pageCursor.type
+      request.pageCursor() == null ? null : request.pageCursor().type
     );
 
     PageCursor nextPageCursor = factory.nextPageCursor();
     PageCursor prevPageCursor = factory.previousPageCursor();
 
     if (LOG.isDebugEnabled()) {
-      logPagingInformation(request.pageCursor, prevPageCursor, nextPageCursor, routingErrors);
+      logPagingInformation(request.pageCursor(), prevPageCursor, nextPageCursor, routingErrors);
     }
 
     var metadata = createTripSearchMetadata(request, searchParams, firstRemovedItinerary);
@@ -77,10 +77,12 @@ public class RoutingResponseMapper {
 
     if (searchParams != null) {
       if (!searchParams.isSearchWindowSet()) {
-        throw new IllegalArgumentException("SearchWindow not set");
+        LOG.debug("SearchWindow not set");
+        return factory;
       }
       if (!searchParams.isEarliestDepartureTimeSet()) {
-        throw new IllegalArgumentException("Earliest departure time not set");
+        LOG.debug("Earliest departure time not set");
+        return factory;
       }
 
       long t0 = transitSearchTimeZero.toEpochSecond();
@@ -104,7 +106,7 @@ public class RoutingResponseMapper {
 
   @Nullable
   private static TripSearchMetadata createTripSearchMetadata(
-    RoutingRequest request,
+    RouteRequest request,
     SearchParams searchParams,
     Itinerary firstRemovedItinerary
   ) {
@@ -112,9 +114,9 @@ public class RoutingResponseMapper {
       return null;
     }
 
-    Instant reqTime = request.getDateTime();
+    Instant reqTime = request.dateTime();
 
-    if (request.arriveBy) {
+    if (request.arriveBy()) {
       return TripSearchMetadata.createForArriveBy(
         reqTime,
         searchParams.searchWindowInSeconds(),
@@ -135,9 +137,9 @@ public class RoutingResponseMapper {
     PageCursor nextPageCursor,
     Set<RoutingError> errors
   ) {
-    LOG.debug("PageCursor current  : " + currentPageCursor);
-    LOG.debug("PageCursor previous : " + prevPageCursor);
-    LOG.debug("PageCursor next ... : " + nextPageCursor);
-    LOG.debug("Errors ............ : " + errors);
+    LOG.debug("PageCursor current  : {}", currentPageCursor);
+    LOG.debug("PageCursor previous : {}", prevPageCursor);
+    LOG.debug("PageCursor next ... : {}", nextPageCursor);
+    LOG.debug("Errors ............ : {}", errors);
   }
 }

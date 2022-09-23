@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
@@ -49,7 +49,6 @@ public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
           return new FrequencyBoardingEvent<>(
             patternForDates,
             tripTimes,
-            pattern.getTripPattern().getPattern(),
             stopPositionInPattern,
             departureTime - headway,
             headway,

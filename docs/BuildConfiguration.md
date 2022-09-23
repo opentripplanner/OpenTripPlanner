@@ -11,7 +11,9 @@ Sections follow that describe particular settings in more depth.
 | `banDiscouragedBiking`             | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"`                                                                                                                                                                                                  | boolean        | false                   |                                                                                           |
 | `blockBasedInterlining`            | Whether to automatically insert an in-seat transfer between two trips with the same block id.                                                                                                                                                                                    | boolean        | true                    | Consider using using [transfer types 4 and 5](https://github.com/google/transit/pull/303) |
 | `boardingLocationTags`             | The OSM tags to extract a stop's boarding location from.                                                                                                                                                                                                                         | list           | `["ref"]`               | [Detailed documentation](./BoardingLocations.md)                                          |
+| `buildReportDir`                   | Path to directory where the build issue report will be written.                                                                                                                                                                                                                  | uri            | null                    |                                                                                           |
 | `dataImportReport`                 | Generate nice HTML report of Graph errors/warnings                                                                                                                                                                                                                               | boolean        | false                   |                                                                                           |
+| `dem`                              | Configure access to elevation data.                                                                                                                                                                                                                                              | array          | null                    | see [DEM](#DEM)                                                                           |
 | `discardMinTransferTimes`          | Should minimum transfer times in GTFS files be discarded. This is useful eg. when the minimum transfer time is only set for ticketing purposes, but we want to calculate the transfers always from OSM data.                                                                     | boolean        | false                   |                                                                                           |
 | `distanceBetweenElevationSamples`  | TODO OTP2                                                                                                                                                                                                                                                                        | double         | 10                      |                                                                                           |
 | `elevationBucket`                  | If specified, download NED elevation tiles from the given AWS S3 bucket                                                                                                                                                                                                          | object         | null                    | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3              |
@@ -19,8 +21,11 @@ Sections follow that describe particular settings in more depth.
 | `embedRouterConfig`                | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire                                                                                                                                                                      | boolean        | true                    |                                                                                           |
 | `extraEdgesStopPlatformLink`       | add extra edges when linking a stop to a platform, to prevent detours along the platform edge                                                                                                                                                                                    | boolean        | false                   |                                                                                           |
 | `fares`                            | A specific fares service to use                                                                                                                                                                                                                                                  | object         | null                    | see [fares configuration](#fares-configuration)                                           |
+| `graph`                            | Path where the graph file will be written, overriding the default of `graph.obj` in the base directory. Note that currently this option will also affect where the server _reads_ the graph from.                                                                                | uri            | null                    |                                                                                           |
+| `gsCredentials`                    | Path to a Google Cloud credential file. Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`.                                                                                                                                             | uri            | null                    |                                                                                           |            
 | `islandWithStopsMaxSize`           | Pruning threshold for islands with stops. Any such island under this size will be pruned                                                                                                                                                                                         | int            | 5                       |                                                                                           |
 | `islandWithoutStopsMaxSize`        | Pruning threshold for islands without stops. Any such island under this size will be pruned                                                                                                                                                                                      | int            | 40                      |                                                                                           |
+| `localFileNamePatterns`            | Patterns used in determining the type of input files from their names.                                                                                                                                                                                                           | object         | null                    |                                                                                           |
 | `matchBusRoutesToStreets`          | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking                                                                                                                                                                                       | boolean        | false                   |                                                                                           |
 | `maxAreaNodes`                     | Visibility calculations for an area will not be done if there are more nodes than this limit                                                                                                                                                                                     | integer        | 500                     |                                                                                           |
 | `maxDataImportIssuesPerFile`       | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files                                                                                                                                                     | int            | 1,000                   |                                                                                           |
@@ -29,64 +34,128 @@ Sections follow that describe particular settings in more depth.
 | `maxStopToShapeSnapDistance`       | This field is used for mapping route's geometry shapes. It determines max distance between shape points and their stop sequence. If the mapper can not find any stops within this radius it will default to simple stop-to-stop geometry instead.                                | double         | 150                     | units: meters                                                                             |
 | `maxTransferDurationSeconds`       | Transfers up to this duration in seconds will be pre-calculated and included in the Graph                                                                                                                                                                                        | double         | 1800                    | units: seconds                                                                            |
 | `multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations.                                                                                                                                                                                            | boolean        | false                   | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations) |
+| `netexDefaults`                    | Default properties for NeTEx feeds.                                                                                                                                                                                                                                              | object         | null                    | see [NeTEx Defaults](#NeTEx-Defaults)                                                     |
+| `osm`                              | Configure access to OpenStreetMap data.                                                                                                                                                                                                                                          | array          | null                    | see [OSM](#OSM)                                                                           |
+| `osmDefaults`                      | Default properties for OpenStreetMap feeds.                                                                                                                                                                                                                                      | object         | null                    | see [OSM Defaults](#OSM-Defaults)                                                         |
 | `osmNaming`                        | A custom OSM namer to use                                                                                                                                                                                                                                                        | object         | null                    | see [custom naming](#custom-naming)                                                       |
-| `osmWayPropertySet`                | Custom OSM way properties                                                                                                                                                                                                                                                        | string         | `default`               | options: `default`, `finland`, `norway`, `uk`, `germany`                                  |
 | `platformEntriesLinking`           | Link unconnected entries to public transport platforms                                                                                                                                                                                                                           | boolean        | false                   |                                                                                           |
 | `readCachedElevations`             | If true, reads in pre-calculated elevation data.                                                                                                                                                                                                                                 | boolean        | true                    | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations) |
 | `staticBikeParkAndRide`            | Whether we should create bike P+R stations from OSM data                                                                                                                                                                                                                         | boolean        | false                   |                                                                                           |
 | `staticParkAndRide`                | Whether we should create car P+R stations from OSM data                                                                                                                                                                                                                          | boolean        | true                    |                                                                                           |
 | `streets`                          | Include street input files (OSM/PBF)                                                                                                                                                                                                                                             | boolean        | true                    |                                                                                           |
-| `storage`                          | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT.                                                                                                                                                                                                     | object         | null                    |                                                                                           |
+| `streetGraph`                      | Path to the input street-graph file.                                                                                                                                                                                                                                             | uri            | null                    |                                                                                           |
 | `subwayAccessTime`                 | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street                                                                                                                                                                            | double         | 2.0                     | units: minutes                                                                            |
-| `timeZone`                         | Time zone for the graph. This is used to store the timetables in the transit model, and to interpret times in incoming requests. This is required if the input data contains agencies with multiple timezones. If empty it will use the time zone shared by all of the agencies. | string         | null                    | The value can be given either as a zone id, or an UTC offset.                             |
+| `transitModelTimeZone`             | Time zone for the graph. This is used to store the timetables in the transit model, and to interpret times in incoming requests. This is required if the input data contains agencies with multiple timezones. If empty it will use the time zone shared by all of the agencies. | string         | null                    | The value can be given either as a zone id, or an UTC offset.                             |
 | `transferRequests`                 | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                                                                                                                                              | array          | `[ { modes: "WALK" } ]` |                                                                                           |
 | `transit`                          | Include all transit input files (GTFS) from scanned directory                                                                                                                                                                                                                    | boolean        | true                    |                                                                                           |
+| `transitFeeds`                     | Configure access to data transit data sources  (NeTEx, GTFS).                                                                                                                                                                                                                    | array          | null                    | see [Transit Feeds](#Transit-Feeds)                                                       | 
 | `transitServiceStart`              | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`.                                                 | date or period | &minus;P1Y              | _2020&#8209;01&#8209;01, &minus;P1M3D, &minus;P3W_                                        |
 | `transitServiceEnd`                | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build.                                                                                                                              | date or period | P3Y                     | _2022&#8209;12&#8209;31, P1Y6M10D, P12W_                                                  |
 | `writeCachedElevations`            | If true, writes the calculated elevation data.                                                                                                                                                                                                                                   | boolean        | false                   | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations) |
 
-This list of parameters in defined in
+This list of parameters in defined in 
 the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
 .
 
-## Storage
+## Transit Feeds
 
-The storage section of `build-config.json` allows you to override the default behavior of scanning
-for input files in the [base directory](Configuration.md#Base Directory) and writing output files (
-such as the graph and error reports) to that same directory. In OTP2 it is now possible to read and
-write data located outside the local filesystem (including cloud storage services) or at various
+The transitFeeds section of `build-config.json` allows you to override the default behavior of scanning
+for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
+located outside the local filesystem (including cloud storage services) or at various
+different locations around the local filesystem.  
+When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds section, auto-scanning in the base directory for this feed type will be disabled.
+
+| config key                | description                                                                                                                                         | value type      | value default |
+|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|---------------|
+| `type`                    | The type of transit data. Supported types are `netex` and `gtfs`.                                                                                   | string          | mandatory     |
+| `feedId`                  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                             | string          | `null`        |
+| `source`                  | The unique URI pointing to the data file.                                                                                                           | uri             | `null`        |
+| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.       | regexp pattern  | `null`        |
+| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults. | regexp pattern  | `null`        |
+| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.            | regexp pattern  | `null`        |
+| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.                          | regexp pattern  | `null`        |
+
+## NeTEx Defaults
+
+The netexDefaults section of `build-config.json` allows you to specify default properties for NeTEx files.
+
+| config key                | description                                                                                       | value type      | value default |
+|---------------------------|---------------------------------------------------------------------------------------------------|-----------------|---------------|
+| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type.       | regexp pattern  | `null`        |
+| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. | regexp pattern  | `null`        |
+| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type.            | regexp pattern  | `null`        |
+| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type.                          | regexp pattern  | `null`        |
+
+
+## OSM 
+
+The osm section of `build-config.json` allows you to override the default behavior of scanning
+for OpenStreetMap files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
+located outside the local filesystem (including cloud storage services) or at various
 different locations around the local filesystem.
 
-If your OTP instance is running on a cloud compute service, you may get significantly faster
-start-up and graph build times if you use the cloud storage directly instead of copying the files
-back and forth to cloud server instances. This also simplifies the deployment process.
+| config key       | description                                                                                                                                         | value type                                                     | value default |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------|
+| `source`         | The unique URI pointing to the data file.                                                                                                           | uri                                                            | mandatory     |
+| `timeZone`       | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                                               | The value can be given either as a zone id, or an UTC offset.  | `null`        |
+| `osmTagMapping`  | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults | string                                                         | `null`        |
 
-### Specifying Data Sources
+## OSM Defaults
 
-Here is a summary of the configuration keys that can be nested inside the`storage` property of the
-build-config JSON to specify input and output data sources:
+The osmDefaults section of `build-config.json` allows you to specify default properties for OpenStreetMap files. 
 
-| config key              | description                                                                                                                                                                                                | value type | value default |
-|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------------|
-| `gsCredentials`         | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`.                                                                                                               | string     | `null`        |
-| `graph`                 | Absolute path where the graph file will be written, overriding the default of `graph.obj` in the base directory. Note that currently this option will also affect where the server _reads_ the graph from. | uri        | `null`        |
-| `streetGraph`           | Absolute path to the input street-graph file.                                                                                                                                                              | uri        | `null`        |
-| `osm`                   | List of absolute paths of OpenStreetMap input files to read.                                                                                                                                               | uri []     | `null`        |
-| `dem`                   | List of absolute paths of Elevation DEM input files to read.                                                                                                                                               | uri []     | `null`        |
-| `gtfs`                  | List of GTFS transit data files to read.                                                                                                                                                                   | uri []     | `null`        |
-| `netex`                 | List of NeTEx transit data files to read.                                                                                                                                                                  | uri []     | `null`        |
-| `buildReportDir`        | Path to directory where the build issue report will be written.                                                                                                                                            | uri        | `null`        |
-| `localFileNamePatterns` | Patterns used in determining the type of input files from their names.                                                                                                                                     | object     | `null`        |
+| config key          | description                                                                                                                      | value type                                                     | value default |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------|
+| `timeZone`          | The timezone used to resolve opening hours in OSM data. If the parameter is not specified, the opening hours will not be parsed. | The value can be given either as a zone id, or an UTC offset.  | `null`        |
+| `osmTagMapping`     | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`                            | string                                                         | `default`     |
+
+## DEM
+
+The dem section of `build-config.json` allows you to override the default behavior of scanning
+for elevation files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
+located outside the local filesystem (including cloud storage services) or at various
+different locations around the local filesystem.
+
+| config key                 | description                                                                                                                                                                                                                                               | value type | value default |
+|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------------|
+| `source`                   | The unique URI pointing to the data file.                                                                                                                                                                                                                 | uri        | mandatory     |
+| `elevationUnitMultiplier`  | The multiplier applied to elevation values. Use 0.1 if values are given in decimeters. See [Elevation unit conversion](#elevation-unit-conversion). Overrides the value specified in `elevationUnitMultiplier` at the top-level of the configuration file | double     | 1.0           |
+
+## Specifying URIs
+
+As a general rule, references to data files are specified as absolute URIs and must start with the protocol name.   
+Example:   
+Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`   
+Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`
+
+Alternatively if a relative URI can be provided, it is interpreted as a path relative to the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+Example:   
+File relative to the base directory (inside the base directory): `streetGraph.obj`   
+File relative to the base directory (outside the base directory): `../street-graphs/streetGraph.obj`
+
+
+### Example With Multiple Data Sources
 
 For example, this configuration could be used to load GTFS and OSM inputs from Google Cloud Storage:
 
 ```JSON
 // build-config.json
 {
-  "storage": {
-      "osm": ["gs://bucket-name/streets.pbf"],
-      "gtfs": ["gs://bucket-name/transit1.zip", "gs://bucket-name/transit2.zip"]
-  }
+  "osm": [
+    {
+      "source": "gs://bucket-name/streets.pbf"
+    }
+  ],
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "gs://bucket-name/transit1.zip"
+    },
+    {
+      "type": "gtfs",
+      "source": "gs://bucket-name/transit2.zip"
+    }
+  ]
 }
 ```
 
@@ -104,14 +173,14 @@ array for a particular file type will ensure that no inputs of that type are loa
 local directory scanning.
 
 See the comments in the source code of
-class [StorageConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java)
+class [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
 for an up-to-date detailed description of each config parameter.
 
 ### Local Filename Patterns
 
 When scanning the base directory for inputs, each file's name is checked against patterns to detect
 what kind of file it is. These patterns can be overridden in the config, by nesting a
-`localFileNamePatterns` property inside the `storage` property (see example below). Here are the
+`localFileNamePatterns` property in the build configuration file. Here are the
 keys you can place inside `localFileNamePatterns`:
 
 | config key | description                                               | value type     | value default  |
@@ -127,20 +196,14 @@ seeking within files to guess what they are. Therefore, like all other file type
 detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
 Netex data is also often supplied in a ZIP file.
 
-### Storage example
+### Configuration example
 
 ```JSON
 // build-config.json 
 {
-  "storage": {
-    // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
-    "gsCredentials": "${GCS_SERVICE_CREDENTIALS}",
-    "streetGraph": "file:///Users/kelvin/otp/streetGraph.obj",
-    "osm": ["gs://bucket-name/shared-osm-file.pbf"],
-    "localFileNamePatterns": {
-      // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
-      "gtfs" : "^g-.*\\.zip$"
-    }
+  "localFileNamePatterns": {
+    // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
+    "gtfs" : "^g-.*\\.zip$"
   }
 }
 ```
@@ -193,32 +256,16 @@ Therefore there is currently no per-mode access time, it is subway-specific.
 Subway systems tend to exist in their own layer of the city separate from the surface, though there
 are exceptions where tracks lie right below the street and transfers happen via the surface. In
 systems where the subway is quite deep and transfers happen via tunnels, the time required for an
-in-station transfer is often less than that for a surface transfer. A proposal was made to provide
-detailed station pathways in GTFS but it is not in common use.
+in-station transfer is often less than that for a surface transfer.
 
 One way to resolve this problem is by ensuring that the GTFS feed codes each platform as a separate
 stop, then micro-mapping stations in OSM. When OSM data contains a detailed description of walkways,
 stairs, and platforms within a station, GTFS stops can be linked to the nearest platform and
 transfers will happen via the OSM ways, which should yield very realistic transfer time
 expectations. This works particularly well in above-ground train stations where the layering of
-non-intersecting ways is less prevalent. Here's an example in the Netherlands:
+non-intersecting ways is less prevalent. See [BoardingLocations](BoardingLocations.md) for more details.
 
-<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=4.70502644777298%2C52.01675028000761%2C4.7070810198783875%2C52.01813190694357&amp;layer=mapnik" style="border: 1px solid black"></iframe><small><a href="http://www.openstreetmap.org/#map=19/52.01744/4.70605">
-View Larger Map</a></small>
-When such micro-mapping data is not available, we need to rely on information from GTFS including
-how stops are grouped into stations and a table of transfer timings where available. During the
-graph build, OTP can create preferential connections between each pair of stops in the same station
-to favor in-station transfers:
-
-```JSON
-// build-config.json
-{
-  "stationTransfers": true
-}
-```
-
-Note that this method is at odds with micro-mapping and might make some transfers artificially
-short.
+An alternative approach is to use GTFS pathways to model entrances and platforms within stations.
 
 ## Elevation data
 
@@ -344,8 +391,13 @@ converts the elevation values from some other unit to metres.
 ```JSON
 // build-config.json
 {
-  // Correct conversation multiplier when source data uses decimetres instead of metres
-  "elevationUnitMultiplier": 0.1
+  "dem": [
+    {
+      "source": "gs://otp-test-bucket/a/b/northpole.dem.tif",
+      // Correct conversion multiplier when source data uses decimetres instead of metres
+      "elevationUnitMultiplier": 0.1
+    }
+  ]
 }
 ```
 
@@ -496,23 +548,25 @@ The current list of `combinationStrategy` is:
 It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part
 of the routing graph.
 
-### Way property sets
+### OSM tag mapping
 
 OSM tags have different meanings in different countries, and how the roads in a particular country
-or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly)
+or region are tagged affects routing. As an example roads tagged with `highway=trunk are (mainly)
 walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to
 snap stops to these roads, or by giving you poor routing results for walking and biking. You can
 adjust which road types that are accessible by foot, car & bicycle as well as speed limits,
-suitability for biking and walking.
+suitability for biking and walking. It's possible to define "safety" values for cycling and walking which are used in routing.
 
-There are currently following wayPropertySets defined;
+There are currently following OSM tag mapping defined;
 
 - `default` which is based on California/US mapping standard
 - `finland` which is adjusted to rules and speeds in Finland
 - `norway` which is adjusted to rules and speeds in Norway
 - `uk` which is adjusted to rules and speed in the UK
+- `germany` which is adjusted to rules and speed in Germany
+- `atlanta` which is adjusted to rules in Atlanta
 
-To add your own custom property set have a look
+To add your own OSM tag mapping have a look
 at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
 and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly
 rely on the default rules, make sure you add your own rules first before applying the default ones.
@@ -521,7 +575,12 @@ The mechanism is that for any two identical tags, OTP will use the first one.
 ```JSON
 // build-config.json
 {
-  "osmWayPropertySet": "norway"
+  "osm": [
+    {
+      "source": "gs://marduk-dev/osm/oslo_norway.osm-160816.pbf",
+      "osmTagMapping": "norway"
+    }
+    ]
 }
 ```
 

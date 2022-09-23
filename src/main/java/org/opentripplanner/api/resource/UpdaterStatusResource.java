@@ -7,7 +7,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -18,10 +18,10 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
 
   public UpdaterStatusResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760

@@ -3,6 +3,8 @@ package org.opentripplanner.ext.siri.updater;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
@@ -16,6 +18,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
   private static final Logger LOG = LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
 
   private static final long RETRY_INTERVAL_MILLIS = 5000;
+  private static final Map<String, String> requestHeaders = new HashMap<>();
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
@@ -47,6 +50,8 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     if (timeoutSec > 0) {
       this.timeout = 1000 * timeoutSec;
     }
+
+    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-VM"));
   }
 
   @Override
@@ -62,7 +67,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
 
-      InputStream is = SiriHttpUtils.postData(url, vmServiceRequest, timeout);
+      InputStream is = SiriHttpUtils.postData(url, vmServiceRequest, timeout, requestHeaders);
       if (is != null) {
         // Decode message
         fetching = System.currentTimeMillis() - t1;
@@ -80,7 +85,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
       }
     } catch (IOException | JAXBException | XMLStreamException e) {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
-      LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
+      LOG.warn("Failed to parse SIRI-VM feed from {}", url, e);
 
       final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
 

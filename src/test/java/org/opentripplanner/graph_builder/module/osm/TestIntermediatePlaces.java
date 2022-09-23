@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR;
+import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,11 +23,10 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -59,7 +60,7 @@ public class TestIntermediatePlaces {
       TransitModel transitModel = model.transitModel();
       FakeGraph.addPerpendicularRoutes(graph, transitModel);
       FakeGraph.link(graph, transitModel);
-      graph.index();
+      model.index();
       TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
       timeZone = transitModel.getTimeZone();
 
@@ -85,14 +86,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.WALK),
+      RequestModes.of().clearTransitModes().build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.WALK),
+      RequestModes.of().clearTransitModes().build(),
       true
     );
   }
@@ -108,14 +109,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.WALK),
+      RequestModes.of().clearTransitModes().build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.WALK),
+      RequestModes.of().clearTransitModes().build(),
       true
     );
   }
@@ -133,14 +134,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.CAR),
+      RequestModes.of().withDirectMode(CAR).clearTransitModes().build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.CAR),
+      RequestModes.of().withDirectMode(CAR).clearTransitModes().build(),
       true
     );
   }
@@ -155,14 +156,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK),
+      RequestModes.defaultRequestModes(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK),
+      RequestModes.defaultRequestModes(),
       true
     );
   }
@@ -177,14 +178,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT),
+      RequestModes.of().withDirectMode(NOT_SET).build(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT),
+      RequestModes.of().withDirectMode(NOT_SET).build(),
       true
     );
   }
@@ -199,14 +200,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK),
+      RequestModes.defaultRequestModes(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK),
+      RequestModes.defaultRequestModes(),
       true
     );
   }
@@ -223,14 +224,14 @@ public class TestIntermediatePlaces {
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK),
+      RequestModes.defaultRequestModes(),
       false
     );
     handleRequest(
       fromLocation,
       toLocation,
       intermediateLocations,
-      new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK),
+      RequestModes.defaultRequestModes(),
       true
     );
   }
@@ -239,16 +240,18 @@ public class TestIntermediatePlaces {
     GenericLocation from,
     GenericLocation to,
     GenericLocation[] via,
-    TraverseModeSet modes,
+    RequestModes modes,
     boolean arriveBy
   ) {
-    RoutingRequest request = new RoutingRequest(modes);
+    RouteRequest request = new RouteRequest();
+    request.journey().setModes(modes);
     request.setDateTime("2016-04-20", "13:00", timeZone);
     request.setArriveBy(arriveBy);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
     for (GenericLocation intermediateLocation : via) {
-      request.addIntermediatePlace(intermediateLocation);
+      // TODO VIA - Replace with a RouteViaRequest
+      //options.addIntermediatePlace(intermediateLocation);
     }
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, request)) {
       var routingContext = new RoutingContext(request, graph, temporaryVertices);
@@ -266,8 +269,8 @@ public class TestIntermediatePlaces {
         assertTrue(via.length < itinerary.getLegs().size());
         validateLegsTemporally(request, itinerary);
         validateLegsSpatially(plan, itinerary);
-        if (modes.contains(TraverseMode.TRANSIT)) {
-          assertTrue(itinerary.getTransitTimeSeconds() > 0);
+        if (!modes.transitModes.isEmpty()) {
+          assertTrue(itinerary.getTransitDuration().toSeconds() > 0);
         }
       }
     }
@@ -304,14 +307,14 @@ public class TestIntermediatePlaces {
   }
 
   // Check that the start time and end time of each leg are consistent
-  private void validateLegsTemporally(RoutingRequest request, Itinerary itinerary) {
+  private void validateLegsTemporally(RouteRequest request, Itinerary itinerary) {
     Instant departTime;
     Instant arriveTime;
-    if (request.arriveBy) {
+    if (request.arriveBy()) {
       departTime = itinerary.getLegs().get(0).getStartTime().toInstant();
-      arriveTime = request.getDateTime();
+      arriveTime = request.dateTime();
     } else {
-      departTime = request.getDateTime();
+      departTime = request.dateTime();
       arriveTime = itinerary.getLegs().get(itinerary.getLegs().size() - 1).getEndTime().toInstant();
     }
     long sumOfDuration = 0;
@@ -320,15 +323,15 @@ public class TestIntermediatePlaces {
       assertFalse(leg.getStartTime().isAfter(leg.getEndTime()));
 
       departTime = leg.getEndTime().toInstant();
-      sumOfDuration += leg.getDuration();
+      sumOfDuration += leg.getDuration().toSeconds();
     }
-    sumOfDuration += itinerary.getWaitingTimeSeconds();
+    sumOfDuration += itinerary.getWaitingDuration().toSeconds();
 
     assertFalse(departTime.isAfter(arriveTime));
 
     // Check the total duration of the legs,
     int accuracy = itinerary.getLegs().size(); // allow 1 second per leg for rounding errors
-    assertEquals(sumOfDuration, itinerary.getDurationSeconds(), accuracy);
+    assertEquals(sumOfDuration, itinerary.getDuration().toSeconds(), accuracy);
   }
 
   private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

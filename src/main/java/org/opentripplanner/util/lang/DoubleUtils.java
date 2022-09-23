@@ -7,17 +7,10 @@ import javax.annotation.Nullable;
 public class DoubleUtils {
 
   /**
-   * Useful for coordinates, round of to ~ 1 cm.
+   * Round to a decimal number with 1 digits precision
    */
-  public static Double roundTo7Decimals(@Nullable Double value) {
-    return value == null ? null : roundTo7Decimals(value.doubleValue());
-  }
-
-  /**
-   * Useful for coordinates, round of to ~ 1 cm.
-   */
-  public static double roundTo7Decimals(double value) {
-    return roundToNDecimals(value, 7);
+  public static double roundTo1Decimal(double value) {
+    return roundToNDecimals(value, 1);
   }
 
   /**
@@ -34,10 +27,41 @@ public class DoubleUtils {
     return roundToNDecimals(value, 2);
   }
 
+  /**
+   * Round to a decimal number with 3 digits precision
+   */
+  public static double roundTo3Decimals(double value) {
+    return roundToNDecimals(value, 3);
+  }
+
+  /**
+   * Useful for coordinates, round of to ~ 1 cm.
+   */
+  public static Double roundTo7Decimals(@Nullable Double value) {
+    return value == null ? null : roundTo7Decimals(value.doubleValue());
+  }
+
+  /**
+   * Useful for coordinates, round of to ~ 1 cm.
+   */
+  public static double roundTo7Decimals(double value) {
+    return roundToNDecimals(value, 7);
+  }
+
   public static double roundToNDecimals(double value, int places) {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;
     }
     return BigDecimal.valueOf(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
+  }
+
+  /**
+   * Compare two doubles for equality - this is equivalent of
+   * <pre>
+   * Double.compare(a, b) == 0
+   * </pre>
+   */
+  public static boolean doubleEquals(double a, double b) {
+    return Double.compare(a, b) == 0;
   }
 }

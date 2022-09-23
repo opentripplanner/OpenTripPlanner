@@ -1,11 +1,13 @@
 package org.opentripplanner.model.plan;
 
+import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.SERVICE_DAY;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
@@ -47,9 +49,9 @@ public class LegTest implements PlanTestConstants {
 
   @Test
   public void getDuration() {
-    assertEquals(120, WALK_LEG.getDuration());
-    assertEquals(600, BUS_LEG.getDuration());
-    assertEquals(240, BICYCLE_LEG.getDuration());
+    assertEquals(ofMinutes(2), WALK_LEG.getDuration());
+    assertEquals(ofMinutes(10), BUS_LEG.getDuration());
+    assertEquals(ofMinutes(4), BICYCLE_LEG.getDuration());
   }
 
   @Test

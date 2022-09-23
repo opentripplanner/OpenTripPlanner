@@ -11,6 +11,8 @@ import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
@@ -21,11 +23,11 @@ import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class QuayType {
@@ -132,7 +134,7 @@ public class QuayType {
           .dataFetcher(environment ->
             Objects.requireNonNullElse(
               (((StopLocation) environment.getSource()).getWheelchairAccessibility()),
-              WheelchairAccessibility.NO_INFORMATION
+              Accessibility.NO_INFORMATION
             )
           )
           .build()
@@ -288,21 +290,21 @@ public class QuayType {
             Integer departuresPerLineAndDestinationDisplay = environment.getArgument(
               "numberOfDeparturesPerLineAndDestinationDisplay"
             );
-            int timeRange = environment.getArgument("timeRange");
-            Stop stop = environment.getSource();
+            Integer timeRangeInput = environment.getArgument("timeRange");
+            Duration timeRange = Duration.ofSeconds(timeRangeInput.longValue());
+            RegularStop stop = environment.getSource();
 
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            Long startTimeMs = environment.getArgument("startTime") == null
-              ? 0L
-              : environment.getArgument("startTime");
-            Long startTimeSeconds = startTimeMs / 1000;
+            Instant startTime = environment.containsArgument("startTime")
+              ? Instant.ofEpochMilli(environment.getArgument("startTime"))
+              : Instant.now();
 
             return StopPlaceType
               .getTripTimesForStop(
                 stop,
-                startTimeSeconds,
+                startTime,
                 timeRange,
                 arrivalDeparture,
                 includeCancelledTrips,

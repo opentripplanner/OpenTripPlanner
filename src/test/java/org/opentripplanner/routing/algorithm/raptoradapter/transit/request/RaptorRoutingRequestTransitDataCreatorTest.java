@@ -11,16 +11,16 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.ServiceDateUtils;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
@@ -28,12 +28,6 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
   public static final FeedScopedId TP_ID_3 = id("3");
-
-  private static final TripPattern TP = new TripPattern(
-    id("P1"),
-    TransitModelForTest.route("1").withMode(TransitMode.BUS).build(),
-    new StopPattern(List.of(createStopTime(), createStopTime()))
-  );
 
   @Test
   public void testMergeTripPatterns() {
@@ -48,12 +42,10 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
 
     List<TripTimes> tripTimes = List.of(createTripTimesForTest());
 
-    int[] stopIndexes = new int[] { 0, 1 };
-
     // Total available trip patterns
-    TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1, stopIndexes, TP);
-    TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2, stopIndexes, TP);
-    TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3, stopIndexes, TP);
+    RoutingTripPattern tripPattern1 = createTripPattern(TP_ID_1);
+    RoutingTripPattern tripPattern2 = createTripPattern(TP_ID_2);
+    RoutingTripPattern tripPattern3 = createTripPattern(TP_ID_3);
 
     List<TripPatternForDate> tripPatternsForDates = new ArrayList<>();
 
@@ -78,9 +70,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     );
 
     // Get the results
-    var r1 = findTripPatternForDate(TP_ID_1, combinedTripPatterns);
-    var r2 = findTripPatternForDate(TP_ID_2, combinedTripPatterns);
-    var r3 = findTripPatternForDate(TP_ID_3, combinedTripPatterns);
+    var r1 = findTripPatternForDate(tripPattern1.patternIndex(), combinedTripPatterns);
+    var r2 = findTripPatternForDate(tripPattern2.patternIndex(), combinedTripPatterns);
+    var r3 = findTripPatternForDate(tripPattern3.patternIndex(), combinedTripPatterns);
 
     // Check the number of trip schedules available for each pattern after combining dates in the search range
     assertEquals(2, r1.numberOfTripSchedules());
@@ -95,12 +87,12 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   }
 
   private static TripPatternForDates findTripPatternForDate(
-    FeedScopedId patternId,
+    int patternIndex,
     List<TripPatternForDates> list
   ) {
     return list
       .stream()
-      .filter(p -> patternId.equals(p.getTripPattern().getId()))
+      .filter(p -> patternIndex == p.getTripPattern().patternIndex())
       .findFirst()
       .orElseThrow();
   }
@@ -130,6 +122,15 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     return st;
   }
 
+  private static RoutingTripPattern createTripPattern(FeedScopedId id) {
+    return TripPattern
+      .of(id)
+      .withRoute(TransitModelForTest.route("1").withMode(TransitMode.BUS).build())
+      .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
+      .build()
+      .getRoutingTripPattern();
+  }
+
   /**
    * Utility class that does nothing, used just to avoid null value on filter
    */
@@ -146,10 +147,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     }
 
     @Override
-    public BitSet filterAvailableStops(
-      TripPatternWithRaptorStopIndexes tripPattern,
-      BitSet boardingPossible
-    ) {
+    public BitSet filterAvailableStops(RoutingTripPattern tripPattern, BitSet boardingPossible) {
       return boardingPossible;
     }
   }

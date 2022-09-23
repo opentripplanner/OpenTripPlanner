@@ -72,6 +72,12 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
   }
 
   @Override
+  public double elevationUnitMultiplier() {
+    // NED elevation is provided in decimal meter
+    return 1;
+  }
+
+  @Override
   public void checkInputs() {
     /* Attempt to create cache directory if it doesn't exist. */
     if (!cacheDirectory.exists()) {

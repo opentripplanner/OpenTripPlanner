@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -78,7 +78,7 @@ public class ApiItinerary {
   /**
    * The cost of this trip
    */
-  public ApiFare fare = new ApiFare(Map.of(), Map.of());
+  public ApiItineraryFares fare = new ApiItineraryFares(Map.of(), Map.of(), null, null);
 
   /**
    * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit
@@ -105,7 +105,7 @@ public class ApiItinerary {
   public boolean tooSloped = false;
 
   /**
-   * If {@link org.opentripplanner.routing.api.request.RoutingRequest#allowKeepingRentedVehicleAtDestination}
+   * If {@link RouteRequest#allowArrivingInRentalVehicleAtDestination}
    * is set than it is possible to end a trip without dropping off the rented bicycle.
    */
   public boolean arrivedAtDestinationWithRentedBicycle = false;

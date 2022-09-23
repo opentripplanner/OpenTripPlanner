@@ -11,9 +11,9 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.distance.DistanceOp;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge
@@ -22,8 +22,6 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
  * @author novalis
  */
 public class AreaEdgeList implements Serializable {
-
-  private static final long serialVersionUID = 969137349467214074L;
 
   public final HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
 
@@ -119,7 +117,7 @@ public class AreaEdgeList implements Serializable {
         intersects.add(area);
       }
     }
-    if (intersects.size() > 0) {
+    if (!intersects.isEmpty()) {
       // If more than one area intersects, we pick one by random for the name & properties
       NamedArea area = intersects.get(0);
 

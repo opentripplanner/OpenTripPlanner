@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -188,6 +189,10 @@ public class NodeAdapter {
     return param(paramName).asText(defaultValue);
   }
 
+  public String asText() {
+    return json.asText();
+  }
+
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
     if (!exist(paramName)) return defaultValue;
     return new HashSet<>(arrayAsList(paramName, JsonNode::asText));
@@ -324,6 +329,10 @@ public class NodeAdapter {
     return ids;
   }
 
+  public List<FeedScopedId> asFeedScopedIdList(String paramName, List<FeedScopedId> defaultValues) {
+    return List.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
+  }
+
   public Locale asLocale(String paramName, Locale defaultValue) {
     if (!exist(paramName)) {
       return defaultValue;
@@ -383,6 +392,27 @@ public class NodeAdapter {
     return DurationUtils.duration(param(paramName).asText());
   }
 
+  /**
+   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
+   * This version can be used to be backwards compatible when moving from an integer value
+   * to a duration.
+   */
+  public Duration asDuration2(String paramName, Duration defaultValue, ChronoUnit unit) {
+    return exist(paramName)
+      ? DurationUtils.duration(param(paramName).asText(), unit)
+      : defaultValue;
+  }
+
+  /**
+   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
+   * This version can be used to be backwards compatible when moving from an integer value
+   * to a duration.
+   */
+  public Duration asDuration2(String paramName, ChronoUnit unit) {
+    assertRequiredFieldExist(paramName);
+    return DurationUtils.duration(param(paramName).asText(), unit);
+  }
+
   public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
     JsonNode array = param(paramName);
 
@@ -399,7 +429,11 @@ public class NodeAdapter {
   }
 
   public Pattern asPattern(String paramName, String defaultValue) {
-    return Pattern.compile(asText(paramName, defaultValue));
+    String regex = asText(paramName, defaultValue);
+    if (regex == null) {
+      return null;
+    }
+    return Pattern.compile(regex);
   }
 
   public List<URI> asUris(String paramName) {

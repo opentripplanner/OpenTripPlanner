@@ -7,10 +7,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TripPatternTest {
 
@@ -45,11 +47,16 @@ public class TripPatternTest {
       .build();
     var coordinate = new Coordinate(0.5, 0.5);
 
-    var originalTripPattern = setupTripPattern(stopOrigin, stopDestination);
-    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination);
-
     // Add coordinate between stops on original trip pattern
-    originalTripPattern.setHopGeometries(getLineStrings(stopOrigin, stopDestination, coordinate));
+    var originalTripPattern = setupTripPattern(
+      stopOrigin,
+      stopDestination,
+      null,
+      getLineStrings(stopOrigin, stopDestination, coordinate)
+    );
+
+    // Test without setting original trip pattern
+    var newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, null, null);
 
     var originalCoordinates = originalTripPattern.getHopGeometry(0).getCoordinates().length;
     var coordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
@@ -61,8 +68,8 @@ public class TripPatternTest {
     );
     assertEquals(2, coordinates, "The coordinates for tripPattern on first hop should be 2");
 
-    // Add geometry from planned data
-    newTripPattern.setHopGeometriesFromPattern(originalTripPattern);
+    // Test with setting original trip pattern
+    newTripPattern = setupTripPattern(stopNewOrigin, stopDestination, originalTripPattern, null);
 
     var finalCoordinates = newTripPattern.getHopGeometry(0).getCoordinates().length;
 
@@ -75,19 +82,35 @@ public class TripPatternTest {
 
   /**
    * Create TripPattern between to stops
-   * @param origin Start stop
+   *
+   * @param origin      Start stop
    * @param destination End stop
    * @return TripPattern with stopPattern
    */
-  public TripPattern setupTripPattern(Stop origin, Stop destination) {
+  public TripPattern setupTripPattern(
+    RegularStop origin,
+    RegularStop destination,
+    TripPattern originalTripPattern,
+    List<LineString> geometry
+  ) {
     var builder = StopPattern.create(2);
     builder.stops[0] = origin;
     builder.stops[1] = destination;
+    for (int i = 0; i < 2; i++) {
+      builder.pickups[i] = PickDrop.SCHEDULED;
+      builder.dropoffs[i] = PickDrop.SCHEDULED;
+    }
 
     var stopPattern = builder.build();
     var route = TransitModelForTest.route("R1").build();
 
-    return new TripPattern(new FeedScopedId("Test", "T1"), route, stopPattern);
+    return TripPattern
+      .of(new FeedScopedId("Test", "T1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .withOriginalTripPattern(originalTripPattern)
+      .withHopGeometries(geometry)
+      .build();
   }
 
   /**
@@ -97,7 +120,11 @@ public class TripPatternTest {
    * @param coordinate Coordinate to inject between stops
    * @return LineString with all coordinates
    */
-  private LineString[] getLineStrings(Stop origin, Stop destination, Coordinate coordinate) {
+  private List<LineString> getLineStrings(
+    RegularStop origin,
+    RegularStop destination,
+    Coordinate coordinate
+  ) {
     var coordinates = new ArrayList<Coordinate>();
     // Add start and stop first and last
     coordinates.add(new Coordinate(origin.getLon(), origin.getLat()));
@@ -108,6 +135,6 @@ public class TripPatternTest {
       .getGeometryFactory()
       .createLineString(coordinates.toArray(Coordinate[]::new));
 
-    return List.of(l1).toArray(LineString[]::new);
+    return List.of(l1);
   }
 }

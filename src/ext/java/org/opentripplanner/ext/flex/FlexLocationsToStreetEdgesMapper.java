@@ -1,17 +1,16 @@
 package org.opentripplanner.ext.flex;
 
-import java.util.HashMap;
 import java.util.HashSet;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.transit.model.site.FlexStopLocation;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,33 +19,38 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexLocationsToStreetEdgesMapper.class);
 
+  private final Graph graph;
+  private final TransitModel transitModel;
+
+  @Inject
+  public FlexLocationsToStreetEdgesMapper(Graph graph, TransitModel transitModel) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+  }
+
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
-    if (!transitModel.getStopModel().hasFlexLocations()) {
+  @SuppressWarnings("Convert2MethodRef")
+  public void buildGraph() {
+    if (!transitModel.getStopModel().hasAreaStops()) {
       return;
     }
 
-    StreetVertexIndex streetIndex = graph.getStreetIndex();
+    StreetVertexIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
 
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      transitModel.getStopModel().getAllFlexLocations().size()
+      transitModel.getStopModel().listAreaStops().size()
     );
 
     LOG.info(progress.startMessage());
     // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
-    for (FlexStopLocation flexStopLocation : transitModel.getStopModel().getAllFlexLocations()) {
+    for (AreaStop areaStop : transitModel.getStopModel().listAreaStops()) {
       for (Vertex vertx : streetIndex.getVerticesForEnvelope(
-        flexStopLocation.getGeometry().getEnvelopeInternal()
+        areaStop.getGeometry().getEnvelopeInternal()
       )) {
         // Check that the vertex is connected to both driveable and walkable edges
-        if (!(vertx instanceof StreetVertex)) {
+        if (!(vertx instanceof StreetVertex streetVertex)) {
           continue;
         }
         if (!((StreetVertex) vertx).isEligibleForCarPickupDropoff()) {
@@ -55,17 +59,15 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
 
         // The street index overselects, so need to check for exact geometry inclusion
         Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
-        if (flexStopLocation.getGeometry().disjoint(p)) {
+        if (areaStop.getGeometry().disjoint(p)) {
           continue;
         }
 
-        StreetVertex streetVertex = (StreetVertex) vertx;
-
-        if (streetVertex.flexStopLocations == null) {
-          streetVertex.flexStopLocations = new HashSet<>();
+        if (streetVertex.areaStops == null) {
+          streetVertex.areaStops = new HashSet<>();
         }
 
-        streetVertex.flexStopLocations.add(flexStopLocation);
+        streetVertex.areaStops.add(areaStop);
       }
       // Keep lambda! A method-ref would cause incorrect class and line number to be logged
       progress.step(m -> LOG.info(m));
