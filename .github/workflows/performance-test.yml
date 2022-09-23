@@ -3,7 +3,7 @@ name: Performance test
 on:
   push:
     branches:
-      - dev-2.x
+      - otp2_test_large_memory_pages
 
 jobs:
   perf-test:
@@ -87,7 +87,7 @@ jobs:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           MEASUREMENT_ENVIRONMENT: CI
           SPEEDTEST_LOCATION: ${{ matrix.location }}
-          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
+          MAVEN_OPTS: "-Xmx50g -XX:+UseTransparentHugePages -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
         run: |
           mv graph/graph.obj test/performance/${{ matrix.location }}
           mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
