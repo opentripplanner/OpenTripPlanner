@@ -26,4 +26,11 @@ public class StringUtils {
     }
     return value;
   }
+
+  public static StringBuilder pad(StringBuilder buf, char ch, int newLenght) {
+    while (buf.length() < newLenght) {
+      buf.append(ch);
+    }
+    return buf;
+  }
 }
