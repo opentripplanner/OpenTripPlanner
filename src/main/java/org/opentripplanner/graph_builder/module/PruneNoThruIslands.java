@@ -1,9 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,11 +14,11 @@ import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.GraphIsland;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
 import org.opentripplanner.graph_builder.issues.PrunedIslandStop;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.graph_builder.linking.VertexLinker;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -38,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * this module is part of the  {@link org.opentripplanner.graph_builder.services.GraphBuilderModule}
+ * this module is part of the  {@link GraphBuilderModule}
  * process. It extends the functionality of PruneFloatingIslands by considering also through traffic
  * limitations. It is quite common that no thru edges break connectivity of the graph, creating
  * islands. The quality of the graph can be improved by converting such islands to nothru state so
@@ -49,6 +47,9 @@ public class PruneNoThruIslands implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(PruneNoThruIslands.class);
 
   private static final int islandCounter = 0;
+  private final Graph graph;
+  private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
   private final StreetLinkerModule streetLinkerModule;
   /**
    * this field indicate the maximum size for island without stops island under this size will be
@@ -61,33 +62,27 @@ public class PruneNoThruIslands implements GraphBuilderModule {
    */
   private int pruningThresholdIslandWithStops;
 
-  public PruneNoThruIslands(StreetLinkerModule streetLinkerModule) {
+  public PruneNoThruIslands(
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
+    StreetLinkerModule streetLinkerModule
+  ) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
     this.streetLinkerModule = streetLinkerModule;
   }
 
-  public List<String> provides() {
-    return Collections.emptyList();
-  }
-
-  public List<String> getPrerequisites() {
-    // this module can run after the street module only but if
-    //  the street linker did not run then it couldn't identifies island with stops.
-    //  so if the need is to distinguish between island with stops or without stops
-    //  as explained before this module should run after the streets and the linker modules.
-    return Arrays.asList("streets");
-  }
-
   @Override
-  public void buildGraph(
-    Graph graph,
-    TransitModel transitModel,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     LOG.info("Pruning islands and areas isolated by nothru edges in street network");
+
+    var vertexLinker = graph.getLinkerSafe(transitModel.getStopModel());
 
     pruneNoThruIslands(
       graph,
+      vertexLinker,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -95,6 +90,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     );
     pruneNoThruIslands(
       graph,
+      vertexLinker,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -102,6 +98,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     );
     pruneNoThruIslands(
       graph,
+      vertexLinker,
       pruningThresholdIslandWithoutStops,
       pruningThresholdIslandWithStops,
       issueStore,
@@ -158,6 +155,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static void pruneNoThruIslands(
     Graph graph,
+    VertexLinker vertexLinker,
     int maxIslandSize,
     int islandWithStopMaxSize,
     DataImportIssueStore issueStore,
@@ -190,6 +188,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     /* collect unreachable edges to a map */
     processIslands(
       graph,
+      vertexLinker,
       islands,
       isolated,
       true,
@@ -217,6 +216,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     count =
       processIslands(
         graph,
+        vertexLinker,
         islands,
         isolated,
         false,
@@ -230,6 +230,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static int processIslands(
     Graph graph,
+    VertexLinker vertexLinker,
     ArrayList<Subgraph> islands,
     Map<Edge, Boolean> isolated,
     boolean markIsolated,
@@ -254,7 +255,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
         //for islands with stops
         islandsWithStops++;
         if (island.streetSize() < islandWithStopMaxSize) {
-          restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode, issueStore);
+          restrictOrRemove(
+            graph,
+            vertexLinker,
+            island,
+            isolated,
+            stats,
+            markIsolated,
+            traverseMode,
+            issueStore
+          );
           changed = true;
           islandsWithStopsChanged++;
           count++;
@@ -262,7 +272,16 @@ public class PruneNoThruIslands implements GraphBuilderModule {
       } else {
         //for islands without stops
         if (island.streetSize() < maxIslandSize) {
-          restrictOrRemove(graph, island, isolated, stats, markIsolated, traverseMode, issueStore);
+          restrictOrRemove(
+            graph,
+            vertexLinker,
+            island,
+            isolated,
+            stats,
+            markIsolated,
+            traverseMode,
+            issueStore
+          );
           changed = true;
           count++;
         }
@@ -297,7 +316,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
     TraverseMode traverseMode,
     boolean shouldMatchNoThruType
   ) {
-    RoutingRequest options = new RoutingRequest(new TraverseModeSet(traverseMode));
+    RouteRequest options = new RouteRequest(traverseMode);
 
     for (Vertex gv : graph.getVertices()) {
       if (!(gv instanceof StreetVertex)) {
@@ -386,6 +405,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
 
   private static void restrictOrRemove(
     Graph graph,
+    VertexLinker vertexLinker,
     Subgraph island,
     Map<Edge, Boolean> isolated,
     Map<String, Integer> stats,
@@ -426,7 +446,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
               }
               if (permission == StreetTraversalPermission.NONE) {
                 // currently we must update spatial index manually, graph.removeEdge does not do that
-                graph.getLinker().removePermanentEdgeFromIndex(pse);
+                vertexLinker.removePermanentEdgeFromIndex(pse);
                 graph.removeEdge(pse);
                 stats.put("removed", stats.get("removed") + 1);
               } else {

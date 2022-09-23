@@ -1,6 +1,8 @@
 package org.opentripplanner.index;
 
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.AlertMapper;
 import org.opentripplanner.api.mapping.FeedInfoMapper;
@@ -45,15 +49,16 @@ import org.opentripplanner.api.model.ApiTransfer;
 import org.opentripplanner.api.model.ApiTrip;
 import org.opentripplanner.api.model.ApiTripShort;
 import org.opentripplanner.api.model.ApiTripTimeShort;
+import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.model.StopTimesInPattern;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.standalone.api.OtpServerContext;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -70,14 +75,14 @@ public class IndexAPI {
 
   private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
 
   /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
   @Context
   UriInfo uriInfo;
 
   public IndexAPI(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -183,7 +188,7 @@ public class IndexAPI {
   ) {
     /* When no parameters are supplied, return all stops. */
     if (uriInfo.getQueryParameters().isEmpty()) {
-      return StopMapper.mapToApiShort(transitService().getAllStops());
+      return StopMapper.mapToApiShort(transitService().listStopLocations());
     }
 
     /* If any of the circle parameters are specified, expect a circle not a box. */
@@ -197,10 +202,10 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return routingService()
-        .getStopsInRadius(new WgsCoordinate(lat, lon), radius)
+      return new DirectGraphFinder(serverContext.transitService()::findRegularStop)
+        .findClosestStops(lat, lon, radius)
         .stream()
-        .map(it -> StopMapper.mapToApiShort(it.first, it.second.intValue()))
+        .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))
         .collect(Collectors.toList());
     } else {
       /* We're not circle mode, we must be in box mode. */
@@ -212,8 +217,18 @@ public class IndexAPI {
         .lessThan("minLat", minLat, "maxLat", maxLat)
         .lessThan("minLon", minLon, "maxLon", maxLon)
         .validate();
-      var stops = routingService().getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
-      return StopMapper.mapToApiShort(stops);
+
+      Envelope envelope = new Envelope(
+        new Coordinate(minLon, minLat),
+        new Coordinate(maxLon, maxLat)
+      );
+
+      var stops = transitService().findRegularStop(envelope);
+      return stops
+        .stream()
+        .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
+        .map(StopMapper::mapToApiShort)
+        .toList();
     }
   }
 
@@ -244,7 +259,7 @@ public class IndexAPI {
    * Return upcoming vehicle arrival/departure times at the given stop.
    *
    * @param stopIdString       Stop ID in Agency:Stop ID format
-   * @param startTime          Start time for the search. Seconds from UNIX epoch
+   * @param startTimeSeconds          Start time for the search. Seconds from UNIX epoch
    * @param timeRange          Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    */
@@ -252,16 +267,20 @@ public class IndexAPI {
   @Path("/stops/{stopId}/stoptimes")
   public Collection<ApiStopTimesInPattern> getStopTimesForStop(
     @PathParam("stopId") String stopIdString,
-    @QueryParam("startTime") long startTime,
+    @QueryParam("startTime") long startTimeSeconds,
     @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
     @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
     @QueryParam("omitNonPickups") boolean omitNonPickups
   ) {
+    Instant startTime = startTimeSeconds == 0
+      ? Instant.now()
+      : Instant.ofEpochSecond(startTimeSeconds);
+
     return transitService()
       .stopTimesForStop(
         stop(stopIdString),
         startTime,
-        timeRange,
+        Duration.ofSeconds(timeRange),
         numberOfDepartures,
         omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
         false
@@ -417,7 +436,7 @@ public class IndexAPI {
   @Path("/trips/{tripId}/semanticHash")
   public String getSemanticHashForTrip(@PathParam("tripId") String tripId) {
     var trip = trip(tripId);
-    return tripPattern(trip).semanticHashString(trip);
+    return SemanticHash.forTripPattern(tripPattern(trip), trip);
   }
 
   @GET
@@ -483,7 +502,7 @@ public class IndexAPI {
   @Path("/patterns/{patternId}/semanticHash")
   public String getSemanticHashForPattern(@PathParam("patternId") String patternId) {
     var tripPattern = tripPattern(patternId);
-    return tripPattern.semanticHashString(null);
+    return SemanticHash.forTripPattern(tripPattern, null);
   }
 
   /** Return geometry for the pattern as a packed coordinate sequence */
@@ -579,7 +598,7 @@ public class IndexAPI {
   }
 
   private StopLocation stop(String stopId) {
-    var stop = transitService().getStopForId(createId("stopId", stopId));
+    var stop = transitService().getRegularStop(createId("stopId", stopId));
     return validateExist("Stop", stop, "stopId", stop);
   }
 

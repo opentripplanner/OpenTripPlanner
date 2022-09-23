@@ -166,6 +166,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     if (next != null) {
       if (next.isTransfer()) {
         next.timeShiftTransferTime(slackProvider);
+        if (next.next().isEgress()) {
+          next.timeShiftThisAndNextLeg(slackProvider);
+        }
       } else if (next.isEgress()) {
         next.timeShiftEgressTime(slackProvider);
       }

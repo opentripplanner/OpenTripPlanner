@@ -1,6 +1,14 @@
 package org.opentripplanner.model;
 
-import com.google.common.collect.Lists;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -13,11 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import java.util.OptionalInt;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -40,9 +51,9 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private final List<TripTimes> tripTimes = Lists.newArrayList();
+  private final List<TripTimes> tripTimes = new ArrayList<>();
 
-  private final List<FrequencyEntry> frequencyEntries = Lists.newArrayList();
+  private final List<FrequencyEntry> frequencyEntries = new ArrayList<>();
 
   private final LocalDate serviceDate;
 
@@ -132,49 +143,56 @@ public class Timetable implements Serializable {
    * cloning the same Timetable when several updates are applied to it at once. We assume here that
    * all trips in a timetable are from the same feed, which should always be the case.
    *
-   * @param tripUpdate        GTFS-RT trip update
-   * @param timeZone          time zone of trip update
-   * @param updateServiceDate service date of trip update
+   * @param tripUpdate                    GTFS-RT trip update
+   * @param timeZone                      time zone of trip update
+   * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
-   *                          if these stops are given the NO_DATA flag
-   * @return {@link TripTimesPatch} that contains a new copy of updated TripTimes after TripUpdate
-   * has been applied on TripTimes of trip with the id specified in the trip descriptor of the
-   * TripUpdate and a list of stop indices that have been skipped with the realtime update; null if
-   * something went wrong
+   *                                      if these stops are given the NO_DATA flag
+   * @return {@link Result<TripTimesPatch, UpdateError>} contains either a new copy of updated
+   * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
+   * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
+   * realtime update; or an error if something went wrong
    * <p>
    * TODO OTP2 - This method depend on GTFS RealTime classes. Refactor this so GTFS RT can do
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
    */
-  public TripTimesPatch createUpdatedTripTimes(
+  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimes(
     TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
     BackwardsDelayPropagationType backwardsDelayPropagationType
   ) {
+    Result<TripTimesPatch, UpdateError> invalidInput = Result.failure(
+      UpdateError.noTripId(INVALID_INPUT_STRUCTURE)
+    );
     if (tripUpdate == null) {
-      LOG.error("A null TripUpdate pointer was passed to the Timetable class update method.");
-      return null;
+      LOG.debug("A null TripUpdate pointer was passed to the Timetable class update method.");
+      return invalidInput;
     }
 
     // Though all timetables have the same trip ordering, some may have extra trips due to
     // the dynamic addition of unscheduled trips.
     // However, we want to apply trip updates on top of *scheduled* times
     if (!tripUpdate.hasTrip()) {
-      LOG.error("TripUpdate object has no TripDescriptor field.");
-      return null;
+      LOG.debug("TripUpdate object has no TripDescriptor field.");
+      return invalidInput;
     }
 
     TripDescriptor tripDescriptor = tripUpdate.getTrip();
     if (!tripDescriptor.hasTripId()) {
-      LOG.error("TripDescriptor object has no TripId field");
-      return null;
+      LOG.debug("TripDescriptor object has no TripId field");
+      Result.failure(UpdateError.noTripId(TRIP_NOT_FOUND));
     }
+
     String tripId = tripDescriptor.getTripId();
+
+    var feedScopedTripId = new FeedScopedId(this.getPattern().getFeedId(), tripId);
+
     int tripIndex = getTripIndex(tripId);
     if (tripIndex == -1) {
-      LOG.info("tripId {} not found in pattern.", tripId);
-      return null;
+      LOG.debug("tripId {} not found in pattern.", tripId);
+      return Result.failure(new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN));
     } else {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
@@ -186,7 +204,7 @@ public class Timetable implements Serializable {
     Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
     if (!updates.hasNext()) {
       LOG.warn("Won't apply zero-length trip update to trip {}.", tripId);
-      return null;
+      return Result.failure(new UpdateError(feedScopedTripId, TOO_FEW_STOPS));
     }
     StopTimeUpdate update = updates.next();
 
@@ -241,7 +259,7 @@ public class Timetable implements Serializable {
               delay = newTimes.getArrivalDelay(i);
             } else {
               LOG.error("Arrival time at index {} is erroneous.", i);
-              return null;
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME));
             }
           } else if (delay != null) {
             newTimes.updateArrivalDelay(i, delay);
@@ -264,7 +282,7 @@ public class Timetable implements Serializable {
               delay = newTimes.getDepartureDelay(i);
             } else {
               LOG.error("Departure time at index {} is erroneous.", i);
-              return null;
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME));
             }
           } else if (delay != null) {
             newTimes.updateDepartureDelay(i, delay);
@@ -282,11 +300,11 @@ public class Timetable implements Serializable {
       }
     }
     if (update != null) {
-      LOG.error(
+      LOG.debug(
         "Part of a TripUpdate object could not be applied successfully to trip {}.",
         tripId
       );
-      return null;
+      return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
     }
 
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
@@ -311,12 +329,15 @@ public class Timetable implements Serializable {
         );
       }
     }
-    if (!newTimes.timesIncreasing()) {
-      LOG.error(
-        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {}.",
-        tripId
+
+    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
+    if (invalidStopIndex.isPresent()) {
+      LOG.debug(
+        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
+        tripId,
+        invalidStopIndex.getAsInt()
       );
-      return null;
+      return Result.failure(new UpdateError(feedScopedTripId, NON_INCREASING_TRIP_TIMES));
     }
 
     if (tripUpdate.hasVehicle()) {
@@ -328,11 +349,11 @@ public class Timetable implements Serializable {
       }
     }
 
-    LOG.debug(
+    LOG.trace(
       "A valid TripUpdate object was applied to trip {} using the Timetable class update method.",
       tripId
     );
-    return new TripTimesPatch(newTimes, skippedStopIndices);
+    return Result.success(new TripTimesPatch(newTimes, skippedStopIndices));
   }
 
   /**

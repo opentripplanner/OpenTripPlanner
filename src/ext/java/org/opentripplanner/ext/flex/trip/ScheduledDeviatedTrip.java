@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -23,24 +24,27 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.model.site.FlexLocationGroup;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.TransitBuilder;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
-public class ScheduledDeviatedTrip extends FlexTrip {
+public class ScheduledDeviatedTrip
+  extends FlexTrip<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> {
 
   private final ScheduledDeviatedStopTime[] stopTimes;
 
   private final BookingInfo[] dropOffBookingInfos;
   private final BookingInfo[] pickupBookingInfos;
 
-  public ScheduledDeviatedTrip(Trip trip, List<StopTime> stopTimes) {
-    super(trip);
+  ScheduledDeviatedTrip(ScheduledDeviatedTripBuilder builder) {
+    super(builder);
+    List<StopTime> stopTimes = builder.stopTimes();
     if (!isScheduledFlexTrip(stopTimes)) {
       throw new IllegalArgumentException("Incompatible stopTimes for scheduled flex trip");
     }
@@ -57,8 +61,12 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     }
   }
 
+  public static ScheduledDeviatedTripBuilder of(FeedScopedId id) {
+    return new ScheduledDeviatedTripBuilder(id);
+  }
+
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
+    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof RegularStop);
     Predicate<StopTime> notContinuousStop = stopTime ->
       stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
     return (
@@ -215,9 +223,25 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     return stopTimes[i].dropOffType;
   }
 
+  @Override
+  public boolean sameAs(@Nonnull ScheduledDeviatedTrip other) {
+    return (
+      super.sameAs(other) &&
+      Arrays.equals(stopTimes, other.stopTimes) &&
+      Arrays.equals(pickupBookingInfos, other.pickupBookingInfos) &&
+      Arrays.equals(dropOffBookingInfos, other.dropOffBookingInfos)
+    );
+  }
+
+  @Nonnull
+  @Override
+  public TransitBuilder<ScheduledDeviatedTrip, ScheduledDeviatedTripBuilder> copy() {
+    return new ScheduledDeviatedTripBuilder(this);
+  }
+
   private Collection<StopLocation> expandStops(StopLocation stop) {
-    return stop instanceof FlexLocationGroup
-      ? ((FlexLocationGroup) stop).getLocations()
+    return stop instanceof GroupStop groupStop
+      ? groupStop.getLocations()
       : Collections.singleton(stop);
   }
 
@@ -227,8 +251,8 @@ public class ScheduledDeviatedTrip extends FlexTrip {
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
-      if (stop instanceof FlexLocationGroup) {
-        if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
+      if (stop instanceof GroupStop groupStop) {
+        if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {
@@ -246,8 +270,8 @@ public class ScheduledDeviatedTrip extends FlexTrip {
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
-      if (stop instanceof FlexLocationGroup) {
-        if (((FlexLocationGroup) stop).getLocations().contains(accessEgress.stop)) {
+      if (stop instanceof GroupStop groupStop) {
+        if (groupStop.getLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {

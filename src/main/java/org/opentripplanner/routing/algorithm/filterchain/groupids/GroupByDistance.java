@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -139,12 +141,15 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   private static String keySetToString(Leg leg) {
     var builder = ToStringBuilder
       .of(leg.getClass())
-      .addEnum("mode", leg.getMode())
       .addTime("start", leg.getStartTime())
       .addTime("end", leg.getStartTime());
 
-    if (leg.isTransitLeg()) {
-      builder.addObj("tripId", leg.getTrip().getId());
+    if (leg instanceof TransitLeg trLeg) {
+      builder.addEnum("mode", trLeg.getMode()).addObj("tripId", leg.getTrip().getId());
+    } else if (leg instanceof StreetLeg stLeg) {
+      builder.addEnum("mode", stLeg.getMode());
+    } else {
+      throw new IllegalStateException("Unhandled type: " + leg.getClass());
     }
     return builder.toString();
   }

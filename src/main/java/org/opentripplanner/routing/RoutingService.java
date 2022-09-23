@@ -5,12 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -23,37 +22,41 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Stop;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
+// TODO VIA: 2022-08-29 javadocs
 /**
  * Entry point for requests towards the routing API.
  */
-public class RoutingService {
+public class RoutingService implements org.opentripplanner.routing.api.request.RoutingService {
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final Graph graph;
 
   private final ZoneId timeZone;
 
   private final GraphFinder graphFinder;
 
-  public RoutingService(OtpServerContext serverContext) {
+  public RoutingService(OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
     this.graph = serverContext.graph();
     this.timeZone = serverContext.transitService().getTimeZone();
-    this.graphFinder = GraphFinder.getInstance(graph);
+    this.graphFinder = serverContext.graphFinder();
   }
 
-  public RoutingResponse route(RoutingRequest request) {
+  @Override
+  public RoutingResponse route(RouteRequest request) {
     RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
+  }
+
+  @Override
+  public RoutingResponse route(RouteViaRequest request, RoutingPreferences preferences) {
+    throw new RuntimeException("Not implemented");
   }
 
   /** {@link Graph#getVertex(String)} */
@@ -140,16 +143,6 @@ public class RoutingService {
     return this.graph.getVehicleParkingService();
   }
 
-  /** {@link Graph#getDrivingDirection()} */
-  public DrivingDirection getDrivingDirection() {
-    return this.graph.getDrivingDirection();
-  }
-
-  /** {@link Graph#getIntersectionTraversalModel()} */
-  public IntersectionTraversalCostModel getIntersectionTraversalModel() {
-    return this.graph.getIntersectionTraversalModel();
-  }
-
   /** {@link GraphFinder#findClosestStops(double, double, double)} */
   public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
     return this.graphFinder.findClosestStops(lat, lon, radiusMeters);
@@ -184,20 +177,5 @@ public class RoutingService {
         filterByBikeRentalStations,
         transitService
       );
-  }
-
-  /** {@link Graph#getStopsByBoundingBox(double, double, double, double)} */
-  public Collection<StopLocation> getStopsByBoundingBox(
-    double minLat,
-    double minLon,
-    double maxLat,
-    double maxLon
-  ) {
-    return this.graph.getStopsByBoundingBox(minLat, minLon, maxLat, maxLon);
-  }
-
-  /** {@link Graph#getStopsInRadius(WgsCoordinate, double)} */
-  public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
-    return this.graph.getStopsInRadius(center, radius);
   }
 }

@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.geometry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +16,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -25,21 +24,18 @@ import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
 import org.opentripplanner.graph_builder.issues.MissingShapeGeometry;
 import org.opentripplanner.graph_builder.issues.ShapeGeometryTooFar;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.util.logging.ProgressTracker;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Once transit model entities have been loaded into the graph, this post-processes them to extract
- * and prepare geometries.
+ * This module creates hop geometries from GTFS shapes.
  *
  * <p>
  * THREAD SAFETY The computation runs in parallel so be careful about thread safety when modifying
@@ -49,7 +45,7 @@ public class GeometryProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(GeometryProcessor.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-  private final OtpTransitService transitService;
+  private final OtpTransitServiceBuilder transitService;
   // this is a thread-safe implementation
   private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
   // this is a thread-safe implementation
@@ -59,14 +55,10 @@ public class GeometryProcessor {
   private final double maxStopToShapeSnapDistance;
   private final DataImportIssueStore issueStore;
 
-  public GeometryProcessor(GtfsContext context) {
-    this(context.getTransitService(), -1, DataImportIssueStore.noop());
-  }
-
   public GeometryProcessor(
     // TODO OTP2 - Operate on the builder, not the transit service and move the execution of
     //           - this to where the builder is in context.
-    OtpTransitService transitService,
+    OtpTransitServiceBuilder transitService,
     double maxStopToShapeSnapDistance,
     DataImportIssueStore issueStore
   ) {
@@ -76,71 +68,26 @@ public class GeometryProcessor {
     this.issueStore = issueStore;
   }
 
-  // TODO OTP2 - Instead of exposing the graph (the entire world) to this class, this class should
-  //           - Create a datastructure and return it, then that should be injected into the graph.
   /**
-   * Generate the edges. Assumes that there are already vertices in the graph for the stops.
+   * Generate the geometry for the trip. Assumes that there are already vertices in the graph for
+   * the stops.
    * <p>
    * THREAD SAFETY The geometries for the trip patterns are computed in parallel. The collections
    * needed for this are concurrent implementations and therefore threadsafe but the issue store,
    * the graph, the OtpTransitService and others are not.
    */
-  @SuppressWarnings("Convert2MethodRef")
-  public void run(TransitModel transitModel) {
-    LOG.info("Processing geometries and blocks on graph...");
-
-    // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving
-    // only the tripTimes (which don't have enough information to build a geometry). So we keep
-    // them here. In the current design, a trip pattern does not have a single geometry, but
-    // one per hop, so we store them in an array.
-    Map<TripPattern, LineString[]> geometriesByTripPattern = new ConcurrentHashMap<>();
-
-    Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
-
-    /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
-    ProgressTracker progress = ProgressTracker.track(
-      "Generate TripPattern geometries",
-      100,
-      tripPatterns.size()
-    );
-    LOG.info(progress.startMessage());
-
-    tripPatterns
-      .parallelStream()
-      .forEach(tripPattern -> {
-        tripPattern
-          .scheduledTripsAsStream()
-          .forEach(trip -> {
-            // create geometries if they aren't already created
-            // note that this is not only done on new trip patterns, because it is possible that
-            // there would be a trip pattern with no geometry yet because it failed some of these tests
-            if (
-              !geometriesByTripPattern.containsKey(tripPattern) &&
-              trip.getShapeId() != null &&
-              trip.getShapeId().getId() != null &&
-              !trip.getShapeId().getId().equals("")
-            ) {
-              // save the geometry to later be applied to the hops
-              geometriesByTripPattern.put(
-                tripPattern,
-                createGeometry(trip.getShapeId(), transitService.getStopTimesForTrip(trip))
-              );
-            }
-          });
-        //Keep lambda! A method-ref would causes incorrect class and line number to be logged
-        progress.step(m -> LOG.info(m));
-      });
-    LOG.info(progress.completeMessage());
-
-    /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
-    for (TripPattern tripPattern : tripPatterns) {
-      LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
-      if (hopGeometries != null) {
-        // Make a single unified geometry, and also store the per-hop split geometries.
-        tripPattern.setHopGeometries(hopGeometries);
-      }
+  public List<LineString> createHopGeometries(Trip trip) {
+    if (
+      trip.getShapeId() == null ||
+      trip.getShapeId().getId() == null ||
+      trip.getShapeId().getId().equals("")
+    ) {
+      return null;
     }
-    /* Identify interlined trips and create the necessary edges. */
+
+    return Arrays.asList(
+      createGeometry(trip.getShapeId(), transitService.getStopTimesSortedByTrip().get(trip))
+    );
   }
 
   private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
@@ -514,7 +461,8 @@ public class GeometryProcessor {
    * indexed line to return a segment location of NaN, which we do not want.
    */
   private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
-    List<ShapePoint> points = transitService.getShapePointsForShapeId(shapeId);
+    List<ShapePoint> points = new ArrayList<>(transitService.getShapePoints().get(shapeId));
+    Collections.sort(points);
     ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
     ShapePoint last = null;
     for (ShapePoint sp : points) {
@@ -531,7 +479,7 @@ public class GeometryProcessor {
       filtered.trimToSize();
       return filtered;
     } else {
-      return new ArrayList<>(points);
+      return points;
     }
   }
 

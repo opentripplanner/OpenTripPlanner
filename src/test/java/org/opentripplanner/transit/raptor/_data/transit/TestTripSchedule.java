@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
+import java.util.Arrays;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
@@ -13,34 +13,29 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
  * <p>
- * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
+ * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
 public class TestTripSchedule implements DefaultTripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
-  private static final String DEFAULT_ROUTE_FEED = "default";
-  private static final String DEFAULT_ROUTE_ID_STR = "101";
-  private final RaptorTripPattern pattern;
+  private final DefaultTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
-  private final WheelchairAccessibility wheelchairBoarding;
-  private final FeedScopedId routeId;
+  private final Accessibility wheelchairBoarding;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
     int transitReluctanceIndex,
-    WheelchairAccessibility wheelchairBoarding,
-    FeedScopedId routeId
+    Accessibility wheelchairBoarding
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
     this.departureTimes = departureTimes;
     this.transitReluctanceIndex = transitReluctanceIndex;
     this.wheelchairBoarding = wheelchairBoarding;
-    this.routeId = routeId;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -72,7 +67,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
   }
 
   @Override
-  public RaptorTripPattern pattern() {
+  public DefaultTripPattern pattern() {
     return pattern;
   }
 
@@ -82,13 +77,8 @@ public class TestTripSchedule implements DefaultTripSchedule {
   }
 
   @Override
-  public WheelchairAccessibility wheelchairBoarding() {
+  public Accessibility wheelchairBoarding() {
     return wheelchairBoarding;
-  }
-
-  @Override
-  public FeedScopedId routeId() {
-    return routeId;
   }
 
   public int size() {
@@ -97,7 +87,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
 
   @Override
   public String toString() {
-    if (arrivalTimes == departureTimes) {
+    if (Arrays.equals(arrivalTimes, departureTimes)) {
       return ToStringBuilder
         .of(TestTripSchedule.class)
         .addServiceTimeSchedule("times", arrivalTimes)
@@ -118,8 +108,7 @@ public class TestTripSchedule implements DefaultTripSchedule {
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
-    private WheelchairAccessibility wheelchairBoarding = NO_INFORMATION;
-    private FeedScopedId routeId;
+    private Accessibility wheelchairBoarding = NO_INFORMATION;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -185,13 +174,8 @@ public class TestTripSchedule implements DefaultTripSchedule {
       return this;
     }
 
-    public TestTripSchedule.Builder wheelchairBoarding(WheelchairAccessibility wcb) {
+    public TestTripSchedule.Builder wheelchairBoarding(Accessibility wcb) {
       this.wheelchairBoarding = wcb;
-      return this;
-    }
-
-    public TestTripSchedule.Builder routeId(FeedScopedId routeId) {
-      this.routeId = routeId;
       return this;
     }
 
@@ -222,16 +206,13 @@ public class TestTripSchedule implements DefaultTripSchedule {
           pattern.numberOfStopsInPattern()
         );
       }
-      if (routeId == null) {
-        routeId = new FeedScopedId(DEFAULT_ROUTE_FEED, DEFAULT_ROUTE_ID_STR);
-      }
+
       return new TestTripSchedule(
         pattern,
         arrivalTimes,
         departureTimes,
         transitReluctanceIndex,
-        wheelchairBoarding,
-        routeId
+        wheelchairBoarding
       );
     }
 

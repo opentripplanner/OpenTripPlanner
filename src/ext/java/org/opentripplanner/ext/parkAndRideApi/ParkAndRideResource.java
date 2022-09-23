@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.parkAndRideApi;
 
-import java.util.List;
 import java.util.Optional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,11 +12,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
@@ -28,10 +27,10 @@ import org.opentripplanner.transit.model.basic.I18NString;
 public class ParkAndRideResource {
 
   private final VehicleParkingService vehicleParkingService;
-  private final StreetVertexIndex streetIndex;
+  private final GraphFinder graphFinder;
 
   public ParkAndRideResource(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -39,7 +38,12 @@ public class ParkAndRideResource {
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
     this.vehicleParkingService = serverContext.graph().getVehicleParkingService();
-    this.streetIndex = serverContext.graph().getStreetIndex();
+
+    // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
+    //           - serverContext.graphFinder(). This needs at least a comment!
+    //           - This can be replaced with a search done with the StopModel
+    //           - if we have a radius search there.
+    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStop);
   }
 
   /** Envelopes are in latitude, longitude format */
@@ -83,10 +87,7 @@ public class ParkAndRideResource {
     if (maxTransitDistance == null) {
       return true;
     } else {
-      List<TransitStopVertex> stops = streetIndex.getNearbyTransitStops(
-        new Coordinate(lot.getX(), lot.getY()),
-        maxTransitDistance
-      );
+      var stops = graphFinder.findClosestStops(lot.getY(), lot.getX(), maxTransitDistance);
       return !stops.isEmpty();
     }
   }

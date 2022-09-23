@@ -1,54 +1,39 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest.DEFAULT;
+import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
 
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 
 public class WheelchairAccessibilityRequestMapper {
 
-  static WheelchairAccessibilityRequest mapAccessibilityRequest(NodeAdapter a) {
-    var trips = mapAccessibilityFeature(a.path("trip"), DEFAULT.trip());
-    var stops = mapAccessibilityFeature(a.path("stop"), DEFAULT.stop());
-    var elevators = mapAccessibilityFeature(a.path("elevator"), DEFAULT.elevator());
-    var inaccessibleStreetReluctance = (float) a.asDouble(
-      "inaccessibleStreetReluctance",
-      DEFAULT.inaccessibleStreetReluctance()
-    );
-    var maxSlope = a.asDouble("maxSlope", DEFAULT.maxSlope());
-    var slopeExceededReluctance = a.asDouble(
-      "slopeExceededReluctance",
-      DEFAULT.slopeExceededReluctance()
-    );
-    var stairsReluctance = a.asDouble("stairsReluctance", DEFAULT.stairsReluctance());
-
-    return new WheelchairAccessibilityRequest(
-      a.asBoolean("enabled", DEFAULT.enabled()),
-      trips,
-      stops,
-      elevators,
-      inaccessibleStreetReluctance,
-      maxSlope,
-      slopeExceededReluctance,
-      stairsReluctance
+  static WheelchairPreferences mapAccessibilityRequest(NodeAdapter a) {
+    return new WheelchairPreferences(
+      mapAccessibilityFeature(a.path("trip"), DEFAULT.trip()),
+      mapAccessibilityFeature(a.path("stop"), DEFAULT.stop()),
+      mapAccessibilityFeature(a.path("elevator"), DEFAULT.elevator()),
+      a.asDouble("inaccessibleStreetReluctance", DEFAULT.inaccessibleStreetReluctance()),
+      a.asDouble("maxSlope", DEFAULT.maxSlope()),
+      a.asDouble("slopeExceededReluctance", DEFAULT.slopeExceededReluctance()),
+      a.asDouble("stairsReluctance", DEFAULT.stairsReluctance())
     );
   }
 
-  private static WheelchairAccessibilityFeature mapAccessibilityFeature(
+  private static AccessibilityPreferences mapAccessibilityFeature(
     NodeAdapter adapter,
-    WheelchairAccessibilityFeature deflt
+    AccessibilityPreferences defaultValue
   ) {
     var onlyAccessible = adapter.asBoolean(
       "onlyConsiderAccessible",
-      deflt.onlyConsiderAccessible()
+      defaultValue.onlyConsiderAccessible()
     );
 
     var unknownCost = adapter.asInt("unknownCost", 60 * 10);
     var inaccessibleCost = adapter.asInt("inaccessibleCost", 60 * 60);
     if (onlyAccessible) {
-      return WheelchairAccessibilityFeature.ofOnlyAccessible();
+      return AccessibilityPreferences.ofOnlyAccessible();
     } else {
-      return WheelchairAccessibilityFeature.ofCost(unknownCost, inaccessibleCost);
+      return AccessibilityPreferences.ofCost(unknownCost, inaccessibleCost);
     }
   }
 }

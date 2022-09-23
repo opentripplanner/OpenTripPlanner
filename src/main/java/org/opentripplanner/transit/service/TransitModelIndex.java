@@ -2,9 +2,7 @@ package org.opentripplanner.transit.service;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import java.time.LocalDate;
@@ -17,17 +15,17 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripIdAndServiceDate;
-import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,13 +40,13 @@ public class TransitModelIndex {
   private static final Logger LOG = LoggerFactory.getLogger(TransitModelIndex.class);
 
   // TODO: consistently key on model object or id string
-  private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
-  private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
+  private final Map<FeedScopedId, Agency> agencyForId = new HashMap<>();
+  private final Map<FeedScopedId, Operator> operatorForId = new HashMap<>();
 
-  private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
-  private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
+  private final Map<FeedScopedId, Trip> tripForId = new HashMap<>();
+  private final Map<FeedScopedId, Route> routeForId = new HashMap<>();
 
-  private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
+  private final Map<Trip, TripPattern> patternForTrip = new HashMap<>();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
 
@@ -61,7 +59,7 @@ public class TransitModelIndex {
   private final Map<FeedScopedId, GroupOfRoutes> groupOfRoutesForId = new HashMap<>();
   private FlexIndex flexIndex = null;
 
-  public TransitModelIndex(TransitModel transitModel) {
+  TransitModelIndex(TransitModel transitModel) {
     LOG.info("Transit model index init...");
 
     for (Agency agency : transitModel.getAgencies()) {
@@ -138,7 +136,7 @@ public class TransitModelIndex {
 
   /** Dynamically generate the set of Routes passing though a Stop on demand. */
   public Set<Route> getRoutesForStop(StopLocation stop) {
-    Set<Route> routes = Sets.newHashSet();
+    Set<Route> routes = new HashSet<>();
     for (TripPattern p : getPatternsForStop(stop)) {
       routes.add(p.getRoute());
     }

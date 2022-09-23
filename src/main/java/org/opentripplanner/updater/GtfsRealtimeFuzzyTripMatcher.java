@@ -6,12 +6,12 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.opentripplanner.util.time.TimeUtils;
@@ -29,7 +29,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
   // TODO: replace this with a runtime solution
   private final DirectionMapper directionMapper = new DirectionMapper(
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore()
   );
 
   public GtfsRealtimeFuzzyTripMatcher(TransitService transitService) {
@@ -86,7 +86,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
     int startTime,
     LocalDate date
   ) {
-    TIntSet servicesRunningForDate = transitService.getServicesRunningForDate(date);
+    TIntSet servicesRunningForDate = transitService.getServiceCodesRunningForDate(date);
     for (TripPattern pattern : transitService.getPatternsForRoute(route)) {
       if (pattern.getDirection() != direction) continue;
       for (TripTimes times : pattern.getScheduledTimetable().getTripTimes()) {

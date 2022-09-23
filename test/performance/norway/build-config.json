@@ -3,16 +3,12 @@
   "transitServiceEnd": "2022-12-31",
   "dataImportReport": true,
   "transit": true,
-  "useTransfersTxt": false,
-  "parentStopLinking": true,
-  "stationTransfers": false,
   "subwayAccessTime": 0,
   "streets": true,
   "embedRouterConfig": true,
   "areaVisibility": true,
   "platformEntriesLinking": true,
   "matchBusRoutesToStreets": false,
-  "osmWayPropertySet": "norway",
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
   "maxDataImportIssuesPerFile": 1000,
@@ -26,7 +22,12 @@
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "boardingLocationTags": [],
-  "netex": {
+  "transitModelTimeZone": "Europe/Oslo",
+  "osmDefaults": {
+    "osmTagMapping": "norway",
+    "timeZone": "Europe/Oslo"
+  },
+  "netexDefaults": {
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
     "groupFilePattern": "(\\w{3})_.*\\.xml",

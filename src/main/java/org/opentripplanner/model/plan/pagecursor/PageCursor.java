@@ -13,6 +13,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * <p>
  * The PageCursor class is internal to the router, only the serialized string is passed to/from the
  * clients.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
 public class PageCursor {
 

@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.framework.TransitEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class TransitIdMapper {
 
   private static String fixedFeedId = null;
 
-  public static String mapEntityIDToApi(TransitEntity entity) {
+  public static String mapEntityIDToApi(AbstractTransitEntity entity) {
     if (entity == null) {
       return null;
     }
@@ -70,7 +70,7 @@ public class TransitIdMapper {
    *                 of wrongly set feedIds to block the entire API from working.
    * @return the fixedFeedId - used to unit test this method.
    */
-  public static String setupFixedFeedId(Collection<? extends TransitEntity> entities) {
+  public static String setupFixedFeedId(Collection<? extends AbstractTransitEntity> entities) {
     fixedFeedId = "UNKNOWN_FEED";
 
     // Count each feedId

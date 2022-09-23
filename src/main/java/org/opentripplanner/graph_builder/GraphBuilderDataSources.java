@@ -8,14 +8,26 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.io.File;
+import java.net.URI;
 import java.util.EnumSet;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
+import org.opentripplanner.standalone.config.feed.DemExtractConfig;
+import org.opentripplanner.standalone.config.feed.DemExtractConfigBuilder;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
+import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
+import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
+import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * the available data-sources against the configuration - and then if not valid - abort the entire
  * OTP startup early, before spending time on loading any data - like the streetGraph.
  */
+@Singleton
 public class GraphBuilderDataSources {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphBuilderDataSources.class);
@@ -43,11 +56,25 @@ public class GraphBuilderDataSources {
   private final Set<FileType> includeTypes = EnumSet.complementOf(EnumSet.of(FileType.UNKNOWN));
   private final File cacheDirectory;
   private final DataSource outputGraph;
+  private final BuildConfig buildConfig;
+  private final File baseDirectory;
 
-  private GraphBuilderDataSources(CommandLineParameters cli, BuildConfig bc, OtpDataStore store) {
+  /**
+   * Create a wrapper around the data-store and resolve which files to import and export. Validate
+   * these files against the given command line arguments and the graph build parameters.
+   */
+  @Inject
+  public GraphBuilderDataSources(
+    CommandLineParameters cli,
+    BuildConfig bc,
+    OtpDataStore store,
+    @OtpBaseDirectory File baseDirectory
+  ) {
     this.store = store;
+    this.buildConfig = bc;
     this.cacheDirectory = cli.cacheDirectory;
     this.outputGraph = getOutputGraph(cli);
+    this.baseDirectory = baseDirectory;
 
     // Select which files to import
     include(cli.doBuildStreet() && bc.streets, OSM);
@@ -65,18 +92,6 @@ public class GraphBuilderDataSources {
     validateCliMatchesInputData(cli);
   }
 
-  /**
-   * Create a wrapper around the data-store and resolve which files to import and export. Validate
-   * these files against the given command line arguments and the graph build parameters.
-   */
-  public static GraphBuilderDataSources create(
-    CommandLineParameters cli,
-    BuildConfig bc,
-    OtpDataStore store
-  ) {
-    return new GraphBuilderDataSources(cli, bc, store);
-  }
-
   public DataSource getOutputGraph() {
     return outputGraph;
   }
@@ -85,19 +100,100 @@ public class GraphBuilderDataSources {
    * @return {@code true} if and only if the data source exist, proper command line parameters is
    * set and not disabled by the loaded configuration files.
    */
-  boolean has(FileType type) {
+  public boolean has(FileType type) {
     return inputData.containsKey(type);
   }
 
-  Iterable<DataSource> get(FileType type) {
+  public Iterable<DataSource> get(FileType type) {
     return inputData.get(type);
   }
 
-  CompositeDataSource getBuildReportDir() {
+  public Iterable<ConfiguredDataSource<OsmExtractConfig>> getOsmConfiguredDatasource() {
+    return inputData
+      .get(OSM)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getOsmExtractConfig(it)))
+      .toList();
+  }
+
+  private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
+    return buildConfig.osm.osmExtractConfigs
+      .stream()
+      .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
+      .findFirst()
+      .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  public Iterable<ConfiguredDataSource<DemExtractConfig>> getDemConfiguredDatasource() {
+    return inputData
+      .get(DEM)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getDemExtractConfig(it)))
+      .toList();
+  }
+
+  private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
+    return buildConfig.dem.demExtractConfigs
+      .stream()
+      .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
+      .findFirst()
+      .orElse(new DemExtractConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  public Iterable<ConfiguredDataSource<GtfsFeedConfig>> getGtfsConfiguredDatasource() {
+    return inputData
+      .get(GTFS)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getGtfsFeedConfig(it)))
+      .toList();
+  }
+
+  private GtfsFeedConfig getGtfsFeedConfig(DataSource dataSource) {
+    return buildConfig.transitFeeds.gtfsFeedConfigs
+      .stream()
+      .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
+      .findFirst()
+      .orElse(new GtfsFeedConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  public Iterable<ConfiguredDataSource<NetexFeedConfig>> getNetexConfiguredDatasource() {
+    return inputData
+      .get(NETEX)
+      .stream()
+      .map(it -> new ConfiguredDataSource<>(it, getNetexFeedConfig(it)))
+      .toList();
+  }
+
+  private NetexFeedConfig getNetexFeedConfig(DataSource dataSource) {
+    return buildConfig.transitFeeds.netexFeedConfigs
+      .stream()
+      .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
+      .findFirst()
+      .orElse(new NetexFeedConfigBuilder().withSource(dataSource.uri()).build());
+  }
+
+  /**
+   * Match the URI provided in the configuration with the URI of a datasource,
+   * either by comparing directly the two URIs or by first prepending the OTP base directory
+   * to the URI provided in the configuration.
+   * This covers the case where the source parameter provided in the configuration is relative to
+   * the base directory.
+   */
+  private boolean uriMatch(URI configURI, URI datasourceURI) {
+    return (
+      configURI.equals(datasourceURI) ||
+      (
+        !configURI.isAbsolute() &&
+        baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI)
+      )
+    );
+  }
+
+  public CompositeDataSource getBuildReportDir() {
     return store.getBuildReportDir();
   }
 
-  File getCacheDirectory() {
+  public File getCacheDirectory() {
     return cacheDirectory;
   }
 
@@ -119,7 +215,7 @@ public class GraphBuilderDataSources {
     LOG.info("Existing files expected to be read or written:");
     for (FileType type : FileType.values()) {
       for (DataSource source : inputData.get(type)) {
-        LOG.info(BULLET_POINT + source.detailedInfo());
+        LOG.info(BULLET_POINT + "{}", source.detailedInfo());
       }
     }
 
@@ -127,7 +223,7 @@ public class GraphBuilderDataSources {
       LOG.info("Files excluded due to command line switches or unknown type:");
       for (FileType type : FileType.values()) {
         for (DataSource source : skipData.get(type)) {
-          LOG.info(BULLET_POINT + source.detailedInfo());
+          LOG.info(BULLET_POINT + "{}", source.detailedInfo());
         }
       }
     }

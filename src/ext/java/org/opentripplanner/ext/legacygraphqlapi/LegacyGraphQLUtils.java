@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFilterPlaceType;
@@ -12,8 +13,8 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 public class LegacyGraphQLUtils {
 
@@ -41,7 +42,7 @@ public class LegacyGraphQLUtils {
     return input.toString(getLocale(environment));
   }
 
-  public static LegacyGraphQLWheelchairBoarding toGraphQL(WheelchairAccessibility boarding) {
+  public static LegacyGraphQLWheelchairBoarding toGraphQL(Accessibility boarding) {
     if (boarding == null) return null;
     return switch (boarding) {
       case NO_INFORMATION -> LegacyGraphQLWheelchairBoarding.NO_INFORMATION;
@@ -93,5 +94,20 @@ public class LegacyGraphQLUtils {
       case DEPARTURE_ROW -> PlaceType.PATTERN_AT_STOP;
       case STOP -> PlaceType.STOP;
     };
+  }
+
+  /**
+   * Convert the UNIX timestamp into an Instant, or return the current time if set to zero.
+   */
+  public static Instant getTimeOrNow(long epochSeconds) {
+    return epochSeconds != 0 ? Instant.ofEpochSecond(epochSeconds) : Instant.now();
+  }
+
+  public static boolean startsWith(String str, String name, Locale locale) {
+    return str != null && str.toLowerCase(locale).startsWith(name);
+  }
+
+  public static boolean startsWith(I18NString str, String name, Locale locale) {
+    return str != null && str.toString(locale).toLowerCase(locale).startsWith(name);
   }
 }

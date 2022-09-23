@@ -10,10 +10,10 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.MultilingualString;
@@ -52,7 +52,7 @@ public class NoticeAssignmentMapperTest {
     routesById.add(route);
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       List.of(),
       new HierarchicalMapById<>(),
@@ -61,11 +61,14 @@ public class NoticeAssignmentMapperTest {
       new HashMap<>()
     );
 
-    Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement = noticeAssignmentMapper.map(
+    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
       noticeAssignment
     );
 
-    org.opentripplanner.model.Notice notice2 = noticesByElement.get(route).iterator().next();
+    org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement
+      .get(route)
+      .iterator()
+      .next();
 
     assertEquals(NOTICE_ID, notice2.getId().getId());
   }
@@ -100,7 +103,7 @@ public class NoticeAssignmentMapperTest {
       .withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
 
     NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       serviceJourneys,
       noticesById,
@@ -109,17 +112,17 @@ public class NoticeAssignmentMapperTest {
       stopTimesById
     );
 
-    Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement = noticeAssignmentMapper.map(
+    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
       noticeAssignment
     );
 
-    org.opentripplanner.model.Notice notice2a = noticesByElement
+    org.opentripplanner.transit.model.basic.Notice notice2a = noticesByElement
       .get(stopTime1.getId())
       .stream()
       .findFirst()
       .orElseThrow(IllegalStateException::new);
 
-    org.opentripplanner.model.Notice notice2b = noticesByElement
+    org.opentripplanner.transit.model.basic.Notice notice2b = noticesByElement
       .get(stopTime2.getId())
       .stream()
       .findFirst()

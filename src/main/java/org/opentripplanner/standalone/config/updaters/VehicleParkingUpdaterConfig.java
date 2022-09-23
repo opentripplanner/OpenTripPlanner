@@ -26,6 +26,7 @@ public class VehicleParkingUpdaterConfig {
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = mapStringToSourceType(c.asText("sourceType"));
     var feedId = c.asText("feedId", null);
+    var timeZone = c.asZoneId("timeZone", null);
     switch (sourceType) {
       case HSL_PARK:
         return new HslParkUpdaterParameters(
@@ -35,7 +36,8 @@ public class VehicleParkingUpdaterConfig {
           feedId,
           sourceType,
           c.asInt("utilizationsFrequencySec", 600),
-          c.asText("utilizationsUrl", null)
+          c.asText("utilizationsUrl", null),
+          timeZone
         );
       case KML:
         return new KmlUpdaterParameters(
@@ -56,7 +58,8 @@ public class VehicleParkingUpdaterConfig {
           c.asInt("frequencySec", 60),
           c.asMap("headers", NodeAdapter::asText),
           new ArrayList<>(c.asTextSet("tags", Set.of())),
-          sourceType
+          sourceType,
+          timeZone
         );
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);

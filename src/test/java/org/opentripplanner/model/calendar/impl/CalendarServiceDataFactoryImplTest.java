@@ -19,11 +19,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -129,20 +128,14 @@ public class CalendarServiceDataFactoryImplTest {
       ConstantsForTests.FAKE_GTFS
     );
     OtpTransitServiceBuilder builder = ctxBuilder
-      .withDataImportIssueStore(new DataImportIssueStore(false))
+      .withDataImportIssueStore(DataImportIssueStore.noopIssueStore())
       .getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections
     builder.getCalendarDates().add(removeMondayFromAlldays());
-    builder.getFareAttributes().add(createFareAttribute());
-    builder.getFareRules().add(new FareRule());
     builder.getFeedInfos().add(FeedInfo.dummyForTest(TransitModelForTest.FEED_ID));
 
     return ctxBuilder.build();
-  }
-
-  private static FareAttribute createFareAttribute() {
-    return new FareAttribute(id("FA"));
   }
 
   private static ServiceCalendarDate removeMondayFromAlldays() {

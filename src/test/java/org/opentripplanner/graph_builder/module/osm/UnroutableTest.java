@@ -1,18 +1,19 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
-import com.google.common.collect.Maps;
 import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
@@ -20,7 +21,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -34,22 +35,26 @@ import org.opentripplanner.transit.service.TransitModel;
 public class UnroutableTest {
 
   private Graph graph;
-  private TransitModel transitModel;
 
   @BeforeEach
   public void setUp() throws Exception {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    TransitModel transitModel = new TransitModel(stopModel, deduplicator);
 
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
     OpenStreetMapProvider provider = new OpenStreetMapProvider(osmDataFile, true);
-    OpenStreetMapModule osmBuilder = new OpenStreetMapModule(provider);
+    OpenStreetMapModule osmBuilder = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      graph,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-    HashMap<Class<?>, Object> extra = Maps.newHashMap();
-    osmBuilder.buildGraph(graph, transitModel, extra); // TODO get rid of this "extra" thing
+    osmBuilder.buildGraph();
   }
 
   /**
@@ -59,7 +64,7 @@ public class UnroutableTest {
    */
   @Test
   public void testOnBoardRouting() {
-    RoutingRequest options = new RoutingRequest();
+    RouteRequest options = new RouteRequest();
 
     Vertex from = graph.getVertex("osm:node:2003617278");
     Vertex to = graph.getVertex("osm:node:40446276");

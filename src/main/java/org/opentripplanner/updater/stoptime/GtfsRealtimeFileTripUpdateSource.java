@@ -66,7 +66,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
         }
       }
     } catch (Exception e) {
-      LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
+      LOG.warn("Failed to parse gtfs-rt feed at {}", file, e);
     }
     return updates;
   }

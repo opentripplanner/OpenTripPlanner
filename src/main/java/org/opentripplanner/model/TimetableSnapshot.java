@@ -1,6 +1,5 @@
 package org.opentripplanner.model;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
@@ -11,14 +10,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +44,13 @@ import org.slf4j.LoggerFactory;
 public class TimetableSnapshot {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
+
   /**
    * A set of all timetables which have been modified and are waiting to be indexed. When
    * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
    */
   private final Set<Timetable> dirtyTimetables = new HashSet<>();
+
   /**
    * The timetables for different days, for each TripPattern (each sequence of stops on a particular
    * Route) for which we have an updated Timetable. The keys include both TripPatterns from the
@@ -57,20 +62,20 @@ public class TimetableSnapshot {
    * FIXME: this could be made into a flat hashtable with compound keys.
    */
   private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
+
   /**
    * <p>
-   * Map containing the last <b>added</b> trip pattern given a trip id (without agency) and a
-   * service date as a result of a call to {@link #update(TripPattern, TripTimes, LocalDate)} with
-   * trip times of a trip that didn't exist yet in the trip pattern.
+   * Map containing the current trip pattern given a trip id and a service date, if it has been
+   * changed from the scheduled pattern with an update, for which the stopPattern is different.
    * </p>
    * <p>
    * This is a HashMap and not a Map so the clone function is available.
-   * </p>
-   * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
    */
-  private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
-  private HashMap<FeedScopedId, TripOnServiceDate> lastAddedTripOnServiceDate = new HashMap<>();
-  private HashMap<TripIdAndServiceDate, TripOnServiceDate> lastAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
+  private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
+
+  private HashMap<FeedScopedId, TripOnServiceDate> realtimeAddedTripOnServiceDate = new HashMap<>();
+  private HashMap<TripIdAndServiceDate, TripOnServiceDate> realtimeAddedTripOnServiceDateByTripIdAndServiceDate = new HashMap<>();
+
   /**
    * This maps contains all of the new or updated TripPatterns added by realtime data indexed on
    * stop. This has to be kept in order for them to be included in the stop times api call on a
@@ -81,11 +86,13 @@ public class TimetableSnapshot {
    * TODO Find a generic way to keep all realtime indexes.
    */
   private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
+
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
    * shouldn't be possible to change it to false anymore.
    */
   private boolean readOnly = false;
+
   /**
    * Boolean value indicating that this timetable snapshot contains changes compared to the state of
    * the last commit if true.
@@ -143,25 +150,23 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as a
-   * result of a call to {@link #update(TripPattern, TripTimes, LocalDate)} with trip times of a
-   * trip that didn't exist yet in the trip pattern.
-   * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
+   * Get the current trip pattern given a trip id and a service date, if it has been changed from
+   * the scheduled pattern with an update, for which the stopPattern is different.
    *
    * @param tripId      trip id
    * @param serviceDate service date
-   * @return last added trip pattern; null if trip never was added to a trip pattern
+   * @return trip pattern created by the updater; null if trip is on the original trip pattern
    */
-  public TripPattern getLastAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
+  public TripPattern getRealtimeAddedTripPattern(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
-    return lastAddedTripPattern.get(tripIdAndServiceDate);
+    return realtimeAddedTripPattern.get(tripIdAndServiceDate);
   }
 
   /**
    * @return if any trip patterns were added.
    */
-  public boolean hasLastAddedTripPatterns() {
-    return !lastAddedTripPattern.isEmpty();
+  public boolean hasRealtimeAddedTripPatterns() {
+    return !realtimeAddedTripPattern.isEmpty();
   }
 
   /**
@@ -171,12 +176,16 @@ public class TimetableSnapshot {
    * @param pattern          trip pattern
    * @param updatedTripTimes updated trip times
    * @param serviceDate      service day for which this update is valid
-   * @return whether or not the update was actually applied
+   * @return whether the update was actually applied
    */
-  public boolean update(TripPattern pattern, TripTimes updatedTripTimes, LocalDate serviceDate) {
+  public Optional<UpdateError> update(
+    TripPattern pattern,
+    TripTimes updatedTripTimes,
+    LocalDate serviceDate
+  ) {
     // Preconditions
-    Preconditions.checkNotNull(pattern);
-    Preconditions.checkNotNull(serviceDate);
+    Objects.requireNonNull(pattern);
+    Objects.requireNonNull(serviceDate);
 
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
@@ -218,7 +227,7 @@ public class TimetableSnapshot {
       // Remember this pattern for the added trip id and service date
       FeedScopedId tripId = updatedTripTimes.getTrip().getId();
       TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
-      lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
+      realtimeAddedTripPattern.put(tripIdAndServiceDate, pattern);
     }
 
     // To make these trip patterns visible for departureRow searches.
@@ -226,7 +235,7 @@ public class TimetableSnapshot {
 
     // The time tables are finished during the commit
 
-    return true;
+    return UpdateError.noError();
   }
 
   /**
@@ -254,17 +263,17 @@ public class TimetableSnapshot {
       return null;
     }
     ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
-    ret.lastAddedTripPattern =
-      (HashMap<TripIdAndServiceDate, TripPattern>) this.lastAddedTripPattern.clone();
+    ret.realtimeAddedTripPattern =
+      (HashMap<TripIdAndServiceDate, TripPattern>) this.realtimeAddedTripPattern.clone();
 
     if (transitLayerUpdater != null) {
       transitLayerUpdater.update(dirtyTimetables, timetables);
     }
 
-    ret.lastAddedTripOnServiceDate =
-      (HashMap<FeedScopedId, TripOnServiceDate>) this.lastAddedTripOnServiceDate.clone();
-    ret.lastAddedTripOnServiceDateByTripIdAndServiceDate =
-      (HashMap<TripIdAndServiceDate, TripOnServiceDate>) this.lastAddedTripOnServiceDateByTripIdAndServiceDate.clone();
+    ret.realtimeAddedTripOnServiceDate =
+      (HashMap<FeedScopedId, TripOnServiceDate>) this.realtimeAddedTripOnServiceDate.clone();
+    ret.realtimeAddedTripOnServiceDateByTripIdAndServiceDate =
+      (HashMap<TripIdAndServiceDate, TripOnServiceDate>) this.realtimeAddedTripOnServiceDateByTripIdAndServiceDate.clone();
     this.dirtyTimetables.clear();
     this.dirty = false;
 
@@ -277,7 +286,7 @@ public class TimetableSnapshot {
   /**
    * Clear all data of snapshot for the provided feed id
    *
-   * @param feedId feed id to clear the snapshop for
+   * @param feedId feed id to clear the snapshot for
    */
   public void clear(String feedId) {
     if (readOnly) {
@@ -285,10 +294,10 @@ public class TimetableSnapshot {
     }
     // Clear all data from snapshot.
     boolean timetableWasModified = clearTimetable(feedId);
-    boolean lastAddedWasModified = clearLastAddedTripPattern(feedId);
+    boolean realtimeAddedWasModified = clearRealtimeAddedTripPattern(feedId);
 
     // If this snapshot was modified, it will be dirty after the clear actions.
-    if (timetableWasModified || lastAddedWasModified) {
+    if (timetableWasModified || realtimeAddedWasModified) {
       dirty = true;
     }
   }
@@ -298,7 +307,7 @@ public class TimetableSnapshot {
    * trip times from the timetable the trip has been added to.
    */
   public void removeLastAddedTripPattern(FeedScopedId feedScopedTripId, LocalDate serviceDate) {
-    lastAddedTripPattern.remove(new TripIdAndServiceDate(feedScopedTripId, serviceDate));
+    realtimeAddedTripPattern.remove(new TripIdAndServiceDate(feedScopedTripId, serviceDate));
   }
 
   /**
@@ -331,7 +340,7 @@ public class TimetableSnapshot {
 
     // Also remove last added trip pattern for days that are purged
     for (
-      Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = lastAddedTripPattern
+      Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = realtimeAddedTripPattern
         .entrySet()
         .iterator();
       iterator.hasNext();
@@ -366,25 +375,20 @@ public class TimetableSnapshot {
     this.patternsForStop = patternsForStop;
   }
 
-  public void addLastAddedTripOnServiceDate(
-    Trip trip,
-    LocalDate serviceDate,
-    FeedScopedId datedServiceJourneyId,
-    TripOnServiceDate tripOnServiceDate
-  ) {
-    lastAddedTripOnServiceDate.put(datedServiceJourneyId, tripOnServiceDate);
-    lastAddedTripOnServiceDateByTripIdAndServiceDate.put(
-      new TripIdAndServiceDate(trip.getId(), serviceDate),
+  public void addLastAddedTripOnServiceDate(TripOnServiceDate tripOnServiceDate) {
+    realtimeAddedTripOnServiceDate.put(tripOnServiceDate.getId(), tripOnServiceDate);
+    realtimeAddedTripOnServiceDateByTripIdAndServiceDate.put(
+      tripOnServiceDate.getTripIdAndServiceDate(),
       tripOnServiceDate
     );
   }
 
-  public HashMap<FeedScopedId, TripOnServiceDate> getLastAddedTripOnServiceDate() {
-    return lastAddedTripOnServiceDate;
+  public HashMap<FeedScopedId, TripOnServiceDate> getRealtimeAddedTripOnServiceDate() {
+    return realtimeAddedTripOnServiceDate;
   }
 
-  public HashMap<TripIdAndServiceDate, TripOnServiceDate> getLastAddedTripOnServiceDateByTripIdAndServiceDate() {
-    return lastAddedTripOnServiceDateByTripIdAndServiceDate;
+  public HashMap<TripIdAndServiceDate, TripOnServiceDate> getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate() {
+    return realtimeAddedTripOnServiceDateByTripIdAndServiceDate;
   }
 
   /**
@@ -398,15 +402,17 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Clear all last added trip patterns matching the provided feed id.
+   * Clear all realtime added trip patterns matching the provided feed id.
    *
    * @param feedId feed id to clear out
-   * @return true if the lastAddedTripPattern changed as a result of the call
+   * @return true if the realtimeAddedTripPattern changed as a result of the call
    */
-  protected boolean clearLastAddedTripPattern(String feedId) {
-    return lastAddedTripPattern
+  protected boolean clearRealtimeAddedTripPattern(String feedId) {
+    return realtimeAddedTripPattern
       .keySet()
-      .removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.tripId().getFeedId()));
+      .removeIf(realtimeAddedTripPattern ->
+        feedId.equals(realtimeAddedTripPattern.tripId().getFeedId())
+      );
   }
 
   /**
@@ -414,6 +420,8 @@ public class TimetableSnapshot {
    */
   private void addPatternToIndex(TripPattern tripPattern) {
     if (tripPattern.isCreatedByRealtimeUpdater()) {
+      //TODO - SIRI: Add pattern to index?
+
       for (var stop : tripPattern.getStops()) {
         patternsForStop.put(stop, tripPattern);
       }

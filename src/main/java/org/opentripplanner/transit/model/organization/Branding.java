@@ -3,14 +3,14 @@ package org.opentripplanner.transit.model.organization;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * OTP model for branding. Common for both NeTEx and GTFS.
  */
-public class Branding extends TransitEntity2<Branding, BrandingBuilder> implements LogInfo {
+public class Branding extends AbstractTransitEntity<Branding, BrandingBuilder> implements LogInfo {
 
   private final String name;
   private final String shortName;
@@ -18,7 +18,7 @@ public class Branding extends TransitEntity2<Branding, BrandingBuilder> implemen
   private final String description;
   private final String image;
 
-  public Branding(BrandingBuilder builder) {
+  Branding(BrandingBuilder builder) {
     super(builder.getId());
     // Required fields - id only
 

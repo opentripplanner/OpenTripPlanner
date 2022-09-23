@@ -87,6 +87,12 @@ The messages are processed in the same order as they came in (in the list) so it
 to include multiple messages on same DatedServiceJourney as long as they are sorted in correct order
 and the newest message is the last one in the list.
 
+### Matching on stop arrival-times
+Normally ET messages are matched with corresponding trips based on ServiceJourney or DatedServiceJourney
+id from the message. In case OTP was not able to find corresponding trip additional search will be
+performed based on arrival-times/stop-patterns from the ET message. This feature turned off by default but can be
+activated by adding *fuzzyTripMatching* property to updater configuration. 
+
 
 
 

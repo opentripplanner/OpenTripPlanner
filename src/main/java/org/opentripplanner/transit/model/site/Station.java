@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
-import static org.opentripplanner.common.geometry.GeometryUtils.getGeometryFactory;
+import static org.opentripplanner.util.geometry.GeometryUtils.getGeometryFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.ZoneId;
@@ -17,9 +17,9 @@ import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
 
 /**
  * A grouping of stops in GTFS or the lowest level grouping in NeTEx. It can be a train station, a
@@ -27,8 +27,8 @@ import org.opentripplanner.transit.model.framework.TransitEntity2;
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
 public class Station
-  extends TransitEntity2<Station, StationBuilder>
-  implements StopCollection, LogInfo {
+  extends AbstractTransitEntity<Station, StationBuilder>
+  implements StopLocationsGroup, LogInfo {
 
   public static final StopTransferPriority DEFAULT_PRIORITY = StopTransferPriority.ALLOWED;
 
@@ -67,7 +67,7 @@ public class Station
     return new StationBuilder(id);
   }
 
-  void addChildStop(Stop stop) {
+  void addChildStop(RegularStop stop) {
     this.childStops.add(stop);
     this.geometry = computeGeometry(coordinate, childStops);
   }

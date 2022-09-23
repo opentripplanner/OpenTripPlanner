@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,10 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   public SiriETHttpTripUpdateSource(Parameters parameters) {
     this.feedId = parameters.getFeedId();
     this.url = parameters.getUrl();
-    this.requestorRef = parameters.getRequestorRef();
+    this.requestorRef =
+      parameters.getRequestorRef() == null || parameters.getRequestorRef().isEmpty()
+        ? "otp-" + UUID.randomUUID()
+        : parameters.getRequestorRef();
     this.timeout = parameters.getTimeoutSec() > 0 ? 1000 * parameters.getTimeoutSec() : -1;
 
     int min = parameters.getPreviewIntervalMinutes();
@@ -58,7 +62,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
 
-      InputStream is = SiriHttpUtils.postData(url, etServiceRequest, timeout);
+      InputStream is = SiriHttpUtils.postData(url, etServiceRequest, timeout, requestHeaders);
       if (is != null) {
         // Decode message
         fetching = System.currentTimeMillis() - t1;
@@ -82,7 +86,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       LOG.warn("Could not get SIRI-ET data from {}, caused by {}", url, e.getMessage());
     } catch (Exception e) {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
-      LOG.warn("Failed to parse SIRI-ET feed from " + url + ":", e);
+      LOG.warn("Failed to parse SIRI-ET feed from {}", url, e);
     } finally {
       LOG.info(
         "Updating ET [{}]: Create req: {}, Fetching data: {}, Unmarshalling: {}",

@@ -4,12 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
-import java.util.HashMap;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -17,10 +15,11 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.OsmVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class ElevationModuleTest {
 
@@ -38,7 +37,7 @@ public class ElevationModuleTest {
     // create a graph with a StreetWithElevationEdge
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
     OsmVertex from = new OsmVertex(graph, "from", -122.6932051, 45.5122964, 40513757);
     OsmVertex to = new OsmVertex(graph, "to", -122.6903532, 45.5115309, 1677595882);
@@ -99,11 +98,11 @@ public class ElevationModuleTest {
     File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());
     DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
     NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
-    ElevationModule elevationModule = new ElevationModule(gcf);
+    ElevationModule elevationModule = new ElevationModule(gcf, graph);
 
     // build to graph to execute the elevation module
     elevationModule.checkInputs();
-    elevationModule.buildGraph(graph, transitModel, new HashMap<>());
+    elevationModule.buildGraph();
 
     // verify that elevation data has been set on the StreetWithElevationEdge
     assertNotNull(edge.getElevationProfile());

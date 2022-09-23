@@ -2,8 +2,8 @@ package org.opentripplanner.model.transfer;
 
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
-import org.opentripplanner.transit.model.site.Stop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TransferTestData {
@@ -15,18 +15,18 @@ public class TransferTestData {
   static final int POS_3 = 3;
   static final int ANY_POS = 999;
 
-  static final Stop STOP_A = TransitModelForTest
+  static final RegularStop STOP_A = TransitModelForTest
     .stopForTest("A", 60.0, 11.0)
     .copy()
     .withParentStation(STATION)
     .build();
-  static final Stop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.0);
-  static final Stop STOP_S = TransitModelForTest
+  static final RegularStop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.0);
+  static final RegularStop STOP_S = TransitModelForTest
     .stopForTest("S", 60.0, 11.0)
     .copy()
     .withParentStation(STATION)
     .build();
-  static final Stop ANY_STOP = TransitModelForTest.stopForTest("any", 60.0, 11.0);
+  static final RegularStop ANY_STOP = TransitModelForTest.stopForTest("any", 60.0, 11.0);
 
   static final Route ROUTE_1 = TransitModelForTest.route("1").build();
   static final Route ROUTE_2 = TransitModelForTest.route("2").build();

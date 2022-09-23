@@ -7,7 +7,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.TestOtpModel;
@@ -17,7 +16,7 @@ import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
@@ -50,18 +49,19 @@ public abstract class FlexTest {
     }
 
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var graph = new Graph(stopModel, deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
+    var graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(new StopModel(), deduplicator);
     GtfsBundle gtfsBundle = new GtfsBundle(file);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
+      transitModel,
+      graph,
       new ServiceDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    module.buildGraph(graph, transitModel, new HashMap<>());
+    module.buildGraph();
     transitModel.index();
-    graph.index();
+    graph.index(transitModel.getStopModel());
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     assertTrue(transitModel.hasFlexTrips());
     return new TestOtpModel(graph, transitModel);

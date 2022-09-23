@@ -59,7 +59,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations
         .stream()
         .noneMatch(vehicleRentalStation ->
-          vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed()
+          vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
   }
@@ -112,7 +112,7 @@ class GbfsVehicleRentalDataSourceTest {
       stations
         .stream()
         .noneMatch(vehicleRentalStation ->
-          vehicleRentalStation.isKeepingVehicleRentalAtDestinationAllowed()
+          vehicleRentalStation.isArrivingInRentalVehicleAtDestinationAllowed()
         )
     );
   }

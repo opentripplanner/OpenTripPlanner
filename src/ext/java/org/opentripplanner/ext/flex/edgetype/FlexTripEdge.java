@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 public class FlexTripEdge extends Edge {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
-
-  private static final long serialVersionUID = 1L;
   private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;
@@ -64,7 +62,7 @@ public class FlexTripEdge extends Edge {
       return null;
     }
     StateEditor editor = s0.edit(this);
-    editor.setBackMode(TraverseMode.BUS);
+    editor.setBackMode(TraverseMode.FLEX);
     // TODO: decide good value
     editor.incrementWeight(10 * 60);
     int timeInSeconds = getTimeInSeconds();

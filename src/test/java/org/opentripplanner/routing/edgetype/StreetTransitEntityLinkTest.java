@@ -2,25 +2,25 @@ package org.opentripplanner.routing.edgetype;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NOT_POSSIBLE;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.POSSIBLE;
+import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
+import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.WheelchairAccessibilityRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -29,7 +29,7 @@ class StreetTransitEntityLinkTest {
   private static Graph graph;
   private static TransitModel transitModel;
 
-  Stop inaccessibleStop = TransitModelForTest.stopForTest(
+  RegularStop inaccessibleStop = TransitModelForTest.stopForTest(
     "A:inaccessible",
     "wheelchair inaccessible stop",
     10.001,
@@ -37,7 +37,7 @@ class StreetTransitEntityLinkTest {
     null,
     NOT_POSSIBLE
   );
-  Stop accessibleStop = TransitModelForTest.stopForTest(
+  RegularStop accessibleStop = TransitModelForTest.stopForTest(
     "A:accessible",
     "wheelchair accessible stop",
     10.001,
@@ -46,7 +46,7 @@ class StreetTransitEntityLinkTest {
     POSSIBLE
   );
 
-  Stop unknownStop = TransitModelForTest.stopForTest(
+  RegularStop unknownStop = TransitModelForTest.stopForTest(
     "A:unknown",
     "unknown",
     10.001,
@@ -58,9 +58,8 @@ class StreetTransitEntityLinkTest {
   @BeforeAll
   static void setup() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(stopModel, deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(deduplicator);
+    transitModel = new TransitModel(new StopModel(), deduplicator);
   }
 
   @Test
@@ -85,24 +84,25 @@ class StreetTransitEntityLinkTest {
     assertNull(afterStrictTraversal);
   }
 
-  private State traverse(Stop stop, boolean onlyAccessible) {
+  private State traverse(RegularStop stop, boolean onlyAccessible) {
     var from = new SimpleVertex(graph, "A", 10, 10);
     var to = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(stop)
-      .withTransitModel(transitModel)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 
-    var req = new RoutingRequest();
-    WheelchairAccessibilityFeature feature;
+    var req = new RouteRequest();
+    AccessibilityPreferences feature;
     if (onlyAccessible) {
-      feature = WheelchairAccessibilityFeature.ofOnlyAccessible();
+      feature = AccessibilityPreferences.ofOnlyAccessible();
     } else {
-      feature = WheelchairAccessibilityFeature.ofCost(100, 100);
+      feature = AccessibilityPreferences.ofCost(100, 100);
     }
-    req.wheelchairAccessibility =
-      new WheelchairAccessibilityRequest(true, feature, feature, feature, 25, 8, 10, 25);
+    req.setWheelchair(true);
+    req
+      .preferences()
+      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);

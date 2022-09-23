@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM streets can be traversed
@@ -10,6 +9,10 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
  * @author bdferris, novalis, seime
  */
 public interface WayPropertySetSource {
+  static WayPropertySetSource defaultWayPropertySetSource() {
+    return fromConfig("default");
+  }
+
   /**
    * Return the given WayPropertySetSource or throws IllegalArgumentException if an unknown type is
    * specified
@@ -27,16 +30,14 @@ public interface WayPropertySetSource {
       return new FinlandWayPropertySetSource();
     } else if ("germany".equals(type)) {
       return new GermanyWayPropertySetSource();
+    } else if ("atlanta".equals(type)) {
+      return new AtlantaWayPropertySetSource();
     } else {
       throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'", type));
     }
   }
 
   void populateProperties(WayPropertySet wayPropertySet);
-
-  DrivingDirection drivingDirection();
-
-  IntersectionTraversalCostModel getIntersectionTraversalCostModel();
 
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
     return (
@@ -85,18 +86,5 @@ public interface WayPropertySetSource {
   default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
-  }
-
-  enum DrivingDirection {
-    /**
-     * Specifies that cars go on the right hand side of the road. This is true for the US mainland
-     * Europe.
-     */
-    RIGHT_HAND_TRAFFIC,
-    /**
-     * Specifies that cars go on the left hand side of the road. This is true for the UK, Japan and
-     * Australia.
-     */
-    LEFT_HAND_TRAFFIC,
   }
 }

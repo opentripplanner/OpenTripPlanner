@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -27,12 +26,12 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   @Override
   public void initialize(RoutingContext rctx) {
     Vertex target = rctx.toVertices.iterator().next();
-    maxStreetSpeed = rctx.opt.getStreetSpeedUpperBound();
-    walkingSpeed = rctx.opt.walkSpeed;
-    arriveBy = rctx.opt.arriveBy;
+    maxStreetSpeed = getStreetSpeedUpperBound(rctx);
+    walkingSpeed = rctx.opt.preferences().walk().speed();
+    arriveBy = rctx.opt.arriveBy();
 
     if (target.getDegreeIn() == 1) {
-      Edge edge = Iterables.getOnlyElement(target.getIncoming());
+      Edge edge = target.getIncoming().iterator().next();
       if (edge instanceof FreeEdge) {
         target = edge.getFromVertex();
       }
@@ -40,6 +39,21 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
 
     lat = target.getLat();
     lon = target.getLon();
+  }
+
+  /** @return The highest speed for all possible road-modes. */
+  private double getStreetSpeedUpperBound(RoutingContext rctx) {
+    var opt = rctx.opt;
+    var preferences = opt.preferences();
+
+    // Assume carSpeed > bikeSpeed > walkSpeed
+    if (opt.streetSubRequestModes.getCar()) {
+      return preferences.car().speed();
+    }
+    if (opt.streetSubRequestModes.getBicycle()) {
+      return preferences.bike().speed();
+    }
+    return preferences.walk().speed();
   }
 
   /**

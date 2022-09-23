@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.transit.model.site.Stop;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * Represents two stops where the routing distance between them (using OSM data) is much longer than
@@ -19,15 +19,15 @@ public class TransferRoutingDistanceTooLong implements DataImportIssue {
     "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> is %.0f times longer than " +
     "the euclidean distance. Street distance: %.2f, direct distance: %.2f.";
 
-  private final Stop origin;
-  private final Stop destination;
+  private final RegularStop origin;
+  private final RegularStop destination;
   private final double directDistance;
   private final double streetDistance;
   private final double ratio;
 
   public TransferRoutingDistanceTooLong(
-    Stop origin,
-    Stop destination,
+    RegularStop origin,
+    RegularStop destination,
     double directDistance,
     double streetDistance,
     double ratio

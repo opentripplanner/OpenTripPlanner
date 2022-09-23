@@ -4,17 +4,15 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
+import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 
 /**
  * This calculator is maintained by IBI Group.
  */
 public class HighestFareInFreeTransferWindowFareService extends DefaultFareServiceImpl {
-
-  private static final long serialVersionUID = 20120229L;
 
   private final boolean analyzeInterlinedTransfers;
   private final Duration freeTransferWindow;
@@ -46,7 +44,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
    */
   @Override
   protected boolean populateFare(
-    Fare fare,
+    ItineraryFares fare,
     Currency currency,
     FareType fareType,
     List<Leg> legs,

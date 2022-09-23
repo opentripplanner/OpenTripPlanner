@@ -2,14 +2,16 @@ package org.opentripplanner.ext.transmodelapi.model.stop;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.framework.TransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class MonoOrMultiModalStation extends TransitEntity {
+public class MonoOrMultiModalStation {
+
+  private final FeedScopedId id;
 
   private final I18NString name;
 
@@ -39,7 +41,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
   private final MonoOrMultiModalStation parentStation;
 
   public MonoOrMultiModalStation(Station station, MultiModalStation parentStation) {
-    super(station.getId());
+    this.id = station.getId();
     this.name = station.getName();
     this.lat = station.getLat();
     this.lon = station.getLon();
@@ -52,7 +54,7 @@ public class MonoOrMultiModalStation extends TransitEntity {
   }
 
   public MonoOrMultiModalStation(MultiModalStation multiModalStation) {
-    super(multiModalStation.getId());
+    this.id = multiModalStation.getId();
     this.name = multiModalStation.getName();
     this.lat = multiModalStation.getLat();
     this.lon = multiModalStation.getLon();
@@ -62,6 +64,10 @@ public class MonoOrMultiModalStation extends TransitEntity {
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
     this.parentStation = null;
+  }
+
+  public final FeedScopedId getId() {
+    return id;
   }
 
   public I18NString getName() {
@@ -98,5 +104,32 @@ public class MonoOrMultiModalStation extends TransitEntity {
 
   public MonoOrMultiModalStation getParentStation() {
     return parentStation;
+  }
+
+  @Override
+  public final int hashCode() {
+    return getId().hashCode();
+  }
+
+  /**
+   * Uses the  {@code id} for identity. We could use the {@link Object#equals(Object)} method, but
+   * this causes the equals to fail in cases were the same entity is created twice - for example
+   * after reloading a serialized instance.
+   */
+  @Override
+  public final boolean equals(Object obj) {
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    MonoOrMultiModalStation other = (MonoOrMultiModalStation) obj;
+    return getId().equals(other.getId());
+  }
+
+  /**
+   * Provide a default toString implementation with class name and id.
+   */
+  @Override
+  public final String toString() {
+    return getClass().getSimpleName() + '{' + getId() + '}';
   }
 }

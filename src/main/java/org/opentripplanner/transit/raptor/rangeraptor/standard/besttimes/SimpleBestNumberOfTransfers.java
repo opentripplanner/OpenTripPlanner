@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
-import org.opentripplanner.transit.raptor.util.IntUtils;
+import org.opentripplanner.util.lang.IntUtils;
 
 /**
  * The responsibility for this class is to keep track of the best (minimun) number of transfers for

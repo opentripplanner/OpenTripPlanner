@@ -3,10 +3,10 @@ package org.opentripplanner.transit.model.network;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.LogInfo;
-import org.opentripplanner.transit.model.framework.TransitEntity2;
-import org.opentripplanner.util.lang.AssertUtils;
+import org.opentripplanner.util.lang.StringUtils;
 
 /**
  * OTP model for NeTEx GroupOfLines. Not used for GTFS at the moment. This is used to categorize
@@ -14,7 +14,7 @@ import org.opentripplanner.util.lang.AssertUtils;
  * example divide lines into commercial and non-commercial groups.
  */
 public class GroupOfRoutes
-  extends TransitEntity2<GroupOfRoutes, GroupOfRoutesBuilder>
+  extends AbstractTransitEntity<GroupOfRoutes, GroupOfRoutesBuilder>
   implements LogInfo {
 
   private final String name;
@@ -24,10 +24,8 @@ public class GroupOfRoutes
 
   GroupOfRoutes(GroupOfRoutesBuilder builder) {
     super(builder.getId());
-    // required fields
-    this.name = AssertUtils.assertHasValue(builder.getName());
-
     // Optional fields
+    this.name = builder.getName();
     this.privateCode = builder.getPrivateCode();
     this.shortName = builder.getShortName();
     this.description = builder.getDescription();

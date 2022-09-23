@@ -6,8 +6,8 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Set;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import java.util.List;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
@@ -40,51 +40,60 @@ public class SpeedTestRequest {
     return testCase;
   }
 
-  RoutingRequest toRoutingRequest() {
+  RouteRequest toRoutingRequest() {
     var request = config.request.clone();
+    var pref = request.preferences();
+
     var input = testCase.definition();
 
     if (input.departureTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.departureTime()));
-      request.arriveBy = false;
+      request.setArriveBy(false);
       if (input.arrivalTime() != TestCase.NOT_SET) {
-        request.raptorOptions.withTimeLimit(time(input.arrivalTime()));
+        pref.transit().raptorOptions().withTimeLimit(time(input.arrivalTime()));
       }
     } else if (input.arrivalTime() != TestCase.NOT_SET) {
       request.setDateTime(time(input.arrivalTime()));
-      request.arriveBy = true;
+      request.setArriveBy(true);
     }
 
     if (input.window() != TestCase.NOT_SET) {
-      request.searchWindow = Duration.ofSeconds(input.window());
+      request.setSearchWindow(Duration.ofSeconds(input.window()));
     }
 
-    request.from = input.fromPlace();
-    request.to = input.toPlace();
-    request.numItineraries = opts.numOfItineraries();
-    request.modes = input.modes();
+    request.setFrom(input.fromPlace());
+    request.setTo(input.toPlace());
+    request.setNumItineraries(opts.numOfItineraries());
+    request.journey().setModes(input.modes());
 
-    request.raptorOptions
+    pref
+      .transit()
+      .raptorOptions()
       .withProfile(profile.raptorProfile())
       .withOptimizations(profile.optimizations())
       .withSearchDirection(profile.direction());
 
     if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
-      request.searchWindow = Duration.ZERO;
+      request.setSearchWindow(Duration.ZERO);
     }
 
-    addDebugOptions(request, opts);
-    request.tags =
-      Set.of(
-        RoutingTag.testCaseSample(input.idAndDescription()),
-        RoutingTag.testCaseCategory(input.category())
+    request
+      .journey()
+      .transit()
+      .raptorDebugging()
+      .withStops(opts.debugStops())
+      .withPath(opts.debugPath());
+
+    pref
+      .system()
+      .tags()
+      .addAll(
+        List.of(
+          RoutingTag.testCaseSample(input.idAndDescription()),
+          RoutingTag.testCaseCategory(input.category())
+        )
       );
-
     return request;
-  }
-
-  private static void addDebugOptions(RoutingRequest request, SpeedTestCmdLineOpts opts) {
-    request.raptorDebugging.withStops(opts.debugStops()).withPath(opts.debugPath());
   }
 
   private Instant time(int time) {

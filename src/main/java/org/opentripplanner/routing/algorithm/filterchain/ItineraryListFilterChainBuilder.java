@@ -11,7 +11,6 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -33,8 +32,10 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
 /**
@@ -64,6 +65,7 @@ public class ItineraryListFilterChainBuilder {
   private FareService faresService;
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
+  private boolean removeItinerariesWithSameRoutesAndStops;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -258,11 +260,20 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
+    boolean remove
+  ) {
+    this.removeItinerariesWithSameRoutesAndStops = remove;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
+
+    filters.addAll(buildGroupBySameRoutesAndStopsFilter());
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
@@ -359,6 +370,27 @@ public class ItineraryListFilterChainBuilder {
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
     return new ItineraryListFilterChain(filters, debug);
+  }
+
+  /**
+   * If enabled, this adds the filter to remove itineraries which have the same stops and routes.
+   * These are sometimes called "time-shifted duplicates" but since those terms have so many meanings
+   * we chose to use a long, but descriptive name instead.
+   */
+  private List<ItineraryListFilter> buildGroupBySameRoutesAndStopsFilter() {
+    if (removeItinerariesWithSameRoutesAndStops) {
+      return List.of(
+        new GroupByFilter<>(
+          GroupBySameRoutesAndStops::new,
+          List.of(
+            new SortingFilter(SortOrderComparator.comparator(sortOrder)),
+            new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+          )
+        )
+      );
+    } else {
+      return List.of();
+    }
   }
 
   public ItineraryListFilterChainBuilder withTransitAlerts(

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.net.URI;
 import java.time.LocalDate;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
@@ -28,14 +28,17 @@ public class SpeedTestConfig {
   /** The speed test run all its test on an existing pre-build graph. */
   public final URI graph;
 
+  public final String feedId;
+
   public final TransitRoutingConfig transitRoutingParams;
-  public final RoutingRequest request;
+  public final RouteRequest request;
 
   public SpeedTestConfig(JsonNode node) {
     NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
     this.rawNode = node;
     testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
     graph = adapter.asUri("graph", null);
+    feedId = adapter.asText("feedId");
     transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
     request = mapRoutingRequest(adapter.path("routingDefaults"));
   }
@@ -43,7 +46,7 @@ public class SpeedTestConfig {
   public static SpeedTestConfig config(File dir) {
     var json = new ConfigLoader(dir).loadJsonByFilename(FILE_NAME);
     SpeedTestConfig config = new SpeedTestConfig(json);
-    LOG.info("SpeedTest config loaded: " + config);
+    LOG.info("SpeedTest config loaded: {}", config);
     return config;
   }
 

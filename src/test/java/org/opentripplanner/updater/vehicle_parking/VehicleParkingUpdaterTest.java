@@ -13,7 +13,6 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
@@ -44,9 +43,17 @@ class VehicleParkingUpdaterTest {
     dataSource = (DataSource<VehicleParking>) Mockito.mock(DataSource.class);
     when(dataSource.update()).thenReturn(true);
 
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
+
     var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
-    vehicleParkingUpdater = new VehicleParkingUpdater(parameters, dataSource);
-    vehicleParkingUpdater.setup(graph, transitModel);
+    vehicleParkingUpdater =
+      new VehicleParkingUpdater(
+        parameters,
+        dataSource,
+        graph.getLinker(),
+        graph.getVehicleParkingService()
+      );
   }
 
   @Test
@@ -75,7 +82,7 @@ class VehicleParkingUpdaterTest {
     assertVehicleParkingsInGraph(1);
 
     var vehicleParkingInGraph = graph
-      .getService(VehicleParkingService.class)
+      .getVehicleParkingService()
       .getVehicleParkings()
       .findFirst()
       .orElseThrow();
@@ -92,7 +99,7 @@ class VehicleParkingUpdaterTest {
     assertVehicleParkingsInGraph(1);
 
     vehicleParkingInGraph =
-      graph.getService(VehicleParkingService.class).getVehicleParkings().findFirst().orElseThrow();
+      graph.getVehicleParkingService().getVehicleParkings().findFirst().orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
   }
@@ -124,7 +131,7 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    assertEquals(1, graph.getService(VehicleParkingService.class).getVehicleParkings().count());
+    assertEquals(1, graph.getVehicleParkingService().getVehicleParkings().count());
     assertVehicleParkingNotLinked();
   }
 
@@ -141,7 +148,7 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    var vehicleParkingService = graph.getService(VehicleParkingService.class);
+    var vehicleParkingService = graph.getVehicleParkingService();
     assertEquals(1, vehicleParkingService.getVehicleParkings().count());
     assertEquals(
       vehiclePlaces,
@@ -176,7 +183,7 @@ class VehicleParkingUpdaterTest {
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
 
-    var vehicleParkingService = graph.getService(VehicleParkingService.class);
+    var vehicleParkingService = graph.getVehicleParkingService();
     assertEquals(1, vehicleParkingService.getVehicleParkings().count());
 
     when(dataSource.getUpdates()).thenReturn(List.of());
@@ -225,7 +232,7 @@ class VehicleParkingUpdaterTest {
 
     assertEquals(
       vehicleParkingNumber,
-      graph.getService(VehicleParkingService.class).getVehicleParkings().count()
+      graph.getVehicleParkingService().getVehicleParkings().count()
     );
   }
 

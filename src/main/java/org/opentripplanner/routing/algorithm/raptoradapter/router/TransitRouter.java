@@ -17,9 +17,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Acces
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -29,26 +28,25 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {
 
   public static final int NOT_SET = -1;
 
-  private final RoutingRequest request;
-  private final OtpServerContext serverContext;
+  private final RouteRequest request;
+  private final OtpServerRequestContext serverContext;
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
 
   private TransitRouter(
-    RoutingRequest request,
-    OtpServerContext serverContext,
+    RouteRequest request,
+    OtpServerRequestContext serverContext,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
@@ -61,8 +59,8 @@ public class TransitRouter {
   }
 
   public static TransitRouterResult route(
-    RoutingRequest request,
-    OtpServerContext serverContext,
+    RouteRequest request,
+    OtpServerRequestContext serverContext,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
@@ -78,17 +76,17 @@ public class TransitRouter {
   }
 
   private TransitRouterResult route() {
-    if (request.modes.transitModes.isEmpty()) {
+    if (request.journey().transit().modes().isEmpty()) {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!serverContext.transitService().transitFeedCovers(request.getDateTime())) {
+    if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
     }
 
-    var transitLayer = request.ignoreRealtimeUpdates
+    var transitLayer = request.preferences().transit().ignoreRealtimeUpdates()
       ? serverContext.transitService().getTransitLayer()
       : serverContext.transitService().getRealtimeTransitLayer();
 
@@ -96,7 +94,7 @@ public class TransitRouter {
 
     debugTimingAggregator.finishedPatternFiltering();
 
-    var accessEgresses = getAccessEgresses(transitLayer);
+    var accessEgresses = getAccessEgresses();
 
     debugTimingAggregator.finishedAccessEgress(
       accessEgresses.getAccesses().size(),
@@ -133,7 +131,7 @@ public class TransitRouter {
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
             raptorRequest,
-            request.transferOptimization
+            request.preferences().transfer().optimization()
           )
           .optimize(transitResponse.paths());
     }
@@ -155,8 +153,8 @@ public class TransitRouter {
     return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());
   }
 
-  private AccessEgresses getAccessEgresses(TransitLayer transitLayer) {
-    var accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
+  private AccessEgresses getAccessEgresses() {
+    var accessEgressMapper = new AccessEgressMapper();
     var accessList = new ArrayList<AccessEgress>();
     var egressList = new ArrayList<AccessEgress>();
 
@@ -198,10 +196,10 @@ public class TransitRouter {
     boolean isEgress
   ) {
     var results = new ArrayList<AccessEgress>();
-    var mode = isEgress ? request.modes.egressMode : request.modes.accessMode;
+    var mode = isEgress ? request.journey().egress().mode() : request.journey().access().mode();
 
     // Prepare access/egress lists
-    RoutingRequest accessRequest = request.getStreetSearchRequest(mode);
+    RouteRequest accessRequest = request.getStreetSearchRequest(mode);
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest)
     ) {
@@ -212,7 +210,7 @@ public class TransitRouter {
       );
 
       if (!isEgress) {
-        accessRequest.allowKeepingRentedVehicleAtDestination = false;
+        accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
       }
 
       var nearbyStops = AccessEgressRouter.streetSearch(
@@ -230,7 +228,7 @@ public class TransitRouter {
           routingContext,
           serverContext.transitService(),
           additionalSearchDays,
-          serverContext.routerConfig().flexParameters(request),
+          serverContext.routerConfig().flexParameters(accessRequest.preferences()),
           isEgress
         );
 
@@ -244,23 +242,16 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    RoutingRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
+    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
 
     return new RaptorRoutingRequestTransitData(
-      serverContext.transitService().getTransferService(),
       transitLayer,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
-      createRequestTransitDataProviderFilter(serverContext.transitService()),
+      new RoutingRequestTransitDataProviderFilter(request, serverContext.transitService()),
       new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null)
     );
-  }
-
-  private TransitDataProviderFilter createRequestTransitDataProviderFilter(
-    TransitService transitService
-  ) {
-    return new RoutingRequestTransitDataProviderFilter(request, transitService);
   }
 
   private void verifyAccessEgress(Collection<?> access, Collection<?> egress) {

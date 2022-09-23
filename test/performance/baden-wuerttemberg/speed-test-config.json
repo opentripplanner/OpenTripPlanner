@@ -1,6 +1,7 @@
 {
   // Run all test-cases on the given date
   "testDate": "2022-07-25",
+  "feedId": "1",
 
   // Relative paths supported like "../../data/otp-ci/graph-${otp.serialization.version.id}.obj"
   // Default: "graph.obj"

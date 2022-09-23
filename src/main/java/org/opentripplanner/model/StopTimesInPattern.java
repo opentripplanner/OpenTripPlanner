@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * Some stopTimes all in the same pattern. TripTimeShort should probably be renamed StopTimeShort

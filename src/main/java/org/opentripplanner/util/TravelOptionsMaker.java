@@ -1,10 +1,9 @@
 package org.opentripplanner.util;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TransitService;
@@ -21,9 +20,9 @@ public final class TravelOptionsMaker {
 
   static {
     staticTravelOptions = new ArrayList<>(3);
-    staticTravelOptions.add(new TravelOption(TraverseMode.WALK.toString()));
-    staticTravelOptions.add(new TravelOption(TraverseMode.BICYCLE.toString()));
-    staticTravelOptions.add(new TravelOption(TraverseMode.CAR.toString()));
+    staticTravelOptions.add(new TravelOption(ApiRequestMode.WALK.toString()));
+    staticTravelOptions.add(new TravelOption(ApiRequestMode.BICYCLE.toString()));
+    staticTravelOptions.add(new TravelOption(ApiRequestMode.CAR.toString()));
   }
 
   public static List<TravelOption> makeOptions(Graph graph, TransitService transitService) {
@@ -47,15 +46,15 @@ public final class TravelOptionsMaker {
     if (!transitModes.isEmpty()) {
       travelOptions.add(
         new TravelOption(
-          String.join(",", TraverseMode.TRANSIT.toString(), TraverseMode.WALK.toString()),
-          TraverseMode.TRANSIT.toString()
+          String.join(",", ApiRequestMode.TRANSIT.toString(), ApiRequestMode.WALK.toString()),
+          ApiRequestMode.TRANSIT.toString()
         )
       );
 
       for (TransitMode transitMode : transitModes) {
         travelOptions.add(
           new TravelOption(
-            String.join(",", transitMode.toString(), TraverseMode.WALK.toString()),
+            String.join(",", transitMode.toString(), ApiRequestMode.WALK.toString()),
             transitMode.toString()
           )
         );
@@ -67,7 +66,7 @@ public final class TravelOptionsMaker {
     if (hasBikeSharing) {
       travelOptions.add(
         new TravelOption(
-          String.join(",", TraverseMode.WALK.toString(), "BICYCLE_RENT"),
+          String.join(",", ApiRequestMode.WALK.toString(), "BICYCLE_RENT"),
           "BICYCLERENT"
         )
       );
@@ -78,8 +77,8 @@ public final class TravelOptionsMaker {
       //Adds bicycle transit mode
       travelOptions.add(
         new TravelOption(
-          String.join(",", TraverseMode.TRANSIT.toString(), TraverseMode.BICYCLE.toString()),
-          String.join("_", TraverseMode.TRANSIT.toString(), TraverseMode.BICYCLE.toString())
+          String.join(",", ApiRequestMode.TRANSIT.toString(), ApiRequestMode.BICYCLE.toString()),
+          String.join("_", ApiRequestMode.TRANSIT.toString(), ApiRequestMode.BICYCLE.toString())
         )
       );
       if (hasBikeSharing) {
@@ -87,8 +86,8 @@ public final class TravelOptionsMaker {
           new TravelOption(
             String.join(
               ",",
-              TraverseMode.TRANSIT.toString(),
-              TraverseMode.WALK.toString(),
+              ApiRequestMode.TRANSIT.toString(),
+              ApiRequestMode.WALK.toString(),
               "BICYCLE_RENT"
             ),
             "TRANSIT_BICYCLERENT"
@@ -101,8 +100,8 @@ public final class TravelOptionsMaker {
             String.join(
               ",",
               "CAR_PARK",
-              TraverseMode.WALK.toString(),
-              TraverseMode.TRANSIT.toString()
+              ApiRequestMode.WALK.toString(),
+              ApiRequestMode.TRANSIT.toString()
             ),
             "PARKRIDE"
           )
@@ -114,8 +113,8 @@ public final class TravelOptionsMaker {
             String.join(
               ",",
               "BICYCLE_PARK",
-              TraverseMode.WALK.toString(),
-              TraverseMode.TRANSIT.toString()
+              ApiRequestMode.WALK.toString(),
+              ApiRequestMode.TRANSIT.toString()
             ),
             "BIKERIDE"
           )
@@ -125,9 +124,9 @@ public final class TravelOptionsMaker {
         new TravelOption(
           String.join(
             ",",
-            TraverseMode.CAR.toString(),
-            TraverseMode.WALK.toString(),
-            TraverseMode.TRANSIT.toString()
+            ApiRequestMode.CAR.toString(),
+            ApiRequestMode.WALK.toString(),
+            ApiRequestMode.TRANSIT.toString()
           ),
           "KISSRIDE"
         )

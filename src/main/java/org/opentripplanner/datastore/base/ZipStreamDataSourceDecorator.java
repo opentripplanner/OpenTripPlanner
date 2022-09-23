@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +54,11 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   @Override
   public String path() {
     return delegate.path();
+  }
+
+  @Override
+  public URI uri() {
+    return URI.create(path());
   }
 
   @Override

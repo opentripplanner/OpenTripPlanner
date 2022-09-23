@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -23,7 +23,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
   Graph graph;
 
   public StreetEdgeCostTest() {
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -48,8 +48,8 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RoutingRequest();
-    req.setWalkReluctance(walkReluctance);
+    var req = new RouteRequest();
+    req.preferences().withWalk(w -> w.setReluctance(walkReluctance));
     State result = traverse(edge, req);
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
@@ -70,9 +70,9 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setMode(TraverseMode.BICYCLE);
-    req.setBikeReluctance(bikeReluctance);
+    req.preferences().withBike(bike -> bike.setReluctance(bikeReluctance));
 
     State result = traverse(edge, req);
     assertNotNull(result);
@@ -94,9 +94,9 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RoutingRequest();
+    var req = new RouteRequest();
     req.setMode(TraverseMode.CAR);
-    req.setCarReluctance(carReluctance);
+    req.preferences().car().setReluctance(carReluctance);
 
     State result = traverse(edge, req);
     assertNotNull(result);
@@ -118,8 +118,8 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
 
-    var req = new RoutingRequest();
-    req.stairsReluctance = stairsReluctance;
+    var req = new RouteRequest();
+    req.preferences().withWalk(w -> w.setStairsReluctance(stairsReluctance));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);
@@ -131,7 +131,41 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     assertEquals(15, (long) notStairsResult.weight);
   }
 
-  private State traverse(StreetEdge edge, RoutingRequest req) {
+  static Stream<Arguments> walkSafetyCases = Stream.of(
+    Arguments.of(0, 15),
+    Arguments.of(0.5, 22),
+    Arguments.of(1, 30)
+  );
+
+  @ParameterizedTest(name = "walk safety factor of of {0} should lead to traversal costs of {1}")
+  @VariableSource("walkSafetyCases")
+  public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
+    double length = 10;
+    var edge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      "test edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
+    edge.setWalkSafetyFactor(2);
+
+    var req = new RouteRequest();
+    req.preferences().withWalk(w -> w.setSafetyFactor(walkSafetyFactor));
+
+    var result = traverse(edge, req);
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(8, result.getElapsedTimeSeconds());
+
+    edge.setWalkSafetyFactor(1);
+    var defaultSafetyResult = traverse(edge, req);
+    assertEquals(15, (long) defaultSafetyResult.weight);
+  }
+
+  private State traverse(StreetEdge edge, RouteRequest req) {
     var ctx = new RoutingContext(req, graph, V1, V2);
     var state = new State(ctx);
 

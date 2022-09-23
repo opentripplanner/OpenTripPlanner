@@ -157,4 +157,9 @@ public class ServiceDateIntervalTest {
     assertEquals("[MIN, MAX]", new ServiceDateInterval(null, null).toString());
     assertEquals("[MIN, MAX]", ServiceDateInterval.unbounded().toString());
   }
+
+  @Test
+  public void daysInPeriod() {
+    assertEquals(7, new ServiceDateInterval(d0, d1).daysInPeriod());
+  }
 }

@@ -29,8 +29,8 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,12 +48,12 @@ public class TransmodelAPI {
   private static GraphQLSchema schema;
   private static Collection<String> tracingHeaderTags;
 
-  private final OtpServerContext serverContext;
+  private final OtpServerRequestContext serverContext;
   private final TransmodelGraph index;
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public TransmodelAPI(
-    @Context OtpServerContext serverContext,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -72,7 +72,7 @@ public class TransmodelAPI {
   public static void setUp(
     TransmodelAPIParameters config,
     TransitModel transitModel,
-    RoutingRequest defaultRoutingRequest
+    RouteRequest defaultRoutingRequest
   ) {
     if (config.hideFeedId()) {
       TransitIdMapper.setupFixedFeedId(transitModel.getAgencies());

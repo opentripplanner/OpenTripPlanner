@@ -20,7 +20,6 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeMode
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnRouteModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel;
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.DirectionAndRoute;
 import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRouteOrTripKey;
@@ -29,6 +28,7 @@ import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
@@ -156,7 +156,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .map(entitySelector -> {
           if (entitySelector instanceof EntitySelector.Stop) {
             FeedScopedId id = ((EntitySelector.Stop) entitySelector).stopId;
-            StopLocation stop = getTransitService(environment).getStopForId(id);
+            StopLocation stop = getTransitService(environment).getRegularStop(id);
             return List.of(getAlertEntityOrUnknown(stop, id.toString(), "stop"));
           }
           if (entitySelector instanceof EntitySelector.Agency) {
@@ -179,7 +179,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
               ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
             FeedScopedId stopId = stopAndRouteKey.stop;
             FeedScopedId routeId = stopAndRouteKey.routeOrTrip;
-            StopLocation stop = getTransitService(environment).getStopForId(stopId);
+            StopLocation stop = getTransitService(environment).getRegularStop(stopId);
             Route route = getTransitService(environment).getRouteForId(routeId);
             return List.of(
               stop != null && route != null
@@ -199,7 +199,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
               ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
             FeedScopedId stopId = stopAndTripKey.stop;
             FeedScopedId tripId = stopAndTripKey.routeOrTrip;
-            StopLocation stop = getTransitService(environment).getStopForId(stopId);
+            StopLocation stop = getTransitService(environment).getRegularStop(stopId);
             Trip trip = getTransitService(environment).getTripForId(tripId);
             return List.of(
               stop != null && trip != null
@@ -307,7 +307,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
         .findAny()
         .map(EntitySelector.Stop.class::cast)
-        .map(entitySelector -> getTransitService(environment).getStopForId(entitySelector.stopId))
+        .map(entitySelector -> getTransitService(environment).getRegularStop(entitySelector.stopId))
         .orElse(null);
   }
 

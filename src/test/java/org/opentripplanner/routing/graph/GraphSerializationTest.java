@@ -19,9 +19,9 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -74,11 +74,13 @@ public class GraphSerializationTest {
    */
   @Test
   public void compareGraphToItself() {
-    TestOtpModel cachedPortlandGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
+    TestOtpModel cachedPortlandGraph = ConstantsForTests
+      .getInstance()
+      .getCachedPortlandGraph()
+      .index();
     Graph originalGraph = cachedPortlandGraph.graph();
     TransitModel originalTransitModel = cachedPortlandGraph.transitModel();
-    originalTransitModel.index();
-    originalGraph.index();
+
     // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
     // We do skip edge lists - otherwise we trigger a depth-first search of the graph causing a stack overflow.
     // We also skip some deeply buried weak-value hash maps, which refuse to tell you what their keys are.
@@ -177,10 +179,10 @@ public class GraphSerializationTest {
     // might be indexed by other tests.
 
     originalTransitModel.index();
-    originalGraph.index();
+    originalGraph.index(originalTransitModel.getStopModel());
 
     copiedTransitModel1.index();
-    copiedGraph1.index();
+    copiedGraph1.index(copiedTransitModel1.getStopModel());
 
     assertNoDifferences(originalGraph, copiedGraph1);
 
@@ -188,7 +190,7 @@ public class GraphSerializationTest {
     Graph copiedGraph2 = deserializedGraph2.graph;
     TransitModel copiedTransitModel2 = deserializedGraph2.transitModel;
     copiedTransitModel2.index();
-    copiedGraph2.index();
+    copiedGraph2.index(copiedTransitModel2.getStopModel());
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 }

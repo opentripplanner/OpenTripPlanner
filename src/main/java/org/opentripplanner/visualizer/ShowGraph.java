@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -53,6 +52,7 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -610,11 +610,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       Edge e = s.getBackEdge();
       if (e == null) continue;
 
-      if (mode != null && mode.isTransit()) {
-        stroke(200, 050, 000);
-        strokeWeight(6);
-        drawEdge(e);
-      }
+      // TODO Add support for crating transit edges on the fly
+      //      if (mode != null && mode.isTransit()) {
+      //        stroke(200, 050, 000);
+      //        strokeWeight(6);
+      //        drawEdge(e);
+      //      }
       if (e instanceof StreetEdge) {
         StreetTraversalPermission stp = ((StreetEdge) e).getPermission();
         if (stp == StreetTraversalPermission.PEDESTRIAN) {

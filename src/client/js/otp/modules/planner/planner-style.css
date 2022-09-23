@@ -9,6 +9,10 @@
   height: 300px;
 }
 
+.otp-defaultItinsWidget table.fares td {
+  padding: 0 3px 0 0;
+}
+
 @media only screen and (min-width: 1024px) {
   .otp-defaultItinsWidget {
     width: 450px;
@@ -182,7 +186,7 @@ h3.sysNotice {
 }
 
 .otp-itinTripSummaryText {
-    margin-left: 7.5em;
+    margin-left: 10em;
 }
 
 .otp-itinTripSummaryFooter {

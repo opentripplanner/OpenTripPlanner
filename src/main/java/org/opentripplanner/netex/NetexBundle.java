@@ -16,8 +16,8 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.standalone.config.NetexConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
  * keeping an index of entities to enable linking. The convention is documented here {@link
- * NetexConfig#sharedFilePattern} and here {@link NetexDataSourceHierarchy}.
+ * NetexDefaultsConfig#sharedFilePattern} and here {@link NetexDataSourceHierarchy}.
  * <p>
  * This class is also responsible for logging progress and exception handling.
  */

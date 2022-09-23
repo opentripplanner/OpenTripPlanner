@@ -6,23 +6,23 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(OtpServerContext serverContext, RoutingRequest request) {
-    if (request.modes.directMode == StreetMode.NOT_SET) {
+  public static List<Itinerary> route(OtpServerRequestContext serverContext, RouteRequest request) {
+    if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
 
-    RoutingRequest directRequest = request.getStreetSearchRequest(request.modes.directMode);
+    RouteRequest directRequest = request.getStreetSearchRequest(request.journey().direct().mode());
     try (
       var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
     ) {
@@ -50,7 +50,11 @@ public class DirectStreetRouter {
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
+      ItinerariesHelper.decorateItinerariesWithRequestData(
+        response,
+        directRequest.wheelchair(),
+        directRequest.preferences().wheelchair()
+      );
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
@@ -72,17 +76,19 @@ public class DirectStreetRouter {
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
    * RoutingRequest.
    */
-  private static double calculateDistanceMaxLimit(RoutingRequest request) {
+  private static double calculateDistanceMaxLimit(RouteRequest request) {
+    var preferences = request.preferences();
     double distanceLimit;
-    StreetMode mode = request.modes.directMode;
-    double durationLimit = request.getMaxDirectStreetDuration(mode).toSeconds();
+    StreetMode mode = request.journey().direct().mode();
+
+    double durationLimit = preferences.street().maxDirectDuration().valueOf(mode).toSeconds();
 
     if (mode.includesDriving()) {
-      distanceLimit = durationLimit * request.carSpeed;
+      distanceLimit = durationLimit * preferences.car().speed();
     } else if (mode.includesBiking()) {
-      distanceLimit = durationLimit * request.bikeSpeed;
+      distanceLimit = durationLimit * preferences.bike().speed();
     } else if (mode.includesWalking()) {
-      distanceLimit = durationLimit * request.walkSpeed;
+      distanceLimit = durationLimit * preferences.walk().speed();
     } else {
       throw new IllegalStateException("Could not set max limit for StreetMode");
     }

@@ -1,12 +1,13 @@
 package org.opentripplanner.standalone.server;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.jersey2.server.DefaultJerseyTagsProvider;
 import io.micrometer.jersey2.server.MetricsApplicationEventListener;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -19,7 +20,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.standalone.api.OtpServerContext;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -34,7 +35,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class OTPWebApplication extends Application {
 
   /* This object groups together all the modules for a single running OTP server. */
-  private final Supplier<OtpServerContext> contextProvider;
+  private final Supplier<OtpServerRequestContext> contextProvider;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -44,7 +45,7 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
-  public OTPWebApplication(Supplier<OtpServerContext> contextProvider) {
+  public OTPWebApplication(Supplier<OtpServerRequestContext> contextProvider) {
     this.contextProvider = contextProvider;
   }
 
@@ -58,10 +59,8 @@ public class OTPWebApplication extends Application {
    */
   @Override
   public Set<Class<?>> getClasses() {
-    Set<Class<?>> classes = Sets.newHashSet();
-
     // Add API Endpoints defined in the api package
-    classes.addAll(APIEndpoints.listAPIEndpoints());
+    Set<Class<?>> classes = new HashSet<>(APIEndpoints.listAPIEndpoints());
 
     /* Features and Filters: extend Jersey, manipulate requests and responses. */
     classes.add(CorsFilter.class);
@@ -79,17 +78,19 @@ public class OTPWebApplication extends Application {
    */
   @Override
   public Set<Object> getSingletons() {
-    var singletons = Sets.newHashSet(
-      // Show exception messages in responses
-      new OTPExceptionMapper(),
-      // Enable Jackson JSON response serialization
-      new JacksonJsonProvider(),
-      // Serialize POJOs (unannotated) JSON using Jackson
-      new JSONObjectMapperProvider(),
-      // Allow injecting the OTP server object into Jersey resource classes
-      makeBinder(contextProvider),
-      // Add performance instrumentation of Jersey requests to micrometer
-      getMetricsApplicationEventListener()
+    var singletons = new HashSet<>(
+      List.of(
+        // Show exception messages in responses
+        new OTPExceptionMapper(),
+        // Enable Jackson JSON response serialization
+        new JacksonJsonProvider(),
+        // Serialize POJOs (unannotated) JSON using Jackson
+        new JSONObjectMapperProvider(),
+        // Allow injecting the OTP server object into Jersey resource classes
+        makeBinder(contextProvider),
+        // Add performance instrumentation of Jersey requests to micrometer
+        getMetricsApplicationEventListener()
+      )
     );
 
     if (OTPFeature.ActuatorAPI.isOn()) {
@@ -106,7 +107,7 @@ public class OTPWebApplication extends Application {
    */
   @Override
   public Map<String, Object> getProperties() {
-    Map<String, Object> props = Maps.newHashMap();
+    Map<String, Object> props = new HashMap<>();
     props.put(ServerProperties.TRACING, Boolean.TRUE);
     props.put(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
     return props;
@@ -121,11 +122,11 @@ public class OTPWebApplication extends Application {
    * <p>
    * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
-  private Binder makeBinder(Supplier<OtpServerContext> contextProvider) {
+  private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bindFactory(contextProvider).to(OtpServerContext.class);
+        bindFactory(contextProvider).to(OtpServerRequestContext.class);
       }
     };
   }

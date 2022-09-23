@@ -3,9 +3,8 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.PathwayMode;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -14,6 +13,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.PathwayMode;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A walking pathway as described in GTFS
@@ -21,7 +22,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
-  private static final long serialVersionUID = -3311099256178798982L;
   private final I18NString name;
   private final int traversalTime;
   private final double distance;
@@ -78,36 +78,33 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
-  public String getDirection() {
-    return null;
-  }
-
   public State traverse(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
     if (s1 == null) {
       return null;
     }
 
-    RoutingRequest options = s0.getOptions();
+    RoutingPreferences preferences = s0.getPreferences();
+    RouteRequest request = s0.getOptions();
 
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
     int time = traversalTime;
 
     if (time == 0) {
       if (distance > 0) {
-        time = (int) (distance * options.walkSpeed);
+        time = (int) (distance * preferences.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time = (int) (0.4 * Math.abs(steps) * options.walkSpeed);
+        time = (int) (0.4 * Math.abs(steps) * preferences.walk().speed());
       }
     }
 
     if (time > 0) {
       double weight = time;
-      if (options.wheelchairAccessibility.enabled()) {
+      if (request.wheelchair()) {
         weight *=
           StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
-            options,
+            preferences,
             slope,
             wheelchairAccessible,
             isStairs()
@@ -115,7 +112,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       } else {
         weight *=
           StreetEdgeReluctanceCalculator.computeReluctance(
-            options,
+            preferences,
             TraverseMode.WALK,
             s0.getNonTransitMode() == TraverseMode.BICYCLE,
             isStairs()

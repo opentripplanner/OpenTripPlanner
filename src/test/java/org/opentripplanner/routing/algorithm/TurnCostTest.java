@@ -10,14 +10,14 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -26,6 +26,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class TurnCostTest {
 
@@ -37,7 +38,9 @@ public class TurnCostTest {
 
   private StreetEdge maple_main1, broad1_2;
 
-  private RoutingRequest proto;
+  private RouteRequest proto;
+
+  private IntersectionTraversalCalculator calculator;
 
   @BeforeEach
   public void before() {
@@ -89,16 +92,19 @@ public class TurnCostTest {
     bottomLeft = broad3;
 
     // Make a prototype routing request.
-    proto = new RoutingRequest();
-    proto.carSpeed = 1.0;
-    proto.walkSpeed = 1.0;
-    proto.bikeSpeed = 1.0;
-    proto.turnReluctance = (1.0);
-    proto.setNonTransitReluctance(1.0);
-    proto.stairsReluctance = (1.0);
+    proto = new RouteRequest();
+    var preferences = proto.preferences();
+    preferences.car().setSpeed(1.0);
+    preferences.withWalk(walk -> {
+      walk.setSpeed(1.0);
+      walk.setStairsReluctance(1.0);
+    });
+    preferences.withBike(bike -> bike.setSpeed(1.0));
+    preferences.street().setTurnReluctance(1.0);
+    preferences.setAllStreetReluctance(1.0);
 
     // Turn costs are all 0 by default.
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(0.0));
+    calculator = new ConstantIntersectionTraversalCalculator(0.0);
   }
 
   @Test
@@ -109,13 +115,12 @@ public class TurnCostTest {
 
   @Test
   public void testForwardDefaultConstTurnCosts() {
-    RoutingRequest options = proto.clone();
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+    calculator = new ConstantIntersectionTraversalCalculator(10.0);
 
     // Without turn costs, this path costs 2x100 + 2x50 = 300.
     // Since we traverse 3 intersections, the total cost should be 330.
     GraphPath path = checkForwardRouteDuration(
-      new RoutingContext(options, graph, topRight, bottomLeft),
+      new RoutingContext(proto, graph, topRight, bottomLeft),
       330
     );
 
@@ -139,7 +144,7 @@ public class TurnCostTest {
 
   @Test
   public void testForwardCarNoTurnCosts() {
-    RoutingRequest options = proto.clone();
+    RouteRequest options = proto.clone();
     options.setMode(TraverseMode.CAR);
 
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
@@ -160,8 +165,8 @@ public class TurnCostTest {
 
   @Test
   public void testForwardCarConstTurnCosts() {
-    RoutingRequest options = proto.clone();
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+    RouteRequest options = proto.clone();
+    calculator = new ConstantIntersectionTraversalCalculator(10.0);
     options.setMode(TraverseMode.CAR);
 
     // Without turn costs, this path costs 3x100 + 1x50 = 350.
@@ -188,7 +193,11 @@ public class TurnCostTest {
   }
 
   private GraphPath checkForwardRouteDuration(RoutingContext context, int expectedDuration) {
-    ShortestPathTree tree = AStarBuilder.oneToOne().setContext(context).getShortestPathTree();
+    ShortestPathTree tree = AStarBuilder
+      .oneToOne()
+      .setContext(context)
+      .setIntersectionTraversalCalculator(calculator)
+      .getShortestPathTree();
     GraphPath path = tree.getPath(bottomLeft);
     assertNotNull(path);
 

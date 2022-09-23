@@ -24,6 +24,11 @@ public interface RaptorTimers {
     public void findTransfersForRound(Runnable body) {
       body.run();
     }
+
+    @Override
+    public RaptorTimers withNamePrefix(String namePrefix) {
+      return this;
+    }
   };
 
   /**
@@ -44,4 +49,9 @@ public interface RaptorTimers {
    * for a Range-Raptor round.
    */
   void findTransfersForRound(Runnable body);
+
+  /**
+   * Create a new instance with a new name prefix. Useful when creating a new request for heuristic.
+   */
+  RaptorTimers withNamePrefix(String namePrefix);
 }

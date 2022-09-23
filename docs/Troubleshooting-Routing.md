@@ -79,7 +79,7 @@ OTP has a very flexible system for deciding when a street is to be allowed by pe
 or cars.
 
 To configure the which settings to use for your location, please use
-the [osmWayPropertySet config attribute](BuildConfiguration.md#Way-property-sets).
+the [osmTagMapping config attribute](BuildConfiguration.md#Osm-Tag-Mapping).
 
 In the following section we will discuss the default case, which will be used if the property is not
 set.

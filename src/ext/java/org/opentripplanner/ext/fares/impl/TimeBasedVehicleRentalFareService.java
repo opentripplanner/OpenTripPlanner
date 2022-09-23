@@ -6,8 +6,9 @@ import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 
 /**
@@ -32,7 +33,7 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
   }
 
   @Override
-  public Fare getCost(Itinerary itinerary) {
+  public ItineraryFares getCost(Itinerary itinerary) {
     var totalCost = itinerary
       .getLegs()
       .stream()
@@ -40,14 +41,14 @@ public class TimeBasedVehicleRentalFareService implements FareService, Serializa
       .mapToInt(this::getLegCost)
       .sum();
 
-    Fare fare = new Fare();
-    fare.addFare(FareType.regular, currency, totalCost);
+    ItineraryFares fare = ItineraryFares.empty();
+    fare.addFare(FareType.regular, new Money(currency, totalCost));
     return fare;
   }
 
   private int getLegCost(Leg pathLeg) {
     int rideCost = 0;
-    long rideTime = pathLeg.getDuration();
+    long rideTime = pathLeg.getDuration().toSeconds();
     for (P2<Integer> bracket : pricing_by_second) {
       int time = bracket.first;
       if (rideTime < time) {

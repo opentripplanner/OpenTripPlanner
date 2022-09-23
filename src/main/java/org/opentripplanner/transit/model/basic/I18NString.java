@@ -20,4 +20,14 @@ public interface I18NString {
    * @param locale Wanted locale
    */
   String toString(Locale locale);
+
+  public static I18NString assertHasValue(I18NString value) {
+    if (value == null || value.toString().isBlank()) {
+      throw new IllegalArgumentException(
+        "Value can not be null, empty or just whitespace: " +
+        (value == null ? "null" : "'" + value + "'")
+      );
+    }
+    return value;
+  }
 }

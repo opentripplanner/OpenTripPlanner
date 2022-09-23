@@ -3,8 +3,8 @@ package org.opentripplanner.ext.fares.impl;
 import java.io.Serializable;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.fares.FareService;
 
@@ -19,22 +19,22 @@ public class AddingMultipleFareService implements FareService, Serializable {
   }
 
   @Override
-  public Fare getCost(Itinerary itinerary) {
-    Fare fare = null;
+  public ItineraryFares getCost(Itinerary itinerary) {
+    ItineraryFares fare = null;
 
     for (FareService subService : subServices) {
-      Fare subFare = subService.getCost(itinerary);
+      ItineraryFares subFare = subService.getCost(itinerary);
       if (subFare == null) {
         // No fare, next one please
         continue;
       }
       if (fare == null) {
         // Pick first defined fare
-        fare = new Fare(subFare);
+        fare = new ItineraryFares(subFare);
       } else {
         // Merge subFare with existing fare
         // Must use a temporary as we need to keep fare clean during the loop on FareType
-        Fare newFare = new Fare(fare);
+        ItineraryFares newFare = new ItineraryFares(fare);
         for (FareType fareType : FareType.values()) {
           Money cost = fare.getFare(fareType);
           Money subCost = subFare.getFare(fareType);
@@ -63,7 +63,7 @@ public class AddingMultipleFareService implements FareService, Serializable {
             // Add new cost
             // Note: this should not happen often: only if a fare
             // did not compute a "regular" fare.
-            newFare.addFare(fareType, subCost.currency(), subCost.cents());
+            newFare.addFare(fareType, subCost);
           }
         }
         fare = newFare;

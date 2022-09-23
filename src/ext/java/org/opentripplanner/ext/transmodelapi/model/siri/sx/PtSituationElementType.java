@@ -118,7 +118,7 @@ public class PtSituationElementType {
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
               .map(entitySelector -> entitySelector.stopId)
-              .map(transitService::getStopForId)
+              .map(transitService::getRegularStop)
               .collect(Collectors.toList());
           })
           .build()

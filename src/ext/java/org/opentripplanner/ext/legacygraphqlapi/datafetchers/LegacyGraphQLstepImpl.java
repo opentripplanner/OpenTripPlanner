@@ -15,7 +15,7 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Iterable<P2<Double>>> elevationProfile() {
-    return environment -> getSource(environment).getElevation();
+    return environment -> getSource(environment).getRoundedElevation();
   }
 
   @Override

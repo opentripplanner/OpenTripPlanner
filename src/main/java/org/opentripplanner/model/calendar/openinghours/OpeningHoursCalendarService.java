@@ -3,9 +3,11 @@ package org.opentripplanner.model.calendar.openinghours;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import org.opentripplanner.routing.trippattern.Deduplicator;
+import javax.inject.Inject;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.standalone.config.api.TransitServicePeriod;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OpeningHoursCalendarService implements Serializable {
 
@@ -13,14 +15,22 @@ public class OpeningHoursCalendarService implements Serializable {
   private final LocalDate startOfPeriod;
   private final int daysInPeriod;
 
+  @Inject
+  public OpeningHoursCalendarService(
+    Deduplicator deduplicator,
+    @TransitServicePeriod ServiceDateInterval transitServicePeriod
+  ) {
+    this.deduplicator = deduplicator;
+    this.startOfPeriod = transitServicePeriod.getStart();
+    this.daysInPeriod = transitServicePeriod.daysInPeriod();
+  }
+
   public OpeningHoursCalendarService(
     Deduplicator deduplicator,
     LocalDate startOfPeriod,
     LocalDate endOfPeriod
   ) {
-    this.deduplicator = deduplicator;
-    this.startOfPeriod = startOfPeriod;
-    this.daysInPeriod = (int) ChronoUnit.DAYS.between(startOfPeriod, endOfPeriod);
+    this(deduplicator, new ServiceDateInterval(startOfPeriod, endOfPeriod));
   }
 
   public OHCalendarBuilder newBuilder(ZoneId zoneId) {
@@ -44,7 +54,7 @@ public class OpeningHoursCalendarService implements Serializable {
     return (
       deduplicator.equals(that.deduplicator) &&
       startOfPeriod.equals(that.startOfPeriod) &&
-      daysInPeriod == daysInPeriod
+      daysInPeriod == that.daysInPeriod
     );
   }
 }

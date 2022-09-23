@@ -8,7 +8,6 @@ import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopG
 import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
 import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 
-import com.google.common.collect.Iterables;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -32,6 +30,7 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class LinkingTest {
 
@@ -126,7 +125,7 @@ public class LinkingTest {
     link(g2, transitModel2);
 
     // compare the linkages
-    for (TransitStopVertex ts : Iterables.filter(g1.getVertices(), TransitStopVertex.class)) {
+    for (TransitStopVertex ts : g1.getVerticesOfType(TransitStopVertex.class)) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
       assertTrue(stls1.size() >= 1);
 

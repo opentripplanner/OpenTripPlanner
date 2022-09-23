@@ -13,6 +13,8 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.transit.model.network.Route;
@@ -58,7 +60,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Double> duration() {
-    return environment -> (double) getSource(environment).getDuration();
+    return environment -> (double) getSource(environment).getDuration().toSeconds();
   }
 
   @Override
@@ -123,7 +125,16 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<String> mode() {
-    return environment -> getSource(environment).getMode().name();
+    return environment -> {
+      Leg leg = getSource(environment);
+      if (leg instanceof StreetLeg s) {
+        return s.getMode().name();
+      }
+      if (leg instanceof TransitLeg s) {
+        return s.getMode().name();
+      }
+      throw new IllegalStateException("Unhandled leg type: " + leg);
+    };
   }
 
   @Override

@@ -1,14 +1,14 @@
 package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RouteCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
-import java.util.Set;
+import java.util.BitSet;
 import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,12 +49,12 @@ public class F02_UnpreferredRouteTest implements RaptorTestConstants {
   public void setup() {
     // Given 2 identical routes R1 and R2
     data.withRoute(
-      route(pattern("R1", STOP_A, STOP_B))
-        .withTimetable(schedule("00:01, 00:02:40").routeId(ROUTE_ID_1))
+      route(pattern("R1", STOP_A, STOP_B).withRoute(TransitModelForTest.route(ROUTE_ID_1).build()))
+        .withTimetable(schedule("00:01, 00:02:40"))
     );
     data.withRoute(
-      route(pattern("R2", STOP_A, STOP_B))
-        .withTimetable(schedule("00:01, 00:02:40").routeId(ROUTE_ID_2))
+      route(pattern("R2", STOP_A, STOP_B).withRoute(TransitModelForTest.route(ROUTE_ID_2).build()))
+        .withTimetable(schedule("00:01, 00:02:40"))
     );
 
     requestBuilder
@@ -92,7 +92,13 @@ public class F02_UnpreferredRouteTest implements RaptorTestConstants {
   }
 
   private void unpreferRoute(FeedScopedId routeId) {
-    data.mcCostParamsBuilder().unpreferredRoutes(Set.of(routeId));
+    final BitSet patterns = new BitSet();
+    for (var pattern : data.getPatterns()) {
+      if (pattern.route().getId().equals(routeId)) {
+        patterns.set(pattern.patternIndex());
+      }
+    }
+    data.mcCostParamsBuilder().unpreferredPatterns(patterns);
     data.mcCostParamsBuilder().unpreferredCost(UNPREFER_COST);
   }
 

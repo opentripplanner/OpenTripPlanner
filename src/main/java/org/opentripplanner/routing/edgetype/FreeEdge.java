@@ -15,8 +15,6 @@ import org.opentripplanner.transit.model.basic.I18NString;
  */
 public class FreeEdge extends Edge {
 
-  private static final long serialVersionUID = 3925814840369402222L;
-
   public FreeEdge(Vertex from, Vertex to) {
     super(from, to);
   }

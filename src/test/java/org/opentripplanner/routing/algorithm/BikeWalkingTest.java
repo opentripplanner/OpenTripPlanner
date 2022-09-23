@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -301,7 +301,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
     //
     //   TS1 <-> A <-> B <-> C <-> D <-> E <-> F <-> E1 <-> S2
 
-    var otpModel = graphOf(
+    var otpModel = modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -370,15 +370,16 @@ public class BikeWalkingTest extends GraphRoutingTest {
     StreetMode streetMode,
     boolean arriveBy
   ) {
-    var options = new RoutingRequest();
-    options.bikeSwitchTime = 100;
-    options.bikeSwitchCost = 1000;
-    options.walkSpeed = 10;
-    options.bikeSpeed = 20;
-    options.bikeWalkingSpeed = 5;
-    options.arriveBy = arriveBy;
+    var request = new RouteRequest();
+    var preferences = request.preferences();
 
-    var bikeOptions = options.getStreetSearchRequest(streetMode);
+    preferences.withBike(it ->
+      it.setSpeed(20d).setWalkingSpeed(5d).setSwitchTime(100).setSwitchCost(1000)
+    );
+    preferences.withWalk(w -> w.setSpeed(10));
+    request.setArriveBy(arriveBy);
+
+    var bikeOptions = request.getStreetSearchRequest(streetMode);
 
     var tree = AStarBuilder
       .oneToOne()

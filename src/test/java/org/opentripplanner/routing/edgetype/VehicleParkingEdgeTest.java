@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -180,9 +180,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     routingRequest.parkAndRide = true;
-    routingRequest.useVehicleParkingAvailabilityInformation = realtime;
+    routingRequest.preferences().parking().setUseAvailabilityInformation(realtime);
     routingRequest.streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK, parkingMode);
     routingContext = new RoutingContext(routingRequest, graph, vertex, vertex);
   }

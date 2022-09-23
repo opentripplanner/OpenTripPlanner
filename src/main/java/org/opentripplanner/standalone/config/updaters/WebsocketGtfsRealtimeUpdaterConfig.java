@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 
 public class WebsocketGtfsRealtimeUpdaterConfig {
@@ -10,7 +11,8 @@ public class WebsocketGtfsRealtimeUpdaterConfig {
       configRef,
       c.asText("feedId", null),
       c.asText("url", null),
-      c.asInt("reconnectPeriodSec", 60)
+      c.asInt("reconnectPeriodSec", 60),
+      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }
 }

@@ -285,7 +285,7 @@ public class StatesToWalkStepsMapper {
         }
       }
     } else {
-      if (!createdNewStep && current.getElevation() != null) {
+      if (!createdNewStep && current.getRawElevation() != null) {
         updateElevationProfile(backState, edge);
       }
       distance += edge.getDistanceMeters();
@@ -303,7 +303,7 @@ public class StatesToWalkStepsMapper {
     List<P2<Double>> s = encodeElevationProfile(
       edge,
       distance,
-      backState.getOptions().geoidElevation ? -ellipsoidToGeoidDifference : 0
+      backState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
     );
     current.addElevation(s);
   }
@@ -323,13 +323,13 @@ public class StatesToWalkStepsMapper {
     current = threeBack;
     current.addDistance(twoBack.getDistance());
     distance += current.getDistance();
-    if (twoBack.getElevation() != null) {
-      if (current.getElevation() == null) {
-        current.addElevation(twoBack.getElevation());
+    if (twoBack.getRawElevation() != null) {
+      if (current.getRawElevation() == null) {
+        current.addElevation(twoBack.getRawElevation());
       } else {
         current.addElevation(
           twoBack
-            .getElevation()
+            .getRawElevation()
             .stream()
             .map(p -> new P2<>(p.first + current.getDistance(), p.second))
             .toList()
@@ -524,7 +524,7 @@ public class StatesToWalkStepsMapper {
       encodeElevationProfile(
         forwardState.getBackEdge(),
         0,
-        forwardState.getOptions().geoidElevation ? -ellipsoidToGeoidDifference : 0
+        forwardState.getPreferences().system().geoidElevation() ? -ellipsoidToGeoidDifference : 0
       )
     );
     step.addStreetNotes(streetNotesService.getNotes(forwardState));

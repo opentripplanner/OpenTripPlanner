@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ALTERNATIVE_LEGS_FILTER;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.LEG_MODE;
 
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
@@ -16,16 +16,19 @@ import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripIdAndServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class LegType {
@@ -119,8 +122,8 @@ public class LegType {
           .description(
             "The mode of transport or access (e.g., foot) used when traversing this leg."
           )
-          .type(new GraphQLNonNull(MODE))
-          .dataFetcher(env -> leg(env).getMode())
+          .type(new GraphQLNonNull(LEG_MODE))
+          .dataFetcher(env -> onLeg(env, StreetLeg::getMode, TransitLeg::getMode))
           .build()
       )
       .field(
@@ -146,7 +149,7 @@ public class LegType {
           .name("duration")
           .description("The leg's duration in seconds")
           .type(new GraphQLNonNull(ExtendedScalars.GraphQLLong))
-          .dataFetcher(env -> leg(env).getDuration())
+          .dataFetcher(env -> leg(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -155,7 +158,7 @@ public class LegType {
           .name("directDuration")
           .type(new GraphQLNonNull(ExtendedScalars.GraphQLLong))
           .description("NOT IMPLEMENTED")
-          .dataFetcher(env -> leg(env).getDuration())
+          .dataFetcher(env -> leg(env).getDuration().toSeconds())
           .build()
       )
       .field(
@@ -524,5 +527,20 @@ public class LegType {
 
   private static Leg leg(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  private static <S, T> Object onLeg(
+    DataFetchingEnvironment environment,
+    Function<StreetLeg, S> streetLegAccessor,
+    Function<TransitLeg, T> transitLegAccessor
+  ) {
+    Leg leg = leg(environment);
+    if (leg instanceof StreetLeg sl) {
+      return streetLegAccessor.apply(sl);
+    }
+    if (leg instanceof TransitLeg tl) {
+      return transitLegAccessor.apply(tl);
+    }
+    throw new IllegalStateException("Unhandled leg type: " + leg);
   }
 }

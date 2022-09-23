@@ -2414,8 +2414,10 @@ type QueryType {
 
         """
         How much more reluctant is the user to walk on streets with car traffic allowed. Default value: 1.0
+
+        Deprecated, use walkSafetyFactor instead.
         """
-        walkOnStreetReluctance: Float
+        walkOnStreetReluctance: Float @deprecated(reason: "Use walkSafetyFactor instead")
 
         """
         How much worse is waiting for a transit vehicle than being on a transit
@@ -2668,6 +2670,12 @@ type QueryType {
         Which vehicle rental networks cannot be used. By default, all networks are allowed.
         """
         bannedVehicleRentalNetworks: [String]
+
+        """
+        Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+        If the value is set to be 0, safety is ignored. Default is 1.0.
+        """
+        walkSafetyFactor: Float
     ): Plan
 }
 
@@ -2720,7 +2728,11 @@ type Route implements Node {
     shortName: String
 
     """Long name of the route, e.g. Helsinki-Leppävaara"""
-    longName: String
+    longName(
+        """If translated longName is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from routes.txt.
+        """
+        language: String): String
 
     """Transport mode of this route, e.g. `BUS`"""
     mode: Mode
@@ -3228,7 +3240,7 @@ type TicketType implements Node {
     Ticket type ID in format `FeedId:TicketTypeId`. Ticket type IDs are usually
     combination of ticket zones where the ticket is valid.
     """
-    fareId: ID!
+    fareId: String!
 
     """Price of the ticket in currency that is specified in `currency` field"""
     price: Float
