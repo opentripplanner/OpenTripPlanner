@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.TripPlannerResponse;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +49,13 @@ public class SmokeTest {
    * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
    * run any assertions against the fares. (That is done during unit tests.)
    */
-  static class FareDeserializer extends JsonDeserializer<Fare> {
+  static class FareDeserializer extends JsonDeserializer<ItineraryFares> {
 
     @Override
-    public Fare deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
+    public ItineraryFares deserialize(
+      JsonParser jsonParser,
+      DeserializationContext deserializationContext
+    ) {
       return null;
     }
   }
@@ -61,7 +64,7 @@ public class SmokeTest {
     var provider = new JSONObjectMapperProvider();
 
     SimpleModule module = new SimpleModule("SmokeTests");
-    module.addDeserializer(Fare.class, new FareDeserializer());
+    module.addDeserializer(ItineraryFares.class, new FareDeserializer());
 
     mapper = provider.getContext(null);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
