@@ -42,6 +42,7 @@ public class GraphReportBuilder {
       new StreetStats(edgeTypes, vertexTypes),
       new TransitStats(
         stopCounts,
+        transitService.getAllTrips().size(),
         transitService.getAllTripPatterns().size(),
         transitService.getAllRoutes().size(),
         constrainedTransferCounts
@@ -71,7 +72,13 @@ public class GraphReportBuilder {
 
   record StreetStats(TypeStats edges, TypeStats vertices) {}
 
-  record TransitStats(TypeStats stops, int patterns, int routes, TypeStats constrainedTransfers) {}
+  record TransitStats(
+    TypeStats stops,
+    int trips,
+    int tripPatterns,
+    int routes,
+    TypeStats constrainedTransfers
+  ) {}
 
   record TypeStats(int total, Map<String, Integer> types) {}
 }
