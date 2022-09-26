@@ -115,7 +115,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
   public void sendMetrics(UpdateResult result) {
     this.succesfulCounter.set(result.successful());
-    this.failedCounter.set(result.successful());
+    this.failedCounter.set(result.failed());
   }
 
   @Override
