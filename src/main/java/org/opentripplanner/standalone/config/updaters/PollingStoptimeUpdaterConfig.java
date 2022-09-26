@@ -30,7 +30,6 @@ public class PollingStoptimeUpdaterConfig {
     return new PollingStoptimeUpdaterParameters(
       configRef + ":" + sourceTypeStr,
       c.asInt("frequencySec", 60),
-      c.asInt("logFrequency", -1),
       c.asInt("maxSnapshotFrequencyMs", -1),
       c.asBoolean("purgeExpiredData", false),
       c.asBoolean("fuzzyTripMatching", false),

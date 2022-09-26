@@ -172,7 +172,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             backwardsDelayPropagationType,
             fullDataset,
             updates,
-            feedId
+            feedId,
+            ignored -> {}
           )
         );
       }

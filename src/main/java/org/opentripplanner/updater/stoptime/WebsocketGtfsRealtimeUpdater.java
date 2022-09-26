@@ -195,7 +195,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
           backwardsDelayPropagationType,
           fullDataset,
           updates,
-          feedId
+          feedId,
+          ignored -> {}
         );
         saveResultOnGraph.execute(runnable);
       }

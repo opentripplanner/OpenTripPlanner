@@ -99,9 +99,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
 
-  private final int logFrequency;
-  private int totalSuccessfullyApplied = 0;
-
   /**
    * If a timetable snapshot is requested less than this number of milliseconds after the previous
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
@@ -154,7 +151,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
-    this.logFrequency = parameters.logFrequency();
     this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = localDateNow;
@@ -202,7 +198,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    *                    now, i.e. all previous updates should be disregarded
    * @param updates     GTFS-RT TripUpdate's that should be applied atomically
    */
-  public void applyTripUpdates(
+  public UpdateResult applyTripUpdates(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     boolean fullDataset,
@@ -211,14 +207,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
-      return;
+      return UpdateResult.empty();
     }
 
     // Acquire lock on buffer
     bufferLock.lock();
 
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship = new HashMap<>();
-    List<UpdateError> errors = new ArrayList<>();
+    List<Optional<UpdateError>> results = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -227,7 +223,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       LOG.debug("message contains {} trip updates", updates.size());
-      int successfullyApplied = 0;
       int uIndex = 0;
       for (TripUpdate tripUpdate : updates) {
         if (!tripUpdate.hasTrip()) {
@@ -249,7 +244,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         FeedScopedId tripId = new FeedScopedId(feedId, tripUpdate.getTrip().getTripId());
 
-        LocalDate serviceDate = LocalDate.now(timeZone);
+        LocalDate serviceDate;
         if (tripDescriptor.hasStartDate()) {
           try {
             serviceDate = ServiceDateUtils.parseString(tripDescriptor.getStartDate());
@@ -262,8 +257,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             continue;
           }
         } else {
-          // TODO: figure out the correct service date. For the special case that a trip
-          // starts for example at 40:00, yesterday would probably be a better guess.
+          serviceDate = LocalDate.now(timeZone);
         }
 
         uIndex += 1;
@@ -275,7 +269,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripDescriptor
         );
 
-        Optional<UpdateError> updateError =
+        Optional<UpdateError> maybeError =
           switch (tripScheduleRelationship) {
             case SCHEDULED -> handleScheduledTrip(
               tripUpdate,
@@ -300,12 +294,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             case DUPLICATED -> UpdateError.optional(tripId, NOT_IMPLEMENTED_DUPLICATED);
           };
 
-        updateError.ifPresent(errors::add);
+        results.add(maybeError);
 
-        if (updateError.isEmpty()) {
-          successfullyApplied++;
-          totalSuccessfullyApplied++;
-        } else {
+        if (maybeError.isPresent()) {
           debug(tripId, "Failed to apply TripUpdate.");
           LOG.trace(" Contents: {}", tripUpdate);
           if (failuresByRelationship.containsKey(tripScheduleRelationship)) {
@@ -314,44 +305,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           } else {
             failuresByRelationship.put(tripScheduleRelationship, 1);
           }
-        }
-
-        if (totalSuccessfullyApplied % logFrequency == 0) {
-          LOG.debug("Applied {} trip updates in total.", totalSuccessfullyApplied);
-        }
-      }
-
-      if (fullDataset) {
-        LOG.info(
-          "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
-          feedId,
-          successfullyApplied,
-          updates.size(),
-          DoubleUtils.roundTo2Decimals((double) successfullyApplied / updates.size() * 100)
-        );
-
-        var errorIndex = Multimaps.index(errors, UpdateError::errorType);
-
-        errorIndex
-          .keySet()
-          .forEach(key -> {
-            var value = errorIndex.get(key);
-            var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
-            LOG.error(
-              "[feedId: {}] {} failures of type {}: {}",
-              feedId,
-              value.size(),
-              key,
-              tripIds
-            );
-          });
-
-        if (!failuresByRelationship.isEmpty()) {
-          LOG.info(
-            "[feedId: {}] Failures by scheduleRelationship {}",
-            feedId,
-            failuresByRelationship
-          );
         }
       }
 
@@ -368,6 +321,38 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Always release lock
       bufferLock.unlock();
     }
+
+    var errors = results.stream().filter(Optional::isPresent).map(Optional::get).toList();
+    var successfullyApplied = results.stream().filter(Optional::isEmpty).count();
+
+    var errorIndex = Multimaps.index(errors, UpdateError::errorType);
+
+    if (fullDataset) {
+      LOG.info(
+        "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
+        feedId,
+        successfullyApplied,
+        updates.size(),
+        DoubleUtils.roundTo2Decimals((double) successfullyApplied / updates.size() * 100)
+      );
+
+      errorIndex
+        .keySet()
+        .forEach(key -> {
+          var value = errorIndex.get(key);
+          var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
+          LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
+        });
+
+      if (!failuresByRelationship.isEmpty()) {
+        LOG.info(
+          "[feedId: {}] Failures by scheduleRelationship {}",
+          feedId,
+          failuresByRelationship
+        );
+      }
+    }
+    return new UpdateResult((int) successfullyApplied, errors.size(), errorIndex);
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {

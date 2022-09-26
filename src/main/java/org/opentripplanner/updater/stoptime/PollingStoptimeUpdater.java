@@ -1,12 +1,17 @@
 package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,16 +42,16 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   private final String feedId;
 
   /**
-   * Defines when delays are propagated to previous stops and if these stops are given
-   * the NO_DATA flag.
+   * Defines when delays are propagated to previous stops and if these stops are given the NO_DATA
+   * flag.
    */
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
-
+  private final AtomicInteger succesfulCounter;
+  private final AtomicInteger failedCounter;
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
@@ -61,13 +66,15 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     // Create update streamer from preferences
     this.feedId = parameters.getFeedId();
     this.updateSource = createSource(parameters);
-
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
     if (parameters.fuzzyTripMatching()) {
       this.fuzzyTripMatcher =
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
+
+    this.succesfulCounter = getGauge("trip_updates.successful", parameters);
+    this.failedCounter = getGauge("trip_updates.failed", parameters);
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -99,10 +106,16 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         backwardsDelayPropagationType,
         fullDataset,
         updates,
-        feedId
+        feedId,
+        this::sendMetrics
       );
       saveResultOnGraph.execute(runnable);
     }
+  }
+
+  public void sendMetrics(UpdateResult result) {
+    this.succesfulCounter.set(result.successful());
+    this.failedCounter.set(result.successful());
   }
 
   @Override
@@ -113,6 +126,19 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       .addStr("feedId", feedId)
       .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatcher != null)
       .toString();
+  }
+
+  private static AtomicInteger getGauge(String name, PollingStoptimeUpdaterParameters parameters) {
+    if (OTPFeature.ActuatorAPI.isOn()) {
+      var tags = List.of(
+        Tag.of("configRef", parameters.getConfigRef()),
+        Tag.of("url", parameters.httpSourceParameters().getUrl()),
+        Tag.of("feedId", parameters.getFeedId())
+      );
+      return Metrics.globalRegistry.gauge(name, tags, new AtomicInteger(0));
+    } else {
+      return new AtomicInteger();
+    }
   }
 
   private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {

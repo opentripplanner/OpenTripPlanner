@@ -7,7 +7,6 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
 
   private final String configRef;
   private final int frequencySec;
-  private final int logFrequency;
   private final int maxSnapshotFrequencyMs;
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
@@ -22,7 +21,6 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   public PollingStoptimeUpdaterParameters(
     String configRef,
     int frequencySec,
-    int logFrequency,
     int maxSnapshotFrequencyMs,
     boolean purgeExpiredData,
     boolean fuzzyTripMatching,
@@ -34,7 +32,6 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   ) {
     this.configRef = configRef;
     this.frequencySec = frequencySec;
-    this.logFrequency = logFrequency;
     this.maxSnapshotFrequencyMs = maxSnapshotFrequencyMs;
     this.purgeExpiredData = purgeExpiredData;
     this.fuzzyTripMatching = fuzzyTripMatching;
@@ -61,14 +58,6 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
 
   String getFeedId() {
     return feedId;
-  }
-
-  int getLogFrequency() {
-    return logFrequency;
-  }
-
-  int getMaxSnapshotFrequencyMs() {
-    return maxSnapshotFrequencyMs;
   }
 
   boolean purgeExpiredData() {

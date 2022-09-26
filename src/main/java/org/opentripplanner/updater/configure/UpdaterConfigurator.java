@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.configure;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
