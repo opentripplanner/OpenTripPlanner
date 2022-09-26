@@ -119,7 +119,8 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
           fuzzyTripMatcher(),
           feedId,
           false,
-          updates
+          updates,
+          fuzzyTripMatching
         )
       );
     } catch (JAXBException | XMLStreamException e) {
@@ -143,7 +144,8 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
           fuzzyTripMatcher(),
           feedId,
           false,
-          updates
+          updates,
+          fuzzyTripMatching
         );
 
         setPrimed(true);

@@ -14,8 +14,6 @@ import org.opentripplanner.routing.core.ItineraryFares;
  */
 public class HighestFareInFreeTransferWindowFareService extends DefaultFareServiceImpl {
 
-  private static final long serialVersionUID = 20120229L;
-
   private final boolean analyzeInterlinedTransfers;
   private final Duration freeTransferWindow;
 

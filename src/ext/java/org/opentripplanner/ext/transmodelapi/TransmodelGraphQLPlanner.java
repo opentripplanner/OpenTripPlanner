@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -202,6 +203,16 @@ public class TransmodelGraphQLPlanner {
 
     // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
     // callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
+
+    callWith.argument(
+      "whiteListed.rentalNetworks",
+      (List<String> networks) -> request.journey().rental().setAllowedNetworks(Set.copyOf(networks))
+    );
+
+    callWith.argument(
+      "banned.rentalNetworks",
+      (List<String> networks) -> request.journey().rental().setBannedNetworks(Set.copyOf(networks))
+    );
 
     // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
     // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });

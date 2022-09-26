@@ -27,7 +27,7 @@ class OtpProjectInfoParser {
           getBool(props, "git.dirty")
         )
       );
-      LOG.debug("Parsed Maven artifact version: {}", version.toString());
+      LOG.debug("Parsed Maven artifact version: {}", version);
       return version;
     } catch (Exception e) {
       LOG.error("Error reading version from properties file: {}", e.getMessage());

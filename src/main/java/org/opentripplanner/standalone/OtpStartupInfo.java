@@ -36,13 +36,13 @@ public class OtpStartupInfo {
   public static void logInfo() {
     // This is good when aggregating logs across multiple load balanced instances of OTP
     // Hint: a regexp filter like "^OTP (START|SHUTTING)" will list nodes going up/down
-    LOG.info("OTP STARTING UP (" + projectInfo().getVersionString() + ")");
+    LOG.info("OTP STARTING UP ({})", projectInfo().getVersionString());
     Runtime
       .getRuntime()
       .addShutdownHook(
-        new Thread(() -> LOG.info("OTP SHUTTING DOWN (" + projectInfo().getVersionString() + ")"))
+        new Thread(() -> LOG.info("OTP SHUTTING DOWN ({})", projectInfo().getVersionString()))
       );
-    LOG.info(NEW_LINE + info());
+    LOG.info(NEW_LINE + "{}", info());
   }
 
   /** Use this to do a manual test */

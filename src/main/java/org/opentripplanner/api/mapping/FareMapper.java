@@ -3,7 +3,6 @@ package org.opentripplanner.api.mapping;
 import com.google.common.collect.Multimap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;

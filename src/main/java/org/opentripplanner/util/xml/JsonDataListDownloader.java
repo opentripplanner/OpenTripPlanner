@@ -41,16 +41,16 @@ public class JsonDataListDownloader<T> {
 
     try (InputStream data = HttpUtils.openInputStream(url, headers)) {
       if (data == null) {
-        log.warn("Failed to get data from url " + url);
+        log.warn("Failed to get data from url {}", url);
         return null;
       }
       return parseJSON(data);
     } catch (IllegalArgumentException e) {
-      log.warn("Error parsing bike rental feed from " + url, e);
+      log.warn("Error parsing bike rental feed from {}", url, e);
     } catch (JsonProcessingException e) {
-      log.warn("Error parsing bike rental feed from " + url + "(bad JSON of some sort)", e);
+      log.warn("Error parsing bike rental feed from {} (bad JSON of some sort)", url, e);
     } catch (IOException e) {
-      log.warn("Error reading bike rental feed from " + url, e);
+      log.warn("Error reading bike rental feed from {}", url, e);
     }
     return null;
   }

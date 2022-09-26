@@ -19,6 +19,7 @@ public abstract class SiriAzureUpdaterConfig {
     parameters.setServiceBusUrl(c.asText("servicebus-url", null));
     parameters.setTopicName(c.asText("topic", null));
     parameters.setFeedId(c.asText("feedId", null));
+    parameters.setFuzzyTripMatching(c.asBoolean("fuzzyTripMatching", false));
 
     if (c.exist("history")) {
       NodeAdapter history = c.path("history");
