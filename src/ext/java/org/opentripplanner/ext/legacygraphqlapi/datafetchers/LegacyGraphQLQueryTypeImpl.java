@@ -626,17 +626,36 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("maxSlope", request::setMaxSlope);
       // callWith.argument("carParkCarLegWeight", request::setCarParkCarLegWeight);
       // callWith.argument("itineraryFiltering", request::setItineraryFiltering);
-      callWith.argument("bikeReluctance", preferences.bike()::setReluctance);
-      callWith.argument("bikeWalkingReluctance", preferences.bike()::setWalkingReluctance);
+      preferences.withBike(bike -> {
+        callWith.argument("bikeReluctance", bike::setReluctance);
+        callWith.argument("bikeWalkingReluctance", bike::setWalkingReluctance);
+        callWith.argument("bikeWalkingSpeed", bike::setWalkingSpeed);
+        callWith.argument("bikeSpeed", bike::setSpeed);
+        callWith.argument("bikeSwitchTime", bike::setSwitchTime);
+        callWith.argument("bikeSwitchCost", bike::setSwitchCost);
+        callWith.argument("bikeBoardCost", bike::setBoardCost);
+
+        if (environment.getArgument("optimize") != null) {
+          bike.setOptimizeType(BicycleOptimizeType.valueOf(environment.getArgument("optimize")));
+        }
+        if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+          bike.withOptimizeTriangle(triangle -> {
+            callWith.argument("triangle.timeFactor", triangle::withTime);
+            callWith.argument("triangle.slopeFactor", triangle::withSlope);
+            callWith.argument("triangle.safetyFactor", triangle::withSafety);
+          });
+        }
+      });
+
       callWith.argument("carReluctance", preferences.car()::setReluctance);
-      callWith.argument("walkReluctance", preferences.walk()::setReluctance);
+      preferences.withWalk(b -> {
+        callWith.argument("walkReluctance", b::setReluctance);
+        callWith.argument("walkSpeed", b::setSpeed);
+        callWith.argument("walkBoardCost", b::setBoardCost);
+        callWith.argument("walkSafetyFactor", b::setSafetyFactor);
+      });
       callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
       callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
-      callWith.argument("walkSpeed", preferences.walk()::setSpeed);
-      callWith.argument("bikeWalkingSpeed", preferences.bike()::setWalkingSpeed);
-      callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
-      callWith.argument("bikeSwitchTime", preferences.bike()::setSwitchTime);
-      callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
       callWith.argument(
         "allowKeepingRentedBicycleAtDestination",
         request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
@@ -709,8 +728,6 @@ public class LegacyGraphQLQueryTypeImpl
         "unpreferred.unpreferredRouteCost",
         preferences.transit()::setUnpreferredCostString
       );
-      callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
-      callWith.argument("bikeBoardCost", preferences.bike()::setBoardCost);
       callWith.argument("banned.routes", request.journey().transit()::setBannedRoutesFromString);
       callWith.argument("banned.agencies", request.journey().transit()::setBannedAgenciesFromSting);
       callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
@@ -719,25 +736,6 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("transferPenalty", preferences.transfer()::setCost);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
-
-      if (environment.getArgument("optimize") != null) {
-        BicycleOptimizeType optimize = BicycleOptimizeType.valueOf(
-          environment.getArgument("optimize")
-        );
-
-        if (optimize == BicycleOptimizeType.TRIANGLE) {
-          // because we must use a final variable in the lambda we have to use this ugly crutch.
-          final double[] args = new double[3];
-          callWith.argument("triangle.timeFactor", (Double v) -> args[0] = v);
-          callWith.argument("triangle.slopeFactor", (Double v) -> args[1] = v);
-          callWith.argument("triangle.safetyFactor", (Double v) -> args[2] = v);
-          preferences.bike().initOptimizeTriangle(args[0], args[1], args[2]);
-        }
-
-        if (optimize != null) {
-          preferences.bike().setOptimizeType(optimize);
-        }
-      }
 
       if (hasArgument(environment, "transportModes")) {
         QualifiedModeSet modes = new QualifiedModeSet("WALK");
@@ -780,7 +778,9 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (request.vehicleRental && !hasArgument(environment, "bikeSpeed")) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.
-        preferences.bike().setSpeed(4.3);
+        // TODO - There should be a separate speed preference for rented bike, setting this
+        //      - here will cause the different APIs to behave differently
+        preferences.withBike(b -> b.setSpeed(4.3));
       }
 
       callWith.argument(
@@ -801,7 +801,6 @@ public class LegacyGraphQLQueryTypeImpl
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
       callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
-      callWith.argument("walkSafetyFactor", preferences.walk()::setSafetyFactor);
 
       callWith.argument(
         "locale",

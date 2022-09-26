@@ -6,6 +6,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -268,7 +270,7 @@ public abstract class RoutingResource {
    */
   @Deprecated
   @QueryParam("optimize")
-  protected BicycleOptimizeType optimize;
+  protected BicycleOptimizeType bikeOptimizeType;
 
   /**
    * The set of modes that a user is willing to use, with qualifiers stating whether vehicles should
@@ -753,21 +755,24 @@ public abstract class RoutingResource {
       request.setNumItineraries(numItineraries);
     }
 
-    if (bikeReluctance != null) {
-      preferences.bike().setReluctance(bikeReluctance);
-    }
-
-    if (bikeWalkingReluctance != null) {
-      preferences.bike().setWalkingReluctance(bikeWalkingReluctance);
-    }
-
     if (carReluctance != null) {
       preferences.car().setReluctance(carReluctance);
     }
 
-    if (walkReluctance != null) {
-      preferences.walk().setReluctance(walkReluctance);
-    }
+    preferences.withWalk(walk -> {
+      if (walkReluctance != null) {
+        walk.setReluctance(walkReluctance);
+      }
+      if (walkSpeed != null) {
+        walk.setSpeed(walkSpeed);
+      }
+      if (walkBoardCost != null) {
+        walk.setBoardCost(walkBoardCost);
+      }
+      if (walkSafetyFactor != null) {
+        walk.setSafetyFactor(walkSafetyFactor);
+      }
+    });
 
     if (waitReluctance != null) {
       preferences.transfer().setWaitReluctance(waitReluctance);
@@ -777,25 +782,26 @@ public abstract class RoutingResource {
       preferences.transfer().setWaitAtBeginningFactor(waitAtBeginningFactor);
     }
 
-    if (walkSpeed != null) {
-      preferences.walk().setSpeed(walkSpeed);
-    }
+    preferences.withBike(bike -> {
+      setIfNotNull(bikeSpeed, bike::setSpeed);
+      setIfNotNull(bikeReluctance, bike::setReluctance);
+      setIfNotNull(bikeBoardCost, bike::setBoardCost);
+      setIfNotNull(bikeWalkingSpeed, bike::setWalkingSpeed);
+      setIfNotNull(bikeWalkingReluctance, bike::setWalkingReluctance);
+      setIfNotNull(bikeParkCost, bike::setParkCost);
+      setIfNotNull(bikeParkTime, bike::setParkTime);
+      setIfNotNull(bikeSwitchTime, bike::setSwitchTime);
+      setIfNotNull(bikeSwitchCost, bike::setSwitchCost);
+      setIfNotNull(bikeOptimizeType, bike::setOptimizeType);
 
-    if (bikeSpeed != null) {
-      preferences.bike().setSpeed(bikeSpeed);
-    }
-
-    if (bikeWalkingSpeed != null) {
-      preferences.bike().setWalkingSpeed(bikeWalkingSpeed);
-    }
-
-    if (bikeSwitchTime != null) {
-      preferences.bike().setSwitchTime(bikeSwitchTime);
-    }
-
-    if (bikeSwitchCost != null) {
-      preferences.bike().setSwitchCost(bikeSwitchCost);
-    }
+      if (bikeOptimizeType == BicycleOptimizeType.TRIANGLE) {
+        bike.withOptimizeTriangle(triangle -> {
+          setIfNotNull(triangleTimeFactor, triangle::withTime);
+          setIfNotNull(triangleSlopeFactor, triangle::withSlope);
+          setIfNotNull(triangleSafetyFactor, triangle::withSafety);
+        });
+      }
+    });
 
     if (allowKeepingRentedBicycleAtDestination != null) {
       request
@@ -818,14 +824,6 @@ public abstract class RoutingResource {
       request.journey().rental().setBannedNetworks(bannedVehicleRentalNetworks);
     }
 
-    if (bikeParkCost != null) {
-      preferences.bike().setParkCost(bikeParkCost);
-    }
-
-    if (bikeParkTime != null) {
-      preferences.bike().setParkTime(bikeParkTime);
-    }
-
     if (carParkCost != null) {
       preferences.car().setParkCost(carParkCost);
     }
@@ -840,16 +838,6 @@ public abstract class RoutingResource {
 
     if (requiredVehicleParkingTags != null) {
       request.journey().parking().setRequiredTags(requiredVehicleParkingTags);
-    }
-
-    if (optimize != null) {
-      // Optimize types are basically combined presets of routing parameters, except for triangle
-      preferences.bike().setOptimizeType(optimize);
-      if (optimize == BicycleOptimizeType.TRIANGLE) {
-        preferences
-          .bike()
-          .initOptimizeTriangle(triangleTimeFactor, triangleSlopeFactor, triangleSafetyFactor);
-      }
     }
 
     if (arriveBy != null) {
@@ -876,15 +864,6 @@ public abstract class RoutingResource {
     if (unpreferredAgencies != null) {
       request.journey().transit().setUnpreferredAgenciesFromString(unpreferredAgencies);
     }
-    if (walkBoardCost != null) {
-      preferences.walk().setBoardCost(walkBoardCost);
-    }
-    if (bikeBoardCost != null) {
-      preferences.bike().setBoardCost(bikeBoardCost);
-    }
-    if (walkSafetyFactor != null) {
-      preferences.walk().setSafetyFactor(walkSafetyFactor);
-    }
     if (bannedRoutes != null) {
       request.journey().transit().setBannedRoutesFromString(bannedRoutes);
     }
@@ -906,9 +885,6 @@ public abstract class RoutingResource {
       preferences.transfer().setCost(transferPenalty);
     }
 
-    if (optimize != null) {
-      preferences.bike().setOptimizeType(optimize);
-    }
     /* Temporary code to get bike/car parking and renting working. */
     if (modes != null && !modes.qModes.isEmpty()) {
       request.journey().setModes(modes.getRequestModes());
@@ -916,7 +892,7 @@ public abstract class RoutingResource {
 
     if (request.vehicleRental && bikeSpeed == null) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
-      preferences.bike().setSpeed(4.3);
+      preferences.withBike(bike -> bike.setSpeed(4.3));
     }
 
     var transitPref = preferences.transit();
@@ -992,5 +968,11 @@ public abstract class RoutingResource {
     }
 
     return request;
+  }
+
+  private static <T> void setIfNotNull(T value, @NotNull Consumer<T> body) {
+    if (value != null) {
+      body.accept(value);
+    }
   }
 }

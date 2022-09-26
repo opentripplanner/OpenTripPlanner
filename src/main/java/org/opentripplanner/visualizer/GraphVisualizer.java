@@ -473,16 +473,22 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     var preferences = options.preferences();
 
     options.setArriveBy(arriveByCheckBox.isSelected());
-    preferences.walk().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-    // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-    preferences.bike().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
-    // there should be a ui element for walk distance and optimize type
-    preferences.bike().setOptimizeType(getSelectedOptimizeType());
+    preferences.withWalk(walk -> {
+      walk.setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+      walk.setSpeed(Float.parseFloat(walkSpeed.getText()));
+    });
+    preferences.withBike(bike ->
+      bike
+        .setSpeed(Float.parseFloat(bikeSpeed.getText()))
+        // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
+        .setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
+        // there should be a ui element for walk distance and optimize type
+        .setOptimizeType(getSelectedOptimizeType())
+    );
+
     options.setDateTime(when);
     options.setFrom(LocationStringParser.fromOldStyleString(from));
     options.setTo(LocationStringParser.fromOldStyleString(to));
-    preferences.walk().setSpeed(Float.parseFloat(walkSpeed.getText()));
-    preferences.bike().setSpeed(Float.parseFloat(bikeSpeed.getText()));
     options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);

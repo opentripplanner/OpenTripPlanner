@@ -94,7 +94,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     }
     client.setCallback(new Callback());
 
-    LOG.debug("Connecting to broker: " + url);
+    LOG.debug("Connecting to broker: {}", url);
     client.connect(connOpts);
   }
 
@@ -120,7 +120,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         LOG.debug("Connected");
         client.subscribe(topic, qos);
       } catch (MqttException e) {
-        LOG.warn("Could not subscribe to: " + topic);
+        LOG.warn("Could not subscribe to: {}", topic);
       }
     }
 

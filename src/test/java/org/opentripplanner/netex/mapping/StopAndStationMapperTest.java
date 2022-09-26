@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.AccessibilityAssessment;
@@ -77,9 +77,9 @@ public class StopAndStationMapperTest {
 
     assertEquals(3, stops.size(), "Stops.size must be 3 found " + stops.size());
 
-    assertWheelchairAccessibility("ST:Quay:1", WheelchairAccessibility.POSSIBLE, stops);
-    assertWheelchairAccessibility("ST:Quay:2", WheelchairAccessibility.NOT_POSSIBLE, stops);
-    assertWheelchairAccessibility("ST:Quay:3", WheelchairAccessibility.NO_INFORMATION, stops);
+    assertWheelchairAccessibility("ST:Quay:1", Accessibility.POSSIBLE, stops);
+    assertWheelchairAccessibility("ST:Quay:2", Accessibility.NOT_POSSIBLE, stops);
+    assertWheelchairAccessibility("ST:Quay:3", Accessibility.NO_INFORMATION, stops);
 
     // Now test with AccessibilityAssessment set on StopPlace (should be default)
     stopPlace.withAccessibilityAssessment(
@@ -92,7 +92,7 @@ public class StopAndStationMapperTest {
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
     assertEquals(4, stops.size(), "stops.size must be 4 found " + stops.size());
-    assertWheelchairAccessibility("ST:Quay:4", WheelchairAccessibility.POSSIBLE, stops);
+    assertWheelchairAccessibility("ST:Quay:4", Accessibility.POSSIBLE, stops);
   }
 
   @Test
@@ -240,7 +240,7 @@ public class StopAndStationMapperTest {
    */
   private void assertWheelchairAccessibility(
     String quayId,
-    WheelchairAccessibility expected,
+    Accessibility expected,
     List<RegularStop> stops
   ) {
     var wheelchairAccessibility = stops

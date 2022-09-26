@@ -30,6 +30,7 @@
       // In this case 04:00 every night,
       // so that 2022-04-21 03:00 will still be operating day date 2022-04-20
       "customMidnight": 4,
+      "fuzzyTripMatching": false,
       "history": {
         "url": "<history_endpoint_url>",
         // Get all realtime history for current operating day date

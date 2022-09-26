@@ -36,6 +36,7 @@ gen-py/
 node_modules/
 target/
 /graphs
+/v9.6.0
 
 # for local dev only
 src/ext/resources/reportapi/report.csv

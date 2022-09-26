@@ -281,10 +281,10 @@ public class GtfsModule implements GraphBuilderModule {
 
     for (Class<?> entityClass : reader.getEntityClasses()) {
       if (skipEntityClass(entityClass)) {
-        LOG.info("Skipping entity: " + entityClass.getName());
+        LOG.info("Skipping entity: {}", entityClass.getName());
         continue;
       }
-      LOG.info("Reading entity: " + entityClass.getName());
+      LOG.info("Reading entity: {}", entityClass.getName());
       reader.readEntities(entityClass);
       store.flush();
       // NOTE that agencies are first in the list and read before all other entity types, so it is effective to
@@ -470,7 +470,7 @@ public class GtfsModule implements GraphBuilderModule {
         String name = bean.getClass().getName();
         int index = name.lastIndexOf('.');
         if (index != -1) name = name.substring(index + 1);
-        LOG.debug("loading " + name + ": " + count);
+        LOG.debug("loading {}: {}", name, count);
       }
     }
 

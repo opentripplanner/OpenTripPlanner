@@ -25,10 +25,10 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -161,8 +161,7 @@ public class AddTransitModelEntitiesToGraph {
       stationElementNodes.put(boardingArea, boardingAreaVertex);
       if (boardingArea.getParentStop() != null) {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
-        boolean wheelchair =
-          boardingArea.getWheelchairAccessibility() == WheelchairAccessibility.POSSIBLE;
+        boolean wheelchair = boardingArea.getWheelchairAccessibility() == Accessibility.POSSIBLE;
 
         PathwayEdge.lowCost(
           boardingAreaVertex,
@@ -314,7 +313,7 @@ public class AddTransitModelEntitiesToGraph {
       fromOnboardVertex,
       toOnboardVertex,
       permission,
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       levels,
       pathway.getTraversalTime()
     );
@@ -333,7 +332,7 @@ public class AddTransitModelEntitiesToGraph {
         toOnboardVertex,
         fromOnboardVertex,
         permission,
-        WheelchairAccessibility.POSSIBLE,
+        Accessibility.POSSIBLE,
         levels,
         pathway.getTraversalTime()
       );

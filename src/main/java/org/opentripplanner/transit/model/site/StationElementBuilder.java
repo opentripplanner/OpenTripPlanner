@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.site;
 
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -20,7 +20,7 @@ public abstract class StationElementBuilder<
   private String code;
   private I18NString description;
   private WgsCoordinate coordinate;
-  private WheelchairAccessibility wheelchairAccessibility;
+  private Accessibility wheelchairAccessibility;
   private StopLevel level;
   private Station parentStation;
 
@@ -82,11 +82,11 @@ public abstract class StationElementBuilder<
     return instance();
   }
 
-  public WheelchairAccessibility wheelchairAccessibility() {
+  public Accessibility wheelchairAccessibility() {
     return wheelchairAccessibility;
   }
 
-  public B withWheelchairAccessibility(WheelchairAccessibility wheelchairAccessibility) {
+  public B withWheelchairAccessibility(Accessibility wheelchairAccessibility) {
     this.wheelchairAccessibility = wheelchairAccessibility;
     return instance();
   }

@@ -16,8 +16,8 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -187,7 +187,7 @@ public interface Leg {
     return null;
   }
 
-  default WheelchairAccessibility getTripWheelchairAccessibility() {
+  default Accessibility getTripWheelchairAccessibility() {
     return null;
   }
 

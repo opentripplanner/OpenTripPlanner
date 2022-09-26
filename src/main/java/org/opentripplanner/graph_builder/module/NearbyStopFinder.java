@@ -278,7 +278,7 @@ public class NearbyStopFinder {
 
   private List<NearbyStop> findNearbyStopsViaDirectTransfers(Vertex vertex) {
     // It make sense for the directGraphFinder to use meters as a limit, so we convert first
-    double limitMeters = durationLimit.toSeconds() * new WalkPreferences().speed();
+    double limitMeters = durationLimit.toSeconds() * WalkPreferences.DEFAULT.speed();
     Coordinate c0 = vertex.getCoordinate();
     return directGraphFinder.findClosestStops(c0.y, c0.x, limitMeters);
   }

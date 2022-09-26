@@ -68,7 +68,7 @@ public class CalendarServiceDataFactoryImpl {
     for (FeedScopedId serviceId : serviceIds) {
       index++;
 
-      LOG.debug("serviceId=" + serviceId + " (" + index + "/" + serviceIds.size() + ")");
+      LOG.debug("serviceId={} ({}/{})", serviceId, index, serviceIds.size());
 
       Set<LocalDate> activeDates = getServiceDatesForServiceId(serviceId);
       List<LocalDate> serviceDates = new ArrayList<>(activeDates);
@@ -139,7 +139,8 @@ public class CalendarServiceDataFactoryImpl {
       case ServiceCalendarDate.EXCEPTION_TYPE_ADD -> addServiceDate(activeDates, serviceDate);
       case ServiceCalendarDate.EXCEPTION_TYPE_REMOVE -> activeDates.remove(serviceDate);
       default -> LOG.warn(
-        "unknown CalendarDate exception type: " + calendarDate.getExceptionType()
+        "unknown CalendarDate exception type: {}",
+        calendarDate.getExceptionType()
       );
     }
   }

@@ -249,6 +249,23 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
   }
 
+  public void applyEstimatedTimetable(
+    final TransitModel transitModel,
+    final SiriFuzzyTripMatcher fuzzyTripMatcher,
+    final String feedId,
+    final boolean fullDataset,
+    final List<EstimatedTimetableDeliveryStructure> updates
+  ) {
+    this.applyEstimatedTimetable(
+        transitModel,
+        fuzzyTripMatcher,
+        feedId,
+        fullDataset,
+        updates,
+        false
+      );
+  }
+
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
@@ -262,7 +279,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
     final boolean fullDataset,
-    final List<EstimatedTimetableDeliveryStructure> updates
+    final List<EstimatedTimetableDeliveryStructure> updates,
+    final boolean fuzzyTripMatching
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -310,7 +328,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               } else {
                 // Updated trip
                 if (
-                  handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey).isSuccess()
+                  handleModifiedTrip(
+                    transitModel,
+                    fuzzyTripMatcher,
+                    feedId,
+                    journey,
+                    fuzzyTripMatching
+                  )
+                    .isSuccess()
                 ) {
                   handledCounter++;
                 } else {
@@ -451,7 +476,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     if (!success) {
-      LOG.info("Pattern not updated for trip " + trip.getId());
+      LOG.info("Pattern not updated for trip {}", trip.getId());
     }
     return success;
   }
@@ -842,7 +867,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TransitModel transitModel,
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
-    EstimatedVehicleJourney estimatedVehicleJourney
+    EstimatedVehicleJourney estimatedVehicleJourney,
+    boolean fuzzyTripMatching
   ) {
     //Check if EstimatedVehicleJourney is reported as NOT monitored
     if (estimatedVehicleJourney.isMonitored() != null && !estimatedVehicleJourney.isMonitored()) {
@@ -912,7 +938,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           return Result.failure(List.of(updateResult.failureValue()));
         }
       }
-    } else {
+    } else if (fuzzyTripMatching) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       Set<Trip> trips = fuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
 

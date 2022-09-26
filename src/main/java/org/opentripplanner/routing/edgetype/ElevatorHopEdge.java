@@ -8,8 +8,8 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -21,7 +21,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   private final StreetTraversalPermission permission;
 
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
   private double levels = 1;
   private int travelTime = 0;
@@ -30,7 +30,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairAccessibility,
+    Accessibility wheelchairAccessibility,
     double levels,
     int travelTime
   ) {
@@ -43,7 +43,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairAccessibility
+    Accessibility wheelchairAccessibility
   ) {
     super(from, to);
     this.permission = permission;
@@ -54,7 +54,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairBoarding,
+    Accessibility wheelchairBoarding,
     int levels,
     int travelTime
   ) {
@@ -66,7 +66,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairBoarding
+    Accessibility wheelchairBoarding
   ) {
     new ElevatorHopEdge(from, to, permission, wheelchairBoarding);
     new ElevatorHopEdge(to, from, permission, wheelchairBoarding);
@@ -90,14 +90,14 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
     if (request.wheelchair()) {
       if (
-        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
-        preferences.wheelchairAccessibility().elevator().onlyConsiderAccessible()
+        wheelchairAccessibility != Accessibility.POSSIBLE &&
+        preferences.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return null;
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().unknownCost());
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().inaccessibleCost());
+      } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
+        s1.incrementWeight(preferences.wheelchair().elevator().unknownCost());
+      } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
+        s1.incrementWeight(preferences.wheelchair().elevator().inaccessibleCost());
       }
     }
 
@@ -143,6 +143,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public boolean isWheelchairAccessible() {
-    return wheelchairAccessibility == WheelchairAccessibility.POSSIBLE;
+    return wheelchairAccessibility == Accessibility.POSSIBLE;
   }
 }

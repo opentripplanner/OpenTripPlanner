@@ -6,8 +6,8 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class TransitStopVertex extends Vertex {
   // Do we actually need a set of modes for each stop?
   // It's nice to have for the index web API but can be generated on demand.
   private final Set<TransitMode> modes;
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
   private final RegularStop stop;
 
@@ -45,7 +45,7 @@ public class TransitStopVertex extends Vertex {
     graph.expandToInclude(stop.getLon(), stop.getLat());
   }
 
-  public WheelchairAccessibility getWheelchairAccessibility() {
+  public Accessibility getWheelchairAccessibility() {
     return wheelchairAccessibility;
   }
 

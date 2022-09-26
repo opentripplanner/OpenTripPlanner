@@ -73,7 +73,7 @@ class AreaGroup {
       for (int i = 0; i < mp.getNumGeometries(); ++i) {
         Geometry poly = mp.getGeometryN(i);
         if (!(poly instanceof Polygon)) {
-          LOG.warn("Unexpected non-polygon when merging areas: " + poly);
+          LOG.warn("Unexpected non-polygon when merging areas: {}", poly);
           continue;
         }
         outermostRings.add(toRing((Polygon) poly, nodeMap));
@@ -81,7 +81,7 @@ class AreaGroup {
     } else if (u instanceof Polygon) {
       outermostRings.add(toRing((Polygon) u, nodeMap));
     } else {
-      LOG.warn("Unexpected non-polygon when merging areas: " + u);
+      LOG.warn("Unexpected non-polygon when merging areas: {}", u);
     }
   }
 

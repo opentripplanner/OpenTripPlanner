@@ -10,6 +10,8 @@ public abstract class SiriAzureUpdaterParameters {
   private String feedId;
   private int timeout;
 
+  private boolean fuzzyTripMatching;
+
   public SiriAzureUpdaterParameters(String type) {
     this.type = type;
   }
@@ -64,5 +66,13 @@ public abstract class SiriAzureUpdaterParameters {
 
   public void setTimeout(int timeout) {
     this.timeout = timeout;
+  }
+
+  public boolean isFuzzyTripMatching() {
+    return fuzzyTripMatching;
+  }
+
+  public void setFuzzyTripMatching(boolean fuzzyTripMatching) {
+    this.fuzzyTripMatching = fuzzyTripMatching;
   }
 }

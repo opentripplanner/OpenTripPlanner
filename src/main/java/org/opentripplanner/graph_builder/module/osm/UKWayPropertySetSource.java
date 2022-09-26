@@ -1,11 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.LEFT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
-
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 
 /**
  * OSM way properties for UK roads. The main differences compared to the default property set are:
@@ -24,8 +20,6 @@ import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTra
  * @see DefaultWayPropertySetSource
  */
 public class UKWayPropertySetSource implements WayPropertySetSource {
-
-  private final DrivingDirection drivingDirection = LEFT_HAND_TRAFFIC;
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -77,15 +71,5 @@ public class UKWayPropertySetSource implements WayPropertySetSource {
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
-  }
-
-  @Override
-  public DrivingDirection drivingDirection() {
-    return drivingDirection;
-  }
-
-  @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
   }
 }

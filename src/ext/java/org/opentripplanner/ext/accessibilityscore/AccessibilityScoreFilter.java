@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.WheelchairTraversalInformation;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
@@ -53,7 +53,7 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
     return itineraries.stream().map(this::addAccessibilityScore).toList();
   }
 
-  private static double accessibilityScore(WheelchairAccessibility wheelchair) {
+  private static double accessibilityScore(Accessibility wheelchair) {
     return switch (wheelchair) {
       case NO_INFORMATION -> 0.5;
       case POSSIBLE -> 1;

@@ -302,7 +302,7 @@ public abstract class SnapshotTestBase {
       dateTime.toLocalTime().format(apiTimeFormatter),
       modes,
       request.arriveBy(),
-      request.preferences().wheelchairAccessibility()
+      request.preferences().wheelchair()
     );
   }
 

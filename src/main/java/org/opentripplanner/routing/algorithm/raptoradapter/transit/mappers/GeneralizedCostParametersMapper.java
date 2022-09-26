@@ -6,20 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParams;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.McCostParamsBuilder;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParametersBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class McCostParamsMapper {
+public class GeneralizedCostParametersMapper {
 
-  public static McCostParams map(
+  public static GeneralizedCostParameters map(
     RouteRequest request,
     List<? extends DefaultTripPattern> patternIndex
   ) {
-    McCostParamsBuilder builder = new McCostParamsBuilder();
+    GeneralizedCostParametersBuilder builder = new GeneralizedCostParametersBuilder();
     var preferences = request.preferences();
 
     builder
@@ -36,7 +36,7 @@ public class McCostParamsMapper {
       mapTransitReluctance(preferences.transit().reluctanceForMode())
     );
     builder.wheelchairEnabled(request.wheelchair());
-    builder.wheelchairAccessibility(preferences.wheelchairAccessibility());
+    builder.wheelchairAccessibility(preferences.wheelchair().trip());
 
     final Set<FeedScopedId> unpreferredRoutes = Set.copyOf(
       request.journey().transit().unpreferredRoutes()
@@ -77,7 +77,7 @@ public class McCostParamsMapper {
     // {@link TripScheduleWithOffset#transitReluctanceIndex}, but this is difficult with the
     // current transit model design.
     double[] transitReluctance = new double[TransitMode.values().length];
-    Arrays.fill(transitReluctance, McCostParams.DEFAULT_TRANSIT_RELUCTANCE);
+    Arrays.fill(transitReluctance, GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE);
     for (TransitMode mode : map.keySet()) {
       transitReluctance[mode.ordinal()] = map.get(mode);
     }

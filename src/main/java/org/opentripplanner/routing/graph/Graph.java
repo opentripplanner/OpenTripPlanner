@@ -22,10 +22,7 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -49,13 +46,6 @@ import org.slf4j.LoggerFactory;
 public class Graph implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-
-  public static final DrivingDirection DEFAULT_DRIVING_DIRECTION =
-    DrivingDirection.RIGHT_HAND_TRAFFIC;
-
-  public static final IntersectionTraversalCostModel DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL = new SimpleIntersectionTraversalCostModel(
-    DEFAULT_DRIVING_DIRECTION
-  );
 
   public final StreetNotesService streetNotesService = new StreetNotesService();
 
@@ -119,11 +109,6 @@ public class Graph implements Serializable {
 
   private final VehicleParkingService vehicleParkingService = new VehicleParkingService();
   private FareService fareService;
-
-  private DrivingDirection drivingDirection = DEFAULT_DRIVING_DIRECTION;
-
-  private IntersectionTraversalCostModel intersectionTraversalCostModel =
-    DEFAULT_INTERSECTION_TRAVERSAL_COST_MODEL;
 
   /**
    * Hack. I've tried three different ways of generating unique labels. Previously we were just
@@ -273,7 +258,6 @@ public class Graph implements Serializable {
     return (v != null) && vertices.get(v.getLabel()) == v;
   }
 
-  @SuppressWarnings("unchecked")
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
   }
@@ -462,24 +446,6 @@ public class Graph implements Serializable {
 
   public void setFareService(FareService fareService) {
     this.fareService = fareService;
-  }
-
-  public DrivingDirection getDrivingDirection() {
-    return drivingDirection;
-  }
-
-  public void setDrivingDirection(DrivingDirection drivingDirection) {
-    this.drivingDirection = drivingDirection;
-  }
-
-  public IntersectionTraversalCostModel getIntersectionTraversalModel() {
-    return intersectionTraversalCostModel;
-  }
-
-  public void setIntersectionTraversalCostModel(
-    IntersectionTraversalCostModel intersectionTraversalCostModel
-  ) {
-    this.intersectionTraversalCostModel = intersectionTraversalCostModel;
   }
 
   public LuceneIndex getLuceneIndex() {

@@ -16,9 +16,9 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -112,7 +112,7 @@ public class ServiceLinkMapperTest {
         parentStation,
         List.of(),
         new T2<>(TransitMode.BUS, "UNKNOWN"),
-        WheelchairAccessibility.NO_INFORMATION
+        Accessibility.NO_INFORMATION
       );
       stopPatternBuilder.stops[i] = stop;
       stopsById.add(stop);

@@ -24,7 +24,8 @@ import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -42,6 +43,9 @@ public class TriangleInequalityTest {
 
   private static Graph graph;
   private static TransitModel transitModel;
+  private final IntersectionTraversalCalculator calculator = new ConstantIntersectionTraversalCalculator(
+    10.0
+  );
 
   private Vertex start;
   private Vertex end;
@@ -179,6 +183,7 @@ public class TriangleInequalityTest {
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
       .setContext(new RoutingContext(options, graph, u, v))
+      .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
   }
@@ -194,14 +199,16 @@ public class TriangleInequalityTest {
     RouteRequest prototypeOptions = new RouteRequest();
 
     // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions.preferences().walk().setStairsReluctance(1.0);
-    prototypeOptions.preferences().setNonTransitReluctance(1.0);
+    prototypeOptions
+      .preferences()
+      .withWalk(walk -> {
+        walk.setStairsReluctance(1.0);
+        walk.setSpeed(1.0);
+      });
+    prototypeOptions.preferences().setAllStreetReluctance(1.0);
     prototypeOptions.preferences().street().setTurnReluctance(1.0);
     prototypeOptions.preferences().car().setSpeed(1.0);
-    prototypeOptions.preferences().walk().setSpeed(1.0);
-    prototypeOptions.preferences().bike().setSpeed(1.0);
-
-    graph.setIntersectionTraversalCostModel(new ConstantIntersectionTraversalCostModel(10.0));
+    prototypeOptions.preferences().withBike(it -> it.setSpeed(1.0));
 
     if (modes != null) {
       prototypeOptions.journey().setModes(modes);
@@ -211,6 +218,7 @@ public class TriangleInequalityTest {
       .oneToOne()
       .setDominanceFunction(new DominanceFunction.EarliestArrival())
       .setContext(new RoutingContext(prototypeOptions, graph, start, end))
+      .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(end);

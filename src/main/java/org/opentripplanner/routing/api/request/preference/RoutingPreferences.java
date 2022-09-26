@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.routing.core.TraverseMode;
 
@@ -9,26 +10,28 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   private TransitPreferences transit = new TransitPreferences();
   private TransferPreferences transfer = new TransferPreferences();
-  private WalkPreferences walk = new WalkPreferences();
+  private WalkPreferences walk = WalkPreferences.DEFAULT;
   private StreetPreferences street = new StreetPreferences();
 
   @Nonnull
-  private WheelchairAccessibilityPreferences wheelchairAccessibility =
-    WheelchairAccessibilityPreferences.DEFAULT;
+  private WheelchairPreferences wheelchair = WheelchairPreferences.DEFAULT;
 
-  private BikePreferences bike = new BikePreferences();
+  private BikePreferences bike = BikePreferences.DEFAULT;
   private CarPreferences car = new CarPreferences();
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
   private VehicleParkingPreferences parking = new VehicleParkingPreferences();
   private SystemPreferences system = new SystemPreferences();
 
-  // TODO VIA (Thomas): Rename to setStreetReluctance
-  public void setNonTransitReluctance(double streetReluctance) {
+  /**
+   * This set the reluctance for bike, walk, car and bikeWalking (x2.7) - all in one go. These
+   * parameters can be set individually.
+   */
+  public void setAllStreetReluctance(double streetReluctance) {
     if (streetReluctance > 0) {
-      this.bike.setReluctance(streetReluctance);
-      this.walk.setReluctance(streetReluctance);
+      withWalk(it -> it.setReluctance(streetReluctance));
+      withBike(it -> it.setReluctance(streetReluctance).setWalkingReluctance(streetReluctance * 2.7)
+      );
       this.car.setReluctance(streetReluctance);
-      this.bike.setWalkingReluctance(streetReluctance * 2.7);
     }
   }
 
@@ -44,6 +47,13 @@ public class RoutingPreferences implements Cloneable, Serializable {
     return walk;
   }
 
+  public RoutingPreferences withWalk(Consumer<WalkPreferences.Builder> body) {
+    var builder = walk.copyOf();
+    body.accept(builder);
+    this.walk = builder.build();
+    return this;
+  }
+
   public StreetPreferences street() {
     return street;
   }
@@ -52,18 +62,23 @@ public class RoutingPreferences implements Cloneable, Serializable {
    * Preferences for how strict wheel-accessibility settings are
    */
   @Nonnull
-  public WheelchairAccessibilityPreferences wheelchairAccessibility() {
-    return wheelchairAccessibility;
+  public WheelchairPreferences wheelchair() {
+    return wheelchair;
   }
 
-  public void setWheelchairAccessibility(
-    @Nonnull WheelchairAccessibilityPreferences wheelchairAccessibility
-  ) {
-    this.wheelchairAccessibility = wheelchairAccessibility;
+  public void setWheelchair(@Nonnull WheelchairPreferences wheelchair) {
+    this.wheelchair = wheelchair;
   }
 
   public BikePreferences bike() {
     return bike;
+  }
+
+  public RoutingPreferences withBike(Consumer<BikePreferences.Builder> body) {
+    var builder = bike.copyOf();
+    body.accept(builder);
+    this.bike = builder.build();
+    return this;
   }
 
   public CarPreferences car() {
@@ -96,20 +111,18 @@ public class RoutingPreferences implements Cloneable, Serializable {
 
   public RoutingPreferences clone() {
     try {
-      // TODO VIA: 2022-09-06 Skipping WheelchairAccessibilityRequest
-
       var clone = (RoutingPreferences) super.clone();
 
       clone.transit = transit.clone();
       clone.transfer = transfer.clone();
-      clone.walk = walk.clone();
       clone.street = street.clone();
-      clone.wheelchairAccessibility = wheelchairAccessibility;
-      clone.bike = bike.clone();
       clone.car = car.clone();
       clone.rental = rental.clone();
       clone.parking = parking.clone();
       clone.system = system.clone();
+
+      // The following immutable types can be skipped:
+      // - walk, bike, wheelchair
 
       return clone;
     } catch (CloneNotSupportedException e) {

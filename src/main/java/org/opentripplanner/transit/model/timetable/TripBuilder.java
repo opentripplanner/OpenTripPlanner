@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
@@ -21,7 +21,7 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
   private FeedScopedId shapeId;
   private Direction direction;
   private BikeAccess bikesAllowed;
-  private WheelchairAccessibility wheelchairBoarding;
+  private Accessibility wheelchairBoarding;
   private String gtfsBlockId;
   private String gtfsFareId;
   private String netexInternalPlanningCode;
@@ -158,11 +158,11 @@ public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
     return this;
   }
 
-  public WheelchairAccessibility getWheelchairBoarding() {
+  public Accessibility getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 
-  public TripBuilder withWheelchairBoarding(WheelchairAccessibility wheelchairBoarding) {
+  public TripBuilder withWheelchairBoarding(Accessibility wheelchairBoarding) {
     this.wheelchairBoarding = wheelchairBoarding;
     return this;
   }

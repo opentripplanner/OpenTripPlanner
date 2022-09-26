@@ -8,8 +8,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -92,7 +92,7 @@ class TripMapper {
 
     var wheelChairBoarding = WheelChairMapper.wheelchairAccessibility(
       serviceJourney.getAccessibilityAssessment(),
-      WheelchairAccessibility.NO_INFORMATION
+      Accessibility.NO_INFORMATION
     );
 
     var builder = Trip.of(id);

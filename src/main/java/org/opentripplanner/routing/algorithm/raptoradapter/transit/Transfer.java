@@ -46,25 +46,33 @@ public class Transfer {
     rr.setFrom(null);
     rr.setTo(null);
 
-    var bikePreferences = transferPreferences.bike();
-    var walkPreferences = transferPreferences.walk();
     var streetPreferences = transferPreferences.street();
 
+    // TODO VIA - Remove all rounding logic from here and move it into the Preference type
+    //          - constructors - We should cache and route on the same normalized values to be
+    //          - consistent.
+
+    transferPreferences.withWalk(walk ->
+      walk
+        .setSpeed(roundToHalf(walk.speed()))
+        .setReluctance(roundTo(walk.reluctance(), 1))
+        .setStairsReluctance(roundTo(walk.stairsReluctance(), 1))
+        .setStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1))
+        .setSafetyFactor(roundTo(walk.safetyFactor(), 1))
+    );
+
     // Some values are rounded to ease caching in RaptorRequestTransferCache
-    bikePreferences.setSwitchCost(roundTo100(bikePreferences.switchCost()));
-    bikePreferences.setSwitchTime(roundTo100(bikePreferences.switchTime()));
+    transferPreferences.withBike(bike ->
+      bike
+        .setSwitchCost(roundTo100(bike.switchCost()))
+        .setSwitchTime(roundTo100(bike.switchTime()))
+        .setSpeed(roundToHalf(bike.speed()))
+    );
 
     // it's a record (immutable) so can be safely reused
-    transferPreferences.setWheelchairAccessibility(request.preferences().wheelchairAccessibility());
+    transferPreferences.setWheelchair(request.preferences().wheelchair());
 
-    walkPreferences.setSpeed(roundToHalf(walkPreferences.speed()));
-    bikePreferences.setSpeed(roundToHalf(bikePreferences.speed()));
-
-    walkPreferences.setReluctance(roundTo(walkPreferences.reluctance(), 1));
-    walkPreferences.setStairsReluctance(roundTo(walkPreferences.stairsReluctance(), 1));
-    walkPreferences.setStairsTimeFactor(roundTo(walkPreferences.stairsTimeFactor(), 1));
     streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
-    walkPreferences.setSafetyFactor(roundTo(walkPreferences.safetyFactor(), 1));
 
     streetPreferences.setElevatorBoardCost(roundTo100(streetPreferences.elevatorBoardCost()));
     streetPreferences.setElevatorBoardTime(roundTo100(streetPreferences.elevatorBoardTime()));

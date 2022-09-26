@@ -16,7 +16,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestRoute;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 
-class McCostParamsMapperTest {
+class GeneralizedCostParametersMapperTest {
 
   static FeedScopedId regularAgency = id("regular-agency");
   static FeedScopedId unpreferredAgency = id("unpreferred-agency");
@@ -43,7 +43,7 @@ class McCostParamsMapperTest {
     var routingRequest = new RouteRequest();
     routingRequest.journey().transit().setUnpreferredAgencies(List.of(unpreferredAgency));
 
-    BitSet unpreferredPatterns = McCostParamsMapper
+    BitSet unpreferredPatterns = GeneralizedCostParametersMapper
       .map(routingRequest, data.getPatterns())
       .unpreferredPatterns();
 
@@ -62,7 +62,7 @@ class McCostParamsMapperTest {
 
     assertEquals(
       new BitSet(),
-      McCostParamsMapper.map(routingRequest, data.getPatterns()).unpreferredPatterns()
+      GeneralizedCostParametersMapper.map(routingRequest, data.getPatterns()).unpreferredPatterns()
     );
   }
 
