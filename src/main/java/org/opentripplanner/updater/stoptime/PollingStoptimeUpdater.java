@@ -1,23 +1,13 @@
 package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.opentripplanner.model.UpdateError;
+import java.util.function.Consumer;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
-import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,11 +42,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
    * flag.
    */
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
-  private final AtomicInteger successfulGauge;
-  private final AtomicInteger failureGauge;
-  private final Map<UpdateError.UpdateErrorType, AtomicInteger> failuresByType = new HashMap<>();
-  private final List<Tag> baseTags;
-  final String METRICS_PREFIX = "trip_updates";
+  private final Consumer<UpdateResult> sendMetrics;
+
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
@@ -82,15 +69,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
 
-    this.baseTags =
-      List.of(
-        Tag.of("configRef", parameters.getConfigRef()),
-        Tag.of("url", parameters.httpSourceParameters().getUrl()),
-        Tag.of("feedId", parameters.getFeedId())
-      );
-
-    this.successfulGauge = getGauge(METRICS_PREFIX + ".successful");
-    this.failureGauge = getGauge(METRICS_PREFIX + ".failed");
+    this.sendMetrics = TripUpdateMetrics.buildConsumer(parameters);
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -123,30 +102,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         fullDataset,
         updates,
         feedId,
-        this::sendMetrics
+        this.sendMetrics
       );
       saveResultOnGraph.execute(runnable);
-    }
-  }
-
-  public void sendMetrics(UpdateResult result) {
-    this.successfulGauge.set(result.successful());
-    this.failureGauge.set(result.failed());
-
-    for (var errorType : result.failures().keySet()) {
-      var counter = failuresByType.get(errorType);
-      if (Objects.isNull(counter)) {
-        counter = getGauge(METRICS_PREFIX + ".failure_type", Tag.of("errorType", errorType.name()));
-        failuresByType.put(errorType, counter);
-      }
-      counter.set(result.failures().get(errorType).size());
-    }
-
-    var toZero = new HashSet<>(failuresByType.keySet());
-    toZero.removeAll(result.failures().keySet());
-
-    for (var keyToZero : toZero) {
-      failuresByType.get(keyToZero).set(0);
     }
   }
 
@@ -158,15 +116,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       .addStr("feedId", feedId)
       .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatcher != null)
       .toString();
-  }
-
-  private AtomicInteger getGauge(String name, Tag... tags) {
-    if (OTPFeature.ActuatorAPI.isOn()) {
-      var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
-      return Metrics.globalRegistry.gauge(name, finalTags, new AtomicInteger(0));
-    } else {
-      return new AtomicInteger();
-    }
   }
 
   private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {
