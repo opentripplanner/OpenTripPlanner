@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
  * rt.feedId = TA
  * </pre>
  */
-public class PollingStoptimeUpdater extends PollingGraphUpdater {
+public class PollingTripUpdater extends PollingGraphUpdater {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PollingTripUpdater.class);
 
   private final TripUpdateSource updateSource;
   private final TimetableSnapshotSource snapshotSource;
@@ -53,8 +53,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
    */
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-  public PollingStoptimeUpdater(
-    PollingStoptimeUpdaterParameters parameters,
+  public PollingTripUpdater(
+    PollingTripUpdaterParameters parameters,
     TransitModel transitModel,
     TimetableSnapshotSource snapshotSource
   ) {
@@ -118,7 +118,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       .toString();
   }
 
-  private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {
+  private static TripUpdateSource createSource(PollingTripUpdaterParameters parameters) {
     switch (parameters.getSourceType()) {
       case GTFS_RT_HTTP:
         return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());

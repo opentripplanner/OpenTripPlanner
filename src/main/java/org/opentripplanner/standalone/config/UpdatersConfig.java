@@ -35,7 +35,7 @@ import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
+import org.opentripplanner.updater.stoptime.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -161,7 +161,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters() {
+  public List<PollingTripUpdaterParameters> getPollingStoptimeUpdaterParameters() {
     return getParameters(STOP_TIME_UPDATER);
   }
 

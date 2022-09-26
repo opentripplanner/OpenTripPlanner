@@ -22,7 +22,7 @@ public class TripUpdateMetrics {
   private final AtomicInteger failureGauge;
   private final Map<UpdateError.UpdateErrorType, AtomicInteger> failuresByType = new HashMap<>();
 
-  public TripUpdateMetrics(PollingStoptimeUpdaterParameters parameters) {
+  public TripUpdateMetrics(PollingTripUpdaterParameters parameters) {
     this.baseTags =
       List.of(
         Tag.of("configRef", parameters.getConfigRef()),
@@ -30,18 +30,27 @@ public class TripUpdateMetrics {
         Tag.of("feedId", parameters.getFeedId())
       );
 
-    this.successfulGauge = getGauge(METRICS_PREFIX + ".successful");
-    this.failureGauge = getGauge(METRICS_PREFIX + ".failed");
+    this.successfulGauge = getGauge("successful");
+    this.failureGauge = getGauge("failed");
   }
 
-  public void sendMetrics(UpdateResult result) {
+  public static Consumer<UpdateResult> buildConsumer(PollingTripUpdaterParameters parameters) {
+    if (OTPFeature.ActuatorAPI.isOn()) {
+      var metrics = new TripUpdateMetrics(parameters);
+      return metrics::setGauges;
+    } else {
+      return ignored -> {};
+    }
+  }
+
+  public void setGauges(UpdateResult result) {
     this.successfulGauge.set(result.successful());
     this.failureGauge.set(result.failed());
 
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
       if (Objects.isNull(counter)) {
-        counter = getGauge(METRICS_PREFIX + ".failure_type", Tag.of("errorType", errorType.name()));
+        counter = getGauge("failure_type", Tag.of("errorType", errorType.name()));
         failuresByType.put(errorType, counter);
       }
       counter.set(result.failures().get(errorType).size());
@@ -56,20 +65,11 @@ public class TripUpdateMetrics {
   }
 
   private AtomicInteger getGauge(String name, Tag... tags) {
-    if (OTPFeature.ActuatorAPI.isOn()) {
-      var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
-      return Metrics.globalRegistry.gauge(name, finalTags, new AtomicInteger(0));
-    } else {
-      return new AtomicInteger();
-    }
-  }
-
-  public static Consumer<UpdateResult> buildConsumer(PollingStoptimeUpdaterParameters parameters) {
-    if (OTPFeature.ActuatorAPI.isOn()) {
-      var x = new TripUpdateMetrics(parameters);
-      return x::sendMetrics;
-    } else {
-      return ignored -> {};
-    }
+    var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
+    return Metrics.globalRegistry.gauge(
+      METRICS_PREFIX + "." + name,
+      finalTags,
+      new AtomicInteger(0)
+    );
   }
 }

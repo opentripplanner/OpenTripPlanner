@@ -3,7 +3,7 @@ package org.opentripplanner.updater.stoptime;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
-public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterParameters {
+public class PollingTripUpdaterParameters implements PollingGraphUpdaterParameters {
 
   private final String configRef;
   private final int frequencySec;
@@ -18,7 +18,7 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   private final String httpSourceUrl;
   private final String fileSource;
 
-  public PollingStoptimeUpdaterParameters(
+  public PollingTripUpdaterParameters(
     String configRef,
     int frequencySec,
     int maxSnapshotFrequencyMs,
