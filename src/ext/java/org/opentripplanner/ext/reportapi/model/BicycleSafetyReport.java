@@ -3,7 +3,7 @@ package org.opentripplanner.ext.reportapi.model;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 
-public class BicyleSafetyReport {
+public class BicycleSafetyReport {
 
   public static void main(String[] args) {
     System.out.println(makeCsv("norway"));
@@ -33,8 +33,8 @@ public class BicyleSafetyReport {
         buf.addText(p.getProperties().getPermission().toString());
 
         var safetyProps = p.getProperties().getBicycleSafetyFeatures();
-        buf.addNumber(safetyProps.first);
-        buf.addNumber(safetyProps.second);
+        buf.addNumber(safetyProps.forward());
+        buf.addNumber(safetyProps.back());
         buf.newLine();
       });
 

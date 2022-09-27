@@ -143,7 +143,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
     this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
     this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
-    this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
+    this.headsigns =
+      deduplicator.deduplicateObjectArray(I18NString.class, makeHeadsignsArray(stopTimes));
     this.headsignVias = deduplicator.deduplicateString2DArray(makeHeadsignViasArray(stopTimes));
 
     this.dropOffBookingInfos =
