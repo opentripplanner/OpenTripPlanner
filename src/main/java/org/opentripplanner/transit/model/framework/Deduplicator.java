@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -20,12 +22,15 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public class Deduplicator implements Serializable {
 
+  private static final String ZERO_COUNT = sizeAndCount(0, 0);
+
   private final Map<BitSet, BitSet> canonicalBitSets = new HashMap<>();
   private final Map<IntArray, IntArray> canonicalIntArrays = new HashMap<>();
   private final Map<String, String> canonicalStrings = new HashMap<>();
   private final Map<StringArray, StringArray> canonicalStringArrays = new HashMap<>();
   private final Map<String2DArray, String2DArray> canonicalString2DArrays = new HashMap<>();
   private final Map<Class<?>, Map<?, ?>> canonicalObjects = new HashMap<>();
+  private final Map<Class<?>, Map<?, ?>> canonicalObjArrays = new HashMap<>();
   private final Map<Class<?>, Map<List<?>, List<?>>> canonicalLists = new HashMap<>();
 
   private final Map<String, Integer> effectCounter = new HashMap<>();
@@ -41,6 +46,7 @@ public class Deduplicator implements Serializable {
     canonicalStringArrays.clear();
     canonicalString2DArrays.clear();
     canonicalObjects.clear();
+    canonicalObjArrays.clear();
     canonicalLists.clear();
   }
 
@@ -89,9 +95,9 @@ public class Deduplicator implements Serializable {
     if (original == null) {
       return null;
     }
-    StringArray canonical = canonicalStringArrays.get(new StringArray(original, false));
+    StringArray canonical = canonicalStringArrays.get(new StringArray(original));
     if (canonical == null) {
-      canonical = new StringArray(original, true);
+      canonical = StringArray.deepDeduplicateOf(original, this);
       canonicalStringArrays.put(canonical, canonical);
     }
     incrementEffectCounter(StringArray.class);
@@ -107,9 +113,9 @@ public class Deduplicator implements Serializable {
     if (original == null) {
       return null;
     }
-    String2DArray canonical = canonicalString2DArrays.get(new String2DArray(original, false));
+    String2DArray canonical = canonicalString2DArrays.get(new String2DArray(original));
     if (canonical == null) {
-      canonical = new String2DArray(original, true);
+      canonical = String2DArray.deepDeduplicateOf(original, this);
       canonicalString2DArrays.put(canonical, canonical);
     }
     incrementEffectCounter(String2DArray.class);
@@ -127,8 +133,31 @@ public class Deduplicator implements Serializable {
     }
     Map<T, T> objects = (Map<T, T>) canonicalObjects.computeIfAbsent(cl, c -> new HashMap<T, T>());
     T canonical = objects.putIfAbsent(original, original);
-    incrementEffectCounter(cl);
+    incrementEffectCounter(objCounterName(cl));
     return canonical == null ? original : canonical;
+  }
+
+  @Nullable
+  public <T> T[] deduplicateObjectArray(Class<T> type, T[] original) {
+    if (original == null) {
+      return null;
+    }
+    Map<ObjArray<T>, ObjArray<T>> map;
+    if (canonicalObjArrays.containsKey(type)) {
+      //noinspection unchecked
+      map = (Map<ObjArray<T>, ObjArray<T>>) canonicalObjArrays.get(type);
+    } else {
+      map = new HashMap<>();
+      canonicalObjArrays.put(type, map);
+    }
+    ObjArray<T> canonical = map.get(new ObjArray<>(original));
+
+    if (canonical == null) {
+      canonical = ObjArray.deepDeduplicateOf(type, original, this);
+      map.put(canonical, canonical);
+    }
+    incrementEffectCounter(arrayCounterName(type));
+    return canonical.array();
   }
 
   @Nullable
@@ -144,10 +173,10 @@ public class Deduplicator implements Serializable {
     List<T> canonical = (List<T>) canonicalLists.get(original);
     if (canonical == null) {
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
-      //noinspection FuseStreamOperations
       boolean containsNull = original.stream().anyMatch(Objects::isNull);
       Stream<T> stream = original.stream().map(it -> deduplicateObject(clazz, it));
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
+      //noinspection SimplifyStreamApiCallChains
       canonical =
         containsNull
           ? Collections.unmodifiableList(stream.collect(Collectors.toList()))
@@ -155,7 +184,7 @@ public class Deduplicator implements Serializable {
       canonicalLists.put(canonical, canonical);
     }
 
-    incrementEffectCounter(listKey(clazz));
+    incrementEffectCounter(listCounterName(clazz));
     return canonical;
   }
 
@@ -166,33 +195,54 @@ public class Deduplicator implements Serializable {
   public String toString() {
     var builder = ToStringBuilder
       .of(Deduplicator.class)
-      .addObj("BitSet", sizeAndCount(canonicalBitSets.size(), BitSet.class))
-      .addObj("IntArray", sizeAndCount(canonicalIntArrays.size(), IntArray.class))
-      .addObj("String", sizeAndCount(canonicalStrings.size(), String.class))
-      .addObj("StringArray", sizeAndCount(canonicalStringArrays.size(), StringArray.class))
-      .addObj("String2DArray", sizeAndCount(canonicalString2DArrays.size(), String2DArray.class));
-
-    canonicalObjects.forEach((k, v) -> builder.addObj(k.getSimpleName(), sizeAndCount(v.size(), k))
-    );
-    canonicalLists.forEach((k, v) ->
-      builder.addObj("List<" + k.getSimpleName() + ">", sizeAndCount(v.size(), listKey(k)))
-    );
+      .addObj("BitSet", sizeAndCount(canonicalBitSets.size(), BitSet.class), ZERO_COUNT)
+      .addObj("int[]", sizeAndCount(canonicalIntArrays.size(), IntArray.class), ZERO_COUNT)
+      .addObj("String", sizeAndCount(canonicalStrings.size(), String.class), ZERO_COUNT)
+      .addObj("String[]", sizeAndCount(canonicalStringArrays.size(), StringArray.class), ZERO_COUNT)
+      .addObj(
+        "String[][]",
+        sizeAndCount(canonicalString2DArrays.size(), String2DArray.class),
+        ZERO_COUNT
+      );
+    addToBuilder(builder, canonicalObjects, Deduplicator::objCounterName);
+    addToBuilder(builder, canonicalObjArrays, Deduplicator::arrayCounterName);
+    addToBuilder(builder, canonicalLists, Deduplicator::listCounterName);
 
     return builder.toString();
   }
 
   /* private members */
 
-  private static <T> String listKey(Class<T> elementType) {
-    return "List<" + elementType.getName() + ">";
+  private static <T> String objCounterName(Class<T> type) {
+    return type.getSimpleName();
+  }
+
+  private static <T> String listCounterName(Class<T> type) {
+    return "List<" + type.getSimpleName() + ">";
+  }
+
+  private static <T> String arrayCounterName(Class<T> type) {
+    return type.getSimpleName() + "[]";
+  }
+
+  /**
+   * Add all entries sorted by the {@code toName} function with count to builder.
+   */
+  private <K, V extends Map<?, ?>> void addToBuilder(
+    ToStringBuilder builder,
+    Map<K, V> map,
+    Function<K, String> toName
+  ) {
+    map
+      .entrySet()
+      .stream()
+      .map(e -> new NameSize(toName.apply(e.getKey()), e.getValue().size()))
+      .sorted(Comparator.comparing(NameSize::name))
+      .forEach(it -> builder.addObj(it.name(), sizeAndCount(it.size(), it.name()), ZERO_COUNT));
   }
 
   private void incrementEffectCounter(Class<?> clazz) {
     incrementEffectCounter(clazz.getName());
-  }
-
-  private String sizeAndCount(int size, Class<?> clazz) {
-    return sizeAndCount(size, clazz.getName());
   }
 
   private void incrementEffectCounter(String key) {
@@ -200,23 +250,23 @@ public class Deduplicator implements Serializable {
     effectCounter.compute(key, (k, v) -> v == null ? 1 : ++v);
   }
 
+  private String sizeAndCount(int size, Class<?> clazz) {
+    return sizeAndCount(size, clazz.getName());
+  }
+
   private String sizeAndCount(int size, String key) {
     int count = effectCounter.getOrDefault(key, 0);
+    return sizeAndCount(size, count);
+  }
+
+  private static String sizeAndCount(int size, int count) {
     return size + "(" + count + ")";
   }
 
   /* private classes */
 
   /** A wrapper for a primitive int array. This is insane but necessary in Java. */
-  private static class IntArray implements Serializable {
-
-    private static final long serialVersionUID = 20140524L;
-    final int[] array;
-
-    IntArray(int[] array) {
-      this.array = array;
-    }
-
+  private record IntArray(int[] array) implements Serializable {
     @Override
     public int hashCode() {
       return Arrays.hashCode(array);
@@ -224,62 +274,28 @@ public class Deduplicator implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-      if (!(other instanceof IntArray)) {
-        return false;
+      if (other instanceof IntArray that) {
+        return Arrays.equals(array, that.array);
       }
-
-      IntArray that = (IntArray) other;
-      return Arrays.equals(array, that.array);
+      return false;
     }
   }
 
-  /** A wrapper for a String array. Optionally, the individual Strings may be deduplicated too. */
-  private class StringArray implements Serializable {
-
-    private static final long serialVersionUID = 20140524L;
-    final String[] array;
-
-    StringArray(String[] array, boolean deduplicateStrings) {
-      if (deduplicateStrings) {
-        this.array = new String[array.length];
-        for (int i = 0; i < array.length; i++) {
-          this.array[i] = deduplicateString(array[i]);
-        }
-      } else {
-        this.array = array;
+  /**
+   * A wrapper around an arrays. Use {@code deepDeduplicateOf()} to deduplicate the elements
+   * as well.
+   */
+  private record ObjArray<T>(T[] array) implements Serializable {
+    private static <E> ObjArray<E> deepDeduplicateOf(
+      Class<E> type,
+      E[] array,
+      Deduplicator deduplicator
+    ) {
+      E[] copy = Arrays.copyOf(array, array.length);
+      for (int i = 0; i < array.length; i++) {
+        copy[i] = deduplicator.deduplicateObject(type, array[i]);
       }
-    }
-
-    @Override
-    public int hashCode() {
-      return Arrays.hashCode(array);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-      if (!(other instanceof StringArray)) {
-        return false;
-      }
-      StringArray that = (StringArray) other;
-      return Arrays.equals(array, that.array);
-    }
-  }
-
-  /** A wrapper for 2D string array */
-  private class String2DArray implements Serializable {
-
-    private static final long serialVersionUID = 20140524L;
-    final String[][] array;
-
-    private String2DArray(String[][] array, boolean deduplicate) {
-      if (deduplicate) {
-        this.array = new String[array.length][];
-        for (int i = 0; i < array.length; i++) {
-          this.array[i] = deduplicateStringArray(array[i]);
-        }
-      } else {
-        this.array = array;
-      }
+      return new ObjArray<>(copy);
     }
 
     @Override
@@ -289,11 +305,62 @@ public class Deduplicator implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-      if (!(other instanceof String2DArray)) {
-        return false;
+      if (other instanceof ObjArray that) {
+        return Arrays.deepEquals(array, that.array);
       }
-      String2DArray that = (String2DArray) other;
-      return Arrays.deepEquals(array, that.array);
+      return false;
     }
   }
+
+  /** A wrapper for a String array. Optionally, the individual Strings may be deduplicated too. */
+  private record StringArray(String[] array) implements Serializable {
+    private static StringArray deepDeduplicateOf(String[] array, Deduplicator deduplicator) {
+      String[] copy = new String[array.length];
+      for (int i = 0; i < array.length; i++) {
+        copy[i] = deduplicator.deduplicateString(array[i]);
+      }
+      return new StringArray(copy);
+    }
+
+    /** Note! Records do a shallow hash, so we need to override */
+    @Override
+    public int hashCode() {
+      return Arrays.hashCode(array);
+    }
+
+    /** Note! Records do a shallow compare in equals, so we need to override */
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof StringArray that) {
+        return Arrays.equals(array, that.array);
+      }
+      return false;
+    }
+  }
+
+  /** A wrapper for 2D string array */
+  private record String2DArray(String[][] array) implements Serializable {
+    private static String2DArray deepDeduplicateOf(String[][] array, Deduplicator deduplicator) {
+      var copy = new String[array.length][];
+      for (int i = 0; i < array.length; i++) {
+        copy[i] = deduplicator.deduplicateStringArray(array[i]);
+      }
+      return new String2DArray(copy);
+    }
+
+    @Override
+    public int hashCode() {
+      return Arrays.deepHashCode(array);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof String2DArray that) {
+        return Arrays.deepEquals(array, that.array);
+      }
+      return false;
+    }
+  }
+
+  private record NameSize(String name, int size) {}
 }
