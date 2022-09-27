@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.stoptime.metrics;
 
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
@@ -28,8 +29,9 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
 
   public BatchTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
-    this.successfulGauge = getGauge("successful");
-    this.failureGauge = getGauge("failed");
+    this.successfulGauge =
+      getGauge("successful", "Trip updates that were successfully applied at the last update");
+    this.failureGauge = getGauge("failed", "Trip updates that failed to apply at the last update");
   }
 
   public void setGauges(UpdateResult result) {
@@ -39,7 +41,12 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
       if (Objects.isNull(counter)) {
-        counter = getGauge("failure_type", Tag.of("errorType", errorType.name()));
+        counter =
+          getGauge(
+            "failure_type",
+            "Failure types of the last update",
+            Tag.of("errorType", errorType.name())
+          );
         failuresByType.put(errorType, counter);
       }
       counter.set(result.failures().get(errorType).size());
@@ -53,12 +60,14 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
     }
   }
 
-  private AtomicInteger getGauge(String name, Tag... tags) {
+  private AtomicInteger getGauge(String name, String description, Tag... tags) {
     var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
-    return Metrics.globalRegistry.gauge(
-      METRICS_PREFIX + "." + name,
-      finalTags,
-      new AtomicInteger(0)
-    );
+    var atomicInt = new AtomicInteger(0);
+    Gauge
+      .builder(METRICS_PREFIX + "." + name, () -> atomicInt)
+      .description(description)
+      .tags(finalTags)
+      .register(Metrics.globalRegistry);
+    return atomicInt;
   }
 }

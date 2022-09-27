@@ -30,8 +30,8 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
 
   public StreamingTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
-    this.successfulCounter = getCounter("successful");
-    this.failureCounter = getCounter("failed");
+    this.successfulCounter = getCounter("successful", "Total successfully applied trip updates");
+    this.failureCounter = getCounter("failed", "Total failed trip updates");
   }
 
   public void setCounters(UpdateResult result) {
@@ -41,15 +41,24 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
       if (Objects.isNull(counter)) {
-        counter = getCounter("failure_type", Tag.of("errorType", errorType.name()));
+        counter =
+          getCounter(
+            "failure_type",
+            "Total failed trip updates by type",
+            Tag.of("errorType", errorType.name())
+          );
         failuresByType.put(errorType, counter);
       }
       counter.increment(result.failures().get(errorType).size());
     }
   }
 
-  private Counter getCounter(String name, Tag... tags) {
+  private Counter getCounter(String name, String description, Tag... tags) {
     var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
-    return Metrics.globalRegistry.counter(METRICS_PREFIX + "." + name, finalTags);
+    return Counter
+      .builder(METRICS_PREFIX + "." + name)
+      .description(description)
+      .tags(finalTags)
+      .register(Metrics.globalRegistry);
   }
 }
