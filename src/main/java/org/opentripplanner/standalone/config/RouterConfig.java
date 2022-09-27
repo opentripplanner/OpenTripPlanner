@@ -60,8 +60,8 @@ public class RouterConfig implements Serializable {
     this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
     this.flexConfig = new FlexConfig(adapter.path("flex"));
 
-    if (logUnusedParams) {
-      adapter.logAllUnusedParameters(LOG);
+    if (logUnusedParams && LOG.isWarnEnabled()) {
+      adapter.logAllUnusedParameters(LOG::warn);
     }
   }
 

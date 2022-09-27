@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -33,7 +34,6 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
-import org.slf4j.Logger;
 
 /**
  * This class wrap a {@link JsonNode} and decorate it with type-safe parsing of types used in OTP
@@ -64,13 +64,13 @@ public class NodeAdapter {
    * This parameter is used internally in this class to be able to produce a list of parameters
    * which is NOT requested.
    */
-  private final List<String> parameterNames = new ArrayList<>();
+  private final Set<String> parameterNames = new HashSet<>();
 
   /**
-   * The collection of children is used to be able to produce a list of unused parameters for all
-   * children.
+   * The map of all children by their name. It is used to be able to produce a list of unused
+   * parameters for all children after the parsing is complete.
    */
-  private final List<NodeAdapter> children = new ArrayList<>();
+  private final Map<String, NodeAdapter> childrenByName = new HashMap<>();
 
   public NodeAdapter(@Nonnull JsonNode node, String source) {
     this(node, source, null);
@@ -91,9 +91,9 @@ public class NodeAdapter {
     // Count elements starting at 1
     int i = 1;
     for (JsonNode node : json) {
-      String pName = "[" + i + "]";
-      NodeAdapter child = new NodeAdapter(node, source, fullPath(pName));
-      children.add(child);
+      String arrayElementName = "[" + i + "]";
+      NodeAdapter child = new NodeAdapter(node, source, fullPath(arrayElementName));
+      childrenByName.put(arrayElementName, child);
       result.add(child);
       ++i;
     }
@@ -117,11 +117,15 @@ public class NodeAdapter {
   }
 
   public NodeAdapter path(String paramName) {
+    if (childrenByName.containsKey(paramName)) {
+      return childrenByName.get(paramName);
+    }
+
     NodeAdapter child = new NodeAdapter(param(paramName), source, fullPath(paramName));
 
     if (!child.isEmpty()) {
       parameterNames.add(paramName);
-      children.add(child);
+      childrenByName.put(paramName, child);
     }
     return child;
   }
@@ -178,11 +182,6 @@ public class NodeAdapter {
 
   public long asLong(String paramName, long defaultValue) {
     return param(paramName).asLong(defaultValue);
-  }
-
-  public long asLong(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return param(paramName).asLong();
   }
 
   public String asText(String paramName, String defaultValue) {
@@ -506,12 +505,12 @@ public class NodeAdapter {
   }
 
   /**
-   * Log unused parameters for the entire configuration file/noe tree. Call this method for thew
-   * root adapter for each config file read.
+   * Log unused parameters for the entire configuration file/node tree. Only call this method for the
+   * root adapter, once for each config file read.
    */
-  public void logAllUnusedParameters(Logger log) {
+  public void logAllUnusedParameters(Consumer<String> logger) {
     for (String p : unusedParams()) {
-      log.warn("Unexpected config parameter: '{}' in '{}'. Is the spelling correct?", p, source);
+      logger.accept("Unexpected config parameter: '" + p + "' in '" + source + "'");
     }
   }
 
@@ -575,7 +574,7 @@ public class NodeAdapter {
       }
     }
 
-    for (NodeAdapter c : children) {
+    for (NodeAdapter c : childrenByName.values()) {
       // Recursive call to get child unused parameters
       unusedParams.addAll(c.unusedParams());
     }
