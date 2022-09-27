@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.stoptime;
+package org.opentripplanner.updater.stoptime.metrics;
 
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
@@ -6,41 +6,24 @@ import io.micrometer.core.instrument.Tags;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.updater.stoptime.UpdateResult;
+import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
 
-public class TripUpdateMetrics {
+public class BatchTripUpdateMetrics extends TripUpdateMetrics {
 
-  static final String METRICS_PREFIX = "trip_updates";
-  private final List<Tag> baseTags;
+  protected static final String METRICS_PREFIX = "batch_trip_updates";
   private final AtomicInteger successfulGauge;
   private final AtomicInteger failureGauge;
   private final Map<UpdateError.UpdateErrorType, AtomicInteger> failuresByType = new HashMap<>();
 
-  public TripUpdateMetrics(PollingTripUpdaterParameters parameters) {
-    this.baseTags =
-      List.of(
-        Tag.of("configRef", parameters.getConfigRef()),
-        Tag.of("url", parameters.httpSourceParameters().getUrl()),
-        Tag.of("feedId", parameters.getFeedId())
-      );
-
+  public BatchTripUpdateMetrics(UrlUpdaterParameters parameters) {
+    super(parameters);
     this.successfulGauge = getGauge("successful");
     this.failureGauge = getGauge("failed");
-  }
-
-  public static Consumer<UpdateResult> buildConsumer(PollingTripUpdaterParameters parameters) {
-    if (OTPFeature.ActuatorAPI.isOn()) {
-      var metrics = new TripUpdateMetrics(parameters);
-      return metrics::setGauges;
-    } else {
-      return ignored -> {};
-    }
   }
 
   public void setGauges(UpdateResult result) {

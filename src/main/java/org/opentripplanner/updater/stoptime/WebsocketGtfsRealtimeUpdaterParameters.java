@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.stoptime;
 
-public class WebsocketGtfsRealtimeUpdaterParameters {
+public class WebsocketGtfsRealtimeUpdaterParameters implements UrlUpdaterParameters {
 
   private final String configRef;
   private final String feedId;
@@ -22,11 +22,11 @@ public class WebsocketGtfsRealtimeUpdaterParameters {
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
   }
 
-  String getUrl() {
+  public String getUrl() {
     return url;
   }
 
-  String getFeedId() {
+  public String getFeedId() {
     return feedId;
   }
 
@@ -35,7 +35,7 @@ public class WebsocketGtfsRealtimeUpdaterParameters {
   }
 
   /** The config name/type for the updater. Used to reference the configuration element. */
-  String getConfigRef() {
+  public String getConfigRef() {
     return configRef;
   }
 

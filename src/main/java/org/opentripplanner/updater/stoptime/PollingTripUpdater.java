@@ -8,6 +8,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.stoptime.metrics.BatchTripUpdateMetrics;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
    * flag.
    */
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
-  private final Consumer<UpdateResult> sendMetrics;
+  private final Consumer<UpdateResult> recordMetrics;
 
   /**
    * Parent update manager. Is used to execute graph writer runnables.
@@ -69,7 +70,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
 
-    this.sendMetrics = TripUpdateMetrics.buildConsumer(parameters);
+    this.recordMetrics = BatchTripUpdateMetrics.batch(parameters);
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -102,7 +103,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         fullDataset,
         updates,
         feedId,
-        this.sendMetrics
+        recordMetrics
       );
       saveResultOnGraph.execute(runnable);
     }
