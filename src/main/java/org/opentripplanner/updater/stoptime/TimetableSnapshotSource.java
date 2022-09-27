@@ -15,7 +15,6 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimaps;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
@@ -322,19 +321,18 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       bufferLock.unlock();
     }
 
-    var errors = results.stream().filter(Optional::isPresent).map(Optional::get).toList();
-    var successfullyApplied = results.stream().filter(Optional::isEmpty).count();
-
-    var errorIndex = Multimaps.index(errors, UpdateError::errorType);
+    var updateResult = UpdateResult.ofOptions(results);
 
     if (fullDataset) {
       LOG.info(
         "[feedId: {}] {} of {} update messages were applied successfully (success rate: {}%)",
         feedId,
-        successfullyApplied,
+        updateResult.successful(),
         updates.size(),
-        DoubleUtils.roundTo2Decimals((double) successfullyApplied / updates.size() * 100)
+        DoubleUtils.roundTo2Decimals((double) updateResult.successful() / updates.size() * 100)
       );
+
+      var errorIndex = updateResult.failures();
 
       errorIndex
         .keySet()
@@ -352,7 +350,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         );
       }
     }
-    return new UpdateResult((int) successfullyApplied, errors.size(), errorIndex);
+    return updateResult;
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {

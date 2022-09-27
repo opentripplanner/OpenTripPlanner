@@ -13,6 +13,12 @@ import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.updater.stoptime.UpdateResult;
 import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
 
+/**
+ * Records micrometer metrics for trip updaters that send batches of updates, for example GTFS-RT
+ * via HTTP.
+ * <p>
+ * It records the latest trip update as gauges.
+ */
 public class BatchTripUpdateMetrics extends TripUpdateMetrics {
 
   protected static final String METRICS_PREFIX = "batch_trip_updates";

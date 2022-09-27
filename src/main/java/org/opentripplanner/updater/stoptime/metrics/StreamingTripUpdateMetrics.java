@@ -8,18 +8,25 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.updater.stoptime.UpdateResult;
 import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
 
+/**
+ * Records micrometer metrics for trip updaters that stream trip updates into the system, for
+ * example GTFS-RT via MQTT.
+ * <p>
+ * It records the trip update as counters (continuously increasing numbers) since the concept of
+ * "latest update" doesn't exist for them.
+ * <p>
+ * Use your metrics database to convert the counters to rates.
+ */
 public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
 
   protected static final String METRICS_PREFIX = "streaming_trip_updates";
   private final Counter successfulCounter;
   private final Counter failureCounter;
   private final Map<UpdateError.UpdateErrorType, Counter> failuresByType = new HashMap<>();
-  private static final Consumer<UpdateResult> NOOP = ignored -> {};
 
   public StreamingTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
@@ -29,7 +36,7 @@ public class StreamingTripUpdateMetrics extends TripUpdateMetrics {
 
   public void setCounters(UpdateResult result) {
     this.successfulCounter.increment(result.successful());
-    this.successfulCounter.increment(result.failed());
+    this.failureCounter.increment(result.failed());
 
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
