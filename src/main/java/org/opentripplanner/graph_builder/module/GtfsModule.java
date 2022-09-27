@@ -184,7 +184,7 @@ public class GtfsModule implements GraphBuilderModule {
             maxInterlineDistance,
             issueStore
           )
-            .run(transitModel.getAllTripPatterns());
+            .run(otpTransitService.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
