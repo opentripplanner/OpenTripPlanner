@@ -25,6 +25,7 @@ public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorTy
     INVALID_STOP_SEQUENCE,
     NOT_IMPLEMENTED_UNSCHEDULED,
     NOT_IMPLEMENTED_DUPLICATED,
+    NOT_MONITORED,
   }
 
   public static Optional<UpdateError> optional(FeedScopedId tripId, UpdateErrorType errorType) {

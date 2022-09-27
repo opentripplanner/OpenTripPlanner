@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.siri.updater;
 
-public class SiriETGooglePubsubUpdaterParameters {
+import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
+
+public class SiriETGooglePubsubUpdaterParameters implements UrlUpdaterParameters {
 
   private final String configRef;
   private final String feedId;
@@ -31,11 +33,16 @@ public class SiriETGooglePubsubUpdaterParameters {
     this.purgeExpiredData = purgeExpiredData;
   }
 
-  String getConfigRef() {
+  @Override
+  public String getUrl() {
+    return dataInitializationUrl;
+  }
+
+  public String getConfigRef() {
     return configRef;
   }
 
-  String getFeedId() {
+  public String getFeedId() {
     return feedId;
   }
 

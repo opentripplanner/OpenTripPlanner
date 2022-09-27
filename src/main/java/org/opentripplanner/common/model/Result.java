@@ -1,6 +1,7 @@
 package org.opentripplanner.common.model;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
@@ -23,6 +24,14 @@ public abstract sealed class Result<T, E> {
 
   public static <E> Result<Void, E> success() {
     return new Success<>(null);
+  }
+
+  public Optional<E> optionalFailure() {
+    if (isSuccess()) {
+      return Optional.empty();
+    } else {
+      return Optional.of(failureValue());
+    }
   }
 
   /**

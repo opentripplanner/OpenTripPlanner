@@ -10,6 +10,7 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRI
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
@@ -47,6 +48,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.stoptime.UpdateResult;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
@@ -248,14 +250,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
   }
 
-  public void applyEstimatedTimetable(
+  public UpdateResult applyEstimatedTimetable(
     final TransitModel transitModel,
     final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
     final boolean fullDataset,
     final List<EstimatedTimetableDeliveryStructure> updates
   ) {
-    this.applyEstimatedTimetable(
+    return this.applyEstimatedTimetable(
         transitModel,
         fuzzyTripMatcher,
         feedId,
@@ -273,7 +275,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    *                     now, i.e. all previous updates should be disregarded
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
-  public void applyEstimatedTimetable(
+  public UpdateResult applyEstimatedTimetable(
     final TransitModel transitModel,
     final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
@@ -283,11 +285,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
-      return;
+      return UpdateResult.empty();
     }
 
     // Acquire lock on buffer
     bufferLock.lock();
+
+    List<Optional<UpdateError>> results = new ArrayList<>();
 
     try {
       if (fullDataset) {
@@ -296,65 +300,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (EstimatedTimetableDeliveryStructure etDelivery : updates) {
-        List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
-        if (estimatedJourneyVersions != null) {
-          //Handle deliveries
-          for (EstimatedVersionFrameStructure estimatedJourneyVersion : estimatedJourneyVersions) {
-            List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
-            LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
-            int handledCounter = 0;
-            int skippedCounter = 0;
-            int addedCounter = 0;
-            int notMonitoredCounter = 0;
-            for (EstimatedVehicleJourney journey : journeys) {
-              if (journey.isExtraJourney() != null && journey.isExtraJourney()) {
-                // Added trip
-                try {
-                  if (handleAddedTrip(transitModel, feedId, journey).isSuccess()) {
-                    addedCounter++;
-                  } else {
-                    skippedCounter++;
-                  }
-                } catch (Throwable t) {
-                  // Since this is work in progress - catch everything to continue processing updates
-                  LOG.warn(
-                    "Adding ExtraJourney with id='{}' failed, caused by '{}'.",
-                    journey.getEstimatedVehicleJourneyCode(),
-                    t.getMessage()
-                  );
-                  skippedCounter++;
-                }
-              } else {
-                // Updated trip
-                if (
-                  handleModifiedTrip(
-                    transitModel,
-                    fuzzyTripMatcher,
-                    feedId,
-                    journey,
-                    fuzzyTripMatching
-                  )
-                    .isSuccess()
-                ) {
-                  handledCounter++;
-                } else {
-                  if (journey.isMonitored() != null && !journey.isMonitored()) {
-                    notMonitoredCounter++;
-                  } else {
-                    skippedCounter++;
-                  }
-                }
-              }
-            }
-            LOG.debug(
-              "Processed EstimatedVehicleJourneys: updated {}, added {}, skipped {}, not monitored {}.",
-              handledCounter,
-              addedCounter,
-              skippedCounter,
-              notMonitoredCounter
-            );
-          }
-        }
+        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher, fuzzyTripMatching);
+        results.addAll(res);
       }
 
       LOG.debug("message contains {} trip updates", updates.size());
@@ -373,6 +320,62 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       // Always release lock
       bufferLock.unlock();
     }
+    return UpdateResult.ofOptions(results);
+  }
+
+  private List<Optional<UpdateError>> apply(
+    EstimatedTimetableDeliveryStructure etDelivery,
+    TransitModel transitModel,
+    String feedId,
+    SiriFuzzyTripMatcher fuzzyTripMatcher,
+    boolean fuzzyTripMatching
+  ) {
+    List<Optional<UpdateError>> results = new ArrayList<>();
+    List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
+    if (estimatedJourneyVersions != null) {
+      //Handle deliveries
+      for (EstimatedVersionFrameStructure estimatedJourneyVersion : estimatedJourneyVersions) {
+        List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
+        LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
+        for (EstimatedVehicleJourney journey : journeys) {
+          if (journey.isExtraJourney() != null && journey.isExtraJourney()) {
+            // Added trip
+            try {
+              Result<Void, UpdateError> res = handleAddedTrip(transitModel, feedId, journey);
+              results.add(res.optionalFailure());
+            } catch (Throwable t) {
+              // Since this is work in progress - catch everything to continue processing updates
+              LOG.warn(
+                "Adding ExtraJourney with id='{}' failed, caused by '{}'.",
+                journey.getEstimatedVehicleJourneyCode(),
+                t.getMessage()
+              );
+              results.add(Optional.of(UpdateError.noTripId(UNKNOWN)));
+            }
+          } else {
+            // Updated trip
+            var result = handleModifiedTrip(
+              transitModel,
+              fuzzyTripMatcher,
+              feedId,
+              journey,
+              fuzzyTripMatching
+            );
+            result.ifSuccess(ignored -> results.add(Optional.empty()));
+            result.ifFailure(failures -> {
+              failures.stream().map(Optional::of).forEach(results::add);
+
+              if (journey.isMonitored() != null && !journey.isMonitored()) {
+                results.add(
+                  Optional.of(UpdateError.noTripId(UpdateError.UpdateErrorType.NOT_MONITORED))
+                );
+              }
+            });
+          }
+        }
+      }
+    }
+    return results;
   }
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
