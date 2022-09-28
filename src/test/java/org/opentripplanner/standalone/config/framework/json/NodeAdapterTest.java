@@ -399,10 +399,10 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'no', key2 : 'no_NO', key3 : 'no_NO_NY' }"
     );
-    assertEquals("no", subject.asLocale("key1", null).toString());
-    assertEquals("no_NO", subject.asLocale("key2", null).toString());
-    assertEquals("no_NO_NY", subject.asLocale("key3", null).toString());
-    assertEquals(Locale.FRANCE, subject.asLocale("missing-key", Locale.FRANCE));
+    assertEquals("no", subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString());
+    assertEquals("no_NO", subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString());
+    assertEquals("no_NO_NY", subject.of("key3").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString());
+    assertEquals(Locale.FRANCE, subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asLocale(Locale.FRANCE));
   }
 
   @Test

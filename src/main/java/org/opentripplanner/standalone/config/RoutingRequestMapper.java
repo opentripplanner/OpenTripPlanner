@@ -315,7 +315,7 @@ public class RoutingRequestMapper {
       );
     request.carPickup =
       c.of("kissAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.carPickup);
-    request.setLocale(c.asLocale("locale", dft.locale()));
+    request.setLocale(c.of("locale").withDoc(NA, /*TODO DOC*/"TODO").asLocale(dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
     preferences
       .street()
