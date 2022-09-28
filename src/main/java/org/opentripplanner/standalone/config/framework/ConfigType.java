@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.framework;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.EnumSet;
+import javax.annotation.Nonnull;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
@@ -92,8 +93,8 @@ public enum ConfigType {
     return name().toLowerCase();
   }
 
-  public String wrap(String value) {
-    return value == null ? null : type == JsonType.string ? "\"" + value + "\"" : value;
+  public String wrap(@Nonnull Object value) {
+    return type == JsonType.string ? "\"" + value + "\"" : value.toString();
   }
 
   public boolean isComplex() {

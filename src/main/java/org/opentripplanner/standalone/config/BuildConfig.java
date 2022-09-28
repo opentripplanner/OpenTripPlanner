@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
@@ -471,7 +473,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     areaVisibility = root.asBoolean("areaVisibility", false);
     banDiscouragedWalking = root.asBoolean("banDiscouragedWalking", false);
     banDiscouragedBiking = root.asBoolean("banDiscouragedBiking", false);
-    configVersion = root.asText("configVersion", null);
+    configVersion = root.of("configVersion").doc(NA, "TODO DOC").example("2.2.12_12").asString(null);
     dataImportReport = root.asBoolean("dataImportReport", false);
     distanceBetweenElevationSamples =
       root.asDouble(
@@ -637,5 +639,9 @@ public class BuildConfig implements OtpDataStoreConfig {
   public int getSubwayAccessTimeSeconds() {
     // Convert access time in minutes to seconds
     return (int) (subwayAccessTime * 60.0);
+  }
+
+  public NodeAdapter asNodeAdapter() {
+    return root;
   }
 }

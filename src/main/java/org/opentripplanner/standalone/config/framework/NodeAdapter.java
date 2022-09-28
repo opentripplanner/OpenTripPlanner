@@ -98,6 +98,14 @@ public class NodeAdapter {
     return result;
   }
 
+  public String contextPath() {
+    return contextPath;
+  }
+
+  public String source() {
+    return source;
+  }
+
   public boolean isNonEmptyArray() {
     return json.isArray() && json.size() > 0;
   }

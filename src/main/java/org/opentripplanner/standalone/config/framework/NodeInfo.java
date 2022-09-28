@@ -6,6 +6,8 @@ import static org.opentripplanner.standalone.config.framework.ConfigType.ENUM_MA
 import static org.opentripplanner.standalone.config.framework.ConfigType.ENUM_SET;
 import static org.opentripplanner.standalone.config.framework.ConfigType.MAP;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.EnumSet;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -36,6 +38,7 @@ public record NodeInfo(
   @Nullable ConfigType elementType,
   OtpVersion since,
   @Nullable String defaultValue,
+  @Nullable Object exampleValue,
   boolean required,
   @Nullable DeprecatedInfo deprecated
 ) {
@@ -44,6 +47,11 @@ public record NodeInfo(
     Objects.requireNonNull(type);
     Objects.requireNonNull(since);
     Objects.requireNonNull(summary);
+    /**
+    if (EnumSet.of(STRING, ENUM, MAP, ENUM_MAP, ENUM_SET, ARRAY).contains(type)) {
+      Objects.requireNonNull(exampleValue, name + " : " + type);
+    }
+    */
   }
 
   public boolean printDetails() {
@@ -52,6 +60,51 @@ public record NodeInfo(
 
   public boolean isDeprecated() {
     return deprecated != null;
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public String exampleValueJson() {
+    return type.wrap(
+      switch (type) {
+        case BOOLEAN -> exampleOrFallback("true").toString().toLowerCase();
+        case DOUBLE -> exampleOrFallback(3.15);
+        case INTEGER -> exampleOrFallback(123);
+        case LONG -> exampleOrFallback(1000);
+        case ENUM -> exampleOrFallback("MONDAY");
+        case STRING -> exampleOrFallback("A String");
+        case LOCALE -> exampleOrFallback("en_US");
+        case DATE -> exampleOrFallback("20022-05-31");
+        case DATE_OR_PERIOD -> exampleOrFallback("P1Y5D");
+        case DURATION -> exampleOrFallback("45s");
+        case REGEXP -> exampleOrFallback("-?[\\d+=*/ =]+");
+        case URI -> exampleOrFallback("https://www.opentripplanner.org/");
+        case ZONE_ID -> exampleOrFallback("UTC");
+        case FEED_SCOPED_ID -> exampleOrFallback("FEED_1");
+        case LINEAR_FUNCTION -> exampleOrFallback("600 + 3.0 x");
+        case OBJECT, MAP -> exampleOrFallback("{a:1}");
+        case ENUM_MAP -> exampleOrFallback("{MONDAY : 2}");
+        case ENUM_SET -> exampleOrFallback("[MONDAY,TUESDAY]");
+        case ARRAY -> exampleOrFallback("[{n:1},{n:2}]");
+      }
+    );
+  }
+
+  public Object exampleOrFallback(Object fallback) {
+    if (exampleValue != null) {
+      if (type.isComplex()) {
+        try {
+          new ObjectMapper().writeValueAsString(exampleValue);
+        } catch (JsonProcessingException e) {
+          throw new IllegalStateException(
+            "JSON serialization of exampleValue failed!: " + e.getMessage(),
+            e
+          );
+        }
+      } else {
+        return exampleValue;
+      }
+    }
+    return fallback;
   }
 
   static Builder of() {
@@ -117,6 +170,7 @@ public record NodeInfo(
     private String summary = "TODO: Add short summary.";
     private String description = null;
     private String defaultValue = null;
+    private Object exampleValue = null;
     private boolean required = true;
     private DeprecatedInfo deprecated = null;
 
@@ -156,6 +210,11 @@ public record NodeInfo(
 
     Builder withDeprecated(OtpVersion deprecatedSince, String description) {
       this.deprecated = new DeprecatedInfo(deprecatedSince, description);
+      return this;
+    }
+
+    Builder withExample(Object exampleValue) {
+      this.exampleValue = exampleValue;
       return this;
     }
 
@@ -216,6 +275,7 @@ public record NodeInfo(
         elementType,
         since,
         defaultValue,
+        exampleValue,
         required,
         deprecated
       );
