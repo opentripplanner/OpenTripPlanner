@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
@@ -129,13 +130,26 @@ public class NetexMapper {
   }
 
   /**
-   * Any post processing step in the mapping is done in this method. The method is called ONCE after
-   * all other mapping is complete. Note! Hierarchical data structures are not accessible any more.
+   * Any post-processing step in the mapping is done in this method. The method is called ONCE after
+   * all other mapping is complete. Note! Hierarchical data structures are not accessible anymore.
    */
-  public void finnishUp() {
+  public void finishUp() {
     // Add Calendar data created during the mapping of dayTypes, dayTypeAssignments,
     // datedServiceJourney and ServiceJourneys
     transitBuilder.getCalendarDates().addAll(calendarServiceBuilder.createServiceCalendar());
+
+    // Add the empty service id, as it can be used for routes expected to be added from realtime
+    // updates or DSJs which are replaced, and where we want to keep the original DSJ
+    ServiceCalendar emptyCalendar = calendarServiceBuilder.getEmptyCalendar();
+    if (
+      transitBuilder
+        .getTripsById()
+        .values()
+        .stream()
+        .anyMatch(trip -> emptyCalendar.getServiceId().equals(trip.getServiceId()))
+    ) {
+      transitBuilder.getCalendars().add(emptyCalendar);
+    }
   }
 
   /**
