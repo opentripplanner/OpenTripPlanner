@@ -123,14 +123,6 @@ public class NodeAdapter {
     return childrenByName.get(paramName);
   }
 
-  /**
-   * @deprecated Inline
-   */
-  @Deprecated
-  public ParameterBuilder ofWDoc(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/ "TODO");
-  }
-
   /** Create new parameter, a builder is returned. */
   public ParameterBuilder of(String paramName) {
     return new ParameterBuilder(this, paramName);
@@ -145,14 +137,18 @@ public class NodeAdapter {
    */
   @Deprecated
   public NodeAdapter path(String paramName) {
-    return ofWDoc(paramName)
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
   }
 
   public <T> List<T> asList(String paramName, Function<NodeAdapter, T> mapper) {
-    return ofWDoc(paramName).withDescription(/*TODO DOC*/"TODO").asObjects(mapper);
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObjects(mapper);
   }
 
   public <T> List<T> asList(
@@ -160,7 +156,7 @@ public class NodeAdapter {
     List<T> defaultValue,
     Function<NodeAdapter, T> mapper
   ) {
-    return ofWDoc(paramName).asObjects(defaultValue, mapper);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asObjects(defaultValue, mapper);
   }
 
   /** Delegates to {@link JsonNode#has(String)} */
@@ -170,57 +166,60 @@ public class NodeAdapter {
 
   /** TODO: Inline this */
   public boolean asBoolean(String paramName) {
-    return ofWDoc(paramName).asBoolean();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asBoolean();
   }
 
   /** TODO: Inline this */
   public Boolean asBoolean(String paramName, boolean defaultValue) {
-    return ofWDoc(paramName).asBoolean(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asBoolean(defaultValue);
   }
 
   /** TODO: Inline this */
   public double asDouble(String paramName, double defaultValue) {
-    return ofWDoc(paramName).asDouble(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDouble(defaultValue);
   }
 
   /** TODO: Inline this */
   public double asDouble(String paramName) {
-    return ofWDoc(paramName).asDouble();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDouble();
   }
 
   /** TODO: Inline this */
   public Optional<Double> asDoubleOptional(String paramName) {
-    return ofWDoc(paramName).asDoubleOptional();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDoubleOptional();
   }
 
   /** TODO: Inline this */
   public List<Double> asDoubles(String paramName, List<Double> defaultValue) {
-    return ofWDoc(paramName).asDoubles(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDoubles(defaultValue);
   }
 
   /** TODO: Inline this */
   public int asInt(String paramName, int defaultValue) {
-    return ofWDoc(paramName).asInt(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asInt(defaultValue);
   }
 
   /** TODO: Inline this */
   public int asInt(String paramName) {
-    return ofWDoc(paramName).asInt();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asInt();
   }
 
   /** TODO: Inline this */
   public long asLong(String paramName, long defaultValue) {
-    return ofWDoc(paramName).asLong(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asLong(defaultValue);
   }
 
   /** TODO: Inline this */
   public String asText(String paramName, String defaultValue) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asString(defaultValue);
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString(defaultValue);
   }
 
   /** TODO: Inline this */
   public String asText(String paramName) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asString();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
   }
 
   /**
@@ -234,13 +233,17 @@ public class NodeAdapter {
   /** TODO: Inline this */
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
     return Set.copyOf(
-      ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asStringList(List.copyOf(defaultValue))
+      of(paramName)
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asStringList(List.copyOf(defaultValue))
     );
   }
 
   /** TODO: Inline this */
   public <T> T asCustomStingType(String paramName, T defaultValue, Function<String, T> mapper) {
-    return ofWDoc(paramName)
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .asCustomStingType(defaultValue, mapper);
   }
@@ -248,12 +251,12 @@ public class NodeAdapter {
   /** TODO: Inline this */
   /** Get required enum value. Parser is not case sensitive. */
   public <T extends Enum<T>> T asEnum(String paramName, Class<T> enumType) {
-    return ofWDoc(paramName).asEnum(enumType);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asEnum(enumType);
   }
 
   /** TODO: Inline this */
   public <T extends Enum<T>> T asEnum(String paramName, T defaultValue) {
-    return ofWDoc(paramName).asEnum(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asEnum(defaultValue);
   }
 
   /** TODO: Inline this */
@@ -262,7 +265,10 @@ public class NodeAdapter {
     Class<E> enumClass,
     Class<T> elementType
   ) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asEnumMap(enumClass, elementType);
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asEnumMap(enumClass, elementType);
   }
 
   /** TODO: Inline this */
@@ -271,76 +277,85 @@ public class NodeAdapter {
     Class<E> enumClass,
     Class<T> elementType
   ) {
-    return ofWDoc(paramName)
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .asEnumMapAllKeysRequired(enumClass, elementType);
   }
 
   /** TODO: Inline this */
   public <T extends Enum<T>> Set<T> asEnumSet(String paramName, Class<T> enumClass) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asEnumSet(enumClass);
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asEnumSet(enumClass);
   }
 
   /** TODO: Inline this */
   public FeedScopedId asFeedScopedId(String paramName, FeedScopedId defaultValue) {
-    return ofWDoc(paramName).asFeedScopedId(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(defaultValue);
   }
 
   /** TODO: Inline this */
   public List<FeedScopedId> asFeedScopedIds(String paramName, List<FeedScopedId> defaultValues) {
-    return ofWDoc(paramName).asFeedScopedIds(defaultValues);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(defaultValues);
   }
 
   /** TODO: Inline this */
   public Locale asLocale(String paramName, Locale defaultValue) {
-    return ofWDoc(paramName).asLocale(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asLocale(defaultValue);
   }
 
   /** TODO: Inline this */
   public LocalDate asDateOrRelativePeriod(String paramName, String defaultValue, ZoneId timeZone) {
-    return ofWDoc(paramName).asDateOrRelativePeriod(defaultValue, timeZone);
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asDateOrRelativePeriod(defaultValue, timeZone);
   }
 
   /** TODO: Inline this */
   public Duration asDuration(String paramName, Duration defaultValue) {
-    return ofWDoc(paramName).asDuration(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration(defaultValue);
   }
 
   /** TODO: Inline this */
   public Duration asDuration(String paramName) {
-    return ofWDoc(paramName).asDuration();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration();
   }
 
   /** TODO: Inline this */
   public Duration asDuration2(String paramName, Duration defaultValue, ChronoUnit unit) {
-    return ofWDoc(paramName).asDuration2(defaultValue, unit);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration2(defaultValue, unit);
   }
 
   /** TODO: Inline this */
   public Duration asDuration2(String paramName, ChronoUnit unit) {
-    return ofWDoc(paramName).asDuration2(unit);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration2(unit);
   }
 
   /** TODO: Inline this */
   public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
-    return ofWDoc(paramName).asDurations(defaultValues);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDurations(defaultValues);
   }
 
   /** TODO: Inline this */
   public Pattern asPattern(String paramName, String defaultValue) {
-    return ofWDoc(paramName).asPattern(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asPattern(defaultValue);
   }
 
   public List<URI> asUris(String paramName) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asUris();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUris();
   }
 
   public URI asUri(String paramName) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asUri();
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
   }
 
   public URI asUri(String paramName, String defaultValue) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asUri(defaultValue);
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asUri(defaultValue);
   }
 
   /** TODO: Inline this */
@@ -348,18 +363,21 @@ public class NodeAdapter {
     String paramName,
     DoubleFunction<Double> defaultValue
   ) {
-    return ofWDoc(paramName).asLinearFunction(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asLinearFunction(defaultValue);
   }
 
   /** TODO: Inline this */
   public ZoneId asZoneId(String paramName, ZoneId defaultValue) {
-    return ofWDoc(paramName).asZoneId(defaultValue);
+    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asZoneId(defaultValue);
   }
 
   // TODO: This method should be inlined
 
   public Map<String, String> asStringMap(String paramName) {
-    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asStringMap();
+    return of(paramName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asStringMap();
   }
 
   /** List all present parameters by name */
