@@ -21,7 +21,6 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 
 /**
@@ -169,16 +168,6 @@ public class NodeAdapter {
    */
   public String asText() {
     return json.asText();
-  }
-
-  /** TODO: Inline this */
-  public FeedScopedId asFeedScopedId(String paramName, FeedScopedId defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public List<FeedScopedId> asFeedScopedIds(String paramName, List<FeedScopedId> defaultValues) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(defaultValues);
   }
 
   /** TODO: Inline this */

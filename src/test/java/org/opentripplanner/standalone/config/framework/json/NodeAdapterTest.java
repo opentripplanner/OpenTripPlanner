@@ -298,22 +298,22 @@ public class NodeAdapterTest {
   @Test
   public void asFeedScopedId() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1: 'A:23', key2: 'B:12' }");
-    assertEquals("A:23", subject.asFeedScopedId("key1", null).toString());
-    assertEquals("B:12", subject.asFeedScopedId("key2", null).toString());
+    assertEquals("A:23", subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString());
+    assertEquals("B:12", subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString());
     assertEquals(
       "C:12",
-      subject.asFeedScopedId("missing-key", new FeedScopedId("C", "12")).toString()
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(new FeedScopedId("C", "12")).toString()
     );
   }
 
   @Test
   public void asFeedScopedIds() {
     NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12']}");
-    assertEquals("[A:23, B:12]", subject.asFeedScopedIds("routes", List.of()).toString());
-    assertEquals("[]", subject.asFeedScopedIds("missing-key", List.of()).toString());
+    assertEquals("[A:23, B:12]", subject.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of()).toString());
+    assertEquals("[]", subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of()).toString());
     assertEquals(
       "[C:12]",
-      subject.asFeedScopedIds("missing-key", List.of(new FeedScopedId("C", "12"))).toString()
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of(new FeedScopedId("C", "12"))).toString()
     );
   }
 
@@ -326,7 +326,7 @@ public class NodeAdapterTest {
         new FeedScopedId("B", "12"),
         new FeedScopedId("A", "23")
       ),
-      subject.asFeedScopedIds("routes", List.of())
+      subject.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of())
     );
   }
 
