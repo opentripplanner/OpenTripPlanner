@@ -14,10 +14,16 @@ public class WheelchairAccessibilityRequestMapper {
       mapAccessibilityFeature(a.path("trip"), DEFAULT.trip()),
       mapAccessibilityFeature(a.path("stop"), DEFAULT.stop()),
       mapAccessibilityFeature(a.path("elevator"), DEFAULT.elevator()),
-      a.asDouble("inaccessibleStreetReluctance", DEFAULT.inaccessibleStreetReluctance()),
-      a.asDouble("maxSlope", DEFAULT.maxSlope()),
-      a.asDouble("slopeExceededReluctance", DEFAULT.slopeExceededReluctance()),
-      a.asDouble("stairsReluctance", DEFAULT.stairsReluctance())
+      a
+        .of("inaccessibleStreetReluctance")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(DEFAULT.inaccessibleStreetReluctance()),
+      a.of("maxSlope").withDoc(NA, /*TODO DOC*/"TODO").asDouble(DEFAULT.maxSlope()),
+      a
+        .of("slopeExceededReluctance")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(DEFAULT.slopeExceededReluctance()),
+      a.of("stairsReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(DEFAULT.stairsReluctance())
     );
   }
 

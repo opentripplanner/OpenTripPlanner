@@ -62,15 +62,22 @@ public class NodeAdapterTest {
   @Test
   public void asDouble() {
     NodeAdapter subject = newNodeAdapterForTest("{ aDouble : 7.0 }");
-    assertEquals(7.0, subject.asDouble("aDouble", -1d), 0.01);
-    assertEquals(7.0, subject.asDouble("aDouble"), 0.01);
-    assertEquals(-1d, subject.asDouble("missingField", -1d), 00.1);
+    assertEquals(7.0, subject.of("aDouble").withDoc(NA, /*TODO DOC*/"TODO").asDouble(-1d), 0.01);
+    assertEquals(7.0, subject.of("aDouble").withDoc(NA, /*TODO DOC*/"TODO").asDouble(), 0.01);
+    assertEquals(
+      -1d,
+      subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asDouble(-1d),
+      00.1
+    );
   }
 
   @Test
   public void asDoubles() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 2.0, 3.0, 5.0 ] }");
-    assertEquals(List.of(2d, 3d, 5d), subject.asDoubles("key", null));
+    assertEquals(
+      List.of(2d, 3d, 5d),
+      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asDoubles(null)
+    );
   }
 
   @Test

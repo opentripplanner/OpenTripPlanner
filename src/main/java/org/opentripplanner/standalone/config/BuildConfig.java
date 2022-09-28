@@ -479,12 +479,13 @@ public class BuildConfig implements OtpDataStoreConfig {
       root.of("configVersion").withDoc(NA, "TODO DOC").withExample("2.2.12_12").asString(null);
     dataImportReport = root.of("dataImportReport").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     distanceBetweenElevationSamples =
-      root.asDouble(
-        "distanceBetweenElevationSamples",
-        CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
-      );
+      root
+        .of("distanceBetweenElevationSamples")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root.path("elevationBucket"));
-    elevationUnitMultiplier = root.asDouble("elevationUnitMultiplier", 1);
+    elevationUnitMultiplier =
+      root.of("elevationUnitMultiplier").withDoc(NA, /*TODO DOC*/"TODO").asDouble(1);
     embedRouterConfig =
       root.of("embedRouterConfig").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     extraEdgesStopPlatformLink =
@@ -500,8 +501,12 @@ public class BuildConfig implements OtpDataStoreConfig {
     blockBasedInterlining =
       root.of("blockBasedInterlining").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     maxTransferDurationSeconds =
-      root.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
-    maxStopToShapeSnapDistance = root.asDouble("maxStopToShapeSnapDistance", 150);
+      root
+        .of("maxTransferDurationSeconds")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble((double) Duration.ofMinutes(30).toSeconds());
+    maxStopToShapeSnapDistance =
+      root.of("maxStopToShapeSnapDistance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(150);
     multiThreadElevationCalculations =
       root.of("multiThreadElevationCalculations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     osmCacheDataInMem =
@@ -515,7 +520,11 @@ public class BuildConfig implements OtpDataStoreConfig {
     staticParkAndRide =
       root.of("staticParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     streets = root.of("streets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
-    subwayAccessTime = root.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+    subwayAccessTime =
+      root
+        .of("subwayAccessTime")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
     transit = root.of("transit").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
 
     // Time Zone dependent config

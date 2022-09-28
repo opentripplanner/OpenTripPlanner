@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
@@ -40,7 +42,8 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
       maxZoom = node.asInt("maxZoom", MAX_ZOOM);
       minZoom = node.asInt("minZoom", MIN_ZOOM);
       cacheMaxSeconds = node.asInt("cacheMaxSeconds", CACHE_MAX_SECONDS);
-      expansionFactor = node.asDouble("expansionFactor", EXPANSION_FACTOR);
+      expansionFactor =
+        node.of("expansionFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(EXPANSION_FACTOR);
     }
 
     @Override

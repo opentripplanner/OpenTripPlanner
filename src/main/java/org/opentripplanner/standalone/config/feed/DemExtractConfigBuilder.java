@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.net.URI;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -12,7 +14,11 @@ public class DemExtractConfigBuilder {
     DemExtractConfigBuilder demExtractConfigBuilder = new DemExtractConfigBuilder();
     demExtractConfigBuilder.source = config.asUri("source");
     demExtractConfigBuilder.elevationUnitMultiplier =
-      config.asDoubleOptional("elevationUnitMultiplier").orElse(null);
+      config
+        .of("elevationUnitMultiplier")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDoubleOptional()
+        .orElse(null);
     return demExtractConfigBuilder;
   }
 

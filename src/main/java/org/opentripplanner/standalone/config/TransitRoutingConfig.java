@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -101,9 +103,15 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     public DynamicSearchWindowConfig(NodeAdapter dsWin) {
       DynamicSearchWindowCoefficients dsWinDft = new DynamicSearchWindowCoefficients() {};
       this.minTransitTimeCoefficient =
-        dsWin.asDouble("minTransitTimeCoefficient", dsWinDft.minTransitTimeCoefficient());
+        dsWin
+          .of("minTransitTimeCoefficient")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dsWinDft.minTransitTimeCoefficient());
       this.minWaitTimeCoefficient =
-        dsWin.asDouble("minWaitTimeCoefficient", dsWinDft.minWaitTimeCoefficient());
+        dsWin
+          .of("minWaitTimeCoefficient")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dsWinDft.minWaitTimeCoefficient());
       this.minWinTimeMinutes = dsWin.asInt("minWinTimeMinutes", dsWinDft.minWinTimeMinutes());
       this.maxWinTimeMinutes = dsWin.asInt("maxWinTimeMinutes", dsWinDft.maxWinTimeMinutes());
       this.stepMinutes = dsWin.asInt("stepMinutes", dsWinDft.stepMinutes());

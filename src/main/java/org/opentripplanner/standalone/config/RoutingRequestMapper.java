@@ -57,22 +57,37 @@ public class RoutingRequestMapper {
     );
 
     preferences.withBike(bike -> {
-      bike.setSpeed(c.asDouble("bikeSpeed", bike.speed()));
-      bike.setReluctance(c.asDouble("bikeReluctance", bike.reluctance()));
+      bike.setSpeed(c.of("bikeSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(bike.speed()));
+      bike.setReluctance(
+        c.of("bikeReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(bike.reluctance())
+      );
       bike.setBoardCost(c.asInt("bikeBoardCost", bike.boardCost()));
       bike.setParkTime(c.asInt("bikeParkTime", bike.parkTime()));
       bike.setParkCost(c.asInt("bikeParkCost", bike.parkCost()));
-      bike.setWalkingSpeed(c.asDouble("bikeWalkingSpeed", bike.walkingSpeed()));
-      bike.setWalkingReluctance(c.asDouble("bikeWalkingReluctance", bike.walkingReluctance()));
+      bike.setWalkingSpeed(
+        c.of("bikeWalkingSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(bike.walkingSpeed())
+      );
+      bike.setWalkingReluctance(
+        c
+          .of("bikeWalkingReluctance")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(bike.walkingReluctance())
+      );
       bike.setSwitchTime(c.asInt("bikeSwitchTime", bike.switchTime()));
       bike.setSwitchCost(c.asInt("bikeSwitchCost", bike.switchCost()));
       bike.setOptimizeType(c.asEnum("optimize", bike.optimizeType()));
 
       bike.withOptimizeTriangle(it ->
         it
-          .withTime(c.asDouble("bikeTriangleTimeFactor", it.time()))
-          .withSlope(c.asDouble("bikeTriangleSlopeFactor", it.slope()))
-          .withSafety(c.asDouble("bikeTriangleSafetyFactor", it.safety()))
+          .withTime(
+            c.of("bikeTriangleTimeFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(it.time())
+          )
+          .withSlope(
+            c.of("bikeTriangleSlopeFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(it.slope())
+          )
+          .withSafety(
+            c.of("bikeTriangleSafetyFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(it.safety())
+          )
       );
     });
 
@@ -100,10 +115,10 @@ public class RoutingRequestMapper {
     preferences
       .rental()
       .setArrivingInRentalVehicleAtDestinationCost(
-        c.asDouble(
-          "keepingRentedBicycleAtDestinationCost",
-          preferences.rental().arrivingInRentalVehicleAtDestinationCost()
-        )
+        c
+          .of("keepingRentedBicycleAtDestinationCost")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.rental().arrivingInRentalVehicleAtDestinationCost())
       );
     preferences
       .transit()
@@ -124,20 +139,37 @@ public class RoutingRequestMapper {
     preferences
       .car()
       .setAccelerationSpeed(
-        c.asDouble("carAccelerationSpeed", preferences.car().accelerationSpeed())
+        c
+          .of("carAccelerationSpeed")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.car().accelerationSpeed())
       );
     preferences
       .car()
       .setDecelerationSpeed(
-        c.asDouble("carDecelerationSpeed", preferences.car().decelerationSpeed())
+        c
+          .of("carDecelerationSpeed")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.car().decelerationSpeed())
       );
     preferences.car().setDropoffTime(c.asInt("carDropoffTime", preferences.car().dropoffTime()));
     preferences.car().setParkCost(c.asInt("carParkCost", preferences.car().parkCost()));
     preferences.car().setParkTime(c.asInt("carParkTime", preferences.car().parkTime()));
     preferences.car().setPickupCost(c.asInt("carPickupCost", preferences.car().pickupCost()));
     preferences.car().setPickupTime(c.asInt("carPickupTime", preferences.car().pickupTime()));
-    preferences.car().setReluctance(c.asDouble("carReluctance", preferences.car().reluctance()));
-    preferences.car().setSpeed(c.asDouble("carSpeed", preferences.car().speed()));
+    preferences
+      .car()
+      .setReluctance(
+        c
+          .of("carReluctance")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.car().reluctance())
+      );
+    preferences
+      .car()
+      .setSpeed(
+        c.of("carSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(preferences.car().speed())
+      );
 
     preferences
       .system()
@@ -238,7 +270,12 @@ public class RoutingRequestMapper {
       );
     preferences
       .street()
-      .setTurnReluctance(c.asDouble("turnReluctance", preferences.street().turnReluctance()));
+      .setTurnReluctance(
+        c
+          .of("turnReluctance")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.street().turnReluctance())
+      );
     preferences
       .rental()
       .setUseAvailabilityInformation(
@@ -265,20 +302,34 @@ public class RoutingRequestMapper {
     preferences
       .transfer()
       .setWaitAtBeginningFactor(
-        c.asDouble("waitAtBeginningFactor", preferences.transfer().waitAtBeginningFactor())
+        c
+          .of("waitAtBeginningFactor")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.transfer().waitAtBeginningFactor())
       );
     preferences
       .transfer()
       .setWaitReluctance(
-        c.asDouble("waitReluctance", preferences.transfer().waitAtBeginningFactor())
+        c
+          .of("waitReluctance")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(preferences.transfer().waitAtBeginningFactor())
       );
     preferences.withWalk(walk -> {
-      walk.setSpeed(c.asDouble("walkSpeed", walk.speed()));
-      walk.setReluctance(c.asDouble("walkReluctance", walk.reluctance()));
+      walk.setSpeed(c.of("walkSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.speed()));
+      walk.setReluctance(
+        c.of("walkReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.reluctance())
+      );
       walk.setBoardCost(c.asInt("walkBoardCost", walk.boardCost()));
-      walk.setStairsReluctance(c.asDouble("stairsReluctance", walk.stairsReluctance()));
-      walk.setStairsTimeFactor(c.asDouble("stairsTimeFactor", walk.stairsTimeFactor()));
-      walk.setSafetyFactor(c.asDouble("walkSafetyFactor", walk.safetyFactor()));
+      walk.setStairsReluctance(
+        c.of("stairsReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.stairsReluctance())
+      );
+      walk.setStairsTimeFactor(
+        c.of("stairsTimeFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.stairsTimeFactor())
+      );
+      walk.setSafetyFactor(
+        c.of("walkSafetyFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.safetyFactor())
+      );
     });
 
     preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
@@ -333,9 +384,18 @@ public class RoutingRequestMapper {
         .of("optimizeTransferWaitTime")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asBoolean(dft.optimizeTransferWaitTime()),
-      c.asDouble("minSafeWaitTimeFactor", dft.minSafeWaitTimeFactor()),
-      c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor()),
-      c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())
+      c
+        .of("minSafeWaitTimeFactor")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.minSafeWaitTimeFactor()),
+      c
+        .of("backTravelWaitTimeFactor")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.backTravelWaitTimeFactor()),
+      c
+        .of("extraStopBoardAlightCostsFactor")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.extraStopBoardAlightCostsFactor())
     );
   }
 }

@@ -22,19 +22,31 @@ public class ItineraryFiltersMapper {
 
     return new ItineraryFilterParameters(
       c.of("debug").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.debug),
-      c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne),
-      c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree),
-      c.asDouble(
-        "groupedOtherThanSameLegsMaxCostMultiplier",
-        dft.groupedOtherThanSameLegsMaxCostMultiplier
-      ),
+      c
+        .of("groupSimilarityKeepOne")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.groupSimilarityKeepOne),
+      c
+        .of("groupSimilarityKeepThree")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.groupSimilarityKeepThree),
+      c
+        .of("groupedOtherThanSameLegsMaxCostMultiplier")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.groupedOtherThanSameLegsMaxCostMultiplier),
       parseTransitGeneralizedCostLimit(
         c.path("transitGeneralizedCostLimit"),
         dft.transitGeneralizedCostLimit
       ),
       c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),
-      c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio),
-      c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio),
+      c
+        .of("bikeRentalDistanceRatio")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.bikeRentalDistanceRatio),
+      c
+        .of("parkAndRideDurationRatio")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(dft.parkAndRideDurationRatio),
       c
         .of("filterItinerariesWithSameFirstOrLastTrip")
         .withDoc(NA, /*TODO DOC*/"TODO")
@@ -58,7 +70,10 @@ public class ItineraryFiltersMapper {
     if (node.isObject()) {
       return new TransitGeneralizedCostFilterParams(
         node.asLinearFunction("costLimitFunction", transitGeneralizedCostLimit.costLimitFunction()),
-        node.asDouble("intervalRelaxFactor", transitGeneralizedCostLimit.intervalRelaxFactor())
+        node
+          .of("intervalRelaxFactor")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
       );
     }
 

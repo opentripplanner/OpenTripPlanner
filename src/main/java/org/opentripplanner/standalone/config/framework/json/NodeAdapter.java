@@ -15,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
@@ -162,26 +161,6 @@ public class NodeAdapter {
   /** Delegates to {@link JsonNode#has(String)} */
   public boolean exist(String paramName) {
     return json.has(paramName);
-  }
-
-  /** TODO: Inline this */
-  public double asDouble(String paramName, double defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDouble(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public double asDouble(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDouble();
-  }
-
-  /** TODO: Inline this */
-  public Optional<Double> asDoubleOptional(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDoubleOptional();
-  }
-
-  /** TODO: Inline this */
-  public List<Double> asDoubles(String paramName, List<Double> defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDoubles(defaultValue);
   }
 
   /** TODO: Inline this */
