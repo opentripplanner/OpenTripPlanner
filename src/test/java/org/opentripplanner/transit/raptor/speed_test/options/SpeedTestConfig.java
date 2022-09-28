@@ -8,8 +8,8 @@ import java.net.URI;
 import java.time.LocalDate;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.framework;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
@@ -531,9 +531,15 @@ public class NodeAdapter {
     return result;
   }
 
-  JsonNode asRawNode(String paramName) {
+  /**
+   * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
+   * track of unused parameters and can not generate documentation for these.
+   */
+  public JsonNode asRawNode(String paramName) {
     return param(paramName);
   }
+
+  /* private methods */
 
   private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
     var upperCaseValue = value.toUpperCase();
@@ -556,8 +562,6 @@ public class NodeAdapter {
         );
       });
   }
-
-  /* private methods */
 
   /**
    * This method list all unused parameters(full path), also nested ones. It uses recursion to get

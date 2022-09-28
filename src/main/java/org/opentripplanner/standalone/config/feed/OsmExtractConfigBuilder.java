@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import java.net.URI;
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 
 /**
  * Configure an OpenStreetMap extract.

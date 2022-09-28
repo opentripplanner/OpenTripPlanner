@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.updaters;
 
 import java.util.UUID;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 
 public class SiriVMUpdaterConfig {
 

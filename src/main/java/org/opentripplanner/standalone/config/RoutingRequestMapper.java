@@ -10,6 +10,7 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;

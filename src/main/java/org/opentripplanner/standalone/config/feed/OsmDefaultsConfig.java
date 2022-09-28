@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 
 /**
  * Default configuration for OpenStreetMap feeds.

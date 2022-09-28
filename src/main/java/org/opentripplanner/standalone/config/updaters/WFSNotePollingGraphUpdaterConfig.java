@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 
 public class WFSNotePollingGraphUpdaterConfig {

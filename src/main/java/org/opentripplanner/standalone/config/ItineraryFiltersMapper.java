@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

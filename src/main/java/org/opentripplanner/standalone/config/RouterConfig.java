@@ -12,6 +12,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;

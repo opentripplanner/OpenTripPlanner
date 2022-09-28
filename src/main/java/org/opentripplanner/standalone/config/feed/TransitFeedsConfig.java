@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import java.net.URI;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 
 public class TransitFeedsConfig {
 

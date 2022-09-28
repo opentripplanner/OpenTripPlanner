@@ -7,7 +7,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.IndexVariable;
 import org.opentripplanner.ext.dataoverlay.configuration.ParameterBinding;
 import org.opentripplanner.ext.dataoverlay.configuration.TimeUnit;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 
 public class DataOverlayConfigMapper {
 

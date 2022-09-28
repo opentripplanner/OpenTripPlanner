@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config;
 
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

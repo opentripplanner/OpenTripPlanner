@@ -1,10 +1,11 @@
 package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.standalone.config.JsonSupport.jsonNodeForTest;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeForTest;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 
 class RouterConfigTest {
 

@@ -25,6 +25,7 @@ import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
+import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

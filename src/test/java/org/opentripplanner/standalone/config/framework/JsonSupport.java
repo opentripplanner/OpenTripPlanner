@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.framework;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +27,7 @@ public class JsonSupport {
     }
   }
 
-  static NodeAdapter newNodeAdapterForTest(String configText) {
+  public static NodeAdapter newNodeAdapterForTest(String configText) {
     JsonNode config = jsonNodeForTest(configText);
     return new NodeAdapter(config, "Test");
   }
