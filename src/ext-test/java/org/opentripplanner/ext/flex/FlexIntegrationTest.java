@@ -137,7 +137,7 @@ public class FlexIntegrationTest {
     // in the middle of flex zone
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-    var itin = getItinerary(from, to, 1, true);
+    var itin = getItinerary(from, to, 0, true);
 
     // walk, flex
     assertEquals(2, itin.getLegs().size());
