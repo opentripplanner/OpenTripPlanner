@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -24,10 +25,10 @@ public class WheelchairAccessibilityRequestMapper {
     NodeAdapter adapter,
     AccessibilityPreferences defaultValue
   ) {
-    var onlyAccessible = adapter.asBoolean(
-      "onlyConsiderAccessible",
-      defaultValue.onlyConsiderAccessible()
-    );
+    var onlyAccessible = adapter
+      .of("onlyConsiderAccessible")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asBoolean(defaultValue.onlyConsiderAccessible());
 
     var unknownCost = adapter.asInt("unknownCost", 60 * 10);
     var inaccessibleCost = adapter.asInt("inaccessibleCost", 60 * 60);

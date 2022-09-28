@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.HashMap;
@@ -55,6 +57,9 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
     freeTransferWindow = adapter.asDuration("freeTransferWindow", freeTransferWindow);
 
     analyzeInterlinedTransfers =
-      adapter.asBoolean("analyzeInterlinedTransfers", analyzeInterlinedTransfers);
+      adapter
+        .of("analyzeInterlinedTransfers")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asBoolean(analyzeInterlinedTransfers);
   }
 }

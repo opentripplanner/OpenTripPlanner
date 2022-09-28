@@ -470,12 +470,14 @@ public class BuildConfig implements OtpDataStoreConfig {
     this.root = new NodeAdapter(node, source);
 
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    areaVisibility = root.asBoolean("areaVisibility", false);
-    banDiscouragedWalking = root.asBoolean("banDiscouragedWalking", false);
-    banDiscouragedBiking = root.asBoolean("banDiscouragedBiking", false);
+    areaVisibility = root.of("areaVisibility").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    banDiscouragedWalking =
+      root.of("banDiscouragedWalking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    banDiscouragedBiking =
+      root.of("banDiscouragedBiking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     configVersion =
       root.of("configVersion").withDoc(NA, "TODO DOC").withExample("2.2.12_12").asString(null);
-    dataImportReport = root.asBoolean("dataImportReport", false);
+    dataImportReport = root.of("dataImportReport").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     distanceBetweenElevationSamples =
       root.asDouble(
         "distanceBetweenElevationSamples",
@@ -483,27 +485,38 @@ public class BuildConfig implements OtpDataStoreConfig {
       );
     elevationBucket = S3BucketConfig.fromConfig(root.path("elevationBucket"));
     elevationUnitMultiplier = root.asDouble("elevationUnitMultiplier", 1);
-    embedRouterConfig = root.asBoolean("embedRouterConfig", true);
-    extraEdgesStopPlatformLink = root.asBoolean("extraEdgesStopPlatformLink", false);
-    includeEllipsoidToGeoidDifference = root.asBoolean("includeEllipsoidToGeoidDifference", false);
+    embedRouterConfig =
+      root.of("embedRouterConfig").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    extraEdgesStopPlatformLink =
+      root.of("extraEdgesStopPlatformLink").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    includeEllipsoidToGeoidDifference =
+      root.of("includeEllipsoidToGeoidDifference").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     pruningThresholdIslandWithStops = root.asInt("islandWithStopsMaxSize", 5);
     pruningThresholdIslandWithoutStops = root.asInt("islandWithoutStopsMaxSize", 40);
-    matchBusRoutesToStreets = root.asBoolean("matchBusRoutesToStreets", false);
+    matchBusRoutesToStreets =
+      root.of("matchBusRoutesToStreets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     maxDataImportIssuesPerFile = root.asInt("maxDataImportIssuesPerFile", 1000);
     maxInterlineDistance = root.asInt("maxInterlineDistance", 200);
-    blockBasedInterlining = root.asBoolean("blockBasedInterlining", true);
+    blockBasedInterlining =
+      root.of("blockBasedInterlining").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     maxTransferDurationSeconds =
       root.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
     maxStopToShapeSnapDistance = root.asDouble("maxStopToShapeSnapDistance", 150);
-    multiThreadElevationCalculations = root.asBoolean("multiThreadElevationCalculations", false);
-    osmCacheDataInMem = root.asBoolean("osmCacheDataInMem", false);
-    platformEntriesLinking = root.asBoolean("platformEntriesLinking", false);
-    readCachedElevations = root.asBoolean("readCachedElevations", true);
-    staticBikeParkAndRide = root.asBoolean("staticBikeParkAndRide", false);
-    staticParkAndRide = root.asBoolean("staticParkAndRide", true);
-    streets = root.asBoolean("streets", true);
+    multiThreadElevationCalculations =
+      root.of("multiThreadElevationCalculations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    osmCacheDataInMem =
+      root.of("osmCacheDataInMem").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    platformEntriesLinking =
+      root.of("platformEntriesLinking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    readCachedElevations =
+      root.of("readCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    staticBikeParkAndRide =
+      root.of("staticBikeParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    staticParkAndRide =
+      root.of("staticParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    streets = root.of("streets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     subwayAccessTime = root.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    transit = root.asBoolean("transit", true);
+    transit = root.of("transit").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
 
     // Time Zone dependent config
     {
@@ -515,11 +528,13 @@ public class BuildConfig implements OtpDataStoreConfig {
       transitServiceEnd = root.asDateOrRelativePeriod("transitServiceEnd", "P3Y", confZone);
     }
 
-    writeCachedElevations = root.asBoolean("writeCachedElevations", false);
+    writeCachedElevations =
+      root.of("writeCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     maxAreaNodes = root.asInt("maxAreaNodes", 500);
     maxElevationPropagationMeters = root.asInt("maxElevationPropagationMeters", 2000);
     boardingLocationTags = root.asTextSet("boardingLocationTags", Set.of("ref"));
-    discardMinTransferTimes = root.asBoolean("discardMinTransferTimes", false);
+    discardMinTransferTimes =
+      root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
 
     var localFileNamePatternsConfig = root.path("localFileNamePatterns");
     gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);

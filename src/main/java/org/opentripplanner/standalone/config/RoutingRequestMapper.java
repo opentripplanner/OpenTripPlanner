@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import java.time.Duration;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -47,7 +48,7 @@ public class RoutingRequestMapper {
     vehicleRental.setAllowedNetworks(
       c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
     );
-    request.setArriveBy(c.asBoolean("arriveBy", dft.arriveBy()));
+    request.setArriveBy(c.of("arriveBy").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.arriveBy()));
     vehicleParking.setBannedTags(
       c.asTextSet("bannedVehicleParkingTags", vehicleParking.bannedTags())
     );
@@ -91,10 +92,10 @@ public class RoutingRequestMapper {
       .journey()
       .rental()
       .setAllowArrivingInRentedVehicleAtDestination(
-        c.asBoolean(
-          "allowKeepingRentedBicycleAtDestination",
-          request.journey().rental().allowArrivingInRentedVehicleAtDestination()
-        )
+        c
+          .of("allowKeepingRentedBicycleAtDestination")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(request.journey().rental().allowArrivingInRentedVehicleAtDestination())
       );
     preferences
       .rental()
@@ -144,7 +145,10 @@ public class RoutingRequestMapper {
     preferences
       .system()
       .setDisableAlertFiltering(
-        c.asBoolean("disableAlertFiltering", preferences.system().disableAlertFiltering())
+        c
+          .of("disableAlertFiltering")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(preferences.system().disableAlertFiltering())
       );
     preferences
       .street()
@@ -160,13 +164,22 @@ public class RoutingRequestMapper {
       .setElevatorHopTime(c.asInt("elevatorHopTime", preferences.street().elevatorHopTime()));
     preferences
       .system()
-      .setGeoidElevation(c.asBoolean("geoidElevation", preferences.system().geoidElevation()));
+      .setGeoidElevation(
+        c
+          .of("geoidElevation")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(preferences.system().geoidElevation())
+      );
     preferences
       .transit()
       .setIgnoreRealtimeUpdates(
-        c.asBoolean("ignoreRealtimeUpdates", preferences.transit().ignoreRealtimeUpdates())
+        c
+          .of("ignoreRealtimeUpdates")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(preferences.transit().ignoreRealtimeUpdates())
       );
-    request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
+    request.carPickup =
+      c.of("kissAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.carPickup);
     request.setLocale(c.asLocale("locale", dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
     preferences
@@ -209,7 +222,8 @@ public class RoutingRequestMapper {
           preferences.transit().otherThanPreferredRoutesPenalty()
         )
       );
-    request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
+    request.parkAndRide =
+      c.of("parkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.parkAndRide);
     request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
     vehicleParking.setRequiredTags(
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
@@ -228,25 +242,26 @@ public class RoutingRequestMapper {
     preferences
       .rental()
       .setUseAvailabilityInformation(
-        c.asBoolean(
-          "useBikeRentalAvailabilityInformation",
-          preferences.rental().useAvailabilityInformation()
-        )
+        c
+          .of("useBikeRentalAvailabilityInformation")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(preferences.rental().useAvailabilityInformation())
       );
     preferences
       .parking()
       .setUseAvailabilityInformation(
-        c.asBoolean(
-          "useVehicleParkingAvailabilityInformation",
-          preferences.parking().useAvailabilityInformation()
-        )
+        c
+          .of("useVehicleParkingAvailabilityInformation")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(preferences.parking().useAvailabilityInformation())
       );
     preferences
       .transit()
       .setUnpreferredCost(
         c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredCost())
       );
-    request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
+    request.vehicleRental =
+      c.of("allowBikeRental").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.vehicleRental);
     preferences
       .transfer()
       .setWaitAtBeginningFactor(
@@ -267,7 +282,13 @@ public class RoutingRequestMapper {
     });
 
     preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
-    request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));
+    request.setWheelchair(
+      c
+        .path("wheelchairAccessibility")
+        .of("enabled")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asBoolean(false)
+    );
 
     preferences.transfer().setOptimization(mapTransferOptimization(c.path("transferOptimization")));
 
@@ -308,7 +329,10 @@ public class RoutingRequestMapper {
   private static TransferOptimizationPreferences mapTransferOptimization(NodeAdapter c) {
     var dft = TransferOptimizationPreferences.DEFAULT;
     return new TransferOptimizationPreferences(
-      c.asBoolean("optimizeTransferWaitTime", dft.optimizeTransferWaitTime()),
+      c
+        .of("optimizeTransferWaitTime")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asBoolean(dft.optimizeTransferWaitTime()),
       c.asDouble("minSafeWaitTimeFactor", dft.minSafeWaitTimeFactor()),
       c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor()),
       c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())

@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters.sources;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -80,10 +82,13 @@ public class VehicleRentalSourceFactory {
   }
 
   private boolean allowKeepingRentedVehicleAtDestination() {
-    return c.asBoolean("allowKeepingRentedBicycleAtDestination", false);
+    return c
+      .of("allowKeepingRentedBicycleAtDestination")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asBoolean(false);
   }
 
   private boolean allowOverloading() {
-    return c.asBoolean("allowOverloading", false);
+    return c.of("allowOverloading").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
   }
 }

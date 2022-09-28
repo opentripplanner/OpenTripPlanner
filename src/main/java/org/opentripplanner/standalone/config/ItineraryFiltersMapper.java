@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 import org.opentripplanner.routing.api.request.RequestFunctions;
@@ -19,7 +21,7 @@ public class ItineraryFiltersMapper {
     }
 
     return new ItineraryFilterParameters(
-      c.asBoolean("debug", dft.debug),
+      c.of("debug").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.debug),
       c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne),
       c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree),
       c.asDouble(
@@ -33,15 +35,15 @@ public class ItineraryFiltersMapper {
       c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),
       c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio),
       c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio),
-      c.asBoolean(
-        "filterItinerariesWithSameFirstOrLastTrip",
-        dft.filterItinerariesWithSameFirstOrLastTrip
-      ),
-      c.asBoolean("accessibilityScore", dft.accessibilityScore),
-      c.asBoolean(
-        "removeItinerariesWithSameRoutesAndStops",
-        dft.removeItinerariesWithSameRoutesAndStops
-      )
+      c
+        .of("filterItinerariesWithSameFirstOrLastTrip")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip),
+      c.of("accessibilityScore").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.accessibilityScore),
+      c
+        .of("removeItinerariesWithSameRoutesAndStops")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asBoolean(dft.removeItinerariesWithSameRoutesAndStops)
     );
   }
 

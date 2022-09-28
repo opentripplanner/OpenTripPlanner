@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
@@ -53,9 +54,9 @@ public class NodeAdapterTest {
   @Test
   public void asBoolean() {
     NodeAdapter subject = newNodeAdapterForTest("{ aBoolean : true }");
-    assertTrue(subject.asBoolean("aBoolean"));
-    assertTrue(subject.asBoolean("aBoolean", false));
-    assertFalse(subject.asBoolean("missingField", false));
+    assertTrue(subject.of("aBoolean").withDoc(NA, /*TODO DOC*/"TODO").asBoolean());
+    assertTrue(subject.of("aBoolean").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false));
+    assertFalse(subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false));
   }
 
   @Test
@@ -421,7 +422,7 @@ public class NodeAdapterTest {
     var buf = new StringBuilder();
 
     // When: Access ONLY parameter 'a', but not 'b'
-    assertTrue(subject.path("foo").asBoolean("a"));
+    assertTrue(subject.path("foo").of("a").withDoc(NA, /*TODO DOC*/"TODO").asBoolean());
 
     // Then: expect 'b' to be unused
     subject.logAllUnusedParameters(buf::append);

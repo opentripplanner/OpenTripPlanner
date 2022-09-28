@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
@@ -129,7 +131,7 @@ public class UpdatersConfig implements UpdatersParameters {
     return new TimetableSnapshotSourceParameters(
       c.asInt("logFrequency", dflt.logFrequency()),
       c.asInt("maxSnapshotFrequency", dflt.maxSnapshotFrequencyMs()),
-      c.asBoolean("purgeExpiredData", dflt.purgeExpiredData())
+      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dflt.purgeExpiredData())
     );
   }
 

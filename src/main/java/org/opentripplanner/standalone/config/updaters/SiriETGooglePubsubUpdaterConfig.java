@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -14,7 +16,7 @@ public class SiriETGooglePubsubUpdaterConfig {
       c.asText("topicName"),
       c.asText("dataInitializationUrl", null),
       c.asInt("reconnectPeriodSec", 30),
-      c.asBoolean("purgeExpiredData", false)
+      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
     );
   }
 }

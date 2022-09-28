@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +48,7 @@ public class VehicleParkingUpdaterConfig {
           feedId,
           c.asText("namePrefix", null),
           c.asInt("frequencySec", 60),
-          c.asBoolean("zip", false),
+          c.of("zip").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
           sourceType
         );
       case PARK_API:

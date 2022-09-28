@@ -165,16 +165,6 @@ public class NodeAdapter {
   }
 
   /** TODO: Inline this */
-  public boolean asBoolean(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asBoolean();
-  }
-
-  /** TODO: Inline this */
-  public Boolean asBoolean(String paramName, boolean defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asBoolean(defaultValue);
-  }
-
-  /** TODO: Inline this */
   public double asDouble(String paramName, double defaultValue) {
     return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDouble(defaultValue);
   }

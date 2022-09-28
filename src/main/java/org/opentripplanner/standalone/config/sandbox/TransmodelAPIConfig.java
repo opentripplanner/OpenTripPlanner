@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPIParameters;
@@ -14,7 +16,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
   private final Collection<String> tracingHeaderTags;
 
   public TransmodelAPIConfig(NodeAdapter node) {
-    hideFeedId = node.asBoolean("hideFeedId", false);
+    hideFeedId = node.of("hideFeedId").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     tracingHeaderTags = node.asTextSet("tracingHeaderTags", Set.of());
   }
 

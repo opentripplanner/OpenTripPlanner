@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters.azure;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -19,7 +21,9 @@ public abstract class SiriAzureUpdaterConfig {
     parameters.setServiceBusUrl(c.asText("servicebus-url", null));
     parameters.setTopicName(c.asText("topic", null));
     parameters.setFeedId(c.asText("feedId", null));
-    parameters.setFuzzyTripMatching(c.asBoolean("fuzzyTripMatching", false));
+    parameters.setFuzzyTripMatching(
+      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
+    );
 
     if (c.exist("history")) {
       NodeAdapter history = c.path("history");
