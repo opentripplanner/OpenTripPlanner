@@ -361,8 +361,11 @@ public class NodeAdapterTest {
 
     List<ARecord> result = subject
       .of("key")
-      .doc(V2_0, "Summary Array")
-      .asObjects(List.of(), n -> new ARecord(n.of("a").doc(V2_1, "Summary Element").asString()));
+      .withDoc(V2_0, "Summary Array")
+      .asObjects(
+        List.of(),
+        n -> new ARecord(n.of("a").withDoc(V2_1, "Summary Element").asString())
+      );
 
     assertEquals("[ARecord[a=I], ARecord[a=2]]", result.toString());
     assertEquals("[key : object[] = [] Since 2.0]", subject.parametersSorted().toString());
@@ -387,13 +390,6 @@ public class NodeAdapterTest {
     assertThrows(OtpAppException.class, () -> subject.asZoneId("key4", null));
 
     assertEquals(ZoneId.of("UTC"), subject.asZoneId("missing-key", ZoneId.of("UTC")));
-  }
-
-  @Test
-  public void asBooleanMap() {
-    NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
-    assertEquals(Map.of("A", true, "B", false), subject.asBooleanMap("key"));
-    assertEquals(Collections.<String, Boolean>emptyMap(), subject.asBooleanMap("missing-key"));
   }
 
   @Test

@@ -1,14 +1,12 @@
 package org.opentripplanner.standalone.config.framework.json;
 
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ARRAY;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.MAP;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.EnumSet;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
@@ -47,11 +45,10 @@ public record NodeInfo(
     Objects.requireNonNull(type);
     Objects.requireNonNull(since);
     Objects.requireNonNull(summary);
-    /**
-    if (EnumSet.of(STRING, ENUM, MAP, ENUM_MAP, ENUM_SET, ARRAY).contains(type)) {
-      Objects.requireNonNull(exampleValue, name + " : " + type);
+
+    if (type.isMapOrArray()) {
+      Objects.requireNonNull(elementType);
     }
-    */
   }
 
   public boolean printDetails() {
@@ -62,31 +59,8 @@ public record NodeInfo(
     return deprecated != null;
   }
 
-  @SuppressWarnings("ConstantConditions")
   public String exampleValueJson() {
-    return type.wrap(
-      switch (type) {
-        case BOOLEAN -> exampleOrFallback("true").toString().toLowerCase();
-        case DOUBLE -> exampleOrFallback(3.15);
-        case INTEGER -> exampleOrFallback(123);
-        case LONG -> exampleOrFallback(1000);
-        case ENUM -> exampleOrFallback("MONDAY");
-        case STRING -> exampleOrFallback("A String");
-        case LOCALE -> exampleOrFallback("en_US");
-        case DATE -> exampleOrFallback("20022-05-31");
-        case DATE_OR_PERIOD -> exampleOrFallback("P1Y5D");
-        case DURATION -> exampleOrFallback("45s");
-        case REGEXP -> exampleOrFallback("-?[\\d+=*/ =]+");
-        case URI -> exampleOrFallback("https://www.opentripplanner.org/");
-        case ZONE_ID -> exampleOrFallback("UTC");
-        case FEED_SCOPED_ID -> exampleOrFallback("FEED_1");
-        case LINEAR_FUNCTION -> exampleOrFallback("600 + 3.0 x");
-        case OBJECT, MAP -> exampleOrFallback("{a:1}");
-        case ENUM_MAP -> exampleOrFallback("{MONDAY : 2}");
-        case ENUM_SET -> exampleOrFallback("[MONDAY,TUESDAY]");
-        case ARRAY -> exampleOrFallback("[{n:1},{n:2}]");
-      }
-    );
+    return exampleValueJson(type);
   }
 
   public Object exampleOrFallback(Object fallback) {
@@ -107,8 +81,8 @@ public record NodeInfo(
     return fallback;
   }
 
-  static Builder of() {
-    return new Builder();
+  static NodeInfoBuilder of() {
+    return new NodeInfoBuilder();
   }
 
   @Override
@@ -155,130 +129,37 @@ public record NodeInfo(
     return builder.toString();
   }
 
-  @SuppressWarnings("UnusedReturnValue")
-  static class Builder {
-
-    private String name;
-    private ConfigType type;
-    private Class<Enum<?>> enumType;
-    private ConfigType elementType;
-
-    @Nullable
-    Class<Enum<?>> elementEnumType;
-
-    private OtpVersion since = OtpVersion.NA;
-    private String summary = "TODO: Add short summary.";
-    private String description = null;
-    private String defaultValue = null;
-    private Object exampleValue = null;
-    private boolean required = true;
-    private DeprecatedInfo deprecated = null;
-
-    public String name() {
-      return name;
-    }
-
-    Builder withName(String name) {
-      this.name = name;
-      return this;
-    }
-
-    Builder withType(ConfigType type) {
-      if (EnumSet.of(ARRAY, MAP, ENUM_MAP, ENUM_SET, ENUM).contains(type)) {
-        throw new IllegalArgumentException(
-          "Use type specific build methods for this type like 'withArray'. Type : " + type
+  @SuppressWarnings("ConstantConditions")
+  private String exampleValueJson(ConfigType type) {
+    return type.wrap(
+      switch (type) {
+        case BOOLEAN -> exampleOrFallback("true").toString().toLowerCase();
+        case DOUBLE -> exampleOrFallback(3.15);
+        case INTEGER -> exampleOrFallback(123);
+        case LONG -> exampleOrFallback(1000);
+        case ENUM -> exampleOrFallback(firstEnumValue());
+        case STRING -> exampleOrFallback("A String");
+        case LOCALE -> exampleOrFallback("en_US");
+        case DATE -> exampleOrFallback("20022-05-31");
+        case DATE_OR_PERIOD -> exampleOrFallback("P1Y5D");
+        case DURATION -> exampleOrFallback("45s");
+        case REGEXP -> exampleOrFallback("-?[\\d+=*/ =]+");
+        case URI -> exampleOrFallback("https://www.opentripplanner.org/");
+        case ZONE_ID -> exampleOrFallback("UTC");
+        case FEED_SCOPED_ID -> exampleOrFallback("FID:Trip0001");
+        case LINEAR_FUNCTION -> exampleOrFallback("600 + 3.0 x");
+        case OBJECT -> exampleOrFallback("{a:1}");
+        case MAP -> exampleOrFallback("{a:" + exampleValueJson(elementType) + "}");
+        case ENUM_MAP -> exampleOrFallback(
+          "{" + firstEnumValue() + " : " + exampleValueJson(elementType) + "}"
         );
+        case ENUM_SET -> exampleOrFallback("[" + firstEnumValue() + "]");
+        case ARRAY -> exampleOrFallback("[{n:1},{n:2}]");
       }
-      this.type = type;
-      return this;
-    }
-
-    Builder withSince(OtpVersion since) {
-      this.since = since;
-      return this;
-    }
-
-    public Builder withSummary(String summary) {
-      this.summary = summary;
-      return this;
-    }
-
-    Builder withDescription(String description) {
-      this.description = description;
-      return this;
-    }
-
-    Builder withDeprecated(OtpVersion deprecatedSince, String description) {
-      this.deprecated = new DeprecatedInfo(deprecatedSince, description);
-      return this;
-    }
-
-    Builder withExample(Object exampleValue) {
-      this.exampleValue = exampleValue;
-      return this;
-    }
-
-    Builder withOptional(String defaultValue) {
-      this.defaultValue = defaultValue;
-      return withOptional();
-    }
-
-    Builder withOptional() {
-      this.required = false;
-      return this;
-    }
-
-    Builder withRequired() {
-      this.required = true;
-      return this;
-    }
-
-    Builder withEnum(Class<Enum<?>> enumType) {
-      this.type = ENUM;
-      this.enumType = enumType;
-      return this;
-    }
-
-    Builder withArray(ConfigType elementType) {
-      this.type = ARRAY;
-      this.elementType = elementType;
-      return this;
-    }
-
-    Builder withMap(ConfigType elementType) {
-      this.type = MAP;
-      this.elementType = elementType;
-      return this;
-    }
-
-    Builder withEnumMap(Class<Enum<?>> enumType, ConfigType elementType) {
-      this.type = ENUM_MAP;
-      this.enumType = enumType;
-      this.elementType = elementType;
-      return this;
-    }
-
-    Builder withEnumSet(Class<Enum<?>> enumType) {
-      this.type = ENUM_SET;
-      this.elementType = ENUM;
-      this.enumType = enumType;
-      return this;
-    }
-
-    NodeInfo build() {
-      return new NodeInfo(
-        name,
-        summary,
-        description,
-        type,
-        enumType,
-        elementType,
-        since,
-        defaultValue,
-        exampleValue,
-        required,
-        deprecated
-      );
-    }
+    );
+  }
+  private String firstEnumValue() {
+    //noinspection ConstantConditions
+    return enumType.getEnumConstants()[0].name();
   }
 }

@@ -49,7 +49,7 @@ public class ParameterBuilder {
    * parameter "under construction". This meta information is used later, fr example to generate
    * user documentation.
    */
-  private final NodeInfo.Builder info = NodeInfo.of();
+  private final NodeInfoBuilder info = NodeInfo.of();
 
   /**
    * The parameter "under construction" belong to the {@code target} node-adaptor. The parameter
@@ -63,19 +63,19 @@ public class ParameterBuilder {
   }
 
   /** Add documentation metadata. This can be used to generate a user documentation */
-  public ParameterBuilder doc(OtpVersion since, String summary) {
+  public ParameterBuilder withDoc(OtpVersion since, String summary) {
     this.info.withSince(since).withSummary(summary);
     return this;
   }
 
   /** Add documentation detail description to a parameter. */
-  public ParameterBuilder description(String description) {
+  public ParameterBuilder withDescription(String description) {
     this.info.withDescription(description);
     return this;
   }
 
   /** Add documentation detail description to a parameter. */
-  public ParameterBuilder example(Object example) {
+  public ParameterBuilder withExample(Object example) {
     this.info.withExample(example);
     return this;
   }
@@ -271,7 +271,9 @@ public class ParameterBuilder {
    * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
    * This version can be used to be backwards compatible when moving from an integer value
    * to a duration.
+   * @deprecated This will be removed in version 2.2, change to {@link #asDuration(Duration)}
    */
+  @Deprecated
   public Duration asDuration2(Duration defaultValue, ChronoUnit unit) {
     return ofOptional(DURATION, defaultValue, node -> parseDuration(node.asText(), unit));
   }
@@ -280,7 +282,9 @@ public class ParameterBuilder {
    * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
    * This version can be used to be backwards compatible when moving from an integer value
    * to a duration.
+   * @deprecated This will be removed in version 2.2, change to {@link #asDuration(Duration)}
    */
+  @Deprecated
   public Duration asDuration2(ChronoUnit unit) {
     return ofRequired(DURATION, node -> parseDuration(node.asText(), unit));
   }

@@ -474,7 +474,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     banDiscouragedWalking = root.asBoolean("banDiscouragedWalking", false);
     banDiscouragedBiking = root.asBoolean("banDiscouragedBiking", false);
     configVersion =
-      root.of("configVersion").doc(NA, "TODO DOC").example("2.2.12_12").asString(null);
+      root.of("configVersion").withDoc(NA, "TODO DOC").withExample("2.2.12_12").asString(null);
     dataImportReport = root.asBoolean("dataImportReport", false);
     distanceBetweenElevationSamples =
       root.asDouble(

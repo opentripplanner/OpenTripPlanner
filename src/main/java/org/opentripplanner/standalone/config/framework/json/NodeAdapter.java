@@ -81,7 +81,7 @@ public class NodeAdapter {
     parent.childrenByName.put(paramName, this);
   }
 
-  /** @deprecated Use {@link #asList(String, Function)} */
+  /** @deprecated TODO DOC Use {@link #asList(String, Function)} */
   @Deprecated
   public List<NodeAdapter> asList() {
     List<NodeAdapter> result = new ArrayList<>();
@@ -128,7 +128,7 @@ public class NodeAdapter {
    */
   @Deprecated
   public ParameterBuilder ofWDoc(String paramName) {
-    return of(paramName).doc(NA, "TODO DOC");
+    return of(paramName).withDoc(NA, /*TODO DOC*/ "TODO");
   }
 
   /** Create new parameter, a builder is returned. */
@@ -145,11 +145,14 @@ public class NodeAdapter {
    */
   @Deprecated
   public NodeAdapter path(String paramName) {
-    return ofWDoc(paramName).asObject();
+    return ofWDoc(paramName)
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObject();
   }
 
   public <T> List<T> asList(String paramName, Function<NodeAdapter, T> mapper) {
-    return ofWDoc(paramName).asObjects(mapper);
+    return ofWDoc(paramName).withDescription(/*TODO DOC*/"TODO").asObjects(mapper);
   }
 
   public <T> List<T> asList(
@@ -212,12 +215,12 @@ public class NodeAdapter {
 
   /** TODO: Inline this */
   public String asText(String paramName, String defaultValue) {
-    return ofWDoc(paramName).asString(defaultValue);
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asString(defaultValue);
   }
 
   /** TODO: Inline this */
   public String asText(String paramName) {
-    return ofWDoc(paramName).asString();
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asString();
   }
 
   /**
@@ -230,11 +233,16 @@ public class NodeAdapter {
 
   /** TODO: Inline this */
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
-    return Set.copyOf(ofWDoc(paramName).asStringList(List.copyOf(defaultValue)));
+    return Set.copyOf(
+      ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asStringList(List.copyOf(defaultValue))
+    );
   }
 
+  /** TODO: Inline this */
   public <T> T asCustomStingType(String paramName, T defaultValue, Function<String, T> mapper) {
-    return ofWDoc(paramName).asCustomStingType(defaultValue, mapper);
+    return ofWDoc(paramName)
+      .withExample(/*TODO DOC*/"TODO")
+      .asCustomStingType(defaultValue, mapper);
   }
 
   /** TODO: Inline this */
@@ -254,7 +262,7 @@ public class NodeAdapter {
     Class<E> enumClass,
     Class<T> elementType
   ) {
-    return ofWDoc(paramName).asEnumMap(enumClass, elementType);
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asEnumMap(enumClass, elementType);
   }
 
   /** TODO: Inline this */
@@ -263,12 +271,14 @@ public class NodeAdapter {
     Class<E> enumClass,
     Class<T> elementType
   ) {
-    return ofWDoc(paramName).asEnumMapAllKeysRequired(enumClass, elementType);
+    return ofWDoc(paramName)
+      .withExample(/*TODO DOC*/"TODO")
+      .asEnumMapAllKeysRequired(enumClass, elementType);
   }
 
   /** TODO: Inline this */
   public <T extends Enum<T>> Set<T> asEnumSet(String paramName, Class<T> enumClass) {
-    return ofWDoc(paramName).asEnumSet(enumClass);
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asEnumSet(enumClass);
   }
 
   /** TODO: Inline this */
@@ -322,15 +332,15 @@ public class NodeAdapter {
   }
 
   public List<URI> asUris(String paramName) {
-    return ofWDoc(paramName).asUris();
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asUris();
   }
 
   public URI asUri(String paramName) {
-    return ofWDoc(paramName).asUri();
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asUri();
   }
 
   public URI asUri(String paramName, String defaultValue) {
-    return ofWDoc(paramName).asUri(defaultValue);
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asUri(defaultValue);
   }
 
   /** TODO: Inline this */
@@ -349,13 +359,7 @@ public class NodeAdapter {
   // TODO: This method should be inlined
 
   public Map<String, String> asStringMap(String paramName) {
-    return ofWDoc(paramName).asStringMap();
-  }
-
-  // TODO: This method should be inlined
-
-  public Map<String, Boolean> asBooleanMap(String paramName) {
-    return ofWDoc(paramName).asBooleanMap();
+    return ofWDoc(paramName).withExample(/*TODO DOC*/"TODO").asStringMap();
   }
 
   /** List all present parameters by name */
