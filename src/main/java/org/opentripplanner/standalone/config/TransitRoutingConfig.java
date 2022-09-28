@@ -35,11 +35,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     this.searchThreadPoolSize = c.asInt("searchThreadPoolSize", dft.searchThreadPoolSize());
     // Dynamic Search Window
     this.stopTransferCost =
-      c.asEnumMapAllKeysRequired(
-        "stopTransferCost",
-        StopTransferPriority.class,
-        NodeAdapter::asInt
-      );
+      c.asEnumMapAllKeysRequired("stopTransferCost", StopTransferPriority.class, Integer.class);
     this.transferCacheMaxSize = c.asInt("transferCacheMaxSize", 25);
 
     this.pagingSearchWindowAdjustments =

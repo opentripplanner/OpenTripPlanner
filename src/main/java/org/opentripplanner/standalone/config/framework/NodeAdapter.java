@@ -1,47 +1,37 @@
 package org.opentripplanner.standalone.config.framework;
 
+import static java.util.Comparator.comparing;
+import static org.opentripplanner.standalone.config.framework.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.routing.api.request.RequestFunctions;
-import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
-import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * This class wrap a {@link JsonNode} and decorate it with type-safe parsing of types used in OTP
  * like enums, date, time, URIs and so on. By wrapping the JsonNode we get consistent parsing rules
- * and the possibility to log unused parameters when the end of parsing a file. Also the
- * configuration POJOs become cleaner because they do not have any parsing logic in them any more.
+ * and the possibility to log unused parameters when the end of parsing a file. Also, the
+ * configuration POJOs become cleaner because they do not have any parsing logic in them anymore.
  * <p>
- * This class have 100% test coverage - keep it that way, for the individual configuration POJOs a
+ * This class has 100% test coverage - keep it that way, for the individual configuration POJOs a
  * smoke test is good enough.
  */
 public class NodeAdapter {
@@ -61,16 +51,23 @@ public class NodeAdapter {
   private final String contextPath;
 
   /**
-   * This parameter is used internally in this class to be able to produce a list of parameters
-   * which is NOT requested.
-   */
-  private final Set<String> parameterNames = new HashSet<>();
-
-  /**
    * The map of all children by their name. It is used to be able to produce a list of unused
    * parameters for all children after the parsing is complete.
    */
   private final Map<String, NodeAdapter> childrenByName = new HashMap<>();
+
+  /**
+   * A map of all configured parameters for this node. The current JSON document that is parsed
+   * may or may not contain the parameter in this map. The map holds information about the
+   * parameter and can be used for generating documentation and such.
+   */
+  private final Map<String, NodeInfo> parameters = new HashMap<>();
+
+  private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath) {
+    this.json = node;
+    this.source = source;
+    this.contextPath = contextPath;
+  }
 
   public NodeAdapter(@Nonnull JsonNode node, String source) {
     this(node, source, null);
@@ -79,12 +76,13 @@ public class NodeAdapter {
   /**
    * Constructor for nested configuration nodes.
    */
-  private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath) {
-    this.json = node;
-    this.source = source;
-    this.contextPath = contextPath;
+  private NodeAdapter(@Nonnull JsonNode node, @Nonnull NodeAdapter parent, String paramName) {
+    this(node, parent.source, parent.fullPath(paramName));
+    parent.childrenByName.put(paramName, this);
   }
 
+  /** @deprecated Use {@link #asList(String, Function)} */
+  @Deprecated
   public List<NodeAdapter> asList() {
     List<NodeAdapter> result = new ArrayList<>();
 
@@ -92,9 +90,9 @@ public class NodeAdapter {
     int i = 1;
     for (JsonNode node : json) {
       String arrayElementName = "[" + i + "]";
-      NodeAdapter child = new NodeAdapter(node, source, fullPath(arrayElementName));
-      childrenByName.put(arrayElementName, child);
+      NodeAdapter child = path(arrayElementName, node);
       result.add(child);
+      childrenByName.put(arrayElementName, child);
       ++i;
     }
     return result;
@@ -108,26 +106,50 @@ public class NodeAdapter {
     return json.isObject() && json.size() > 0;
   }
 
-  public String getSource() {
-    return source;
+  public List<NodeInfo> parametersSorted() {
+    return parameters.values().stream().sorted(comparing(NodeInfo::name)).toList();
+  }
+
+  /** Get a child by name. The child must exist. */
+  public NodeAdapter child(String paramName) {
+    return childrenByName.get(paramName);
+  }
+
+  /**
+   * @deprecated Inline
+   */
+  @Deprecated
+  public ParameterBuilder ofWDoc(String paramName) {
+    return of(paramName).doc(NA, "TODO DOC");
+  }
+
+  /** Create new parameter, a builder is returned. */
+  public ParameterBuilder of(String paramName) {
+    return new ParameterBuilder(this, paramName);
   }
 
   public boolean isEmpty() {
     return json.isMissingNode();
   }
 
+  /**
+   * @deprecated Inline
+   */
+  @Deprecated
   public NodeAdapter path(String paramName) {
-    if (childrenByName.containsKey(paramName)) {
-      return childrenByName.get(paramName);
-    }
+    return ofWDoc(paramName).asObject();
+  }
 
-    NodeAdapter child = new NodeAdapter(param(paramName), source, fullPath(paramName));
+  public <T> List<T> asList(String paramName, Function<NodeAdapter, T> mapper) {
+    return ofWDoc(paramName).asObjects(mapper);
+  }
 
-    if (!child.isEmpty()) {
-      parameterNames.add(paramName);
-      childrenByName.put(paramName, child);
-    }
-    return child;
+  public <T> List<T> asList(
+    String paramName,
+    List<T> defaultValue,
+    Function<NodeAdapter, T> mapper
+  ) {
+    return ofWDoc(paramName).asObjects(defaultValue, mapper);
   }
 
   /** Delegates to {@link JsonNode#has(String)} */
@@ -135,57 +157,59 @@ public class NodeAdapter {
     return json.has(paramName);
   }
 
-  public Boolean asBoolean(String paramName, boolean defaultValue) {
-    return param(paramName).asBoolean(defaultValue);
-  }
-
-  /**
-   * Get a required parameter as a boolean value.
-   *
-   * @throws OtpAppException if parameter is missing.
-   */
+  /** TODO: Inline this */
   public boolean asBoolean(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return param(paramName).asBoolean();
+    return ofWDoc(paramName).asBoolean();
   }
 
+  /** TODO: Inline this */
+  public Boolean asBoolean(String paramName, boolean defaultValue) {
+    return ofWDoc(paramName).asBoolean(defaultValue);
+  }
+
+  /** TODO: Inline this */
   public double asDouble(String paramName, double defaultValue) {
-    return param(paramName).asDouble(defaultValue);
+    return ofWDoc(paramName).asDouble(defaultValue);
   }
 
+  /** TODO: Inline this */
   public double asDouble(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return param(paramName).asDouble();
+    return ofWDoc(paramName).asDouble();
   }
 
+  /** TODO: Inline this */
   public Optional<Double> asDoubleOptional(String paramName) {
-    JsonNode node = param(paramName);
-    if (node.isMissingNode()) {
-      return Optional.empty();
-    }
-    return Optional.of(node.asDouble());
+    return ofWDoc(paramName).asDoubleOptional();
   }
 
+  /** TODO: Inline this */
   public List<Double> asDoubles(String paramName, List<Double> defaultValue) {
-    if (!exist(paramName)) return defaultValue;
-    return arrayAsList(paramName, JsonNode::asDouble);
+    return ofWDoc(paramName).asDoubles(defaultValue);
   }
 
+  /** TODO: Inline this */
   public int asInt(String paramName, int defaultValue) {
-    return param(paramName).asInt(defaultValue);
+    return ofWDoc(paramName).asInt(defaultValue);
   }
 
+  /** TODO: Inline this */
   public int asInt(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return param(paramName).asInt();
+    return ofWDoc(paramName).asInt();
   }
 
+  /** TODO: Inline this */
   public long asLong(String paramName, long defaultValue) {
-    return param(paramName).asLong(defaultValue);
+    return ofWDoc(paramName).asLong(defaultValue);
   }
 
+  /** TODO: Inline this */
   public String asText(String paramName, String defaultValue) {
-    return param(paramName).asText(defaultValue);
+    return ofWDoc(paramName).asString(defaultValue);
+  }
+
+  /** TODO: Inline this */
+  public String asText(String paramName) {
+    return ofWDoc(paramName).asString();
   }
 
   /**
@@ -196,316 +220,139 @@ public class NodeAdapter {
     return json.asText();
   }
 
+  /** TODO: Inline this */
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
-    if (!exist(paramName)) return defaultValue;
-    return new HashSet<>(arrayAsList(paramName, JsonNode::asText));
+    return Set.copyOf(ofWDoc(paramName).asStringList(List.copyOf(defaultValue)));
   }
 
-  public RequestModes asRequestModes(String paramName, RequestModes defaultValue) {
-    var node = param(paramName);
-    return node == null || node.asText().isBlank()
-      ? defaultValue
-      : new QualifiedModeSet(node.asText()).getRequestModes();
+  public <T> T asCustomStingType(String paramName, T defaultValue, Function<String, T> mapper) {
+    return ofWDoc(paramName).asCustomStingType(defaultValue, mapper);
   }
 
-  /**
-   * Get a required parameter as a text String value.
-   *
-   * @throws OtpAppException if parameter is missing.
-   */
-  public String asText(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return param(paramName).asText();
-  }
-
+  /** TODO: Inline this */
   /** Get required enum value. Parser is not case sensitive. */
-  public <T extends Enum<T>> T asEnum(String paramName, Class<T> ofType) {
-    return asEnum(paramName, asText(paramName), ofType);
+  public <T extends Enum<T>> T asEnum(String paramName, Class<T> enumType) {
+    return ofWDoc(paramName).asEnum(enumType);
   }
 
-  /** Get optional enum value. Parser is not case sensitive. */
-  @SuppressWarnings("unchecked")
+  /** TODO: Inline this */
   public <T extends Enum<T>> T asEnum(String paramName, T defaultValue) {
-    var value = asText(paramName, defaultValue.name());
-    return asEnum(paramName, value, (Class<T>) defaultValue.getClass());
+    return ofWDoc(paramName).asEnum(defaultValue);
   }
 
-  /**
-   * Get a map of enum values listed in the config like this: (This example have Boolean values)
-   * <pre>
-   * key : {
-   *   A : true,  // turned on
-   *   B : false  // turned off
-   *   // Commented out to use default value
-   *   // C : true
-   * }
-   * </pre>
-   *
-   * @param <E>    The enum type
-   * @param <T>    The map value type.
-   * @param mapper The function to use to map a node in the JSON tree into a value of type T. The
-   *               second argument to the function is the enum NAME(String).
-   * @return a map of listed enum values as keys with value, or an empty map if not set.
-   */
+  /** TODO: Inline this */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(
     String paramName,
     Class<E> enumClass,
-    BiFunction<NodeAdapter, String, T> mapper
+    Class<T> elementType
   ) {
-    return localAsEnumMap(paramName, enumClass, mapper, false);
+    return ofWDoc(paramName).asEnumMap(enumClass, elementType);
   }
 
-  /**
-   * Get a map of enum values listed in the config like the {@link #asEnumMap(String, Class,
-   * BiFunction)}, but verify that all enum keys are listed. This can be used for settings where
-   * there is appropriate no default value. Note! This method return {@code null} if the given
-   * parameter is not present.
-   */
+  /** TODO: Inline this */
   public <T, E extends Enum<E>> Map<E, T> asEnumMapAllKeysRequired(
     String paramName,
     Class<E> enumClass,
-    BiFunction<NodeAdapter, String, T> mapper
+    Class<T> elementType
   ) {
-    Map<E, T> map = localAsEnumMap(paramName, enumClass, mapper, true);
-    return map.isEmpty() ? null : map;
+    return ofWDoc(paramName).asEnumMapAllKeysRequired(enumClass, elementType);
   }
 
+  /** TODO: Inline this */
   public <T extends Enum<T>> Set<T> asEnumSet(String paramName, Class<T> enumClass) {
-    if (!exist(paramName)) {
-      return Set.of();
-    }
-
-    Set<T> result = EnumSet.noneOf(enumClass);
-
-    JsonNode param = param(paramName);
-    if (param.isArray()) {
-      for (JsonNode it : param) {
-        result.add(Enum.valueOf(enumClass, it.asText()));
-      }
-    }
-    // Assume all values is concatenated in one string separated by ','
-    else {
-      String[] values = asText(paramName).split("[,\\s]+");
-      for (String value : values) {
-        if (value.isBlank()) {
-          continue;
-        }
-        try {
-          result.add(Enum.valueOf(enumClass, value));
-        } catch (IllegalArgumentException e) {
-          throw new OtpAppException(
-            "The parameter '" +
-            fullPath(paramName) +
-            "': '" +
-            value +
-            "' is not an enum value of " +
-            enumClass.getSimpleName() +
-            ". Source: " +
-            source +
-            "."
-          );
-        }
-      }
-    }
-    return result;
+    return ofWDoc(paramName).asEnumSet(enumClass);
   }
 
+  /** TODO: Inline this */
   public FeedScopedId asFeedScopedId(String paramName, FeedScopedId defaultValue) {
-    if (!exist(paramName)) {
-      return defaultValue;
-    }
-    return FeedScopedId.parseId(asText(paramName));
+    return ofWDoc(paramName).asFeedScopedId(defaultValue);
   }
 
+  /** TODO: Inline this */
   public List<FeedScopedId> asFeedScopedIds(String paramName, List<FeedScopedId> defaultValues) {
-    JsonNode array = param(paramName);
-
-    if (array.isMissingNode()) {
-      return defaultValues;
-    }
-    assertIsArray(paramName, array);
-
-    List<FeedScopedId> ids = new ArrayList<>();
-    for (JsonNode it : array) {
-      ids.add(FeedScopedId.parseId(it.asText()));
-    }
-    return ids;
+    return ofWDoc(paramName).asFeedScopedIds(defaultValues);
   }
 
-  public List<FeedScopedId> asFeedScopedIdList(String paramName, List<FeedScopedId> defaultValues) {
-    return List.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
-  }
-
+  /** TODO: Inline this */
   public Locale asLocale(String paramName, Locale defaultValue) {
-    if (!exist(paramName)) {
-      return defaultValue;
-    }
-    String[] parts = asText(paramName).split("[-_ ]+");
-    if (parts.length == 1) {
-      return new Locale(parts[0]);
-    }
-    if (parts.length == 2) {
-      return new Locale(parts[0], parts[1]);
-    }
-    if (parts.length == 3) {
-      return new Locale(parts[0], parts[1], parts[2]);
-    }
-    throw new OtpAppException(
-      "The parameter: '" +
-      fullPath(paramName) +
-      "' is not recognized as a valid Locale. Use: <Language>[_<country>[_<variant>]]. " +
-      "Source: " +
-      source +
-      "."
-    );
+    return ofWDoc(paramName).asLocale(defaultValue);
   }
 
-  public LocalDate asDateOrRelativePeriod(String paramName, String defaultValue) {
-    String text = asText(paramName, defaultValue);
-    try {
-      if (text == null || text.isBlank()) {
-        return null;
-      }
-      if (text.startsWith("-") || text.startsWith("P")) {
-        return LocalDate.now().plus(Period.parse(text));
-      } else {
-        return LocalDate.parse(text);
-      }
-    } catch (DateTimeParseException e) {
-      throw new OtpAppException(
-        "The parameter '" +
-        fullPath(paramName) +
-        "': '" +
-        text +
-        "' is not a Period or LocalDate. " +
-        "Source: " +
-        source +
-        ". Details: " +
-        e.getLocalizedMessage()
-      );
-    }
+  /** TODO: Inline this */
+  public LocalDate asDateOrRelativePeriod(String paramName, String defaultValue, ZoneId timeZone) {
+    return ofWDoc(paramName).asDateOrRelativePeriod(defaultValue, timeZone);
   }
 
+  /** TODO: Inline this */
   public Duration asDuration(String paramName, Duration defaultValue) {
-    return exist(paramName) ? DurationUtils.duration(param(paramName).asText()) : defaultValue;
+    return ofWDoc(paramName).asDuration(defaultValue);
   }
 
+  /** TODO: Inline this */
   public Duration asDuration(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return DurationUtils.duration(param(paramName).asText());
+    return ofWDoc(paramName).asDuration();
   }
 
-  /**
-   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
-   * This version can be used to be backwards compatible when moving from an integer value
-   * to a duration.
-   */
+  /** TODO: Inline this */
   public Duration asDuration2(String paramName, Duration defaultValue, ChronoUnit unit) {
-    return exist(paramName)
-      ? DurationUtils.duration(param(paramName).asText(), unit)
-      : defaultValue;
+    return ofWDoc(paramName).asDuration2(defaultValue, unit);
   }
 
-  /**
-   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
-   * This version can be used to be backwards compatible when moving from an integer value
-   * to a duration.
-   */
+  /** TODO: Inline this */
   public Duration asDuration2(String paramName, ChronoUnit unit) {
-    assertRequiredFieldExist(paramName);
-    return DurationUtils.duration(param(paramName).asText(), unit);
+    return ofWDoc(paramName).asDuration2(unit);
   }
 
+  /** TODO: Inline this */
   public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
-    JsonNode array = param(paramName);
-
-    if (array.isMissingNode()) {
-      return defaultValues;
-    }
-    assertIsArray(paramName, array);
-
-    List<Duration> durations = new ArrayList<>();
-    for (JsonNode it : array) {
-      durations.add(DurationUtils.duration(it.asText()));
-    }
-    return durations;
+    return ofWDoc(paramName).asDurations(defaultValues);
   }
 
+  /** TODO: Inline this */
   public Pattern asPattern(String paramName, String defaultValue) {
-    String regex = asText(paramName, defaultValue);
-    if (regex == null) {
-      return null;
-    }
-    return Pattern.compile(regex);
+    return ofWDoc(paramName).asPattern(defaultValue);
   }
 
   public List<URI> asUris(String paramName) {
-    List<URI> uris = new ArrayList<>();
-    JsonNode array = param(paramName);
-
-    if (array.isMissingNode()) {
-      return uris;
-    }
-    assertIsArray(paramName, array);
-
-    for (JsonNode it : array) {
-      uris.add(uriFromString(paramName, it.asText()));
-    }
-    return uris;
+    return ofWDoc(paramName).asUris();
   }
 
   public URI asUri(String paramName) {
-    assertRequiredFieldExist(paramName);
-    return asUri(paramName, null);
+    return ofWDoc(paramName).asUri();
   }
 
   public URI asUri(String paramName, String defaultValue) {
-    return uriFromString(paramName, asText(paramName, defaultValue));
+    return ofWDoc(paramName).asUri(defaultValue);
   }
 
+  /** TODO: Inline this */
   public DoubleFunction<Double> asLinearFunction(
     String paramName,
     DoubleFunction<Double> defaultValue
   ) {
-    String text = param(paramName).asText();
-    if (text == null || text.isBlank()) {
-      return defaultValue;
-    }
-    try {
-      return RequestFunctions.parse(text);
-    } catch (Exception e) {
-      throw new OtpAppException(
-        "Unable to parse parameter '" +
-        fullPath(paramName) +
-        "'. The value '" +
-        text +
-        "' is not a valid function on the form \"a + b x\" (\"2.0 + 7.1 x\")." +
-        "Source: " +
-        source +
-        "."
-      );
-    }
+    return ofWDoc(paramName).asLinearFunction(defaultValue);
   }
 
+  /** TODO: Inline this */
   public ZoneId asZoneId(String paramName, ZoneId defaultValue) {
-    if (!exist(paramName)) {
-      return defaultValue;
-    }
-    final String zoneId = param(paramName).asText();
-    try {
-      return ZoneId.of(zoneId);
-    } catch (DateTimeException e) {
-      throw new OtpAppException(
-        "Unable to parse parameter '" +
-        fullPath(paramName) +
-        "'. The value '" +
-        zoneId +
-        "' is is not a valid Zone ID, it should be parsable by java.time.ZoneId class. " +
-        "Source: " +
-        source +
-        "."
-      );
-    }
+    return ofWDoc(paramName).asZoneId(defaultValue);
+  }
+
+  // TODO: This method should be inlined
+
+  public Map<String, String> asStringMap(String paramName) {
+    return ofWDoc(paramName).asStringMap();
+  }
+
+  // TODO: This method should be inlined
+
+  public Map<String, Boolean> asBooleanMap(String paramName) {
+    return ofWDoc(paramName).asBooleanMap();
+  }
+
+  /** List all present parameters by name */
+  public Iterator<String> parameterNames() {
+    return json.fieldNames();
   }
 
   /**
@@ -518,29 +365,12 @@ public class NodeAdapter {
     }
   }
 
-  public <T> Map<String, T> asMap(String paramName, BiFunction<NodeAdapter, String, T> mapper) {
-    NodeAdapter node = path(paramName);
-
-    if (node.isEmpty()) {
-      return Map.of();
-    }
-
-    Map<String, T> result = new HashMap<>();
-
-    Iterator<String> names = node.json.fieldNames();
-    while (names.hasNext()) {
-      String key = names.next();
-      result.put(key, mapper.apply(node, key));
-    }
-    return result;
-  }
-
   /**
    * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
    * track of unused parameters and can not generate documentation for this parameter.
    */
   public JsonNode rawNode(String paramName) {
-    return param(paramName);
+    return json.path(paramName);
   }
 
   /** Return the node as a JSON string. */
@@ -555,26 +385,11 @@ public class NodeAdapter {
 
   /* private methods */
 
-  private <T extends Enum<T>> T asEnum(String paramName, String value, Class<T> ofType) {
-    var upperCaseValue = value.toUpperCase();
-    return Stream
-      .of(ofType.getEnumConstants())
-      .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
-      .findFirst()
-      .orElseThrow(() -> {
-        List<T> legalValues = List.of(ofType.getEnumConstants());
-        throw new OtpAppException(
-          "The parameter '" +
-          fullPath(paramName) +
-          "': '" +
-          value +
-          "' is not in legal. Expected one of " +
-          legalValues +
-          ". Source: " +
-          source +
-          "."
-        );
-      });
+  NodeAdapter path(String paramName, JsonNode node) {
+    if (childrenByName.containsKey(paramName)) {
+      return childrenByName.get(paramName);
+    }
+    return new NodeAdapter(node, this, paramName);
   }
 
   /**
@@ -584,6 +399,7 @@ public class NodeAdapter {
   private List<String> unusedParams() {
     List<String> unusedParams = new ArrayList<>();
     Iterator<String> it = json.fieldNames();
+    Set<String> parameterNames = parameters.keySet();
 
     while (it.hasNext()) {
       String fieldName = it.next();
@@ -600,45 +416,55 @@ public class NodeAdapter {
     return unusedParams;
   }
 
-  private JsonNode param(String paramName) {
-    parameterNames.add(paramName);
-    return json.path(paramName);
+  /**
+   * This method validate the given parameter info and save it to the list of parameters.
+   * The JSON node is for this parameter is returned, if the node do not exist a "missing node"
+   * (node that returns true for isMissingNode) will be returned.
+   */
+  JsonNode addAndValidateParameterNode(NodeInfo info) {
+    addParameterInfo(info);
+
+    if (info.required()) {
+      assertRequiredFieldExist(info.name());
+    }
+    return json.path(info.name());
   }
 
-  private String fullPath(String paramName) {
+  public String fullPath(String paramName) {
     return contextPath == null ? paramName : concatPath(contextPath, paramName);
   }
 
-  private String concatPath(String a, String b) {
+  String concatPath(String a, String b) {
     return a + "." + b;
   }
 
-  private URI uriFromString(String paramName, String text) {
-    if (text == null || text.isBlank()) {
-      return null;
-    }
-    try {
-      return new URI(text);
-    } catch (URISyntaxException e) {
-      throw new OtpAppException(
-        "Unable to parse parameter '" +
-        fullPath(paramName) +
-        "'. The value '" +
-        text +
-        "' is is not a valid URI, it should be parsable by java.net.URI class. " +
-        "Source: " +
-        source +
-        "."
-      );
-    }
+  /**
+   * Return a {@link OtpAppException}. The full path and source is injected into the message if
+   * replacing the placeholders {@code "{path}"}, if they exist.
+   */
+  public OtpAppException createException(String message, String paramName) {
+    message += " Parameter: " + fullPath(paramName) + ".";
+    message += " Source: " + source + ".";
+    return new OtpAppException(message);
   }
 
-  private <T> List<T> arrayAsList(String paramName, Function<JsonNode, T> parse) {
-    List<T> values = new ArrayList<>();
-    for (JsonNode node : param(paramName)) {
-      values.add(parse.apply(node));
+  /**
+   * Same as {@link #createException(String, String)} with the given cause is appended to the
+   * message.
+   */
+  public OtpAppException createException(String message, String paramName, Exception cause) {
+    message += " Details: " + cause.getMessage();
+    return createException(message, paramName);
+  }
+
+  /* private methods */
+
+  private void addParameterInfo(NodeInfo info) {
+    if (parameters.containsKey(info.name())) {
+      assertParameterInfoIsEqual(info);
+    } else {
+      parameters.put(info.name(), info);
     }
-    return values;
   }
 
   private void assertRequiredFieldExist(String paramName) {
@@ -647,47 +473,18 @@ public class NodeAdapter {
     }
   }
 
-  private OtpAppException requiredFieldMissingException(String paramName) {
-    return new OtpAppException(
-      "Required parameter '" + fullPath(paramName) + "' not found in '" + source + "'."
-    );
-  }
-
-  private void assertIsArray(String paramName, JsonNode array) {
-    if (!array.isArray()) {
+  private void assertParameterInfoIsEqual(NodeInfo info) {
+    var other = parameters.get(info.name());
+    if (!other.equals(info)) {
       throw new OtpAppException(
-        "Unable to parse parameter '" +
-        fullPath(paramName) +
-        "': '" +
-        array.asText() +
-        "' expected an ARRAY. Source: " +
-        source +
-        "."
+        "Two different parameter definitions exist: " + other + " != " + info
       );
     }
   }
 
-  private <T, E extends Enum<E>> EnumMap<E, T> localAsEnumMap(
-    String paramName,
-    Class<E> enumClass,
-    BiFunction<NodeAdapter, String, T> mapper,
-    boolean requireAllValues
-  ) {
-    NodeAdapter node = path(paramName);
-
-    EnumMap<E, T> result = new EnumMap<>(enumClass);
-
-    if (node.isEmpty()) {
-      return result;
-    }
-
-    for (E v : enumClass.getEnumConstants()) {
-      if (node.exist(v.name())) {
-        result.put(v, mapper.apply(node, v.name()));
-      } else if (requireAllValues) {
-        throw requiredFieldMissingException(concatPath(paramName, v.name()));
-      }
-    }
-    return result;
+  private OtpAppException requiredFieldMissingException(String paramName) {
+    return new OtpAppException(
+      "Required parameter '" + fullPath(paramName) + "' not found in '" + source + "'."
+    );
   }
 }

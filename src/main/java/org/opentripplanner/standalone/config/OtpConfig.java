@@ -35,7 +35,7 @@ public class OtpConfig {
     this.root = new NodeAdapter(otpConfig, source);
 
     this.configVersion = root.asText("configVersion", null);
-    this.otpFeatures = root.asEnumMap("otpFeatures", OTPFeature.class, NodeAdapter::asBoolean);
+    this.otpFeatures = root.asEnumMap("otpFeatures", OTPFeature.class, Boolean.class);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);

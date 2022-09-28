@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.framework.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.OtpVersion.V2_1;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
@@ -52,6 +53,7 @@ public class NodeAdapterTest {
   @Test
   public void asBoolean() {
     NodeAdapter subject = newNodeAdapterForTest("{ aBoolean : true }");
+    assertTrue(subject.asBoolean("aBoolean"));
     assertTrue(subject.asBoolean("aBoolean", false));
     assertFalse(subject.asBoolean("missingField", false));
   }
@@ -133,21 +135,18 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false),
-      subject.asEnumMap("key", AnEnum.class, NodeAdapter::asBoolean)
+      subject.asEnumMap("key", AnEnum.class, Boolean.class)
     );
     assertEquals(
       Collections.<AnEnum, Boolean>emptyMap(),
-      subject.asEnumMap("missing-key", AnEnum.class, NodeAdapter::asBoolean)
+      subject.asEnumMap("missing-key", AnEnum.class, Boolean.class)
     );
   }
 
   @Test
   public void asEnumMapWithUnknownValue() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { unknown : 7 } }");
-    assertEquals(
-      Map.<AnEnum, Double>of(),
-      subject.asEnumMap("key", AnEnum.class, NodeAdapter::asDouble)
-    );
+    assertEquals(Map.<AnEnum, Double>of(), subject.asEnumMap("key", AnEnum.class, Double.class));
 
     // Assert unknown parameter is logged at warning level and with full pathname
     var buf = new StringBuilder();
@@ -161,9 +160,9 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false, C: true } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.C, true),
-      subject.asEnumMapAllKeysRequired("key", AnEnum.class, NodeAdapter::asBoolean)
+      subject.asEnumMapAllKeysRequired("key", AnEnum.class, Boolean.class)
     );
-    assertNull(subject.asEnumMapAllKeysRequired("missing-key", AnEnum.class, NodeAdapter::asText));
+    assertNull(subject.asEnumMapAllKeysRequired("missing-key", AnEnum.class, Boolean.class));
   }
 
   @Test
@@ -173,21 +172,21 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () -> subject.asEnumMapAllKeysRequired("key", AnEnum.class, NodeAdapter::asBoolean)
+      () -> subject.asEnumMapAllKeysRequired("key", AnEnum.class, Boolean.class)
     );
   }
 
   @Test
-  public void asEnumSetUsingJsonArray() {
+  public void asEnumSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 'A', 'B' ] }");
     assertEquals(Set.of(AnEnum.A, AnEnum.B), subject.asEnumSet("key", AnEnum.class));
     assertEquals(Set.of(), subject.asEnumSet("missing-key", AnEnum.class));
   }
 
   @Test
-  public void asEnumSetUsingConcatenatedString() {
+  public void asEnumSetFailsUsingWrongFormat() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A,B' }");
-    assertEquals(Set.of(AnEnum.A, AnEnum.B), subject.asEnumSet("key", AnEnum.class));
+    assertThrows(OtpAppException.class, () -> subject.asEnumSet("key", AnEnum.class));
   }
 
   @Test
@@ -221,24 +220,25 @@ public class NodeAdapterTest {
         new FeedScopedId("B", "12"),
         new FeedScopedId("A", "23")
       ),
-      subject.asFeedScopedIdList("routes", List.of())
+      subject.asFeedScopedIds("routes", List.of())
     );
   }
 
   @Test
   public void asDateOrRelativePeriod() {
     // Given
-    NodeAdapter subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");
+    var subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");
+    var utc = ZoneId.of("UTC");
 
     // Then
-    assertEquals(LocalDate.of(2020, 2, 28), subject.asDateOrRelativePeriod("a", null));
+    assertEquals(LocalDate.of(2020, 2, 28), subject.asDateOrRelativePeriod("a", null, utc));
 
-    assertEquals(LocalDate.now().minusYears(3), subject.asDateOrRelativePeriod("b", null));
+    assertEquals(LocalDate.now().minusYears(3), subject.asDateOrRelativePeriod("b", null, utc));
     assertEquals(
       LocalDate.of(2020, 3, 1),
-      subject.asDateOrRelativePeriod("do-no-exist", "2020-03-01")
+      subject.asDateOrRelativePeriod("do-no-exist", "2020-03-01", utc)
     );
-    assertNull(subject.asDateOrRelativePeriod("do-no-exist", null));
+    assertNull(subject.asDateOrRelativePeriod("do-no-exist", null, utc));
   }
 
   @Test
@@ -247,7 +247,10 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ 'foo' : 'bar' }");
 
     // Then
-    assertThrows(OtpAppException.class, () -> subject.asDateOrRelativePeriod("foo", null));
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.asDateOrRelativePeriod("foo", null, ZoneId.systemDefault())
+    );
   }
 
   @Test
@@ -356,11 +359,13 @@ public class NodeAdapterTest {
   public void objectAsList() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [{ a: 'I' }, { a: '2' } ] }");
 
-    List<NodeAdapter> result = subject.path("key").asList();
+    List<ARecord> result = subject
+      .of("key")
+      .doc(V2_0, "Summary Array")
+      .asObjects(List.of(), n -> new ARecord(n.of("a").doc(V2_1, "Summary Element").asString()));
 
-    String content = result.stream().map(n -> n.asText("a")).collect(Collectors.joining(", "));
-
-    assertEquals("I, 2", content);
+    assertEquals("[ARecord[a=I], ARecord[a=2]]", result.toString());
+    assertEquals("[key : object[] = [] Since 2.0]", subject.parametersSorted().toString());
   }
 
   @Test
@@ -385,13 +390,10 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asMap() {
+  public void asBooleanMap() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
-    assertEquals(Map.of("A", true, "B", false), subject.asMap("key", NodeAdapter::asBoolean));
-    assertEquals(
-      Collections.<String, Boolean>emptyMap(),
-      subject.asMap("missing-key", NodeAdapter::asBoolean)
-    );
+    assertEquals(Map.of("A", true, "B", false), subject.asBooleanMap("key"));
+    assertEquals(Collections.<String, Boolean>emptyMap(), subject.asBooleanMap("missing-key"));
   }
 
   @Test
@@ -435,4 +437,6 @@ public class NodeAdapterTest {
     B,
     C,
   }
+
+  private record ARecord(String a) {}
 }

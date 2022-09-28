@@ -16,7 +16,7 @@ public class VehiclePositionsUpdaterConfig {
   }
 
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var sourceType = mapStringToSourceType(c.asText("sourceType"));
+    var sourceType = c.asEnum("sourceType", DataSourceType.class);
     var feedId = c.asText("feedId");
     var frequencySec = c.asInt("frequencySec", 60);
 
@@ -27,13 +27,5 @@ public class VehiclePositionsUpdaterConfig {
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);
     }
-  }
-
-  private static DataSourceType mapStringToSourceType(String typeKey) {
-    DataSourceType type = CONFIG_MAPPING.get(typeKey);
-    if (type == null) {
-      throw new OtpAppException("The updater source type is unknown: " + typeKey);
-    }
-    return type;
   }
 }

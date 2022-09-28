@@ -27,6 +27,7 @@ import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
 import org.opentripplanner.standalone.config.framework.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
+import org.opentripplanner.util.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -500,14 +501,22 @@ public class BuildConfig implements OtpDataStoreConfig {
     streets = root.asBoolean("streets", true);
     subwayAccessTime = root.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
     transit = root.asBoolean("transit", true);
-    transitServiceStart = root.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
-    transitServiceEnd = root.asDateOrRelativePeriod("transitServiceEnd", "P3Y");
+
+    // Time Zone dependent config
+    {
+      // We need a time zone for setting transit service start and end. Getting the wrong time-zone
+      // will just shift the period with one day, so the consequences is limited.
+      transitModelTimeZone = root.asZoneId("transitModelTimeZone", null);
+      var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
+      transitServiceStart = root.asDateOrRelativePeriod("transitServiceStart", "-P1Y", confZone);
+      transitServiceEnd = root.asDateOrRelativePeriod("transitServiceEnd", "P3Y", confZone);
+    }
+
     writeCachedElevations = root.asBoolean("writeCachedElevations", false);
     maxAreaNodes = root.asInt("maxAreaNodes", 500);
     maxElevationPropagationMeters = root.asInt("maxElevationPropagationMeters", 2000);
     boardingLocationTags = root.asTextSet("boardingLocationTags", Set.of("ref"));
     discardMinTransferTimes = root.asBoolean("discardMinTransferTimes", false);
-    transitModelTimeZone = root.asZoneId("transitModelTimeZone", null);
 
     var localFileNamePatternsConfig = root.path("localFileNamePatterns");
     gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);

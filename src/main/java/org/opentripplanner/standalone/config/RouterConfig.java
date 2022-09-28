@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -145,25 +145,10 @@ public class RouterConfig implements Serializable {
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
-    try {
-      return adapter.asDuration("streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT);
-    } catch (DateTimeParseException ex) {
-      LOG.warn(
-        "The `streetRoutingTimeout` parameter input format changed from a real number to a " +
-        "Duration. Update you config, the support for the old format will be removed in the " +
-        "next version after v2.2. Details: " +
-        ex.getMessage()
-      );
-      // This is safe, because the asDouble, will fall back to the default value on parse error
-      return Duration.ofMillis(
-        (long) (
-          1000L *
-          adapter.asDouble(
-            "streetRoutingTimeout",
-            (double) DEFAULT_STREET_ROUTING_TIMEOUT.toSeconds()
-          )
-        )
-      );
-    }
+    return adapter.asDuration2(
+      "streetRoutingTimeout",
+      DEFAULT_STREET_ROUTING_TIMEOUT,
+      ChronoUnit.SECONDS
+    );
   }
 }

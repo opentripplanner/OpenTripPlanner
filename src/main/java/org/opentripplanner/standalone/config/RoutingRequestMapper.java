@@ -3,6 +3,8 @@ package org.opentripplanner.standalone.config;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
+import java.time.Duration;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -40,7 +42,7 @@ public class RoutingRequestMapper {
       .transit()
       .initAlightSlack(
         c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
-        c.asEnumMap("alightSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
+        c.asEnumMap("alightSlackForMode", TransitMode.class, Duration.class)
       );
     vehicleRental.setAllowedNetworks(
       c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
@@ -106,7 +108,7 @@ public class RoutingRequestMapper {
       .transit()
       .initBoardSlack(
         c.asDuration2("boardSlack", preferences.transit().boardSlack().defaultValue(), SECONDS),
-        c.asEnumMap("boardSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
+        c.asEnumMap("boardSlackForMode", TransitMode.class, Duration.class)
       );
 
     preferences
@@ -116,7 +118,7 @@ public class RoutingRequestMapper {
           "maxAccessEgressDuration",
           preferences.street().maxAccessEgressDuration().defaultValue()
         ),
-        c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+        c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, Duration.class)
       );
     preferences
       .car()
@@ -174,7 +176,7 @@ public class RoutingRequestMapper {
           "maxDirectStreetDuration",
           preferences.street().maxDirectDuration().defaultValue()
         ),
-        c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+        c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, Duration.class)
       );
 
     preferences
@@ -183,7 +185,15 @@ public class RoutingRequestMapper {
         c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
       );
 
-    request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
+    request
+      .journey()
+      .setModes(
+        c.asCustomStingType(
+          "modes",
+          RequestModes.defaultRequestModes(),
+          s -> new QualifiedModeSet(s).getRequestModes()
+        )
+      );
 
     preferences
       .transfer()
@@ -210,7 +220,7 @@ public class RoutingRequestMapper {
     preferences
       .transit()
       .setReluctanceForMode(
-        c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble)
+        c.asEnumMap("transitReluctanceForMode", TransitMode.class, Double.class)
       );
     preferences
       .street()
@@ -282,14 +292,14 @@ public class RoutingRequestMapper {
       .journey()
       .transit()
       .setUnpreferredRoutes(
-        unpreferred.asFeedScopedIdList("routes", request.journey().transit().unpreferredRoutes())
+        unpreferred.asFeedScopedIds("routes", request.journey().transit().unpreferredRoutes())
       );
 
     request
       .journey()
       .transit()
       .setUnpreferredAgencies(
-        unpreferred.asFeedScopedIdList("agencies", request.journey().transit().unpreferredRoutes())
+        unpreferred.asFeedScopedIds("agencies", request.journey().transit().unpreferredRoutes())
       );
 
     return request;
