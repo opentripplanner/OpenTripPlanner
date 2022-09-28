@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Currency;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,6 +23,7 @@ public class AtlantaFareServiceImpl extends DefaultFareServiceImpl {
   public static final String XPRESS_AGENCY_ID = "6";
   public static final String MARTA_AGENCY_ID = "5";
   public static final String GCT_AGENCY_ID = "4";
+  public static final Set<String> COBB_FREE_RIDE_SHORT_NAMES = Set.of("blue", "green");
 
   private enum TransferType {
     END_TRANSFER, // Ends this transfer entirely.
@@ -109,9 +109,13 @@ public class AtlantaFareServiceImpl extends DefaultFareServiceImpl {
       // so we only check if it's valid if the transfer is going to be used.
       if (!transferClassification.type.equals(TransferType.NO_TRANSFER)) {
         // Consider the conditions under which this transfer will no longer be valid.
-        if (transferClassification.type.equals(TransferType.END_TRANSFER)) return false; else if (
-          transferUseTime.isBefore(transferStartTime.plus(transferWindow))
-        ) return false; else if (legs.size() > maxRides) return false;
+        if (transferClassification.type.equals(TransferType.END_TRANSFER)) {
+          return false;
+        } else if (transferUseTime.isAfter(transferStartTime.plus(transferWindow))) {
+          return false;
+        } else if (legs.size() > maxRides) {
+          return false;
+        }
       }
 
       // The transfer is valid for this ride, so create a fare object.
@@ -191,9 +195,6 @@ public class AtlantaFareServiceImpl extends DefaultFareServiceImpl {
   private static RideType classify(Leg ride) {
     Route getRoute = ride.getRoute();
     String shortName = getRoute.getShortName().toLowerCase();
-    final HashSet<String> COBB_FREE_RIDE_SHORT_NAMES = new HashSet<>(
-      Arrays.asList("blue", "green")
-    );
 
     switch (getRoute.getAgency().getId().getId()) {
       case COBB_AGENCY_ID -> {
@@ -240,7 +241,7 @@ public class AtlantaFareServiceImpl extends DefaultFareServiceImpl {
     };
   }
 
-  private static Duration getTransferWindow(RideType rideType) {
+  private static Duration getTransferWindow(RideType ignored) {
     return Duration.ofHours(3);
   }
 
