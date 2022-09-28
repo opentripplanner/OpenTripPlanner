@@ -153,9 +153,21 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A' }");
 
     // Then
-    assertEquals(AnEnum.A, subject.asEnum("key", AnEnum.B), "Get existing property");
-    assertEquals(AnEnum.B, subject.asEnum("missing-key", AnEnum.B), "Get default value");
-    assertEquals(AnEnum.A, subject.asEnum("key", AnEnum.class), "Get existing property");
+    assertEquals(
+      AnEnum.A,
+      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.B),
+      "Get existing property"
+    );
+    assertEquals(
+      AnEnum.B,
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.B),
+      "Get default value"
+    );
+    assertEquals(
+      AnEnum.A,
+      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.class),
+      "Get existing property"
+    );
   }
 
   @Test
@@ -165,7 +177,10 @@ public class NodeAdapterTest {
 
     // Then expect an error when value 'NONE_EXISTING_ENUM_VALUE' is not in the set of legal
     // values: ['A', 'B', 'C']
-    assertThrows(OtpAppException.class, () -> subject.asEnum("key", AnEnum.B));
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.B)
+    );
   }
 
   @Test
@@ -174,18 +189,33 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false),
-      subject.asEnumMap("key", AnEnum.class, Boolean.class)
+      subject
+        .of("key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMap(AnEnum.class, Boolean.class)
     );
     assertEquals(
       Collections.<AnEnum, Boolean>emptyMap(),
-      subject.asEnumMap("missing-key", AnEnum.class, Boolean.class)
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMap(AnEnum.class, Boolean.class)
     );
   }
 
   @Test
   public void asEnumMapWithUnknownValue() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { unknown : 7 } }");
-    assertEquals(Map.<AnEnum, Double>of(), subject.asEnumMap("key", AnEnum.class, Double.class));
+    assertEquals(
+      Map.<AnEnum, Double>of(),
+      subject
+        .of("key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMap(AnEnum.class, Double.class)
+    );
 
     // Assert unknown parameter is logged at warning level and with full pathname
     var buf = new StringBuilder();
@@ -199,9 +229,19 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false, C: true } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.C, true),
-      subject.asEnumMapAllKeysRequired("key", AnEnum.class, Boolean.class)
+      subject
+        .of("key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
-    assertNull(subject.asEnumMapAllKeysRequired("missing-key", AnEnum.class, Boolean.class));
+    assertNull(
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    );
   }
 
   @Test
@@ -211,21 +251,48 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () -> subject.asEnumMapAllKeysRequired("key", AnEnum.class, Boolean.class)
+      () ->
+        subject
+          .of("key")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
   }
 
   @Test
   public void asEnumSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 'A', 'B' ] }");
-    assertEquals(Set.of(AnEnum.A, AnEnum.B), subject.asEnumSet("key", AnEnum.class));
-    assertEquals(Set.of(), subject.asEnumSet("missing-key", AnEnum.class));
+    assertEquals(
+      Set.of(AnEnum.A, AnEnum.B),
+      subject
+        .of("key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumSet(AnEnum.class)
+    );
+    assertEquals(
+      Set.of(),
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumSet(AnEnum.class)
+    );
   }
 
   @Test
   public void asEnumSetFailsUsingWrongFormat() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A,B' }");
-    assertThrows(OtpAppException.class, () -> subject.asEnumSet("key", AnEnum.class));
+    assertThrows(
+      OtpAppException.class,
+      () ->
+        subject
+          .of("key")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumSet(AnEnum.class)
+    );
   }
 
   @Test

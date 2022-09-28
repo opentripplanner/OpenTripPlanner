@@ -41,7 +41,10 @@ public class PollingStoptimeUpdaterConfig {
       c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA),
+      c
+        .of("backwardsDelayPropagationType")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
       sourceType,
       c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       url,

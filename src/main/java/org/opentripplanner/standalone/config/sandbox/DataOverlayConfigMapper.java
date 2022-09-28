@@ -34,7 +34,7 @@ public class DataOverlayConfigMapper {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(),
-      c.asEnum("timeFormat", TimeUnit.class),
+      c.of("timeFormat").withDoc(NA, /*TODO DOC*/"TODO").asEnum(TimeUnit.class),
       mapIndexVariables(c.path("indexVariables")),
       mapRequestParameters(c.path("requestParameters"))
     );
@@ -70,7 +70,7 @@ public class DataOverlayConfigMapper {
 
   private static ParameterBinding mapRequestParameter(NodeAdapter c) {
     return new ParameterBinding(
-      c.asEnum("name", ParameterName.class),
+      c.of("name").withDoc(NA, /*TODO DOC*/"TODO").asEnum(ParameterName.class),
       c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
       c.of("formula").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
     );

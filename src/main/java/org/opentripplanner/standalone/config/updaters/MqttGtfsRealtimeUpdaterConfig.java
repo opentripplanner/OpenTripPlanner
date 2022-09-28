@@ -16,7 +16,10 @@ public class MqttGtfsRealtimeUpdaterConfig {
       c.of("topic").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
       c.of("qos").withDoc(NA, /*TODO DOC*/"TODO").asInt(0),
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA)
+      c
+        .of("backwardsDelayPropagationType")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }
 }

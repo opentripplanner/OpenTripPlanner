@@ -45,7 +45,11 @@ public class RoutingRequestMapper {
       .transit()
       .initAlightSlack(
         c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
-        c.asEnumMap("alightSlackForMode", TransitMode.class, Duration.class)
+        c
+          .of("alightSlackForMode")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumMap(TransitMode.class, Duration.class)
       );
     vehicleRental.setAllowedNetworks(
       Set.copyOf(
@@ -101,7 +105,9 @@ public class RoutingRequestMapper {
       bike.setSwitchCost(
         c.of("bikeSwitchCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(bike.switchCost())
       );
-      bike.setOptimizeType(c.asEnum("optimize", bike.optimizeType()));
+      bike.setOptimizeType(
+        c.of("optimize").withDoc(NA, /*TODO DOC*/"TODO").asEnum(bike.optimizeType())
+      );
 
       bike.withOptimizeTriangle(it ->
         it
@@ -170,7 +176,11 @@ public class RoutingRequestMapper {
       .transit()
       .initBoardSlack(
         c.asDuration2("boardSlack", preferences.transit().boardSlack().defaultValue(), SECONDS),
-        c.asEnumMap("boardSlackForMode", TransitMode.class, Duration.class)
+        c
+          .of("boardSlackForMode")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumMap(TransitMode.class, Duration.class)
       );
 
     preferences
@@ -180,7 +190,11 @@ public class RoutingRequestMapper {
           "maxAccessEgressDuration",
           preferences.street().maxAccessEgressDuration().defaultValue()
         ),
-        c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, Duration.class)
+        c
+          .of("maxAccessEgressDurationForMode")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumMap(StreetMode.class, Duration.class)
       );
     preferences
       .car()
@@ -310,7 +324,11 @@ public class RoutingRequestMapper {
           "maxDirectStreetDuration",
           preferences.street().maxDirectDuration().defaultValue()
         ),
-        c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, Duration.class)
+        c
+          .of("maxDirectStreetDurationForMode")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumMap(StreetMode.class, Duration.class)
       );
 
     preferences
@@ -377,7 +395,11 @@ public class RoutingRequestMapper {
     preferences
       .transit()
       .setReluctanceForMode(
-        c.asEnumMap("transitReluctanceForMode", TransitMode.class, Double.class)
+        c
+          .of("transitReluctanceForMode")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asEnumMap(TransitMode.class, Double.class)
       );
     preferences
       .street()
@@ -461,15 +483,18 @@ public class RoutingRequestMapper {
     preferences
       .street()
       .setDrivingDirection(
-        c.asEnum("drivingDirection", dft.preferences().street().drivingDirection())
+        c
+          .of("drivingDirection")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asEnum(dft.preferences().street().drivingDirection())
       );
     preferences
       .street()
       .setIntersectionTraversalModel(
-        c.asEnum(
-          "intersectionTraversalModel",
-          dft.preferences().street().intersectionTraversalModel()
-        )
+        c
+          .of("intersectionTraversalModel")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asEnum(dft.preferences().street().intersectionTraversalModel())
       );
 
     NodeAdapter unpreferred = c.path("unpreferred");

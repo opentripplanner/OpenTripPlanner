@@ -172,49 +172,6 @@ public class NodeAdapter {
   }
 
   /** TODO: Inline this */
-  /** Get required enum value. Parser is not case sensitive. */
-  public <T extends Enum<T>> T asEnum(String paramName, Class<T> enumType) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asEnum(enumType);
-  }
-
-  /** TODO: Inline this */
-  public <T extends Enum<T>> T asEnum(String paramName, T defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asEnum(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public <T, E extends Enum<E>> Map<E, T> asEnumMap(
-    String paramName,
-    Class<E> enumClass,
-    Class<T> elementType
-  ) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asEnumMap(enumClass, elementType);
-  }
-
-  /** TODO: Inline this */
-  public <T, E extends Enum<E>> Map<E, T> asEnumMapAllKeysRequired(
-    String paramName,
-    Class<E> enumClass,
-    Class<T> elementType
-  ) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asEnumMapAllKeysRequired(enumClass, elementType);
-  }
-
-  /** TODO: Inline this */
-  public <T extends Enum<T>> Set<T> asEnumSet(String paramName, Class<T> enumClass) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asEnumSet(enumClass);
-  }
-
-  /** TODO: Inline this */
   public FeedScopedId asFeedScopedId(String paramName, FeedScopedId defaultValue) {
     return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(defaultValue);
   }

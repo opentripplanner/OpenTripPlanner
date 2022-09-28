@@ -14,7 +14,10 @@ public class WebsocketGtfsRealtimeUpdaterConfig {
       c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       c.of("reconnectPeriodSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA)
+      c
+        .of("backwardsDelayPropagationType")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }
 }

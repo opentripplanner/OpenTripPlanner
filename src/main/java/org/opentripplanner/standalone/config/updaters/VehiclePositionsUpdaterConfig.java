@@ -18,7 +18,10 @@ public class VehiclePositionsUpdaterConfig {
   }
 
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var sourceType = c.asEnum("sourceType", DataSourceType.class);
+    var sourceType = c
+      .of("sourceType")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asEnum(DataSourceType.class);
     var feedId = c
       .of("feedId")
       .withDoc(NA, /*TODO DOC*/"TODO")

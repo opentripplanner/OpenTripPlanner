@@ -42,7 +42,12 @@ public class OtpConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null);
-    this.otpFeatures = root.asEnumMap("otpFeatures", OTPFeature.class, Boolean.class);
+    this.otpFeatures =
+      root
+        .of("otpFeatures")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMap(OTPFeature.class, Boolean.class);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);
