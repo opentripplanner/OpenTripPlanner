@@ -537,8 +537,16 @@ public class BuildConfig implements OtpDataStoreConfig {
       // will just shift the period with one day, so the consequences is limited.
       transitModelTimeZone = root.asZoneId("transitModelTimeZone", null);
       var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
-      transitServiceStart = root.asDateOrRelativePeriod("transitServiceStart", "-P1Y", confZone);
-      transitServiceEnd = root.asDateOrRelativePeriod("transitServiceEnd", "P3Y", confZone);
+      transitServiceStart =
+        root
+          .of("transitServiceStart")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDateOrRelativePeriod("-P1Y", confZone);
+      transitServiceEnd =
+        root
+          .of("transitServiceEnd")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDateOrRelativePeriod("P3Y", confZone);
     }
 
     writeCachedElevations =

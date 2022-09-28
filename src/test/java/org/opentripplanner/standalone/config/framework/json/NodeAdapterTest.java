@@ -298,22 +298,46 @@ public class NodeAdapterTest {
   @Test
   public void asFeedScopedId() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1: 'A:23', key2: 'B:12' }");
-    assertEquals("A:23", subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString());
-    assertEquals("B:12", subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString());
+    assertEquals(
+      "A:23",
+      subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString()
+    );
+    assertEquals(
+      "B:12",
+      subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString()
+    );
     assertEquals(
       "C:12",
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(new FeedScopedId("C", "12")).toString()
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asFeedScopedId(new FeedScopedId("C", "12"))
+        .toString()
     );
   }
 
   @Test
   public void asFeedScopedIds() {
     NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12']}");
-    assertEquals("[A:23, B:12]", subject.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of()).toString());
-    assertEquals("[]", subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of()).toString());
+    assertEquals(
+      "[A:23, B:12]",
+      subject.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of()).toString()
+    );
+    assertEquals(
+      "[]",
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asFeedScopedIds(List.of())
+        .toString()
+    );
     assertEquals(
       "[C:12]",
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of(new FeedScopedId("C", "12"))).toString()
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asFeedScopedIds(List.of(new FeedScopedId("C", "12")))
+        .toString()
     );
   }
 
@@ -337,14 +361,25 @@ public class NodeAdapterTest {
     var utc = ZoneId.of("UTC");
 
     // Then
-    assertEquals(LocalDate.of(2020, 2, 28), subject.asDateOrRelativePeriod("a", null, utc));
+    assertEquals(
+      LocalDate.of(2020, 2, 28),
+      subject.of("a").withDoc(NA, /*TODO DOC*/"TODO").asDateOrRelativePeriod(null, utc)
+    );
 
-    assertEquals(LocalDate.now().minusYears(3), subject.asDateOrRelativePeriod("b", null, utc));
+    assertEquals(
+      LocalDate.now().minusYears(3),
+      subject.of("b").withDoc(NA, /*TODO DOC*/"TODO").asDateOrRelativePeriod(null, utc)
+    );
     assertEquals(
       LocalDate.of(2020, 3, 1),
-      subject.asDateOrRelativePeriod("do-no-exist", "2020-03-01", utc)
+      subject
+        .of("do-no-exist")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDateOrRelativePeriod("2020-03-01", utc)
     );
-    assertNull(subject.asDateOrRelativePeriod("do-no-exist", null, utc));
+    assertNull(
+      subject.of("do-no-exist").withDoc(NA, /*TODO DOC*/"TODO").asDateOrRelativePeriod(null, utc)
+    );
   }
 
   @Test
@@ -355,7 +390,11 @@ public class NodeAdapterTest {
     // Then
     assertThrows(
       OtpAppException.class,
-      () -> subject.asDateOrRelativePeriod("foo", null, ZoneId.systemDefault())
+      () ->
+        subject
+          .of("foo")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDateOrRelativePeriod(null, ZoneId.systemDefault())
     );
   }
 
@@ -399,10 +438,22 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'no', key2 : 'no_NO', key3 : 'no_NO_NY' }"
     );
-    assertEquals("no", subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString());
-    assertEquals("no_NO", subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString());
-    assertEquals("no_NO_NY", subject.of("key3").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString());
-    assertEquals(Locale.FRANCE, subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asLocale(Locale.FRANCE));
+    assertEquals(
+      "no",
+      subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString()
+    );
+    assertEquals(
+      "no_NO",
+      subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString()
+    );
+    assertEquals(
+      "no_NO_NY",
+      subject.of("key3").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString()
+    );
+    assertEquals(
+      Locale.FRANCE,
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asLocale(Locale.FRANCE)
+    );
   }
 
   @Test

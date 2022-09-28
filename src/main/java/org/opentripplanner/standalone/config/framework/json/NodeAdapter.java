@@ -6,7 +6,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -167,13 +166,6 @@ public class NodeAdapter {
    */
   public String asText() {
     return json.asText();
-  }
-
-  /** TODO: Inline this */
-  public LocalDate asDateOrRelativePeriod(String paramName, String defaultValue, ZoneId timeZone) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .asDateOrRelativePeriod(defaultValue, timeZone);
   }
 
   /** TODO: Inline this */

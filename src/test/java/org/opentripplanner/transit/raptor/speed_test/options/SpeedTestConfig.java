@@ -38,7 +38,11 @@ public class SpeedTestConfig {
   public SpeedTestConfig(JsonNode node) {
     NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
     this.rawNode = node;
-    testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D", ZoneId.of("UTC"));
+    testDate =
+      adapter
+        .of("testDate")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
     graph = adapter.asUri("graph", null);
     feedId =
       adapter

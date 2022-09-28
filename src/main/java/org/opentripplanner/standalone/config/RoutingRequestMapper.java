@@ -502,14 +502,20 @@ public class RoutingRequestMapper {
       .journey()
       .transit()
       .setUnpreferredRoutes(
-        unpreferred.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(request.journey().transit().unpreferredRoutes())
+        unpreferred
+          .of("routes")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
     request
       .journey()
       .transit()
       .setUnpreferredAgencies(
-        unpreferred.of("agencies").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(request.journey().transit().unpreferredRoutes())
+        unpreferred
+          .of("agencies")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
     return request;
