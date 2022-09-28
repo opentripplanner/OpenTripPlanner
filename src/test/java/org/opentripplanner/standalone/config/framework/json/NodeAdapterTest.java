@@ -403,34 +403,76 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ k1:'PT1s', k2:'3h2m1s', k3:7 }");
 
     // as required duration
-    assertEquals("PT1S", subject.asDuration("k1").toString());
-    assertEquals("PT3H2M1S", subject.asDuration("k2").toString());
+    assertEquals("PT1S", subject.of("k1").withDoc(NA, /*TODO DOC*/"TODO").asDuration().toString());
+    assertEquals(
+      "PT3H2M1S",
+      subject.of("k2").withDoc(NA, /*TODO DOC*/"TODO").asDuration().toString()
+    );
 
     // as optional duration
-    assertEquals("PT1S", subject.asDuration("k1", null).toString());
-    assertEquals("PT3H", subject.asDuration("missing-key", D3h).toString());
+    assertEquals(
+      "PT1S",
+      subject.of("k1").withDoc(NA, /*TODO DOC*/"TODO").asDuration(null).toString()
+    );
+    assertEquals(
+      "PT3H",
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asDuration(D3h).toString()
+    );
 
     // as required duration v2 (with unit)
-    assertEquals("PT1S", subject.asDuration("k1").toString());
-    assertEquals("PT7S", subject.asDuration2("k3", ChronoUnit.SECONDS).toString());
+    assertEquals("PT1S", subject.of("k1").withDoc(NA, /*TODO DOC*/"TODO").asDuration().toString());
+    assertEquals(
+      "PT7S",
+      subject.of("k3").withDoc(NA, /*TODO DOC*/"TODO").asDuration2(ChronoUnit.SECONDS).toString()
+    );
 
     // as optional duration v2 (with unit)
-    assertEquals("PT1S", subject.asDuration2("k1", null, ChronoUnit.SECONDS).toString());
-    assertEquals("PT7S", subject.asDuration2("k3", null, ChronoUnit.SECONDS).toString());
-    assertEquals("PT3H", subject.asDuration2("missing-key", D3h, ChronoUnit.SECONDS).toString());
+    assertEquals(
+      "PT1S",
+      subject
+        .of("k1")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDuration2(null, ChronoUnit.SECONDS)
+        .toString()
+    );
+    assertEquals(
+      "PT7S",
+      subject
+        .of("k3")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDuration2(null, ChronoUnit.SECONDS)
+        .toString()
+    );
+    assertEquals(
+      "PT3H",
+      subject
+        .of("missing-key")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDuration2(D3h, ChronoUnit.SECONDS)
+        .toString()
+    );
   }
 
   @Test
   public void requiredAsDuration() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    assertThrows(OtpAppException.class, () -> subject.asDuration("missingField"));
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asDuration()
+    );
   }
 
   @Test
   public void asDurations() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1 : ['PT1s', '2h'] }");
-    assertEquals("[PT1S, PT2H]", subject.asDurations("key1", List.of()).toString());
-    assertEquals("[PT3H]", subject.asDurations("missing-key", List.of(D3h)).toString());
+    assertEquals(
+      "[PT1S, PT2H]",
+      subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asDurations(List.of()).toString()
+    );
+    assertEquals(
+      "[PT3H]",
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asDurations(List.of(D3h)).toString()
+    );
   }
 
   @Test

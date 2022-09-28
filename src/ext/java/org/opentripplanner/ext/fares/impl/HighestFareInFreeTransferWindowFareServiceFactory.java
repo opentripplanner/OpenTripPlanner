@@ -54,7 +54,11 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
   @Override
   public void configure(JsonNode config) {
     var adapter = new NodeAdapter(config, null);
-    freeTransferWindow = adapter.asDuration("freeTransferWindow", freeTransferWindow);
+    freeTransferWindow =
+      adapter
+        .of("freeTransferWindow")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDuration(freeTransferWindow);
 
     analyzeInterlinedTransfers =
       adapter

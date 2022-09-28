@@ -156,10 +156,9 @@ public class RouterConfig implements Serializable {
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
-    return adapter.asDuration2(
-      "streetRoutingTimeout",
-      DEFAULT_STREET_ROUTING_TIMEOUT,
-      ChronoUnit.SECONDS
-    );
+    return adapter
+      .of("streetRoutingTimeout")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asDuration2(DEFAULT_STREET_ROUTING_TIMEOUT, ChronoUnit.SECONDS);
   }
 }

@@ -60,7 +60,10 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       c.of("transferCacheMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(25);
 
     this.pagingSearchWindowAdjustments =
-      c.asDurations("pagingSearchWindowAdjustments", PAGING_SEARCH_WINDOW_ADJUSTMENTS);
+      c
+        .of("pagingSearchWindowAdjustments")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
     this.dynamicSearchWindowCoefficients =
       new DynamicSearchWindowConfig(c.path("dynamicSearchWindow"));

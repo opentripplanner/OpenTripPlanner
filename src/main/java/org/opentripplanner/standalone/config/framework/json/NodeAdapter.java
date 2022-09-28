@@ -5,9 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
-import java.time.Duration;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -166,31 +164,6 @@ public class NodeAdapter {
    */
   public String asText() {
     return json.asText();
-  }
-
-  /** TODO: Inline this */
-  public Duration asDuration(String paramName, Duration defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public Duration asDuration(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration();
-  }
-
-  /** TODO: Inline this */
-  public Duration asDuration2(String paramName, Duration defaultValue, ChronoUnit unit) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration2(defaultValue, unit);
-  }
-
-  /** TODO: Inline this */
-  public Duration asDuration2(String paramName, ChronoUnit unit) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDuration2(unit);
-  }
-
-  /** TODO: Inline this */
-  public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asDurations(defaultValues);
   }
 
   /** TODO: Inline this */

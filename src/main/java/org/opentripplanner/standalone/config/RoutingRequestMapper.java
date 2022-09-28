@@ -44,7 +44,10 @@ public class RoutingRequestMapper {
     preferences
       .transit()
       .initAlightSlack(
-        c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
+        c
+          .of("alightSlack")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDuration2(preferences.transit().alightSlack().defaultValue(), SECONDS),
         c
           .of("alightSlackForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
@@ -175,7 +178,10 @@ public class RoutingRequestMapper {
     preferences
       .transit()
       .initBoardSlack(
-        c.asDuration2("boardSlack", preferences.transit().boardSlack().defaultValue(), SECONDS),
+        c
+          .of("boardSlack")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDuration2(preferences.transit().boardSlack().defaultValue(), SECONDS),
         c
           .of("boardSlackForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
@@ -186,10 +192,10 @@ public class RoutingRequestMapper {
     preferences
       .street()
       .initMaxAccessEgressDuration(
-        c.asDuration(
-          "maxAccessEgressDuration",
-          preferences.street().maxAccessEgressDuration().defaultValue()
-        ),
+        c
+          .of("maxAccessEgressDuration")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDuration(preferences.street().maxAccessEgressDuration().defaultValue()),
         c
           .of("maxAccessEgressDurationForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
@@ -320,10 +326,10 @@ public class RoutingRequestMapper {
     preferences
       .street()
       .initMaxDirectDuration(
-        c.asDuration(
-          "maxDirectStreetDuration",
-          preferences.street().maxDirectDuration().defaultValue()
-        ),
+        c
+          .of("maxDirectStreetDuration")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDuration(preferences.street().maxDirectDuration().defaultValue()),
         c
           .of("maxDirectStreetDurationForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
@@ -334,7 +340,10 @@ public class RoutingRequestMapper {
     preferences
       .system()
       .setMaxJourneyDuration(
-        c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
+        c
+          .of("maxJourneyDuration")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDuration(preferences.system().maxJourneyDuration())
       );
 
     request
@@ -371,7 +380,9 @@ public class RoutingRequestMapper {
       );
     request.parkAndRide =
       c.of("parkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.parkAndRide);
-    request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
+    request.setSearchWindow(
+      c.of("searchWindow").withDoc(NA, /*TODO DOC*/"TODO").asDuration(dft.searchWindow())
+    );
     vehicleParking.setRequiredTags(
       Set.copyOf(
         c
