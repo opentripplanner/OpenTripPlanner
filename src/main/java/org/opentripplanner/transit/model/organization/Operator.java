@@ -26,7 +26,8 @@ public class Operator extends AbstractTransitEntity<Operator, OperatorBuilder> i
   Operator(OperatorBuilder builder) {
     super(builder.getId());
     // Required fields
-    this.name = assertHasValue(builder.getName());
+    this.name =
+      assertHasValue(builder.getName(), "Missing mandatory name on Operator %s", builder.getId());
 
     // Optional fields
     this.url = builder.getUrl();
