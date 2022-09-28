@@ -12,6 +12,8 @@ import java.io.PrintStream;
 import java.util.Set;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.framework.doc.MarkDownDocWriter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
 public class BuildConfigUserGuideDocPrinter {
 
@@ -26,7 +28,9 @@ public class BuildConfigUserGuideDocPrinter {
   }
 
   public static void main(String[] args) throws FileNotFoundException {
-    var out = new PrintStream(new FileOutputStream(new File("docs", "BuildConfiguration-generated.md")));
+    var out = new PrintStream(
+      new FileOutputStream(new File("docs", "BuildConfiguration-generated.md"))
+    );
     var printer = new BuildConfigUserGuideDocPrinter(
       new BuildConfigTemplate(),
       new MarkDownDocWriter(out)

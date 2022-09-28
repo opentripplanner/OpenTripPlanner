@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

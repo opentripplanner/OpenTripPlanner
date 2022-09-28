@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
 public enum OtpVersion {
   /** @deprecated Replace this and remove when not in use. */

@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Configure a GTFS feed.

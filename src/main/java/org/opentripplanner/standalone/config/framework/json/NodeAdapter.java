@@ -1,7 +1,7 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
 import static java.util.Comparator.comparing;
-import static org.opentripplanner.standalone.config.framework.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;

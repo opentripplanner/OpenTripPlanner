@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.framework.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -27,7 +27,7 @@ import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.util.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -473,7 +473,8 @@ public class BuildConfig implements OtpDataStoreConfig {
     areaVisibility = root.asBoolean("areaVisibility", false);
     banDiscouragedWalking = root.asBoolean("banDiscouragedWalking", false);
     banDiscouragedBiking = root.asBoolean("banDiscouragedBiking", false);
-    configVersion = root.of("configVersion").doc(NA, "TODO DOC").example("2.2.12_12").asString(null);
+    configVersion =
+      root.of("configVersion").doc(NA, "TODO DOC").example("2.2.12_12").asString(null);
     dataImportReport = root.asBoolean("dataImportReport", false);
     distanceBetweenElevationSamples =
       root.asDouble(

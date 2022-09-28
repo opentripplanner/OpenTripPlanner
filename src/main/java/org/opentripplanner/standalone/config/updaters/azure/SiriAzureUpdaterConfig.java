@@ -6,7 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdaterParameters;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public abstract class SiriAzureUpdaterConfig {
 

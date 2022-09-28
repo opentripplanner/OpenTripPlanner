@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class DataOverlayParametersMapper {
 

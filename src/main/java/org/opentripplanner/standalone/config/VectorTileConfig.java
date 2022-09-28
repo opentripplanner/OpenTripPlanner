@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VectorTileConfig implements VectorTilesResource.LayersParameters {
 

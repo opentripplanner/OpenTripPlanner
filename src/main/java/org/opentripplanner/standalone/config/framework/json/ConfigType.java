@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;

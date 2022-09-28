@@ -1,8 +1,8 @@
 package org.opentripplanner.standalone.config.framework.doc;
 
 import java.util.function.Predicate;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
-import org.opentripplanner.standalone.config.framework.NodeInfo;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,10 @@ public class ParameterDetailsList {
         } else {
           LOG.error(
             "Not found: '{} : {}'. Add to JSON input: {} : {}",
-            node.fullPath(it.name()), it.type(), it.name(), it.exampleValueJson()
+            node.fullPath(it.name()),
+            it.type(),
+            it.name(),
+            it.exampleValueJson()
           );
         }
       }

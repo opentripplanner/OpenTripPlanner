@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
-import static org.opentripplanner.standalone.config.framework.OtpVersion.V2_0;
-import static org.opentripplanner.standalone.config.framework.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import java.time.Duration;
 import java.time.LocalDate;

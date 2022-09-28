@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class NetexDefaultsConfig {
 

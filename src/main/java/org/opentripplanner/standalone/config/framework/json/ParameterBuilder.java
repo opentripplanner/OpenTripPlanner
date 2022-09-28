@@ -1,17 +1,17 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
-import static org.opentripplanner.standalone.config.framework.ConfigType.BOOLEAN;
-import static org.opentripplanner.standalone.config.framework.ConfigType.DOUBLE;
-import static org.opentripplanner.standalone.config.framework.ConfigType.DURATION;
-import static org.opentripplanner.standalone.config.framework.ConfigType.FEED_SCOPED_ID;
-import static org.opentripplanner.standalone.config.framework.ConfigType.INTEGER;
-import static org.opentripplanner.standalone.config.framework.ConfigType.LINEAR_FUNCTION;
-import static org.opentripplanner.standalone.config.framework.ConfigType.LOCALE;
-import static org.opentripplanner.standalone.config.framework.ConfigType.LONG;
-import static org.opentripplanner.standalone.config.framework.ConfigType.OBJECT;
-import static org.opentripplanner.standalone.config.framework.ConfigType.REGEXP;
-import static org.opentripplanner.standalone.config.framework.ConfigType.STRING;
-import static org.opentripplanner.standalone.config.framework.ConfigType.ZONE_ID;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.FEED_SCOPED_ID;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.LINEAR_FUNCTION;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.LOCALE;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.LONG;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.REGEXP;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ZONE_ID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;

@@ -5,8 +5,8 @@ import static org.opentripplanner.standalone.config.framework.doc.MarkDownDocWri
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
-import org.opentripplanner.standalone.config.framework.NodeInfo;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +70,10 @@ abstract class AbstractTable {
   String requieredOptonalInfo(NodeInfo info) {
     StringBuilder buf = new StringBuilder();
     buf.append(writer().em(info.required() ? "Required" : "Optional"));
-    if(info.defaultValue() != null) {
-      buf.append(" ").append(
-        writer.code(info.type().wrap(writer.escapeInTable(info.defaultValue()))));
+    if (info.defaultValue() != null) {
+      buf
+        .append(" ")
+        .append(writer.code(info.type().wrap(writer.escapeInTable(info.defaultValue()))));
     }
     return buf.toString();
   }

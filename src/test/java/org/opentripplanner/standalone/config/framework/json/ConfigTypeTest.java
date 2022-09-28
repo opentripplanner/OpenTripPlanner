@@ -1,17 +1,17 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.standalone.config.framework.ConfigType.BOOLEAN;
-import static org.opentripplanner.standalone.config.framework.ConfigType.DOUBLE;
-import static org.opentripplanner.standalone.config.framework.ConfigType.DURATION;
-import static org.opentripplanner.standalone.config.framework.ConfigType.ENUM;
-import static org.opentripplanner.standalone.config.framework.ConfigType.INTEGER;
-import static org.opentripplanner.standalone.config.framework.ConfigType.LONG;
-import static org.opentripplanner.standalone.config.framework.ConfigType.OBJECT;
-import static org.opentripplanner.standalone.config.framework.ConfigType.STRING;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.LONG;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
 
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.DoubleNode;

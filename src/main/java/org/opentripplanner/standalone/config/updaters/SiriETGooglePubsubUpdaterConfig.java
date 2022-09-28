@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class SiriETGooglePubsubUpdaterConfig {
 

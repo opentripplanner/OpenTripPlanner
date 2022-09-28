@@ -6,7 +6,7 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNo
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.util.OtpAppException;
 
 class RouterConfigTest {

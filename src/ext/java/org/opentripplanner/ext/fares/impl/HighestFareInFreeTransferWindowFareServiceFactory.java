@@ -8,7 +8,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

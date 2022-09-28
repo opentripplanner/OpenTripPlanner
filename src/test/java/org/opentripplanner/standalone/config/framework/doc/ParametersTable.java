@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.config.framework.doc;
 
 import java.util.List;
 import java.util.function.Predicate;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
-import org.opentripplanner.standalone.config.framework.NodeInfo;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
 public class ParametersTable extends AbstractTable {
 

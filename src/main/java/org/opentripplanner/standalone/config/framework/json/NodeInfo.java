@@ -1,10 +1,10 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.standalone.config.framework.json;
 
-import static org.opentripplanner.standalone.config.framework.ConfigType.ARRAY;
-import static org.opentripplanner.standalone.config.framework.ConfigType.ENUM;
-import static org.opentripplanner.standalone.config.framework.ConfigType.ENUM_MAP;
-import static org.opentripplanner.standalone.config.framework.ConfigType.ENUM_SET;
-import static org.opentripplanner.standalone.config.framework.ConfigType.MAP;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ARRAY;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.MAP;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

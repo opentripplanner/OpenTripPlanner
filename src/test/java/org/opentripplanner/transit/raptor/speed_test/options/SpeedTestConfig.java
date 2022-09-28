@@ -10,7 +10,7 @@ import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

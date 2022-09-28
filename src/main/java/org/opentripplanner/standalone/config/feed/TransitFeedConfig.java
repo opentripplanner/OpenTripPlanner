@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Configuration for a transit data feed.

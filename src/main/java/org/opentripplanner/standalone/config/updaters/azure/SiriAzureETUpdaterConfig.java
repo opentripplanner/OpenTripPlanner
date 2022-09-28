@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.updaters.azure;
 
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
-import org.opentripplanner.standalone.config.framework.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class SiriAzureETUpdaterConfig extends SiriAzureUpdaterConfig {
 
