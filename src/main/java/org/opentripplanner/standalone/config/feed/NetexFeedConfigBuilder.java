@@ -67,18 +67,22 @@ public class NetexFeedConfigBuilder {
 
   public static NetexFeedConfigBuilder of(NodeAdapter config) {
     NetexFeedConfigBuilder netexFeedConfigBuilder = new NetexFeedConfigBuilder();
-    netexFeedConfigBuilder.source = config.asUri("source");
+    netexFeedConfigBuilder.source =
+      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
     netexFeedConfigBuilder.feedId =
       config
         .of("feedId")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null);
-    netexFeedConfigBuilder.sharedFilePattern = config.asPattern("sharedFilePattern", null);
+    netexFeedConfigBuilder.sharedFilePattern =
+      config.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
     netexFeedConfigBuilder.sharedGroupFilePattern =
-      config.asPattern("sharedGroupFilePattern", null);
-    netexFeedConfigBuilder.ignoreFilePattern = config.asPattern("ignoreFilePattern", null);
-    netexFeedConfigBuilder.groupFilePattern = config.asPattern("groupFilePattern", null);
+      config.of("sharedGroupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
+    netexFeedConfigBuilder.ignoreFilePattern =
+      config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
+    netexFeedConfigBuilder.groupFilePattern =
+      config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
     return netexFeedConfigBuilder;
   }
 

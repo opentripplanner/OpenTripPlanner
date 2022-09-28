@@ -103,10 +103,17 @@ public class NetexDefaultsConfig {
   public final Set<String> ferryIdsNotAllowedForBicycle;
 
   public NetexDefaultsConfig(NodeAdapter config) {
-    ignoreFilePattern = config.asPattern("ignoreFilePattern", IGNORE_FILE_PATTERN);
-    sharedFilePattern = config.asPattern("sharedFilePattern", SHARED_FILE_PATTERN);
-    sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
-    groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
+    ignoreFilePattern =
+      config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(IGNORE_FILE_PATTERN);
+    sharedFilePattern =
+      config.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(SHARED_FILE_PATTERN);
+    sharedGroupFilePattern =
+      config
+        .of("sharedGroupFilePattern")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(SHARED_GROUP_FILE_PATTERN);
+    groupFilePattern =
+      config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(GROUP_FILE_PATTERN);
     netexFeedId =
       config
         .of("netexFeedId")

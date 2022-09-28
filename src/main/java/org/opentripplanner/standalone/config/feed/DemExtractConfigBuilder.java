@@ -12,7 +12,8 @@ public class DemExtractConfigBuilder {
 
   public static DemExtractConfigBuilder of(NodeAdapter config) {
     DemExtractConfigBuilder demExtractConfigBuilder = new DemExtractConfigBuilder();
-    demExtractConfigBuilder.source = config.asUri("source");
+    demExtractConfigBuilder.source =
+      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
     demExtractConfigBuilder.elevationUnitMultiplier =
       config
         .of("elevationUnitMultiplier")

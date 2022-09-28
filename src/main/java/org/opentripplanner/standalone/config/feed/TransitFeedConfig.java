@@ -28,7 +28,7 @@ public class TransitFeedConfig implements DataSourceConfig {
 
   public TransitFeedConfig(NodeAdapter config) {
     this(
-      config.asUri("source"),
+      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
       config
         .of("feedId")
         .withDoc(NA, /*TODO DOC*/"TODO")

@@ -4,8 +4,6 @@ import static java.util.Comparator.comparing;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.net.URI;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opentripplanner.util.OtpAppException;
 
@@ -164,48 +160,6 @@ public class NodeAdapter {
    */
   public String asText() {
     return json.asText();
-  }
-
-  /** TODO: Inline this */
-  public Pattern asPattern(String paramName, String defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asPattern(defaultValue);
-  }
-
-  public List<URI> asUris(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUris();
-  }
-
-  public URI asUri(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
-  }
-
-  public URI asUri(String paramName, String defaultValue) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asUri(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public DoubleFunction<Double> asLinearFunction(
-    String paramName,
-    DoubleFunction<Double> defaultValue
-  ) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asLinearFunction(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public ZoneId asZoneId(String paramName, ZoneId defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asZoneId(defaultValue);
-  }
-
-  // TODO: This method should be inlined
-
-  public Map<String, String> asStringMap(String paramName) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asStringMap();
   }
 
   /** List all present parameters by name */

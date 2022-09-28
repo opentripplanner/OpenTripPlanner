@@ -535,7 +535,8 @@ public class BuildConfig implements OtpDataStoreConfig {
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone
       // will just shift the period with one day, so the consequences is limited.
-      transitModelTimeZone = root.asZoneId("transitModelTimeZone", null);
+      transitModelTimeZone =
+        root.of("transitModelTimeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
       var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
       transitServiceStart =
         root
@@ -566,10 +567,26 @@ public class BuildConfig implements OtpDataStoreConfig {
       root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
 
     var localFileNamePatternsConfig = root.path("localFileNamePatterns");
-    gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
-    netexLocalFilePattern = localFileNamePatternsConfig.asPattern("netex", DEFAULT_NETEX_PATTERN);
-    osmLocalFilePattern = localFileNamePatternsConfig.asPattern("osm", DEFAULT_OSM_PATTERN);
-    demLocalFilePattern = localFileNamePatternsConfig.asPattern("dem", DEFAULT_DEM_PATTERN);
+    gtfsLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("gtfs")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_GTFS_PATTERN);
+    netexLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("netex")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_NETEX_PATTERN);
+    osmLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("osm")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_OSM_PATTERN);
+    demLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("dem")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_DEM_PATTERN);
 
     gsCredentials =
       root
@@ -577,9 +594,20 @@ public class BuildConfig implements OtpDataStoreConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null);
-    graph = root.asUri("graph", null);
-    streetGraph = root.asUri("streetGraph", null);
-    buildReportDir = root.asUri("buildReportDir", null);
+    graph =
+      root.of("graph").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(null);
+    streetGraph =
+      root
+        .of("streetGraph")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null);
+    buildReportDir =
+      root
+        .of("buildReportDir")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null);
 
     osm = new OsmExtractsConfig(root.path("osm"));
     dem = new DemExtractsConfig((root.path("dem")));

@@ -74,7 +74,11 @@ public class VehicleRentalSourceFactory {
   }
 
   private Map<String, String> headers() {
-    return c.asStringMap("headers");
+    return c
+      .of("headers")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asStringMap();
   }
 
   private String url() {

@@ -43,7 +43,12 @@ public class SpeedTestConfig {
         .of("testDate")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
-    graph = adapter.asUri("graph", null);
+    graph =
+      adapter
+        .of("graph")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null);
     feedId =
       adapter
         .of("feedId")

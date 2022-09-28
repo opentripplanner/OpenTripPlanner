@@ -13,7 +13,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     }
 
     return new VehicleRentalServiceDirectoryFetcherParameters(
-      c.asUri("url"),
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
       c
         .of("sourcesName")
         .withDoc(NA, /*TODO DOC*/"TODO")
@@ -34,7 +34,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null),
-      c.asStringMap("headers")
+      c.of("headers").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asStringMap()
     );
   }
 }

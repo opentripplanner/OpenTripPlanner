@@ -29,7 +29,8 @@ public class OsmExtractConfigBuilder {
 
   public static OsmExtractConfigBuilder of(NodeAdapter config) {
     OsmExtractConfigBuilder osmExtractConfigBuilder = new OsmExtractConfigBuilder();
-    osmExtractConfigBuilder.source = config.asUri("source");
+    osmExtractConfigBuilder.source =
+      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
     String osmTagMapping = config
       .of("osmTagMapping")
       .withDoc(NA, /*TODO DOC*/"TODO")
@@ -38,7 +39,8 @@ public class OsmExtractConfigBuilder {
     if (osmTagMapping != null) {
       osmExtractConfigBuilder.osmWayPropertySet = WayPropertySetSource.fromConfig(osmTagMapping);
     }
-    osmExtractConfigBuilder.timeZone = config.asZoneId("timeZone", null);
+    osmExtractConfigBuilder.timeZone =
+      config.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
     return osmExtractConfigBuilder;
   }
 

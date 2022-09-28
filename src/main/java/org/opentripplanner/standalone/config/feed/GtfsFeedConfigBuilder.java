@@ -15,7 +15,8 @@ public class GtfsFeedConfigBuilder {
 
   public static GtfsFeedConfigBuilder of(NodeAdapter config) {
     GtfsFeedConfigBuilder gtfsFeedConfigBuilder = new GtfsFeedConfigBuilder();
-    gtfsFeedConfigBuilder.source = config.asUri("source");
+    gtfsFeedConfigBuilder.source =
+      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
     gtfsFeedConfigBuilder.feedId =
       config
         .of("feedId")

@@ -439,7 +439,10 @@ public class RoutingRequestMapper {
     preferences
       .transit()
       .setUnpreferredCost(
-        c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredCost())
+        c
+          .of("unpreferredRouteCost")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asLinearFunction(preferences.transit().unpreferredCost())
       );
     request.vehicleRental =
       c.of("allowBikeRental").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.vehicleRental);

@@ -31,7 +31,11 @@ public class VehiclePositionsUpdaterConfig {
 
     switch (sourceType) {
       case GTFS_RT_VEHICLE_POSITIONS:
-        var url = c.asUri("url");
+        var url = c
+          .of("url")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asUri();
         return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequencySec);
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);

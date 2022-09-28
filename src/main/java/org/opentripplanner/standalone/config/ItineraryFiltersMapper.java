@@ -38,7 +38,10 @@ public class ItineraryFiltersMapper {
         c.path("transitGeneralizedCostLimit"),
         dft.transitGeneralizedCostLimit
       ),
-      c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),
+      c
+        .of("nonTransitGeneralizedCostLimit")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asLinearFunction(dft.nonTransitGeneralizedCostLimit),
       c
         .of("bikeRentalDistanceRatio")
         .withDoc(NA, /*TODO DOC*/"TODO")
@@ -69,7 +72,10 @@ public class ItineraryFiltersMapper {
 
     if (node.isObject()) {
       return new TransitGeneralizedCostFilterParams(
-        node.asLinearFunction("costLimitFunction", transitGeneralizedCostLimit.costLimitFunction()),
+        node
+          .of("costLimitFunction")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
         node
           .of("intervalRelaxFactor")
           .withDoc(NA, /*TODO DOC*/"TODO")

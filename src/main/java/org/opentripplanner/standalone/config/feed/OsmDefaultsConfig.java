@@ -34,7 +34,7 @@ public class OsmDefaultsConfig {
           .withExample(/*TODO DOC*/"TODO")
           .asString("default")
       ),
-      config.asZoneId("timeZone", null)
+      config.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null)
     );
   }
 

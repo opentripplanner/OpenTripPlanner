@@ -36,7 +36,7 @@ public class VehicleParkingUpdaterConfig {
       .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .asString(null);
-    var timeZone = c.asZoneId("timeZone", null);
+    var timeZone = c.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
     switch (sourceType) {
       case HSL_PARK:
         return new HslParkUpdaterParameters(
@@ -86,7 +86,11 @@ public class VehicleParkingUpdaterConfig {
             .asString(null),
           feedId,
           c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-          c.asStringMap("headers"),
+          c
+            .of("headers")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .asStringMap(),
           new ArrayList<>(
             Set.copyOf(
               c

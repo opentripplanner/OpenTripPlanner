@@ -501,8 +501,14 @@ public class NodeAdapterTest {
   @Test
   public void asPattern() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'Ab*a' }");
-    assertEquals("Ab*a", subject.asPattern("key", "ABC").toString());
-    assertEquals("ABC", subject.asPattern("missingField", "ABC").toString());
+    assertEquals(
+      "Ab*a",
+      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asPattern("ABC").toString()
+    );
+    assertEquals(
+      "ABC",
+      subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asPattern("ABC").toString()
+    );
   }
 
   @Test
@@ -510,17 +516,56 @@ public class NodeAdapterTest {
     var URL = "gs://bucket/a.obj";
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : '" + URL + "' }");
 
-    assertEquals(URL, subject.asUri("aUri").toString());
-    assertEquals(URL, subject.asUri("aUri", null).toString());
-    assertEquals("http://foo.bar/", subject.asUri("missingField", "http://foo.bar/").toString());
-    assertNull(subject.asUri("missingField", null));
+    assertEquals(
+      URL,
+      subject
+        .of("aUri")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri()
+        .toString()
+    );
+    assertEquals(
+      URL,
+      subject
+        .of("aUri")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null)
+        .toString()
+    );
+    assertEquals(
+      "http://foo.bar/",
+      subject
+        .of("missingField")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri("http://foo.bar/")
+        .toString()
+    );
+    assertNull(
+      subject
+        .of("missingField")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null)
+    );
   }
 
   @Test
   public void uriSyntaxException() {
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : 'error$%uri' }");
 
-    assertThrows(OtpAppException.class, () -> subject.asUri("aUri", null), "error$%uri");
+    assertThrows(
+      OtpAppException.class,
+      () ->
+        subject
+          .of("aUri")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asUri(null),
+      "error$%uri"
+    );
   }
 
   @Test
@@ -529,7 +574,8 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () -> subject.asUri("aUri"),
+      () ->
+        subject.of("aUri").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
       "Required parameter 'aUri' not found in 'Test'"
     );
   }
@@ -537,10 +583,26 @@ public class NodeAdapterTest {
   @Test
   public void uris() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : ['gs://a/b', 'gs://c/d'] }");
-    assertEquals("[gs://a/b, gs://c/d]", subject.asUris("foo").toString());
+    assertEquals(
+      "[gs://a/b, gs://c/d]",
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUris()
+        .toString()
+    );
 
     subject = newNodeAdapterForTest("{ }");
-    assertEquals("[]", subject.asUris("foo").toString());
+    assertEquals(
+      "[]",
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUris()
+        .toString()
+    );
   }
 
   @Test
@@ -549,7 +611,8 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () -> subject.asUris("uris"),
+      () ->
+        subject.of("uris").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUris(),
       "'uris': 'no array'" + "Source: Test"
     );
   }
@@ -573,8 +636,11 @@ public class NodeAdapterTest {
   @Test
   public void linearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '4+8x' }");
-    assertEquals("f(x) = 4.0 + 8.0 x", subject.asLinearFunction("key", null).toString());
-    assertNull(subject.asLinearFunction("no-key", null));
+    assertEquals(
+      "f(x) = 4.0 + 8.0 x",
+      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asLinearFunction(null).toString()
+    );
+    assertNull(subject.of("no-key").withDoc(NA, /*TODO DOC*/"TODO").asLinearFunction(null));
   }
 
   @Test
@@ -582,13 +648,25 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'UTC', key2 : 'Europe/Oslo', key3 : '+02:00', key4: 'invalid' }"
     );
-    assertEquals("UTC", subject.asZoneId("key1", null).getId());
-    assertEquals("Europe/Oslo", subject.asZoneId("key2", null).getId());
-    assertEquals("+02:00", subject.asZoneId("key3", null).getId());
+    assertEquals("UTC", subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null).getId());
+    assertEquals(
+      "Europe/Oslo",
+      subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null).getId()
+    );
+    assertEquals(
+      "+02:00",
+      subject.of("key3").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null).getId()
+    );
 
-    assertThrows(OtpAppException.class, () -> subject.asZoneId("key4", null));
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.of("key4").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null)
+    );
 
-    assertEquals(ZoneId.of("UTC"), subject.asZoneId("missing-key", ZoneId.of("UTC")));
+    assertEquals(
+      ZoneId.of("UTC"),
+      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(ZoneId.of("UTC"))
+    );
   }
 
   @Test
