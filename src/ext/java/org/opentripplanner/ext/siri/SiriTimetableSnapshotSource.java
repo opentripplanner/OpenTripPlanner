@@ -613,11 +613,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     var tripBuilder = Trip.of(tripId);
     tripBuilder.withRoute(route);
 
-    if (!route.getMode().equals(transitMode.first)) {
-      // Trip overrides default TransitMode specified in the Route - needs to be set on Trip
-      tripBuilder.withMode(transitMode.first);
-      tripBuilder.withNetexSubmode(transitMode.second);
-    }
+    // Explicitly set TransitMode on Trip - in case it differs from Route
+    tripBuilder.withMode(transitMode.first);
+    tripBuilder.withNetexSubmode(transitMode.second);
 
     LocalDate serviceDate = getServiceDateForEstimatedVehicleJourney(estimatedVehicleJourney);
 
