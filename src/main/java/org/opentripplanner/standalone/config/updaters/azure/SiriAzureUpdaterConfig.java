@@ -28,7 +28,7 @@ public abstract class SiriAzureUpdaterConfig {
     if (c.exist("history")) {
       NodeAdapter history = c.path("history");
       parameters.setDataInitializationUrl(history.asText("url", null));
-      parameters.setTimeout(history.asInt("timeout", 300000));
+      parameters.setTimeout(history.of("timeout").withDoc(NA, /*TODO DOC*/"TODO").asInt(300000));
     }
   }
 

@@ -12,9 +12,9 @@ public class GtfsRealtimeAlertsUpdaterConfig {
       configRef,
       c.asText("feedId", null),
       c.asText("url"),
-      c.asInt("earlyStartSec", 0),
+      c.of("earlyStartSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(0),
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.asInt("frequencySec", 60)
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60)
     );
   }
 }

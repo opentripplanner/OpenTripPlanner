@@ -33,11 +33,11 @@ public class VehicleParkingUpdaterConfig {
       case HSL_PARK:
         return new HslParkUpdaterParameters(
           updaterRef,
-          c.asInt("facilitiesFrequencySec", 3600),
+          c.of("facilitiesFrequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(3600),
           c.asText("facilitiesUrl", null),
           feedId,
           sourceType,
-          c.asInt("utilizationsFrequencySec", 600),
+          c.of("utilizationsFrequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(600),
           c.asText("utilizationsUrl", null),
           timeZone
         );
@@ -47,7 +47,7 @@ public class VehicleParkingUpdaterConfig {
           c.asText("url", null),
           feedId,
           c.asText("namePrefix", null),
-          c.asInt("frequencySec", 60),
+          c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
           c.of("zip").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
           sourceType
         );
@@ -57,7 +57,7 @@ public class VehicleParkingUpdaterConfig {
           updaterRef,
           c.asText("url", null),
           feedId,
-          c.asInt("frequencySec", 60),
+          c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
           c.asStringMap("headers"),
           new ArrayList<>(c.asTextSet("tags", Set.of())),
           sourceType,

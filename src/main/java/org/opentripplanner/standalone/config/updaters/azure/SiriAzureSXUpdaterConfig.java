@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters.azure;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -14,7 +16,7 @@ public class SiriAzureSXUpdaterConfig extends SiriAzureUpdaterConfig {
 
       String fromDateTime = history.asText("fromDateTime", "-P1D");
       String toDateTime = history.asText("toDateTime", "P1D");
-      int customMidnight = c.asInt("customMidnight", 0);
+      int customMidnight = c.of("customMidnight").withDoc(NA, /*TODO DOC*/"TODO").asInt(0);
 
       parameters.setFromDateTime(asDateOrRelativePeriod(fromDateTime, customMidnight));
       parameters.setToDateTime(asDateOrRelativePeriod(toDateTime, customMidnight));

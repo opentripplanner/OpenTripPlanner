@@ -31,9 +31,9 @@ public class PollingStoptimeUpdaterConfig {
 
     return new PollingStoptimeUpdaterParameters(
       configRef + ":" + sourceTypeStr,
-      c.asInt("frequencySec", 60),
-      c.asInt("logFrequency", -1),
-      c.asInt("maxSnapshotFrequencyMs", -1),
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
+      c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
+      c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA),

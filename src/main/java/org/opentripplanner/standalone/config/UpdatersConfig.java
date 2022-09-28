@@ -129,8 +129,11 @@ public class UpdatersConfig implements UpdatersParameters {
       return dflt;
     }
     return new TimetableSnapshotSourceParameters(
-      c.asInt("logFrequency", dflt.logFrequency()),
-      c.asInt("maxSnapshotFrequency", dflt.maxSnapshotFrequencyMs()),
+      c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(dflt.logFrequency()),
+      c
+        .of("maxSnapshotFrequency")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dflt.maxSnapshotFrequencyMs()),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dflt.purgeExpiredData())
     );
   }

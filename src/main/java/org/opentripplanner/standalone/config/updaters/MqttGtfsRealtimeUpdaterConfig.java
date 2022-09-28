@@ -14,7 +14,7 @@ public class MqttGtfsRealtimeUpdaterConfig {
       c.asText("feedId", null),
       c.asText("url"),
       c.asText("topic"),
-      c.asInt("qos", 0),
+      c.of("qos").withDoc(NA, /*TODO DOC*/"TODO").asInt(0),
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );

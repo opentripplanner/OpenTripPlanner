@@ -12,15 +12,15 @@ public class SiriETUpdaterConfig {
     return new SiriETUpdaterParameters(
       configRef,
       c.asText("feedId", null),
-      c.asInt("logFrequency", -1),
-      c.asInt("maxSnapshotFrequencyMs", -1),
+      c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
+      c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.of("blockReadinessUntilInitialized").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.asText("url"),
-      c.asInt("frequencySec", 60),
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
       c.asText("requestorRef", "otp-" + UUID.randomUUID()),
-      c.asInt("timeoutSec", -1),
-      c.asInt("previewIntervalMinutes", -1)
+      c.of("timeoutSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
+      c.of("previewIntervalMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
     );
   }
 }

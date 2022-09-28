@@ -29,16 +29,31 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   public TransitRoutingConfig(NodeAdapter c) {
     RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
-    this.maxNumberOfTransfers = c.asInt("maxNumberOfTransfers", dft.maxNumberOfTransfers());
+    this.maxNumberOfTransfers =
+      c
+        .of("maxNumberOfTransfers")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.maxNumberOfTransfers());
     this.scheduledTripBinarySearchThreshold =
-      c.asInt("scheduledTripBinarySearchThreshold", dft.scheduledTripBinarySearchThreshold());
+      c
+        .of("scheduledTripBinarySearchThreshold")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.scheduledTripBinarySearchThreshold());
     this.iterationDepartureStepInSeconds =
-      c.asInt("iterationDepartureStepInSeconds", dft.iterationDepartureStepInSeconds());
-    this.searchThreadPoolSize = c.asInt("searchThreadPoolSize", dft.searchThreadPoolSize());
+      c
+        .of("iterationDepartureStepInSeconds")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.iterationDepartureStepInSeconds());
+    this.searchThreadPoolSize =
+      c
+        .of("searchThreadPoolSize")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.searchThreadPoolSize());
     // Dynamic Search Window
     this.stopTransferCost =
       c.asEnumMapAllKeysRequired("stopTransferCost", StopTransferPriority.class, Integer.class);
-    this.transferCacheMaxSize = c.asInt("transferCacheMaxSize", 25);
+    this.transferCacheMaxSize =
+      c.of("transferCacheMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(25);
 
     this.pagingSearchWindowAdjustments =
       c.asDurations("pagingSearchWindowAdjustments", PAGING_SEARCH_WINDOW_ADJUSTMENTS);
@@ -112,9 +127,18 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
           .of("minWaitTimeCoefficient")
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asDouble(dsWinDft.minWaitTimeCoefficient());
-      this.minWinTimeMinutes = dsWin.asInt("minWinTimeMinutes", dsWinDft.minWinTimeMinutes());
-      this.maxWinTimeMinutes = dsWin.asInt("maxWinTimeMinutes", dsWinDft.maxWinTimeMinutes());
-      this.stepMinutes = dsWin.asInt("stepMinutes", dsWinDft.stepMinutes());
+      this.minWinTimeMinutes =
+        dsWin
+          .of("minWinTimeMinutes")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(dsWinDft.minWinTimeMinutes());
+      this.maxWinTimeMinutes =
+        dsWin
+          .of("maxWinTimeMinutes")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(dsWinDft.maxWinTimeMinutes());
+      this.stepMinutes =
+        dsWin.of("stepMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(dsWinDft.stepMinutes());
     }
 
     @Override

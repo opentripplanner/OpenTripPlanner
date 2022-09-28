@@ -492,12 +492,16 @@ public class BuildConfig implements OtpDataStoreConfig {
       root.of("extraEdgesStopPlatformLink").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     includeEllipsoidToGeoidDifference =
       root.of("includeEllipsoidToGeoidDifference").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    pruningThresholdIslandWithStops = root.asInt("islandWithStopsMaxSize", 5);
-    pruningThresholdIslandWithoutStops = root.asInt("islandWithoutStopsMaxSize", 40);
+    pruningThresholdIslandWithStops =
+      root.of("islandWithStopsMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(5);
+    pruningThresholdIslandWithoutStops =
+      root.of("islandWithoutStopsMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(40);
     matchBusRoutesToStreets =
       root.of("matchBusRoutesToStreets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    maxDataImportIssuesPerFile = root.asInt("maxDataImportIssuesPerFile", 1000);
-    maxInterlineDistance = root.asInt("maxInterlineDistance", 200);
+    maxDataImportIssuesPerFile =
+      root.of("maxDataImportIssuesPerFile").withDoc(NA, /*TODO DOC*/"TODO").asInt(1000);
+    maxInterlineDistance =
+      root.of("maxInterlineDistance").withDoc(NA, /*TODO DOC*/"TODO").asInt(200);
     blockBasedInterlining =
       root.of("blockBasedInterlining").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     maxTransferDurationSeconds =
@@ -539,8 +543,9 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     writeCachedElevations =
       root.of("writeCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    maxAreaNodes = root.asInt("maxAreaNodes", 500);
-    maxElevationPropagationMeters = root.asInt("maxElevationPropagationMeters", 2000);
+    maxAreaNodes = root.of("maxAreaNodes").withDoc(NA, /*TODO DOC*/"TODO").asInt(500);
+    maxElevationPropagationMeters =
+      root.of("maxElevationPropagationMeters").withDoc(NA, /*TODO DOC*/"TODO").asInt(2000);
     boardingLocationTags = root.asTextSet("boardingLocationTags", Set.of("ref"));
     discardMinTransferTimes =
       root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);

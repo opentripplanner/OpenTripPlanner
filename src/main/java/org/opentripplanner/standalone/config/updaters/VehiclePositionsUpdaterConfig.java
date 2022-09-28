@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -18,7 +20,7 @@ public class VehiclePositionsUpdaterConfig {
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = c.asEnum("sourceType", DataSourceType.class);
     var feedId = c.asText("feedId");
-    var frequencySec = c.asInt("frequencySec", 60);
+    var frequencySec = c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60);
 
     switch (sourceType) {
       case GTFS_RT_VEHICLE_POSITIONS:

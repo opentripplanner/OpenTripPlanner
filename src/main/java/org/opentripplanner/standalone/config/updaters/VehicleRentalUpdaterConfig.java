@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.updaters.sources.VehicleRentalSourceFactory;
 import org.opentripplanner.updater.DataSourceType;
@@ -11,7 +13,7 @@ public class VehicleRentalUpdaterConfig {
     var sourceType = c.asEnum("sourceType", DataSourceType.class);
     return new VehicleRentalUpdaterParameters(
       configRef + "." + sourceType,
-      c.asInt("frequencySec", 60),
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
       VehicleRentalSourceFactory.create(sourceType, c)
     );
   }

@@ -164,21 +164,6 @@ public class NodeAdapter {
   }
 
   /** TODO: Inline this */
-  public int asInt(String paramName, int defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asInt(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public int asInt(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asInt();
-  }
-
-  /** TODO: Inline this */
-  public long asLong(String paramName, long defaultValue) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asLong(defaultValue);
-  }
-
-  /** TODO: Inline this */
   public String asText(String paramName, String defaultValue) {
     return of(paramName)
       .withDoc(NA, /*TODO DOC*/"TODO")

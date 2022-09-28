@@ -61,9 +61,11 @@ public class RoutingRequestMapper {
       bike.setReluctance(
         c.of("bikeReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(bike.reluctance())
       );
-      bike.setBoardCost(c.asInt("bikeBoardCost", bike.boardCost()));
-      bike.setParkTime(c.asInt("bikeParkTime", bike.parkTime()));
-      bike.setParkCost(c.asInt("bikeParkCost", bike.parkCost()));
+      bike.setBoardCost(
+        c.of("bikeBoardCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(bike.boardCost())
+      );
+      bike.setParkTime(c.of("bikeParkTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(bike.parkTime()));
+      bike.setParkCost(c.of("bikeParkCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(bike.parkCost()));
       bike.setWalkingSpeed(
         c.of("bikeWalkingSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(bike.walkingSpeed())
       );
@@ -73,8 +75,12 @@ public class RoutingRequestMapper {
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asDouble(bike.walkingReluctance())
       );
-      bike.setSwitchTime(c.asInt("bikeSwitchTime", bike.switchTime()));
-      bike.setSwitchCost(c.asInt("bikeSwitchCost", bike.switchCost()));
+      bike.setSwitchTime(
+        c.of("bikeSwitchTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(bike.switchTime())
+      );
+      bike.setSwitchCost(
+        c.of("bikeSwitchCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(bike.switchCost())
+      );
       bike.setOptimizeType(c.asEnum("optimize", bike.optimizeType()));
 
       bike.withOptimizeTriangle(it ->
@@ -93,16 +99,36 @@ public class RoutingRequestMapper {
 
     preferences
       .rental()
-      .setDropoffCost(c.asInt("bikeRentalDropoffCost", preferences.rental().dropoffCost()));
+      .setDropoffCost(
+        c
+          .of("bikeRentalDropoffCost")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.rental().dropoffCost())
+      );
     preferences
       .rental()
-      .setDropoffTime(c.asInt("bikeRentalDropoffTime", preferences.rental().dropoffTime()));
+      .setDropoffTime(
+        c
+          .of("bikeRentalDropoffTime")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.rental().dropoffTime())
+      );
     preferences
       .rental()
-      .setPickupCost(c.asInt("bikeRentalPickupCost", preferences.rental().pickupCost()));
+      .setPickupCost(
+        c
+          .of("bikeRentalPickupCost")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.rental().pickupCost())
+      );
     preferences
       .rental()
-      .setPickupTime(c.asInt("bikeRentalPickupTime", preferences.rental().pickupTime()));
+      .setPickupTime(
+        c
+          .of("bikeRentalPickupTime")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.rental().pickupTime())
+      );
     request
       .journey()
       .rental()
@@ -152,11 +178,34 @@ public class RoutingRequestMapper {
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asDouble(preferences.car().decelerationSpeed())
       );
-    preferences.car().setDropoffTime(c.asInt("carDropoffTime", preferences.car().dropoffTime()));
-    preferences.car().setParkCost(c.asInt("carParkCost", preferences.car().parkCost()));
-    preferences.car().setParkTime(c.asInt("carParkTime", preferences.car().parkTime()));
-    preferences.car().setPickupCost(c.asInt("carPickupCost", preferences.car().pickupCost()));
-    preferences.car().setPickupTime(c.asInt("carPickupTime", preferences.car().pickupTime()));
+    preferences
+      .car()
+      .setDropoffTime(
+        c
+          .of("carDropoffTime")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.car().dropoffTime())
+      );
+    preferences
+      .car()
+      .setParkCost(
+        c.of("carParkCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(preferences.car().parkCost())
+      );
+    preferences
+      .car()
+      .setParkTime(
+        c.of("carParkTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(preferences.car().parkTime())
+      );
+    preferences
+      .car()
+      .setPickupCost(
+        c.of("carPickupCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(preferences.car().pickupCost())
+      );
+    preferences
+      .car()
+      .setPickupTime(
+        c.of("carPickupTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(preferences.car().pickupTime())
+      );
     preferences
       .car()
       .setReluctance(
@@ -184,16 +233,36 @@ public class RoutingRequestMapper {
       );
     preferences
       .street()
-      .setElevatorBoardCost(c.asInt("elevatorBoardCost", preferences.street().elevatorBoardCost()));
+      .setElevatorBoardCost(
+        c
+          .of("elevatorBoardCost")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.street().elevatorBoardCost())
+      );
     preferences
       .street()
-      .setElevatorBoardTime(c.asInt("elevatorBoardTime", preferences.street().elevatorBoardTime()));
+      .setElevatorBoardTime(
+        c
+          .of("elevatorBoardTime")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.street().elevatorBoardTime())
+      );
     preferences
       .street()
-      .setElevatorHopCost(c.asInt("elevatorHopCost", preferences.street().elevatorHopCost()));
+      .setElevatorHopCost(
+        c
+          .of("elevatorHopCost")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.street().elevatorHopCost())
+      );
     preferences
       .street()
-      .setElevatorHopTime(c.asInt("elevatorHopTime", preferences.street().elevatorHopTime()));
+      .setElevatorHopTime(
+        c
+          .of("elevatorHopTime")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.street().elevatorHopTime())
+      );
     preferences
       .system()
       .setGeoidElevation(
@@ -243,16 +312,21 @@ public class RoutingRequestMapper {
     preferences
       .transfer()
       .setNonpreferredCost(
-        c.asInt("nonpreferredTransferPenalty", preferences.transfer().nonpreferredCost())
+        c
+          .of("nonpreferredTransferPenalty")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.transfer().nonpreferredCost())
       );
-    request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
+    request.setNumItineraries(
+      c.of("numItineraries").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.numItineraries())
+    );
     preferences
       .transit()
       .setOtherThanPreferredRoutesPenalty(
-        c.asInt(
-          "otherThanPreferredRoutesPenalty",
-          preferences.transit().otherThanPreferredRoutesPenalty()
-        )
+        c
+          .of("otherThanPreferredRoutesPenalty")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(preferences.transit().otherThanPreferredRoutesPenalty())
       );
     request.parkAndRide =
       c.of("parkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.parkAndRide);
@@ -261,8 +335,16 @@ public class RoutingRequestMapper {
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
 
-    preferences.transfer().setCost(c.asInt("transferPenalty", preferences.transfer().cost()));
-    preferences.transfer().setSlack(c.asInt("transferSlack", preferences.transfer().slack()));
+    preferences
+      .transfer()
+      .setCost(
+        c.of("transferPenalty").withDoc(NA, /*TODO DOC*/"TODO").asInt(preferences.transfer().cost())
+      );
+    preferences
+      .transfer()
+      .setSlack(
+        c.of("transferSlack").withDoc(NA, /*TODO DOC*/"TODO").asInt(preferences.transfer().slack())
+      );
     preferences
       .transit()
       .setReluctanceForMode(
@@ -320,7 +402,9 @@ public class RoutingRequestMapper {
       walk.setReluctance(
         c.of("walkReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.reluctance())
       );
-      walk.setBoardCost(c.asInt("walkBoardCost", walk.boardCost()));
+      walk.setBoardCost(
+        c.of("walkBoardCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(walk.boardCost())
+      );
       walk.setStairsReluctance(
         c.of("stairsReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(walk.stairsReluctance())
       );

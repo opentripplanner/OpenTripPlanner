@@ -15,7 +15,7 @@ public class SiriETGooglePubsubUpdaterConfig {
       c.asText("projectName"),
       c.asText("topicName"),
       c.asText("dataInitializationUrl", null),
-      c.asInt("reconnectPeriodSec", 30),
+      c.of("reconnectPeriodSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(30),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
     );
   }

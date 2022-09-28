@@ -83,15 +83,15 @@ public class NodeAdapterTest {
   @Test
   public void asInt() {
     NodeAdapter subject = newNodeAdapterForTest("{ aInt : 5 }");
-    assertEquals(5, subject.asInt("aInt", -1));
-    assertEquals(-1, subject.asInt("missingField", -1));
+    assertEquals(5, subject.of("aInt").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1));
+    assertEquals(-1, subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1));
   }
 
   @Test
   public void asLong() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 5 }");
-    assertEquals(5, subject.asLong("key", -1));
-    assertEquals(-1, subject.asLong("missingField", -1));
+    assertEquals(5, subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asLong(-1));
+    assertEquals(-1, subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asLong(-1));
   }
 
   @Test

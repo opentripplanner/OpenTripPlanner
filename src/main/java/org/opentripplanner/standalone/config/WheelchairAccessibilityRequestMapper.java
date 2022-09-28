@@ -36,8 +36,11 @@ public class WheelchairAccessibilityRequestMapper {
       .withDoc(NA, /*TODO DOC*/"TODO")
       .asBoolean(defaultValue.onlyConsiderAccessible());
 
-    var unknownCost = adapter.asInt("unknownCost", 60 * 10);
-    var inaccessibleCost = adapter.asInt("inaccessibleCost", 60 * 60);
+    var unknownCost = adapter.of("unknownCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(60 * 10);
+    var inaccessibleCost = adapter
+      .of("inaccessibleCost")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asInt(60 * 60);
     if (onlyAccessible) {
       return AccessibilityPreferences.ofOnlyAccessible();
     } else {

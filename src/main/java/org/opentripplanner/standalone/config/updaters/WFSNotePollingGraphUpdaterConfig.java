@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 
@@ -10,7 +12,7 @@ public class WFSNotePollingGraphUpdaterConfig {
       configRef,
       c.asText("url"),
       c.asText("featureType"),
-      c.asInt("frequencySec", 60)
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60)
     );
   }
 }
