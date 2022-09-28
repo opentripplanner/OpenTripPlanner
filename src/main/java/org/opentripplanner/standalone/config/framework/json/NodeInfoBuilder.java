@@ -62,10 +62,6 @@ class NodeInfoBuilder {
     return this;
   }
 
-  public boolean exampleValueSet() {
-    return exampleValue != null;
-  }
-
   NodeInfoBuilder withExample(Object exampleValue) {
     this.exampleValue = exampleValue;
     return this;

@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.framework.json;
 
+import static java.time.temporal.ChronoUnit.DECADES;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -7,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
@@ -52,93 +54,80 @@ public class NodeAdapterTest {
   }
 
   @Test
+  public void docInfo() {
+    NodeAdapter subject = newNodeAdapterForTest("{ bool: false }");
+    subject.of("bool").withDoc(V2_0, "B Summary").withDescription("Ddd").asBoolean();
+    subject.of("en").withDoc(V2_1, "EN Summary").withExample(DECADES).asEnum(SECONDS);
+    subject.of("em").withDoc(V2_1, "EM Summary").asEnumMap(ChronoUnit.class, String.class);
+
+    List<NodeInfo> infos = subject.parametersSorted();
+    assertEquals(
+      "[" +
+      "bool : boolean Required Since 2.0, " +
+      "em : enum map of string Optional Since 2.1, " +
+      "en : enum = \"SECONDS\" Since 2.1" +
+      "]",
+      infos.toString()
+    );
+    assertEquals("bool", infos.get(0).name());
+    assertEquals(null, infos.get(0).defaultValue());
+    assertEquals("B Summary", infos.get(0).summary());
+    assertEquals("Ddd", infos.get(0).description());
+    assertEquals(BOOLEAN, infos.get(0).type());
+    assertEquals("{NANOS : \"A String\"}", infos.get(1).exampleValueJson());
+    assertEquals(DECADES, infos.get(2).exampleValue());
+  }
+
+  @Test
   public void asBoolean() {
     NodeAdapter subject = newNodeAdapterForTest("{ aBoolean : true }");
-    assertTrue(subject.of("aBoolean").withDoc(NA, /*TODO DOC*/"TODO").asBoolean());
-    assertTrue(subject.of("aBoolean").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false));
-    assertFalse(subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false));
+    assertTrue(subject.of("aBoolean").asBoolean());
+    assertTrue(subject.of("aBoolean").asBoolean(false));
+    assertFalse(subject.of("missingField").asBoolean(false));
   }
 
   @Test
   public void asDouble() {
     NodeAdapter subject = newNodeAdapterForTest("{ aDouble : 7.0 }");
-    assertEquals(7.0, subject.of("aDouble").withDoc(NA, /*TODO DOC*/"TODO").asDouble(-1d), 0.01);
-    assertEquals(7.0, subject.of("aDouble").withDoc(NA, /*TODO DOC*/"TODO").asDouble(), 0.01);
-    assertEquals(
-      -1d,
-      subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asDouble(-1d),
-      00.1
-    );
+    assertEquals(7.0, subject.of("aDouble").asDouble(-1d), 0.01);
+    assertEquals(7.0, subject.of("aDouble").asDouble(), 0.01);
+    assertEquals(-1d, subject.of("missingField").asDouble(-1d), 00.1);
   }
 
   @Test
   public void asDoubles() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 2.0, 3.0, 5.0 ] }");
-    assertEquals(
-      List.of(2d, 3d, 5d),
-      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asDoubles(null)
-    );
+    assertEquals(List.of(2d, 3d, 5d), subject.of("key").asDoubles(null));
   }
 
   @Test
   public void asInt() {
     NodeAdapter subject = newNodeAdapterForTest("{ aInt : 5 }");
-    assertEquals(5, subject.of("aInt").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1));
-    assertEquals(-1, subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1));
+    assertEquals(5, subject.of("aInt").asInt(-1));
+    assertEquals(-1, subject.of("missingField").asInt(-1));
   }
 
   @Test
   public void asLong() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 5 }");
-    assertEquals(5, subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asLong(-1));
-    assertEquals(-1, subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asLong(-1));
+    assertEquals(5, subject.of("key").asLong(-1));
+    assertEquals(-1, subject.of("missingField").asLong(-1));
   }
 
   @Test
   public void asText() {
     NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
-    assertEquals(
-      "TEXT",
-      subject
-        .of("aText")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString("DEFAULT")
-    );
-    assertEquals(
-      "DEFAULT",
-      subject
-        .of("missingField")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString("DEFAULT")
-    );
-    assertNull(
-      subject
-        .of("missingField")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null)
-    );
+    assertEquals("TEXT", subject.of("aText").asString("DEFAULT"));
+    assertEquals("DEFAULT", subject.of("missingField").asString("DEFAULT"));
+    assertNull(subject.of("missingField").asString(null));
 
-    assertEquals(
-      "TEXT",
-      subject.of("aText").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
-    );
+    assertEquals("TEXT", subject.of("aText").asString());
   }
 
   @Test
   public void requiredAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    assertThrows(
-      OtpAppException.class,
-      () ->
-        subject
-          .of("missingField")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asString()
-    );
+    assertThrows(OtpAppException.class, () -> subject.of("missingField").asString());
   }
 
   @Test
@@ -153,21 +142,9 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A' }");
 
     // Then
-    assertEquals(
-      AnEnum.A,
-      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.B),
-      "Get existing property"
-    );
-    assertEquals(
-      AnEnum.B,
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.B),
-      "Get default value"
-    );
-    assertEquals(
-      AnEnum.A,
-      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.class),
-      "Get existing property"
-    );
+    assertEquals(AnEnum.A, subject.of("key").asEnum(AnEnum.B), "Get existing property");
+    assertEquals(AnEnum.B, subject.of("missing-key").asEnum(AnEnum.B), "Get default value");
+    assertEquals(AnEnum.A, subject.of("key").asEnum(AnEnum.class), "Get existing property");
   }
 
   @Test
@@ -177,10 +154,7 @@ public class NodeAdapterTest {
 
     // Then expect an error when value 'NONE_EXISTING_ENUM_VALUE' is not in the set of legal
     // values: ['A', 'B', 'C']
-    assertThrows(
-      OtpAppException.class,
-      () -> subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asEnum(AnEnum.B)
-    );
+    assertThrows(OtpAppException.class, () -> subject.of("key").asEnum(AnEnum.B));
   }
 
   @Test
@@ -189,33 +163,18 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false),
-      subject
-        .of("key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumMap(AnEnum.class, Boolean.class)
+      subject.of("key").asEnumMap(AnEnum.class, Boolean.class)
     );
     assertEquals(
       Collections.<AnEnum, Boolean>emptyMap(),
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumMap(AnEnum.class, Boolean.class)
+      subject.of("missing-key").asEnumMap(AnEnum.class, Boolean.class)
     );
   }
 
   @Test
   public void asEnumMapWithUnknownValue() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { unknown : 7 } }");
-    assertEquals(
-      Map.<AnEnum, Double>of(),
-      subject
-        .of("key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumMap(AnEnum.class, Double.class)
-    );
+    assertEquals(Map.<AnEnum, Double>of(), subject.of("key").asEnumMap(AnEnum.class, Double.class));
 
     // Assert unknown parameter is logged at warning level and with full pathname
     var buf = new StringBuilder();
@@ -229,19 +188,9 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false, C: true } }");
     assertEquals(
       Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.C, true),
-      subject
-        .of("key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+      subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
-    assertNull(
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
-    );
+    assertNull(subject.of("missing-key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class));
   }
 
   @Test
@@ -251,93 +200,42 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () ->
-        subject
-          .of("key")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+      () -> subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
   }
 
   @Test
   public void asEnumSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 'A', 'B' ] }");
-    assertEquals(
-      Set.of(AnEnum.A, AnEnum.B),
-      subject
-        .of("key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumSet(AnEnum.class)
-    );
-    assertEquals(
-      Set.of(),
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumSet(AnEnum.class)
-    );
+    assertEquals(Set.of(AnEnum.A, AnEnum.B), subject.of("key").asEnumSet(AnEnum.class));
+    assertEquals(Set.of(), subject.of("missing-key").asEnumSet(AnEnum.class));
   }
 
   @Test
   public void asEnumSetFailsUsingWrongFormat() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A,B' }");
-    assertThrows(
-      OtpAppException.class,
-      () ->
-        subject
-          .of("key")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asEnumSet(AnEnum.class)
-    );
+    assertThrows(OtpAppException.class, () -> subject.of("key").asEnumSet(AnEnum.class));
   }
 
   @Test
   public void asFeedScopedId() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1: 'A:23', key2: 'B:12' }");
-    assertEquals(
-      "A:23",
-      subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString()
-    );
-    assertEquals(
-      "B:12",
-      subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedId(null).toString()
-    );
+    assertEquals("A:23", subject.of("key1").asFeedScopedId(null).toString());
+    assertEquals("B:12", subject.of("key2").asFeedScopedId(null).toString());
     assertEquals(
       "C:12",
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asFeedScopedId(new FeedScopedId("C", "12"))
-        .toString()
+      subject.of("missing-key").asFeedScopedId(new FeedScopedId("C", "12")).toString()
     );
   }
 
   @Test
   public void asFeedScopedIds() {
     NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12']}");
-    assertEquals(
-      "[A:23, B:12]",
-      subject.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of()).toString()
-    );
-    assertEquals(
-      "[]",
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asFeedScopedIds(List.of())
-        .toString()
-    );
+    assertEquals("[A:23, B:12]", subject.of("routes").asFeedScopedIds(List.of()).toString());
+    assertEquals("[]", subject.of("missing-key").asFeedScopedIds(List.of()).toString());
     assertEquals(
       "[C:12]",
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asFeedScopedIds(List.of(new FeedScopedId("C", "12")))
-        .toString()
+      subject.of("missing-key").asFeedScopedIds(List.of(new FeedScopedId("C", "12"))).toString()
     );
   }
 
@@ -350,7 +248,7 @@ public class NodeAdapterTest {
         new FeedScopedId("B", "12"),
         new FeedScopedId("A", "23")
       ),
-      subject.of("routes").withDoc(NA, /*TODO DOC*/"TODO").asFeedScopedIds(List.of())
+      subject.of("routes").asFeedScopedIds(List.of())
     );
   }
 
@@ -361,25 +259,14 @@ public class NodeAdapterTest {
     var utc = ZoneId.of("UTC");
 
     // Then
-    assertEquals(
-      LocalDate.of(2020, 2, 28),
-      subject.of("a").withDoc(NA, /*TODO DOC*/"TODO").asDateOrRelativePeriod(null, utc)
-    );
+    assertEquals(LocalDate.of(2020, 2, 28), subject.of("a").asDateOrRelativePeriod(null, utc));
 
-    assertEquals(
-      LocalDate.now().minusYears(3),
-      subject.of("b").withDoc(NA, /*TODO DOC*/"TODO").asDateOrRelativePeriod(null, utc)
-    );
+    assertEquals(LocalDate.now().minusYears(3), subject.of("b").asDateOrRelativePeriod(null, utc));
     assertEquals(
       LocalDate.of(2020, 3, 1),
-      subject
-        .of("do-no-exist")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDateOrRelativePeriod("2020-03-01", utc)
+      subject.of("do-no-exist").asDateOrRelativePeriod("2020-03-01", utc)
     );
-    assertNull(
-      subject.of("do-no-exist").withDoc(NA, /*TODO DOC*/"TODO").asDateOrRelativePeriod(null, utc)
-    );
+    assertNull(subject.of("do-no-exist").asDateOrRelativePeriod(null, utc));
   }
 
   @Test
@@ -390,11 +277,7 @@ public class NodeAdapterTest {
     // Then
     assertThrows(
       OtpAppException.class,
-      () ->
-        subject
-          .of("foo")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asDateOrRelativePeriod(null, ZoneId.systemDefault())
+      () -> subject.of("foo").asDateOrRelativePeriod(null, ZoneId.systemDefault())
     );
   }
 
@@ -403,76 +286,34 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ k1:'PT1s', k2:'3h2m1s', k3:7 }");
 
     // as required duration
-    assertEquals("PT1S", subject.of("k1").withDoc(NA, /*TODO DOC*/"TODO").asDuration().toString());
-    assertEquals(
-      "PT3H2M1S",
-      subject.of("k2").withDoc(NA, /*TODO DOC*/"TODO").asDuration().toString()
-    );
+    assertEquals("PT1S", subject.of("k1").asDuration().toString());
+    assertEquals("PT3H2M1S", subject.of("k2").asDuration().toString());
 
     // as optional duration
-    assertEquals(
-      "PT1S",
-      subject.of("k1").withDoc(NA, /*TODO DOC*/"TODO").asDuration(null).toString()
-    );
-    assertEquals(
-      "PT3H",
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asDuration(D3h).toString()
-    );
+    assertEquals("PT1S", subject.of("k1").asDuration(null).toString());
+    assertEquals("PT3H", subject.of("missing-key").asDuration(D3h).toString());
 
     // as required duration v2 (with unit)
-    assertEquals("PT1S", subject.of("k1").withDoc(NA, /*TODO DOC*/"TODO").asDuration().toString());
-    assertEquals(
-      "PT7S",
-      subject.of("k3").withDoc(NA, /*TODO DOC*/"TODO").asDuration2(ChronoUnit.SECONDS).toString()
-    );
+    assertEquals("PT1S", subject.of("k1").asDuration().toString());
+    assertEquals("PT7S", subject.of("k3").asDuration2(SECONDS).toString());
 
     // as optional duration v2 (with unit)
-    assertEquals(
-      "PT1S",
-      subject
-        .of("k1")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDuration2(null, ChronoUnit.SECONDS)
-        .toString()
-    );
-    assertEquals(
-      "PT7S",
-      subject
-        .of("k3")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDuration2(null, ChronoUnit.SECONDS)
-        .toString()
-    );
-    assertEquals(
-      "PT3H",
-      subject
-        .of("missing-key")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDuration2(D3h, ChronoUnit.SECONDS)
-        .toString()
-    );
+    assertEquals("PT1S", subject.of("k1").asDuration2(null, SECONDS).toString());
+    assertEquals("PT7S", subject.of("k3").asDuration2(null, SECONDS).toString());
+    assertEquals("PT3H", subject.of("missing-key").asDuration2(D3h, SECONDS).toString());
   }
 
   @Test
   public void requiredAsDuration() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    assertThrows(
-      OtpAppException.class,
-      () -> subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asDuration()
-    );
+    assertThrows(OtpAppException.class, () -> subject.of("missingField").asDuration());
   }
 
   @Test
   public void asDurations() {
     NodeAdapter subject = newNodeAdapterForTest("{ key1 : ['PT1s', '2h'] }");
-    assertEquals(
-      "[PT1S, PT2H]",
-      subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asDurations(List.of()).toString()
-    );
-    assertEquals(
-      "[PT3H]",
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asDurations(List.of(D3h)).toString()
-    );
+    assertEquals("[PT1S, PT2H]", subject.of("key1").asDurations(List.of()).toString());
+    assertEquals("[PT3H]", subject.of("missing-key").asDurations(List.of(D3h)).toString());
   }
 
   @Test
@@ -480,35 +321,17 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'no', key2 : 'no_NO', key3 : 'no_NO_NY' }"
     );
-    assertEquals(
-      "no",
-      subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString()
-    );
-    assertEquals(
-      "no_NO",
-      subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString()
-    );
-    assertEquals(
-      "no_NO_NY",
-      subject.of("key3").withDoc(NA, /*TODO DOC*/"TODO").asLocale(null).toString()
-    );
-    assertEquals(
-      Locale.FRANCE,
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asLocale(Locale.FRANCE)
-    );
+    assertEquals("no", subject.of("key1").asLocale(null).toString());
+    assertEquals("no_NO", subject.of("key2").asLocale(null).toString());
+    assertEquals("no_NO_NY", subject.of("key3").asLocale(null).toString());
+    assertEquals(Locale.FRANCE, subject.of("missing-key").asLocale(Locale.FRANCE));
   }
 
   @Test
   public void asPattern() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'Ab*a' }");
-    assertEquals(
-      "Ab*a",
-      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asPattern("ABC").toString()
-    );
-    assertEquals(
-      "ABC",
-      subject.of("missingField").withDoc(NA, /*TODO DOC*/"TODO").asPattern("ABC").toString()
-    );
+    assertEquals("Ab*a", subject.of("key").asPattern("ABC").toString());
+    assertEquals("ABC", subject.of("missingField").asPattern("ABC").toString());
   }
 
   @Test
@@ -516,56 +339,17 @@ public class NodeAdapterTest {
     var URL = "gs://bucket/a.obj";
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : '" + URL + "' }");
 
-    assertEquals(
-      URL,
-      subject
-        .of("aUri")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri()
-        .toString()
-    );
-    assertEquals(
-      URL,
-      subject
-        .of("aUri")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri(null)
-        .toString()
-    );
-    assertEquals(
-      "http://foo.bar/",
-      subject
-        .of("missingField")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri("http://foo.bar/")
-        .toString()
-    );
-    assertNull(
-      subject
-        .of("missingField")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri(null)
-    );
+    assertEquals(URL, subject.of("aUri").asUri().toString());
+    assertEquals(URL, subject.of("aUri").asUri(null).toString());
+    assertEquals("http://foo.bar/", subject.of("missingField").asUri("http://foo.bar/").toString());
+    assertNull(subject.of("missingField").asUri(null));
   }
 
   @Test
   public void uriSyntaxException() {
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : 'error$%uri' }");
 
-    assertThrows(
-      OtpAppException.class,
-      () ->
-        subject
-          .of("aUri")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asUri(null),
-      "error$%uri"
-    );
+    assertThrows(OtpAppException.class, () -> subject.of("aUri").asUri(null), "error$%uri");
   }
 
   @Test
@@ -574,8 +358,7 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () ->
-        subject.of("aUri").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
+      () -> subject.of("aUri").asUri(),
       "Required parameter 'aUri' not found in 'Test'"
     );
   }
@@ -583,26 +366,10 @@ public class NodeAdapterTest {
   @Test
   public void uris() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : ['gs://a/b', 'gs://c/d'] }");
-    assertEquals(
-      "[gs://a/b, gs://c/d]",
-      subject
-        .of("foo")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUris()
-        .toString()
-    );
+    assertEquals("[gs://a/b, gs://c/d]", subject.of("foo").asUris().toString());
 
     subject = newNodeAdapterForTest("{ }");
-    assertEquals(
-      "[]",
-      subject
-        .of("foo")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUris()
-        .toString()
-    );
+    assertEquals("[]", subject.of("foo").asUris().toString());
   }
 
   @Test
@@ -611,8 +378,7 @@ public class NodeAdapterTest {
 
     assertThrows(
       OtpAppException.class,
-      () ->
-        subject.of("uris").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUris(),
+      () -> subject.of("uris").asUris(),
       "'uris': 'no array'" + "Source: Test"
     );
   }
@@ -636,11 +402,8 @@ public class NodeAdapterTest {
   @Test
   public void linearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '4+8x' }");
-    assertEquals(
-      "f(x) = 4.0 + 8.0 x",
-      subject.of("key").withDoc(NA, /*TODO DOC*/"TODO").asLinearFunction(null).toString()
-    );
-    assertNull(subject.of("no-key").withDoc(NA, /*TODO DOC*/"TODO").asLinearFunction(null));
+    assertEquals("f(x) = 4.0 + 8.0 x", subject.of("key").asLinearFunction(null).toString());
+    assertNull(subject.of("no-key").asLinearFunction(null));
   }
 
   @Test
@@ -648,25 +411,13 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest(
       "{ key1 : 'UTC', key2 : 'Europe/Oslo', key3 : '+02:00', key4: 'invalid' }"
     );
-    assertEquals("UTC", subject.of("key1").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null).getId());
-    assertEquals(
-      "Europe/Oslo",
-      subject.of("key2").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null).getId()
-    );
-    assertEquals(
-      "+02:00",
-      subject.of("key3").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null).getId()
-    );
+    assertEquals("UTC", subject.of("key1").asZoneId(null).getId());
+    assertEquals("Europe/Oslo", subject.of("key2").asZoneId(null).getId());
+    assertEquals("+02:00", subject.of("key3").asZoneId(null).getId());
 
-    assertThrows(
-      OtpAppException.class,
-      () -> subject.of("key4").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null)
-    );
+    assertThrows(OtpAppException.class, () -> subject.of("key4").asZoneId(null));
 
-    assertEquals(
-      ZoneId.of("UTC"),
-      subject.of("missing-key").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(ZoneId.of("UTC"))
-    );
+    assertEquals(ZoneId.of("UTC"), subject.of("missing-key").asZoneId(ZoneId.of("UTC")));
   }
 
   @Test
@@ -674,23 +425,11 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
     assertEquals(
       Set.of("A", "C", "F"),
-      Set.copyOf(
-        subject
-          .of("ids")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asStringList(List.copyOf(Collections.emptySet()))
-      )
+      Set.copyOf(subject.of("ids").asStringList(List.copyOf(Collections.emptySet())))
     );
     assertEquals(
       Set.of("X"),
-      Set.copyOf(
-        subject
-          .of("nonExisting")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asStringList(List.copyOf(Set.of("X")))
-      )
+      Set.copyOf(subject.of("nonExisting").asStringList(List.copyOf(Set.of("X"))))
     );
   }
 
@@ -716,7 +455,7 @@ public class NodeAdapterTest {
     var buf = new StringBuilder();
 
     // When: Access ONLY parameter 'a', but not 'b'
-    assertTrue(subject.path("foo").of("a").withDoc(NA, /*TODO DOC*/"TODO").asBoolean());
+    assertTrue(subject.path("foo").of("a").asBoolean());
 
     // Then: expect 'b' to be unused
     subject.logAllUnusedParameters(buf::append);

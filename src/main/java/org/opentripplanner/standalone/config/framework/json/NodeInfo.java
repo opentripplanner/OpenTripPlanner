@@ -26,6 +26,9 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  *                 set.
  * @param deprecated This parameter is no longer in use in OTP, we keep it here to be able to
  *                   generate documentation.
+ *
+ *
+ * TODO DOC - Add Unit tests on this class using the builder
  */
 public record NodeInfo(
   String name,
