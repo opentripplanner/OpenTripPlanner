@@ -11,8 +11,8 @@ public class WebsocketGtfsRealtimeUpdaterConfig {
   public static WebsocketGtfsRealtimeUpdaterParameters create(String configRef, NodeAdapter c) {
     return new WebsocketGtfsRealtimeUpdaterParameters(
       configRef,
-      c.asText("feedId", null),
-      c.asText("url", null),
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       c.of("reconnectPeriodSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
       c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );

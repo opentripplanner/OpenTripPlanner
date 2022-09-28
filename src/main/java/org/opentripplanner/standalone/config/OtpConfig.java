@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -34,7 +36,12 @@ public class OtpConfig {
   OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
     this.root = new NodeAdapter(otpConfig, source);
 
-    this.configVersion = root.asText("configVersion", null);
+    this.configVersion =
+      root
+        .of("configVersion")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
     this.otpFeatures = root.asEnumMap("otpFeatures", OTPFeature.class, Boolean.class);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {

@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.net.URI;
 import java.util.regex.Pattern;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -66,7 +68,12 @@ public class NetexFeedConfigBuilder {
   public static NetexFeedConfigBuilder of(NodeAdapter config) {
     NetexFeedConfigBuilder netexFeedConfigBuilder = new NetexFeedConfigBuilder();
     netexFeedConfigBuilder.source = config.asUri("source");
-    netexFeedConfigBuilder.feedId = config.asText("feedId", null);
+    netexFeedConfigBuilder.feedId =
+      config
+        .of("feedId")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
     netexFeedConfigBuilder.sharedFilePattern = config.asPattern("sharedFilePattern", null);
     netexFeedConfigBuilder.sharedGroupFilePattern =
       config.asPattern("sharedGroupFilePattern", null);

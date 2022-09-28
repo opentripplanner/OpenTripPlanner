@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -25,7 +27,13 @@ public class OsmDefaultsConfig {
 
   public OsmDefaultsConfig(NodeAdapter config) {
     this(
-      WayPropertySetSource.fromConfig(config.asText("osmTagMapping", "default")),
+      WayPropertySetSource.fromConfig(
+        config
+          .of("osmTagMapping")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString("default")
+      ),
       config.asZoneId("timeZone", null)
     );
   }

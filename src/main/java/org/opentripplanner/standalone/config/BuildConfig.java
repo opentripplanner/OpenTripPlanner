@@ -546,7 +546,14 @@ public class BuildConfig implements OtpDataStoreConfig {
     maxAreaNodes = root.of("maxAreaNodes").withDoc(NA, /*TODO DOC*/"TODO").asInt(500);
     maxElevationPropagationMeters =
       root.of("maxElevationPropagationMeters").withDoc(NA, /*TODO DOC*/"TODO").asInt(2000);
-    boardingLocationTags = root.asTextSet("boardingLocationTags", Set.of("ref"));
+    boardingLocationTags =
+      Set.copyOf(
+        root
+          .of("boardingLocationTags")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(Set.of("ref")))
+      );
     discardMinTransferTimes =
       root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
 
@@ -556,7 +563,12 @@ public class BuildConfig implements OtpDataStoreConfig {
     osmLocalFilePattern = localFileNamePatternsConfig.asPattern("osm", DEFAULT_OSM_PATTERN);
     demLocalFilePattern = localFileNamePatternsConfig.asPattern("dem", DEFAULT_DEM_PATTERN);
 
-    gsCredentials = root.asText("gsCredentials", null);
+    gsCredentials =
+      root
+        .of("gsCredentials")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
     graph = root.asUri("graph", null);
     streetGraph = root.asUri("streetGraph", null);
     buildReportDir = root.asUri("buildReportDir", null);

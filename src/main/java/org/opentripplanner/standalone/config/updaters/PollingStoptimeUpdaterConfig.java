@@ -13,14 +13,19 @@ public class PollingStoptimeUpdaterConfig {
   public static PollingStoptimeUpdaterParameters create(String configRef, NodeAdapter c) {
     String file = null;
     String url = null;
-    String sourceTypeStr = c.asText("sourceType");
+    String sourceTypeStr = c
+      .of("sourceType")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString();
     DataSourceType sourceType;
 
     if ("gtfs-file".equals(sourceTypeStr)) {
-      file = c.asText("file");
+      file =
+        c.of("file").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
       sourceType = DataSourceType.GTFS_RT_FILE;
     } else if ("gtfs-http".equals(sourceTypeStr)) {
-      url = c.asText("url");
+      url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
       sourceType = DataSourceType.GTFS_RT_HTTP;
     } else {
       throw new OtpAppException(
@@ -38,7 +43,7 @@ public class PollingStoptimeUpdaterConfig {
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA),
       sourceType,
-      c.asText("feedId", null),
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       url,
       file
     );

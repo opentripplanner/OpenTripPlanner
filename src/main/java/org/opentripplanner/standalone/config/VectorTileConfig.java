@@ -36,9 +36,16 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     private final double expansionFactor;
 
     public Layer(NodeAdapter node) {
-      name = node.asText("name");
-      type = node.asText("type");
-      mapper = node.asText("mapper");
+      name =
+        node.of("name").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
+      type =
+        node.of("type").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
+      mapper =
+        node
+          .of("mapper")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString();
       maxZoom = node.of("maxZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MAX_ZOOM);
       minZoom = node.of("minZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MIN_ZOOM);
       cacheMaxSeconds =

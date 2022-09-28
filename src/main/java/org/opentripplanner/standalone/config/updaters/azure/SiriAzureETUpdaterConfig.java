@@ -14,7 +14,11 @@ public class SiriAzureETUpdaterConfig extends SiriAzureUpdaterConfig {
     if (c.exist("history")) {
       NodeAdapter history = c.path("history");
 
-      String fromDateTime = history.asText("fromDateTime", "-P1D");
+      String fromDateTime = history
+        .of("fromDateTime")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("-P1D");
       int customMidnight = c.of("customMidnight").withDoc(NA, /*TODO DOC*/"TODO").asInt(0);
 
       parameters.setFromDateTime(asDateOrRelativePeriod(fromDateTime, customMidnight));

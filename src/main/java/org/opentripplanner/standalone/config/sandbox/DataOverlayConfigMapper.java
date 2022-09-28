@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
@@ -16,10 +18,22 @@ public class DataOverlayConfigMapper {
       return null;
     }
     return new DataOverlayConfig(
-      c.asText("fileName"),
-      c.asText("latitudeVariable"),
-      c.asText("longitudeVariable"),
-      c.asText("timeVariable"),
+      c.of("fileName").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
+      c
+        .of("latitudeVariable")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(),
+      c
+        .of("longitudeVariable")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(),
+      c
+        .of("timeVariable")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(),
       c.asEnum("timeFormat", TimeUnit.class),
       mapIndexVariables(c.path("indexVariables")),
       mapRequestParameters(c.path("requestParameters"))
@@ -35,7 +49,15 @@ public class DataOverlayConfigMapper {
   }
 
   private static IndexVariable mapIndexVariable(NodeAdapter c) {
-    return new IndexVariable(c.asText("name"), c.asText("displayName"), c.asText("variable"));
+    return new IndexVariable(
+      c.of("name").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
+      c
+        .of("displayName")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(),
+      c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
+    );
   }
 
   private static List<ParameterBinding> mapRequestParameters(NodeAdapter c) {
@@ -49,8 +71,8 @@ public class DataOverlayConfigMapper {
   private static ParameterBinding mapRequestParameter(NodeAdapter c) {
     return new ParameterBinding(
       c.asEnum("name", ParameterName.class),
-      c.asText("variable"),
-      c.asText("formula")
+      c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
+      c.of("formula").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
     );
   }
 }

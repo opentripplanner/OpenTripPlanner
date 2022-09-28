@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -50,8 +51,18 @@ public class RouterConfig implements Serializable {
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this.root = new NodeAdapter(node, source);
-    this.configVersion = root.asText("configVersion", null);
-    this.requestLogFile = root.asText("requestLogFile", null);
+    this.configVersion =
+      root
+        .of("configVersion")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
+    this.requestLogFile =
+      root
+        .of("requestLogFile")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
     this.transmodelApi = new TransmodelAPIConfig(root.path("transmodelApi"));
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
     this.transitConfig = new TransitRoutingConfig(root.path("transit"));

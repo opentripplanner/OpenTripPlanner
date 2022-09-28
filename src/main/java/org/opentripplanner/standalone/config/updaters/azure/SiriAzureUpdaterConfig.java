@@ -18,16 +18,32 @@ public abstract class SiriAzureUpdaterConfig {
     NodeAdapter c
   ) {
     parameters.setConfigRef(configRef);
-    parameters.setServiceBusUrl(c.asText("servicebus-url", null));
-    parameters.setTopicName(c.asText("topic", null));
-    parameters.setFeedId(c.asText("feedId", null));
+    parameters.setServiceBusUrl(
+      c
+        .of("servicebus-url")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null)
+    );
+    parameters.setTopicName(
+      c.of("topic").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null)
+    );
+    parameters.setFeedId(
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null)
+    );
     parameters.setFuzzyTripMatching(
       c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
     );
 
     if (c.exist("history")) {
       NodeAdapter history = c.path("history");
-      parameters.setDataInitializationUrl(history.asText("url", null));
+      parameters.setDataInitializationUrl(
+        history
+          .of("url")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString(null)
+      );
       parameters.setTimeout(history.of("timeout").withDoc(NA, /*TODO DOC*/"TODO").asInt(300000));
     }
   }

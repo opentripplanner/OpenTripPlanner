@@ -97,17 +97,48 @@ public class NodeAdapterTest {
   @Test
   public void asText() {
     NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
-    assertEquals("TEXT", subject.asText("aText", "DEFAULT"));
-    assertEquals("DEFAULT", subject.asText("missingField", "DEFAULT"));
-    assertNull(subject.asText("missingField", null));
+    assertEquals(
+      "TEXT",
+      subject
+        .of("aText")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("DEFAULT")
+    );
+    assertEquals(
+      "DEFAULT",
+      subject
+        .of("missingField")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("DEFAULT")
+    );
+    assertNull(
+      subject
+        .of("missingField")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null)
+    );
 
-    assertEquals("TEXT", subject.asText("aText"));
+    assertEquals(
+      "TEXT",
+      subject.of("aText").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
+    );
   }
 
   @Test
   public void requiredAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    assertThrows(OtpAppException.class, () -> subject.asText("missingField"));
+    assertThrows(
+      OtpAppException.class,
+      () ->
+        subject
+          .of("missingField")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString()
+    );
   }
 
   @Test
@@ -403,8 +434,26 @@ public class NodeAdapterTest {
   @Test
   public void asTextSet() {
     NodeAdapter subject = newNodeAdapterForTest("{ ids : ['A', 'C', 'F'] }");
-    assertEquals(Set.of("A", "C", "F"), subject.asTextSet("ids", Collections.emptySet()));
-    assertEquals(Set.of("X"), subject.asTextSet("nonExisting", Set.of("X")));
+    assertEquals(
+      Set.of("A", "C", "F"),
+      Set.copyOf(
+        subject
+          .of("ids")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(Collections.emptySet()))
+      )
+    );
+    assertEquals(
+      Set.of("X"),
+      Set.copyOf(
+        subject
+          .of("nonExisting")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(Set.of("X")))
+      )
+    );
   }
 
   @Test

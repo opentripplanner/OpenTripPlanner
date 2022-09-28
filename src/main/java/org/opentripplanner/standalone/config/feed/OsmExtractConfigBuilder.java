@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.net.URI;
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
@@ -28,7 +30,11 @@ public class OsmExtractConfigBuilder {
   public static OsmExtractConfigBuilder of(NodeAdapter config) {
     OsmExtractConfigBuilder osmExtractConfigBuilder = new OsmExtractConfigBuilder();
     osmExtractConfigBuilder.source = config.asUri("source");
-    String osmTagMapping = config.asText("osmTagMapping", null);
+    String osmTagMapping = config
+      .of("osmTagMapping")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString(null);
     if (osmTagMapping != null) {
       osmExtractConfigBuilder.osmWayPropertySet = WayPropertySetSource.fromConfig(osmTagMapping);
     }

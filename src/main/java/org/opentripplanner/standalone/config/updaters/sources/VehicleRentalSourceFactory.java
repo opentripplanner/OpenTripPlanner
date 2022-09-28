@@ -66,7 +66,11 @@ public class VehicleRentalSourceFactory {
   }
 
   private String language() {
-    return c.asText("language", null);
+    return c
+      .of("language")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString(null);
   }
 
   private Map<String, String> headers() {
@@ -74,11 +78,15 @@ public class VehicleRentalSourceFactory {
   }
 
   private String url() {
-    return c.asText("url");
+    return c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
   }
 
   private String network() {
-    return c.asText("network", null);
+    return c
+      .of("network")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString(null);
   }
 
   private boolean allowKeepingRentedVehicleAtDestination() {

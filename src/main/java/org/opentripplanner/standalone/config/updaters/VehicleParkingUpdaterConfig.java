@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
@@ -27,26 +28,46 @@ public class VehicleParkingUpdaterConfig {
 
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = c.asEnum("sourceType", DataSourceType.class);
-    var feedId = c.asText("feedId", null);
+    var feedId = c
+      .of("feedId")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString(null);
     var timeZone = c.asZoneId("timeZone", null);
     switch (sourceType) {
       case HSL_PARK:
         return new HslParkUpdaterParameters(
           updaterRef,
           c.of("facilitiesFrequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(3600),
-          c.asText("facilitiesUrl", null),
+          c
+            .of("facilitiesUrl")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .asString(null),
           feedId,
           sourceType,
           c.of("utilizationsFrequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(600),
-          c.asText("utilizationsUrl", null),
+          c
+            .of("utilizationsUrl")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .asString(null),
           timeZone
         );
       case KML:
         return new KmlUpdaterParameters(
           updaterRef,
-          c.asText("url", null),
+          c
+            .of("url")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .asString(null),
           feedId,
-          c.asText("namePrefix", null),
+          c
+            .of("namePrefix")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .asString(null),
           c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
           c.of("zip").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
           sourceType
@@ -55,11 +76,23 @@ public class VehicleParkingUpdaterConfig {
       case BICYCLE_PARK_API:
         return new ParkAPIUpdaterParameters(
           updaterRef,
-          c.asText("url", null),
+          c
+            .of("url")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .asString(null),
           feedId,
           c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
           c.asStringMap("headers"),
-          new ArrayList<>(c.asTextSet("tags", Set.of())),
+          new ArrayList<>(
+            Set.copyOf(
+              c
+                .of("tags")
+                .withDoc(NA, /*TODO DOC*/"TODO")
+                .withExample(/*TODO DOC*/"TODO")
+                .asStringList(List.copyOf(Set.of()))
+            )
+          ),
           sourceType,
           timeZone
         );

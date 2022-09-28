@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.net.URI;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -14,7 +16,12 @@ public class GtfsFeedConfigBuilder {
   public static GtfsFeedConfigBuilder of(NodeAdapter config) {
     GtfsFeedConfigBuilder gtfsFeedConfigBuilder = new GtfsFeedConfigBuilder();
     gtfsFeedConfigBuilder.source = config.asUri("source");
-    gtfsFeedConfigBuilder.feedId = config.asText("feedId", null);
+    gtfsFeedConfigBuilder.feedId =
+      config
+        .of("feedId")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
 
     return gtfsFeedConfigBuilder;
   }

@@ -110,7 +110,11 @@ public class UpdatersConfig implements UpdatersParameters {
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
 
     for (NodeAdapter conf : updaters) {
-      String type = conf.asText("type");
+      String type = conf
+        .of("type")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString();
       BiFunction<String, NodeAdapter, ?> factory = CONFIG_CREATORS.get(type);
       if (factory == null) {
         throw new OtpAppException("The updater config type is unknown: " + type);

@@ -1,6 +1,9 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -104,8 +107,19 @@ public class NetexDefaultsConfig {
     sharedFilePattern = config.asPattern("sharedFilePattern", SHARED_FILE_PATTERN);
     sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
     groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
-    netexFeedId = config.asText("netexFeedId", NETEX_FEED_ID);
+    netexFeedId =
+      config
+        .of("netexFeedId")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(NETEX_FEED_ID);
     ferryIdsNotAllowedForBicycle =
-      config.asTextSet("ferryIdsNotAllowedForBicycle", FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE);
+      Set.copyOf(
+        config
+          .of("ferryIdsNotAllowedForBicycle")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE))
+      );
   }
 }

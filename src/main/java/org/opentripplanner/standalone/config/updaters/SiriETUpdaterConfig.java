@@ -11,14 +11,18 @@ public class SiriETUpdaterConfig {
   public static SiriETUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriETUpdaterParameters(
       configRef,
-      c.asText("feedId", null),
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
       c.of("blockReadinessUntilInitialized").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.asText("url"),
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
       c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-      c.asText("requestorRef", "otp-" + UUID.randomUUID()),
+      c
+        .of("requestorRef")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("otp-" + UUID.randomUUID()),
       c.of("timeoutSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("previewIntervalMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
     );

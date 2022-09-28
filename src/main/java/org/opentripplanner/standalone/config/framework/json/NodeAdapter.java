@@ -163,43 +163,12 @@ public class NodeAdapter {
     return json.has(paramName);
   }
 
-  /** TODO: Inline this */
-  public String asText(String paramName, String defaultValue) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asString(defaultValue);
-  }
-
-  /** TODO: Inline this */
-  public String asText(String paramName) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
-  }
-
   /**
    * WARNING! Avoid using this method - it bypasses the build in typesafe parsing support. Only
    * use it to provide custom parsing.
    */
   public String asText() {
     return json.asText();
-  }
-
-  /** TODO: Inline this */
-  public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
-    return Set.copyOf(
-      of(paramName)
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asStringList(List.copyOf(defaultValue))
-    );
-  }
-
-  /** TODO: Inline this */
-  public <T> T asCustomStingType(String paramName, T defaultValue, Function<String, T> mapper) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asCustomStingType(defaultValue, mapper);
   }
 
   /** TODO: Inline this */

@@ -11,9 +11,13 @@ public class SiriSXUpdaterConfig {
   public static SiriSXUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriSXUpdaterParameters(
       configRef,
-      c.asText("feedId", null),
-      c.asText("url"),
-      c.asText("requestorRef", "otp-" + UUID.randomUUID()),
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
+      c
+        .of("requestorRef")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("otp-" + UUID.randomUUID()),
       c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
       c.of("earlyStartSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("timeoutSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),

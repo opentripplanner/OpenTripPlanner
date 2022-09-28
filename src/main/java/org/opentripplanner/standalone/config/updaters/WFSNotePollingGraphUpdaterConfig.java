@@ -10,8 +10,12 @@ public class WFSNotePollingGraphUpdaterConfig {
   public static WFSNotePollingGraphUpdaterParameters create(String configRef, NodeAdapter c) {
     return new WFSNotePollingGraphUpdaterParameters(
       configRef,
-      c.asText("url"),
-      c.asText("featureType"),
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
+      c
+        .of("featureType")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(),
       c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60)
     );
   }

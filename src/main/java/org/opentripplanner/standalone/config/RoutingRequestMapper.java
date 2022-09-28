@@ -5,6 +5,8 @@ import static org.opentripplanner.standalone.config.WheelchairAccessibilityReque
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Set;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -46,14 +48,32 @@ public class RoutingRequestMapper {
         c.asEnumMap("alightSlackForMode", TransitMode.class, Duration.class)
       );
     vehicleRental.setAllowedNetworks(
-      c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
+      Set.copyOf(
+        c
+          .of("allowedVehicleRentalNetworks")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(vehicleRental.allowedNetworks()))
+      )
     );
     request.setArriveBy(c.of("arriveBy").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.arriveBy()));
     vehicleParking.setBannedTags(
-      c.asTextSet("bannedVehicleParkingTags", vehicleParking.bannedTags())
+      Set.copyOf(
+        c
+          .of("bannedVehicleParkingTags")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(vehicleParking.bannedTags()))
+      )
     );
     vehicleRental.setBannedNetworks(
-      c.asTextSet("bannedVehicleRentalNetworks", vehicleRental.bannedNetworks())
+      Set.copyOf(
+        c
+          .of("bannedVehicleRentalNetworks")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(vehicleRental.bannedNetworks()))
+      )
     );
 
     preferences.withBike(bike -> {
@@ -302,11 +322,14 @@ public class RoutingRequestMapper {
     request
       .journey()
       .setModes(
-        c.asCustomStingType(
-          "modes",
-          RequestModes.defaultRequestModes(),
-          s -> new QualifiedModeSet(s).getRequestModes()
-        )
+        c
+          .of("modes")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asCustomStingType(
+            RequestModes.defaultRequestModes(),
+            s -> new QualifiedModeSet(s).getRequestModes()
+          )
       );
 
     preferences
@@ -332,7 +355,13 @@ public class RoutingRequestMapper {
       c.of("parkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.parkAndRide);
     request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
     vehicleParking.setRequiredTags(
-      c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
+      Set.copyOf(
+        c
+          .of("requiredVehicleParkingTags")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asStringList(List.copyOf(vehicleParking.requiredTags()))
+      )
     );
 
     preferences

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
@@ -39,7 +40,12 @@ public class SpeedTestConfig {
     this.rawNode = node;
     testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D", ZoneId.of("UTC"));
     graph = adapter.asUri("graph", null);
-    feedId = adapter.asText("feedId");
+    feedId =
+      adapter
+        .of("feedId")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString();
     transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
     request = mapRoutingRequest(adapter.path("routingDefaults"));
   }
