@@ -44,41 +44,41 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   @Test
   public void fromMartaTransfers() {
     List<Leg> rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(XPRESS_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, 349);
+    calculateFare(rides, 349);
 
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(GCT_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, 349);
+    calculateFare(rides, 349);
 
     // to GCT Express
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(GCT_AGENCY_ID, "101", 1));
-    calculateFare(rides, FareType.electronicRegular, 349);
+    calculateFare(rides, 349);
 
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(COBB_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, 349);
+    calculateFare(rides, 349);
 
     // To Cobb Express
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(COBB_AGENCY_ID, "101", 1));
-    calculateFare(rides, FareType.electronicRegular, 349);
+    calculateFare(rides, 349);
   }
 
   @Test
   public void fromCobbTransfers() {
     List<Leg> rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
 
     // Local to express
     rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(COBB_AGENCY_ID, "101", 1));
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
 
     rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(XPRESS_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 150);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 150);
 
     // Express to local
     rides = List.of(getLeg(COBB_AGENCY_ID, "101", 0), getLeg(COBB_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
 
     rides = List.of(getLeg(COBB_AGENCY_ID, "101", 0), getLeg(GCT_AGENCY_ID, "102", 1));
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2 + 300);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2 + 300);
 
     // Local to circulator to express
     rides =
@@ -87,13 +87,13 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(COBB_AGENCY_ID, "BLUE", 1),
         getLeg(COBB_AGENCY_ID, "101", 1)
       );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
   }
 
   @Test
   public void fromGctTransfers() {
     List<Leg> rides = List.of(getLeg(GCT_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
   }
 
   @Test
@@ -106,7 +106,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       getLeg(MARTA_AGENCY_ID, 4),
       getLeg(MARTA_AGENCY_ID, 5)
     );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
 
     rides =
       List.of(
@@ -117,7 +117,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, 4),
         getLeg(COBB_AGENCY_ID, 5)
       );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
 
     rides =
       List.of(
@@ -126,7 +126,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, 2),
         getLeg(MARTA_AGENCY_ID, 3)
       );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
 
     rides =
       List.of(
@@ -137,7 +137,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         // new transfer - only got 3 from GCT
         getLeg(MARTA_AGENCY_ID, 4)
       );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
 
     rides =
       List.of(
@@ -147,7 +147,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(GCT_AGENCY_ID, 3),
         getLeg(GCT_AGENCY_ID, 4)
       );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
   }
 
   @Test
@@ -158,7 +158,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       getLeg(MARTA_AGENCY_ID, 181),
       getLeg(MARTA_AGENCY_ID, 179)
     );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
 
     rides =
       List.of(
@@ -168,7 +168,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, 181 + 178),
         getLeg(MARTA_AGENCY_ID, 181 + 179)
       );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
   }
 
   @Test
@@ -181,7 +181,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       getLeg(MARTA_AGENCY_ID, 3),
       getLeg(MARTA_AGENCY_ID, 4)
     );
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_RIDE_PRICE_IN_CENTS + STREETCAR_PRICE);
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + STREETCAR_PRICE);
 
     rides =
       List.of(
@@ -189,11 +189,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, "atlsc", 1),
         getLeg(COBB_AGENCY_ID, "101", 2)
       );
-    calculateFare(
-      rides,
-      FareType.electronicRegular,
-      DEFAULT_RIDE_PRICE_IN_CENTS + 100 + STREETCAR_PRICE
-    );
+    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100 + STREETCAR_PRICE);
   }
 
   /**
@@ -202,56 +198,21 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
    * default fare is applied a test substitute {@link AtlantaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is
    * used. This will be the same for all cash fare types except when overriden above.
    */
-  private static void calculateFare(List<Leg> rides, FareType fareType, float expectedFareInCents) {
+  private static void calculateFare(List<Leg> rides, float expectedFareInCents) {
     ItineraryFares fare = new ItineraryFares();
-    atlFareService.populateFare(fare, null, fareType, rides, null);
-    assertEquals(expectedFareInCents, fare.getFare(fareType).cents());
+    atlFareService.populateFare(fare, null, FareType.electronicRegular, rides, null);
+    assertEquals(expectedFareInCents, fare.getFare(FareType.electronicRegular).cents());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {
-    return createLeg(agencyId, "-1", -1, null, startTimeMins, "123", "", "123");
+    return createLeg(agencyId, "-1", startTimeMins);
   }
 
   private static Leg getLeg(String agencyId, String shortName, long startTimeMins) {
-    return createLeg(agencyId, shortName, -1, null, startTimeMins, "123", "", "123");
+    return createLeg(agencyId, shortName, startTimeMins);
   }
 
-  private static Leg createLeg(
-    String agencyId,
-    String shortName,
-    int rideType,
-    String desc,
-    long startTimeMins,
-    String routeId,
-    String tripId,
-    String routeLongName
-  ) {
-    return createLeg(
-      agencyId,
-      shortName,
-      rideType,
-      desc,
-      startTimeMins,
-      routeId,
-      tripId,
-      routeLongName,
-      "",
-      ""
-    );
-  }
-
-  private static Leg createLeg(
-    String agencyId,
-    String shortName,
-    int rideType,
-    String desc,
-    long startTimeMins,
-    String routeId,
-    String tripId,
-    String routeLongName,
-    String firstStopName,
-    String lastStopName
-  ) {
+  private static Leg createLeg(String agencyId, String shortName, long startTimeMins) {
     Agency agency = Agency
       .of(new FeedScopedId("A", agencyId))
       .withName(agencyId)
@@ -262,23 +223,21 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     RegularStop firstStop = RegularStop
       .of(new FeedScopedId("A", "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
-      .withName(new NonLocalizedString(firstStopName))
+      .withName(new NonLocalizedString("first stop"))
       .build();
     RegularStop lastStop = RegularStop
       .of(new FeedScopedId("A", "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
-      .withName(new NonLocalizedString(lastStopName))
+      .withName(new NonLocalizedString("last stop"))
       .build();
 
-    FeedScopedId routeFeedScopeId = new FeedScopedId("A", routeId);
+    FeedScopedId routeFeedScopeId = new FeedScopedId("A", "123");
     Route route = Route
       .of(routeFeedScopeId)
       .withAgency(agency)
       .withShortName(shortName)
-      .withLongName(new NonLocalizedString(routeLongName))
+      .withLongName(new NonLocalizedString("123"))
       .withMode(TransitMode.BUS)
-      .withGtfsType(rideType)
-      .withDescription(desc)
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
