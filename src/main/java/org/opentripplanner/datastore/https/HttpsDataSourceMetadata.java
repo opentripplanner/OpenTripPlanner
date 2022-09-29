@@ -9,6 +9,7 @@ import org.apache.http.client.utils.DateUtils;
  * HTTPS data source metadata returned by the HTTP server (HTTP headers).
  */
 public class HttpsDataSourceMetadata {
+
   private final String contentEncoding;
   private final String contentType;
   private final long lastModified;
@@ -40,5 +41,4 @@ public class HttpsDataSourceMetadata {
     }
     return 0;
   }
-
 }

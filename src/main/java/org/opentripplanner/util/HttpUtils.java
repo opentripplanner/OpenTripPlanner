@@ -70,7 +70,9 @@ public class HttpUtils {
       throw new RuntimeException(e.getLocalizedMessage(), e);
     }
     if (response.getStatusLine().getStatusCode() != 200) {
-      throw new RuntimeException("URI " + uri + " unavailable. HTTP error code " + response.getStatusLine().getStatusCode());
+      throw new RuntimeException(
+        "URI " + uri + " unavailable. HTTP error code " + response.getStatusLine().getStatusCode()
+      );
     }
     return Arrays.stream(response.getAllHeaders()).toList();
   }

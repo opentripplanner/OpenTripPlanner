@@ -25,8 +25,7 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   @Override
-  public void open() {
-  }
+  public void open() {}
 
   @Override
   public DataSource findSource(@Nonnull URI uri, @Nonnull FileType type) {
@@ -56,10 +55,12 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   private CompositeDataSource createCompositeSource(URI uri, FileType type) {
-
     HttpsDataSourceMetadata httpsDataSourceMetadata = getHttpsDataSourceMetadata(uri);
 
-    if (CONTENT_TYPE_APPLICATION_ZIP.equalsIgnoreCase(httpsDataSourceMetadata.contentType()) || uri.getPath().endsWith(".zip")) {
+    if (
+      CONTENT_TYPE_APPLICATION_ZIP.equalsIgnoreCase(httpsDataSourceMetadata.contentType()) ||
+      uri.getPath().endsWith(".zip")
+    ) {
       DataSource httpsSource = new HttpsFileDataSource(uri, type, httpsDataSourceMetadata);
       return new ZipStreamDataSourceDecorator(httpsSource);
     } else {
@@ -70,9 +71,9 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   private static HttpsDataSourceMetadata getHttpsDataSourceMetadata(URI uri) {
-      List<Header> headers = HttpUtils.getHeaders(uri);
-      return new HttpsDataSourceMetadata(headers.stream().collect(Collectors.toUnmodifiableMap(Header::getName, Header::getValue)));
+    List<Header> headers = HttpUtils.getHeaders(uri);
+    return new HttpsDataSourceMetadata(
+      headers.stream().collect(Collectors.toUnmodifiableMap(Header::getName, Header::getValue))
+    );
   }
-
-
 }
