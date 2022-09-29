@@ -1,17 +1,23 @@
 package org.opentripplanner.datastore.https;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.apache.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.base.ZipStreamDataSourceDecorator;
+import org.opentripplanner.util.HttpUtils;
 
 /**
  * This data store accesses files in read-only mode over HTTPS.
  */
 public class HttpsDataSourceRepository implements DataSourceRepository {
+
+  private static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
 
   @Override
   public String description() {
@@ -19,7 +25,8 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   @Override
-  public void open() {}
+  public void open() {
+  }
 
   @Override
   public DataSource findSource(@Nonnull URI uri, @Nonnull FileType type) {
@@ -44,12 +51,16 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   private DataSource createSource(URI uri, FileType type) {
-    return new HttpsFileDataSource(uri, type);
+    HttpsDataSourceMetadata httpsDataSourceMetadata = getHttpsDataSourceMetadata(uri);
+    return new HttpsFileDataSource(uri, type, httpsDataSourceMetadata);
   }
 
   private CompositeDataSource createCompositeSource(URI uri, FileType type) {
-    if (uri.getPath().endsWith(".zip")) {
-      DataSource httpsSource = new HttpsFileDataSource(uri, type);
+
+    HttpsDataSourceMetadata httpsDataSourceMetadata = getHttpsDataSourceMetadata(uri);
+
+    if (CONTENT_TYPE_APPLICATION_ZIP.equalsIgnoreCase(httpsDataSourceMetadata.contentType()) || uri.getPath().endsWith(".zip")) {
+      DataSource httpsSource = new HttpsFileDataSource(uri, type, httpsDataSourceMetadata);
       return new ZipStreamDataSourceDecorator(httpsSource);
     } else {
       throw new UnsupportedOperationException(
@@ -57,4 +68,11 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
       );
     }
   }
+
+  private static HttpsDataSourceMetadata getHttpsDataSourceMetadata(URI uri) {
+      List<Header> headers = HttpUtils.getHeaders(uri);
+      return new HttpsDataSourceMetadata(headers.stream().collect(Collectors.toUnmodifiableMap(Header::getName, Header::getValue)));
+  }
+
+
 }
