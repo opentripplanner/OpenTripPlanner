@@ -18,7 +18,6 @@ public class RoutingPreferencesTest {
     assertNotSame(pref, clone);
     assertNotSame(pref.street(), clone.street());
     assertNotSame(pref.rental(), clone.rental());
-    assertNotSame(pref.parking(), clone.parking());
     assertNotSame(pref.system(), clone.system());
 
     assertNotSame(pref.system().itineraryFilters(), clone.system().itineraryFilters());
@@ -30,5 +29,6 @@ public class RoutingPreferencesTest {
     assertSame(pref.transfer(), clone.transfer());
     assertSame(pref.wheelchair(), clone.wheelchair());
     assertSame(pref.transit(), clone.transit());
+    assertSame(pref.parking(), clone.parking());
   }
 }

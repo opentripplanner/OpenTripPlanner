@@ -6,6 +6,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 /**
  * Preferences for how to treat trips or stops with accessibility restrictions, like wheelchair
  * accessibility.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public class AccessibilityPreferences {
 

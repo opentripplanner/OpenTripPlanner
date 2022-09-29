@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -182,7 +183,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.parkAndRide = true;
-    routingRequest.preferences().parking().setUseAvailabilityInformation(realtime);
+    routingRequest.preferences().withParking(VehicleParkingPreferences.of(realtime));
     routingRequest.streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK, parkingMode);
     routingContext = new RoutingContext(routingRequest, graph, vertex, vertex);
   }

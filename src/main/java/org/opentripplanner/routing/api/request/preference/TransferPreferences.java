@@ -10,7 +10,12 @@ import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
-// TODO VIA: Javadoc
+/**
+ * Parameters for doing
+ *
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
+ */
 public class TransferPreferences implements Serializable {
 
   public static final TransferPreferences DEFAULT = new TransferPreferences();

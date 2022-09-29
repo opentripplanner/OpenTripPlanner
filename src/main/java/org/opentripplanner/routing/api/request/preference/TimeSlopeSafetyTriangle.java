@@ -15,6 +15,8 @@ import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
  * </pre>
  * <p>
  * This class is currently only used with bicycle routing, but is not limited to that.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public record TimeSlopeSafetyTriangle(double time, double slope, double safety) {
   private static final double ZERO = 0.0;

@@ -17,6 +17,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Preferences for transit routing.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public class TransitPreferences implements Serializable {
 
@@ -44,7 +46,7 @@ public class TransitPreferences implements Serializable {
   private TransitPreferences(Builder builder) {
     this.boardSlack = requireNonNull(builder.boardSlack);
     this.alightSlack = requireNonNull(builder.alightSlack);
-    this.reluctanceForMode = requireNonNull(builder.reluctanceForMode);
+    this.reluctanceForMode = Map.copyOf(requireNonNull(builder.reluctanceForMode));
     this.otherThanPreferredRoutesPenalty = builder.otherThanPreferredRoutesPenalty;
     this.unpreferredCost = requireNonNull(builder.unpreferredCost);
     this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
@@ -91,14 +93,17 @@ public class TransitPreferences implements Serializable {
   }
 
   /**
-   * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add a
-   * penalty to other modes (> 1.0). The type used here it the internal model {@link TransitMode}
+   * Transit reluctance per mode. Use this to add an advantage(<1.0) to specific modes, or to add a
+   * penalty to other modes (> 1.0). The type used here is the internal model {@link TransitMode}
    * make sure to create a mapping for this before using it on the API.
    * <p>
-   * If set, the alight-slack-for-mode override the default value {@code 1.0}.
+   * If set, it overrides the default value {@code 1.0}.
    * <p>
-   * This is a scalar multiplied with the time in second on board the transit vehicle. Default value
+   * This is a scalar multiplied with the time in second on-board the transit vehicle. Default value
    * is not-set(empty map).
+   * <p>
+   * The returned map is READ-ONLY and IMMUTABLE. The map is not an EnumMap(mutable), so convert
+   * the type into something more performant if needed.
    */
   public Map<TransitMode, Double> reluctanceForMode() {
     return reluctanceForMode;

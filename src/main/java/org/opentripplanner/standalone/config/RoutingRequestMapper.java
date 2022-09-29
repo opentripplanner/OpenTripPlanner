@@ -8,6 +8,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
@@ -211,14 +212,14 @@ public class RoutingRequestMapper {
           preferences.rental().useAvailabilityInformation()
         )
       );
-    preferences
-      .parking()
-      .setUseAvailabilityInformation(
+    preferences.withParking(
+      VehicleParkingPreferences.of(
         c.asBoolean(
           "useVehicleParkingAvailabilityInformation",
           preferences.parking().useAvailabilityInformation()
         )
-      );
+      )
+    );
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
     preferences.withWalk(walk -> {
       walk.withSpeed(c.asDouble("walkSpeed", walk.speed()));

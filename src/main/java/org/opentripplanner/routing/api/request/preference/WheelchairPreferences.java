@@ -11,6 +11,8 @@ import org.opentripplanner.util.lang.DoubleUtils;
  *                                severely punished. This value determines how much they are
  *                                punished. This should be a very high value as you want to only
  *                                include stairs as a last result.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public record WheelchairPreferences(
   AccessibilityPreferences trip,

@@ -13,7 +13,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * related to street and transit routing. The values are normalized(rounded) so the class
  * can used as a cache key.
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD SAFE.
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public class WalkPreferences implements Serializable {
 

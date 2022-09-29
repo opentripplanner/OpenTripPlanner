@@ -9,6 +9,11 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
+/**
+ * See {@link TransferOptimizationParameters} for documentation on this class.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
+ */
 public class TransferOptimizationPreferences
   implements Serializable, TransferOptimizationParameters {
 

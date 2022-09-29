@@ -17,7 +17,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 /**
  * Set of optimizations to use with Raptor. These are available here for testing purposes.
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD SAFE.
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public class RaptorPreferences implements Serializable {
 
