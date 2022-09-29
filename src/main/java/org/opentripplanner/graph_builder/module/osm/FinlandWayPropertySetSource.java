@@ -7,7 +7,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -26,9 +26,25 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission = permission ->
+    BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission = (
+        permission,
+        speedLimit
+      ) ->
       switch (permission) {
-        case ALL, PEDESTRIAN_AND_CAR -> 1.8;
+        case ALL, PEDESTRIAN_AND_CAR -> {
+          // ~35kph or under
+          if (speedLimit <= 9.75f) {
+            yield 1.45;
+          }
+          // ~60kph or under
+          else if (speedLimit <= 16.65f) {
+            yield 1.6;
+          }
+          // over ~60kph
+          else {
+            yield 1.8;
+          }
+        }
         case PEDESTRIAN_AND_BICYCLE -> 1.3;
         case PEDESTRIAN -> 1.1;
         // these don't include walking
