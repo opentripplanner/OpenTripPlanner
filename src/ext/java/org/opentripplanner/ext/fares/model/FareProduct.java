@@ -1,10 +1,7 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
