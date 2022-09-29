@@ -127,9 +127,9 @@ public class Place {
 
   public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, State state) {
     TraverseMode traverseMode = null;
-    if (state.getStreetMode().includesDriving()) {
+    if (state.getRequestMode().includesDriving()) {
       traverseMode = TraverseMode.CAR;
-    } else if (state.getStreetMode().includesBiking()) {
+    } else if (state.getRequestMode().includesBiking()) {
       traverseMode = TraverseMode.BICYCLE;
     }
 

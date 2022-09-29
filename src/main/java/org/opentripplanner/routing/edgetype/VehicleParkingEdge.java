@@ -51,7 +51,7 @@ public class VehicleParkingEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
-    if (!s0.getStreetMode().includesParking()) {
+    if (!s0.getRequestMode().includesParking()) {
       return null;
     }
 
@@ -87,7 +87,7 @@ public class VehicleParkingEdge extends Edge {
       return null;
     }
 
-    StreetMode streetMode = s0.getStreetMode();
+    StreetMode streetMode = s0.getRequestMode();
 
     if (streetMode.includesBiking()) {
       final BikePreferences bike = s0.getPreferences().bike();
@@ -122,7 +122,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0) {
-    StreetMode streetMode = s0.getStreetMode();
+    StreetMode streetMode = s0.getRequestMode();
     RoutingPreferences preferences = s0.getPreferences();
 
     if (!streetMode.includesWalking() || s0.isVehicleParked()) {

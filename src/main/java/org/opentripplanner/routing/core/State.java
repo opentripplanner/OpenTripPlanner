@@ -170,15 +170,15 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = stateData.streetMode.includesParking();
+    boolean parkAndRide = stateData.requestMode.includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
     if (stateData.opt.arriveBy()) {
-      vehicleRentingOk = !stateData.streetMode.includesRenting() || !isRentingVehicle();
+      vehicleRentingOk = !stateData.requestMode.includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.streetMode.includesRenting() ||
+        !stateData.requestMode.includesRenting() ||
         (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
@@ -258,8 +258,8 @@ public class State implements Cloneable {
     return stateData.opt;
   }
 
-  public StreetMode getStreetMode() {
-    return stateData.streetMode;
+  public StreetMode getRequestMode() {
+    return stateData.requestMode;
   }
 
   public RoutingPreferences getPreferences() {
@@ -415,7 +415,7 @@ public class State implements Cloneable {
     // It is distributed symmetrically over all preboard and prealight edges.
     var reversedRequest = stateData.opt.copyOfReversed();
     reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(reversedRequest, stateData.streetMode);
+    var newStateData = StateData.getInitialStateData(reversedRequest, stateData.requestMode);
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.

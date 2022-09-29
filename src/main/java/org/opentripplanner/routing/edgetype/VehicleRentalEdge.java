@@ -27,11 +27,11 @@ public class VehicleRentalEdge extends Edge {
   }
 
   public State traverse(State s0) {
-    if (!s0.getStreetMode().includesRenting()) {
+    if (!s0.getRequestMode().includesRenting()) {
       return null;
     }
 
-    var allowedRentalFormFactors = allowedModes(s0.getStreetMode());
+    var allowedRentalFormFactors = allowedModes(s0.getRequestMode());
     if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
       return null;
     }

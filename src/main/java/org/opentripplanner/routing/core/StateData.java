@@ -31,7 +31,7 @@ public class StateData implements Cloneable {
 
   protected CarPickupState carPickupState;
 
-  protected RouteRequest opt;
+  protected final RouteRequest opt;
 
   // TODO VIA - this will be folded into an AStarRequest in the future
   public IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
@@ -39,7 +39,12 @@ public class StateData implements Cloneable {
     DrivingDirection.RIGHT
   );
 
-  protected StreetMode streetMode;
+  /**
+   * The requested mode for the search. This contains information about all allowed transitions
+   * between the different traverse modes, such as renting or parking a vehicle. Contrary to
+   * currentMode, which can change when traversing edges, this is constant for a single search.
+   */
+  protected final StreetMode requestMode;
 
   /**
    * The preferred mode, which may differ from backMode when for example walking with a bike. It may
@@ -65,14 +70,14 @@ public class StateData implements Cloneable {
   public DataOverlayContext dataOverlayContext;
 
   /** Private constructor, use static methods to get a set of initial states. */
-  private StateData(RouteRequest options, StreetMode streetMode) {
+  private StateData(RouteRequest options, StreetMode requestMode) {
     this.opt = options;
-    this.streetMode = streetMode;
-    if (streetMode.includesDriving()) {
+    this.requestMode = requestMode;
+    if (requestMode.includesDriving()) {
       currentMode = TraverseMode.CAR;
-    } else if (streetMode.includesWalking()) {
+    } else if (requestMode.includesWalking()) {
       currentMode = TraverseMode.WALK;
-    } else if (streetMode.includesBiking()) {
+    } else if (requestMode.includesBiking()) {
       currentMode = TraverseMode.BICYCLE;
     } else {
       currentMode = null;
