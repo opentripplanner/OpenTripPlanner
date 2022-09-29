@@ -25,6 +25,14 @@ public class HoustonWayPropertySetSource implements WayPropertySetSource {
       "highway=footway;layer=-1;tunnel=yes;indoor=yes",
       withModes(StreetTraversalPermission.NONE)
     );
+    props.setProperties(
+      "highway=*;layer=-1;tunnel=yes;indoor=yes",
+      withModes(StreetTraversalPermission.ALL)
+    );
+    props.setProperties(
+      "highway=footway;tunnel=yes;indoor=yes",
+      withModes(StreetTraversalPermission.PEDESTRIAN)
+    );
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);

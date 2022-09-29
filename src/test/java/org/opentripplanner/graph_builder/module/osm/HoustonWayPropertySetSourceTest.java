@@ -18,14 +18,27 @@ class HoustonWayPropertySetSourceTest {
   @Test
   public void lamarTunnel() {
     // https://www.openstreetmap.org/way/127288293
-    OSMWithTags lamarTunnel = new OSMWithTags();
-    lamarTunnel.addTag("highway", "footway");
-    lamarTunnel.addTag("indoor", "yes");
-    lamarTunnel.addTag("lit", "yes");
-    lamarTunnel.addTag("name", "Lamar Tunnel");
-    lamarTunnel.addTag("tunnel", "yes");
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "footway");
+    tunnel.addTag("indoor", "yes");
+    tunnel.addTag("layer", "-1");
+    tunnel.addTag("lit", "yes");
+    tunnel.addTag("name", "Lamar Tunnel");
+    tunnel.addTag("tunnel", "yes");
 
-    assertEquals(StreetTraversalPermission.NONE, wps.getDataForWay(lamarTunnel).getPermission());
+    assertEquals(StreetTraversalPermission.NONE, wps.getDataForWay(tunnel).getPermission());
+  }
+
+  @Test
+  public void harrisCountyTunnel() {
+    // https://www.openstreetmap.org/way/127288288
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "footway");
+    tunnel.addTag("indoor", "yes");
+    tunnel.addTag("name", "Harris County Tunnel");
+    tunnel.addTag("tunnel", "yes");
+
+    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -42,6 +55,19 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("note:lanes", "right lane is hov");
     tunnel.addTag("oneway", "yes");
     tunnel.addTag("surface", "concrete");
+    tunnel.addTag("tunnel", "yes");
+
+    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(tunnel).getPermission());
+  }
+
+  @Test
+  public void carUnderpass() {
+    // https://www.openstreetmap.org/way/102925214
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "motorway_link");
+    tunnel.addTag("lanes", "2");
+    tunnel.addTag("layer", "-1");
+    tunnel.addTag("oneway", "yes");
     tunnel.addTag("tunnel", "yes");
 
     assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(tunnel).getPermission());
