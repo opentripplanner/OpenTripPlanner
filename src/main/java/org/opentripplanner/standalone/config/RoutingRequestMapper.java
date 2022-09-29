@@ -229,8 +229,9 @@ public class RoutingRequestMapper {
       walk.withSafetyFactor(c.asDouble("walkSafetyFactor", walk.safetyFactor()));
     });
 
-    preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
-    request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));
+    var wheelchairNode = c.path("wheelchairAccessibility");
+    preferences.setWheelchair(mapAccessibilityRequest(wheelchairNode));
+    request.setWheelchair(wheelchairNode.asBoolean("enabled", false));
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
