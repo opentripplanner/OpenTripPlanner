@@ -2,9 +2,11 @@ package org.opentripplanner.datastore.https;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -18,6 +20,12 @@ import org.opentripplanner.util.HttpUtils;
 public class HttpsDataSourceRepository implements DataSourceRepository {
 
   private static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
+
+  private static final Set<String> HTTP_HEADERS = Set.of(
+    HttpHeaders.CONTENT_ENCODING,
+    HttpHeaders.CONTENT_TYPE,
+    HttpHeaders.LAST_MODIFIED
+  );
 
   @Override
   public String description() {
@@ -73,7 +81,10 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   private static HttpsDataSourceMetadata getHttpsDataSourceMetadata(URI uri) {
     List<Header> headers = HttpUtils.getHeaders(uri);
     return new HttpsDataSourceMetadata(
-      headers.stream().collect(Collectors.toUnmodifiableMap(Header::getName, Header::getValue))
+      headers
+        .stream()
+        .filter(header -> HTTP_HEADERS.contains(header.getName()))
+        .collect(Collectors.toUnmodifiableMap(Header::getName, Header::getValue))
     );
   }
 }
