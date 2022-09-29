@@ -52,8 +52,7 @@ public class AStar {
     RemainingWeightHeuristic heuristic,
     SkipEdgeStrategy skipEdgeStrategy,
     TraverseVisitor traverseVisitor,
-    RouteRequest request,
-    StreetMode streetMode,
+    boolean arriveBy,
     Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     SearchTerminationStrategy terminationStrategy,
@@ -66,12 +65,11 @@ public class AStar {
     this.traverseVisitor = traverseVisitor;
     this.fromVertices = fromVertices;
     this.toVertices = toVertices;
-    this.arriveBy = request.arriveBy();
+    this.arriveBy = arriveBy;
     this.terminationStrategy = terminationStrategy;
     this.timeout = timeout;
 
     this.spt = new ShortestPathTree(dominanceFunction);
-    this.heuristic.initialize(request, streetMode, fromVertices, toVertices);
 
     // Initialized with a reasonable size, see #4445
     this.pq = new BinHeap<>(1000);

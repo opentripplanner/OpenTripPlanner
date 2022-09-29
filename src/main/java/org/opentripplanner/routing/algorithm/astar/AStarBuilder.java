@@ -188,12 +188,13 @@ public class AStarBuilder {
       state.stateData.dataOverlayContext = dataOverlayContext;
     }
 
+    heuristic.initialize(routeRequest, streetRequest.mode(), origin, destination);
+
     return new AStar(
       heuristic,
       skipEdgeStrategy,
       traverseVisitor,
-      routeRequest,
-      streetRequest.mode(),
+      routeRequest.arriveBy(),
       origin,
       destination,
       terminationStrategy,
