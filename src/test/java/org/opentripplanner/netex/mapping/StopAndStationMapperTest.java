@@ -193,6 +193,7 @@ public class StopAndStationMapperTest {
     assertEquals("A", childStop1.getPlatformCode());
 
     assertEquals(DEFAULT_TIME_ZONE, parentStop.getTimezone());
+    assertEquals(DEFAULT_TIME_ZONE, childStop1.getTimeZone());
   }
 
   private static StopPlace createStopPlace(
