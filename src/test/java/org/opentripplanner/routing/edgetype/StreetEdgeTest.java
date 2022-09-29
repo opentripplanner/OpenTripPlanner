@@ -254,6 +254,7 @@ public class StreetEdgeTest {
     StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
     StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
     RouteRequest routingRequest = proto.clone();
+    routingRequest.setArriveBy(true);
     State state = new State(
       v2,
       Instant.EPOCH,
@@ -261,7 +262,6 @@ public class StreetEdgeTest {
       new AStarRequest(routingRequest.dateTime(), routingRequest, StreetMode.WALK)
     );
 
-    state.getOptions().setArriveBy(true);
     e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
 
     assertNotNull(e0.traverse(e1.traverse(state)));

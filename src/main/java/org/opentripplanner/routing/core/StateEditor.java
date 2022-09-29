@@ -66,7 +66,7 @@ public class StateEditor {
       // from and to vertices are the same on eg. vehicle rental and parking vertices, thus, we
       // can't know the direction of travel from the above check. The expression below is simplified
       // fromVertex.equals(toVertex) ? parent.getOptions().arriveBy : false;
-      traversingBackward = fromVertex.equals(toVertex) && parent.getOptions().arriveBy();
+      traversingBackward = fromVertex.equals(toVertex) && parent.getRequest().arriveBy();
       child.vertex = toVertex;
     } else if (parentVertex.equals(toVertex)) {
       traversingBackward = true;
@@ -80,7 +80,7 @@ public class StateEditor {
       defectiveTraversal = true;
     }
 
-    if (traversingBackward != parent.getOptions().arriveBy()) {
+    if (traversingBackward != parent.getRequest().arriveBy()) {
       LOG.error(
         "Actual traversal direction does not match traversal direction in TraverseOptions."
       );

@@ -127,9 +127,9 @@ public class Place {
 
   public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, State state) {
     TraverseMode traverseMode = null;
-    if (state.getRequestMode().includesDriving()) {
+    if (state.getRequest().mode().includesDriving()) {
       traverseMode = TraverseMode.CAR;
-    } else if (state.getRequestMode().includesBiking()) {
+    } else if (state.getRequest().mode().includesBiking()) {
       traverseMode = TraverseMode.BICYCLE;
     }
 
@@ -139,7 +139,7 @@ public class Place {
       preferences.parking().useAvailabilityInformation() &&
       vertex
         .getVehicleParking()
-        .hasRealTimeDataForMode(traverseMode, state.getOptions().wheelchair());
+        .hasRealTimeDataForMode(traverseMode, state.getRequest().wheelchair());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

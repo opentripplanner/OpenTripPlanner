@@ -8,18 +8,12 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.util.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,14 +41,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
-  /**
-   * How close to do you have to be to the start or end to be considered "close".
-   *
-   * @see RouteRequest#isCloseToStartOrEnd(Vertex)
-   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
-   */
-  private static final int MAX_CLOSENESS_METERS = 500;
-
   /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
   private GenericLocation from;
@@ -80,10 +66,6 @@ public class RouteRequest implements Cloneable, Serializable {
   private JourneyRequest journey = new JourneyRequest();
 
   private boolean wheelchair = false;
-
-  private Envelope fromEnvelope;
-
-  private Envelope toEnvelope;
 
   /* CONSTRUCTORS */
 
@@ -246,36 +228,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return ret;
   }
 
-  /**
-   * Returns if the vertex is considered "close" to the start or end point of the request. This is
-   * useful if you want to allow loops in car routes under certain conditions.
-   * <p>
-   * Note: If you are doing Raptor access/egress searches this method does not take the possible
-   * intermediate points (stations) into account. This means that stations might be skipped because
-   * a car route to it cannot be found and a suboptimal route to another station is returned
-   * instead.
-   * <p>
-   * If you encounter a case of this, you can adjust this code to take this into account.
-   *
-   * @see RouteRequest#MAX_CLOSENESS_METERS
-   * @see DominanceFunction#betterOrEqualAndComparable(State, State)
-   */
-  public boolean isCloseToStartOrEnd(Vertex vertex) {
-    if (from == null || to == null || from.getCoordinate() == null || to.getCoordinate() == null) {
-      return false;
-    }
-    if (fromEnvelope == null) {
-      fromEnvelope = getEnvelope(from.getCoordinate(), MAX_CLOSENESS_METERS);
-    }
-    if (toEnvelope == null) {
-      toEnvelope = getEnvelope(to.getCoordinate(), MAX_CLOSENESS_METERS);
-    }
-    return (
-      fromEnvelope.intersects(vertex.getCoordinate()) ||
-      toEnvelope.intersects(vertex.getCoordinate())
-    );
-  }
-
   /** The start location */
   public GenericLocation from() {
     return from;
@@ -407,15 +359,5 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void setNumItineraries(int numItineraries) {
     this.numItineraries = numItineraries;
-  }
-
-  private static Envelope getEnvelope(Coordinate c, int meters) {
-    double lat = SphericalDistanceLibrary.metersToDegrees(meters);
-    double lon = SphericalDistanceLibrary.metersToLonDegrees(meters, c.y);
-
-    Envelope env = new Envelope(c);
-    env.expandBy(lon, lat);
-
-    return env;
   }
 }

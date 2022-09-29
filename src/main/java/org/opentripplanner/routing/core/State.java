@@ -123,7 +123,7 @@ public class State implements Cloneable {
 
   /** returns the length of the trip in seconds up to this state */
   public long getElapsedTimeSeconds() {
-    return Math.abs(getTimeSeconds() - request.startTime.getEpochSecond());
+    return Math.abs(getTimeSeconds() - request.startTime().getEpochSecond());
   }
 
   public boolean isCompatibleVehicleRentalState(State state) {
@@ -154,7 +154,7 @@ public class State implements Cloneable {
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING ||
       (
-        getOptions().journey().rental().allowArrivingInRentedVehicleAtDestination() &&
+        getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
         stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
       )
@@ -178,15 +178,15 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = request.requestMode.includesParking();
+    boolean parkAndRide = request.mode().includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
-    if (request.opt.arriveBy()) {
-      vehicleRentingOk = !request.requestMode.includesRenting() || !isRentingVehicle();
+    if (request.arriveBy()) {
+      vehicleRentingOk = !request.mode().includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !request.requestMode.includesRenting() ||
+        !request.mode().includesRenting() ||
         (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
@@ -262,16 +262,12 @@ public class State implements Cloneable {
     return this;
   }
 
-  public RouteRequest getOptions() {
-    return request.opt;
-  }
-
-  public StreetMode getRequestMode() {
-    return request.requestMode;
+  public AStarRequest getRequest() {
+    return request;
   }
 
   public RoutingPreferences getPreferences() {
-    return request.opt.preferences();
+    return request.preferences();
   }
 
   /**
@@ -415,27 +411,11 @@ public class State implements Cloneable {
     }
   }
 
-  // TODO: There is no documentation about what this means. No one knows precisely.
-  // Needs to be replaced with clearly defined fields.
-
   private State reversedClone() {
-    // We no longer compensate for schedule slack (minTransferTime) here.
-    // It is distributed symmetrically over all preboard and prealight edges.
-    var reversedRequest = request.opt.copyOfReversed();
+    AStarRequest reversedRequest = request.copyOfReversed(getTime());
     reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(reversedRequest, request.requestMode);
-    // TODO Check if those three lines are needed:
-    // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
-    // and rctx from it.
-    newStateData.vehicleRentalState = stateData.vehicleRentalState;
-    newStateData.vehicleParked = stateData.vehicleParked;
-    newStateData.carPickupState = stateData.carPickupState;
-
-    return new State(
-      this.vertex,
-      getTime(),
-      newStateData,
-      new AStarRequest(getTime(), reversedRequest, request.requestMode)
-    );
+    StateData newStateData = stateData.clone();
+    newStateData.backMode = null;
+    return new State(this.vertex, getTime(), newStateData, reversedRequest);
   }
 }
