@@ -62,7 +62,7 @@ class RaptorPreferencesTest {
   }
 
   @Test
-  void testEquals() {
+  void testEqualsAndHashCode() {
     // Return same object if no value is set
     assertSame(RaptorPreferences.DEFAULT, RaptorPreferences.of().build());
     assertSame(subject, subject.copyOf().build());

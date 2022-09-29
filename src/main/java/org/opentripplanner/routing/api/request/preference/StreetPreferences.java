@@ -12,12 +12,7 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
 // Direct street search
 public class StreetPreferences implements Cloneable, Serializable {
 
-  private int elevatorBoardCost = 90;
-  // TODO: how long does it /really/ take to  an elevator?
-  private int elevatorBoardTime = 90;
-  private int elevatorHopTime = 20;
-
-  private int elevatorHopCost = 20;
+  private ElevatorPreferences elevator = ElevatorPreferences.DEFAULT;
 
   private DurationForEnum<StreetMode> maxAccessEgressDuration = DurationForEnum
     .of(StreetMode.class)
@@ -36,11 +31,11 @@ public class StreetPreferences implements Cloneable, Serializable {
 
   /** What is the cost of boarding an elevator? */
   public int elevatorBoardCost() {
-    return elevatorBoardCost;
+    return elevator.boardCost();
   }
 
   public void setElevatorBoardCost(int elevatorBoardCost) {
-    this.elevatorBoardCost = elevatorBoardCost;
+    this.elevator = elevator.copyOf().withBoardCost(elevatorBoardCost).build();
   }
 
   /**
@@ -49,20 +44,20 @@ public class StreetPreferences implements Cloneable, Serializable {
    * will probably prevent OTP from working correctly.
    */
   public int elevatorBoardTime() {
-    return elevatorBoardTime;
+    return elevator.boardTime();
   }
 
   public void setElevatorBoardTime(int elevatorBoardTime) {
-    this.elevatorBoardTime = elevatorBoardTime;
+    this.elevator = elevator.copyOf().withBoardTime(elevatorBoardTime).build();
   }
 
   /** How long does it take to advance one floor on an elevator? */
   public int elevatorHopTime() {
-    return elevatorHopTime;
+    return elevator.hopTime();
   }
 
   public void setElevatorHopTime(int elevatorHopTime) {
-    this.elevatorHopTime = elevatorHopTime;
+    this.elevator = elevator.copyOf().withHopTime(elevatorHopTime).build();
   }
 
   /**
@@ -70,11 +65,11 @@ public class StreetPreferences implements Cloneable, Serializable {
    * It is assumed that getting off an elevator is completely free.
    * */
   public int elevatorHopCost() {
-    return elevatorHopCost;
+    return elevator.hopCost();
   }
 
   public void setElevatorHopCost(int elevatorHopCost) {
-    this.elevatorHopCost = elevatorHopCost;
+    this.elevator = elevator.copyOf().withHopCost(elevatorHopCost).build();
   }
 
   /**
@@ -143,6 +138,7 @@ public class StreetPreferences implements Cloneable, Serializable {
       var clone = (StreetPreferences) super.clone();
 
       clone.maxAccessEgressDuration = this.maxAccessEgressDuration;
+      clone.elevator = this.elevator;
 
       return clone;
     } catch (CloneNotSupportedException e) {
