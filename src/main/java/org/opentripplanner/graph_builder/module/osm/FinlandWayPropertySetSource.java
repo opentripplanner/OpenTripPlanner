@@ -45,7 +45,7 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
             yield 1.8;
           }
         }
-        case PEDESTRIAN_AND_BICYCLE -> 1.3;
+        case PEDESTRIAN_AND_BICYCLE -> 1.15;
         case PEDESTRIAN -> 1.1;
         // these don't include walking
         case BICYCLE_AND_CAR, BICYCLE, CAR, NONE -> 1.8;
