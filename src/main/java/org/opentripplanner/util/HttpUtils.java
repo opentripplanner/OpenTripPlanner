@@ -70,8 +70,13 @@ public class HttpUtils {
       throw new RuntimeException(e.getLocalizedMessage(), e);
     }
     if (response.getStatusLine().getStatusCode() != 200) {
+      // remove the query part from the URI
+      String sanitizedUri = uri.toString().replace('?' + uri.getQuery(), "");
       throw new RuntimeException(
-        "URI " + uri + " unavailable. HTTP error code " + response.getStatusLine().getStatusCode()
+        "Resource " +
+        sanitizedUri +
+        " unavailable. HTTP error code " +
+        response.getStatusLine().getStatusCode()
       );
     }
     return Arrays.stream(response.getAllHeaders()).toList();

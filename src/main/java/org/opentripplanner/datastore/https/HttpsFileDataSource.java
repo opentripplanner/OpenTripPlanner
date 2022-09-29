@@ -87,4 +87,10 @@ record HttpsFileDataSource(URI uri, FileType type, HttpsDataSourceMetadata https
   public String path() {
     return uri.toString();
   }
+
+  @Override
+  public String directory() {
+    int endIndex = path().lastIndexOf(name()) - 1;
+    return endIndex <= 0 ? "" : path().substring(0, endIndex);
+  }
 }
