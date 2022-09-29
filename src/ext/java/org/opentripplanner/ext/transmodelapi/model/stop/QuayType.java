@@ -13,9 +13,11 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -136,6 +138,18 @@ public class QuayType {
               (((StopLocation) environment.getSource()).getWheelchairAccessibility()),
               Accessibility.NO_INFORMATION
             )
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("timeZone")
+          .type(Scalars.GraphQLString)
+          .dataFetcher(environment ->
+            Optional
+              .ofNullable(((StopLocation) environment.getSource()).getTimeZone())
+              .map(ZoneId::getId)
           )
           .build()
       )
