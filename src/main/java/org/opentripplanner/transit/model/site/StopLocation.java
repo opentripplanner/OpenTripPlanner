@@ -153,6 +153,13 @@ public interface StopLocation extends LogInfo {
     return getId();
   }
 
+  /**
+   * Whether we should allow transfers to and from stop location (other than transit)
+   */
+  default boolean transfersNotAllowed() {
+    return false;
+  }
+
   static int indexCounter() {
     return INDEX_COUNTER.get();
   }

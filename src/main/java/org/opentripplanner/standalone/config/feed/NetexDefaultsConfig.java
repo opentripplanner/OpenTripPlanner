@@ -24,6 +24,8 @@ public class NetexDefaultsConfig {
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
+  private static final boolean NO_TRANSFERS_ON_ISOLATED_STOPS = false;
+
   /**
    * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field
    * in GTFS file feed_info.txt.
@@ -102,6 +104,8 @@ public class NetexDefaultsConfig {
    */
   public final Set<String> ferryIdsNotAllowedForBicycle;
 
+  public final boolean noTransfersOnIsolatedStops;
+
   public NetexDefaultsConfig(NodeAdapter config) {
     ignoreFilePattern =
       config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(IGNORE_FILE_PATTERN);
@@ -126,5 +130,12 @@ public class NetexDefaultsConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asStringSet(FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE);
+
+    noTransfersOnIsolatedStops =
+      config
+        .of("noTransfersOnIsolatedStops")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asBoolean(NO_TRANSFERS_ON_ISOLATED_STOPS);
   }
 }

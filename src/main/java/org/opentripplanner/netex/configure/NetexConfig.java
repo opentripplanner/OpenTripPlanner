@@ -82,7 +82,8 @@ public class NetexConfig {
       (CompositeDataSource) netexConfiguredDataSource.dataSource(),
       hierarchy(netexConfiguredDataSource),
       buildParams.netexDefaults.ferryIdsNotAllowedForBicycle,
-      buildParams.maxStopToShapeSnapDistance
+      buildParams.maxStopToShapeSnapDistance,
+      buildParams.netexDefaults.noTransfersOnIsolatedStops
     );
   }
 
