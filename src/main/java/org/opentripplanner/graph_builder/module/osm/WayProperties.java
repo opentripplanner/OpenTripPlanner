@@ -37,8 +37,7 @@ public class WayProperties {
   }
 
   public boolean equals(Object o) {
-    if (o instanceof WayProperties) {
-      WayProperties other = (WayProperties) o;
+    if (o instanceof WayProperties other) {
       return (
         bicycleSafetyFeatures.equals(other.bicycleSafetyFeatures) &&
         walkSafetyFeatures.equals(other.walkSafetyFeatures) &&

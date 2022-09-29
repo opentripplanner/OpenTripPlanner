@@ -44,6 +44,6 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("surface", "concrete");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(StreetTraversalPermission.CAR, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(tunnel).getPermission());
   }
 }
