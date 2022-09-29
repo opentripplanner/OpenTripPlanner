@@ -66,7 +66,6 @@ public class State implements Cloneable {
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
-    this.stateData.startTime = startTime;
     this.walkDistance = 0;
     this.time = startTime.getEpochSecond();
   }
@@ -415,7 +414,11 @@ public class State implements Cloneable {
     // It is distributed symmetrically over all preboard and prealight edges.
     var reversedRequest = stateData.opt.copyOfReversed();
     reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(reversedRequest, stateData.requestMode);
+    var newStateData = StateData.getInitialStateData(
+      reversedRequest,
+      stateData.requestMode,
+      getTime()
+    );
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.

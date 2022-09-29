@@ -123,6 +123,7 @@ public class TravelTimeResource {
       startTime = Instant.now();
     }
 
+    routingRequest.setDateTime(startTime);
     endTime = startTime.plus(traveltimeRequest.maxCutoff);
 
     ZoneId zoneId = transitService.getTimeZone();
@@ -292,8 +293,6 @@ public class TravelTimeResource {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
           State s = new State(v, time, stateData.clone());
           s.weight = startTime.until(time, ChronoUnit.SECONDS);
-          // TODO: This shouldn't be overridden in state initialization
-          s.stateData.startTime = stateData.startTime;
           initialStates.add(s);
         }
       }

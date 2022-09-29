@@ -19,7 +19,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 public class StateData implements Cloneable {
 
   // the time at which the search started
-  public Instant startTime;
+  public final Instant startTime;
 
   // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
@@ -70,7 +70,8 @@ public class StateData implements Cloneable {
   public DataOverlayContext dataOverlayContext;
 
   /** Private constructor, use static methods to get a set of initial states. */
-  private StateData(RouteRequest options, StreetMode requestMode) {
+  private StateData(RouteRequest options, StreetMode requestMode, Instant startTime) {
+    this.startTime = startTime;
     this.opt = options;
     this.requestMode = requestMode;
     if (requestMode.includesDriving()) {
@@ -88,7 +89,7 @@ public class StateData implements Cloneable {
    * Returns a set of initial StateDatas based on the options from the RoutingRequest
    */
   public static List<StateData> getInitialStateDatas(RouteRequest options, StreetMode streetMode) {
-    return getInitialStateDatas(options, streetMode, false);
+    return getInitialStateDatas(options, streetMode, options.dateTime(), false);
   }
 
   /**
@@ -96,7 +97,15 @@ public class StateData implements Cloneable {
    * only a single state, which is considered the "base case"
    */
   public static StateData getInitialStateData(RouteRequest options, StreetMode streetMode) {
-    var stateDatas = getInitialStateDatas(options, streetMode, true);
+    return getInitialStateData(options, streetMode, options.dateTime());
+  }
+
+  public static StateData getInitialStateData(
+    RouteRequest options,
+    StreetMode streetMode,
+    Instant time
+  ) {
+    var stateDatas = getInitialStateDatas(options, streetMode, time, true);
     if (stateDatas.size() != 1) {
       throw new IllegalStateException("Unable to create only a single state");
     }
@@ -110,10 +119,11 @@ public class StateData implements Cloneable {
   private static List<StateData> getInitialStateDatas(
     RouteRequest options,
     StreetMode streetMode,
+    Instant startTime,
     boolean forceSingleState
   ) {
     List<StateData> res = new ArrayList<>();
-    var proto = new StateData(options, streetMode);
+    var proto = new StateData(options, streetMode, startTime);
 
     // carPickup searches may start and end in two distinct states:
     //   - CAR / IN_CAR where pickup happens directly at the bus stop
