@@ -206,7 +206,7 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   public String toString(String sep) {
-    return (from + sep + to + sep + dateTime + sep + arriveBy + sep + journey.modes());
+    return from + sep + to + sep + dateTime + sep + arriveBy + sep + journey.modes();
   }
 
   /* INSTANCE METHODS */
