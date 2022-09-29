@@ -1,8 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
 /**
  * OSM way properties for the Houston, Texas, USA area.
@@ -20,20 +22,16 @@ public class HoustonWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    // Disallow any use of underground indoor pedestrian tunnels
-    props.setProperties(
-      "highway=footway;layer=-1;tunnel=yes;indoor=yes",
-      withModes(StreetTraversalPermission.NONE)
-    );
-    props.setProperties(
-      "highway=*;layer=-1;tunnel=yes;indoor=yes",
-      withModes(StreetTraversalPermission.ALL)
-    );
-    props.setProperties(
-      "highway=footway;tunnel=yes;indoor=yes",
-      withModes(StreetTraversalPermission.PEDESTRIAN)
-    );
+    props.setProperties("highway=*;layer=-1;tunnel=yes;indoor=yes", withModes(ALL));
+    props.setProperties("highway=cycleway;tunnel=yes;indoor=yes", withModes(BICYCLE));
+    // sadly we need these permutations since otherwise they would match with the final props
+    // I'm not sure if this is a bug or working as intended
+    props.setProperties("highway=footway;tunnel=yes;indoor=yes", withModes(PEDESTRIAN));
+    props.setProperties("highway=footway;tunnel=yes;layer=-1", withModes(PEDESTRIAN));
+    props.setProperties("highway=footway", withModes(PEDESTRIAN));
 
+    // Disallow any use of underground indoor pedestrian tunnels
+    props.setProperties("highway=footway;layer=-1;tunnel=yes;indoor=yes", withModes(NONE));
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
   }

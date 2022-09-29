@@ -1,10 +1,13 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 class HoustonWayPropertySetSourceTest {
 
@@ -26,7 +29,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("name", "Lamar Tunnel");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(StreetTraversalPermission.NONE, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(NONE, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -38,7 +41,40 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("name", "Harris County Tunnel");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
+  }
+
+  @Test
+  public void pedestrianUnderpass() {
+    // https://www.openstreetmap.org/way/783648925
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "footway");
+    tunnel.addTag("layer", "-1");
+    tunnel.addTag("tunnel", "yes");
+
+    assertEquals(PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
+  }
+
+  @Test
+  public void cyclingTunnel() {
+    // https://www.openstreetmap.org/way/220484967
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("bicycle", "designated");
+    tunnel.addTag("foot", "designated");
+    tunnel.addTag("highway", "cycleway");
+    tunnel.addTag("segregated", "no");
+    tunnel.addTag("surface", "concrete");
+    tunnel.addTag("tunnel", "yes");
+
+    assertEquals(BICYCLE, wps.getDataForWay(tunnel).getPermission());
+
+    // https://www.openstreetmap.org/way/101884176
+    tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "cycleway");
+    tunnel.addTag("layer", "-1");
+    tunnel.addTag("name", "Hogg Woods Trail");
+    tunnel.addTag("tunnel", "yes");
+    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -57,7 +93,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("surface", "concrete");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -70,6 +106,29 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("oneway", "yes");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
+  }
+
+  @Test
+  public void serviceTunnel() {
+    // https://www.openstreetmap.org/way/15334550
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "service");
+    tunnel.addTag("layer", "-1");
+    tunnel.addTag("tunnel", "yes");
+
+    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
+  }
+
+  @Test
+  public void unclassified() {
+    // https://www.openstreetmap.org/way/44896136
+    OSMWithTags tunnel = new OSMWithTags();
+    tunnel.addTag("highway", "unclassified");
+    tunnel.addTag("name", "Ross Sterling Street");
+    tunnel.addTag("layer", "-1");
+    tunnel.addTag("tunnel", "yes");
+
+    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
   }
 }
