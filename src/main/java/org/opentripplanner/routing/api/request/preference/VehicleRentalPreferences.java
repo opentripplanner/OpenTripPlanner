@@ -4,7 +4,7 @@ import java.io.Serializable;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
 // TODO VIA: Javadoc
-public class VehicleRentalPreferences implements Cloneable, Serializable {
+public final class VehicleRentalPreferences implements Cloneable, Serializable {
 
   private int pickupTime = 60;
   private int pickupCost = 120;

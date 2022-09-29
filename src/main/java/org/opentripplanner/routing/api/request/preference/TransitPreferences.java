@@ -20,7 +20,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class TransitPreferences implements Serializable {
+public final class TransitPreferences implements Serializable {
 
   public static final TransitPreferences DEFAULT = new TransitPreferences();
 

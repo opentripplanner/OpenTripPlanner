@@ -9,7 +9,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class AccessibilityPreferences {
+public final class AccessibilityPreferences {
 
   private static final int NOT_SET = -1;
 

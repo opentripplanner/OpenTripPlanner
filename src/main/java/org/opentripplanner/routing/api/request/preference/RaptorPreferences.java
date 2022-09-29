@@ -19,7 +19,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class RaptorPreferences implements Serializable {
+public final class RaptorPreferences implements Serializable {
 
   public static final RaptorPreferences DEFAULT = new RaptorPreferences();
 

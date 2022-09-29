@@ -9,7 +9,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  *
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class VehicleParkingPreferences implements Serializable {
+public final class VehicleParkingPreferences implements Serializable {
 
   public static final VehicleParkingPreferences DEFAULT = new VehicleParkingPreferences(false);
   private static final VehicleParkingPreferences USE_AVAILABILITY = new VehicleParkingPreferences(

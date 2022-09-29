@@ -16,7 +16,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class BikePreferences implements Serializable {
+public final class BikePreferences implements Serializable {
 
   public static final BikePreferences DEFAULT = new BikePreferences();
 

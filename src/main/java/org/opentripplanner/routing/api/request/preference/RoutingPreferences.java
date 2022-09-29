@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 /** User/trip cost/time/slack/reluctance search config. */
 @SuppressWarnings("UnusedReturnValue")
-public class RoutingPreferences implements Cloneable, Serializable {
+public final class RoutingPreferences implements Cloneable, Serializable {
 
   private TransitPreferences transit = TransitPreferences.DEFAULT;
   private TransferPreferences transfer = TransferPreferences.DEFAULT;
