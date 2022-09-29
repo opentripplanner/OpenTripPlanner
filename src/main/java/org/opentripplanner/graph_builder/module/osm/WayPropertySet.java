@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
@@ -119,20 +120,24 @@ public class WayPropertySet {
     WayProperties result = rightResult
       .mutate()
       .bicycleSafety(
-        rightResult.getBicycleSafetyFeatures() != null
-          ? rightResult.getBicycleSafetyFeatures().forward()
-          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed),
-        leftResult.getBicycleSafetyFeatures() != null
-          ? leftResult.getBicycleSafetyFeatures().back()
-          : defaultBicycleSafetyForPermission.apply(permission, backSpeed)
+        Optional
+          .ofNullable(rightResult.getBicycleSafetyFeatures())
+          .map(safety -> safety.forward())
+          .orElse(defaultBicycleSafetyForPermission.apply(permission, forwardSpeed)),
+        Optional
+          .ofNullable(leftResult.getBicycleSafetyFeatures())
+          .map(safety -> safety.back())
+          .orElse(defaultBicycleSafetyForPermission.apply(permission, backSpeed))
       )
       .walkSafety(
-        rightResult.getWalkSafetyFeatures() != null
-          ? rightResult.getWalkSafetyFeatures().forward()
-          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed),
-        leftResult.getWalkSafetyFeatures() != null
-          ? leftResult.getWalkSafetyFeatures().back()
-          : defaultWalkSafetyForPermission.apply(permission, backSpeed)
+        Optional
+          .ofNullable(rightResult.getWalkSafetyFeatures())
+          .map(safety -> safety.forward())
+          .orElse(defaultWalkSafetyForPermission.apply(permission, forwardSpeed)),
+        Optional
+          .ofNullable(leftResult.getWalkSafetyFeatures())
+          .map(safety -> safety.back())
+          .orElse(defaultWalkSafetyForPermission.apply(permission, backSpeed))
       )
       .build();
 
@@ -436,32 +441,32 @@ public class WayPropertySet {
     boolean right
   ) {
     SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
-    double firstBicycle = bicycleSafetyFeatures.forward();
-    double secondBicycle = bicycleSafetyFeatures.back();
+    double forwardBicycle = bicycleSafetyFeatures.forward();
+    double backBicycle = bicycleSafetyFeatures.back();
     SafetyFeatures walkSafetyFeatures = result.getWalkSafetyFeatures();
-    double firstWalk = walkSafetyFeatures.forward();
-    double secondWalk = walkSafetyFeatures.back();
+    double forwardWalk = walkSafetyFeatures.forward();
+    double backWalk = walkSafetyFeatures.back();
     for (WayProperties properties : mixins) {
       if (right) {
         if (properties.getBicycleSafetyFeatures() != null) {
-          secondBicycle *= properties.getBicycleSafetyFeatures().back();
+          backBicycle *= properties.getBicycleSafetyFeatures().back();
         }
         if (properties.getWalkSafetyFeatures() != null) {
-          secondWalk *= properties.getWalkSafetyFeatures().back();
+          backWalk *= properties.getWalkSafetyFeatures().back();
         }
       } else {
         if (properties.getBicycleSafetyFeatures() != null) {
-          firstBicycle *= properties.getBicycleSafetyFeatures().forward();
+          forwardBicycle *= properties.getBicycleSafetyFeatures().forward();
         }
         if (properties.getWalkSafetyFeatures() != null) {
-          firstWalk *= properties.getWalkSafetyFeatures().forward();
+          forwardWalk *= properties.getWalkSafetyFeatures().forward();
         }
       }
     }
     return result
       .mutate()
-      .bicycleSafety(firstBicycle, secondBicycle)
-      .walkSafety(firstWalk, secondWalk)
+      .bicycleSafety(forwardBicycle, backBicycle)
+      .walkSafety(forwardWalk, backWalk)
       .build();
   }
 }
