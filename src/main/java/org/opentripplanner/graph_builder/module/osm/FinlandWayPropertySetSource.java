@@ -80,14 +80,35 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
     /*
      * Automobile speeds in Finland. General speed limit is 80kph unless signs says otherwise.
-     *
      */
-    props.setCarSpeed("highway=motorway", 27.77f); // = 100kph. Varies between 80 - 120 kph depending on road and season.
-    props.setCarSpeed("highway=motorway_link", 15); // = 54kph
-    props.setCarSpeed("highway=trunk", 22.22f); // 80kph "Valtatie"
-    props.setCarSpeed("highway=trunk_link", 15); // = 54kph
-    props.setCarSpeed("highway=primary", 22.22f); // 80kph "Kantatie"
-    props.setCarSpeed("highway=primary_link", 15); // = 54kph
+    // = 100kph. Varies between 80 - 120 kph depending on road and season.
+    props.setCarSpeed("highway=motorway", 27.77f);
+    // = 54kph
+    props.setCarSpeed("highway=motorway_link", 15);
+    // 80kph "Valtatie"
+    props.setCarSpeed("highway=trunk", 22.22f);
+    // = 54kph
+    props.setCarSpeed("highway=trunk_link", 15);
+    // 80kph "Kantatie"
+    props.setCarSpeed("highway=primary", 22.22f);
+    // = 54kph
+    props.setCarSpeed("highway=primary_link", 15);
+    // ~= 50kph
+    props.setCarSpeed("highway=secondary", 13.89f);
+    // ~= 40 kph
+    props.setCarSpeed("highway=secondary_link", 11.2f);
+    props.setCarSpeed("highway=tertiary", 11.2f);
+    props.setCarSpeed("highway=tertiary_link", 11.2f);
+    props.setCarSpeed("highway=unclassified", 11.2f);
+    props.setCarSpeed("highway=road", 11.2f);
+    // ~= 35 kph
+    props.setCarSpeed("highway=residential", 9.75f);
+    // ~= 30 kph
+    props.setCarSpeed("highway=service", 8.35f);
+    // ~= 20 kph
+    props.setCarSpeed("highway=living_street", 5.55f);
+    // ~= 16 kph
+    props.setCarSpeed("highway=track", 4.5f);
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
