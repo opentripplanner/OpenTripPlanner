@@ -16,7 +16,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.network.Route;
 
-public class AtlantaFareServiceImpl extends DefaultFareServiceImpl {
+public class AtlantaFareService extends DefaultFareServiceImpl {
 
   private static final ZoneId NEW_YORK_ZONE_ID = ZoneId.of("America/New_York");
   public static final String COBB_AGENCY_ID = "2";
@@ -339,7 +339,7 @@ public class AtlantaFareServiceImpl extends DefaultFareServiceImpl {
     );
   }
 
-  public AtlantaFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
+  public AtlantaFareService(Collection<FareRuleSet> regularFareRules) {
     addFareRules(FareType.regular, regularFareRules);
     addFareRules(FareType.senior, regularFareRules);
     addFareRules(FareType.youth, regularFareRules);

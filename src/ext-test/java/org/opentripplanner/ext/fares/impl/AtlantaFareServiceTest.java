@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.impl.AtlantaFareServiceImpl.COBB_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.AtlantaFareServiceImpl.GCT_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.AtlantaFareServiceImpl.MARTA_AGENCY_ID;
-import static org.opentripplanner.ext.fares.impl.AtlantaFareServiceImpl.XPRESS_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.AtlantaFareService.COBB_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.AtlantaFareService.GCT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.AtlantaFareService.MARTA_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.AtlantaFareService.XPRESS_AGENCY_ID;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.time.ZoneId;
@@ -33,7 +33,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   static final ZoneId NEW_YORK_TIMEZONE = ZoneId.of("America/New_York");
   public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
   public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE * 100;
-  private static AtlantaFareServiceImpl atlFareService;
+  private static AtlantaFareService atlFareService;
 
   @BeforeAll
   public static void setUpClass() {
@@ -248,7 +248,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     return itin.getLegs().get(0);
   }
 
-  private static class TestAtlantaFareService extends AtlantaFareServiceImpl {
+  private static class TestAtlantaFareService extends AtlantaFareService {
 
     public TestAtlantaFareService(Collection<FareRuleSet> regularFareRules) {
       super(regularFareRules);
