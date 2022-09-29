@@ -57,6 +57,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -278,9 +279,15 @@ public class TravelTimeResource {
       routingRequest.journey().egress().mode()
     );
 
+    AStarRequest aStarRequest = new AStarRequest(
+      routingRequest.dateTime(),
+      routingRequest,
+      routingRequest.journey().egress().mode()
+    );
+
     for (var vertex : temporaryVertices.getFromVertices()) {
       // TODO StateData should be of direct mode here
-      initialStates.add(new State(vertex, startTime, stateData));
+      initialStates.add(new State(vertex, startTime, stateData, aStarRequest));
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
@@ -291,7 +298,7 @@ public class TravelTimeResource {
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, stateData.clone());
+          State s = new State(v, time, stateData.clone(), aStarRequest);
           s.weight = startTime.until(time, ChronoUnit.SECONDS);
           initialStates.add(s);
         }

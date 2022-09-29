@@ -16,11 +16,13 @@ public class TraverseResultTest {
 
     /* note: times are rounded to seconds toward zero */
 
+    final RouteRequest request = new RouteRequest();
     for (int i = 0; i < 4; i++) {
       State r = new State(
         null,
         Instant.ofEpochSecond(i * 1000),
-        StateData.getInitialStateData(new RouteRequest(), StreetMode.WALK)
+        StateData.getInitialStateData(request, StreetMode.WALK),
+        new AStarRequest(request.dateTime(), request, StreetMode.WALK)
       );
       resultChain = r.addToExistingResultChain(resultChain);
     }

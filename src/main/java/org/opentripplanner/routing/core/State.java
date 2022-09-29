@@ -19,6 +19,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 
 public class State implements Cloneable {
 
+  private final AStarRequest request;
+
   /* Data which is likely to change at most traversals */
 
   // the current time at this state, in seconds since UNIX epoch
@@ -53,7 +55,12 @@ public class State implements Cloneable {
    */
   public State(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.dateTime(), StateData.getInitialStateData(opt, streetMode));
+    this(
+      vertex,
+      opt.dateTime(),
+      StateData.getInitialStateData(opt, streetMode),
+      new AStarRequest(opt.dateTime(), opt, streetMode)
+    );
   }
 
   /**
@@ -61,7 +68,8 @@ public class State implements Cloneable {
    * values. Useful for starting a multiple initial state search, for example when propagating
    * profile results to the street network in RoundBasedProfileRouter.
    */
-  public State(Vertex vertex, Instant startTime, StateData stateData) {
+  public State(Vertex vertex, Instant startTime, StateData stateData, AStarRequest request) {
+    this.request = request;
     this.weight = 0;
     this.vertex = vertex;
     this.backState = null;
@@ -82,9 +90,10 @@ public class State implements Cloneable {
   ) {
     Collection<State> states = new ArrayList<>();
     List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, streetMode);
+    AStarRequest aStarRequest = new AStarRequest(request.dateTime(), request, streetMode);
     for (Vertex vertex : vertices) {
       for (StateData stateData : initialStateDatas) {
-        states.add(new State(vertex, request.dateTime(), stateData));
+        states.add(new State(vertex, request.dateTime(), stateData, aStarRequest));
       }
     }
     return states;
@@ -114,7 +123,7 @@ public class State implements Cloneable {
 
   /** returns the length of the trip in seconds up to this state */
   public long getElapsedTimeSeconds() {
-    return Math.abs(getTimeSeconds() - stateData.startTime.getEpochSecond());
+    return Math.abs(getTimeSeconds() - request.startTime.getEpochSecond());
   }
 
   public boolean isCompatibleVehicleRentalState(State state) {
@@ -169,15 +178,15 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = stateData.requestMode.includesParking();
+    boolean parkAndRide = request.requestMode.includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
-    if (stateData.opt.arriveBy()) {
-      vehicleRentingOk = !stateData.requestMode.includesRenting() || !isRentingVehicle();
+    if (request.opt.arriveBy()) {
+      vehicleRentingOk = !request.requestMode.includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.requestMode.includesRenting() ||
+        !request.requestMode.includesRenting() ||
         (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
@@ -254,15 +263,15 @@ public class State implements Cloneable {
   }
 
   public RouteRequest getOptions() {
-    return stateData.opt;
+    return request.opt;
   }
 
   public StreetMode getRequestMode() {
-    return stateData.requestMode;
+    return request.requestMode;
   }
 
   public RoutingPreferences getPreferences() {
-    return stateData.opt.preferences();
+    return request.opt.preferences();
   }
 
   /**
@@ -412,13 +421,9 @@ public class State implements Cloneable {
   private State reversedClone() {
     // We no longer compensate for schedule slack (minTransferTime) here.
     // It is distributed symmetrically over all preboard and prealight edges.
-    var reversedRequest = stateData.opt.copyOfReversed();
+    var reversedRequest = request.opt.copyOfReversed();
     reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(
-      reversedRequest,
-      stateData.requestMode,
-      getTime()
-    );
+    var newStateData = StateData.getInitialStateData(reversedRequest, request.requestMode);
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.
@@ -426,6 +431,11 @@ public class State implements Cloneable {
     newStateData.vehicleParked = stateData.vehicleParked;
     newStateData.carPickupState = stateData.carPickupState;
 
-    return new State(this.vertex, getTime(), newStateData);
+    return new State(
+      this.vertex,
+      getTime(),
+      newStateData,
+      new AStarRequest(getTime(), reversedRequest, request.requestMode)
+    );
   }
 }

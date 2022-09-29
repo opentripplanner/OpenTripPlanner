@@ -17,6 +17,7 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
@@ -256,7 +257,8 @@ public class StreetEdgeTest {
     State state = new State(
       v2,
       Instant.EPOCH,
-      StateData.getInitialStateData(routingRequest, StreetMode.WALK)
+      StateData.getInitialStateData(routingRequest, StreetMode.WALK),
+      new AStarRequest(routingRequest.dateTime(), routingRequest, StreetMode.WALK)
     );
 
     state.getOptions().setArriveBy(true);
