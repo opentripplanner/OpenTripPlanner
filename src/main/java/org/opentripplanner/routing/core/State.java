@@ -364,11 +364,11 @@ public class State implements Cloneable {
   }
 
   public IntersectionTraversalCalculator intersectionTraversalCalculator() {
-    return stateData.intersectionTraversalCalculator;
+    return request.intersectionTraversalCalculator;
   }
 
   public DataOverlayContext dataOverlayContext() {
-    return stateData.dataOverlayContext;
+    return request.dataOverlayContext;
   }
 
   protected State clone() {

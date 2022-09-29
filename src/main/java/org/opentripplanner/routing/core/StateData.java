@@ -2,12 +2,8 @@ package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
 /**
@@ -26,12 +22,6 @@ public class StateData implements Cloneable {
   protected boolean mayKeepRentedVehicleAtDestination;
 
   protected CarPickupState carPickupState;
-
-  // TODO VIA - this will be folded into an AStarRequest in the future
-  public IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
-    IntersectionTraversalModel.SIMPLE,
-    DrivingDirection.RIGHT
-  );
 
   /**
    * The preferred mode, which may differ from backMode when for example walking with a bike. It may
@@ -53,8 +43,6 @@ public class StateData implements Cloneable {
 
   /** This boolean is set to true upon transition from a normal street to a no-through-traffic street. */
   protected boolean enteredNoThroughTrafficArea;
-
-  public DataOverlayContext dataOverlayContext;
 
   /** Private constructor, use static methods to get a set of initial states. */
   private StateData(StreetMode requestMode) {

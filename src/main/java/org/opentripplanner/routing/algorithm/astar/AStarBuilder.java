@@ -184,8 +184,8 @@ public class AStarBuilder {
     }
 
     for (var state : initialStates) {
-      state.stateData.intersectionTraversalCalculator = intersectionTraversalCalculator;
-      state.stateData.dataOverlayContext = dataOverlayContext;
+      state.getRequest().setIntersectionTraversalCalculator(intersectionTraversalCalculator);
+      state.getRequest().setDataOverlayContext(dataOverlayContext);
     }
 
     heuristic.initialize(routeRequest, streetRequest.mode(), origin, destination);

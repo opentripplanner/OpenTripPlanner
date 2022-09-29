@@ -4,11 +4,15 @@ import java.time.Instant;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
+import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
+import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 
@@ -33,6 +37,13 @@ public class AStarRequest {
 
   private final Envelope fromEnvelope;
   private final Envelope toEnvelope;
+
+  protected IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
+    IntersectionTraversalModel.SIMPLE,
+    DrivingDirection.RIGHT
+  );
+
+  protected DataOverlayContext dataOverlayContext;
 
   public AStarRequest(Instant startTime, RouteRequest opt, StreetMode mode) {
     this.startTime = startTime;
@@ -102,6 +113,16 @@ public class AStarRequest {
 
   public AStarRequest copyOfReversed(Instant time) {
     return new AStarRequest(this, time);
+  }
+
+  public void setIntersectionTraversalCalculator(
+    IntersectionTraversalCalculator intersectionTraversalCalculator
+  ) {
+    this.intersectionTraversalCalculator = intersectionTraversalCalculator;
+  }
+
+  public void setDataOverlayContext(DataOverlayContext dataOverlayContext) {
+    this.dataOverlayContext = dataOverlayContext;
   }
 
   /**

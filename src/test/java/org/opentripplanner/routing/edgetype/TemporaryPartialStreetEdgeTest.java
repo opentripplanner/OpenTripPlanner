@@ -144,7 +144,7 @@ public class TemporaryPartialStreetEdgeTest {
 
     StreetMode streetMode = options.journey().direct().mode();
     State s0 = new State(v1, options, streetMode);
-    s0.stateData.intersectionTraversalCalculator = calculator;
+    s0.getRequest().setIntersectionTraversalCalculator(calculator);
     State s1 = e1.traverse(s0);
     State s2 = e2.traverse(s1);
     State s3 = e3.traverse(s2);
@@ -153,7 +153,7 @@ public class TemporaryPartialStreetEdgeTest {
     Edge partialE2Second = start.getOutgoing().iterator().next();
 
     State partialS0 = new State(v1, options, streetMode);
-    partialS0.stateData.intersectionTraversalCalculator = calculator;
+    partialS0.getRequest().setIntersectionTraversalCalculator(calculator);
     State partialS1 = e1.traverse(partialS0);
     State partialS2A = partialE2First.traverse(partialS1);
     State partialS2B = partialE2Second.traverse(partialS2A);
@@ -171,13 +171,13 @@ public class TemporaryPartialStreetEdgeTest {
     calculator = new ConstantIntersectionTraversalCalculator();
 
     State s0NoCost = new State(v1, options, streetMode);
-    s0NoCost.stateData.intersectionTraversalCalculator = calculator;
+    s0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
     State s1NoCost = e1.traverse(s0NoCost);
     State s2NoCost = e2.traverse(s1NoCost);
     State s3NoCost = e3.traverse(s2NoCost);
 
     State partialS0NoCost = new State(v1, options, streetMode);
-    partialS0NoCost.stateData.intersectionTraversalCalculator = calculator;
+    partialS0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
     State partialS1NoCost = e1.traverse(partialS0NoCost);
     State partialS2ANoCost = partialE2First.traverse(partialS1NoCost);
     State partialS2BNoCost = partialE2Second.traverse(partialS2ANoCost);
