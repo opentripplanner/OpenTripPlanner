@@ -108,6 +108,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Extract journey request from RouteRequest [#4446](https://github.com/opentripplanner/OpenTripPlanner/pull/4446)
 - Move intersectionTraversalCostModel into StreetPreferences [#4444](https://github.com/opentripplanner/OpenTripPlanner/pull/4444)
 - Add feature switch for matching ET messages on stops [#4347](https://github.com/opentripplanner/OpenTripPlanner/pull/4347)
+- Make safety defaults customizable for walking and cycling [#4438](https://github.com/opentripplanner/OpenTripPlanner/pull/4438)
+- Fix block-based interlining when importing several GTFS feeds [#4468](https://github.com/opentripplanner/OpenTripPlanner/pull/4468)
+- Add error message for value assertion [#4475](https://github.com/opentripplanner/OpenTripPlanner/pull/4475)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)

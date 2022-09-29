@@ -316,12 +316,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       );
 
       if (street != null) {
-        double bicycleSafety = wayData.getBicycleSafetyFeatures().first;
+        double bicycleSafety = wayData.getBicycleSafetyFeatures().forward();
         street.setBicycleSafetyFactor((float) bicycleSafety);
         if (bicycleSafety < bestBikeSafety) {
           bestBikeSafety = (float) bicycleSafety;
         }
-        double walkSafety = wayData.getWalkSafetyFeatures().first;
+        double walkSafety = wayData.getWalkSafetyFeatures().forward();
         street.setWalkSafetyFactor((float) walkSafety);
         if (walkSafety < bestWalkSafety) {
           bestWalkSafety = (float) walkSafety;
@@ -339,12 +339,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
 
       if (backStreet != null) {
-        double bicycleSafety = wayData.getBicycleSafetyFeatures().second;
+        double bicycleSafety = wayData.getBicycleSafetyFeatures().back();
         if (bicycleSafety < bestBikeSafety) {
           bestBikeSafety = (float) bicycleSafety;
         }
         backStreet.setBicycleSafetyFactor((float) bicycleSafety);
-        double walkSafety = wayData.getWalkSafetyFeatures().second;
+        double walkSafety = wayData.getWalkSafetyFeatures().back();
         if (walkSafety < bestWalkSafety) {
           bestWalkSafety = (float) walkSafety;
         }

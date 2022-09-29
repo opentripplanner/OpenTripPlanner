@@ -543,8 +543,8 @@ public class BuildConfig implements OtpDataStoreConfig {
       transferRequests = List.of(new RouteRequest());
     }
 
-    if (logUnusedParams) {
-      c.logAllUnusedParameters(LOG);
+    if (logUnusedParams && LOG.isWarnEnabled()) {
+      c.logAllUnusedParameters(LOG::warn);
     }
   }
 

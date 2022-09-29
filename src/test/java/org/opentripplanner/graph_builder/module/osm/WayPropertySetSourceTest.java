@@ -73,13 +73,13 @@ public class WayPropertySetSourceTest {
 
     var withoutFoo = new OSMWithTags();
     withoutFoo.addTag("tag", "imaginary");
-    assertEquals(2, wps.getDataForWay(withoutFoo).getBicycleSafetyFeatures().second);
+    assertEquals(2, wps.getDataForWay(withoutFoo).getBicycleSafetyFeatures().back());
 
     // the mixin for foo=bar reduces the bike safety factor
     var withFoo = new OSMWithTags();
     withFoo.addTag("tag", "imaginary");
     withFoo.addTag("foo", "bar");
-    assertEquals(1, wps.getDataForWay(withFoo).getBicycleSafetyFeatures().second);
+    assertEquals(1, wps.getDataForWay(withFoo).getBicycleSafetyFeatures().back());
   }
 
   public OSMWithTags way(String key, String value) {

@@ -79,7 +79,7 @@ public class InterlineProcessor {
     if (!transfers.isEmpty()) {
       LOG.info(
         "Found {} pairs of trips for which stay-seated (interlined) transfers were created",
-        interlinedTrips.keySet().size()
+        transfers.size()
       );
 
       transferService.addAll(transfers);
