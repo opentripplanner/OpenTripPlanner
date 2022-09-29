@@ -15,6 +15,7 @@ import org.rutebanken.netex.model.ServiceFrame;
 import org.rutebanken.netex.model.SiteFrame;
 import org.rutebanken.netex.model.TimetableFrame;
 import org.rutebanken.netex.model.VersionFrameDefaultsStructure;
+import org.rutebanken.netex.model.VersionFrame_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,11 +88,6 @@ public class NetexDocumentParser {
     // Declare some ugly types to prevent obstructing the reading later...
     Collection<JAXBElement<? extends Common_VersionFrameStructure>> frames;
 
-    // TODO OTP2 #2781 - Frame defaults can be set on any frame according to the Norwegian
-    //                 - profile. This only set it on the composite frame, and further
-    //                 - overriding it at a sub-level will not be acknowledged, or even
-    //                 - given any kind of warning. This should be fixed as part of Issue
-    //                 - https://github.com/opentripplanner/OpenTripPlanner/issues/2781
     parseFrameDefaultsLikeTimeZone(frame.getFrameDefaults());
 
     frames = frame.getFrames().getCommonFrame();
@@ -102,8 +98,7 @@ public class NetexDocumentParser {
   }
 
   private void parseFrameDefaultsLikeTimeZone(VersionFrameDefaultsStructure frameDefaults) {
-    String timeZone = "GMT";
-
+    String timeZone = null;
     if (
       frameDefaults != null &&
       frameDefaults.getDefaultLocale() != null &&
@@ -111,12 +106,22 @@ public class NetexDocumentParser {
     ) {
       timeZone = frameDefaults.getDefaultLocale().getTimeZone();
     }
+    if (timeZone == null && netexIndex.timeZone.get() == null) {
+      // Set fallback if timezone is not defined in hierarchy
+      timeZone = "GMT";
+    }
 
-    netexIndex.timeZone.set(timeZone);
+    if (timeZone != null) {
+      netexIndex.timeZone.set(timeZone);
+    }
   }
 
   private <T> void parse(T node, NetexParser<T> parser) {
     parser.parse(node);
     parser.setResultOnIndex(netexIndex);
+
+    if (node instanceof VersionFrame_VersionStructure frame) {
+      parseFrameDefaultsLikeTimeZone(frame.getFrameDefaults());
+    }
   }
 }
