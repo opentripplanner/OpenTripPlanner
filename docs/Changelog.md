@@ -112,6 +112,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix block-based interlining when importing several GTFS feeds [#4468](https://github.com/opentripplanner/OpenTripPlanner/pull/4468)
 - Add error message for value assertion [#4475](https://github.com/opentripplanner/OpenTripPlanner/pull/4475)
 - Remove A* internal fields from RouteRequest [#4432](https://github.com/opentripplanner/OpenTripPlanner/pull/4432)
+- Do not remove patterns with non-running DatedServiceJourneys [#4474](https://github.com/opentripplanner/OpenTripPlanner/pull/4474)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
