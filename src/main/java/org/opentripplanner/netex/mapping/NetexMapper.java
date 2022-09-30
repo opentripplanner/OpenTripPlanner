@@ -297,6 +297,7 @@ public class NetexMapper {
       idFactory,
       currentNetexIndex.getQuayById(),
       tariffZoneMapper,
+      ZoneId.of(currentNetexIndex.getTimeZone()),
       issueStore
     );
     for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
