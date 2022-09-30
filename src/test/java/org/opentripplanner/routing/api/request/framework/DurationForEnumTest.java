@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -34,6 +35,11 @@ class DurationForEnumTest {
   void defaultValue() {
     assertEquals(DEFAULT, subject.defaultValue());
     assertEquals(DEFAULT.toSeconds(), subject.defaultValueSeconds());
+
+    assertThrows(
+      NullPointerException.class,
+      () -> DurationForEnum.of(StreetMode.class).withDefault(null).build()
+    );
   }
 
   @Test

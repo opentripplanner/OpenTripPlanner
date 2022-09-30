@@ -6,7 +6,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.util.lang.ObjectUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
@@ -15,7 +14,6 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
-
 public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
   private final Class<E> type;
@@ -30,7 +28,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
   DurationForEnum(Builder<E> builder) {
     this.type = Objects.requireNonNull(builder.type());
-    this.defaultValue = ObjectUtils.ifNotNull(builder.defaultValue(), Duration.ZERO);
+    this.defaultValue = Objects.requireNonNull(builder.defaultValue());
     this.valueForEnum = builder.copyValueForEnum();
   }
 
