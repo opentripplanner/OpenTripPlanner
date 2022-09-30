@@ -20,7 +20,7 @@ import org.opentripplanner.util.OTPFeature;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
- * General mapping code or reusable bussiness logic should be moved into the Builder; hence reusable
+ * General mapping code or reusable business logic should be moved into the Builder; hence reusable
  * for other import modules.
  */
 public class GTFSToOtpTransitServiceMapper {
@@ -68,6 +68,8 @@ public class GTFSToOtpTransitServiceMapper {
   private final FareProductMapper fareProductMapper;
 
   private final FareLegRuleMapper fareLegRuleMapper;
+
+  private final FareTransferRuleMapper fareTransferRuleMapper;
 
   private final DirectionMapper directionMapper;
 
@@ -123,6 +125,7 @@ public class GTFSToOtpTransitServiceMapper {
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
     fareProductMapper = new FareProductMapper();
     fareLegRuleMapper = new FareLegRuleMapper(fareProductMapper, issueStore);
+    fareTransferRuleMapper = new FareTransferRuleMapper(fareProductMapper, issueStore);
   }
 
   public OtpTransitServiceBuilder getBuilder() {
@@ -160,7 +163,14 @@ public class GTFSToOtpTransitServiceMapper {
 
     fareRulesBuilder.fareAttributes().addAll(fareAttributeMapper.map(data.getAllFareAttributes()));
     fareRulesBuilder.fareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
+
+    // we don't want to store the list of fare products if they are not required by a fare rule
+    // or a fare transfer rule, that's why this is not added to the builder
+    fareProductMapper.map(data.getAllFareProducts());
     fareRulesBuilder.fareLegRules().addAll(fareLegRuleMapper.map(data.getAllFareLegRules()));
+    fareRulesBuilder
+      .fareTransferRules()
+      .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
 
     mapAndAddTransfersToBuilder();
   }
