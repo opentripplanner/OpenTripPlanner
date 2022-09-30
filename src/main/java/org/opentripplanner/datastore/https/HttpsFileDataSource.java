@@ -19,8 +19,6 @@ import org.opentripplanner.util.HttpUtils;
  */
 record HttpsFileDataSource(URI uri, FileType type, HttpsDataSourceMetadata httpsDataSourceMetadata)
   implements DataSource {
-  private static final String CONTENT_ENCODING_GZIP = "gzip";
-
   /**
    * Create a data source wrapper around an HTTPS resource. This wrapper handles GZIP(.gz)
    * compressed files as well as normal files. It does not handle
@@ -30,7 +28,7 @@ record HttpsFileDataSource(URI uri, FileType type, HttpsDataSourceMetadata https
 
   @Override
   public long size() {
-    return -1;
+    return httpsDataSourceMetadata.contentLength();
   }
 
   @Override
@@ -60,7 +58,7 @@ record HttpsFileDataSource(URI uri, FileType type, HttpsDataSourceMetadata https
 
     // We support both gzip and unzipped files when reading.
 
-    if (CONTENT_ENCODING_GZIP.equalsIgnoreCase(httpsDataSourceMetadata.contentEncoding())) {
+    if (httpsDataSourceMetadata().isGzipContentType() || uri.getPath().endsWith(".gz")) {
       try {
         return new GZIPInputStream(in);
       } catch (IOException e) {
