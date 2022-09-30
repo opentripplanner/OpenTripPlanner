@@ -1,7 +1,9 @@
 package org.opentripplanner.datastore.https;
 
 import java.net.URI;
+import java.util.List;
 import javax.annotation.Nonnull;
+import org.apache.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -46,14 +48,14 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
 
   private DataSource createSource(URI uri, FileType type) {
     HttpsDataSourceMetadata httpsDataSourceMetadata = new HttpsDataSourceMetadata(
-      HttpUtils.getHeaders(uri)
+      getHttpHeaders(uri)
     );
     return new HttpsFileDataSource(uri, type, httpsDataSourceMetadata);
   }
 
   private CompositeDataSource createCompositeSource(URI uri, FileType type) {
     HttpsDataSourceMetadata httpsDataSourceMetadata = new HttpsDataSourceMetadata(
-      HttpUtils.getHeaders(uri)
+      getHttpHeaders(uri)
     );
 
     if (httpsDataSourceMetadata.isZipContentType() || uri.getPath().endsWith(".zip")) {
@@ -64,5 +66,9 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
         "Only ZIP archives are supported as composite sources for the HTTPS data source"
       );
     }
+  }
+
+  protected List<Header> getHttpHeaders(URI uri) {
+    return HttpUtils.getHeaders(uri);
   }
 }
