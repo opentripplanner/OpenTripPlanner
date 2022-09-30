@@ -52,6 +52,9 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
       counter.set(result.failures().get(errorType).size());
     }
 
+    // every counter that was set in one of the previous round but not in this one
+    // needs to be explicitly set to zero, otherwise the previous count will persist across
+    // batches. this would of course lead to wrong totals.
     var toZero = new HashSet<>(failuresByType.keySet());
     toZero.removeAll(result.failures().keySet());
 
@@ -64,7 +67,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
     var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
     var atomicInt = new AtomicInteger(0);
     Gauge
-      .builder(METRICS_PREFIX + "." + name, () -> atomicInt)
+      .builder(METRICS_PREFIX + "." + name, atomicInt::get)
       .description(description)
       .tags(finalTags)
       .register(Metrics.globalRegistry);
