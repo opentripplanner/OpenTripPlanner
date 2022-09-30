@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 
 public class TraverseResultTest {
 
@@ -19,8 +20,7 @@ public class TraverseResultTest {
       State r = new State(
         null,
         Instant.ofEpochSecond(i * 1000),
-        null,
-        StateData.getInitialStateData(new RouteRequest())
+        StateData.getInitialStateData(new RouteRequest(), StreetMode.WALK)
       );
       resultChain = r.addToExistingResultChain(resultChain);
     }

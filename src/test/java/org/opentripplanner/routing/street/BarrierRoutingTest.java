@@ -2,8 +2,8 @@ package org.opentripplanner.routing.street;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.CAR;
+import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Duration;
@@ -26,10 +26,9 @@ import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.util.PolylineEncoder;
@@ -58,7 +57,7 @@ public class BarrierRoutingTest {
     var to = new GenericLocation(48.59370, 8.87079);
 
     // This takes a detour to avoid walking with the bike
-    var polyline1 = computePolyline(graph, from, to, BICYCLE);
+    var polyline1 = computePolyline(graph, from, to, BIKE);
     assertThatPolylinesAreEqual(polyline1, "o~qgH_ccu@DGFENQZ]NOLOHMFKFILB`BOGo@AeD]U}BaA]Q??");
 
     // The reluctance for walking with the bike is reduced, so a detour is not taken
@@ -66,7 +65,7 @@ public class BarrierRoutingTest {
       graph,
       from,
       to,
-      BICYCLE,
+      BIKE,
       rr -> rr.preferences().withBike(it -> it.setWalkingReluctance(1d)),
       itineraries ->
         itineraries
@@ -129,13 +128,13 @@ public class BarrierRoutingTest {
     Graph graph,
     GenericLocation from,
     GenericLocation to,
-    TraverseMode traverseMode
+    StreetMode streetMode
   ) {
     return computePolyline(
       graph,
       from,
       to,
-      traverseMode,
+      streetMode,
       ignored -> {},
       itineraries ->
         itineraries
@@ -144,19 +143,28 @@ public class BarrierRoutingTest {
           .map(l ->
             () ->
               assertEquals(
-                traverseMode,
+                mapMode(streetMode),
                 (l instanceof StreetLeg s) ? s.getMode() : null,
-                "Allow only " + traverseMode + " legs"
+                "Allow only " + streetMode + " legs"
               )
           )
     );
+  }
+
+  private static TraverseMode mapMode(StreetMode streetMode) {
+    return switch (streetMode) {
+      case WALK -> TraverseMode.WALK;
+      case BIKE -> TraverseMode.BICYCLE;
+      case CAR -> TraverseMode.CAR;
+      default -> throw new IllegalArgumentException();
+    };
   }
 
   private static String computePolyline(
     Graph graph,
     GenericLocation from,
     GenericLocation to,
-    TraverseMode traverseMode,
+    StreetMode streetMode,
     Consumer<RouteRequest> options,
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
@@ -164,15 +172,13 @@ public class BarrierRoutingTest {
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);
-    request.streetSubRequestModes = new TraverseModeSet(traverseMode);
+    request.journey().direct().setMode(streetMode);
 
     options.accept(request);
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, request);
-    RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
-
+    var temporaryVertices = new TemporaryVerticesContainer(graph, request, streetMode, streetMode);
     var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
-    var paths = gpf.graphPathFinderEntryPoint(routingContext);
+    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneId.of("Europe/Berlin"),
