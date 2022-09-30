@@ -2,12 +2,15 @@ package org.opentripplanner.netex.loader.parser;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
 import org.rutebanken.netex.model.GeneralFrame;
 import org.rutebanken.netex.model.InfrastructureFrame;
+import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.rutebanken.netex.model.ResourceFrame;
 import org.rutebanken.netex.model.ServiceCalendarFrame;
@@ -88,7 +91,7 @@ public class NetexDocumentParser {
     // Declare some ugly types to prevent obstructing the reading later...
     Collection<JAXBElement<? extends Common_VersionFrameStructure>> frames;
 
-    parseFrameDefaultsLikeTimeZone(frame.getFrameDefaults());
+    netexIndex.timeZone.set(resolveTimeZone(frame.getFrameDefaults()));
 
     frames = frame.getFrames().getCommonFrame();
 
@@ -97,31 +100,21 @@ public class NetexDocumentParser {
     }
   }
 
-  private void parseFrameDefaultsLikeTimeZone(VersionFrameDefaultsStructure frameDefaults) {
-    String timeZone = null;
-    if (
-      frameDefaults != null &&
-      frameDefaults.getDefaultLocale() != null &&
-      frameDefaults.getDefaultLocale().getTimeZone() != null
-    ) {
-      timeZone = frameDefaults.getDefaultLocale().getTimeZone();
-    }
-    if (timeZone == null && netexIndex.timeZone.get() == null) {
-      // Set fallback if timezone is not defined in hierarchy
-      timeZone = "GMT";
-    }
-
-    if (timeZone != null) {
-      netexIndex.timeZone.set(timeZone);
-    }
-  }
-
   private <T> void parse(T node, NetexParser<T> parser) {
     parser.parse(node);
     parser.setResultOnIndex(netexIndex);
 
     if (node instanceof VersionFrame_VersionStructure frame) {
-      parseFrameDefaultsLikeTimeZone(frame.getFrameDefaults());
+      netexIndex.timeZone.set(resolveTimeZone(frame.getFrameDefaults()));
     }
+  }
+
+  private String resolveTimeZone(VersionFrameDefaultsStructure frameDefaults) {
+    return Optional
+      .ofNullable(frameDefaults)
+      .map(VersionFrameDefaultsStructure::getDefaultLocale)
+      .map(LocaleStructure::getTimeZone)
+      // Fallback to GMT if no time zone exists in hierarchy
+      .orElseGet(() -> netexIndex.timeZone.get() == null ? "GMT" : null);
   }
 }
