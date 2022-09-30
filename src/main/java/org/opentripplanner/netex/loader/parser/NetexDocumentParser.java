@@ -114,7 +114,9 @@ public class NetexDocumentParser {
       .ofNullable(frameDefaults)
       .map(VersionFrameDefaultsStructure::getDefaultLocale)
       .map(LocaleStructure::getTimeZone)
+      // Fallback to previously set time zone in hierarchy
+      .or(() -> Optional.ofNullable(netexIndex.timeZone.get()))
       // Fallback to GMT if no time zone exists in hierarchy
-      .orElseGet(() -> netexIndex.timeZone.get() == null ? "GMT" : null);
+      .orElse("GMT");
   }
 }
