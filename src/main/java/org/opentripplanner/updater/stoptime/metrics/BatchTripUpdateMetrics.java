@@ -52,7 +52,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
       counter.set(result.failures().get(errorType).size());
     }
 
-    // every counter that was set in one of the previous round but not in this one
+    // every counter that was set in one of the previous rounds but not in this one
     // needs to be explicitly set to zero, otherwise the previous count will persist across
     // batches. this would of course lead to wrong totals.
     var toZero = new HashSet<>(failuresByType.keySet());
