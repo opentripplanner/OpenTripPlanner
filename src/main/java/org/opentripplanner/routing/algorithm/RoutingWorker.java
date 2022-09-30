@@ -22,6 +22,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -124,12 +125,16 @@ public class RoutingWorker {
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
+    boolean removeWalkAllTheWayResultsFromDirectFlex =
+      request.journey().direct().mode() == StreetMode.FLEXIBLE;
+
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
       request.preferences().system().itineraryFilters(),
       request.numItineraries(),
       filterOnLatestDepartureTime(),
-      emptyDirectModeHandler.removeWalkAllTheWayResults(),
+      emptyDirectModeHandler.removeWalkAllTheWayResults() ||
+      removeWalkAllTheWayResultsFromDirectFlex,
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       request.wheelchair(),
