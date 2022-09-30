@@ -110,13 +110,17 @@ public class NetexDocumentParser {
   }
 
   private String resolveTimeZone(VersionFrameDefaultsStructure frameDefaults) {
-    return Optional
-      .ofNullable(frameDefaults)
-      .map(VersionFrameDefaultsStructure::getDefaultLocale)
-      .map(LocaleStructure::getTimeZone)
-      // Fallback to previously set time zone in hierarchy
-      .or(() -> Optional.ofNullable(netexIndex.timeZone.get()))
-      // Fallback to GMT if no time zone exists in hierarchy
-      .orElse("GMT");
+    if (frameDefaults != null) {
+      var defaultLocale = frameDefaults.getDefaultLocale();
+      if (defaultLocale != null && defaultLocale.getTimeZone() != null) {
+        return defaultLocale.getTimeZone();
+      }
+    }
+    // Fallback to previously set time zone in hierarchy
+    if (netexIndex.timeZone.get() != null) {
+      return netexIndex.timeZone.get();
+    }
+    // Fallback to GMT if no time zone exists in hierarchy
+    return "GMT";
   }
 }
