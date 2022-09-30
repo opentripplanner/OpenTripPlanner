@@ -75,7 +75,7 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final GtfsRelationalDao data;
 
-  private final OtpTransitServiceBuilder builder = new OtpTransitServiceBuilder();
+  private final OtpTransitServiceBuilder builder;
 
   private final FareRulesData fareRulesBuilder = new FareRulesData();
 
@@ -88,11 +88,12 @@ public class GTFSToOtpTransitServiceMapper {
     boolean discardMinTransferTimes,
     GtfsRelationalDao data
   ) {
+    this.issueStore = issueStore;
+    builder = new OtpTransitServiceBuilder(this.issueStore);
     // Create callbacks for mappers to retrieve stop and stations
     Function<FeedScopedId, Station> stationLookup = id -> builder.getStations().get(id);
     Function<FeedScopedId, RegularStop> stopLookup = id -> builder.getStops().get(id);
 
-    this.issueStore = issueStore;
     this.data = data;
     this.discardMinTransferTimes = discardMinTransferTimes;
     translationHelper = new TranslationHelper();
