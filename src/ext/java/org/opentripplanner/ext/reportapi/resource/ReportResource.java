@@ -3,8 +3,7 @@ package org.opentripplanner.ext.reportapi.resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -14,8 +13,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.opentripplanner.common.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
+import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -25,11 +26,11 @@ import org.opentripplanner.transit.service.TransitService;
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
+  @Nullable
+  private static CachedValue<GraphStats> cachedStats;
+
   private final TransferService transferService;
   private final TransitService transitService;
-
-  @Nullable
-  private static CachedStats cachedStats;
 
   @SuppressWarnings("unused")
   public ReportResource(@Context OtpServerRequestContext requestContext) {
@@ -73,23 +74,17 @@ public class ReportResource {
 
   @GET
   @Path("/graph.json")
-  public synchronized Response stats(@Context OtpServerRequestContext serverRequestContext) {
+  public Response stats(@Context OtpServerRequestContext serverRequestContext) {
     // since the computation is pretty expensive only allow it every 5 minutes
-    if (cachedStats == null || cachedStats.hasExpired(Instant.now())) {
-      var stats = GraphReportBuilder.build(serverRequestContext);
-      cachedStats = new CachedStats(Instant.now(), stats);
+    if (cachedStats == null) {
+      Supplier<GraphStats> getStats = () -> GraphReportBuilder.build(serverRequestContext);
+      cachedStats = new CachedValue<>(getStats, Duration.ofMinutes(5));
     }
 
     return Response
       .status(Response.Status.OK)
-      .entity(cachedStats.stats())
+      .entity(cachedStats.get())
       .type("application/json")
       .build();
-  }
-
-  private record CachedStats(Instant creationTime, GraphReportBuilder.GraphStats stats) {
-    public boolean hasExpired(Instant time) {
-      return this.creationTime.plus(Duration.ofMinutes(5)).isBefore(time);
-    }
   }
 }
