@@ -39,7 +39,7 @@ public class HttpsDataSourceMetadata {
 
   public HttpsDataSourceMetadata(Map<String, String> headers) {
     contentType = headers.get(HttpHeaders.CONTENT_TYPE);
-    contentLength = parseLong(headers);
+    contentLength = parseLong(headers.get(HttpHeaders.CONTENT_LENGTH));
     lastModified = parseDate(headers.get(HttpHeaders.LAST_MODIFIED));
   }
 
@@ -73,9 +73,9 @@ public class HttpsDataSourceMetadata {
     return 0;
   }
 
-  private static long parseLong(Map<String, String> headers) {
+  private static long parseLong(String header) {
     try {
-      return Long.parseLong(headers.get(HttpHeaders.CONTENT_LENGTH));
+      return Long.parseLong(header);
     } catch (Exception e) {
       return 0;
     }
