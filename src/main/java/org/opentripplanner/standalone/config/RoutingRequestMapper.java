@@ -119,15 +119,35 @@ public class RoutingRequestMapper {
         )
       );
 
-    preferences
-      .street()
-      .initMaxAccessEgressDuration(
-        c.asDuration(
-          "maxAccessEgressDuration",
-          preferences.street().maxAccessEgressDuration().defaultValue()
-        ),
-        c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
-      );
+    preferences.withStreet(streetBuilder -> {
+      var street = preferences.street();
+      var dftStreet = dft.preferences().street();
+      streetBuilder
+        .withTurnReluctance(c.asDouble("turnReluctance", street.turnReluctance()))
+        .withDrivingDirection(c.asEnum("drivingDirection", dftStreet.drivingDirection()))
+        .withElevator(elevator -> {
+          var dftElevator = dftStreet.elevator();
+          elevator
+            .withBoardCost(c.asInt("elevatorBoardCost", dftElevator.boardCost()))
+            .withBoardTime(c.asInt("elevatorBoardTime", dftElevator.boardTime()))
+            .withHopCost(c.asInt("elevatorHopCost", dftElevator.hopCost()))
+            .withHopTime(c.asInt("elevatorHopTime", dftElevator.hopTime()));
+        })
+        .withMaxAccessEgressDuration(
+          c.asDuration(
+            "maxAccessEgressDuration",
+            dftStreet.maxAccessEgressDuration().defaultValue()
+          ),
+          c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+        )
+        .withMaxDirectDuration(
+          c.asDuration("maxDirectStreetDuration", dftStreet.maxDirectDuration().defaultValue()),
+          c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+        )
+        .withIntersectionTraversalModel(
+          c.asEnum("intersectionTraversalModel", dftStreet.intersectionTraversalModel())
+        );
+    });
     preferences.withCar(car -> {
       var cDft = preferences.car();
       car.withSpeed(c.asDouble("carSpeed", cDft.speed()));
@@ -151,31 +171,10 @@ public class RoutingRequestMapper {
       );
 
     preferences
-      .street()
-      .withElevator(builder -> {
-        var original = preferences.street().elevator();
-        builder
-          .withBoardCost(c.asInt("elevatorBoardCost", original.boardCost()))
-          .withBoardTime(c.asInt("elevatorBoardTime", original.boardTime()))
-          .withHopCost(c.asInt("elevatorHopCost", original.hopCost()))
-          .withHopTime(c.asInt("elevatorHopTime", original.hopTime()));
-      });
-
-    preferences
       .system()
       .setGeoidElevation(c.asBoolean("geoidElevation", preferences.system().geoidElevation()));
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
     request.setLocale(c.asLocale("locale", dft.locale()));
-    // 'maxTransfers' is configured in the Raptor tuning parameters, not here
-    preferences
-      .street()
-      .initMaxDirectDuration(
-        c.asDuration(
-          "maxDirectStreetDuration",
-          preferences.street().maxDirectDuration().defaultValue()
-        ),
-        c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
-      );
 
     preferences
       .system()
@@ -201,9 +200,6 @@ public class RoutingRequestMapper {
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
 
-    preferences
-      .street()
-      .setTurnReluctance(c.asDouble("turnReluctance", preferences.street().turnReluctance()));
     preferences
       .rental()
       .setUseAvailabilityInformation(
@@ -235,20 +231,6 @@ public class RoutingRequestMapper {
     request.setWheelchair(wheelchairNode.asBoolean("enabled", false));
 
     preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
-
-    preferences
-      .street()
-      .setDrivingDirection(
-        c.asEnum("drivingDirection", dft.preferences().street().drivingDirection())
-      );
-    preferences
-      .street()
-      .setIntersectionTraversalModel(
-        c.asEnum(
-          "intersectionTraversalModel",
-          dft.preferences().street().intersectionTraversalModel()
-        )
-      );
 
     NodeAdapter unpreferred = c.path("unpreferred");
     request

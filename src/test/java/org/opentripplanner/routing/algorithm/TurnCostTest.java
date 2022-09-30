@@ -100,7 +100,7 @@ public class TurnCostTest {
       walk.withStairsReluctance(1.0);
     });
     preferences.withBike(bike -> bike.setSpeed(1.0));
-    preferences.street().setTurnReluctance(1.0);
+    preferences.withStreet(it -> it.withTurnReluctance(1.0));
     preferences.setAllStreetReluctance(1.0);
 
     // Turn costs are all 0 by default.

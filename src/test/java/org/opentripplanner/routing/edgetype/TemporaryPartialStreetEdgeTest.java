@@ -142,7 +142,7 @@ public class TemporaryPartialStreetEdgeTest {
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;
     var calculator = new ConstantIntersectionTraversalCalculator(turnDurationSecs);
-    options.preferences().street().setTurnReluctance(1.0);
+    options.preferences().withStreet(it -> it.withTurnReluctance(1.0));
 
     State s0 = new State(routingContext);
     s0.stateData.intersectionTraversalCalculator = calculator;

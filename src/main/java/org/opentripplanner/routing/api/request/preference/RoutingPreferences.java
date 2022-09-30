@@ -12,7 +12,7 @@ public final class RoutingPreferences implements Cloneable, Serializable {
   private TransitPreferences transit = TransitPreferences.DEFAULT;
   private TransferPreferences transfer = TransferPreferences.DEFAULT;
   private WalkPreferences walk = WalkPreferences.DEFAULT;
-  private StreetPreferences street = new StreetPreferences();
+  private StreetPreferences street = StreetPreferences.DEFAULT;
 
   @Nonnull
   private WheelchairPreferences wheelchair = WheelchairPreferences.DEFAULT;
@@ -65,6 +65,11 @@ public final class RoutingPreferences implements Cloneable, Serializable {
 
   public StreetPreferences street() {
     return street;
+  }
+
+  public RoutingPreferences withStreet(Consumer<StreetPreferences.Builder> body) {
+    this.street = street.copyOf().apply(body).build();
+    return this;
   }
 
   /**
@@ -130,12 +135,11 @@ public final class RoutingPreferences implements Cloneable, Serializable {
     try {
       var clone = (RoutingPreferences) super.clone();
 
-      clone.street = street.clone();
       clone.rental = rental.clone();
       clone.system = system.clone();
 
       // The following immutable types can be skipped:
-      // - transfer, walk, bike, car, wheelchair, transit, parking
+      // - walk, bike, car, street, transfer, transit, parking, wheelchair
 
       return clone;
     } catch (CloneNotSupportedException e) {

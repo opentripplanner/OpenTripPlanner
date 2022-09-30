@@ -223,8 +223,9 @@ public class TravelTimeResource {
 
     accessRequest
       .preferences()
-      .street()
-      .initMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of());
+      .withStreet(it ->
+        it.withMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of())
+      );
 
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);

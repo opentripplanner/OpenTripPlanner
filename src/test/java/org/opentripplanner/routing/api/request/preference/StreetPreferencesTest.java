@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
@@ -19,16 +20,15 @@ class StreetPreferencesTest {
   private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
   private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
 
-  private final StreetPreferences subject = new StreetPreferences();
-
-  {
-    subject.setTurnReluctance(TURN_RELUCTANCE);
-    subject.setDrivingDirection(DRIVING_DIRECTION);
-    subject.withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME));
-    subject.setIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL);
-    subject.initMaxAccessEgressDuration(MAX_ACCESS_EGRESS, Map.of());
-    subject.initMaxDirectDuration(MAX_DIRECT, Map.of());
-  }
+  private final StreetPreferences subject = StreetPreferences
+    .of()
+    .withDrivingDirection(DRIVING_DIRECTION)
+    .withTurnReluctance(TURN_RELUCTANCE)
+    .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))
+    .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
+    .withMaxAccessEgressDuration(MAX_ACCESS_EGRESS, Map.of())
+    .withMaxDirectDuration(MAX_DIRECT, Map.of())
+    .build();
 
   @Test
   void elevator() {
@@ -60,22 +60,18 @@ class StreetPreferencesTest {
     assertEquals(TURN_RELUCTANCE, subject.turnReluctance());
   }
 
-  /*
   @Test
   void testOfAndCopyOf() {
     // Return same object if no value is set
     assertSame(StreetPreferences.DEFAULT, StreetPreferences.of().build());
     assertSame(subject, subject.copyOf().build());
   }
-  */
 
   @Test
   void testEqualsAndHashCode() {
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.clone();
-    other.setTurnReluctance(34.0);
-    var copy = other.clone();
-    copy.setTurnReluctance(TURN_RELUCTANCE);
+    var other = subject.copyOf().withTurnReluctance(34.0).build();
+    var copy = other.copyOf().withTurnReluctance(TURN_RELUCTANCE).build();
     assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
   }
 
@@ -84,8 +80,8 @@ class StreetPreferencesTest {
     assertEquals("StreetPreferences{}", StreetPreferences.DEFAULT.toString());
     assertEquals(
       "StreetPreferences{" +
-      "drivingDirection: LEFT, " +
       "turnReluctance: 2.0, " +
+      "drivingDirection: LEFT, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: NORWAY, " +
       "maxAccessEgressDuration: DurationForStreetMode{default:5m}, " +

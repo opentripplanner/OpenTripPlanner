@@ -16,7 +16,6 @@ public class RoutingPreferencesTest {
     var clone = pref.clone();
 
     assertNotSame(pref, clone);
-    assertNotSame(pref.street(), clone.street());
     assertNotSame(pref.rental(), clone.rental());
     assertNotSame(pref.system(), clone.system());
 
@@ -30,5 +29,6 @@ public class RoutingPreferencesTest {
     assertSame(pref.wheelchair(), clone.wheelchair());
     assertSame(pref.transit(), clone.transit());
     assertSame(pref.parking(), clone.parking());
+    assertSame(pref.street(), clone.street());
   }
 }

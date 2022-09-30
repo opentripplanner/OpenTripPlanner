@@ -46,8 +46,6 @@ public class Transfer {
     rr.setFrom(null);
     rr.setTo(null);
 
-    var streetPreferences = transferPreferences.street();
-
     // TODO VIA - Remove all rounding logic from here and move it into the Preference type
     //          - constructors - We should cache and route on the same normalized values to be
     //          - consistent.
@@ -72,15 +70,19 @@ public class Transfer {
     // it's a record (immutable) so can be safely reused
     transferPreferences.setWheelchair(request.preferences().wheelchair());
 
-    streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
+    transferPreferences.withStreet(streetBuilder -> {
+      var street = transferPreferences.street();
+      streetBuilder.withTurnReluctance(roundTo(street.turnReluctance(), 1));
 
-    streetPreferences.withElevator(builder ->
-      builder
-        .withBoardCost(roundTo100(streetPreferences.elevator().boardCost()))
-        .withBoardTime(roundTo100(streetPreferences.elevator().boardTime()))
-        .withHopCost(roundTo100(streetPreferences.elevator().hopCost()))
-        .withHopTime(roundTo100(streetPreferences.elevator().hopTime()))
-    );
+      streetBuilder.withElevator(builder -> {
+        var elevator = street.elevator();
+        builder
+          .withBoardCost(roundTo100(elevator.boardCost()))
+          .withBoardTime(roundTo100(elevator.boardTime()))
+          .withHopCost(roundTo100(elevator.hopCost()))
+          .withHopTime(roundTo100(elevator.hopTime()));
+      });
+    });
 
     return rr;
   }
