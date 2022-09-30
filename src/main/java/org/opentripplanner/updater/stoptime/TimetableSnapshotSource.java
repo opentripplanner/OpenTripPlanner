@@ -256,6 +256,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             continue;
           }
         } else {
+          // TODO: figure out the correct service date. For the special case that a trip
+          // starts for example at 40:00, yesterday would probably be a better guess.
           serviceDate = LocalDate.now(timeZone);
         }
 
