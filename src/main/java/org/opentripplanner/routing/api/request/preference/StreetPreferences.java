@@ -3,16 +3,24 @@ package org.opentripplanner.routing.api.request.preference;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
+import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 // TODO VIA (Thomas): Javadoc
 // Direct street search
 @SuppressWarnings("UnusedReturnValue")
 public class StreetPreferences implements Cloneable, Serializable {
+
+  public static StreetPreferences DEFAULT = new StreetPreferences();
+
+  private static final Duration D4_HOURS = Duration.ofHours(4);
+  private static final Duration D45_MINUTES = Duration.ofMinutes(45);
 
   private ElevatorPreferences elevator = ElevatorPreferences.DEFAULT;
 
@@ -114,5 +122,49 @@ public class StreetPreferences implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    StreetPreferences that = (StreetPreferences) o;
+    return (
+      drivingDirection == that.drivingDirection &&
+      DoubleUtils.doubleEquals(that.turnReluctance, turnReluctance) &&
+      elevator.equals(that.elevator) &&
+      intersectionTraversalModel == that.intersectionTraversalModel &&
+      maxAccessEgressDuration.equals(that.maxAccessEgressDuration) &&
+      maxDirectDuration.equals(that.maxDirectDuration)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      drivingDirection,
+      turnReluctance,
+      elevator,
+      intersectionTraversalModel,
+      maxAccessEgressDuration,
+      maxDirectDuration
+    );
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(StreetPreferences.class)
+      .addEnum("drivingDirection", drivingDirection, DEFAULT.drivingDirection)
+      .addNum("turnReluctance", turnReluctance, DEFAULT.turnReluctance)
+      .addObj("elevator", elevator, DEFAULT.elevator)
+      .addObj(
+        "intersectionTraversalModel",
+        intersectionTraversalModel,
+        DEFAULT.intersectionTraversalModel
+      )
+      .addObj("maxAccessEgressDuration", maxAccessEgressDuration, DEFAULT.maxAccessEgressDuration)
+      .addObj("maxDirectDuration", maxDirectDuration, DEFAULT.maxDirectDuration)
+      .toString();
   }
 }
