@@ -28,7 +28,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void availableCarPlacesTest() {
     initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true);
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -39,7 +39,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void notAvailableCarPlacesTest() {
     initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, false);
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -56,7 +56,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -67,7 +67,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void realtimeAvailableCarPlacesFallbackTest() {
     initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, true);
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -84,7 +84,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -95,7 +95,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void availableBicyclePlacesTest() {
     initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false);
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -106,7 +106,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void notAvailableBicyclePlacesTest() {
     initEdgeAndRequest(StreetMode.BIKE_TO_PARK, false, false);
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -123,7 +123,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -134,7 +134,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void realtimeAvailableBicyclePlacesFallbackTest() {
     initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, true);
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -151,7 +151,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s0 = new State(vertex, request, streetMode);
+    State s0 = State.createState(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 

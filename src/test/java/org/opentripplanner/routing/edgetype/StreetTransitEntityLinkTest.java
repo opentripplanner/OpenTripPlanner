@@ -94,6 +94,6 @@ class StreetTransitEntityLinkTest {
       .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
     var edge = new StreetTransitStopLink(from, to);
-    return edge.traverse(new State(from, req, StreetMode.BIKE));
+    return edge.traverse(State.createState(from, req, StreetMode.BIKE));
   }
 }

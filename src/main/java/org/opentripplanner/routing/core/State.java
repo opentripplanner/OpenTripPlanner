@@ -3,7 +3,6 @@ package org.opentripplanner.routing.core;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
@@ -50,24 +49,6 @@ public class State implements Cloneable {
 
   /* CONSTRUCTORS */
 
-  /**
-   * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
-   */
-  public State(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
-    // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(
-      vertex,
-      opt.dateTime(),
-      StateData.getInitialStateData(opt, streetMode),
-      new AStarRequest(opt.dateTime(), opt, streetMode)
-    );
-  }
-
-  /**
-   * Create an initial state, forcing vertex, back edge, time and start time to the specified
-   * values. Useful for starting a multiple initial state search, for example when propagating
-   * profile results to the street network in RoundBasedProfileRouter.
-   */
   public State(Vertex vertex, Instant startTime, StateData stateData, AStarRequest request) {
     this.request = request;
     this.weight = 0;
@@ -89,14 +70,26 @@ public class State implements Cloneable {
     Set<Vertex> vertices
   ) {
     Collection<State> states = new ArrayList<>();
-    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, streetMode);
     AStarRequest aStarRequest = new AStarRequest(request.dateTime(), request, streetMode);
     for (Vertex vertex : vertices) {
-      for (StateData stateData : initialStateDatas) {
+      for (StateData stateData : StateData.getInitialStateDatas(aStarRequest)) {
         states.add(new State(vertex, request.dateTime(), stateData, aStarRequest));
       }
     }
     return states;
+  }
+
+  /**
+   * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
+   */
+  public static State createState(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
+    final AStarRequest aStarRequest = new AStarRequest(opt.dateTime(), opt, streetMode);
+    return new State(
+      vertex,
+      opt.dateTime(),
+      StateData.getInitialStateData(aStarRequest),
+      aStarRequest
+    );
   }
 
   /**

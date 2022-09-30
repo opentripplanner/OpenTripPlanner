@@ -159,7 +159,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
   }
 
   private State traverse(StreetEdge edge, RouteRequest req, StreetMode streetMode) {
-    var state = new State(V1, req, streetMode);
+    var state = State.createState(V1, req, streetMode);
 
     assertEquals(0, state.weight);
     return edge.traverse(state);

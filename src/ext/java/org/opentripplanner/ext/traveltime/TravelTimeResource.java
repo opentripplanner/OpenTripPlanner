@@ -274,16 +274,13 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StateData stateData = StateData.getInitialStateData(
-      routingRequest,
-      routingRequest.journey().egress().mode()
-    );
-
     AStarRequest aStarRequest = new AStarRequest(
       routingRequest.dateTime(),
       routingRequest,
       routingRequest.journey().egress().mode()
     );
+
+    StateData stateData = StateData.getInitialStateData(aStarRequest);
 
     for (var vertex : temporaryVertices.getFromVertices()) {
       // TODO StateData should be of direct mode here

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
@@ -60,11 +59,11 @@ public class StateData implements Cloneable {
   /**
    * Returns a set of initial StateDatas based on the options from the RoutingRequest
    */
-  public static List<StateData> getInitialStateDatas(RouteRequest options, StreetMode streetMode) {
+  public static List<StateData> getInitialStateDatas(AStarRequest request) {
     return getInitialStateDatas(
-      streetMode,
-      options.arriveBy(),
-      options.journey().rental().allowArrivingInRentedVehicleAtDestination(),
+      request.mode(),
+      request.arriveBy(),
+      request.rental().allowArrivingInRentedVehicleAtDestination(),
       false
     );
   }
@@ -73,11 +72,11 @@ public class StateData implements Cloneable {
    * Returns an initial StateData based on the options from the RoutingRequest. This returns always
    * only a single state, which is considered the "base case"
    */
-  public static StateData getInitialStateData(RouteRequest options, StreetMode streetMode) {
+  public static StateData getInitialStateData(AStarRequest request) {
     var stateDatas = getInitialStateDatas(
-      streetMode,
-      options.arriveBy(),
-      options.journey().rental().allowArrivingInRentedVehicleAtDestination(),
+      request.mode(),
+      request.arriveBy(),
+      request.rental().allowArrivingInRentedVehicleAtDestination(),
       true
     );
     if (stateDatas.size() != 1) {

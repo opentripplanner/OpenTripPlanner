@@ -16,6 +16,9 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 
+/**
+ * This class contains all information from the {@link RouteRequest} class required for an A* search
+ */
 public class AStarRequest {
 
   /**

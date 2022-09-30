@@ -270,7 +270,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       stopLocation,
       0,
       List.of(),
-      new State(
+      State.createState(
         new StreetLocation(id, new Coordinate(0, 0), id),
         new RouteRequest(),
         StreetMode.WALK

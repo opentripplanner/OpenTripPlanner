@@ -26,18 +26,10 @@ public class DominanceFunctionTest {
 
     // Test if domination works in the general case
 
-    State stateA = new State(
-      fromVertex,
-      Instant.EPOCH,
-      StateData.getInitialStateData(request, StreetMode.WALK),
-      new AStarRequest(request.dateTime(), request, StreetMode.WALK)
-    );
-    State stateB = new State(
-      toVertex,
-      Instant.EPOCH,
-      StateData.getInitialStateData(request, StreetMode.WALK),
-      new AStarRequest(request.dateTime(), request, StreetMode.WALK)
-    );
+    AStarRequest aStarRequest = new AStarRequest(request.dateTime(), request, StreetMode.WALK);
+    StateData stateData = StateData.getInitialStateData(aStarRequest);
+    State stateA = new State(fromVertex, Instant.EPOCH, stateData, aStarRequest);
+    State stateB = new State(toVertex, Instant.EPOCH, stateData, aStarRequest);
     stateA.weight = 1;
     stateB.weight = 2;
 

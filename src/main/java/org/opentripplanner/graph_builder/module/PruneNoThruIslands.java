@@ -331,7 +331,7 @@ public class PruneNoThruIslands implements GraphBuilderModule {
       if (!(gv instanceof StreetVertex)) {
         continue;
       }
-      State s0 = new State(gv, options, streetMode);
+      State s0 = State.createState(gv, options, streetMode);
       for (Edge e : gv.getOutgoing()) {
         if (
           !(
