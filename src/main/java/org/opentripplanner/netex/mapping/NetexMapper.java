@@ -140,7 +140,7 @@ public class NetexMapper {
 
     // Add the empty service id, as it can be used for routes expected to be added from realtime
     // updates or DSJs which are replaced, and where we want to keep the original DSJ
-    ServiceCalendar emptyCalendar = calendarServiceBuilder.getEmptyCalendar();
+    ServiceCalendar emptyCalendar = calendarServiceBuilder.createEmptyCalendar();
     if (
       transitBuilder
         .getTripsById()
