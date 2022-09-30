@@ -79,8 +79,8 @@ public class FlexRouter {
       );
 
     if (graph.hasStreets) {
-      this.accessFlexPathCalculator = new StreetFlexPathCalculator(graph, false);
-      this.egressFlexPathCalculator = new StreetFlexPathCalculator(graph, true);
+      this.accessFlexPathCalculator = new StreetFlexPathCalculator(false);
+      this.egressFlexPathCalculator = new StreetFlexPathCalculator(true);
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets

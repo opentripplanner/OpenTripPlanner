@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -31,12 +31,10 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private static final Duration MAX_FLEX_TRIP_DURATION = Duration.ofMinutes(45);
 
-  private final Graph graph;
   private final Map<Vertex, ShortestPathTree> cache = new HashMap<>();
   private final boolean reverseDirection;
 
-  public StreetFlexPathCalculator(Graph graph, boolean reverseDirection) {
-    this.graph = graph;
+  public StreetFlexPathCalculator(boolean reverseDirection) {
     this.reverseDirection = reverseDirection;
   }
 
@@ -70,19 +68,16 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   private ShortestPathTree routeToMany(Vertex vertex) {
-    RouteRequest routingRequest = new RouteRequest(TraverseMode.CAR);
+    RouteRequest routingRequest = new RouteRequest();
     routingRequest.setArriveBy(reverseDirection);
-    RoutingContext rctx;
-    if (reverseDirection) {
-      rctx = new RoutingContext(routingRequest, graph, null, vertex);
-    } else {
-      rctx = new RoutingContext(routingRequest, graph, vertex, null);
-    }
 
     return AStarBuilder
       .allDirectionsMaxDuration(MAX_FLEX_TRIP_DURATION)
       .setDominanceFunction(new DominanceFunction.EarliestArrival())
-      .setContext(rctx)
+      .setRequest(routingRequest)
+      .setStreetRequest(new StreetRequest(StreetMode.CAR))
+      .setFrom(reverseDirection ? null : vertex)
+      .setTo(reverseDirection ? vertex : null)
       .getShortestPathTree();
   }
 }

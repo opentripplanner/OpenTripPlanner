@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Locale;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
@@ -12,6 +13,7 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 
 /**
@@ -88,5 +90,14 @@ public interface OtpServerRequestContext {
 
   default GraphFinder graphFinder() {
     return GraphFinder.getInstance(graph(), transitService()::findRegularStop);
+  }
+
+  default DataOverlayContext dataOverlayContext(RouteRequest request) {
+    return OTPFeature.DataOverlay.isOnElseNull(() ->
+      new DataOverlayContext(
+        graph().dataOverlayParameterBindings,
+        request.preferences().system().dataOverlay()
+      )
+    );
   }
 }

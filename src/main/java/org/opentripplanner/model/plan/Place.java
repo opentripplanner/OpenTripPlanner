@@ -1,7 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
@@ -126,22 +125,21 @@ public class Place {
     );
   }
 
-  public static Place forVehicleParkingEntrance(
-    VehicleParkingEntranceVertex vertex,
-    RouteRequest request
-  ) {
+  public static Place forVehicleParkingEntrance(VehicleParkingEntranceVertex vertex, State state) {
     TraverseMode traverseMode = null;
-    if (request.streetSubRequestModes.getCar()) {
+    if (state.getRequestMode().includesDriving()) {
       traverseMode = TraverseMode.CAR;
-    } else if (request.streetSubRequestModes.getBicycle()) {
+    } else if (state.getRequestMode().includesBiking()) {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    var preferences = request.preferences();
+    var preferences = state.getPreferences();
 
     boolean realTime =
       preferences.parking().useAvailabilityInformation() &&
-      vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchair());
+      vertex
+        .getVehicleParking()
+        .hasRealTimeDataForMode(traverseMode, state.getOptions().wheelchair());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

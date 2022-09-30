@@ -1084,7 +1084,7 @@ public class StreetEdge
     }
 
     if (costExtension != null) {
-      weight += costExtension.calculateExtraCost(s0.getRoutingContext(), length_mm, traverseMode);
+      weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
     }
 
     s1.incrementTimeInSeconds(roundedTime);

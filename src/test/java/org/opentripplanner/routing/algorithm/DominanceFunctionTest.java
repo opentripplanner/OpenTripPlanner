@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.graph.Vertex;
@@ -27,10 +28,13 @@ public class DominanceFunctionTest {
     State stateA = new State(
       fromVertex,
       Instant.EPOCH,
-      null,
-      StateData.getInitialStateData(request)
+      StateData.getInitialStateData(request, StreetMode.WALK)
     );
-    State stateB = new State(toVertex, Instant.EPOCH, null, StateData.getInitialStateData(request));
+    State stateB = new State(
+      toVertex,
+      Instant.EPOCH,
+      StateData.getInitialStateData(request, StreetMode.WALK)
+    );
     stateA.weight = 1;
     stateB.weight = 2;
 

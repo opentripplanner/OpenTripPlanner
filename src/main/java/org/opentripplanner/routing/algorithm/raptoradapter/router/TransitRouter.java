@@ -23,11 +23,9 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -158,32 +156,41 @@ public class TransitRouter {
     var accessList = new ArrayList<AccessEgress>();
     var egressList = new ArrayList<AccessEgress>();
 
-    var accessCalculator = (Runnable) () -> {
-      debugTimingAggregator.startedAccessCalculating();
-      accessList.addAll(getAccessEgresses(accessEgressMapper, false));
-      debugTimingAggregator.finishedAccessCalculating();
-    };
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        request,
+        request.journey().access().mode(),
+        request.journey().egress().mode()
+      )
+    ) {
+      var accessCalculator = (Runnable) () -> {
+        debugTimingAggregator.startedAccessCalculating();
+        accessList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, false));
+        debugTimingAggregator.finishedAccessCalculating();
+      };
 
-    var egressCalculator = (Runnable) () -> {
-      debugTimingAggregator.startedEgressCalculating();
-      egressList.addAll(getAccessEgresses(accessEgressMapper, true));
-      debugTimingAggregator.finishedEgressCalculating();
-    };
+      var egressCalculator = (Runnable) () -> {
+        debugTimingAggregator.startedEgressCalculating();
+        egressList.addAll(getAccessEgresses(accessEgressMapper, temporaryVertices, true));
+        debugTimingAggregator.finishedEgressCalculating();
+      };
 
-    if (OTPFeature.ParallelRouting.isOn()) {
-      try {
-        CompletableFuture
-          .allOf(
-            CompletableFuture.runAsync(accessCalculator),
-            CompletableFuture.runAsync(egressCalculator)
-          )
-          .join();
-      } catch (CompletionException e) {
-        RoutingValidationException.unwrapAndRethrowCompletionException(e);
+      if (OTPFeature.ParallelRouting.isOn()) {
+        try {
+          CompletableFuture
+            .allOf(
+              CompletableFuture.runAsync(accessCalculator),
+              CompletableFuture.runAsync(egressCalculator)
+            )
+            .join();
+        } catch (CompletionException e) {
+          RoutingValidationException.unwrapAndRethrowCompletionException(e);
+        }
+      } else {
+        accessCalculator.run();
+        egressCalculator.run();
       }
-    } else {
-      accessCalculator.run();
-      egressCalculator.run();
     }
 
     verifyAccessEgress(accessList, egressList);
@@ -193,47 +200,42 @@ public class TransitRouter {
 
   private Collection<AccessEgress> getAccessEgresses(
     AccessEgressMapper accessEgressMapper,
+    TemporaryVerticesContainer temporaryVertices,
     boolean isEgress
   ) {
-    var results = new ArrayList<AccessEgress>();
-    var mode = isEgress ? request.journey().egress().mode() : request.journey().access().mode();
+    var streetRequest = isEgress ? request.journey().egress() : request.journey().access();
 
     // Prepare access/egress lists
-    RouteRequest accessRequest = request.getStreetSearchRequest(mode);
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), accessRequest)
-    ) {
-      var routingContext = new RoutingContext(
+    RouteRequest accessRequest = request.clone();
+
+    if (!isEgress) {
+      accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
+    }
+
+    var nearbyStops = AccessEgressRouter.streetSearch(
+      accessRequest,
+      temporaryVertices,
+      serverContext.transitService(),
+      streetRequest,
+      serverContext.dataOverlayContext(accessRequest),
+      isEgress
+    );
+
+    var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
+
+    // Special handling of flex accesses
+    if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
+      var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
-        serverContext.graph(),
-        temporaryVertices
-      );
-
-      if (!isEgress) {
-        accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
-      }
-
-      var nearbyStops = AccessEgressRouter.streetSearch(
-        routingContext,
-        serverContext.transitService(),
-        mode,
+        temporaryVertices,
+        serverContext,
+        additionalSearchDays,
+        serverContext.routerConfig().flexParameters(accessRequest.preferences()),
+        serverContext.dataOverlayContext(accessRequest),
         isEgress
       );
 
-      results.addAll(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
-
-      // Special handling of flex accesses
-      if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
-        var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
-          routingContext,
-          serverContext.transitService(),
-          additionalSearchDays,
-          serverContext.routerConfig().flexParameters(accessRequest.preferences()),
-          isEgress
-        );
-
-        results.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, isEgress));
-      }
+      results.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, isEgress));
     }
 
     return results;
@@ -250,7 +252,7 @@ public class TransitRouter {
       additionalSearchDays.additionalSearchDaysInPast(),
       additionalSearchDays.additionalSearchDaysInFuture(),
       new RoutingRequestTransitDataProviderFilter(request, serverContext.transitService()),
-      new RoutingContext(transferRoutingRequest, serverContext.graph(), (Vertex) null, null)
+      transferRoutingRequest
     );
   }
 
