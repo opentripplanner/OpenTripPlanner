@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
@@ -10,6 +11,7 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
 
 // TODO VIA (Thomas): Javadoc
 // Direct street search
+@SuppressWarnings("UnusedReturnValue")
 public class StreetPreferences implements Cloneable, Serializable {
 
   private ElevatorPreferences elevator = ElevatorPreferences.DEFAULT;
@@ -29,47 +31,14 @@ public class StreetPreferences implements Cloneable, Serializable {
   private DrivingDirection drivingDirection = DrivingDirection.RIGHT;
   private IntersectionTraversalModel intersectionTraversalModel = IntersectionTraversalModel.SIMPLE;
 
-  /** What is the cost of boarding an elevator? */
-  public int elevatorBoardCost() {
-    return elevator.boardCost();
+  /** Preferences for taking an elevator */
+  public ElevatorPreferences elevator() {
+    return elevator;
   }
 
-  public void setElevatorBoardCost(int elevatorBoardCost) {
-    this.elevator = elevator.copyOf().withBoardCost(elevatorBoardCost).build();
-  }
-
-  /**
-   * How long does it take to  an elevator, on average (actually, it probably should be a bit *more*
-   * than average, to prevent optimistic trips)? Setting it to "seems like forever," while accurate,
-   * will probably prevent OTP from working correctly.
-   */
-  public int elevatorBoardTime() {
-    return elevator.boardTime();
-  }
-
-  public void setElevatorBoardTime(int elevatorBoardTime) {
-    this.elevator = elevator.copyOf().withBoardTime(elevatorBoardTime).build();
-  }
-
-  /** How long does it take to advance one floor on an elevator? */
-  public int elevatorHopTime() {
-    return elevator.hopTime();
-  }
-
-  public void setElevatorHopTime(int elevatorHopTime) {
-    this.elevator = elevator.copyOf().withHopTime(elevatorHopTime).build();
-  }
-
-  /**
-   * What is the cost of travelling one floor on an elevator?
-   * It is assumed that getting off an elevator is completely free.
-   * */
-  public int elevatorHopCost() {
-    return elevator.hopCost();
-  }
-
-  public void setElevatorHopCost(int elevatorHopCost) {
-    this.elevator = elevator.copyOf().withHopCost(elevatorHopCost).build();
+  public StreetPreferences withElevator(Consumer<ElevatorPreferences.Builder> body) {
+    this.elevator = elevator.copyOf().apply(body).build();
+    return this;
   }
 
   /**

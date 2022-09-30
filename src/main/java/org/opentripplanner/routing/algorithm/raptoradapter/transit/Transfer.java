@@ -74,10 +74,13 @@ public class Transfer {
 
     streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
 
-    streetPreferences.setElevatorBoardCost(roundTo100(streetPreferences.elevatorBoardCost()));
-    streetPreferences.setElevatorBoardTime(roundTo100(streetPreferences.elevatorBoardTime()));
-    streetPreferences.setElevatorHopCost(roundTo100(streetPreferences.elevatorHopCost()));
-    streetPreferences.setElevatorHopTime(roundTo100(streetPreferences.elevatorHopTime()));
+    streetPreferences.withElevator(builder ->
+      builder
+        .withBoardCost(roundTo100(streetPreferences.elevator().boardCost()))
+        .withBoardTime(roundTo100(streetPreferences.elevator().boardTime()))
+        .withHopCost(roundTo100(streetPreferences.elevator().hopCost()))
+        .withHopTime(roundTo100(streetPreferences.elevator().hopTime()))
+    );
 
     return rr;
   }

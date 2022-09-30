@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -129,6 +130,11 @@ public final class ElevatorPreferences implements Serializable {
 
     public Builder withHopCost(int hopCost) {
       this.hopCost = hopCost;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 

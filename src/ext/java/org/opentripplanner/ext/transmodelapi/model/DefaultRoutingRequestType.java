@@ -148,7 +148,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorBoardTime")
           .description("How long does it take to get on an elevator, on average.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorBoardTime())
+          .dataFetcher(env -> preferences.street().elevator().boardTime())
           .build()
       )
       .field(
@@ -157,7 +157,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorBoardCost")
           .description("What is the cost of boarding a elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorBoardCost())
+          .dataFetcher(env -> preferences.street().elevator().boardCost())
           .build()
       )
       .field(
@@ -166,7 +166,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorHopTime")
           .description("How long does it take to advance one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorHopTime())
+          .dataFetcher(env -> preferences.street().elevator().hopTime())
           .build()
       )
       .field(
@@ -175,7 +175,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorHopCost")
           .description("What is the cost of travelling one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorHopCost())
+          .dataFetcher(env -> preferences.street().elevator().hopCost())
           .build()
       )
       .field(

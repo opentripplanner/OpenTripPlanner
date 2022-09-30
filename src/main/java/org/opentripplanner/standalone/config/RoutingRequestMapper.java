@@ -149,18 +149,18 @@ public class RoutingRequestMapper {
       .setDisableAlertFiltering(
         c.asBoolean("disableAlertFiltering", preferences.system().disableAlertFiltering())
       );
+
     preferences
       .street()
-      .setElevatorBoardCost(c.asInt("elevatorBoardCost", preferences.street().elevatorBoardCost()));
-    preferences
-      .street()
-      .setElevatorBoardTime(c.asInt("elevatorBoardTime", preferences.street().elevatorBoardTime()));
-    preferences
-      .street()
-      .setElevatorHopCost(c.asInt("elevatorHopCost", preferences.street().elevatorHopCost()));
-    preferences
-      .street()
-      .setElevatorHopTime(c.asInt("elevatorHopTime", preferences.street().elevatorHopTime()));
+      .withElevator(builder -> {
+        var original = preferences.street().elevator();
+        builder
+          .withBoardCost(c.asInt("elevatorBoardCost", original.boardCost()))
+          .withBoardTime(c.asInt("elevatorBoardTime", original.boardTime()))
+          .withHopCost(c.asInt("elevatorHopCost", original.hopCost()))
+          .withHopTime(c.asInt("elevatorHopTime", original.hopTime()));
+      });
+
     preferences
       .system()
       .setGeoidElevation(c.asBoolean("geoidElevation", preferences.system().geoidElevation()));

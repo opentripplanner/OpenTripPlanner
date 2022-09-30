@@ -48,11 +48,11 @@ public class DoubleUtils {
     return roundToNDecimals(value, 7);
   }
 
-  public static double roundToNDecimals(double value, int places) {
+  public static double roundToNDecimals(double value, int decimals) {
     if (Double.isNaN(value) || Double.isInfinite(value)) {
       return value;
     }
-    return BigDecimal.valueOf(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
+    return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).doubleValue();
   }
 
   /**
