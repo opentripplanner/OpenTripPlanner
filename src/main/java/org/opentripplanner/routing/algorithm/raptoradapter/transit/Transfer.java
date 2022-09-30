@@ -9,8 +9,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -37,7 +36,7 @@ public class Transfer {
   }
 
   public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
-    RouteRequest rr = request.getStreetSearchRequest(request.journey().transfer().mode());
+    RouteRequest rr = request.clone();
 
     var transferPreferences = rr.preferences();
 
@@ -68,9 +67,6 @@ public class Transfer {
         .setSwitchTime(roundTo100(bike.switchTime()))
         .setSpeed(roundToHalf(bike.speed()))
     );
-
-    // it's a record (immutable) so can be safely reused
-    transferPreferences.setWheelchair(request.preferences().wheelchair());
 
     streetPreferences.setTurnReluctance(roundTo(streetPreferences.turnReluctance(), 1));
 
@@ -107,20 +103,24 @@ public class Transfer {
     return edges;
   }
 
-  public Optional<RaptorTransfer> asRaptorTransfer(RoutingContext routingContext) {
-    RoutingPreferences routingPreferences = routingContext.opt.preferences();
+  public Optional<RaptorTransfer> asRaptorTransfer(RouteRequest request) {
+    WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
-      double durationSeconds = distanceMeters / routingPreferences.walk().speed();
+      double durationSeconds = distanceMeters / walkPreferences.speed();
       return Optional.of(
         new TransferWithDuration(
           this,
           (int) Math.ceil(durationSeconds),
-          RaptorCostConverter.toRaptorCost(durationSeconds * routingPreferences.walk().reluctance())
+          RaptorCostConverter.toRaptorCost(durationSeconds * walkPreferences.reluctance())
         )
       );
     }
 
-    StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
+    StateEditor se = new StateEditor(
+      request,
+      request.journey().transfer().mode(),
+      edges.get(0).getFromVertex()
+    );
     se.setTimeSeconds(0);
 
     State s = se.makeState();

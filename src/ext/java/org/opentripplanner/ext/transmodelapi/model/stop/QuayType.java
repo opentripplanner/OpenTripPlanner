@@ -22,12 +22,15 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
+import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -350,11 +353,54 @@ public class QuayType {
           })
           .build()
       )
-      //                .field(GraphQLFieldDefinition.newFieldDefinition()
-      //                        .name("stopType")
-      //                        .type(stopTypeEnum)
-      //                        .dataFetcher(environment -> (((StopLocation) environment.getSource()).getStopType()))
-      //                        .build())
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("stopType")
+          .type(Scalars.GraphQLString)
+          .dataFetcher(environment -> {
+            StopLocation stopLocation = environment.getSource();
+            if (stopLocation instanceof RegularStop) {
+              return "regular";
+            } else if (stopLocation instanceof AreaStop) {
+              return "flexible_area";
+            } else if (stopLocation instanceof GroupStop) {
+              return "flexible_group";
+            }
+            return null;
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("flexibleArea")
+          .description("Geometry for flexible area.")
+          .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
+          .dataFetcher(environment ->
+            (
+              environment.getSource() instanceof AreaStop areaStop
+                ? areaStop.getGeometry().getCoordinates()
+                : null
+            )
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("flexibleGroup")
+          .description("the Quays part of an flexible group.")
+          .type(GraphQLList.list(REF))
+          .dataFetcher(environment ->
+            (
+              environment.getSource() instanceof GroupStop groupStop
+                ? groupStop.getLocations()
+                : null
+            )
+          )
+          .build()
+      )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
