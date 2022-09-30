@@ -125,13 +125,16 @@ public class RoutingWorker {
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
+    boolean removeWalkAllTheWayResultsFromDirectFlex =
+      request.journey().direct().mode() == StreetMode.FLEXIBLE;
+
     ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
       request.preferences().system().itineraryFilters(),
       request.numItineraries(),
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults() ||
-      request.journey().direct().mode() == StreetMode.FLEXIBLE,
+      removeWalkAllTheWayResultsFromDirectFlex,
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       request.wheelchair(),
