@@ -2,9 +2,9 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 import static org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences.DEFAULT;
 
 import org.junit.jupiter.api.Test;
@@ -81,10 +81,6 @@ class TransferOptimizationPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withMinSafeWaitTimeFactor(0.0).build();
     var copy = other.copyOf().withMinSafeWaitTimeFactor(MIN_SAFE_WAIT_TIME_FACTOR).build();
-
-    assertEquals(subject, copy);
-    assertEquals(subject.hashCode(), copy.hashCode());
-    assertNotEquals(subject, other);
-    assertNotEquals(subject.hashCode(), other.hashCode());
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
   }
 }

@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -70,11 +70,7 @@ class RaptorPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withTimeLimit(null).build();
     var copy = other.copyOf().withTimeLimit(TIME_LIMIT).build();
-
-    assertEquals(subject, copy);
-    assertEquals(subject.hashCode(), copy.hashCode());
-    assertNotEquals(subject, other);
-    assertNotEquals(subject.hashCode(), other.hashCode());
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
   }
 
   @Test

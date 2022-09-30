@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,18 +36,18 @@ class AccessibilityPreferencesTest {
   }
 
   @Test
-  void testEqualsAndHashCode() {
+  void testFactoryMethods() {
+    // Return same object if no value is set
     assertSame(AccessibilityPreferences.ofOnlyAccessible(), subjectOnlyAccessible);
     assertNotEquals(subject, subjectOnlyAccessible);
     assertNotEquals(subject.hashCode(), subjectOnlyAccessible.hashCode());
+  }
 
+  @Test
+  void testEqualsAndHashCode() {
     var same = AccessibilityPreferences.ofCost(UNKNOWN_COST, INACCESSIBLE_COST);
-    assertEquals(same, subject);
-    assertEquals(same.hashCode(), subject.hashCode());
-
     var other = AccessibilityPreferences.ofCost(2, 2);
-    assertNotEquals(other, subjectOnlyAccessible);
-    assertNotEquals(other.hashCode(), subject.hashCode());
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
   }
 
   @Test

@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import org.junit.jupiter.api.Test;
 
@@ -84,12 +84,8 @@ class CarPreferencesTest {
 
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withSpeed(0.0).build();
-    var copy = other.copyOf().withSpeed(SPEED).build();
-
-    assertEquals(subject, copy);
-    assertEquals(subject.hashCode(), copy.hashCode());
-    assertNotEquals(subject, other);
-    assertNotEquals(subject.hashCode(), other.hashCode());
+    var same = other.copyOf().withSpeed(SPEED).build();
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
   }
 
   @Test

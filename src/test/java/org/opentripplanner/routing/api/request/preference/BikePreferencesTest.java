@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -95,19 +95,18 @@ class BikePreferencesTest {
   }
 
   @Test
-  void testCopyOfEqualsAndHashCode() {
+  void testOfAndCopyOf() {
     // Return same object if no value is set
     assertSame(BikePreferences.DEFAULT, BikePreferences.of().build());
     assertSame(subject, subject.copyOf().build());
+  }
 
+  @Test
+  void testCopyOfEqualsAndHashCode() {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().setSpeed(0.0).build();
-    var copy = other.copyOf().setSpeed(SPEED).build();
-
-    assertEquals(subject, copy);
-    assertEquals(subject.hashCode(), copy.hashCode());
-    assertNotEquals(subject, other);
-    assertNotEquals(subject.hashCode(), other.hashCode());
+    var same = other.copyOf().setSpeed(SPEED).build();
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
   }
 
   @Test

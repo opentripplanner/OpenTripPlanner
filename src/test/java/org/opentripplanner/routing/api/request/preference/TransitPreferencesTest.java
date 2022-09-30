@@ -2,9 +2,9 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
 import java.util.Map;
@@ -101,11 +101,7 @@ class TransitPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().setIgnoreRealtimeUpdates(!IGNORE_REALTIME_UPDATES).build();
     var copy = other.copyOf().setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES).build();
-
-    assertEquals(subject.toString(), copy.toString());
-    assertEquals(subject.hashCode(), copy.hashCode());
-    assertNotEquals(subject, other);
-    assertNotEquals(subject.hashCode(), other.hashCode());
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
   }
 
   @Test

@@ -2,10 +2,10 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class WalkPreferencesTest {
@@ -59,29 +59,14 @@ class WalkPreferencesTest {
 
   @Test
   void testEqualsAndHAshCode() {
+    // Return same object if no value is set
+    assertSame(subject, subject.copyOf().build());
+    assertSame(TransitPreferences.DEFAULT, TransitPreferences.of().build());
+
     // By changing the speed back and forth we force the builder to create a new instance
-    var copy = subject.copyOf().withSpeed(10.0).build().copyOf().withSpeed(SPEED).build();
-
-    assertNotSame(copy, subject);
-    assertEquals(copy, subject);
-    assertEquals(copy.hashCode(), subject.hashCode());
-
-    var others = Stream
-      .of(
-        subject.copyOf().withSpeed(1),
-        subject.copyOf().withReluctance(1),
-        subject.copyOf().withBoardCost(1),
-        subject.copyOf().withStairsReluctance(1),
-        subject.copyOf().withStairsTimeFactor(1),
-        subject.copyOf().withSafetyFactor(1)
-      )
-      .map(WalkPreferences.Builder::build)
-      .toList();
-
-    for (WalkPreferences other : others) {
-      assertNotEquals(subject, other);
-      assertNotEquals(subject.hashCode(), other.hashCode());
-    }
+    var other = subject.copyOf().withSpeed(10.0).build();
+    var copy = other.copyOf().withSpeed(SPEED).build();
+    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
   }
 
   @Test
