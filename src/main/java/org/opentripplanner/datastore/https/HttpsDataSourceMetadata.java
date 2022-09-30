@@ -14,8 +14,8 @@ import org.apache.http.client.utils.DateUtils;
  */
 public class HttpsDataSourceMetadata {
 
-  private static final String CONTENT_TYPE_APPLICATION_GZIP = "application/gzip";
-  private static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
+  static final String CONTENT_TYPE_APPLICATION_GZIP = "application/gzip";
+  static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
 
   private static final Set<String> HTTP_HEADERS = Set.of(
     HttpHeaders.CONTENT_TYPE,
