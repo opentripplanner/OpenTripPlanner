@@ -25,8 +25,6 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -329,17 +327,19 @@ public class OpenStreetMapModuleTest {
 
     loader.buildGraph();
 
-    RouteRequest request = new RouteRequest(TraverseMode.WALK);
+    RouteRequest request = new RouteRequest();
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
     //It tests if it is possible to route over area without visibility calculations
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(request, graph, bottomV, topV);
-
     GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
-    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
+    List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(
+      request,
+      Set.of(bottomV),
+      Set.of(topV)
+    );
 
     assertNotNull(pathList);
     assertFalse(pathList.isEmpty());

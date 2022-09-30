@@ -56,7 +56,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Acces
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -139,7 +139,7 @@ public class TravelTimeResource {
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
         new RoutingRequestTransitDataProviderFilter(routingRequest, transitService),
-        new RoutingContext(transferRoutingRequest, graph, (Vertex) null, null)
+        transferRoutingRequest
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());
@@ -226,18 +226,25 @@ public class TravelTimeResource {
       .street()
       .initMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of());
 
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        accessRequest,
+        accessRequest.journey().access().mode(),
+        StreetMode.NOT_SET
+      )
+    ) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
 
       var arrivals = route(accessList).getArrivals();
 
-      RoutingContext routingContext = new RoutingContext(routingRequest, graph, temporaryVertices);
-
       var spt = AStarBuilder
         .allDirectionsMaxDuration(traveltimeRequest.maxCutoff)
-        .setContext(routingContext)
+        .setRequest(routingRequest)
+        .setStreetRequest(accessRequest.journey().access())
+        .setVerticesContainer(temporaryVertices)
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
-        .setInitialStates(getInitialStates(arrivals, temporaryVertices, routingContext))
+        .setInitialStates(getInitialStates(arrivals, temporaryVertices))
         .getShortestPathTree();
 
       return SampleGridRenderer.getSampleGrid(spt, traveltimeRequest);
@@ -249,9 +256,11 @@ public class TravelTimeResource {
     TemporaryVerticesContainer temporaryVertices
   ) {
     final Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(
-      new RoutingContext(accessRequest, graph, temporaryVertices),
+      accessRequest,
+      temporaryVertices,
       transitService,
-      routingRequest.journey().access().mode(),
+      routingRequest.journey().access(),
+      null,
       false
     );
     return new AccessEgressMapper().mapNearbyStops(accessStops, false);
@@ -259,15 +268,18 @@ public class TravelTimeResource {
 
   private List<State> getInitialStates(
     StopArrivals arrivals,
-    TemporaryVerticesContainer temporaryVertices,
-    RoutingContext routingContext
+    TemporaryVerticesContainer temporaryVertices
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StateData stateData = StateData.getInitialStateData(routingRequest);
+    StateData stateData = StateData.getInitialStateData(
+      routingRequest,
+      routingRequest.journey().egress().mode()
+    );
 
     for (var vertex : temporaryVertices.getFromVertices()) {
-      initialStates.add(new State(vertex, startTime, routingContext, stateData));
+      // TODO StateData should be of direct mode here
+      initialStates.add(new State(vertex, startTime, stateData));
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
@@ -278,7 +290,7 @@ public class TravelTimeResource {
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, routingContext, stateData.clone());
+          State s = new State(v, time, stateData.clone());
           s.weight = startTime.until(time, ChronoUnit.SECONDS);
           // TODO: This shouldn't be overridden in state initialization
           s.stateData.startTime = stateData.startTime;

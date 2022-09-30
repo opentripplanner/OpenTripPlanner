@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
@@ -62,7 +63,7 @@ public class TemporaryVerticesContainerTest {
     request.setTo(to);
 
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, request);
+    subject = new TemporaryVerticesContainer(g, request, StreetMode.WALK, StreetMode.WALK);
 
     // Then:
     originAndDestinationInsertedCorrect();

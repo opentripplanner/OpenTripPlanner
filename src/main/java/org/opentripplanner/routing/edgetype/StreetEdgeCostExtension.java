@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 
 /**
@@ -12,5 +12,5 @@ public interface StreetEdgeCostExtension {
    *
    * @return zero(0) - no extra cost is added, or a positive value.
    */
-  double calculateExtraCost(RoutingContext context, int edgeLength, TraverseMode traverseMode);
+  double calculateExtraCost(State state, int edgeLength, TraverseMode traverseMode);
 }

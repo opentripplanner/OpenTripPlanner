@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.StateEditor;
 public interface CarPickupableEdge {
   default boolean canPickupAndDrive(State state) {
     return (
-      state.getOptions().carPickup &&
+      state.getRequestMode().includesPickup() &&
       state.getCarPickupState() ==
       (
         state.getOptions().arriveBy()
@@ -18,7 +18,9 @@ public interface CarPickupableEdge {
   }
 
   default boolean canDropOffAfterDriving(State state) {
-    return state.getOptions().carPickup && state.getCarPickupState() == CarPickupState.IN_CAR;
+    return (
+      state.getRequestMode().includesPickup() && state.getCarPickupState() == CarPickupState.IN_CAR
+    );
   }
 
   default void dropOffAfterDriving(State state, StateEditor editor) {

@@ -27,11 +27,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -266,17 +265,17 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .filter(s -> s instanceof AreaStop)
       .findFirst()
       .orElseThrow();
-    var r = new RouteRequest();
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, r)) {
-      RoutingContext routingContext = new RoutingContext(r, graph, temporaryVertices);
 
-      return new NearbyStop(
-        stopLocation,
-        0,
-        List.of(),
-        new State(new StreetLocation(id, new Coordinate(0, 0), id), r, routingContext)
-      );
-    }
+    return new NearbyStop(
+      stopLocation,
+      0,
+      List.of(),
+      new State(
+        new StreetLocation(id, new Coordinate(0, 0), id),
+        new RouteRequest(),
+        StreetMode.WALK
+      )
+    );
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {
