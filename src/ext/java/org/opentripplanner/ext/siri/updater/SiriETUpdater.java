@@ -79,7 +79,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
       pollingPeriodSeconds(),
       updateSource
     );
-    recordMetrics = TripUpdateMetrics.batch(config);
+    recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
   @Override
