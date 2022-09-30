@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -136,24 +137,31 @@ public class OSMSpecifier {
     } else return new P2<>(0, 0);
   }
 
-  private P2<Integer> computeANDScore(OSMWithTags match) {
+  private P2<Integer> computeANDScore(OSMWithTags way) {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
+    var allTagsMatch = logicalANDPairs
+      .stream()
+      .allMatch(p -> matchValue(way.getTag(p.first), p.second));
+    if (!allTagsMatch) {
+      return new P2<>(0, 0);
+    }
     for (P2<String> pair : logicalANDPairs) {
       // TODO why are we repeatedly converting these to lower case every time they are used?
       // Probably because it used to be possible to set them from Spring XML.
       String tag = pair.first.toLowerCase();
       String value = pair.second.toLowerCase();
-      String leftMatchValue = match.getTag(tag + ":left");
-      String rightMatchValue = match.getTag(tag + ":right");
-      String matchValue = match.getTag(tag);
+      String leftMatchValue = way.getTag(tag + ":left");
+      String rightMatchValue = way.getTag(tag + ":right");
+      String matchValue = way.getTag(tag);
       if (leftMatchValue == null) {
         leftMatchValue = matchValue;
       }
       if (rightMatchValue == null) {
         rightMatchValue = matchValue;
       }
+
       int leftTagScore = getTagScore(value, leftMatchValue);
       leftScore += leftTagScore;
       if (leftTagScore > 0) {
@@ -181,7 +189,7 @@ public class OSMSpecifier {
    */
   private int getTagScore(String value, String matchValue) {
     // either this matches on a wildcard, or it matches exactly
-    if (value.equals("*") && matchValue != null) {
+    if (matchesWildcard(value, matchValue)) {
       return 1; // wildcard matches are basically tiebreakers
     } else if (value.equals(matchValue)) {
       return 100;
@@ -199,5 +207,15 @@ public class OSMSpecifier {
         return 0;
       }
     }
+  }
+
+  private static boolean matchesWildcard(String value, String matchValue) {
+    return matchValue != null && value != null && value.equals("*");
+  }
+
+  private static boolean matchValue(String value, String matchValue) {
+    return (
+      (Objects.nonNull(value) && value.equals(matchValue)) || matchesWildcard(value, matchValue)
+    );
   }
 }
