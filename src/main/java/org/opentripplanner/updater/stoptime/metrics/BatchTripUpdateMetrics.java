@@ -18,7 +18,7 @@ import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
  * Records micrometer metrics for trip updaters that send batches of updates, for example GTFS-RT
  * via HTTP.
  * <p>
- * It records the latest trip update as gauges.
+ * It records the most recent trip update as gauges.
  */
 public class BatchTripUpdateMetrics extends TripUpdateMetrics {
 
@@ -30,8 +30,12 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
   public BatchTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
     this.successfulGauge =
-      getGauge("successful", "Trip updates that were successfully applied at the last update");
-    this.failureGauge = getGauge("failed", "Trip updates that failed to apply at the last update");
+      getGauge(
+        "successful",
+        "Trip updates that were successfully applied at the most recent update"
+      );
+    this.failureGauge =
+      getGauge("failed", "Trip updates that failed to apply at the most recent update");
   }
 
   public void setGauges(UpdateResult result) {
@@ -44,7 +48,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
         counter =
           getGauge(
             "failure_type",
-            "Failure types of the last update",
+            "Failure types of the most recent update",
             Tag.of("errorType", errorType.name())
           );
         failuresByType.put(errorType, counter);
