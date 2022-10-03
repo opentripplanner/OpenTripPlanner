@@ -15,7 +15,8 @@ public record SiriETGooglePubsubUpdaterParameters(
   @Nullable String dataInitializationUrl,
   Duration reconnectPeriod,
   Duration initialGetDataTimeout,
-  boolean purgeExpiredData
+  boolean purgeExpiredData,
+  boolean fuzzyTripMatching
 ) {
   public static Duration RECONNECT_PERIOD = Duration.ofSeconds(30);
   public static Duration INITIAL_GET_DATA_TIMEOUT = Duration.ofSeconds(30);
@@ -41,6 +42,7 @@ public record SiriETGooglePubsubUpdaterParameters(
       .addDuration("reconnectPeriod", reconnectPeriod, RECONNECT_PERIOD)
       .addDuration("initialGetDataTimeout", initialGetDataTimeout, INITIAL_GET_DATA_TIMEOUT)
       .addBoolIfTrue("purgeExpiredData", purgeExpiredData)
+      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
       .addObj("dataInitializationUrl", dataInitializationUrl, null)
       .toString();
   }

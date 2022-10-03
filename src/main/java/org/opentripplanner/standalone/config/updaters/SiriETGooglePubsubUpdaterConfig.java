@@ -18,7 +18,8 @@ public class SiriETGooglePubsubUpdaterConfig {
       c.asText("dataInitializationUrl", null),
       c.asDuration("reconnectPeriod", RECONNECT_PERIOD),
       c.asDuration("initialGetDataTimeout", INITIAL_GET_DATA_TIMEOUT),
-      c.asBoolean("purgeExpiredData", false)
+      c.asBoolean("purgeExpiredData", false),
+      c.asBoolean("fuzzyTripMatching", false)
     );
   }
 }
