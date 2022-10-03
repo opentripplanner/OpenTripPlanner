@@ -5,13 +5,16 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
+import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
@@ -48,31 +51,40 @@ public class GraphPathFinder {
 
   private final Duration streetRoutingTimeout;
 
+  private final DataOverlayContext dataOverlayContext;
+
   public GraphPathFinder(@Nullable TraverseVisitor traverseVisitor, Duration streetRoutingTimeout) {
+    this(traverseVisitor, streetRoutingTimeout, null);
+  }
+
+  public GraphPathFinder(
+    @Nullable TraverseVisitor traverseVisitor,
+    Duration streetRoutingTimeout,
+    @Nullable DataOverlayContext dataOverlayContext
+  ) {
     this.traverseVisitor = traverseVisitor;
     this.streetRoutingTimeout = streetRoutingTimeout;
+    this.dataOverlayContext = dataOverlayContext;
   }
 
   /**
    * This no longer does "trip banning" to find multiple itineraries. It just searches once trying
    * to find a non-transit path.
    */
-  public List<GraphPath> getPaths(RoutingContext routingContext) {
-    if (routingContext == null) {
-      LOG.error("PathService was passed a null routing context.");
-      return null;
-    }
-
-    RouteRequest options = routingContext.opt;
-    RoutingPreferences preferences = routingContext.opt.preferences();
+  public List<GraphPath> getPaths(RouteRequest request, Set<Vertex> from, Set<Vertex> to) {
+    StreetPreferences preferences = request.preferences().street();
 
     AStarBuilder aStar = AStarBuilder
       .oneToOneMaxDuration(
-        preferences.street().maxDirectDuration().valueOf(options.journey().direct().mode())
+        preferences.maxDirectDuration().valueOf(request.journey().direct().mode())
       )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
-      .setContext(routingContext)
+      .setRequest(request)
+      .setStreetRequest(request.journey().direct())
+      .setFrom(from)
+      .setTo(to)
+      .setDataOverlayContext(dataOverlayContext)
       .setTimeout(streetRoutingTimeout);
 
     // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
@@ -81,7 +93,7 @@ public class GraphPathFinder {
       aStar.setTraverseVisitor(traverseVisitor);
     }
 
-    LOG.debug("rreq={}", options);
+    LOG.debug("rreq={}", request);
 
     long searchBeginTime = System.currentTimeMillis();
     LOG.debug("BEGIN SEARCH");
@@ -90,18 +102,32 @@ public class GraphPathFinder {
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-    paths.sort(new PathComparator(options.arriveBy()));
+    paths.sort(new PathComparator(request.arriveBy()));
     return paths;
   }
 
   /**
    * Try to find N paths through the Graph
    */
-  public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
-    RouteRequest request = routingContext.opt;
+  public List<GraphPath> graphPathFinderEntryPoint(
+    RouteRequest request,
+    TemporaryVerticesContainer vertexContainer
+  ) {
+    return graphPathFinderEntryPoint(
+      request,
+      vertexContainer.getFromVertices(),
+      vertexContainer.getToVertices()
+    );
+  }
+
+  public List<GraphPath> graphPathFinderEntryPoint(
+    RouteRequest request,
+    Set<Vertex> from,
+    Set<Vertex> to
+  ) {
     Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
 
-    List<GraphPath> paths = getPaths(routingContext);
+    List<GraphPath> paths = getPaths(request, from, to);
 
     // Detect and report that most obnoxious of bugs: path reversal asymmetry.
     // Removing paths might result in an empty list, so do this check before the empty list check.
@@ -124,7 +150,7 @@ public class GraphPathFinder {
       }
     }
 
-    if (paths == null || paths.size() == 0) {
+    if (paths == null || paths.isEmpty()) {
       LOG.debug("Path not found: {} : {}", request.from(), request.to());
       throw new PathNotFoundException();
     }

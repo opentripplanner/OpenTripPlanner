@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -150,7 +150,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     Set<String> requiredTags,
     boolean arriveBy
   ) {
-    var options = new RouteRequest().getStreetSearchRequest(streetMode);
+    var options = new RouteRequest();
     var preferences = options.preferences();
 
     preferences.withBike(it -> it.setParkCost(120).setParkTime(60));
@@ -163,7 +163,10 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
 
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, fromVertex, toVertex))
+      .setRequest(options)
+      .setStreetRequest(new StreetRequest(streetMode))
+      .setFrom(fromVertex)
+      .setTo(toVertex)
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

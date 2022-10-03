@@ -890,11 +890,6 @@ public abstract class RoutingResource {
       request.journey().setModes(modes.getRequestModes());
     }
 
-    if (request.vehicleRental && bikeSpeed == null) {
-      //slower bike speed for bike sharing, based on empirical evidence from DC.
-      preferences.withBike(bike -> bike.setSpeed(4.3));
-    }
-
     var transitPref = preferences.transit();
 
     if (boardSlack != null) {

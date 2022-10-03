@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Frequency;
@@ -109,8 +110,11 @@ public class OtpTransitServiceBuilder {
 
   private final EntityById<GroupOfRoutes> groupOfRouteById = new EntityById<>();
 
-  public OtpTransitServiceBuilder() {
+  private final DataImportIssueStore issueStore;
+
+  public OtpTransitServiceBuilder(DataImportIssueStore issueStore) {
     this.stopModelBuilder = StopModel.of();
+    this.issueStore = issueStore;
   }
 
   /* Accessors */
@@ -326,7 +330,16 @@ public class OtpTransitServiceBuilder {
   private void removeTripsWithNoneExistingServiceIds() {
     Set<FeedScopedId> serviceIds = findAllServiceIds();
     int orgSize = tripsById.size();
-    tripsById.removeIf(t -> !serviceIds.contains(t.getServiceId()));
+    tripsById.removeIf(
+      t -> !serviceIds.contains(t.getServiceId()),
+      t ->
+        issueStore.add(
+          "RemovedMissingServiceIdTrip",
+          "Removed trip %s as service id %s does not exist",
+          t.getId(),
+          t.getServiceId()
+        )
+    );
     logRemove("Trip", orgSize, tripsById.size(), "Trip service id does not exist.");
   }
 
@@ -351,6 +364,11 @@ public class OtpTransitServiceBuilder {
     }
     for (Map.Entry<StopPattern, TripPattern> it : removePatterns) {
       tripPatterns.remove(it.getKey(), it.getValue());
+      issueStore.add(
+        "RemovedEmptyTripPattern",
+        "Removed trip pattern %s as it contains no trips",
+        it.getValue().getId()
+      );
     }
     logRemove("TripPattern", orgSize, tripPatterns.size(), "No trips for pattern exist.");
   }

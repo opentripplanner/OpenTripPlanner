@@ -9,10 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
@@ -25,7 +24,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  */
 public class BikeWalkingTest extends GraphRoutingTest {
 
-  private Graph graph;
   private TransitStopVertex S1, S2;
   private TransitEntranceVertex E1;
   private StreetVertex A, B, C, D, E, F, Q;
@@ -301,7 +299,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
     //
     //   TS1 <-> A <-> B <-> C <-> D <-> E <-> F <-> E1 <-> S2
 
-    var otpModel = modelOf(
+    modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -329,7 +327,6 @@ public class BikeWalkingTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph();
   }
 
   private void assertBikePath(Vertex fromVertex, Vertex toVertex, String... descriptor) {
@@ -379,11 +376,12 @@ public class BikeWalkingTest extends GraphRoutingTest {
     preferences.withWalk(w -> w.setSpeed(10));
     request.setArriveBy(arriveBy);
 
-    var bikeOptions = request.getStreetSearchRequest(streetMode);
-
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(bikeOptions, graph, fromVertex, toVertex))
+      .setRequest(request)
+      .setStreetRequest(new StreetRequest(streetMode))
+      .setFrom(fromVertex)
+      .setTo(toVertex)
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -137,7 +138,14 @@ public class FlexIntegrationTest {
     // in the middle of flex zone
     var to = new GenericLocation(33.86701256815635, -84.61787939071655);
 
-    var itin = getItinerary(from, to, 1, true);
+    List<Itinerary> itineraries = getItineraries(from, to, true);
+
+    assertTrue(
+      itineraries.stream().noneMatch(Itinerary::isWalkOnly),
+      "Should contain only flex itineraries"
+    );
+
+    var itin = itineraries.get(0);
 
     // walk, flex
     assertEquals(2, itin.getLegs().size());
@@ -210,13 +218,14 @@ public class FlexIntegrationTest {
   }
 
   private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {
-    return getItinerary(from, to, index, false);
+    List<Itinerary> itineraries = getItineraries(from, to, false);
+    return itineraries.get(index);
   }
 
-  private Itinerary getItinerary(
+  @Nonnull
+  private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
-    int index,
     boolean onlyDirect
   ) {
     RouteRequest request = new RouteRequest();
@@ -239,7 +248,6 @@ public class FlexIntegrationTest {
     var itineraries = result.getTripPlan().itineraries;
 
     assertFalse(itineraries.isEmpty());
-
-    return itineraries.get(index);
+    return itineraries;
   }
 }

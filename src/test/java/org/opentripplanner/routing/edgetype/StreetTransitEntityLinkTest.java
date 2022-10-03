@@ -7,12 +7,11 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 
 import java.util.Set;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
@@ -21,13 +20,10 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
 
 class StreetTransitEntityLinkTest {
 
-  private static Graph graph;
-  private static TransitModel transitModel;
+  private static final Graph graph = new Graph(new Deduplicator());
 
   RegularStop inaccessibleStop = TransitModelForTest.stopForTest(
     "A:inaccessible",
@@ -54,13 +50,6 @@ class StreetTransitEntityLinkTest {
     null,
     NO_INFORMATION
   );
-
-  @BeforeAll
-  static void setup() {
-    var deduplicator = new Deduplicator();
-    graph = new Graph(deduplicator);
-    transitModel = new TransitModel(new StopModel(), deduplicator);
-  }
 
   @Test
   void disallowInaccessibleStop() {
@@ -104,11 +93,7 @@ class StreetTransitEntityLinkTest {
       .preferences()
       .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
-    var ctx = new RoutingContext(req, graph, from, to);
-    var state = new State(ctx);
-
     var edge = new StreetTransitStopLink(from, to);
-
-    return edge.traverse(state);
+    return edge.traverse(new State(from, req, StreetMode.BIKE));
   }
 }

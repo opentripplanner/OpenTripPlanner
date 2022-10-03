@@ -47,7 +47,7 @@ public class TripMapperTest {
     var limitations = new AccessibilityLimitations_RelStructure();
     var access = new AccessibilityAssessment();
 
-    var transitBuilder = new OtpTransitServiceBuilder();
+    var transitBuilder = new OtpTransitServiceBuilder(issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -76,7 +76,7 @@ public class TripMapperTest {
 
   @Test
   public void mapTrip() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -100,7 +100,7 @@ public class TripMapperTest {
 
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
