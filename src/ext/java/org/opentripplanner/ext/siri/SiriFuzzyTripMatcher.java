@@ -222,7 +222,11 @@ public class SiriFuzzyTripMatcher {
     return matches;
   }
 
-  Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey, String feedId) {
+  static Trip findTripByDatedVehicleJourneyRef(
+    EstimatedVehicleJourney journey,
+    String feedId,
+    TransitService transitService
+  ) {
     String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
     if (serviceJourneyId != null) {
       Trip trip = transitService.getTripForId(new FeedScopedId(feedId, serviceJourneyId));
@@ -290,7 +294,7 @@ public class SiriFuzzyTripMatcher {
     return lastStopId + ":" + lastStopArrivalTime;
   }
 
-  private String resolveDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
+  private static String resolveDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
     if (journey.getFramedVehicleJourneyRef() != null) {
       return journey.getFramedVehicleJourneyRef().getDatedVehicleJourneyRef();
     } else if (journey.getDatedVehicleJourneyRef() != null) {
