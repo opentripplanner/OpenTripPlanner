@@ -28,6 +28,6 @@ public class RoutingPreferencesTest {
     assertSame(pref.transit(), clone.transit());
     assertSame(pref.parking(), clone.parking());
     assertSame(pref.street(), clone.street());
-    assertSame(pref.system().itineraryFilters(), clone.system().itineraryFilters());
+    assertSame(pref.itineraryFilter(), clone.itineraryFilter());
   }
 }

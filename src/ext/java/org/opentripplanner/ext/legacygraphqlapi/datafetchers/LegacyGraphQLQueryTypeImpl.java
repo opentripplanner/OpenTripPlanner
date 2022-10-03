@@ -666,7 +666,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument(
         "debugItineraryFilter",
-        (Boolean v) -> preferences.system().withItineraryFilters(it -> it.withDebug(v))
+        (Boolean v) -> preferences.withItineraryFilter(it -> it.withDebug(v))
       );
       callWith.argument("arriveBy", request::setArriveBy);
       // TODO VIA (HSL): 2022-08-24 I'm just commenting this out since we have to refactor it anyway

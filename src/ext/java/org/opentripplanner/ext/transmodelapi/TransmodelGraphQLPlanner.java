@@ -246,10 +246,6 @@ public class TransmodelGraphQLPlanner {
     // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
     // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
     // callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-    callWith.argument(
-      "debugItineraryFilter",
-      (Boolean v) -> preferences.system().withItineraryFilters(it -> it.withDebug(v))
-    );
 
     // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
     // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
@@ -258,10 +254,10 @@ public class TransmodelGraphQLPlanner {
     if (modes != null) {
       request.journey().setModes(modes);
     }
-    preferences
-      .system()
-      .withItineraryFilters(it -> ItineraryFiltersInputType.mapToRequest(environment, callWith, it)
-      );
+    preferences.withItineraryFilter(itineraryFilter -> {
+      callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);
+      ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
+    });
 
     /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");

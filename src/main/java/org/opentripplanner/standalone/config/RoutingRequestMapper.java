@@ -162,9 +162,7 @@ public class RoutingRequestMapper {
       car.withDecelerationSpeed(c.asDouble("carDecelerationSpeed", cDft.decelerationSpeed()));
     });
 
-    preferences
-      .system()
-      .withItineraryFilters(it -> mapItineraryFilterParams(c.path("itineraryFilters"), it));
+    preferences.withItineraryFilter(it -> mapItineraryFilterParams(c.path("itineraryFilters"), it));
     preferences
       .system()
       .setDisableAlertFiltering(

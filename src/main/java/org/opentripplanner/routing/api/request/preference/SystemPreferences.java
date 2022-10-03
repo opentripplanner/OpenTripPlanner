@@ -4,16 +4,11 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RoutingTag;
 
 // TODO VIA: Javadoc
 public class SystemPreferences implements Cloneable, Serializable {
-
-  @Nonnull
-  private ItineraryFilterPreferences itineraryFilters = ItineraryFilterPreferences.createDefault();
 
   private Set<RoutingTag> tags = Set.of();
   private DataOverlayParameters dataOverlay;
@@ -23,20 +18,6 @@ public class SystemPreferences implements Cloneable, Serializable {
   private boolean disableAlertFiltering = false;
 
   private Duration maxJourneyDuration = Duration.ofHours(24);
-
-  @Nonnull
-  public ItineraryFilterPreferences itineraryFilters() {
-    return itineraryFilters;
-  }
-
-  public SystemPreferences withItineraryFilters(Consumer<ItineraryFilterPreferences.Builder> body) {
-    this.itineraryFilters = itineraryFilters.copyOf().apply(body).build();
-    return this;
-  }
-
-  public void setItineraryFilters(@Nonnull ItineraryFilterPreferences itineraryFilters) {
-    this.itineraryFilters = itineraryFilters;
-  }
 
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer

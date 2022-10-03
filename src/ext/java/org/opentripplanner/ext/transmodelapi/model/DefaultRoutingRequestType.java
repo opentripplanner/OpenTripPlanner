@@ -439,7 +439,7 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("debugItineraryFilter")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.system().itineraryFilters().debug)
+          .dataFetcher(env -> preferences.itineraryFilter().debug)
           .build()
       )
       /*

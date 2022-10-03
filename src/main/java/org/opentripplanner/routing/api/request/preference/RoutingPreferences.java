@@ -23,6 +23,9 @@ public final class RoutingPreferences implements Cloneable, Serializable {
   private VehicleParkingPreferences parking = VehicleParkingPreferences.DEFAULT;
   private SystemPreferences system = new SystemPreferences();
 
+  @Nonnull
+  private ItineraryFilterPreferences itineraryFilter = ItineraryFilterPreferences.DEFAULT;
+
   /**
    * This set the reluctance for bike, walk, car and bikeWalking (x2.7) - all in one go. These
    * parameters can be set individually.
@@ -117,6 +120,20 @@ public final class RoutingPreferences implements Cloneable, Serializable {
 
   public SystemPreferences system() {
     return system;
+  }
+
+  @Nonnull
+  public ItineraryFilterPreferences itineraryFilter() {
+    return itineraryFilter;
+  }
+
+  public RoutingPreferences withItineraryFilter(Consumer<ItineraryFilterPreferences.Builder> body) {
+    this.itineraryFilter = itineraryFilter.copyOf().apply(body).build();
+    return this;
+  }
+
+  public void withItineraryFilter(@Nonnull ItineraryFilterPreferences itineraryFilter) {
+    this.itineraryFilter = itineraryFilter;
   }
 
   /**
