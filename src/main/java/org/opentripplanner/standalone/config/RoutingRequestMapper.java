@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.opentripplanner.standalone.config.ItineraryFiltersMapper.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -163,7 +164,7 @@ public class RoutingRequestMapper {
 
     preferences
       .system()
-      .setItineraryFilters(ItineraryFiltersMapper.map(c.path("itineraryFilters")));
+      .withItineraryFilters(it -> mapItineraryFilterParams(c.path("itineraryFilters"), it));
     preferences
       .system()
       .setDisableAlertFiltering(

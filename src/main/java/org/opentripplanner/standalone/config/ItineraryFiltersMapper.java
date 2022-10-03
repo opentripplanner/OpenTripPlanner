@@ -10,38 +10,56 @@ public class ItineraryFiltersMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(ItineraryFiltersMapper.class);
 
-  public static ItineraryFilterParameters map(NodeAdapter c) {
-    ItineraryFilterParameters dft = ItineraryFilterParameters.createDefault();
-
+  public static void mapItineraryFilterParams(
+    NodeAdapter c,
+    ItineraryFilterParameters.Builder builder
+  ) {
     if (c.isEmpty()) {
-      return dft;
+      return;
     }
+    var dft = builder.original();
 
-    return new ItineraryFilterParameters(
-      c.asBoolean("debug", dft.debug),
-      c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne),
-      c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree),
-      c.asDouble(
-        "groupedOtherThanSameLegsMaxCostMultiplier",
-        dft.groupedOtherThanSameLegsMaxCostMultiplier
-      ),
-      parseTransitGeneralizedCostLimit(
-        c.path("transitGeneralizedCostLimit"),
-        dft.transitGeneralizedCostLimit
-      ),
-      c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit),
-      c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio),
-      c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio),
-      c.asBoolean(
-        "filterItinerariesWithSameFirstOrLastTrip",
-        dft.filterItinerariesWithSameFirstOrLastTrip
-      ),
-      c.asBoolean("accessibilityScore", dft.accessibilityScore),
-      c.asBoolean(
-        "removeItinerariesWithSameRoutesAndStops",
-        dft.removeItinerariesWithSameRoutesAndStops
+    builder
+      .withDebug(c.asBoolean("debug", dft.debug))
+      .withGroupSimilarityKeepOne(c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne))
+      .withGroupSimilarityKeepThree(
+        c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree)
       )
-    );
+      .withGroupedOtherThanSameLegsMaxCostMultiplier(
+        c.asDouble(
+          "groupedOtherThanSameLegsMaxCostMultiplier",
+          dft.groupedOtherThanSameLegsMaxCostMultiplier
+        )
+      )
+      .withTransitGeneralizedCostLimit(
+        parseTransitGeneralizedCostLimit(
+          c.path("transitGeneralizedCostLimit"),
+          dft.transitGeneralizedCostLimit
+        )
+      )
+      .withNonTransitGeneralizedCostLimit(
+        c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit)
+      )
+      .withBikeRentalDistanceRatio(
+        c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio)
+      )
+      .withParkAndRideDurationRatio(
+        c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio)
+      )
+      .withFilterItinerariesWithSameFirstOrLastTrip(
+        c.asBoolean(
+          "filterItinerariesWithSameFirstOrLastTrip",
+          dft.filterItinerariesWithSameFirstOrLastTrip
+        )
+      )
+      .withAccessibilityScore(c.asBoolean("accessibilityScore", dft.accessibilityScore))
+      .withRemoveItinerariesWithSameRoutesAndStops(
+        c.asBoolean(
+          "removeItinerariesWithSameRoutesAndStops",
+          dft.removeItinerariesWithSameRoutesAndStops
+        )
+      )
+      .build();
   }
 
   private static TransitGeneralizedCostFilterParams parseTransitGeneralizedCostLimit(

@@ -248,7 +248,7 @@ public class TransmodelGraphQLPlanner {
     // callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
     callWith.argument(
       "debugItineraryFilter",
-      (Boolean v) -> preferences.system().itineraryFilters().debug = v
+      (Boolean v) -> preferences.system().withItineraryFilters(it -> it.withDebug(v))
     );
 
     // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
@@ -258,11 +258,10 @@ public class TransmodelGraphQLPlanner {
     if (modes != null) {
       request.journey().setModes(modes);
     }
-    ItineraryFiltersInputType.mapToRequest(
-      environment,
-      callWith,
-      preferences.system().itineraryFilters()
-    );
+    preferences
+      .system()
+      .withItineraryFilters(it -> ItineraryFiltersInputType.mapToRequest(environment, callWith, it)
+      );
 
     /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");

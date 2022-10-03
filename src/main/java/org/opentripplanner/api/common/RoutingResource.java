@@ -934,7 +934,7 @@ public abstract class RoutingResource {
     }
 
     if (debugItineraryFilter != null) {
-      preferences.system().itineraryFilters().debug = debugItineraryFilter;
+      preferences.system().withItineraryFilters(it -> it.withDebug(debugItineraryFilter));
     }
 
     request

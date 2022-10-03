@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
@@ -27,6 +28,11 @@ public class SystemPreferences implements Cloneable, Serializable {
   @Nonnull
   public ItineraryFilterParameters itineraryFilters() {
     return itineraryFilters;
+  }
+
+  public SystemPreferences withItineraryFilters(Consumer<ItineraryFilterParameters.Builder> body) {
+    this.itineraryFilters = itineraryFilters.copyOf().apply(body).build();
+    return this;
   }
 
   public void setItineraryFilters(@Nonnull ItineraryFilterParameters itineraryFilters) {
@@ -100,7 +106,6 @@ public class SystemPreferences implements Cloneable, Serializable {
 
       var clone = (SystemPreferences) super.clone();
 
-      clone.itineraryFilters = new ItineraryFilterParameters(this.itineraryFilters);
       clone.tags = new HashSet<>(this.tags);
 
       return clone;

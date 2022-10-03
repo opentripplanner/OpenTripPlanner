@@ -144,39 +144,32 @@ public class ItineraryFiltersInputType {
   public static void mapToRequest(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    ItineraryFilterParameters target
+    ItineraryFilterParameters.Builder builder
   ) {
     if (!GqlUtil.hasArgument(environment, "itineraryFilters")) {
       return;
     }
-    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, (Double v) -> target.groupSimilarityKeepOne = v);
+    setField(callWith, GROUP_SIMILARITY_KEEP_ONE, builder::withGroupSimilarityKeepOne);
 
     // This is deprecated, sets same value as GROUP_SIMILARITY_KEEP_THREE
-    setField(
-      callWith,
-      GROUP_SIMILARITY_KEEP_N_ITINERARIES,
-      (Double v) -> target.groupSimilarityKeepThree = v
-    );
+    setField(callWith, GROUP_SIMILARITY_KEEP_N_ITINERARIES, builder::withGroupSimilarityKeepThree);
 
-    setField(
-      callWith,
-      GROUP_SIMILARITY_KEEP_THREE,
-      (Double v) -> target.groupSimilarityKeepThree = v
-    );
+    setField(callWith, GROUP_SIMILARITY_KEEP_THREE, builder::withGroupSimilarityKeepThree);
     setField(
       callWith,
       GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER,
-      (Double v) -> target.groupedOtherThanSameLegsMaxCostMultiplier = v
+      builder::withGroupedOtherThanSameLegsMaxCostMultiplier
     );
     setField(
       callWith,
       TRANSIT_GENERALIZED_COST_LIMIT,
       (Map<String, ?> v) ->
-        target.transitGeneralizedCostLimit =
+        builder.withTransitGeneralizedCostLimit(
           new TransitGeneralizedCostFilterParams(
             (DoubleAlgorithmFunction) v.get("costLimitFunction"),
             (double) v.get("intervalRelaxFactor")
           )
+        )
     );
   }
 
