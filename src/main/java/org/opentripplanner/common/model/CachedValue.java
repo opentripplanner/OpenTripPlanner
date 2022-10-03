@@ -20,7 +20,7 @@ public class CachedValue<T> {
 
   public CachedValue(@Nonnull Supplier<T> supplier, @Nonnull Duration cacheInterval) {
     this.supplier = Objects.requireNonNull(supplier);
-    this.value = supplier.get();
+    this.value = null;
     this.cacheInterval = cacheInterval;
     this.timeout = calculateTimeout();
   }
@@ -45,6 +45,6 @@ public class CachedValue<T> {
   }
 
   private boolean hasExpired() {
-    return timeout.isBefore(Instant.now());
+    return value == null || timeout.isBefore(Instant.now());
   }
 }
