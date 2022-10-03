@@ -858,11 +858,12 @@ public abstract class RoutingResource {
         .setAllowArrivingInRentedVehicleAtDestination(allowKeepingRentedBicycleAtDestination);
     }
 
-    if (keepingRentedBicycleAtDestinationCost != null) {
-      preferences
-        .rental()
-        .setArrivingInRentalVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
-    }
+    preferences.withRental(rental -> {
+      if (keepingRentedBicycleAtDestinationCost != null) {
+        rental.withArrivingInRentalVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
+      }
+      rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
+    });
 
     if (allowedVehicleRentalNetworks != null) {
       request.journey().rental().setAllowedNetworks(allowedVehicleRentalNetworks);
@@ -926,8 +927,6 @@ public abstract class RoutingResource {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
       preferences.withBike(bike -> bike.setSpeed(4.3));
     }
-
-    preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
     if (debugItineraryFilter != null) {
       preferences.withItineraryFilter(it -> it.withDebug(debugItineraryFilter));

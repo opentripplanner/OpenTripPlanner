@@ -91,18 +91,26 @@ public class RoutingRequestMapper {
       );
     });
 
-    preferences
-      .rental()
-      .setDropoffCost(c.asInt("bikeRentalDropoffCost", preferences.rental().dropoffCost()));
-    preferences
-      .rental()
-      .setDropoffTime(c.asInt("bikeRentalDropoffTime", preferences.rental().dropoffTime()));
-    preferences
-      .rental()
-      .setPickupCost(c.asInt("bikeRentalPickupCost", preferences.rental().pickupCost()));
-    preferences
-      .rental()
-      .setPickupTime(c.asInt("bikeRentalPickupTime", preferences.rental().pickupTime()));
+    preferences.withRental(rental -> {
+      var rentalDft = preferences.rental();
+      rental
+        .withDropoffCost(c.asInt("bikeRentalDropoffCost", rentalDft.dropoffCost()))
+        .withDropoffTime(c.asInt("bikeRentalDropoffTime", rentalDft.dropoffTime()))
+        .withPickupCost(c.asInt("bikeRentalPickupCost", rentalDft.pickupCost()))
+        .withPickupTime(c.asInt("bikeRentalPickupTime", rentalDft.pickupTime()))
+        .withUseAvailabilityInformation(
+          c.asBoolean(
+            "useBikeRentalAvailabilityInformation",
+            rentalDft.useAvailabilityInformation()
+          )
+        )
+        .withArrivingInRentalVehicleAtDestinationCost(
+          c.asDouble(
+            "keepingRentedBicycleAtDestinationCost",
+            rentalDft.arrivingInRentalVehicleAtDestinationCost()
+          )
+        );
+    });
     request
       .journey()
       .rental()
@@ -110,14 +118,6 @@ public class RoutingRequestMapper {
         c.asBoolean(
           "allowKeepingRentedBicycleAtDestination",
           request.journey().rental().allowArrivingInRentedVehicleAtDestination()
-        )
-      );
-    preferences
-      .rental()
-      .setArrivingInRentalVehicleAtDestinationCost(
-        c.asDouble(
-          "keepingRentedBicycleAtDestinationCost",
-          preferences.rental().arrivingInRentalVehicleAtDestinationCost()
         )
       );
 
@@ -196,14 +196,6 @@ public class RoutingRequestMapper {
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
 
-    preferences
-      .rental()
-      .setUseAvailabilityInformation(
-        c.asBoolean(
-          "useBikeRentalAvailabilityInformation",
-          preferences.rental().useAvailabilityInformation()
-        )
-      );
     preferences.withParking(
       VehicleParkingPreferences.of(
         c.asBoolean(

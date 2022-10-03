@@ -24,14 +24,14 @@ public final class TransferOptimizationPreferences
 
   public static final TransferOptimizationPreferences DEFAULT = new TransferOptimizationPreferences();
 
-  public TransferOptimizationPreferences() {
+  private TransferOptimizationPreferences() {
     this.optimizeTransferWaitTime = true;
     this.minSafeWaitTimeFactor = 5.0;
     this.backTravelWaitTimeFactor = 1.0;
     this.extraStopBoardAlightCostsFactor = 0.0;
   }
 
-  public TransferOptimizationPreferences(Builder builder) {
+  private TransferOptimizationPreferences(Builder builder) {
     this.optimizeTransferWaitTime = builder.optimizeTransferWaitTime;
     this.minSafeWaitTimeFactor = roundTo2Decimals(builder.minSafeWaitTimeFactor);
     this.backTravelWaitTimeFactor = roundTo2Decimals(builder.backTravelWaitTimeFactor);

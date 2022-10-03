@@ -27,7 +27,7 @@ public final class TransferPreferences implements Serializable {
   private final TransferOptimizationParameters optimization;
   private final int nonpreferredCost;
 
-  public TransferPreferences() {
+  private TransferPreferences() {
     this.cost = 0;
     this.slack = 120;
     this.waitReluctance = 1.0;
@@ -36,7 +36,7 @@ public final class TransferPreferences implements Serializable {
     this.nonpreferredCost = 180;
   }
 
-  public TransferPreferences(Builder builder) {
+  private TransferPreferences(Builder builder) {
     this.cost = builder.cost;
     this.slack = builder.slack;
     this.waitReluctance = roundTo2Decimals(builder.waitReluctance);

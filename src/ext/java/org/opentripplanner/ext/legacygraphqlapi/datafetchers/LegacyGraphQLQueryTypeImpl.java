@@ -659,10 +659,13 @@ public class LegacyGraphQLQueryTypeImpl
         "allowKeepingRentedBicycleAtDestination",
         request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
       );
-      callWith.argument(
-        "keepingRentedBicycleAtDestinationCost",
-        preferences.rental()::setArrivingInRentalVehicleAtDestinationCost
-      );
+      preferences.withRental(rental -> {
+        callWith.argument(
+          "keepingRentedBicycleAtDestinationCost",
+          rental::withArrivingInRentalVehicleAtDestinationCost
+        );
+        rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
+      });
 
       callWith.argument(
         "debugItineraryFilter",
@@ -794,8 +797,6 @@ public class LegacyGraphQLQueryTypeImpl
         //      - here will cause the different APIs to behave differently
         preferences.withBike(b -> b.setSpeed(4.3));
       }
-
-      preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
       callWith.argument(
         "locale",

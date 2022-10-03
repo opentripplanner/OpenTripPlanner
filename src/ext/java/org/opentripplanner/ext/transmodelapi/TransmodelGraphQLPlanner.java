@@ -279,11 +279,12 @@ public class TransmodelGraphQLPlanner {
       preferences.withBike(b -> b.setSpeed(4.3));
     }
 
-    callWith.argument(
-      "useBikeRentalAvailabilityInformation",
-      preferences.rental()::setUseAvailabilityInformation
+    preferences.withRental(rental ->
+      callWith.argument(
+        "useBikeRentalAvailabilityInformation",
+        rental::withUseAvailabilityInformation
+      )
     );
-    //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
 
     return request;
   }

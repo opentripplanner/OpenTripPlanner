@@ -33,7 +33,7 @@ public final class BikePreferences implements Serializable {
   private final BicycleOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
 
-  public BikePreferences() {
+  private BikePreferences() {
     this.speed = 5;
     this.reluctance = 2.0;
     this.boardCost = 60 * 10;
