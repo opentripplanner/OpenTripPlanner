@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
@@ -18,18 +19,18 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
 
   private final int round;
   private final int stop;
-  private final RaptorTransfer[] egressPaths;
+  private final AccessEgress[] egressPaths;
   private final DestinationArrivalListener callback;
 
   EgressStopArrivalState(
     int stop,
     int round,
-    Collection<RaptorTransfer> egressPaths,
+    Collection<AccessEgress> egressPaths,
     DestinationArrivalListener transitCallback
   ) {
     this.round = round;
     this.stop = stop;
-    this.egressPaths = egressPaths.toArray(new RaptorTransfer[0]);
+    this.egressPaths = egressPaths.toArray(new AccessEgress[0]);
     this.callback = transitCallback;
   }
 
@@ -44,7 +45,7 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   @Override
   public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
     super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
-    for (RaptorTransfer egressPath : egressPaths) {
+    for (AccessEgress egressPath : egressPaths) {
       callback.newDestinationArrival(round, arrivalTime, true, egressPath);
     }
   }
@@ -52,7 +53,7 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   @Override
   public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
     super.transferToStop(fromStop, arrivalTime, transferPath);
-    for (RaptorTransfer egressPath : egressPaths) {
+    for (AccessEgress egressPath : egressPaths) {
       if (egressPath.stopReachedOnBoard()) {
         callback.newDestinationArrival(
           round,

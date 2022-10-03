@@ -49,7 +49,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -72,7 +72,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -234,7 +234,10 @@ public class TravelTimeResource {
         StreetMode.NOT_SET
       )
     ) {
-      final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);
+      final Collection<DefaultAccessEgress> accessList = getAccess(
+        accessRequest,
+        temporaryVertices
+      );
 
       var arrivals = route(accessList).getArrivals();
 
@@ -251,7 +254,7 @@ public class TravelTimeResource {
     }
   }
 
-  private Collection<AccessEgress> getAccess(
+  private Collection<DefaultAccessEgress> getAccess(
     RouteRequest accessRequest,
     TemporaryVerticesContainer temporaryVertices
   ) {
@@ -301,7 +304,7 @@ public class TravelTimeResource {
     return initialStates;
   }
 
-  private RaptorResponse<TripSchedule> route(Collection<? extends RaptorTransfer> accessList) {
+  private RaptorResponse<TripSchedule> route(Collection<? extends AccessEgress> accessList) {
     final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()

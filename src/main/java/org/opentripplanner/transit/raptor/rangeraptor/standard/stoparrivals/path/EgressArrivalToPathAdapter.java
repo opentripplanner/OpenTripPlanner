@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.pat
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -56,7 +56,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
     int round,
     int fromStopArrivalTime,
     boolean stopReachedOnBoard,
-    RaptorTransfer egressPath
+    AccessEgress egressPath
   ) {
     int arrivalTime = calculator.plusDuration(fromStopArrivalTime, egressPath.durationInSeconds());
 
@@ -95,7 +95,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
     paths.add(bestArrival.toArrivalState(cursor), bestArrival.egressPath);
   }
 
-  private void debugRejectNew(int round, boolean stopReachedOnBoard, RaptorTransfer egressPath) {
+  private void debugRejectNew(int round, boolean stopReachedOnBoard, AccessEgress egressPath) {
     if (paths.isDebugOn()) {
       rejectedArrivals.add(new DestinationArrivalEvent(round, stopReachedOnBoard, egressPath));
     }
@@ -122,12 +122,12 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
 
     final int round;
     final boolean stopReachedOnBoard;
-    final RaptorTransfer egressPath;
+    final AccessEgress egressPath;
 
     private DestinationArrivalEvent(
       int round,
       boolean stopReachedOnBoard,
-      RaptorTransfer egressPath
+      AccessEgress egressPath
     ) {
       this.round = round;
       this.stopReachedOnBoard = stopReachedOnBoard;

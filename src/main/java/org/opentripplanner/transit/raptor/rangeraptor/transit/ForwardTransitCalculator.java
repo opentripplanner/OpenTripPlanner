@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
@@ -69,8 +70,8 @@ public final class ForwardTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
-  public int departureTime(RaptorTransfer transfer, int departureTime) {
-    return transfer.earliestDepartureTime(departureTime);
+  public int departureTime(AccessEgress accessEgress, int departureTime) {
+    return accessEgress.earliestDepartureTime(departureTime);
   }
 
   @Override

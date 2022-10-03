@@ -9,7 +9,7 @@ import java.util.concurrent.CompletionException;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -153,8 +153,8 @@ public class TransitRouter {
 
   private AccessEgresses getAccessEgresses() {
     var accessEgressMapper = new AccessEgressMapper();
-    var accessList = new ArrayList<AccessEgress>();
-    var egressList = new ArrayList<AccessEgress>();
+    var accessList = new ArrayList<DefaultAccessEgress>();
+    var egressList = new ArrayList<DefaultAccessEgress>();
 
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
@@ -198,7 +198,7 @@ public class TransitRouter {
     return new AccessEgresses(accessList, egressList);
   }
 
-  private Collection<AccessEgress> getAccessEgresses(
+  private Collection<DefaultAccessEgress> getAccessEgresses(
     AccessEgressMapper accessEgressMapper,
     TemporaryVerticesContainer temporaryVertices,
     boolean isEgress

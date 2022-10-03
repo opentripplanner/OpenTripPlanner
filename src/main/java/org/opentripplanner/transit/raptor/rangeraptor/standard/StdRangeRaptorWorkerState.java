@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -91,7 +92,7 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+  public void setAccessToStop(AccessEgress accessPath, int departureTime) {
     final int durationInSeconds = accessPath.durationInSeconds();
     final int stop = accessPath.stop();
 

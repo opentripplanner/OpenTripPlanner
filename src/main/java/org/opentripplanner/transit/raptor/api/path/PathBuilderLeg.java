@@ -4,6 +4,7 @@ import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
@@ -107,7 +108,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /** This leg is a transit leg or access/transfer/egress leg with rides (FLEX) */
   public boolean hasRides() {
-    return isTransit() || ((MyStreetLeg) leg).streetPath.hasRides();
+    return (
+      isTransit() ||
+      (isTransfer() && ((MyTransferLeg) leg).transfer.hasRides()) ||
+      ((isAccess() || isEgress()) && ((MyStreetLeg) leg).streetPath.hasRides())
+    );
   }
 
   /** This leg is an access/transfer/egress leg without any rides. */
@@ -188,7 +193,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       return asAccessLeg().streetPath.generalizedCost();
     }
     if (isTransfer()) {
-      return asTransferLeg().streetPath.generalizedCost();
+      return asTransferLeg().transfer.generalizedCost();
     }
     if (isTransit()) {
       return transitCost(costCalculator, slackProvider);
@@ -235,7 +240,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitTimeBeforeNextLegIncludingSlack() + next.waitTimeBeforeNextLegIncludingSlack();
   }
 
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(RaptorTransfer access) {
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(AccessEgress access) {
     return new PathBuilderLeg<>(new MyAccessLeg(access));
   }
 
@@ -269,7 +274,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     );
   }
 
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(RaptorTransfer egress) {
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(AccessEgress egress) {
     return new PathBuilderLeg<>(new MyEgressLeg(egress));
   }
 
@@ -326,8 +331,12 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /* Build helper methods, package local */
 
-  private static int cost(CostCalculator<?> costCalculator, RaptorTransfer streetPath) {
+  private static int cost(CostCalculator<?> costCalculator, AccessEgress streetPath) {
     return costCalculator != null ? streetPath.generalizedCost() : ZERO_COST;
+  }
+
+  private static int cost(CostCalculator<?> costCalculator, RaptorTransfer transfer) {
+    return costCalculator != null ? transfer.generalizedCost() : ZERO_COST;
   }
 
   private void setTime(int fromTime, int toTime) {
@@ -382,9 +391,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     RaptorSlackProvider slackProvider
   ) {
     PathLeg<T> nextLeg = next.createPathLeg(costCalculator, slackProvider);
-    var streetPath = asTransferLeg().streetPath;
-    int cost = cost(costCalculator, streetPath);
-    return new TransferPathLeg<>(fromStop(), fromTime, toTime, cost, streetPath, nextLeg);
+    var transfer = asTransferLeg().transfer;
+    int cost = cost(costCalculator, transfer);
+    return new TransferPathLeg<>(fromStop(), fromTime, toTime, cost, transfer, nextLeg);
   }
 
   /* private methods */
@@ -463,7 +472,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     int newToTime = nextTransitLeg.transitStopArrivalTimeBefore(slackProvider, hasRides());
 
     if (next.isTransfer()) {
-      newToTime -= next.asTransferLeg().streetPath.durationInSeconds();
+      newToTime -= next.asTransferLeg().transfer.durationInSeconds();
     }
     newToTime = accessPath.latestArrivalTime(newToTime);
 
@@ -480,7 +489,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     } else {
       throw new IllegalStateException("Unexpected leg type before TransferLeg: " + this);
     }
-    setTime(newFromTime, newFromTime + asTransferLeg().streetPath.durationInSeconds());
+    setTime(newFromTime, newFromTime + asTransferLeg().transfer.durationInSeconds());
   }
 
   private void timeShiftEgressTime(RaptorSlackProvider slackProvider) {
@@ -586,9 +595,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /** Abstract access/transfer/egress leg */
   private abstract static class MyStreetLeg implements MyLeg {
 
-    final RaptorTransfer streetPath;
+    final AccessEgress streetPath;
 
-    MyStreetLeg(RaptorTransfer streetPath) {
+    MyStreetLeg(AccessEgress streetPath) {
       this.streetPath = streetPath;
     }
 
@@ -600,7 +609,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private static class MyAccessLeg extends MyStreetLeg {
 
-    private MyAccessLeg(RaptorTransfer streetPath) {
+    private MyAccessLeg(AccessEgress streetPath) {
       super(streetPath);
     }
 
@@ -620,12 +629,13 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  private static class MyTransferLeg extends MyStreetLeg {
+  private static class MyTransferLeg implements MyLeg {
 
     final int toStop;
+    final RaptorTransfer transfer;
 
-    MyTransferLeg(RaptorTransfer streetPath, int toStop) {
-      super(streetPath);
+    MyTransferLeg(RaptorTransfer transfer, int toStop) {
+      this.transfer = transfer;
       this.toStop = toStop;
     }
 
@@ -641,7 +651,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public PathStringBuilder addToString(PathStringBuilder builder) {
-      return builder.walk(streetPath.durationInSeconds()).sep().stop(toStop()).sep();
+      return builder.walk(transfer.durationInSeconds()).sep().stop(toStop()).sep();
     }
   }
 
@@ -716,7 +726,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private static class MyEgressLeg extends MyStreetLeg {
 
-    MyEgressLeg(RaptorTransfer streetPath) {
+    MyEgressLeg(AccessEgress streetPath) {
       super(streetPath);
     }
 

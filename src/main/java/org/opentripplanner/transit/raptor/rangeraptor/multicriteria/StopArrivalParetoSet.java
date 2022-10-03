@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -43,7 +43,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule>
    */
   static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
     int stop,
-    List<RaptorTransfer> egressPaths,
+    List<AccessEgress> egressPaths,
     DestinationArrivalPaths<T> destinationArrivals,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {

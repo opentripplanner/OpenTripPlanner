@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.asser
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -38,8 +39,8 @@ public class SearchParams {
   private final double relaxCostAtDestination;
   private final boolean timetableEnabled;
   private final boolean constrainedTransfersEnabled;
-  private final Collection<RaptorTransfer> accessPaths;
-  private final Collection<RaptorTransfer> egressPaths;
+  private final Collection<AccessEgress> accessPaths;
+  private final Collection<AccessEgress> egressPaths;
   private final boolean allowEmptyEgressPaths;
 
   /**
@@ -221,7 +222,7 @@ public class SearchParams {
    * <p/>
    * Required, at least one access path must exist.
    */
-  public Collection<RaptorTransfer> accessPaths() {
+  public Collection<AccessEgress> accessPaths() {
     return accessPaths;
   }
 
@@ -233,7 +234,7 @@ public class SearchParams {
    * <p/>
    * Required, at least one egress path must exist.
    */
-  public Collection<RaptorTransfer> egressPaths() {
+  public Collection<AccessEgress> egressPaths() {
     return egressPaths;
   }
 
@@ -250,8 +251,8 @@ public class SearchParams {
    */
   public int getAccessEgressMaxDurationSeconds() {
     return Math.max(
-      accessPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0),
-      egressPaths.stream().mapToInt(RaptorTransfer::durationInSeconds).max().orElse(0)
+      accessPaths.stream().mapToInt(AccessEgress::durationInSeconds).max().orElse(0),
+      egressPaths.stream().mapToInt(AccessEgress::durationInSeconds).max().orElse(0)
     );
   }
 

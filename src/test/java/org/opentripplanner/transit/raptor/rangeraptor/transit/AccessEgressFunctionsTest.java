@@ -2,9 +2,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions.calculateEgressDepartureTime;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
@@ -18,8 +17,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 
 class AccessEgressFunctionsTest implements RaptorTestConstants {
@@ -36,13 +36,14 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
   private static final int STOP = 8;
 
-  private static final RaptorTransfer WALK_10m = walk(STOP, D10m);
-  private static final RaptorTransfer WALK_8m = walk(STOP, D8m);
-  private static final RaptorTransfer FLEX_1x_10m = flex(STOP, D10m, 1);
-  private static final RaptorTransfer FLEX_1x_8m = flex(STOP, D8m, 1);
-  private static final RaptorTransfer FLEX_2x_8m = flex(STOP, D8m, 2);
-  private static final RaptorTransfer FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
-  private static final RaptorTransfer WALK_W_OPENING_HOURS_8m = walk(STOP, D8m)
+  private static final AccessEgress WALK_10m = TestAccessEgress.walkAccessEgress(STOP, D10m);
+  private static final AccessEgress WALK_8m = TestAccessEgress.walkAccessEgress(STOP, D8m);
+  private static final AccessEgress FLEX_1x_10m = flex(STOP, D10m, 1);
+  private static final AccessEgress FLEX_1x_8m = flex(STOP, D8m, 1);
+  private static final AccessEgress FLEX_2x_8m = flex(STOP, D8m, 2);
+  private static final AccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
+  private static final AccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress
+    .walkAccessEgress(STOP, D8m)
     .openingHours(T00_00, T01_00);
 
   @Test
@@ -70,7 +71,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30,
       calculateEgressDepartureTime(
         T00_30,
-        walk(STOP, D8m).openingHours(T00_00, T01_00),
+        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_00, T01_00),
         slackProvider,
         calculator
       )
@@ -80,7 +81,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30,
       calculateEgressDepartureTime(
         T00_10,
-        walk(STOP, D8m).openingHours(T00_30, T01_00),
+        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_30, T01_00),
         slackProvider,
         calculator
       )
@@ -91,7 +92,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_10 + D24h,
       calculateEgressDepartureTime(
         T00_31,
-        walk(STOP, D8m).openingHours(T00_10, T00_30),
+        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_10, T00_30),
         slackProvider,
         calculator
       )
@@ -102,7 +103,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       -1,
       calculateEgressDepartureTime(
         T00_30,
-        walk(STOP, D8m).openingHours(5, 4),
+        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(5, 4),
         slackProvider,
         calculator
       )
@@ -134,7 +135,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30,
       calculateEgressDepartureTime(
         T00_30,
-        walk(STOP, D8m).openingHours(T00_00, T01_00),
+        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_00, T01_00),
         slackProvider,
         calculator
       )
@@ -145,7 +146,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30 + D5m,
       calculateEgressDepartureTime(
         T00_40,
-        walk(STOP, D5m).openingHours(T00_10, T00_30),
+        TestAccessEgress.walkAccessEgress(STOP, D5m).openingHours(T00_10, T00_30),
         slackProvider,
         calculator
       )
@@ -156,7 +157,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30 + D3m - D24h,
       calculateEgressDepartureTime(
         T00_00,
-        walk(STOP, D3m).openingHours(T00_10, T00_30),
+        TestAccessEgress.walkAccessEgress(STOP, D3m).openingHours(T00_10, T00_30),
         slackProvider,
         calculator
       )
@@ -167,7 +168,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       -1,
       calculateEgressDepartureTime(
         T00_30,
-        walk(STOP, D8m).openingHours(5, 4),
+        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(5, 4),
         slackProvider,
         calculator
       )
@@ -245,7 +246,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     assertElements(List.of(FLEX_2x_8m), res.get(2));
 
     // Apply same test, but remove entries with number of rides == 1
-    res = groupByRound(List.of(WALK_8m, FLEX_1x_8m), RaptorTransfer::hasRides);
+    res = groupByRound(List.of(WALK_8m, FLEX_1x_8m), AccessEgress::hasRides);
     keys = res.keys();
     Arrays.sort(keys);
 
@@ -261,7 +262,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     assertElements(List.of(WALK_8m), res.get(STOP));
 
     // Map 4 elements into 3 groups
-    var walk_99 = walk(99, D1s);
+    var walk_99 = TestAccessEgress.walkAccessEgress(99, D1s);
     res = groupByStop(List.of(WALK_8m, WALK_10m, walk_99));
     int[] keys = res.keys();
     Arrays.sort(keys);

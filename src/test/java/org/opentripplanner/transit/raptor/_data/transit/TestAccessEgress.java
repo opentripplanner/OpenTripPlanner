@@ -5,12 +5,12 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 
 /**
- * Simple implementation for {@link RaptorTransfer} for use in unit-tests.
+ * Simple implementation for {@link AccessEgress} for use in unit-tests.
  */
-public class TestTransfer implements RaptorTransfer {
+public class TestAccessEgress implements AccessEgress {
 
   public static final int SECONDS_IN_DAY = 24 * 3600;
   public static final int DEFAULT_NUMBER_OF_RIDES = 0;
@@ -26,7 +26,7 @@ public class TestTransfer implements RaptorTransfer {
   private final Integer opening;
   private final Integer closing;
 
-  private TestTransfer(Builder builder) {
+  private TestAccessEgress(Builder builder) {
     this.stop = builder.stop;
     this.durationInSeconds = builder.durationInSeconds;
     this.cost = builder.cost;
@@ -36,16 +36,28 @@ public class TestTransfer implements RaptorTransfer {
     this.closing = builder.closing;
   }
 
-  public static TestTransfer walkTransfer(int stop, int durationInSeconds) {
+  public static TestAccessEgress walkAccessEgress(int stop, int durationInSeconds) {
     return new Builder(stop, durationInSeconds).build();
   }
 
-  public static TestTransfer walkTransfer(int stop, int durationInSeconds, double walkReluctance) {
-    return walkTransfer(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
+  public static TestAccessEgress walkAccessEgress(
+    int stop,
+    int durationInSeconds,
+    double walkReluctance
+  ) {
+    return walkAccessEgress(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
   }
 
-  public static TestTransfer walkTransfer(int stop, int durationInSeconds, int cost) {
+  public static TestAccessEgress walkAccessEgress(int stop, int durationInSeconds, int cost) {
     return new Builder(stop, durationInSeconds).withCost(cost).build();
+  }
+
+  public static TestAccessEgress flexWithOnBoard(int stop, int durationInSeconds, int cost) {
+    return new Builder(stop, durationInSeconds)
+      .withCost(cost)
+      .withNRides(1)
+      .stopReachedOnBoard()
+      .build();
   }
 
   /**
@@ -54,7 +66,7 @@ public class TestTransfer implements RaptorTransfer {
    * which is repeatead every 24 hours. This allows the access to only be traversable between for
    * example 08:00 and 16:00 every day.
    */
-  public static TestTransfer walkTransfer(
+  public static TestAccessEgress walkAccessEgress(
     int stop,
     int durationInSeconds,
     int opening,
@@ -63,7 +75,7 @@ public class TestTransfer implements RaptorTransfer {
     return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
   }
 
-  public static TestTransfer walkTransfer(
+  public static TestAccessEgress walkAccessEgress(
     int stop,
     int durationInSeconds,
     int cost,
@@ -76,10 +88,51 @@ public class TestTransfer implements RaptorTransfer {
       .build();
   }
 
-  public static Collection<TestTransfer> transfers(int... stopTimes) {
-    List<TestTransfer> legs = new ArrayList<>();
+  /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
+  public static TestAccessEgress flex(int stop, int durationInSeconds) {
+    return flex(stop, durationInSeconds, 1, walkCost(durationInSeconds));
+  }
+
+  /** Create a new flex access and arrive stop onBoard with 1 ride/extra transfer. */
+  public static TestAccessEgress flex(int stop, int durationInSeconds, int nRides) {
+    return flex(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
+  }
+
+  /** Create a new flex access and arrive stop onBoard. */
+  public static TestAccessEgress flex(int stop, int durationInSeconds, int nRides, int cost) {
+    assert nRides > DEFAULT_NUMBER_OF_RIDES;
+    return new Builder(stop, durationInSeconds)
+      .stopReachedOnBoard()
+      .withNRides(nRides)
+      .withCost(cost)
+      .build();
+  }
+
+  /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
+  public static TestAccessEgress flexAndWalk(int stop, int durationInSeconds) {
+    return flexAndWalk(stop, durationInSeconds, 1, walkCost(durationInSeconds));
+  }
+
+  /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
+  public static TestAccessEgress flexAndWalk(int stop, int durationInSeconds, int nRides) {
+    return flexAndWalk(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
+  }
+
+  /** Create a flex access arriving at given stop by walking. */
+  public static TestAccessEgress flexAndWalk(
+    int stop,
+    int durationInSeconds,
+    int nRides,
+    int cost
+  ) {
+    assert nRides > DEFAULT_NUMBER_OF_RIDES;
+    return new Builder(stop, durationInSeconds).withNRides(nRides).withCost(cost).build();
+  }
+
+  public static Collection<AccessEgress> transfers(int... stopTimes) {
+    List<AccessEgress> legs = new ArrayList<>();
     for (int i = 0; i < stopTimes.length; i += 2) {
-      legs.add(walkTransfer(stopTimes[i], stopTimes[i + 1]));
+      legs.add(walkAccessEgress(stopTimes[i], stopTimes[i + 1]));
     }
     return legs;
   }
@@ -90,6 +143,11 @@ public class TestTransfer implements RaptorTransfer {
 
   public static int walkCost(int durationInSeconds, double reluctance) {
     return toRaptorCost(durationInSeconds * reluctance);
+  }
+
+  /** Set opening and closing hours and return a new object. */
+  public TestAccessEgress openingHours(int opening, int closing) {
+    return new Builder(this).withOpeningHours(opening, closing).build();
   }
 
   @Override
@@ -181,7 +239,7 @@ public class TestTransfer implements RaptorTransfer {
 
   /**
    * Do not use the builder, use the static factory methods. Only use the builder if you need to
-   * override the {@link TestTransfer class}.
+   * override the {@link TestAccessEgress class}.
    */
   protected static class Builder {
 
@@ -197,6 +255,16 @@ public class TestTransfer implements RaptorTransfer {
       this.stop = stop;
       this.durationInSeconds = durationInSeconds;
       this.cost = walkCost(durationInSeconds);
+    }
+
+    Builder(TestAccessEgress transfer) {
+      this.stop = transfer.stop;
+      this.durationInSeconds = transfer.durationInSeconds;
+      this.cost = transfer.cost;
+      this.numberOfRides = transfer.numberOfRides;
+      this.stopReachedOnBoard = transfer.stopReachedOnBoard;
+      this.opening = transfer.opening;
+      this.closing = transfer.closing;
     }
 
     Builder withCost(int cost) {
@@ -220,8 +288,8 @@ public class TestTransfer implements RaptorTransfer {
       return this;
     }
 
-    TestTransfer build() {
-      return new TestTransfer(this);
+    TestAccessEgress build() {
+      return new TestAccessEgress(this);
     }
   }
 }
