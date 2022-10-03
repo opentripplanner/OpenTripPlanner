@@ -70,14 +70,14 @@ public class HttpsDataSourceMetadata {
         return lastModifiedDate.getTime();
       }
     }
-    return 0;
+    return -1;
   }
 
   private static long parseLong(String header) {
     try {
       return Long.parseLong(header);
     } catch (Exception e) {
-      return 0;
+      return -1;
     }
   }
 }
