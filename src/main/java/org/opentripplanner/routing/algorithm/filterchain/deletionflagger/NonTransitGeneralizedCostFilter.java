@@ -5,6 +5,7 @@ import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterParameters;
 
 /**
  * This filter is similar to {@link TransitGeneralizedCostFilter}. There are some important
@@ -15,7 +16,7 @@ import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction
  * can take you to the destination much quicker.
  * <p>
  *
- * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#nonTransitGeneralizedCostLimit
+ * @see ItineraryFilterParameters#nonTransitGeneralizedCostLimit
  */
 public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterParameters;
 
 /**
  * This filter remove all transit results which have a generalized-cost higher than the max-limit
@@ -14,7 +15,7 @@ import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction
  * {@link TransitGeneralizedCostFilter#getWaitTimeCost}.
  * <p>
  *
- * @see org.opentripplanner.routing.api.request.ItineraryFilterParameters#transitGeneralizedCostLimit
+ * @see ItineraryFilterParameters#transitGeneralizedCostLimit
  */
 public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 

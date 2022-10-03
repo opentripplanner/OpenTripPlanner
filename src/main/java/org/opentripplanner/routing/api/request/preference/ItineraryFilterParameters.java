@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.preference;
 
 import java.util.function.Consumer;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
