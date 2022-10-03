@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.preference.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ public class ItineraryFiltersMapper {
 
   public static void mapItineraryFilterParams(
     NodeAdapter c,
-    ItineraryFilterParameters.Builder builder
+    ItineraryFilterPreferences.Builder builder
   ) {
     if (c.isEmpty()) {
       return;

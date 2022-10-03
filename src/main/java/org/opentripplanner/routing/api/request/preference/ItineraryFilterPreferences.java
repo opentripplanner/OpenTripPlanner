@@ -12,9 +12,9 @@ import org.opentripplanner.routing.api.request.framework.RequestFunctions;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public final class ItineraryFilterParameters {
+public final class ItineraryFilterPreferences {
 
-  public static final ItineraryFilterParameters DEFAULT = new ItineraryFilterParameters();
+  public static final ItineraryFilterPreferences DEFAULT = new ItineraryFilterPreferences();
 
   /**
    * Switch on to return all itineraries and mark filtered itineraries as deleted.
@@ -102,7 +102,7 @@ public final class ItineraryFilterParameters {
    */
   public final boolean removeItinerariesWithSameRoutesAndStops;
 
-  private ItineraryFilterParameters() {
+  private ItineraryFilterPreferences() {
     this.debug = false;
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
@@ -117,7 +117,7 @@ public final class ItineraryFilterParameters {
     this.removeItinerariesWithSameRoutesAndStops = false;
   }
 
-  private ItineraryFilterParameters(Builder builder) {
+  private ItineraryFilterPreferences(Builder builder) {
     this.debug = builder.debug;
     this.groupSimilarityKeepOne = builder.groupSimilarityKeepOne;
     this.groupSimilarityKeepThree = builder.groupSimilarityKeepThree;
@@ -141,13 +141,13 @@ public final class ItineraryFilterParameters {
     return new Builder(this);
   }
 
-  public static ItineraryFilterParameters createDefault() {
-    return new ItineraryFilterParameters();
+  public static ItineraryFilterPreferences createDefault() {
+    return new ItineraryFilterPreferences();
   }
 
   public static class Builder {
 
-    private final ItineraryFilterParameters original;
+    private final ItineraryFilterPreferences original;
     private boolean debug;
     private double groupSimilarityKeepOne;
     private double groupSimilarityKeepThree;
@@ -160,7 +160,7 @@ public final class ItineraryFilterParameters {
     private boolean accessibilityScore;
     private boolean removeItinerariesWithSameRoutesAndStops;
 
-    public ItineraryFilterParameters original() {
+    public ItineraryFilterPreferences original() {
       return original;
     }
 
@@ -229,7 +229,7 @@ public final class ItineraryFilterParameters {
       return this;
     }
 
-    public Builder(ItineraryFilterParameters original) {
+    public Builder(ItineraryFilterPreferences original) {
       this.original = original;
       this.debug = original.debug;
       this.groupSimilarityKeepOne = original.groupSimilarityKeepOne;
@@ -252,8 +252,8 @@ public final class ItineraryFilterParameters {
       return this;
     }
 
-    public ItineraryFilterParameters build() {
-      var value = new ItineraryFilterParameters(this);
+    public ItineraryFilterPreferences build() {
+      var value = new ItineraryFilterPreferences(this);
       return original.equals(value) ? original : value;
     }
   }

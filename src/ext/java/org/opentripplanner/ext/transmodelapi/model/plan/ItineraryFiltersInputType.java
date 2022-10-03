@@ -12,7 +12,7 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.preference.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 public class ItineraryFiltersInputType {
 
@@ -25,7 +25,7 @@ public class ItineraryFiltersInputType {
   private static final String GROUP_SIMILARITY_KEEP_N_ITINERARIES =
     "groupSimilarityKeepNumOfItineraries";
 
-  public static GraphQLInputObjectType create(GqlUtil gqlUtil, ItineraryFilterParameters dft) {
+  public static GraphQLInputObjectType create(GqlUtil gqlUtil, ItineraryFilterPreferences dft) {
     return GraphQLInputObjectType
       .newInputObject()
       .name("ItineraryFilters")
@@ -144,7 +144,7 @@ public class ItineraryFiltersInputType {
   public static void mapToRequest(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    ItineraryFilterParameters.Builder builder
+    ItineraryFilterPreferences.Builder builder
   ) {
     if (!GqlUtil.hasArgument(environment, "itineraryFilters")) {
       return;

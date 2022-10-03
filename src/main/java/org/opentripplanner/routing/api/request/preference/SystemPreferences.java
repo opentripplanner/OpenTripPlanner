@@ -13,7 +13,7 @@ import org.opentripplanner.routing.api.request.RoutingTag;
 public class SystemPreferences implements Cloneable, Serializable {
 
   @Nonnull
-  private ItineraryFilterParameters itineraryFilters = ItineraryFilterParameters.createDefault();
+  private ItineraryFilterPreferences itineraryFilters = ItineraryFilterPreferences.createDefault();
 
   private Set<RoutingTag> tags = Set.of();
   private DataOverlayParameters dataOverlay;
@@ -25,16 +25,16 @@ public class SystemPreferences implements Cloneable, Serializable {
   private Duration maxJourneyDuration = Duration.ofHours(24);
 
   @Nonnull
-  public ItineraryFilterParameters itineraryFilters() {
+  public ItineraryFilterPreferences itineraryFilters() {
     return itineraryFilters;
   }
 
-  public SystemPreferences withItineraryFilters(Consumer<ItineraryFilterParameters.Builder> body) {
+  public SystemPreferences withItineraryFilters(Consumer<ItineraryFilterPreferences.Builder> body) {
     this.itineraryFilters = itineraryFilters.copyOf().apply(body).build();
     return this;
   }
 
-  public void setItineraryFilters(@Nonnull ItineraryFilterParameters itineraryFilters) {
+  public void setItineraryFilters(@Nonnull ItineraryFilterPreferences itineraryFilters) {
     this.itineraryFilters = itineraryFilters;
   }
 

@@ -9,7 +9,7 @@ import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
-import org.opentripplanner.routing.api.request.preference.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -25,7 +25,7 @@ public class RoutingRequestToFilterChainMapper {
 
   public static ItineraryListFilterChain createFilterChain(
     SortOrder sortOrder,
-    ItineraryFilterParameters params,
+    ItineraryFilterPreferences params,
     int maxNumOfItineraries,
     Instant filterOnLatestDepartureTime,
     boolean removeWalkAllTheWayResults,
