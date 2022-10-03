@@ -420,7 +420,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    Set<Trip> trips = fuzzyTripMatcher.match(activity, feedId);
+    Set<Trip> trips = fuzzyTripMatcher.match(monitoredVehicleJourney, feedId);
 
     if (trips == null || trips.isEmpty()) {
       if (keepLogging) {
@@ -666,7 +666,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     for (int i = 0; i < estimatedCalls.size(); i++) {
       EstimatedCall estimatedCall = estimatedCalls.get(i);
 
-      var stop = getStopForStopId(feedId, estimatedCall.getStopPointRef().getValue());
+      var stop = transitService.getRegularStop(
+        new FeedScopedId(feedId, estimatedCall.getStopPointRef().getValue())
+      );
 
       StopTime stopTime = new StopTime();
       stopTime.setStop(stop);
@@ -1554,16 +1556,5 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     } else {
       return null;
     }
-  }
-
-  /**
-   * Retrieve stop given a feed id and stop id.
-   *
-   * @param feedId feed id for the stop id
-   * @param stopId trip id without the agency
-   * @return stop or null if stop doesn't exist
-   */
-  private StopLocation getStopForStopId(String feedId, String stopId) {
-    return transitService.getRegularStop(new FeedScopedId(feedId, stopId));
   }
 }
