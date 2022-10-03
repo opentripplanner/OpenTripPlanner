@@ -268,12 +268,12 @@ public class ToStringBuilder {
   }
 
   public ToStringBuilder addDuration(String name, Duration duration) {
-    return addIfNotIgnored(
-      name,
-      duration,
-      null,
-      d -> DurationUtils.durationToStr((int) d.toSeconds())
-    );
+    return addDuration(name, duration, null);
+  }
+
+  public ToStringBuilder addDuration(String name, Duration duration, Duration ignoreValue) {
+    Function<Duration, String> toStringOp = d -> DurationUtils.durationToStr((int) d.toSeconds());
+    return addIfNotIgnored(name, duration, ignoreValue, toStringOp);
   }
 
   @Override
