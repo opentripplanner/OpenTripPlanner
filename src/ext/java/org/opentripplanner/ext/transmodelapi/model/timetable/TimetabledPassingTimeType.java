@@ -10,6 +10,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 
 public class TimetabledPassingTimeType {
@@ -44,7 +45,7 @@ public class TimetabledPassingTimeType {
           .type(gqlUtil.timeScalar)
           .description("Scheduled time of arrival at quay")
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getScheduledArrival()
+            missingValueToNull(((TripTimeOnDate) environment.getSource()).getScheduledArrival())
           )
           .build()
       )
@@ -55,7 +56,7 @@ public class TimetabledPassingTimeType {
           .type(gqlUtil.timeScalar)
           .description("Scheduled time of departure from quay")
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getScheduledDeparture()
+            missingValueToNull(((TripTimeOnDate) environment.getSource()).getScheduledDeparture())
           )
           .build()
       )
@@ -144,5 +145,17 @@ public class TimetabledPassingTimeType {
           .build()
       )
       .build();
+  }
+
+  /**
+   * Generally the missing values are removed during the graph build. However, for flex trips they
+   * are not and have to be converted to null here.
+   */
+  private static Integer missingValueToNull(int value) {
+    if (value == StopTime.MISSING_VALUE) {
+      return null;
+    } else {
+      return value;
+    }
   }
 }
