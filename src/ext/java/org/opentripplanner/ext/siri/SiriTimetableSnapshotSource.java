@@ -60,6 +60,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
@@ -403,16 +404,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
     if (
-      activity.getMonitoredVehicleJourney() == null ||
-      activity.getMonitoredVehicleJourney().getVehicleRef() == null ||
-      activity.getMonitoredVehicleJourney().getLineRef() == null
+      monitoredVehicleJourney == null ||
+      monitoredVehicleJourney.getVehicleRef() == null ||
+      monitoredVehicleJourney.getLineRef() == null
     ) {
       //No vehicle reference or line reference
       return false;
     }
 
-    Boolean isMonitored = activity.getMonitoredVehicleJourney().isMonitored();
+    Boolean isMonitored = monitoredVehicleJourney.isMonitored();
     if (isMonitored != null && !isMonitored) {
       //Vehicle is reported as NOT monitored
       return false;
@@ -424,20 +426,20 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (keepLogging) {
         String lineRef =
           (
-            activity.getMonitoredVehicleJourney().getLineRef() != null
-              ? activity.getMonitoredVehicleJourney().getLineRef().getValue()
+            monitoredVehicleJourney.getLineRef() != null
+              ? monitoredVehicleJourney.getLineRef().getValue()
               : null
           );
         String vehicleRef =
           (
-            activity.getMonitoredVehicleJourney().getVehicleRef() != null
-              ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue()
+            monitoredVehicleJourney.getVehicleRef() != null
+              ? monitoredVehicleJourney.getVehicleRef().getValue()
               : null
           );
         String tripId =
           (
-            activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null
-              ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue()
+            monitoredVehicleJourney.getCourseOfJourneyRef() != null
+              ? monitoredVehicleJourney.getCourseOfJourneyRef().getValue()
               : null
           );
         LOG.debug(
@@ -453,16 +455,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     //Find the trip that best corresponds to MonitoredVehicleJourney
-    Trip trip = getTripForJourney(trips, activity.getMonitoredVehicleJourney());
+    Trip trip = getTripForJourney(trips, monitoredVehicleJourney);
 
     if (trip == null) {
       return false;
     }
 
-    final Set<TripPattern> patterns = getPatternsForTrip(
-      trips,
-      activity.getMonitoredVehicleJourney()
-    );
+    final Set<TripPattern> patterns = getPatternsForTrip(trips, monitoredVehicleJourney);
 
     if (patterns == null) {
       return false;
@@ -1250,7 +1249,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private Set<TripPattern> getPatternsForTrip(
     Set<Trip> matches,
-    VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney
   ) {
     if (monitoredVehicleJourney.getOriginRef() == null) {
       return null;
@@ -1419,7 +1418,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private Trip getTripForJourney(
     Set<Trip> trips,
-    VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney
   ) {
     ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
     if (date == null) {
