@@ -7,11 +7,11 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class ItineraryFiltersInputType {
@@ -174,7 +174,7 @@ public class ItineraryFiltersInputType {
       (Map<String, ?> v) ->
         target.transitGeneralizedCostLimit =
           new TransitGeneralizedCostFilterParams(
-            (DoubleFunction<Double>) v.get("costLimitFunction"),
+            (DoubleAlgorithmFunction) v.get("costLimitFunction"),
             (double) v.get("intervalRelaxFactor")
           )
     );

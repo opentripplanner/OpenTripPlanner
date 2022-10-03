@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -28,7 +28,7 @@ public final class TransitPreferences implements Serializable {
   private final DurationForEnum<TransitMode> alightSlack;
   private final Map<TransitMode, Double> reluctanceForMode;
   private final int otherThanPreferredRoutesPenalty;
-  private final DoubleFunction<Double> unpreferredCost;
+  private final DoubleAlgorithmFunction unpreferredCost;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
   private final RaptorPreferences raptor;
@@ -124,7 +124,7 @@ public final class TransitPreferences implements Serializable {
    * A cost function used to calculate penalty for an unpreferred route. Function should return
    * number of seconds that we are willing to wait for preferred route.
    */
-  public DoubleFunction<Double> unpreferredCost() {
+  public DoubleAlgorithmFunction unpreferredCost() {
     return unpreferredCost;
   }
 
@@ -214,7 +214,7 @@ public final class TransitPreferences implements Serializable {
     private DurationForEnum<TransitMode> alightSlack;
     private Map<TransitMode, Double> reluctanceForMode;
     private int otherThanPreferredRoutesPenalty;
-    private DoubleFunction<Double> unpreferredCost;
+    private DoubleAlgorithmFunction unpreferredCost;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
     private RaptorPreferences raptor;
@@ -260,7 +260,7 @@ public final class TransitPreferences implements Serializable {
       return this;
     }
 
-    public Builder setUnpreferredCost(DoubleFunction<Double> unpreferredCost) {
+    public Builder setUnpreferredCost(DoubleAlgorithmFunction unpreferredCost) {
       this.unpreferredCost = unpreferredCost;
       return this;
     }

@@ -3,19 +3,19 @@ package org.opentripplanner.routing.api.request;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class RequestFunctionsTest {
 
   @Test
   public void calculate() {
-    DoubleFunction<Double> f = RequestFunctions.createLinearFunction(2.0, 3.0);
+    DoubleAlgorithmFunction f = RequestFunctions.createLinearFunction(2.0, 3.0);
 
-    assertEquals(f.apply(0.0), 2.0, 1e-6);
-    assertEquals(f.apply(1.0), 5.0, 1e-6);
-    assertEquals(f.apply(2.0), 8.0, 1e-6);
+    assertEquals(f.calculate(0.0), 2.0, 1e-6);
+    assertEquals(f.calculate(1.0), 5.0, 1e-6);
+    assertEquals(f.calculate(2.0), 8.0, 1e-6);
   }
 
   @Test

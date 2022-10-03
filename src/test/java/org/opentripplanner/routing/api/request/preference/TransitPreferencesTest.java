@@ -8,8 +8,8 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.function.DoubleFunction;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
@@ -23,7 +23,7 @@ class TransitPreferencesTest {
     TransitMode.AIRPLANE,
     2.1
   );
-  private static final DoubleFunction<Double> UNPREFERRED_COST = RequestFunctions.parse(
+  private static final DoubleAlgorithmFunction UNPREFERRED_COST = RequestFunctions.parse(
     "300 + 1.15 x"
   );
   private static final Duration D15s = Duration.ofSeconds(15);

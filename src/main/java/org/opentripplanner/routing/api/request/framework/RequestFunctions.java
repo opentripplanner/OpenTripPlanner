@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.io.Serializable;
-import java.util.function.DoubleFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -40,7 +39,7 @@ public class RequestFunctions {
    *
    * @throws RuntimeException if the input is not parsable.
    */
-  public static DoubleFunction<Double> parse(String text) {
+  public static DoubleAlgorithmFunction parse(String text) {
     if (text == null || text.isBlank()) {
       return null;
     }
@@ -61,7 +60,7 @@ public class RequestFunctions {
    * constant 'a' and a coefficient 'b' and the use those in the computation of a limit. The input
    * value 'x' is normally the min/max value across the sample set.
    */
-  public static DoubleFunction<Double> createLinearFunction(double constant, double coefficient) {
+  public static DoubleAlgorithmFunction createLinearFunction(double constant, double coefficient) {
     return new LinearFunction(constant, coefficient);
   }
 
@@ -75,7 +74,7 @@ public class RequestFunctions {
     throw new IllegalArgumentException("Function type is not valid: " + function.getClass());
   }
 
-  private static class LinearFunction implements DoubleFunction<Double>, Serializable {
+  private static class LinearFunction implements DoubleAlgorithmFunction, Serializable {
 
     // This class is package local to be unit testable.
 
@@ -90,13 +89,9 @@ public class RequestFunctions {
       this.b = coefficient;
     }
 
+    @Override
     public double calculate(double x) {
       return a + b * x;
-    }
-
-    @Override
-    public Double apply(double value) {
-      return calculate(value);
     }
 
     @Override

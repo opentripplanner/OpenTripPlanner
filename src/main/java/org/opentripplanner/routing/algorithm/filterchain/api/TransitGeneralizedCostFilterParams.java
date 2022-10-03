@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.api;
 
-import java.util.function.DoubleFunction;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 
 /**
  * Input parameters for {@link TransitGeneralizedCostFilter}
@@ -13,6 +13,6 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.Transit
  *                            itineraries, whichever is the greatest
  */
 public record TransitGeneralizedCostFilterParams(
-  DoubleFunction<Double> costLimitFunction,
+  DoubleAlgorithmFunction costLimitFunction,
   double intervalRelaxFactor
 ) {}

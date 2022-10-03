@@ -9,7 +9,6 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
 
 import java.util.List;
-import java.util.function.DoubleFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -41,7 +41,7 @@ public class PatternCostCalculatorTest {
   private static final Agency UNPREFERRED_AGENCY = agency(UNPREFERRED_AGENCY_ID.getId());
   private static final FeedScopedId DEFAULT_ROUTE_ID = id("101");
   // Default cost function: a + bx
-  private static final DoubleFunction<Double> unprefCostFn = RequestFunctions.createLinearFunction(
+  private static final DoubleAlgorithmFunction unprefCostFn = RequestFunctions.createLinearFunction(
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_PENALTY),
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_RELUCTANCE)
   );
@@ -107,7 +107,7 @@ public class PatternCostCalculatorTest {
 
     // test creation of linear cost function
     double expected = 300 + 1.0 * TRANSIT_TIME;
-    double actual = costParams.unnpreferredCost().apply(TRANSIT_TIME);
+    double actual = costParams.unnpreferredCost().calculate(TRANSIT_TIME);
 
     assertEquals(expected, actual);
   }
@@ -127,7 +127,7 @@ public class PatternCostCalculatorTest {
 
     // if we either have just unpreferred routes or just unpreferred agencies
     if (tc.unPrefRoute || tc.unPrefAgency) {
-      var expectedArr = unprefCostFn.apply(TRANSIT_TIME);
+      var expectedArr = unprefCostFn.calculate(TRANSIT_TIME);
       var errorMessageArr = String.format("Invalid arrival cost: %s", tc);
       assertEquals(expectedArr, arrCost - defaultArrCost, errorMessageArr);
       /*

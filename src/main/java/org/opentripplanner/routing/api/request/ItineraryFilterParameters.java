@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.api.request;
 
-import java.util.function.DoubleFunction;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 /**
@@ -75,7 +75,7 @@ public class ItineraryFilterParameters {
    * <p>
    * The default is {@code 3600 + 2x} - 1 hours plus 2 times the lowest cost.
    */
-  public DoubleFunction<Double> nonTransitGeneralizedCostLimit;
+  public DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
 
   /**
    * This is used to filter out journeys that have either same first or last trip. If two journeys
@@ -134,7 +134,7 @@ public class ItineraryFilterParameters {
     double groupSimilarityKeepThree,
     double groupedOtherThanSameLegsMaxCostMultiplier,
     TransitGeneralizedCostFilterParams transitGeneralizedCostLimit,
-    DoubleFunction<Double> nonTransitGeneralizedCostLimit,
+    DoubleAlgorithmFunction nonTransitGeneralizedCostLimit,
     double bikeRentalDistanceRatio,
     double parkAndRideDurationRatio,
     boolean filterItinerariesWithSameFirstOrLastTrip,

@@ -3,10 +3,10 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 
 /**
  * This filter remove all transit results which have a generalized-cost higher than the max-limit
@@ -18,7 +18,7 @@ import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedC
  */
 public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 
-  private final DoubleFunction<Double> costLimitFunction;
+  private final DoubleAlgorithmFunction costLimitFunction;
 
   private final double intervalRelaxFactor;
 
@@ -47,7 +47,7 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
           .stream()
           .anyMatch(t ->
             it.getGeneralizedCost() >
-            (costLimitFunction.apply(t.getGeneralizedCost()) + getWaitTimeCost(t, it))
+            (costLimitFunction.calculate(t.getGeneralizedCost()) + getWaitTimeCost(t, it))
           )
       )
       .collect(Collectors.toList());
