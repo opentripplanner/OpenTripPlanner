@@ -82,9 +82,9 @@ public class ItineraryFiltersInputType {
             "is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure" +
             " or arrival times of the itinerary. " +
             "Default: {\"costLimitFunction\": " +
-            RequestFunctions.serialize(dft.transitGeneralizedCostLimit.costLimitFunction()) +
+            RequestFunctions.serialize(dft.transitGeneralizedCostLimit().costLimitFunction()) +
             ", \"intervalRelaxFactor\": " +
-            dft.transitGeneralizedCostLimit.intervalRelaxFactor() +
+            dft.transitGeneralizedCostLimit().intervalRelaxFactor() +
             "}"
           )
           .build()
@@ -98,7 +98,7 @@ public class ItineraryFiltersInputType {
             "Pick ONE itinerary from each group after putting itineraries that is 85% " +
             "similar together."
           )
-          .defaultValue(dft.groupSimilarityKeepOne)
+          .defaultValue(dft.groupSimilarityKeepOne())
           .build()
       )
       .field(
@@ -112,7 +112,7 @@ public class ItineraryFiltersInputType {
             " 68% of the distance is traveled by similar legs, then two itineraries are " +
             "in the same group. Default value is 68%, must be at least 50%."
           )
-          .defaultValue(dft.groupSimilarityKeepThree)
+          .defaultValue(dft.groupSimilarityKeepThree())
           .build()
       )
       .field(
@@ -121,7 +121,7 @@ public class ItineraryFiltersInputType {
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
-          .defaultValue(dft.groupSimilarityKeepThree)
+          .defaultValue(dft.groupSimilarityKeepThree())
           .build()
       )
       .field(
@@ -135,7 +135,7 @@ public class ItineraryFiltersInputType {
             "double the cost, and any itineraries having a higher cost will be filtered. " +
             "Default value is 2.0, use a value lower than 1.0 to turn off"
           )
-          .defaultValue(dft.groupedOtherThanSameLegsMaxCostMultiplier)
+          .defaultValue(dft.groupedOtherThanSameLegsMaxCostMultiplier())
           .build()
       )
       .build();

@@ -40,19 +40,19 @@ public class RoutingRequestToFilterChainMapper {
     var builder = new ItineraryListFilterChainBuilder(sortOrder);
 
     // Group by similar legs filter
-    if (params.groupSimilarityKeepOne >= 0.5) {
+    if (params.groupSimilarityKeepOne() >= 0.5) {
       builder.addGroupBySimilarity(
-        GroupBySimilarity.createWithOneItineraryPerGroup(params.groupSimilarityKeepOne)
+        GroupBySimilarity.createWithOneItineraryPerGroup(params.groupSimilarityKeepOne())
       );
     }
 
-    if (params.groupSimilarityKeepThree >= 0.5) {
+    if (params.groupSimilarityKeepThree() >= 0.5) {
       builder.addGroupBySimilarity(
         GroupBySimilarity.createWithMoreThanOneItineraryPerGroup(
-          params.groupSimilarityKeepThree,
+          params.groupSimilarityKeepThree(),
           KEEP_THREE,
           true,
-          params.groupedOtherThanSameLegsMaxCostMultiplier
+          params.groupedOtherThanSameLegsMaxCostMultiplier()
         )
       );
     }
@@ -63,22 +63,25 @@ public class RoutingRequestToFilterChainMapper {
 
     builder
       .withMaxNumberOfItineraries(Math.min(maxNumOfItineraries, MAX_NUMBER_OF_ITINERARIES))
-      .withTransitGeneralizedCostLimit(params.transitGeneralizedCostLimit)
-      .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio)
-      .withParkAndRideDurationRatio(params.parkAndRideDurationRatio)
-      .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit)
-      .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip)
-      .withAccessibilityScore(params.accessibilityScore && wheelchairAccessible, wheelchairMaxSlope)
+      .withTransitGeneralizedCostLimit(params.transitGeneralizedCostLimit())
+      .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())
+      .withParkAndRideDurationRatio(params.parkAndRideDurationRatio())
+      .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit())
+      .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
+      .withAccessibilityScore(
+        params.useAccessibilityScore() && wheelchairAccessible,
+        wheelchairMaxSlope
+      )
       .withFares(fareService)
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
-        params.removeItinerariesWithSameRoutesAndStops
+        params.removeItinerariesWithSameRoutesAndStops()
       )
       .withTransitAlerts(transitAlertService, getMultiModalStation)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
-      .withDebugEnabled(params.debug);
+      .withDebugEnabled(params.debug());
 
     return builder.build();
   }

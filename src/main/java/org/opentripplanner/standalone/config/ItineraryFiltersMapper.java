@@ -20,43 +20,45 @@ public class ItineraryFiltersMapper {
     var dft = builder.original();
 
     builder
-      .withDebug(c.asBoolean("debug", dft.debug))
-      .withGroupSimilarityKeepOne(c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne))
+      .withDebug(c.asBoolean("debug", dft.debug()))
+      .withGroupSimilarityKeepOne(
+        c.asDouble("groupSimilarityKeepOne", dft.groupSimilarityKeepOne())
+      )
       .withGroupSimilarityKeepThree(
-        c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree)
+        c.asDouble("groupSimilarityKeepThree", dft.groupSimilarityKeepThree())
       )
       .withGroupedOtherThanSameLegsMaxCostMultiplier(
         c.asDouble(
           "groupedOtherThanSameLegsMaxCostMultiplier",
-          dft.groupedOtherThanSameLegsMaxCostMultiplier
+          dft.groupedOtherThanSameLegsMaxCostMultiplier()
         )
       )
       .withTransitGeneralizedCostLimit(
         parseTransitGeneralizedCostLimit(
           c.path("transitGeneralizedCostLimit"),
-          dft.transitGeneralizedCostLimit
+          dft.transitGeneralizedCostLimit()
         )
       )
       .withNonTransitGeneralizedCostLimit(
-        c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit)
+        c.asLinearFunction("nonTransitGeneralizedCostLimit", dft.nonTransitGeneralizedCostLimit())
       )
       .withBikeRentalDistanceRatio(
-        c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio)
+        c.asDouble("bikeRentalDistanceRatio", dft.bikeRentalDistanceRatio())
       )
       .withParkAndRideDurationRatio(
-        c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio)
+        c.asDouble("parkAndRideDurationRatio", dft.parkAndRideDurationRatio())
       )
       .withFilterItinerariesWithSameFirstOrLastTrip(
         c.asBoolean(
           "filterItinerariesWithSameFirstOrLastTrip",
-          dft.filterItinerariesWithSameFirstOrLastTrip
+          dft.filterItinerariesWithSameFirstOrLastTrip()
         )
       )
-      .withAccessibilityScore(c.asBoolean("accessibilityScore", dft.accessibilityScore))
+      .withAccessibilityScore(c.asBoolean("accessibilityScore", dft.useAccessibilityScore()))
       .withRemoveItinerariesWithSameRoutesAndStops(
         c.asBoolean(
           "removeItinerariesWithSameRoutesAndStops",
-          dft.removeItinerariesWithSameRoutesAndStops
+          dft.removeItinerariesWithSameRoutesAndStops()
         )
       )
       .build();
