@@ -113,6 +113,7 @@ routing parameters.
 - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`. Since v2.0
 - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`. Since
   v2.0
+- `disableAlertFiltering` Not implemented in OTP2. Since v2.0
 
 ## REST API
 

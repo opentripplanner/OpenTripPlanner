@@ -471,7 +471,8 @@ public class DefaultRoutingRequestType {
           .name("disableAlertFiltering")
           .description("Option to disable the default filtering of GTFS-RT alerts by time.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.system().disableAlertFiltering())
+          .deprecate("This is not supported!")
+          .dataFetcher(env -> false)
           .build()
       )
       .field(

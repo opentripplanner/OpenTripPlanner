@@ -88,15 +88,15 @@ public class SpeedTestRequest {
       .withStops(opts.debugStops())
       .withPath(opts.debugPath());
 
-    pref
-      .system()
-      .tags()
-      .addAll(
+    pref.withSystem(it ->
+      it.addTags(
         List.of(
           RoutingTag.testCaseSample(input.idAndDescription()),
           RoutingTag.testCaseCategory(input.category())
         )
-      );
+      )
+    );
+
     return request;
   }
 

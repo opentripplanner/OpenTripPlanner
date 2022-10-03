@@ -659,7 +659,11 @@ public abstract class RoutingResource {
   @Deprecated
   private Boolean useRequestedDateTimeInMaxHours;
 
+  /**
+   * @deprecated This is not supported in OTP2.
+   */
   @QueryParam("disableAlertFiltering")
+  @Deprecated
   private Boolean disableAlertFiltering;
 
   @QueryParam("debugItineraryFilter")
@@ -925,14 +929,6 @@ public abstract class RoutingResource {
 
     preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
 
-    if (disableAlertFiltering != null) {
-      preferences.system().setDisableAlertFiltering(disableAlertFiltering);
-    }
-
-    if (geoidElevation != null) {
-      preferences.system().setGeoidElevation(geoidElevation);
-    }
-
     if (debugItineraryFilter != null) {
       preferences.withItineraryFilter(it -> it.withDebug(debugItineraryFilter));
     }
@@ -954,12 +950,17 @@ public abstract class RoutingResource {
       request.setLocale(Locale.forLanguageTag(locale.replaceAll("-", "_")));
     }
 
-    if (OTPFeature.DataOverlay.isOn()) {
-      var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
-      if (!queryDataOverlayParameters.isEmpty()) {
-        preferences.system().setDataOverlay(queryDataOverlayParameters);
+    preferences.withSystem(sysBuilder -> {
+      if (geoidElevation != null) {
+        sysBuilder.withGeoidElevation(geoidElevation);
       }
-    }
+      if (OTPFeature.DataOverlay.isOn()) {
+        var dataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+        if (!dataOverlayParameters.isEmpty()) {
+          sysBuilder.withDataOverlay(dataOverlayParameters);
+        }
+      }
+    });
 
     return request;
   }

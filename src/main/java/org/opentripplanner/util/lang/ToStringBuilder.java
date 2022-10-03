@@ -280,10 +280,14 @@ public class ToStringBuilder {
   }
 
   public ToStringBuilder addDuration(String name, Duration duration) {
+    return addDuration(name, duration, null);
+  }
+
+  public ToStringBuilder addDuration(String name, Duration duration, Duration ignoreValue) {
     return addIfNotIgnored(
       name,
       duration,
-      null,
+      ignoreValue,
       d -> DurationUtils.durationToStr((int) d.toSeconds())
     );
   }

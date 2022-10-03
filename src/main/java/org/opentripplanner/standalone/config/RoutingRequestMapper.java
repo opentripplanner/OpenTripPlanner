@@ -14,6 +14,7 @@ import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,23 +164,19 @@ public class RoutingRequestMapper {
     });
 
     preferences.withItineraryFilter(it -> mapItineraryFilterParams(c.path("itineraryFilters"), it));
-    preferences
-      .system()
-      .setDisableAlertFiltering(
-        c.asBoolean("disableAlertFiltering", preferences.system().disableAlertFiltering())
-      );
 
-    preferences
-      .system()
-      .setGeoidElevation(c.asBoolean("geoidElevation", preferences.system().geoidElevation()));
+    preferences.withSystem(systemBuilder -> {
+      var sysDft = preferences.system();
+      systemBuilder
+        .withGeoidElevation(c.asBoolean("geoidElevation", sysDft.geoidElevation()))
+        .withMaxJourneyDuration(c.asDuration("maxJourneyDuration", sysDft.maxJourneyDuration()));
+      if (OTPFeature.DataOverlay.isOn()) {
+        systemBuilder.withDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
+      }
+    });
+
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
     request.setLocale(c.asLocale("locale", dft.locale()));
-
-    preferences
-      .system()
-      .setMaxJourneyDuration(
-        c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
-      );
 
     request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
 
@@ -228,8 +225,6 @@ public class RoutingRequestMapper {
     var wheelchairNode = c.path("wheelchairAccessibility");
     preferences.setWheelchair(mapAccessibilityRequest(wheelchairNode));
     request.setWheelchair(wheelchairNode.asBoolean("enabled", false));
-
-    preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
 
     NodeAdapter unpreferred = c.path("unpreferred");
     request

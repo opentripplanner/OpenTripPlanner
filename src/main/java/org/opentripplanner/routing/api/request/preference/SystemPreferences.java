@@ -2,22 +2,55 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RoutingTag;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
-// TODO VIA: Javadoc
-public class SystemPreferences implements Cloneable, Serializable {
+/**
+ * Configure system related features - a system feature is an none-functional feature. It
+ * describes how the system should work, but not change the output of a travel request.
+ * <p>
+ * Some parameters in this class are related to functional-features, but does not have a clear
+ * place where they belong. We should refactor and move these.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
+ */
+public class SystemPreferences implements Serializable {
 
-  private Set<RoutingTag> tags = Set.of();
-  private DataOverlayParameters dataOverlay;
-  private boolean geoidElevation = false;
+  public static final SystemPreferences DEFAULT = new SystemPreferences();
 
-  @Deprecated
-  private boolean disableAlertFiltering = false;
+  private final Set<RoutingTag> tags;
+  private final DataOverlayParameters dataOverlay;
+  private final boolean geoidElevation;
+  private final Duration maxJourneyDuration;
 
-  private Duration maxJourneyDuration = Duration.ofHours(24);
+  private SystemPreferences() {
+    this.tags = Set.of();
+    this.dataOverlay = null;
+    this.geoidElevation = false;
+    this.maxJourneyDuration = Duration.ofHours(24);
+  }
+
+  private SystemPreferences(Builder builder) {
+    this.tags = Set.copyOf(builder.tags);
+    this.dataOverlay = builder.dataOverlay;
+    this.geoidElevation = builder.geoidElevation;
+    this.maxJourneyDuration = Objects.requireNonNull(builder.maxJourneyDuration);
+  }
+
+  public static SystemPreferences.Builder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public Builder copyOf() {
+    return new Builder(this);
+  }
 
   /**
    * List of OTP request tags, these are used to cross-cutting concerns like logging and micrometer
@@ -27,10 +60,6 @@ public class SystemPreferences implements Cloneable, Serializable {
     return tags;
   }
 
-  public void setTags(Set<RoutingTag> tags) {
-    this.tags = tags;
-  }
-
   /**
    * The filled request parameters for penalties and thresholds values
    */
@@ -38,26 +67,9 @@ public class SystemPreferences implements Cloneable, Serializable {
     return dataOverlay;
   }
 
-  public void setDataOverlay(DataOverlayParameters dataOverlay) {
-    this.dataOverlay = dataOverlay;
-  }
-
   /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
   public boolean geoidElevation() {
     return geoidElevation;
-  }
-
-  public void setGeoidElevation(boolean geoidElevation) {
-    this.geoidElevation = geoidElevation;
-  }
-
-  /** Option to disable the default filtering of GTFS-RT alerts by time. */
-  public boolean disableAlertFiltering() {
-    return disableAlertFiltering;
-  }
-
-  public void setDisableAlertFiltering(boolean disableAlertFiltering) {
-    this.disableAlertFiltering = disableAlertFiltering;
   }
 
   /**
@@ -76,22 +88,84 @@ public class SystemPreferences implements Cloneable, Serializable {
     return maxJourneyDuration;
   }
 
-  public void setMaxJourneyDuration(Duration maxJourneyDuration) {
-    this.maxJourneyDuration = maxJourneyDuration;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    SystemPreferences that = (SystemPreferences) o;
+    return (
+      geoidElevation == that.geoidElevation &&
+      tags.equals(that.tags) &&
+      Objects.equals(dataOverlay, that.dataOverlay) &&
+      maxJourneyDuration.equals(that.maxJourneyDuration)
+    );
   }
 
-  public SystemPreferences clone() {
-    try {
-      // TODO VIA (Thomas): 2022-08-26 leaving out dataOverlay (that's how it was before)
+  @Override
+  public int hashCode() {
+    return Objects.hash(tags, dataOverlay, geoidElevation, maxJourneyDuration);
+  }
 
-      var clone = (SystemPreferences) super.clone();
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(SystemPreferences.class)
+      .addCol("tags", tags, DEFAULT.tags)
+      .addObj("dataOverlay", dataOverlay, DEFAULT.dataOverlay)
+      .addBoolIfTrue("geoidElevation", geoidElevation)
+      .addDuration("maxJourneyDuration", maxJourneyDuration, DEFAULT.maxJourneyDuration)
+      .toString();
+  }
 
-      clone.tags = new HashSet<>(this.tags);
+  @SuppressWarnings("UnusedReturnValue")
+  public static class Builder {
 
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
+    private final SystemPreferences original;
+    private final List<RoutingTag> tags = new ArrayList<>();
+    private DataOverlayParameters dataOverlay;
+    private boolean geoidElevation;
+    private Duration maxJourneyDuration;
+
+    public Builder(SystemPreferences original) {
+      this.original = original;
+      this.tags.addAll(original.tags);
+      this.dataOverlay = original.dataOverlay;
+      this.geoidElevation = original.geoidElevation;
+      this.maxJourneyDuration = original.maxJourneyDuration;
+    }
+
+    public SystemPreferences original() {
+      return original;
+    }
+
+    public Builder addTags(Collection<RoutingTag> tags) {
+      this.tags.addAll(tags);
+      return this;
+    }
+
+    public Builder withDataOverlay(DataOverlayParameters dataOverlay) {
+      this.dataOverlay = dataOverlay;
+      return this;
+    }
+
+    public Builder withGeoidElevation(boolean geoidElevation) {
+      this.geoidElevation = geoidElevation;
+      return this;
+    }
+
+    public Builder withMaxJourneyDuration(Duration maxJourneyDuration) {
+      this.maxJourneyDuration = maxJourneyDuration;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
+      return this;
+    }
+
+    public SystemPreferences build() {
+      var value = new SystemPreferences(this);
+      return original.equals(value) ? original : value;
     }
   }
 }

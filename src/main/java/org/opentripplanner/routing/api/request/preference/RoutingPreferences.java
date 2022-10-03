@@ -21,7 +21,7 @@ public final class RoutingPreferences implements Cloneable, Serializable {
   private CarPreferences car = CarPreferences.DEFAULT;
   private VehicleRentalPreferences rental = new VehicleRentalPreferences();
   private VehicleParkingPreferences parking = VehicleParkingPreferences.DEFAULT;
-  private SystemPreferences system = new SystemPreferences();
+  private SystemPreferences system = SystemPreferences.DEFAULT;
 
   @Nonnull
   private ItineraryFilterPreferences itineraryFilter = ItineraryFilterPreferences.DEFAULT;
@@ -118,10 +118,6 @@ public final class RoutingPreferences implements Cloneable, Serializable {
     return this;
   }
 
-  public SystemPreferences system() {
-    return system;
-  }
-
   @Nonnull
   public ItineraryFilterPreferences itineraryFilter() {
     return itineraryFilter;
@@ -134,6 +130,15 @@ public final class RoutingPreferences implements Cloneable, Serializable {
 
   public void withItineraryFilter(@Nonnull ItineraryFilterPreferences itineraryFilter) {
     this.itineraryFilter = itineraryFilter;
+  }
+
+  public SystemPreferences system() {
+    return system;
+  }
+
+  public RoutingPreferences withSystem(Consumer<SystemPreferences.Builder> body) {
+    this.system = system.copyOf().apply(body).build();
+    return this;
   }
 
   /**
@@ -153,10 +158,9 @@ public final class RoutingPreferences implements Cloneable, Serializable {
       var clone = (RoutingPreferences) super.clone();
 
       clone.rental = rental.clone();
-      clone.system = system.clone();
 
       // The following immutable types can be skipped:
-      // - walk, bike, car, street, transfer, transit, parking, wheelchair
+      // - walk, bike, car, street, transfer, transit, parking, wheelchair, itineraryFilter, system
 
       return clone;
     } catch (CloneNotSupportedException e) {
