@@ -46,7 +46,6 @@ public class SiriFuzzyTripMatcher {
 
   private final Map<String, Set<Trip>> internalPlanningCodeCache = new HashMap<>();
   private final Map<String, Set<Trip>> startStopTripCache = new HashMap<>();
-  private final Set<String> nonExistingStops = new HashSet<>();
   private final TransitService transitService;
   private boolean initialized = false;
 
@@ -157,38 +156,6 @@ public class SiriFuzzyTripMatcher {
       }
     }
     return trips;
-  }
-
-  public FeedScopedId getStop(String siriStopId, String feedId) {
-    if (nonExistingStops.contains(siriStopId)) {
-      return null;
-    }
-
-    FeedScopedId id = new FeedScopedId(feedId, siriStopId);
-    if (transitService.getRegularStop(id) != null) {
-      return id;
-    } else if (transitService.getStationById(id) != null) {
-      return id;
-    }
-
-    nonExistingStops.add(siriStopId);
-    return null;
-  }
-
-  public FeedScopedId getTripId(String vehicleJourney, String feedId) {
-    //Attempt to find trip using datedServiceJourneys
-    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
-      new FeedScopedId(feedId, vehicleJourney)
-    );
-    if (tripOnServiceDate != null) {
-      return tripOnServiceDate.getTrip().getId();
-    }
-    //Fallback to handle extrajourneys
-    Trip trip = transitService.getTripForId(new FeedScopedId(feedId, vehicleJourney));
-    if (trip != null) {
-      return trip.getId();
-    }
-    return null;
   }
 
   /**
