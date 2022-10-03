@@ -11,7 +11,6 @@ import java.util.Set;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -47,7 +46,6 @@ public class SiriFuzzyTripMatcher {
 
   private final Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
   private final Map<String, Set<Trip>> internalPlanningCodeCache = new HashMap<>();
-  private final Map<String, Set<Route>> mappedRoutesCache = new HashMap<>();
   private final Map<String, Set<Trip>> startStopTripCache = new HashMap<>();
   private final Map<String, Trip> vehicleJourneyTripCache = new HashMap<>();
   private final Set<String> nonExistingStops = new HashSet<>();
@@ -159,11 +157,6 @@ public class SiriFuzzyTripMatcher {
     return trips;
   }
 
-  public Set<Route> getRoutesForStop(FeedScopedId siriStopId) {
-    var stop = transitService.getRegularStop(siriStopId);
-    return transitService.getRoutesForStop(stop);
-  }
-
   public FeedScopedId getStop(String siriStopId, String feedId) {
     if (nonExistingStops.contains(siriStopId)) {
       return null;
@@ -178,10 +171,6 @@ public class SiriFuzzyTripMatcher {
 
     nonExistingStops.add(siriStopId);
     return null;
-  }
-
-  public Set<Route> getRoutes(String lineRefValue) {
-    return mappedRoutesCache.getOrDefault(lineRefValue, new HashSet<>());
   }
 
   public FeedScopedId getTripId(String vehicleJourney, String feedId) {
@@ -307,18 +296,7 @@ public class SiriFuzzyTripMatcher {
           }
         }
       }
-      for (Route route : index.getAllRoutes()) {
-        String currentRouteId = getUnpaddedTripId(route.getId().getId());
-        if (mappedRoutesCache.containsKey(currentRouteId)) {
-          mappedRoutesCache.get(currentRouteId).add(route);
-        } else {
-          Set<Route> initialSet = new HashSet<>();
-          initialSet.add(route);
-          mappedRoutesCache.put(currentRouteId, initialSet);
-        }
-      }
 
-      LOG.info("Built route-cache [{}].", mappedRoutesCache.size());
       LOG.info("Built internalPlanningCode-cache [{}].", internalPlanningCodeCache.size());
       LOG.info("Built trips-cache [{}].", mappedTripsCache.size());
       LOG.info("Built start-stop-cache [{}].", startStopTripCache.size());
