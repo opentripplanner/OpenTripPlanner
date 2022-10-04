@@ -28,6 +28,16 @@ denver/osm.pbf:
 denver/gtfs.zip:
 	${CURL} https://www.rtd-denver.com/files/gtfs/google_transit.zip -o $@
 
+# Philadelphia conurbation
+septa/osm.pbf:
+	${CURL} http://osm.ibi-transit.com/vex/39.631076770083666,-75.59967041015625,40.33921721760713,-74.64523315429688.pbf -o $@
+
+septa/bus.gtfs.zip:
+	${CURL} https://www3.septa.org/developer/google_bus.zip -o $@
+
+septa/gtfs.zip: septa/bus.gtfs.zip
+	${CURL} https://www3.septa.org/developer/google_rail.zip  -o $@
+
 build-%: otp.jar %/osm.pbf %/gtfs.zip
 	java -jar otp.jar --build --save $*
 

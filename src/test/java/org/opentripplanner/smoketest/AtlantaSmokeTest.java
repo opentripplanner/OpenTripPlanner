@@ -3,11 +3,8 @@ package org.opentripplanner.smoketest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
