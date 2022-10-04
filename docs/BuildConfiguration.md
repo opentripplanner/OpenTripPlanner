@@ -537,6 +537,7 @@ The current list of custom fare type is:
     - `analyzeInterlinedTransfers` If true, will treat interlined transfers as actual transfers.
       This is merely a work-around for transit agencies that choose to code their fares in a
       route-based fashion instead of a zone-based fashion. Default: `false`
+- `atlanta` (no parameters)
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:

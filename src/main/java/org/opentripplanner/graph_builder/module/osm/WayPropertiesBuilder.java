@@ -1,18 +1,17 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.common.model.P2;
+import java.util.function.Function;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * Builder for {@link WayProperties}. 1.0 is used as the default value for bicycle and walk safety
- * if they are unset.
+ * Builder for {@link WayProperties}. Default value for bicycle and walk safety is set when
+ * {@link WayProperties} is built.
  */
 public class WayPropertiesBuilder {
 
-  private static final P2<Double> defaultSafetyFeatures = new P2<>(1.0, 1.0);
   private final StreetTraversalPermission permission;
-  private P2<Double> bicycleSafetyFeatures = defaultSafetyFeatures;
-  private P2<Double> walkSafetyFeatures = defaultSafetyFeatures;
+  private SafetyFeatures bicycleSafetyFeatures = null;
+  private SafetyFeatures walkSafetyFeatures = null;
 
   public WayPropertiesBuilder(StreetTraversalPermission permission) {
     this.permission = permission;
@@ -31,7 +30,7 @@ public class WayPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety) {
-    this.bicycleSafetyFeatures = new P2<>(bicycleSafety, bicycleSafety);
+    this.bicycleSafetyFeatures = new SafetyFeatures(bicycleSafety, bicycleSafety);
     return this;
   }
 
@@ -40,7 +39,7 @@ public class WayPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder bicycleSafety(double bicycleSafety, double bicycleSafetyBack) {
-    this.bicycleSafetyFeatures = new P2<>(bicycleSafety, bicycleSafetyBack);
+    this.bicycleSafetyFeatures = new SafetyFeatures(bicycleSafety, bicycleSafetyBack);
     return this;
   }
 
@@ -51,7 +50,7 @@ public class WayPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder walkSafety(double walkSafety) {
-    this.walkSafetyFeatures = new P2<>(walkSafety, walkSafety);
+    this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafety);
     return this;
   }
 
@@ -60,7 +59,7 @@ public class WayPropertiesBuilder {
    * 1, with all others scaled proportionately.
    */
   public WayPropertiesBuilder walkSafety(double walkSafety, double walkSafetyBack) {
-    this.walkSafetyFeatures = new P2<>(walkSafety, walkSafetyBack);
+    this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafetyBack);
     return this;
   }
 
@@ -68,15 +67,24 @@ public class WayPropertiesBuilder {
     return permission;
   }
 
-  public P2<Double> getBicycleSafetyFeatures() {
+  public SafetyFeatures getBicycleSafetyFeatures() {
     return bicycleSafetyFeatures;
   }
 
-  public P2<Double> getWalkSafetyFeatures() {
+  public SafetyFeatures getWalkSafetyFeatures() {
     return walkSafetyFeatures;
   }
 
-  public WayProperties build() {
+  public WayProperties build(
+    Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission,
+    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
+  ) {
+    if (bicycleSafetyFeatures == null) {
+      bicycleSafety(defaultBicycleSafetyForPermission.apply(permission));
+    }
+    if (walkSafetyFeatures == null) {
+      walkSafety(defaultWalkSafetyForPermission.apply(permission));
+    }
     return new WayProperties(this);
   }
 

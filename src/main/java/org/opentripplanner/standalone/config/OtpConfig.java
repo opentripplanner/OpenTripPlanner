@@ -36,8 +36,8 @@ public class OtpConfig {
 
     this.configVersion = adapter.asText("configVersion", null);
     this.otpFeatures = adapter.asEnumMap("otpFeatures", OTPFeature.class, NodeAdapter::asBoolean);
-    if (logUnusedParams) {
-      adapter.logAllUnusedParameters(LOG);
+    if (logUnusedParams && LOG.isWarnEnabled()) {
+      adapter.logAllUnusedParameters(LOG::warn);
     }
   }
 }

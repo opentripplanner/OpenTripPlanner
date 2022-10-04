@@ -250,13 +250,6 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-    if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
-      //slower bike speed for bike sharing, based on empirical evidence from DC.
-      // TODO - There should be a separate speed preference for rented bike, setting this
-      //      - here will cause the different APIs to behave differently
-      preferences.withBike(b -> b.setSpeed(4.3));
-    }
-
     // One of those arguments has been deprecated. That's why we are mapping same thing twice.
     callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
     callWith.argument("transferSlack", preferences.transfer()::setSlack);

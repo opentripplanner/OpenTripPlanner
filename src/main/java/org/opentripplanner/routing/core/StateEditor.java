@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
@@ -28,8 +30,8 @@ public class StateEditor {
 
   /* CONSTRUCTORS */
 
-  public StateEditor(RoutingContext routingContext, Vertex v) {
-    child = new State(v, routingContext.opt, routingContext);
+  public StateEditor(RouteRequest request, StreetMode streetMode, Vertex v) {
+    child = new State(v, request, streetMode);
   }
 
   public StateEditor(State parent, Edge e) {

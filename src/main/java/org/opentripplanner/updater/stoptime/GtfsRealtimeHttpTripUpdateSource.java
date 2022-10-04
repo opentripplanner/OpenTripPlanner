@@ -35,8 +35,8 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
 
   @Override
   public List<TripUpdate> getUpdates() {
-    FeedMessage feedMessage = null;
-    List<FeedEntity> feedEntityList = null;
+    FeedMessage feedMessage;
+    List<FeedEntity> feedEntityList;
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
@@ -49,7 +49,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
       );
       if (is != null) {
         // Decode message
-        feedMessage = FeedMessage.PARSER.parseFrom(is);
+        feedMessage = FeedMessage.parseFrom(is);
         feedEntityList = feedMessage.getEntityList();
 
         // Change fullDataset value if this is an incremental update
@@ -69,9 +69,11 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
         for (FeedEntity feedEntity : feedEntityList) {
           if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
         }
+      } else {
+        LOG.error("GTFS-RT feed at {} did not return usable data", url);
       }
     } catch (Exception e) {
-      LOG.warn("Failed to parse gtfs-rt feed from {}", url, e);
+      LOG.error("Failed to parse GTFS-RT feed from {}", url, e);
     }
     return updates;
   }

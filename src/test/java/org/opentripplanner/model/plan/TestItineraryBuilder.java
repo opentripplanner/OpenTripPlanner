@@ -312,7 +312,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     legCost += cost(1.0f, end - start) + BOARD_COST;
 
-    Trip trip = trip(tripId, route.copy().withShortName("" + tripId).build());
+    Trip trip = trip(tripId, route);
 
     final List<StopTime> stopTimes = new ArrayList<>();
     StopTime fromStopTime = new StopTime();

@@ -22,10 +22,10 @@ public class RoutingRequestTest {
     //    request.removeMode(CAR);
     //    assertFalse(request.streetSubRequestModes.getCar());
 
-    request.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
-    assertFalse(request.streetSubRequestModes.getCar());
-    assertTrue(request.streetSubRequestModes.getBicycle());
-    assertTrue(request.streetSubRequestModes.getWalk());
+    //    request.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK));
+    //    assertFalse(request.streetSubRequestModes.getCar());
+    //    assertTrue(request.streetSubRequestModes.getBicycle());
+    //    assertTrue(request.streetSubRequestModes.getWalk());
   }
 
   @Test

@@ -86,7 +86,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(TransitModelForTest.id("20"), result.firstLeg().getTrip().getId());
     assertEquals(15_000, result.firstLeg().getDistanceMeters(), 1E-3);
 
-    assertEquals("A ~ RAIL 20 11:05 11:15 ~ B [ $720 ]", result.toStr());
+    assertEquals("A ~ RAIL R2 11:05 11:15 ~ B [ $720 ]", result.toStr());
   }
 
   @Test
@@ -154,7 +154,7 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(
       "A ~ Walk 2m ~ B ~ BUS 55 11:04 11:14 ~ C ~ BUS 21 11:16 11:20 ~ D " +
-      "~ Walk 3m ~ E ~ RAIL 20 11:30 11:50 ~ F ~ Walk 1m ~ G [ $3648 ]",
+      "~ Walk 3m ~ E ~ RAIL R2 11:30 11:50 ~ F ~ Walk 1m ~ G [ $3648 ]",
       result.toStr()
     );
   }

@@ -20,13 +20,11 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
@@ -44,8 +42,6 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  * create complete itineraries that can be shown in a trip planner.
  */
 public class RaptorPathToItineraryMapper {
-
-  private final Graph graph;
 
   private final TransitLayer transitLayer;
 
@@ -70,7 +66,6 @@ public class RaptorPathToItineraryMapper {
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request
   ) {
-    this.graph = graph;
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.request = request;
@@ -260,18 +255,16 @@ public class RaptorPathToItineraryMapper {
           .build()
       );
     } else {
-      // A RoutingRequest with a RoutingContext must be constructed so that the edges
-      // may be re-traversed to create the leg(s) from the list of edges.
+      // A RoutingRequest must be constructed so that the edges may be re-traversed to create the
+      // leg(s) from the list of edges.
       RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
       traverseRequest.setArriveBy(false);
-      RoutingContext routingContext = new RoutingContext(
-        traverseRequest,
-        graph,
-        (Vertex) null,
-        null
-      );
 
-      StateEditor se = new StateEditor(routingContext, edges.get(0).getFromVertex());
+      StateEditor se = new StateEditor(
+        traverseRequest,
+        request.journey().transfer().mode(),
+        edges.get(0).getFromVertex()
+      );
       se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
 
       State s = se.makeState();

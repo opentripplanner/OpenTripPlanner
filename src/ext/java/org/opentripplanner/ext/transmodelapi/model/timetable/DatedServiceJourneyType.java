@@ -19,7 +19,6 @@ import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.TripTimesShortHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -117,6 +116,11 @@ public class DatedServiceJourneyType {
             Integer first = environment.getArgument("first");
             Integer last = environment.getArgument("last");
             TripPattern tripPattern = tripPattern(environment);
+
+            if (tripPattern == null) {
+              return List.of();
+            }
+
             List<StopLocation> stops = tripPattern.getStops();
 
             if (first != null && last != null) {
