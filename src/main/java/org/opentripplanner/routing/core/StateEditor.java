@@ -31,7 +31,7 @@ public class StateEditor {
   /* CONSTRUCTORS */
 
   public StateEditor(RouteRequest request, StreetMode streetMode, Vertex v) {
-    child = State.createState(v, request, streetMode);
+    child = State.create(v, request, streetMode);
   }
 
   public StateEditor(State parent, Edge e) {

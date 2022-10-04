@@ -200,7 +200,7 @@ public class NearbyStopFinder {
             tsv.getStop(),
             0,
             Collections.emptyList(),
-            State.createState(vertex, request, streetRequest.mode())
+            State.create(vertex, request, streetRequest.mode())
           )
         );
       }

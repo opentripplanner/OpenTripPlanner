@@ -82,7 +82,7 @@ public class State implements Cloneable {
   /**
    * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public static State createState(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
+  public static State create(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
     final AStarRequest aStarRequest = new AStarRequest(opt.dateTime(), opt, streetMode);
     return new State(
       vertex,

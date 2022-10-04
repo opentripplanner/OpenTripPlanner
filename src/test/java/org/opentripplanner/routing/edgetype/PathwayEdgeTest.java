@@ -209,7 +209,7 @@ class PathwayEdgeTest {
           25
         )
       );
-    var state = State.createState(from, req, StreetMode.WALK);
+    var state = State.create(from, req, StreetMode.WALK);
 
     var afterTraversal = edge.traverse(state);
     assertNotNull(afterTraversal);

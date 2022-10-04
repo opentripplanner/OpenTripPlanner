@@ -90,10 +90,10 @@ public class TemporaryPartialStreetEdgeTest {
 
     // Traverse both the partial and parent edges.
     StreetMode streetMode = options.journey().direct().mode();
-    State s0 = State.createState(v1, options, streetMode);
+    State s0 = State.create(v1, options, streetMode);
     State s1 = e1.traverse(s0);
 
-    State partialS0 = State.createState(v1, options, streetMode);
+    State partialS0 = State.create(v1, options, streetMode);
     State partialS1 = pEdge1.traverse(partialS0);
 
     // Traversal of original and partial edges should yield the same results.
@@ -143,7 +143,7 @@ public class TemporaryPartialStreetEdgeTest {
     options.preferences().street().setTurnReluctance(1.0);
 
     StreetMode streetMode = options.journey().direct().mode();
-    State s0 = State.createState(v1, options, streetMode);
+    State s0 = State.create(v1, options, streetMode);
     s0.getRequest().setIntersectionTraversalCalculator(calculator);
     State s1 = e1.traverse(s0);
     State s2 = e2.traverse(s1);
@@ -152,7 +152,7 @@ public class TemporaryPartialStreetEdgeTest {
     Edge partialE2First = end.getIncoming().iterator().next();
     Edge partialE2Second = start.getOutgoing().iterator().next();
 
-    State partialS0 = State.createState(v1, options, streetMode);
+    State partialS0 = State.create(v1, options, streetMode);
     partialS0.getRequest().setIntersectionTraversalCalculator(calculator);
     State partialS1 = e1.traverse(partialS0);
     State partialS2A = partialE2First.traverse(partialS1);
@@ -170,13 +170,13 @@ public class TemporaryPartialStreetEdgeTest {
     // All intersections take 0 seconds now.
     calculator = new ConstantIntersectionTraversalCalculator();
 
-    State s0NoCost = State.createState(v1, options, streetMode);
+    State s0NoCost = State.create(v1, options, streetMode);
     s0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
     State s1NoCost = e1.traverse(s0NoCost);
     State s2NoCost = e2.traverse(s1NoCost);
     State s3NoCost = e3.traverse(s2NoCost);
 
-    State partialS0NoCost = State.createState(v1, options, streetMode);
+    State partialS0NoCost = State.create(v1, options, streetMode);
     partialS0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
     State partialS1NoCost = e1.traverse(partialS0NoCost);
     State partialS2ANoCost = partialE2First.traverse(partialS1NoCost);

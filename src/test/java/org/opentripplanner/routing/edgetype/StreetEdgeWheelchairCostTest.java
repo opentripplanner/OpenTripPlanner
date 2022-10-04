@@ -215,7 +215,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
   }
 
   private State traverse(StreetEdge edge, RouteRequest req) {
-    var state = State.createState(V1, req, StreetMode.WALK);
+    var state = State.create(V1, req, StreetMode.WALK);
 
     assertEquals(0, state.weight);
     return edge.traverse(state);
