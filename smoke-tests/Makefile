@@ -28,7 +28,6 @@ denver/osm.pbf:
 denver/gtfs.zip:
 	${CURL} https://www.rtd-denver.com/files/gtfs/google_transit.zip -o $@
 
-# Philadelphia conurbation
 septa/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/39.85441086976069,-75.29136657714844,40.0433862595006,-75.06202697753906.pbf -o $@
 
