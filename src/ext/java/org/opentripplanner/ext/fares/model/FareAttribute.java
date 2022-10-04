@@ -39,6 +39,7 @@ public final class FareAttribute
     this.youthPrice = builder.youthPrice();
     this.seniorPrice = builder.seniorPrice();
     this.journeyDuration = builder.journeyDuration();
+    this.agency = builder.agency();
   }
 
   public static FareAttributeBuilder of(FeedScopedId id) {

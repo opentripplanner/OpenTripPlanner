@@ -56,7 +56,7 @@ public class HSLFareServiceImpl extends DefaultFareServiceImpl {
       lastRideStartTime = leg.getStartTime();
       if (agency == null) {
         agency = leg.getAgency().getId().getId().toString();
-      } else if (agency != leg.getAgency().getId().toString()) {
+      } else if (agency != leg.getAgency().getId().getId().toString()) {
         singleAgency = false;
       }
       /* HSL specific logic: all exception routes start and end from the defined zone set,

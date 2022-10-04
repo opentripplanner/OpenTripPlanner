@@ -38,9 +38,6 @@ class FareRuleMapper {
     lhs.setDestinationId(rhs.getDestinationId());
     lhs.setContainsId(rhs.getContainsId());
 
-    if (rhs.getFare() != null) {
-      lhs.setAgency(rhs.getFare().getAgencyId());
-    }
     return lhs;
   }
 }

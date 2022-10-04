@@ -42,10 +42,10 @@ public class HSLFareServiceFactory extends DefaultFareServiceFactory {
       FareAttribute fare = rule.getFare();
       FeedScopedId id = fare.getId();
       FareRuleSet fareRule = fareRuleSet.get(id);
-      String agency = rule.getAgency();
-      if (agency != null) {
-        fareRule.setAgency(agency);
+      if (fare.getAgency() != null) {
+        fareRule.setAgency(fare.getAgency());
       }
+
       if (fareRule == null) {
         // Should never happen by design
         LOG.error("Inexistant fare ID in fare rule: " + id);
@@ -79,10 +79,10 @@ public class HSLFareServiceFactory extends DefaultFareServiceFactory {
     HSLFareServiceImpl fareService = new HSLFareServiceImpl();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
     for (FareRuleSet ruleSet : regularFareRules.values()) {
-      LOG.info("farerule {}", ruleSet);
-      LOG.info("ruleattr {}", ruleSet.getFareAttribute());
-      LOG.info("hasAgency {}", ruleSet.hasAgencyDefined());
-      LOG.info("agency {}", ruleSet.getAgency());
+      LOG.debug("farerule {}", ruleSet);
+      LOG.debug("ruleattr {}", ruleSet.getFareAttribute());
+      LOG.debug("hasAgency {}", ruleSet.hasAgencyDefined());
+      LOG.debug("agency {}", ruleSet.getAgency());
     }
     return fareService;
   }

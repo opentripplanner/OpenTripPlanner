@@ -10,7 +10,6 @@ public final class FareRule implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String agency;
   private FareAttribute fare;
 
   private Route route;
@@ -20,14 +19,6 @@ public final class FareRule implements Serializable {
   private String destinationId;
 
   private String containsId;
-
-  public String getAgency() {
-    return agency;
-  }
-
-  public void setAgency(String agency) {
-    this.agency = agency;
-  }
 
   public FareAttribute getFare() {
     return fare;
