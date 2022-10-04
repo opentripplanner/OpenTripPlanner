@@ -35,9 +35,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: smoke-tests/**/*.pbf
-          key: osm-2022-08-29-1
-          restore-keys: |
-            osm-
+          key: osm-2022-10-04
+          #restore-keys: |
+          #  osm-
 
       - name: Build jar file, compile tests
         run: |
@@ -46,7 +46,7 @@ jobs:
         
       - name: "[SEPTA] Build graph, run OTP, run smoke tests"
         run: scripts/smoke-tests.sh septa
-        
+
       - name: "[Atlanta] Build graph, run OTP, run smoke tests"
         run: scripts/smoke-tests.sh atlanta
 

@@ -11,18 +11,18 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
  * <p>
  * It uses the REST API to check that a route from South to North Houston can be found.
  */
+@Tag("smoke-test")
 @Tag("septa")
-@Tag("houston")
 public class SeptaSmokeTest {
 
-  WgsCoordinate woodbury = new WgsCoordinate(39.8974, -75.1417);
-  WgsCoordinate logan = new WgsCoordinate(40.0294, -75.1449);
+  WgsCoordinate airport = new WgsCoordinate(39.876151, -75.245189);
+  WgsCoordinate stPetersCemetary = new WgsCoordinate(39.98974, -75.09515);
 
   @Test
-  public void routeFromSouthToNorth() {
+  public void routeFromAirportToNorth() {
     SmokeTest.basicTest(
-      woodbury,
-      logan,
+      airport,
+      stPetersCemetary,
       Set.of("TRANSIT", "WALK"),
       List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
     );
