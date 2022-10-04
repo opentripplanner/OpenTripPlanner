@@ -19,12 +19,12 @@ public class SeptaSmokeTest {
   WgsCoordinate stPetersCemetary = new WgsCoordinate(39.98974, -75.09515);
 
   @Test
-  public void routeFromAirportToNorth() {
+  public void routeFromAirportToNorthPhiladelphia() {
     SmokeTest.basicTest(
       airport,
       stPetersCemetary,
       Set.of("TRANSIT", "WALK"),
-      List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
+      List.of("WALK", "RAIL", "RAIL", "WALK", "SUBWAY", "WALK", "BUS", "WALK")
     );
   }
 }
