@@ -143,7 +143,10 @@ public interface DataSource {
     return info;
   }
 
-  private String directory() {
+  /**
+   * Return the directory that contains the file.
+   */
+  default String directory() {
     int endIndex = path().length() - (name().length() + 1);
     return endIndex <= 0 ? "" : path().substring(0, endIndex);
   }
