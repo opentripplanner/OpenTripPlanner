@@ -1,38 +1,26 @@
 package org.opentripplanner.smoketest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
-import org.opentripplanner.api.resource.TripPlannerResponse;
 import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.smoketest.util.RestClient;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is both a utility class and a category to select or deselect smoke tests during test
@@ -44,9 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SmokeTest {
 
-  static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
-  static HttpClient client = HttpClient.newHttpClient();
-  static final ObjectMapper mapper;
+  public static final ObjectMapper mapper;
 
   /**
    * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
@@ -84,49 +70,9 @@ public class SmokeTest {
    * This is a problem in particular in the case of MARTA as they only publish new data about 2
    * days before the expiration date of the old one.
    */
-  static LocalDate nextMonday() {
+  public static LocalDate nextMonday() {
     var today = LocalDate.now();
     return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-  }
-
-  /**
-   * Builds an HTTP request for sending to an OTP instance.
-   */
-  static HttpRequest buildPlanRequest(Map<String, String> params) {
-    var urlParams = params
-      .entrySet()
-      .stream()
-      .map(kv -> kv.getKey() + "=" + kv.getValue())
-      .collect(Collectors.joining("&"));
-
-    var uri = URI.create("http://localhost:8080/otp/routers/default/plan?" + urlParams);
-
-    return HttpRequest.newBuilder().uri(uri).GET().build();
-  }
-
-  /**
-   * Sends an HTTP request to the OTP plan endpoint and deserializes the response.
-   */
-  static TripPlannerResponse sendPlanRequest(SmokeTestRequest req) {
-    var request = SmokeTest.buildPlanRequest(req.toMap());
-    LOG.info("Sending request to {}", request.uri());
-    TripPlannerResponse otpResponse;
-    try {
-      var response = client.send(request, BodyHandlers.ofInputStream());
-
-      assertEquals(200, response.statusCode(), "Status code returned by OTP server was not 200");
-      otpResponse = SmokeTest.mapper.readValue(response.body(), TripPlannerResponse.class);
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-
-    LOG.info(
-      "Request to {} returned {} itineraries",
-      request.uri(),
-      otpResponse.getPlan().itineraries.size()
-    );
-
-    return otpResponse;
   }
 
   /**
@@ -151,44 +97,18 @@ public class SmokeTest {
     );
   }
 
-  static void basicTest(
+  static void basicRouteTest(
     WgsCoordinate start,
     WgsCoordinate end,
     Set<String> modes,
     List<String> expectedModes
   ) {
     var request = new SmokeTestRequest(start, end, modes);
-    var otpResponse = SmokeTest.sendPlanRequest(request);
+    var otpResponse = RestClient.sendPlanRequest(request);
     var itineraries = otpResponse.getPlan().itineraries;
 
     assertTrue(itineraries.size() > 1);
 
     assertThatItineraryHasModes(itineraries, expectedModes);
-  }
-
-  static JsonNode sendGraphQLRequest(String query) {
-    var body = mapper.createObjectNode();
-    body.put("query", query);
-
-    try {
-      var bodyString = mapper.writeValueAsString(body);
-
-      HttpRequest request = HttpRequest
-        .newBuilder()
-        .uri(URI.create("http://localhost:8080/otp/routers/default/index/graphql"))
-        .header("Content-Type", "application/json")
-        .POST(HttpRequest.BodyPublishers.ofString(bodyString))
-        .build();
-      HttpResponse<String> response = HttpClient
-        .newHttpClient()
-        .send(request, HttpResponse.BodyHandlers.ofString());
-
-      var responseJson = mapper.readTree(response.body());
-
-      LOG.info("Response JSON: {}", responseJson);
-      return responseJson.get("data");
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

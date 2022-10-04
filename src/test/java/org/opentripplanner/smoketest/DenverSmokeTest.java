@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.smoketest.util.GraphQLClient;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
@@ -23,7 +24,7 @@ public class DenverSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
-    SmokeTest.basicTest(
+    SmokeTest.basicRouteTest(
       southBroadway,
       twinLakes,
       Set.of("TRANSIT", "WALK"),
@@ -33,7 +34,7 @@ public class DenverSmokeTest {
 
   @Test
   public void vehiclePositions() throws JsonProcessingException {
-    var json = SmokeTest.sendGraphQLRequest(
+    var json = GraphQLClient.sendGraphQLRequest(
       """
         query {
         	patterns {

@@ -20,7 +20,7 @@ public class SeptaSmokeTest {
 
   @Test
   public void routeFromAirportToNorthPhiladelphia() {
-    SmokeTest.basicTest(
+    SmokeTest.basicRouteTest(
       airport,
       stPetersCemetary,
       Set.of("TRANSIT", "WALK"),

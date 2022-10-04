@@ -20,7 +20,7 @@ public class HoustonSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
-    SmokeTest.basicTest(
+    SmokeTest.basicRouteTest(
       galvestonRoad,
       northLindale,
       Set.of("TRANSIT", "WALK"),
