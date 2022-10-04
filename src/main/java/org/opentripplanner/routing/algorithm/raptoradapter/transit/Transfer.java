@@ -39,8 +39,6 @@ public class Transfer {
   public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
     RouteRequest rr = request.getStreetSearchRequest(request.journey().transfer().mode());
 
-    var transferPreferences = rr.preferences();
-
     rr.setArriveBy(false);
     rr.setDateTime(Instant.ofEpochSecond(0));
     rr.setFrom(null);
@@ -50,37 +48,39 @@ public class Transfer {
     //          - constructors - We should cache and route on the same normalized values to be
     //          - consistent.
 
-    transferPreferences.withWalk(walk ->
-      walk
-        .withSpeed(roundToHalf(walk.speed()))
-        .withReluctance(roundTo(walk.reluctance(), 1))
-        .withStairsReluctance(roundTo(walk.stairsReluctance(), 1))
-        .withStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1))
-        .withSafetyFactor(roundTo(walk.safetyFactor(), 1))
-    );
+    rr.withPreferences(preferences -> {
+      preferences.withWalk(walk ->
+        walk
+          .withSpeed(roundToHalf(walk.speed()))
+          .withReluctance(roundTo(walk.reluctance(), 1))
+          .withStairsReluctance(roundTo(walk.stairsReluctance(), 1))
+          .withStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1))
+          .withSafetyFactor(roundTo(walk.safetyFactor(), 1))
+      );
 
-    // Some values are rounded to ease caching in RaptorRequestTransferCache
-    transferPreferences.withBike(bike ->
-      bike
-        .setSwitchCost(roundTo100(bike.switchCost()))
-        .setSwitchTime(roundTo100(bike.switchTime()))
-        .setSpeed(roundToHalf(bike.speed()))
-    );
+      // Some values are rounded to ease caching in RaptorRequestTransferCache
+      preferences.withBike(bike ->
+        bike
+          .setSwitchCost(roundTo100(bike.switchCost()))
+          .setSwitchTime(roundTo100(bike.switchTime()))
+          .setSpeed(roundToHalf(bike.speed()))
+      );
 
-    // it's a record (immutable) so can be safely reused
-    transferPreferences.setWheelchair(request.preferences().wheelchair());
+      // it's a record (immutable) so can be safely reused
+      preferences.withWheelchair(request.preferences().wheelchair());
 
-    transferPreferences.withStreet(streetBuilder -> {
-      var street = transferPreferences.street();
-      streetBuilder.withTurnReluctance(roundTo(street.turnReluctance(), 1));
+      preferences.withStreet(streetBuilder -> {
+        var street = preferences.street();
+        streetBuilder.withTurnReluctance(roundTo(street.turnReluctance(), 1));
 
-      streetBuilder.withElevator(builder -> {
-        var elevator = street.elevator();
-        builder
-          .withBoardCost(roundTo100(elevator.boardCost()))
-          .withBoardTime(roundTo100(elevator.boardTime()))
-          .withHopCost(roundTo100(elevator.hopCost()))
-          .withHopTime(roundTo100(elevator.hopTime()));
+        streetBuilder.withElevator(builder -> {
+          var elevator = street.elevator();
+          builder
+            .withBoardCost(roundTo100(elevator.boardCost()))
+            .withBoardTime(roundTo100(elevator.boardTime()))
+            .withHopCost(roundTo100(elevator.hopCost()))
+            .withHopTime(roundTo100(elevator.hopTime()));
+        });
       });
     });
 

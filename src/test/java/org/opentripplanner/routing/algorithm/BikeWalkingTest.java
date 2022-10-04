@@ -371,12 +371,12 @@ public class BikeWalkingTest extends GraphRoutingTest {
     boolean arriveBy
   ) {
     var request = new RouteRequest();
-    var preferences = request.preferences();
 
-    preferences.withBike(it ->
-      it.setSpeed(20d).setWalkingSpeed(5d).setSwitchTime(100).setSwitchCost(1000)
+    request.withPreferences(preferences ->
+      preferences
+        .withWalk(w -> w.withSpeed(10))
+        .withBike(it -> it.setSpeed(20d).setWalkingSpeed(5d).setSwitchTime(100).setSwitchCost(1000))
     );
-    preferences.withWalk(w -> w.withSpeed(10));
     request.setArriveBy(arriveBy);
 
     var bikeOptions = request.getStreetSearchRequest(streetMode);

@@ -188,6 +188,10 @@ public final class TransferPreferences implements Serializable {
       this.nonpreferredCost = original.nonpreferredCost;
     }
 
+    public TransferPreferences original() {
+      return original;
+    }
+
     public Builder withCost(int cost) {
       this.cost = cost;
       return this;

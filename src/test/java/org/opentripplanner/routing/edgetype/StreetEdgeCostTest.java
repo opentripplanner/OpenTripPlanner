@@ -49,7 +49,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
     var req = new RouteRequest();
-    req.preferences().withWalk(w -> w.withReluctance(walkReluctance));
+    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(walkReluctance)));
     State result = traverse(edge, req);
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
@@ -72,7 +72,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setMode(TraverseMode.BICYCLE);
-    req.preferences().withBike(bike -> bike.setReluctance(bikeReluctance));
+    req.withPreferences(pref -> pref.withBike(bike -> bike.setReluctance(bikeReluctance)));
 
     State result = traverse(edge, req);
     assertNotNull(result);
@@ -96,7 +96,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setMode(TraverseMode.CAR);
-    req.preferences().withCar(it -> it.withReluctance(carReluctance));
+    req.withPreferences(p -> p.withCar(it -> it.withReluctance(carReluctance)));
 
     State result = traverse(edge, req);
     assertNotNull(result);
@@ -119,7 +119,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     edge.setStairs(true);
 
     var req = new RouteRequest();
-    req.preferences().withWalk(w -> w.withStairsReluctance(stairsReluctance));
+    req.withPreferences(pref -> pref.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);
@@ -153,7 +153,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     edge.setWalkSafetyFactor(2);
 
     var req = new RouteRequest();
-    req.preferences().withWalk(w -> w.withSafetyFactor(walkSafetyFactor));
+    req.withPreferences(pref -> pref.withWalk(w -> w.withSafetyFactor(walkSafetyFactor)));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);

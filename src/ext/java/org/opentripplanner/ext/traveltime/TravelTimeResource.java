@@ -221,11 +221,11 @@ public class TravelTimeResource {
   private ZSampleGrid<WTWD> getSampleGrid() {
     final RouteRequest accessRequest = routingRequest.clone();
 
-    accessRequest
-      .preferences()
-      .withStreet(it ->
+    accessRequest.withPreferences(preferences ->
+      preferences.withStreet(it ->
         it.withMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of())
-      );
+      )
+    );
 
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, accessRequest)) {
       final Collection<AccessEgress> accessList = getAccess(accessRequest, temporaryVertices);

@@ -36,8 +36,6 @@ class TransitPreferencesTest {
 
   private final TransitPreferences subject = TransitPreferences
     .of()
-    .withBoardSlack(bs -> bs.withDefaultSec(BOARD_SLACK))
-    .withAlightSlack(as -> as.withDefaultSec(ALIGHT_SLACK))
     .setReluctanceForMode(RELUCTANCE_FOR_MODE)
     .setOtherThanPreferredRoutesPenalty(OTHER_THAN_PREFERRED_ROUTES_PENALTY)
     .setUnpreferredCost(UNPREFERRED_COST)

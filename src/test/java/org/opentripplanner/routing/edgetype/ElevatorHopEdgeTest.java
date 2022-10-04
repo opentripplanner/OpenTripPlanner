@@ -35,9 +35,9 @@ class ElevatorHopEdgeTest {
     var req = new RouteRequest();
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
     req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
+    req.withPreferences(pref ->
+      pref.withWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25))
+    );
     State result = traverse(wheelchair, req);
     assertNull(result);
   }

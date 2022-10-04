@@ -150,19 +150,20 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     Set<String> requiredTags,
     boolean arriveBy
   ) {
-    var options = new RouteRequest().getStreetSearchRequest(streetMode);
-    var preferences = options.preferences();
-
-    preferences.withBike(it -> it.setParkCost(120).setParkTime(60));
-    preferences.withCar(it -> it.withParkCost(240).withParkTime(180));
-    options.setWheelchair(requireWheelChairAccessible);
-    options.journey().parking().setBannedTags(bannedTags);
-    options.journey().parking().setRequiredTags(requiredTags);
-    options.setArriveBy(arriveBy);
+    var request = new RouteRequest().getStreetSearchRequest(streetMode);
+    request.withPreferences(pref ->
+      pref
+        .withBike(it -> it.setParkCost(120).setParkTime(60))
+        .withCar(it -> it.withParkCost(240).withParkTime(180))
+    );
+    request.setWheelchair(requireWheelChairAccessible);
+    request.journey().parking().setBannedTags(bannedTags);
+    request.journey().parking().setRequiredTags(requiredTags);
+    request.setArriveBy(arriveBy);
 
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, fromVertex, toVertex))
+      .setContext(new RoutingContext(request, graph, fromVertex, toVertex))
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

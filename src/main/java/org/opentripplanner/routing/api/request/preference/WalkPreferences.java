@@ -168,6 +168,10 @@ public final class WalkPreferences implements Serializable {
       this.safetyFactor = original.safetyFactor;
     }
 
+    public WalkPreferences original() {
+      return original;
+    }
+
     public double speed() {
       return speed;
     }

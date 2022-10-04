@@ -195,6 +195,10 @@ public final class CarPreferences implements Serializable {
       this.decelerationSpeed = original.decelerationSpeed;
     }
 
+    public CarPreferences original() {
+      return original;
+    }
+
     public Builder withSpeed(double speed) {
       this.speed = speed;
       return this;

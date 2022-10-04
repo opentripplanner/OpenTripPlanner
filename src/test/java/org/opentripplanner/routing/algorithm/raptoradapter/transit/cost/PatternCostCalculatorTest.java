@@ -77,9 +77,9 @@ public class PatternCostCalculatorTest {
 
     routingRequest.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
     routingRequest.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
-    routingRequest
-      .preferences()
-      .withTransit(tr -> tr.setUnpreferredCost(RequestFunctions.parse("300 + 1.0 x")));
+    routingRequest.withPreferences(p ->
+      p.withTransit(tr -> tr.setUnpreferredCost(RequestFunctions.parse("300 + 1.0 x")))
+    );
 
     var data = new TestTransitData();
     final TestTripPattern unpreferredRoutePattern = pattern(true, false);
@@ -221,19 +221,20 @@ public class PatternCostCalculatorTest {
 
     RouteRequest createRoutingRequest() {
       var request = new RouteRequest();
-      var preferences = request.preferences();
 
-      preferences.withTransit(transit ->
-        transit.setUnpreferredCost(
-          RequestFunctions.createLinearFunction(
-            UNPREFERRED_ROUTE_PENALTY,
-            UNPREFERRED_ROUTE_RELUCTANCE
+      request.withPreferences(preferences -> {
+        preferences.withTransit(transit ->
+          transit.setUnpreferredCost(
+            RequestFunctions.createLinearFunction(
+              UNPREFERRED_ROUTE_PENALTY,
+              UNPREFERRED_ROUTE_RELUCTANCE
+            )
           )
-        )
-      );
-      preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));
-      preferences.withTransfer(tx -> {
-        tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
+        );
+        preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));
+        preferences.withTransfer(tx -> {
+          tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
+        });
       });
 
       if (prefAgency) {

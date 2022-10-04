@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -139,6 +140,10 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public RoutingPreferences preferences() {
     return preferences;
+  }
+
+  public void withPreferences(Consumer<RoutingPreferences.Builder> body) {
+    this.preferences = preferences.copyOf().apply(body).build();
   }
 
   /**
@@ -325,7 +330,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
       clone.allowedRentalFormFactors = new HashSet<>(allowedRentalFormFactors);
 
-      clone.preferences = preferences.clone();
       clone.journey = journey.clone();
 
       return clone;

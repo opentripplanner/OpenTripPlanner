@@ -91,7 +91,6 @@ public class TransmodelGraphQLPlanner {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
     RouteRequest request = serverContext.defaultRouteRequest();
-    RoutingPreferences preferences = request.preferences();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
@@ -115,48 +114,10 @@ public class TransmodelGraphQLPlanner {
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
     //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
     //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
-    preferences.withWalk(b -> {
-      callWith.argument("walkBoardCost", b::withBoardCost);
-      callWith.argument("walkSpeed", b::withSpeed);
-    });
-    callWith.argument("walkReluctance", preferences::setAllStreetReluctance);
-
-    preferences.withBike(bike -> {
-      callWith.argument("bikeSpeed", bike::setSpeed);
-      callWith.argument("bikeSwitchTime", bike::setSwitchTime);
-      callWith.argument("bikeSwitchCost", bike::setSwitchCost);
-      callWith.argument("bicycleOptimisationMethod", bike::setOptimizeType);
-
-      if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
-        bike.withOptimizeTriangle(triangle -> {
-          callWith.argument("triangle.timeFactor", triangle::withTime);
-          callWith.argument("triangle.slopeFactor", triangle::withSlope);
-          callWith.argument("triangle.safetyFactor", triangle::withSafety);
-        });
-      }
-    });
-
-    preferences.withTransfer(transfer -> {
-      callWith.argument("transferPenalty", transfer::withCost);
-
-      // 'minimumTransferTime' is deprecated, that's why we are mapping 'slack' twice.
-      callWith.argument("minimumTransferTime", transfer::withSlack);
-      callWith.argument("transferSlack", transfer::withSlack);
-
-      callWith.argument("waitReluctance", transfer::withWaitReluctance);
-      callWith.argument("maximumTransfers", transfer::withMaxTransfers);
-    });
 
     //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
     callWith.argument("arriveBy", request::setArriveBy);
-    // TODO VIA (Skånetrafiken): 2022-08-24 refactor
-    //    callWith.argument(
-    //      "vias",
-    //      (List<Map<String, Object>> v) ->
-    //        request.intermediatePlaces =
-    //          v.stream().map(this::toGenericLocation).collect(Collectors.toList())
-    //    );
 
     callWith.argument(
       "preferred.authorities",
@@ -178,29 +139,6 @@ public class TransmodelGraphQLPlanner {
       (Collection<String> authorities) ->
         request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
     );
-
-    preferences.withTransit(tr -> {
-      callWith.argument(
-        "preferred.otherThanPreferredLinesPenalty",
-        tr::setOtherThanPreferredRoutesPenalty
-      );
-      tr.withBoardSlack(builder -> {
-        callWith.argument("boardSlackDefault", builder::withDefaultSec);
-        callWith.argument(
-          "boardSlackList",
-          (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
-        );
-      });
-      tr.withAlightSlack(builder -> {
-        callWith.argument("alightSlackDefault", builder::withDefaultSec);
-        callWith.argument(
-          "alightSlackList",
-          (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
-        );
-      });
-      callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
-      callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
-    });
 
     callWith.argument(
       "preferred.lines",
@@ -254,9 +192,9 @@ public class TransmodelGraphQLPlanner {
     if (modes != null) {
       request.journey().setModes(modes);
     }
-    preferences.withItineraryFilter(itineraryFilter -> {
-      callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);
-      ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
+
+    request.withPreferences(preferences -> {
+      mapPreferences(environment, callWith, preferences, request.vehicleRental);
     });
 
     /*
@@ -272,21 +210,88 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-    if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
+    return request;
+  }
+
+  private void mapPreferences(
+    DataFetchingEnvironment environment,
+    DataFetcherDecorator callWith,
+    RoutingPreferences.Builder preferences,
+    boolean vehicleRental
+  ) {
+    preferences.withWalk(b -> {
+      callWith.argument("walkBoardCost", b::withBoardCost);
+      callWith.argument("walkSpeed", b::withSpeed);
+    });
+    callWith.argument(
+      "walkReluctance",
+      (Double streetReluctance) -> {
+        setStreetReluctance(preferences, streetReluctance);
+      }
+    );
+    preferences.withBike(bike -> {
+      callWith.argument("bikeSpeed", bike::setSpeed);
+      callWith.argument("bikeSwitchTime", bike::setSwitchTime);
+      callWith.argument("bikeSwitchCost", bike::setSwitchCost);
+      callWith.argument("bicycleOptimisationMethod", bike::setOptimizeType);
+
+      if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+        bike.withOptimizeTriangle(triangle -> {
+          callWith.argument("triangle.timeFactor", triangle::withTime);
+          callWith.argument("triangle.slopeFactor", triangle::withSlope);
+          callWith.argument("triangle.safetyFactor", triangle::withSafety);
+        });
+      }
+    });
+
+    preferences.withTransfer(transfer -> {
+      callWith.argument("transferPenalty", transfer::withCost);
+
+      // 'minimumTransferTime' is deprecated, that's why we are mapping 'slack' twice.
+      callWith.argument("minimumTransferTime", transfer::withSlack);
+      callWith.argument("transferSlack", transfer::withSlack);
+
+      callWith.argument("waitReluctance", transfer::withWaitReluctance);
+      callWith.argument("maximumTransfers", transfer::withMaxTransfers);
+    });
+    preferences.withTransit(tr -> {
+      callWith.argument(
+        "preferred.otherThanPreferredLinesPenalty",
+        tr::setOtherThanPreferredRoutesPenalty
+      );
+      tr.withBoardSlack(builder -> {
+        callWith.argument("boardSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "boardSlackList",
+          (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+      tr.withAlightSlack(builder -> {
+        callWith.argument("alightSlackDefault", builder::withDefaultSec);
+        callWith.argument(
+          "alightSlackList",
+          (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        );
+      });
+      callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
+      callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
+    });
+    preferences.withItineraryFilter(itineraryFilter -> {
+      callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);
+      ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
+    });
+    if (vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
       // TODO - There should be a separate speed preference for rented bike, setting this
       //      - here will cause the different APIs to behave differently
       preferences.withBike(b -> b.setSpeed(4.3));
     }
-
     preferences.withRental(rental ->
       callWith.argument(
         "useBikeRentalAvailabilityInformation",
         rental::withUseAvailabilityInformation
       )
     );
-
-    return request;
   }
 
   @SuppressWarnings("unchecked")
@@ -337,6 +342,21 @@ public class TransmodelGraphQLPlanner {
       return mBuilder.build();
     }
     return null;
+  }
+
+  /**
+   * This set the reluctance for bike, walk, car and bikeWalking (x2.7) - all in one go. These
+   * parameters can be set individually.
+   */
+  private void setStreetReluctance(
+    RoutingPreferences.Builder preferences,
+    Double streetReluctance
+  ) {
+    if (streetReluctance > 0) {
+      preferences.withWalk(walk -> walk.withReluctance(streetReluctance));
+      preferences.withBike(bike -> bike.setReluctance(streetReluctance));
+      preferences.withCar(car -> car.withReluctance(streetReluctance));
+    }
   }
 
   /**

@@ -199,16 +199,13 @@ public class TriangleInequalityTest {
     RouteRequest prototypeOptions = new RouteRequest();
 
     // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions
-      .preferences()
-      .withWalk(walk -> {
-        walk.withStairsReluctance(1.0);
-        walk.withSpeed(1.0);
-      });
-    prototypeOptions.preferences().setAllStreetReluctance(1.0);
-    prototypeOptions.preferences().withStreet(it -> it.withTurnReluctance(1.0));
-    prototypeOptions.preferences().withCar(it -> it.withSpeed(1.0));
-    prototypeOptions.preferences().withBike(it -> it.setSpeed(1.0));
+    prototypeOptions.withPreferences(preferences ->
+      preferences
+        .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
+        .withStreet(street -> street.withTurnReluctance(1.0))
+        .withCar(car -> car.withSpeed(1.0).withReluctance(1.0))
+        .withBike(bike -> bike.setSpeed(1.0).setReluctance(1.0))
+    );
 
     if (modes != null) {
       prototypeOptions.journey().setModes(modes);

@@ -113,6 +113,10 @@ public final class ElevatorPreferences implements Serializable {
       this.hopTime = original.hopTime;
     }
 
+    public ElevatorPreferences original() {
+      return original;
+    }
+
     public Builder withBoardCost(int boardCost) {
       this.boardCost = boardCost;
       return this;

@@ -121,6 +121,10 @@ public final class RaptorPreferences implements Serializable {
       this.timeLimit = original.timeLimit;
     }
 
+    public RaptorPreferences original() {
+      return original;
+    }
+
     public Builder withOptimizations(Collection<Optimization> optimizations) {
       this.optimizations = EnumSet.copyOf(optimizations);
       return this;

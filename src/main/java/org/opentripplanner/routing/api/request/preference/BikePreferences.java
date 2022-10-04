@@ -227,6 +227,10 @@ public final class BikePreferences implements Serializable {
       this.optimizeTriangle = original.optimizeTriangle;
     }
 
+    public BikePreferences original() {
+      return original;
+    }
+
     public double speed() {
       return speed;
     }

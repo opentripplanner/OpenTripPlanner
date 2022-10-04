@@ -5,7 +5,6 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.P
 import static org.opentripplanner.routing.api.request.framework.RequestFunctions.createLinearFunction;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -231,8 +230,8 @@ public final class TransitPreferences implements Serializable {
       this.raptor = original.raptor;
     }
 
-    public void initBoardSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
-      withBoardSlack(builder -> builder.withDefault(defaultValue).withValues(values));
+    public TransitPreferences original() {
+      return original;
     }
 
     public Builder withBoardSlack(Consumer<DurationForEnum.Builder<TransitMode>> body) {
@@ -240,13 +239,17 @@ public final class TransitPreferences implements Serializable {
       return this;
     }
 
-    public void initAlightSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
-      withAlightSlack(builder -> builder.withDefault(defaultValue).withValues(values));
+    public Builder withDefaultBoardSlackSec(int defaultValue) {
+      return withBoardSlack(it -> it.withDefaultSec(defaultValue));
     }
 
     public Builder withAlightSlack(Consumer<DurationForEnum.Builder<TransitMode>> body) {
       this.alightSlack = this.alightSlack.copyOf().apply(body).build();
       return this;
+    }
+
+    public Builder withDefaultAlightSlackSec(int defaultValue) {
+      return withAlightSlack(it -> it.withDefaultSec(defaultValue));
     }
 
     public Builder setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {

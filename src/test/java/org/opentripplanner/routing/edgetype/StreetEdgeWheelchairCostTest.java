@@ -95,9 +95,8 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(
+    req.withPreferences(pref ->
+      pref.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -107,7 +106,8 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
           reluctance,
           10
         )
-      );
+      )
+    );
     State result = traverse(edge, req);
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
@@ -130,9 +130,8 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(
+    req.withPreferences(pref ->
+      pref.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -142,9 +141,10 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
           1.1f,
           stairsReluctance
         )
-      );
+      )
+    );
 
-    req.preferences().withWalk(w -> w.withReluctance(1.0));
+    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);
@@ -171,9 +171,8 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     var req = new RouteRequest();
     req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(
+    req.withPreferences(pref ->
+      pref.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -183,7 +182,8 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
           1.1f,
           25
         )
-      );
+      )
+    );
 
     var result = traverse(edge, req);
     assertEquals(expectedCost, (long) result.weight);
@@ -210,7 +210,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
 
     var req = new RouteRequest();
-    req.preferences().withWalk(w -> w.withReluctance(walkReluctance));
+    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(walkReluctance)));
     req.setWheelchair(true);
 
     var result = traverse(edge, req);

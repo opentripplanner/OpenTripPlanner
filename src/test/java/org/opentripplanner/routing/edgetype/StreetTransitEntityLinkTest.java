@@ -100,9 +100,9 @@ class StreetTransitEntityLinkTest {
       feature = AccessibilityPreferences.ofCost(100, 100);
     }
     req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
+    req.withPreferences(pref ->
+      pref.withWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25))
+    );
 
     var ctx = new RoutingContext(req, graph, from, to);
     var state = new State(ctx);

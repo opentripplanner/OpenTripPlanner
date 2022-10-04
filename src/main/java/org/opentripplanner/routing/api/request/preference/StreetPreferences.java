@@ -169,6 +169,10 @@ public final class StreetPreferences implements Serializable {
       this.maxDirectDuration = original.maxDirectDuration;
     }
 
+    public StreetPreferences original() {
+      return original;
+    }
+
     public Builder withTurnReluctance(double turnReluctance) {
       this.turnReluctance = turnReluctance;
       return this;

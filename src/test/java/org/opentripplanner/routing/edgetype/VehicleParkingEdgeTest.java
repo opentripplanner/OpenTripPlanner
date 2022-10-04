@@ -183,7 +183,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.parkAndRide = true;
-    routingRequest.preferences().withParking(VehicleParkingPreferences.of(realtime));
+    routingRequest.withPreferences(p -> p.withParking(VehicleParkingPreferences.of(realtime)));
     routingRequest.streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK, parkingMode);
     routingContext = new RoutingContext(routingRequest, graph, vertex, vertex);
   }
