@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,9 +66,10 @@ class StopAndStationMapper {
     FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
     TariffZoneMapper tariffZoneMapper,
+    ZoneId defaultTimeZone,
     DataImportIssueStore issueStore
   ) {
-    this.stationMapper = new StationMapper(issueStore, idFactory);
+    this.stationMapper = new StationMapper(issueStore, idFactory, defaultTimeZone);
     this.quayMapper = new QuayMapper(idFactory, issueStore);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;

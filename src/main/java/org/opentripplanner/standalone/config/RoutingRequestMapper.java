@@ -319,8 +319,6 @@ public class RoutingRequestMapper {
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asBoolean(preferences.transit().ignoreRealtimeUpdates())
       );
-    request.carPickup =
-      c.of("kissAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.carPickup);
     request.setLocale(c.of("locale").withDoc(NA, /*TODO DOC*/"TODO").asLocale(dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
     preferences
@@ -378,8 +376,6 @@ public class RoutingRequestMapper {
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asInt(preferences.transit().otherThanPreferredRoutesPenalty())
       );
-    request.parkAndRide =
-      c.of("parkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.parkAndRide);
     request.setSearchWindow(
       c.of("searchWindow").withDoc(NA, /*TODO DOC*/"TODO").asDuration(dft.searchWindow())
     );
@@ -444,8 +440,6 @@ public class RoutingRequestMapper {
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asLinearFunction(preferences.transit().unpreferredCost())
       );
-    request.vehicleRental =
-      c.of("allowBikeRental").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.vehicleRental);
     preferences
       .transfer()
       .setWaitAtBeginningFactor(

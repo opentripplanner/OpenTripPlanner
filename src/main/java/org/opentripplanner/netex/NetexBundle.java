@@ -75,7 +75,7 @@ public class NetexBundle implements Closeable {
     this.issueStore = issueStore;
 
     // Store result in a mutable OTP Transit Model
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
 
     // init parser and mapper
     xmlParser = new NetexXmlParser();
@@ -128,7 +128,7 @@ public class NetexBundle implements Closeable {
         }
       });
     }
-    mapper.finnishUp();
+    mapper.finishUp();
     NetexDocumentParser.finnishUp();
   }
 

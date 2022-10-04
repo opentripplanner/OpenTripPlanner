@@ -3,17 +3,18 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.util.OTPFeature;
 
 public class DirectStreetRouter {
 
@@ -22,26 +23,26 @@ public class DirectStreetRouter {
       return Collections.emptyList();
     }
 
-    RouteRequest directRequest = request.getStreetSearchRequest(request.journey().direct().mode());
+    RouteRequest directRequest = request.clone();
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(serverContext.graph(), directRequest)
-    ) {
-      final RoutingContext routingContext = new RoutingContext(
-        directRequest,
+      var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
-        temporaryVertices
-      );
-
-      if (!straightLineDistanceIsWithinLimit(routingContext)) {
+        directRequest,
+        request.journey().direct().mode(),
+        request.journey().direct().mode()
+      )
+    ) {
+      if (!straightLineDistanceIsWithinLimit(directRequest, temporaryVertices)) {
         return Collections.emptyList();
       }
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(
         serverContext.traverseVisitor(),
-        serverContext.routerConfig().streetRoutingTimeout()
+        serverContext.routerConfig().streetRoutingTimeout(),
+        serverContext.dataOverlayContext(request)
       );
-      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(routingContext);
+      List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(directRequest, temporaryVertices);
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
@@ -61,14 +62,17 @@ public class DirectStreetRouter {
     }
   }
 
-  private static boolean straightLineDistanceIsWithinLimit(RoutingContext routingContext) {
+  private static boolean straightLineDistanceIsWithinLimit(
+    RouteRequest request,
+    TemporaryVerticesContainer vertexContainer
+  ) {
     // TODO This currently only calculates the distances between the first fromVertex
     //      and the first toVertex
     double distance = SphericalDistanceLibrary.distance(
-      routingContext.fromVertices.iterator().next().getCoordinate(),
-      routingContext.toVertices.iterator().next().getCoordinate()
+      vertexContainer.getFromVertices().iterator().next().getCoordinate(),
+      vertexContainer.getToVertices().iterator().next().getCoordinate()
     );
-    return distance < calculateDistanceMaxLimit(routingContext.opt);
+    return distance < calculateDistanceMaxLimit(request);
   }
 
   /**

@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -209,7 +209,7 @@ class PathwayEdgeTest {
           25
         )
       );
-    var state = new State(new RoutingContext(req, graph, from, to));
+    var state = new State(from, req, StreetMode.WALK);
 
     var afterTraversal = edge.traverse(state);
     assertNotNull(afterTraversal);

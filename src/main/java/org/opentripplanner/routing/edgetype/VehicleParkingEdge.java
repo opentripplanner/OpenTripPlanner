@@ -2,6 +2,9 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
+import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -48,13 +51,11 @@ public class VehicleParkingEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
-    RouteRequest options = s0.getOptions();
-
-    if (!options.parkAndRide) {
+    if (!s0.getRequestMode().includesParking()) {
       return null;
     }
 
-    if (options.arriveBy()) {
+    if (s0.getOptions().arriveBy()) {
       return traverseUnPark(s0);
     } else {
       return traversePark(s0);
@@ -82,27 +83,18 @@ public class VehicleParkingEdge extends Edge {
   }
 
   protected State traverseUnPark(State s0) {
-    RouteRequest options = s0.getOptions();
-    RoutingPreferences preferences = s0.getPreferences();
-
     if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
       return null;
     }
 
-    if (options.streetSubRequestModes.getBicycle()) {
-      return traverseUnPark(
-        s0,
-        preferences.bike().parkCost(),
-        preferences.bike().parkTime(),
-        TraverseMode.BICYCLE
-      );
-    } else if (options.streetSubRequestModes.getCar()) {
-      return traverseUnPark(
-        s0,
-        preferences.car().parkCost(),
-        preferences.car().parkTime(),
-        TraverseMode.CAR
-      );
+    StreetMode streetMode = s0.getRequestMode();
+
+    if (streetMode.includesBiking()) {
+      final BikePreferences bike = s0.getPreferences().bike();
+      return traverseUnPark(s0, bike.parkCost(), bike.parkTime(), TraverseMode.BICYCLE);
+    } else if (streetMode.includesDriving()) {
+      final CarPreferences car = s0.getPreferences().car();
+      return traverseUnPark(s0, car.parkCost(), car.parkTime(), TraverseMode.CAR);
     } else {
       return null;
     }
@@ -130,21 +122,21 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0) {
-    RouteRequest options = s0.getOptions();
+    StreetMode streetMode = s0.getRequestMode();
     RoutingPreferences preferences = s0.getPreferences();
 
-    if (!options.streetSubRequestModes.getWalk() || s0.isVehicleParked()) {
+    if (!streetMode.includesWalking() || s0.isVehicleParked()) {
       return null;
     }
 
-    if (options.streetSubRequestModes.getBicycle()) {
+    if (streetMode.includesBiking()) {
       // Parking a rented bike is not allowed
       if (s0.isRentingVehicle()) {
         return null;
       }
 
       return traversePark(s0, preferences.bike().parkCost(), preferences.bike().parkTime());
-    } else if (options.streetSubRequestModes.getCar()) {
+    } else if (streetMode.includesDriving()) {
       return traversePark(s0, preferences.car().parkCost(), preferences.car().parkTime());
     } else {
       return null;

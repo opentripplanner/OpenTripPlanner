@@ -269,16 +269,18 @@ public class ToStringBuilderTest {
 
   @Test
   public void addDuration() {
+    var D2m5s = Duration.ofSeconds(125);
+    var D1d2h50m45s = Duration.parse("P1dT2h50m45s");
+
     assertEquals("ToStringBuilderTest{d: 35s}", subject().addDurationSec("d", 35).toString());
     assertEquals(
       "ToStringBuilderTest{d: 1d2h50m45s}",
-      subject().addDurationSec("d", (26 * 60 + 50) * 60 + 45).toString()
+      subject().addDurationSec("d", (int) D1d2h50m45s.toSeconds()).toString()
     );
-    assertEquals(
-      "ToStringBuilderTest{d: 2m5s}",
-      subject().addDuration("d", Duration.ofSeconds(125)).toString()
-    );
+    assertEquals("ToStringBuilderTest{d: 2m5s}", subject().addDuration("d", D2m5s).toString());
     assertEquals("ToStringBuilderTest{}", subject().addDurationSec("d", 12, 12).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addDuration("d", null, null).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addDuration("d", D2m5s, D2m5s).toString());
   }
 
   @Test

@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import static org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters.INITIAL_GET_DATA_TIMEOUT;
+import static org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters.RECONNECT_PERIOD;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
@@ -23,7 +25,11 @@ public class SiriETGooglePubsubUpdaterConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null),
-      c.of("reconnectPeriodSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(30),
+      c.of("reconnectPeriod").withDoc(NA, /*TODO DOC*/"TODO").asDuration(RECONNECT_PERIOD),
+      c
+        .of("initialGetDataTimeout")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDuration(INITIAL_GET_DATA_TIMEOUT),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
     );
   }

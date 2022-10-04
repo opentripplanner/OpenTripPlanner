@@ -7,10 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -22,13 +20,15 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   Graph graph;
   VehicleParkingEdge vehicleParkingEdge;
-  RoutingContext routingContext;
+  RouteRequest request;
+  StreetMode streetMode;
+  VehicleParkingEntranceVertex vertex;
 
   @Test
   public void availableCarPlacesTest() {
-    initEdgeAndRequest(TraverseMode.CAR, false, true);
+    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true);
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -37,9 +37,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void notAvailableCarPlacesTest() {
-    initEdgeAndRequest(TraverseMode.CAR, false, false);
+    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, false);
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -49,14 +49,14 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   @Test
   public void realtimeAvailableCarPlacesTest() {
     initEdgeAndRequest(
-      TraverseMode.CAR,
+      StreetMode.CAR_TO_PARK,
       false,
       true,
       VehicleParkingSpaces.builder().carSpaces(1).build(),
       true
     );
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -65,9 +65,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void realtimeAvailableCarPlacesFallbackTest() {
-    initEdgeAndRequest(TraverseMode.CAR, false, true, null, true);
+    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, true);
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -77,14 +77,14 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   @Test
   public void realtimeNotAvailableCarPlacesTest() {
     initEdgeAndRequest(
-      TraverseMode.CAR,
+      StreetMode.CAR_TO_PARK,
       false,
       true,
       VehicleParkingSpaces.builder().carSpaces(0).build(),
       true
     );
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -93,9 +93,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void availableBicyclePlacesTest() {
-    initEdgeAndRequest(TraverseMode.BICYCLE, true, false);
+    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false);
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -104,9 +104,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void notAvailableBicyclePlacesTest() {
-    initEdgeAndRequest(TraverseMode.BICYCLE, false, false);
+    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, false, false);
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -116,14 +116,14 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   @Test
   public void realtimeAvailableBicyclePlacesTest() {
     initEdgeAndRequest(
-      TraverseMode.BICYCLE,
+      StreetMode.BIKE_TO_PARK,
       true,
       false,
       VehicleParkingSpaces.builder().bicycleSpaces(1).build(),
       true
     );
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -132,9 +132,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
   @Test
   public void realtimeAvailableBicyclePlacesFallbackTest() {
-    initEdgeAndRequest(TraverseMode.BICYCLE, true, false, null, true);
+    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, true);
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -144,14 +144,14 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   @Test
   public void realtimeNotAvailableBicyclePlacesTest() {
     initEdgeAndRequest(
-      TraverseMode.BICYCLE,
+      StreetMode.BIKE_TO_PARK,
       true,
       false,
       VehicleParkingSpaces.builder().bicycleSpaces(0).build(),
       true
     );
 
-    State s0 = new State(routingContext);
+    State s0 = new State(vertex, request, streetMode);
 
     State s1 = vehicleParkingEdge.traverse(s0);
 
@@ -159,7 +159,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   }
 
   private void initEdgeAndRequest(
-    TraverseMode parkingMode,
+    StreetMode parkingMode,
     boolean bicyclePlaces,
     boolean carPlaces
   ) {
@@ -167,7 +167,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   }
 
   private void initEdgeAndRequest(
-    TraverseMode parkingMode,
+    StreetMode parkingMode,
     boolean bicyclePlaces,
     boolean carPlaces,
     VehicleParkingSpaces availability,
@@ -176,15 +176,14 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
     graph = new Graph();
 
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
-    var vertex = new VehicleParkingEntranceVertex(graph, vehicleParking.getEntrances().get(0));
+    this.vertex = new VehicleParkingEntranceVertex(graph, vehicleParking.getEntrances().get(0));
 
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 
-    RouteRequest routingRequest = new RouteRequest();
-    routingRequest.parkAndRide = true;
-    routingRequest.preferences().parking().setUseAvailabilityInformation(realtime);
-    routingRequest.streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK, parkingMode);
-    routingContext = new RoutingContext(routingRequest, graph, vertex, vertex);
+    this.request = new RouteRequest();
+    request.journey().direct().setMode(parkingMode);
+    request.preferences().parking().setUseAvailabilityInformation(realtime);
+    this.streetMode = request.journey().direct().mode();
   }
 
   private VehicleParking createVehicleParking(

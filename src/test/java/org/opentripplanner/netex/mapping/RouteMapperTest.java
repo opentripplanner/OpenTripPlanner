@@ -74,7 +74,9 @@ public class RouteMapperTest {
   @Test
   public void mapRouteWithAgencySpecified() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      DataImportIssueStore.noopIssueStore()
+    );
 
     Network network = new Network()
       .withId(NETWORK_ID)
@@ -186,7 +188,9 @@ public class RouteMapperTest {
   @Test
   public void mapRouteWithBranding() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      DataImportIssueStore.noopIssueStore()
+    );
 
     transitBuilder
       .getBrandingsById()
@@ -217,7 +221,9 @@ public class RouteMapperTest {
   @Test
   public void mapRouteWithGroupOfRoutes() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      DataImportIssueStore.noopIssueStore()
+    );
 
     Line line = createExampleLine();
 
