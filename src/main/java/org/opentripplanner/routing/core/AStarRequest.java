@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.core;
 
 import java.time.Instant;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -56,14 +58,8 @@ public class AStarRequest {
     this.wheelchair = opt.wheelchair();
     this.parking = opt.journey().parking();
     this.rental = opt.journey().rental();
-    this.fromEnvelope =
-      opt.from() != null && opt.from().getCoordinate() != null
-        ? getEnvelope(opt.from().getCoordinate())
-        : null;
-    this.toEnvelope =
-      opt.to() != null && opt.to().getCoordinate() != null
-        ? getEnvelope(opt.to().getCoordinate())
-        : null;
+    this.fromEnvelope = getEnvelope(opt.from());
+    this.toEnvelope = getEnvelope(opt.to());
   }
 
   /**
@@ -149,11 +145,21 @@ public class AStarRequest {
     );
   }
 
-  private static Envelope getEnvelope(Coordinate c) {
-    double lat = SphericalDistanceLibrary.metersToDegrees(MAX_CLOSENESS_METERS);
-    double lon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CLOSENESS_METERS, c.y);
+  @Nullable
+  private static Envelope getEnvelope(GenericLocation location) {
+    if (location == null) {
+      return null;
+    }
 
-    Envelope env = new Envelope(c);
+    Coordinate coordinate = location.getCoordinate();
+    if (coordinate == null) {
+      return null;
+    }
+
+    double lat = SphericalDistanceLibrary.metersToDegrees(MAX_CLOSENESS_METERS);
+    double lon = SphericalDistanceLibrary.metersToLonDegrees(MAX_CLOSENESS_METERS, coordinate.y);
+
+    Envelope env = new Envelope(coordinate);
     env.expandBy(lon, lat);
 
     return env;
