@@ -3,6 +3,8 @@ package org.opentripplanner.ext.reportapi.model;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.RouteStationTransferPoint;
@@ -12,8 +14,10 @@ import org.opentripplanner.model.transfer.StopTransferPoint;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -150,7 +154,7 @@ public class TransfersReport {
       var trip = tp.getTrip();
       var route = trip.getRoute();
       var ptn = transitService.getPatternForTrip(trip);
-      r.operator = trip.getOperator().getId().getId();
+      r.operator = getName(trip.getOperator());
       r.type = "Trip";
       r.entityId = trip.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
@@ -160,14 +164,14 @@ public class TransfersReport {
     } else if (p instanceof RouteStopTransferPoint rp) {
       var route = rp.getRoute();
       var ptn = transitService.getPatternsForRoute(route).stream().findFirst().orElse(null);
-      r.operator = route.getOperator().getId().getId();
+      r.operator = getName(route.getOperator());
       r.type = "Route";
       r.entityId = route.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
       addLocation(r, ptn, rp.getStop(), null, boarding);
     } else if (p instanceof RouteStationTransferPoint rp) {
       var route = rp.getRoute();
-      r.operator = route.getOperator().getId().getId();
+      r.operator = getName(route.getOperator());
       r.type = "Route";
       r.entityId = route.getId().getId();
       r.route = route.getName() + " " + route.getMode() + " " + route.getLongName();
@@ -177,7 +181,7 @@ public class TransfersReport {
       StopLocation stop = sp.getStop();
       r.type = "Stop";
       r.entityId = stop.getId().getId();
-      r.loc = stop.getName().toString();
+      r.loc = Optional.ofNullable(stop.getName()).map(I18NString::toString).orElse("");
       r.coordinate = stop.getCoordinate();
     } else if (p instanceof StationTransferPoint sp) {
       Station station = sp.getStation();
@@ -190,6 +194,11 @@ public class TransfersReport {
     r.specificity = p.getSpecificityRanking();
     r.coordinate = null;
     return r;
+  }
+
+  @Nonnull
+  private static String getName(Operator operator) {
+    return Optional.ofNullable(operator).map(o -> o.getId().getId()).orElse("");
   }
 
   static class TxPoint {
