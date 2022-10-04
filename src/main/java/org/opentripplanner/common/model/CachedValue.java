@@ -18,7 +18,6 @@ public class CachedValue<T> {
   private Instant timeout;
 
   public CachedValue(@Nonnull Duration cacheInterval) {
-    this.supplier = Objects.requireNonNull(supplier);
     this.value = null;
     this.cacheInterval = cacheInterval;
     this.timeout = calculateTimeout();

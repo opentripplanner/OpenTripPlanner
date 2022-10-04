@@ -3,8 +3,6 @@ package org.opentripplanner.ext.reportapi.resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,9 +24,10 @@ import org.opentripplanner.transit.service.TransitService;
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
-  @Nullable
-/** Since the computation is pretty expensive only allow it every 5 minutes */
-  private static CachedValue<GraphStats> cachedStats = new CachedValue<>(Duration.ofMinutes(5));;
+  /** Since the computation is pretty expensive only allow it every 5 minutes */
+  private static final CachedValue<GraphStats> cachedStats = new CachedValue<>(
+    Duration.ofMinutes(5)
+  );
 
   private final TransferService transferService;
   private final TransitService transitService;
@@ -76,7 +75,6 @@ public class ReportResource {
   @GET
   @Path("/graph.json")
   public Response stats(@Context OtpServerRequestContext serverRequestContext) {
-
     return Response
       .status(Response.Status.OK)
       .entity(cachedStats.get(() -> GraphReportBuilder.build(serverRequestContext)))
