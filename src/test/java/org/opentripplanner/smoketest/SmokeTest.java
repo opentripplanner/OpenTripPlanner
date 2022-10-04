@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -16,8 +17,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -166,20 +167,26 @@ public class SmokeTest {
   }
 
   static JsonNode sendGraphQLRequest(String query) {
-    var uri = URI.create("http://localhost:8080/otp/routers/default/index/graphql");
-    var request = HttpRequest
-      .newBuilder()
-      .POST(HttpRequest.BodyPublishers.ofByteArray(query.getBytes(StandardCharsets.UTF_8)))
-      .uri(uri)
-      .setHeader("Content-Type", "application/graphql")
-      .build();
+    var body = mapper.createObjectNode();
+    body.put("query", query);
 
-    System.out.println(request.headers());
     try {
-      var response = client.send(request, BodyHandlers.ofInputStream());
+      var bodyString = mapper.writeValueAsString(body);
 
-      assertEquals(200, response.statusCode(), "Status code returned by OTP server was not 200");
-      return SmokeTest.mapper.readTree(response.body());
+      HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create("http://localhost:8080/otp/routers/default/index/graphql"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(bodyString))
+        .build();
+      HttpResponse<String> response = HttpClient
+        .newHttpClient()
+        .send(request, HttpResponse.BodyHandlers.ofString());
+
+      var responseJson = mapper.readTree(response.body());
+
+      LOG.info("Response JSON: {}", responseJson);
+      return responseJson.get("data");
     } catch (IOException | InterruptedException e) {
       throw new RuntimeException(e);
     }

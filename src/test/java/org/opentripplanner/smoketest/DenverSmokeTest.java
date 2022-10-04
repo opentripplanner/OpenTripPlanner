@@ -1,5 +1,8 @@
 package org.opentripplanner.smoketest;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
@@ -29,31 +32,47 @@ public class DenverSmokeTest {
   }
 
   @Test
-  public void vehiclePositions() {
+  public void vehiclePositions() throws JsonProcessingException {
     var json = SmokeTest.sendGraphQLRequest(
       """
-      query {
-      	patterns {
-      		vehiclePositions {
-      			vehicleId
-      			lastUpdated
-      			trip {
-      				id
-      				gtfsId
-      			}
-      			stopRelationship {
-      				status
-      				stop {
-      					name
-      				}
-      			}
-      		}
-      	}
-      }
-              
-        """
+        query {
+        	patterns {
+        		vehiclePositions {
+        			vehicleId
+        			lastUpdated
+        			trip {
+        				id
+        				gtfsId
+        			}
+        			stopRelationship {
+        				status
+        				stop {
+        					name
+        				}
+        			}
+        		}
+        	}
+        }
+                
+          """
     );
 
-    System.out.println(json);
+    var positions = SmokeTest.mapper.treeToValue(json, VehiclePositionResponse.class);
+
+    var vehiclePositions = positions.patterns
+      .stream()
+      .flatMap(p -> p.vehiclePositions.stream())
+      .toList();
+
+    assertFalse(
+      vehiclePositions.isEmpty(),
+      "Found no patterns that have realtime vehicle positions."
+    );
   }
+
+  private record Position(String vehicleId) {}
+
+  private record Pattern(List<Position> vehiclePositions) {}
+
+  private record VehiclePositionResponse(List<Pattern> patterns) {}
 }

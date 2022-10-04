@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 /**
  * This smoke test expects an OTP installation running at localhost:8080
  * <p>
- * It uses the REST API to check that a route from South to North Houston can be found.
+ * It uses the REST API to check that a route from Philadelphia's airport to its North can be found.
  */
 @Tag("smoke-test")
 @Tag("septa")
