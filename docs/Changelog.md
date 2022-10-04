@@ -116,6 +116,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Discard direct walking results if direct mode is flex [#4476](https://github.com/opentripplanner/OpenTripPlanner/pull/4476)
 - Implement free transfers in GTFS Fares V2 [#4460](https://github.com/opentripplanner/OpenTripPlanner/pull/4460)
 - Read and expose time zone in NeTEx/Transmodel API [#4480](https://github.com/opentripplanner/OpenTripPlanner/pull/4480)
+- Document JVM configuration options [#4492](https://github.com/opentripplanner/OpenTripPlanner/pull/4492)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
