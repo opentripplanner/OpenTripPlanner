@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * HTTPS data source metadata returned by the HTTP server (HTTP headers).
@@ -24,7 +25,6 @@ public class HttpsDataSourceMetadata {
   );
 
   private final String contentType;
-
   private final long contentLength;
   private final long lastModified;
 
@@ -79,5 +79,15 @@ public class HttpsDataSourceMetadata {
     } catch (Exception e) {
       return -1;
     }
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(this.getClass())
+      .addObj("contentType", contentType)
+      .addObj("contentLength", contentLength)
+      .addObj("lastModified", lastModified)
+      .toString();
   }
 }
