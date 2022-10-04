@@ -27,7 +27,8 @@ import org.opentripplanner.transit.service.TransitService;
 public class ReportResource {
 
   @Nullable
-  private static CachedValue<GraphStats> cachedStats;
+/** Since the computation is pretty expensive only allow it every 5 minutes */
+  private static CachedValue<GraphStats> cachedStats = new CachedValue<>(Duration.ofMinutes(5));;
 
   private final TransferService transferService;
   private final TransitService transitService;
@@ -75,15 +76,10 @@ public class ReportResource {
   @GET
   @Path("/graph.json")
   public Response stats(@Context OtpServerRequestContext serverRequestContext) {
-    // since the computation is pretty expensive only allow it every 5 minutes
-    if (cachedStats == null) {
-      Supplier<GraphStats> getStats = () -> GraphReportBuilder.build(serverRequestContext);
-      cachedStats = new CachedValue<>(getStats, Duration.ofMinutes(5));
-    }
 
     return Response
       .status(Response.Status.OK)
-      .entity(cachedStats.get())
+      .entity(cachedStats.get(() -> GraphReportBuilder.build(serverRequestContext)))
       .type("application/json")
       .build();
   }

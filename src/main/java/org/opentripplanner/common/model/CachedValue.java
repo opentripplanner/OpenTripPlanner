@@ -13,12 +13,11 @@ import javax.annotation.Nonnull;
  */
 public class CachedValue<T> {
 
-  private final Supplier<T> supplier;
   private final Duration cacheInterval;
   private T value;
   private Instant timeout;
 
-  public CachedValue(@Nonnull Supplier<T> supplier, @Nonnull Duration cacheInterval) {
+  public CachedValue(@Nonnull Duration cacheInterval) {
     this.supplier = Objects.requireNonNull(supplier);
     this.value = null;
     this.cacheInterval = cacheInterval;
@@ -30,7 +29,7 @@ public class CachedValue<T> {
    * <p>
    * Otherwise, recompute and return it.
    */
-  public T get() {
+  public T get(@Nonnull Supplier<T> supplier) {
     synchronized (this) {
       if (hasExpired()) {
         this.value = supplier.get();
