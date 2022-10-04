@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -33,7 +33,7 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
   /**
    * Return the access path for the best stop arrival.
    */
-  AccessEgress accessPathOnStreet();
+  RaptorAccessEgress accessPathOnStreet();
 
   /**
    * Return true is the best option is an access arrival.
@@ -45,7 +45,7 @@ public interface StopArrivalState<T extends RaptorTripSchedule> {
   /**
    * Return the access path for the best stop arrival.
    */
-  AccessEgress accessPathOnBoard();
+  RaptorAccessEgress accessPathOnBoard();
 
   /**
    * A transit arrival exist, but it might be a better transfer arrival as well.

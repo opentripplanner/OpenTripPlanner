@@ -2,8 +2,8 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.time.DurationUtils;
@@ -63,7 +63,7 @@ public class PathStringBuilder {
     return start().append("Flex").duration(duration).space().append(nRides).append("x").end();
   }
 
-  public PathStringBuilder accessEgress(AccessEgress leg) {
+  public PathStringBuilder accessEgress(RaptorAccessEgress leg) {
     if (leg.hasRides()) {
       return flex(leg.durationInSeconds(), leg.numberOfRides());
     }

@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import java.util.BitSet;
 import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class PatternCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
@@ -84,7 +84,7 @@ public class PatternCostCalculator<T extends DefaultTripSchedule> implements Cos
   }
 
   @Override
-  public int costEgress(AccessEgress egress) {
+  public int costEgress(RaptorAccessEgress egress) {
     return delegate.costEgress(egress);
   }
 }

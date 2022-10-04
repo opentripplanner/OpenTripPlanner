@@ -22,9 +22,9 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -98,7 +98,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int ACCESS_START = time("10:00");
   public static final int ACCESS_END = time("10:03:15");
   public static final int ACCESS_DURATION = ACCESS_END - ACCESS_START;
-  public static final AccessEgress ACCESS_TRANSFER = TestAccessEgress.walkAccessEgress(
+  public static final RaptorAccessEgress ACCESS_TRANSFER = TestAccessEgress.walkAccessEgress(
     STOP_A,
     ACCESS_DURATION
   );
@@ -149,7 +149,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int EGRESS_START = time("11:52:15");
   public static final int EGRESS_END = time("12:00");
   public static final int EGRESS_DURATION = EGRESS_END - EGRESS_START;
-  public static final AccessEgress EGRESS_TRANSFER = TestAccessEgress.walkAccessEgress(
+  public static final RaptorAccessEgress EGRESS_TRANSFER = TestAccessEgress.walkAccessEgress(
     STOP_E,
     EGRESS_DURATION
   );
@@ -157,18 +157,22 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
   public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
-  private static final AccessEgress ACCESS = TestAccessEgress.walkAccessEgress(
+  private static final RaptorAccessEgress ACCESS = TestAccessEgress.walkAccessEgress(
     STOP_A,
     ACCESS_DURATION,
     ACCESS_COST
   );
-  private static final AccessEgress EGRESS = TestAccessEgress.walkAccessEgress(
+  private static final RaptorAccessEgress EGRESS = TestAccessEgress.walkAccessEgress(
     STOP_E,
     EGRESS_DURATION,
     EGRESS_COST
   );
   // this is of course not a real flex egress
-  private static final AccessEgress FLEX = flexWithOnBoard(STOP_E, EGRESS_DURATION, EGRESS_COST);
+  private static final RaptorAccessEgress FLEX = flexWithOnBoard(
+    STOP_E,
+    EGRESS_DURATION,
+    EGRESS_COST
+  );
 
   public static final String LINE_11 = "L11";
   public static final String LINE_21 = "L21";

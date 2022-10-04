@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
@@ -19,18 +19,18 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
 
   private final int round;
   private final int stop;
-  private final AccessEgress[] egressPaths;
+  private final RaptorAccessEgress[] egressPaths;
   private final DestinationArrivalListener callback;
 
   EgressStopArrivalState(
     int stop,
     int round,
-    Collection<AccessEgress> egressPaths,
+    Collection<RaptorAccessEgress> egressPaths,
     DestinationArrivalListener transitCallback
   ) {
     this.round = round;
     this.stop = stop;
-    this.egressPaths = egressPaths.toArray(new AccessEgress[0]);
+    this.egressPaths = egressPaths.toArray(new RaptorAccessEgress[0]);
     this.callback = transitCallback;
   }
 
@@ -45,7 +45,7 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   @Override
   public void arriveByTransit(int arrivalTime, int boardStop, int boardTime, T trip) {
     super.arriveByTransit(arrivalTime, boardStop, boardTime, trip);
-    for (AccessEgress egressPath : egressPaths) {
+    for (RaptorAccessEgress egressPath : egressPaths) {
       callback.newDestinationArrival(round, arrivalTime, true, egressPath);
     }
   }
@@ -53,7 +53,7 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   @Override
   public void transferToStop(int fromStop, int arrivalTime, RaptorTransfer transferPath) {
     super.transferToStop(fromStop, arrivalTime, transferPath);
-    for (AccessEgress egressPath : egressPaths) {
+    for (RaptorAccessEgress egressPath : egressPaths) {
       if (egressPath.stopReachedOnBoard()) {
         // TODO add unit test for this use case
         callback.newDestinationArrival(round, arrivalTime, false, egressPath);

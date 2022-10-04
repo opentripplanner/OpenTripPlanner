@@ -14,7 +14,7 @@ import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
@@ -283,8 +283,8 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   /* PRIVATE METHODS */
 
   private static DestinationArrival<TestTripSchedule> flexForwardSearch(
-    AccessEgress accessPath,
-    AccessEgress egressPath,
+    RaptorAccessEgress accessPath,
+    RaptorAccessEgress egressPath,
     String line
   ) {
     int departureTime, arrivalTime, waitTime;
@@ -323,8 +323,8 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   }
 
   private static DestinationArrival<TestTripSchedule> flexReverseSearch(
-    AccessEgress accessPath,
-    AccessEgress egressPath,
+    RaptorAccessEgress accessPath,
+    RaptorAccessEgress egressPath,
     String line
   ) {
     int departureTime, arrivalTime, cost;

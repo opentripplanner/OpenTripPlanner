@@ -11,7 +11,7 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 public class HeuristicToRunResolverTest {
 
@@ -119,7 +119,7 @@ public class HeuristicToRunResolverTest {
     reverse = true;
   }
 
-  private AccessEgress dummyAccessEgress() {
+  private RaptorAccessEgress dummyAccessEgress() {
     return TestAccessEgress.walkAccessEgress(1, 10);
   }
 }

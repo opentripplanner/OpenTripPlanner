@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 
@@ -36,13 +36,13 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
   private static final int STOP = 8;
 
-  private static final AccessEgress WALK_10m = TestAccessEgress.walkAccessEgress(STOP, D10m);
-  private static final AccessEgress WALK_8m = TestAccessEgress.walkAccessEgress(STOP, D8m);
-  private static final AccessEgress FLEX_1x_10m = flex(STOP, D10m, 1);
-  private static final AccessEgress FLEX_1x_8m = flex(STOP, D8m, 1);
-  private static final AccessEgress FLEX_2x_8m = flex(STOP, D8m, 2);
-  private static final AccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
-  private static final AccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress
+  private static final RaptorAccessEgress WALK_10m = TestAccessEgress.walkAccessEgress(STOP, D10m);
+  private static final RaptorAccessEgress WALK_8m = TestAccessEgress.walkAccessEgress(STOP, D8m);
+  private static final RaptorAccessEgress FLEX_1x_10m = flex(STOP, D10m, 1);
+  private static final RaptorAccessEgress FLEX_1x_8m = flex(STOP, D8m, 1);
+  private static final RaptorAccessEgress FLEX_2x_8m = flex(STOP, D8m, 2);
+  private static final RaptorAccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
+  private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress
     .walkAccessEgress(STOP, D8m)
     .openingHours(T00_00, T01_00);
 
@@ -246,7 +246,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     assertElements(List.of(FLEX_2x_8m), res.get(2));
 
     // Apply same test, but remove entries with number of rides == 1
-    res = groupByRound(List.of(WALK_8m, FLEX_1x_8m), AccessEgress::hasRides);
+    res = groupByRound(List.of(WALK_8m, FLEX_1x_8m), RaptorAccessEgress::hasRides);
     keys = res.keys();
     Arrays.sort(keys);
 

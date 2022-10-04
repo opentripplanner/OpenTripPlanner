@@ -1,12 +1,12 @@
 package org.opentripplanner.transit.raptor._data.stoparrival;
 
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.view.AccessPathView;
 
 public class Access extends AbstractStopArrival {
 
-  private final AccessEgress access;
+  private final RaptorAccessEgress access;
 
   public Access(int stop, int departureTime, int arrivalTime, int cost) {
     this(
@@ -16,7 +16,7 @@ public class Access extends AbstractStopArrival {
     );
   }
 
-  public Access(int stop, int arrivalTime, AccessEgress path) {
+  public Access(int stop, int arrivalTime, RaptorAccessEgress path) {
     super(0, stop, arrivalTime, path.generalizedCost(), null);
     this.access = path;
   }

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -74,7 +74,7 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
   }
 
   @Override
-  public final AccessEgress accessPathOnStreet() {
+  public final RaptorAccessEgress accessPathOnStreet() {
     throw new IllegalStateException("This class do no handle access, see AccessStopArrivalState");
   }
 
@@ -84,7 +84,7 @@ class DefaultStopArrivalState<T extends RaptorTripSchedule> implements StopArriv
   }
 
   @Override
-  public final AccessEgress accessPathOnBoard() {
+  public final RaptorAccessEgress accessPathOnBoard() {
     throw new IllegalStateException("This class do no handle access, see AccessStopArrivalState");
   }
 

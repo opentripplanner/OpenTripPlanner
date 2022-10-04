@@ -5,12 +5,12 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 /**
- * Simple implementation for {@link AccessEgress} for use in unit-tests.
+ * Simple implementation for {@link RaptorAccessEgress} for use in unit-tests.
  */
-public class TestAccessEgress implements AccessEgress {
+public class TestAccessEgress implements RaptorAccessEgress {
 
   public static final int SECONDS_IN_DAY = 24 * 3600;
   public static final int DEFAULT_NUMBER_OF_RIDES = 0;
@@ -129,8 +129,8 @@ public class TestAccessEgress implements AccessEgress {
     return new Builder(stop, durationInSeconds).withNRides(nRides).withCost(cost).build();
   }
 
-  public static Collection<AccessEgress> transfers(int... stopTimes) {
-    List<AccessEgress> legs = new ArrayList<>();
+  public static Collection<RaptorAccessEgress> transfers(int... stopTimes) {
+    List<RaptorAccessEgress> legs = new ArrayList<>();
     for (int i = 0; i < stopTimes.length; i += 2) {
       legs.add(walkAccessEgress(stopTimes[i], stopTimes[i + 1]));
     }

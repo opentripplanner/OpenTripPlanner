@@ -7,7 +7,7 @@ import org.opentripplanner.util.time.DurationUtils;
  * the access (origin to first stop) or egress (last stop to destination),
  * to Raptor - all these are the same thing.
  */
-public interface AccessEgress {
+public interface RaptorAccessEgress {
   /**
    * <ul>
    *     <li>Access: The first stop in the journey, where the access path just arrived at.
@@ -39,7 +39,7 @@ public interface AccessEgress {
   int durationInSeconds();
 
   /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */
-  // The methods below should be only overridden when an AccessEgress is only available at
+  // The methods below should be only overridden when an RaptorAccessEgress is only available at
   // specific times, such as flexible transit, TNC or shared vehicle schemes with limited opening
   // hours, not for regular access/transfer/egress.
 

@@ -6,8 +6,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripS
 import org.opentripplanner.transit.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -401,12 +401,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule> implements Wo
    * Set the departure time in the scheduled search to the given departure time, and prepare for the
    * scheduled search at the next-earlier minute.
    */
-  private void addAccessPaths(Collection<AccessEgress> accessPaths) {
+  private void addAccessPaths(Collection<RaptorAccessEgress> accessPaths) {
     if (accessPaths == null) {
       return;
     }
 
-    for (AccessEgress it : accessPaths) {
+    for (RaptorAccessEgress it : accessPaths) {
       // Earliest possible departure time from the origin, or latest possible arrival
       // time at the destination if searching backwards.
       int timeDependentDepartureTime = calculator.departureTime(it, iterationDepartureTime);

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -30,13 +30,13 @@ class StateDebugger<T extends RaptorTripSchedule> {
     this.debugHandlerStopArrivals = dFactory.debugStopArrival();
   }
 
-  void acceptAccessPath(int stop, AccessEgress access) {
+  void acceptAccessPath(int stop, RaptorAccessEgress access) {
     if (isDebug(stop)) {
       debugHandlerStopArrivals.accept(cursor.access(round(), stop, access));
     }
   }
 
-  void rejectAccessPath(AccessEgress accessPath, int arrivalTime) {
+  void rejectAccessPath(RaptorAccessEgress accessPath, int arrivalTime) {
     if (isDebug(accessPath.stop())) {
       reject(cursor.fictiveAccess(round(), accessPath, arrivalTime));
     }

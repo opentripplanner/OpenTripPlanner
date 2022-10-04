@@ -72,7 +72,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.ServiceDateUtils;
@@ -304,7 +304,7 @@ public class TravelTimeResource {
     return initialStates;
   }
 
-  private RaptorResponse<TripSchedule> route(Collection<? extends AccessEgress> accessList) {
+  private RaptorResponse<TripSchedule> route(Collection<? extends RaptorAccessEgress> accessList) {
     final RaptorRequest<TripSchedule> request = new RaptorRequestBuilder<TripSchedule>()
       .profile(RaptorProfile.BEST_TIME)
       .searchParams()

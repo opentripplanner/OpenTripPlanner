@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
@@ -44,7 +44,7 @@ public final class AccessEgressFunctions {
    *     </li>
    * </ol>
    */
-  private static final ParetoComparator<AccessEgress> STANDARD_COMPARATOR = (l, r) ->
+  private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
     (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
     (!l.hasOpeningHours() && r.hasOpeningHours()) ||
     l.numberOfRides() < r.numberOfRides() ||
@@ -59,7 +59,7 @@ public final class AccessEgressFunctions {
    */
   public static int calculateEgressDepartureTime(
     int arrivalTime,
-    AccessEgress egressPath,
+    RaptorAccessEgress egressPath,
     SlackProvider slackProvider,
     TimeCalculator timeCalculator
   ) {
@@ -75,8 +75,8 @@ public final class AccessEgressFunctions {
     }
   }
 
-  static Collection<AccessEgress> removeNoneOptimalPathsForStandardRaptor(
-    Collection<AccessEgress> paths
+  static Collection<RaptorAccessEgress> removeNoneOptimalPathsForStandardRaptor(
+    Collection<RaptorAccessEgress> paths
   ) {
     // To avoid too many items in the pareto set we first group the paths by stop,
     // for each stop we filter it down to the optimal pareto set. We could do this
@@ -85,7 +85,7 @@ public final class AccessEgressFunctions {
     // contain to many non-optimal paths.
     var mapByStop = groupByStop(paths);
     var set = new ParetoSet<>(STANDARD_COMPARATOR);
-    Collection<AccessEgress> result = new ArrayList<>();
+    Collection<RaptorAccessEgress> result = new ArrayList<>();
 
     mapByStop.forEachValue(list -> {
       set.clear();
@@ -100,36 +100,39 @@ public final class AccessEgressFunctions {
    * Filter the given input keeping all elements satisfying the given include predicate. If the
    * {@code keepOne} flag is set only one raptor transfer is kept for each group of numOfRides.
    */
-  static TIntObjectMap<List<AccessEgress>> groupByRound(
-    Collection<AccessEgress> input,
-    Predicate<AccessEgress> include
+  static TIntObjectMap<List<RaptorAccessEgress>> groupByRound(
+    Collection<RaptorAccessEgress> input,
+    Predicate<RaptorAccessEgress> include
   ) {
     return groupBy(
       input.stream().filter(include).collect(Collectors.toList()),
-      AccessEgress::numberOfRides
+      RaptorAccessEgress::numberOfRides
     );
   }
 
-  static TIntObjectMap<List<AccessEgress>> groupByStop(Collection<AccessEgress> input) {
-    return groupBy(input, AccessEgress::stop);
+  static TIntObjectMap<List<RaptorAccessEgress>> groupByStop(Collection<RaptorAccessEgress> input) {
+    return groupBy(input, RaptorAccessEgress::stop);
   }
 
   /* private methods */
 
-  private static List<AccessEgress> getOrCreate(int key, TIntObjectMap<List<AccessEgress>> map) {
+  private static List<RaptorAccessEgress> getOrCreate(
+    int key,
+    TIntObjectMap<List<RaptorAccessEgress>> map
+  ) {
     if (!map.containsKey(key)) {
       map.put(key, new ArrayList<>());
     }
     return map.get(key);
   }
 
-  private static TIntObjectMap<List<AccessEgress>> groupBy(
-    Collection<AccessEgress> input,
-    ToIntFunction<AccessEgress> groupBy
+  private static TIntObjectMap<List<RaptorAccessEgress>> groupBy(
+    Collection<RaptorAccessEgress> input,
+    ToIntFunction<RaptorAccessEgress> groupBy
   ) {
-    var mapByRound = new TIntObjectHashMap<List<AccessEgress>>();
+    var mapByRound = new TIntObjectHashMap<List<RaptorAccessEgress>>();
 
-    for (AccessEgress it : input) {
+    for (RaptorAccessEgress it : input) {
       getOrCreate(groupBy.applyAsInt(it), mapByRound).add(it);
     }
     return mapByRound;

@@ -2,13 +2,13 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
- * Default implementation of the AccessEgress interface.
+ * Default implementation of the RaptorAccessEgress interface.
  */
-public class DefaultAccessEgress implements AccessEgress {
+public class DefaultAccessEgress implements RaptorAccessEgress {
 
   private final int stop;
   private final int durationInSeconds;

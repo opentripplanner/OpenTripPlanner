@@ -15,17 +15,17 @@ import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 class SearchContextTest implements RaptorTestConstants {
 
   private final boolean GET_ACCESS = true;
   private final boolean GET_EGRESS = false;
-  private final AccessEgress PATH_A_10s = TestAccessEgress.walkAccessEgress(STOP_A, D10s);
-  private final AccessEgress PATH_A_11s = TestAccessEgress.walkAccessEgress(STOP_A, D11s);
-  private final AccessEgress PATH_B = TestAccessEgress.walkAccessEgress(STOP_B, D1m);
-  private final AccessEgress PATH_C_30s = TestAccessEgress.walkAccessEgress(STOP_C, D30s);
-  private final AccessEgress PATH_C_40s = TestAccessEgress.walkAccessEgress(STOP_C, D40s);
+  private final RaptorAccessEgress PATH_A_10s = TestAccessEgress.walkAccessEgress(STOP_A, D10s);
+  private final RaptorAccessEgress PATH_A_11s = TestAccessEgress.walkAccessEgress(STOP_A, D11s);
+  private final RaptorAccessEgress PATH_B = TestAccessEgress.walkAccessEgress(STOP_B, D1m);
+  private final RaptorAccessEgress PATH_C_30s = TestAccessEgress.walkAccessEgress(STOP_C, D30s);
+  private final RaptorAccessEgress PATH_C_40s = TestAccessEgress.walkAccessEgress(STOP_C, D40s);
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
 
   @BeforeEach
@@ -76,7 +76,7 @@ class SearchContextTest implements RaptorTestConstants {
     );
   }
 
-  private static List<AccessEgress> sort(Collection<AccessEgress> c) {
+  private static List<RaptorAccessEgress> sort(Collection<RaptorAccessEgress> c) {
     return c
       .stream()
       .sorted(Comparator.comparingInt(it -> it.stop() * 10_000 + it.durationInSeconds()))

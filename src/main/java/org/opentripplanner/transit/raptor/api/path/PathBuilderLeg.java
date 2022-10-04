@@ -4,9 +4,9 @@ import static org.opentripplanner.transit.raptor.api.transit.CostCalculator.ZERO
 
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -238,7 +238,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return waitTimeBeforeNextLegIncludingSlack() + next.waitTimeBeforeNextLegIncludingSlack();
   }
 
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(AccessEgress access) {
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> accessLeg(RaptorAccessEgress access) {
     return new PathBuilderLeg<>(new MyAccessLeg(access));
   }
 
@@ -272,7 +272,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     );
   }
 
-  static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(AccessEgress egress) {
+  static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(RaptorAccessEgress egress) {
     return new PathBuilderLeg<>(new MyEgressLeg(egress));
   }
 
@@ -329,7 +329,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /* Build helper methods, package local */
 
-  private static int cost(CostCalculator<?> costCalculator, AccessEgress streetPath) {
+  private static int cost(CostCalculator<?> costCalculator, RaptorAccessEgress streetPath) {
     return costCalculator != null ? streetPath.generalizedCost() : ZERO_COST;
   }
 
@@ -593,9 +593,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /** Abstract access/transfer/egress leg */
   private abstract static class MyStreetLeg implements MyLeg {
 
-    final AccessEgress streetPath;
+    final RaptorAccessEgress streetPath;
 
-    MyStreetLeg(AccessEgress streetPath) {
+    MyStreetLeg(RaptorAccessEgress streetPath) {
       this.streetPath = streetPath;
     }
 
@@ -607,7 +607,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private static class MyAccessLeg extends MyStreetLeg {
 
-    private MyAccessLeg(AccessEgress streetPath) {
+    private MyAccessLeg(RaptorAccessEgress streetPath) {
       super(streetPath);
     }
 
@@ -724,7 +724,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private static class MyEgressLeg extends MyStreetLeg {
 
-    MyEgressLeg(AccessEgress streetPath) {
+    MyEgressLeg(RaptorAccessEgress streetPath) {
       super(streetPath);
     }
 

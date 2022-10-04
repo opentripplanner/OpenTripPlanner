@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -76,7 +76,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
   }
 
-  public void add(ArrivalView<T> stopArrival, AccessEgress egressPath) {
+  public void add(ArrivalView<T> stopArrival, RaptorAccessEgress egressPath) {
     var destArrival = createDestinationArrivalView(stopArrival, egressPath);
 
     if (destArrival == null) {
@@ -122,7 +122,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     return paths;
   }
 
-  public void debugReject(ArrivalView<T> stopArrival, AccessEgress egress, String reason) {
+  public void debugReject(ArrivalView<T> stopArrival, RaptorAccessEgress egress, String reason) {
     if (isDebugOn()) {
       debugReject(createDestinationArrivalView(stopArrival, egress), reason);
     }
@@ -158,7 +158,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   private DestinationArrival<T> createDestinationArrivalView(
     ArrivalView<T> stopArrival,
-    AccessEgress egressPath
+    RaptorAccessEgress egressPath
   ) {
     int departureTime = AccessEgressFunctions.calculateEgressDepartureTime(
       stopArrival.arrivalTime(),
