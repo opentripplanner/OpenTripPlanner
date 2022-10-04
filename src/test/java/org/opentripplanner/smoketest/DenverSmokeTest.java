@@ -34,7 +34,7 @@ public class DenverSmokeTest {
   }
 
   @Test
-  public void vehiclePositions() throws JsonProcessingException {
+  public void vehiclePositions() {
     SmokeTest.assertThereArePatternsWithVehiclePositions();
   }
 }

@@ -1,0 +1,14 @@
+{
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "gtfs.zip",
+      "feedId": "septa-rail"
+    },
+    {
+      "type": "gtfs",
+      "source": "bus.gtfs.zip",
+      "feedId": "septa-bus"
+    }
+  ]
+}

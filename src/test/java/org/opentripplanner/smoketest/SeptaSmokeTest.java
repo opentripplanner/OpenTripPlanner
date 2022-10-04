@@ -27,4 +27,9 @@ public class SeptaSmokeTest {
       List.of("WALK", "RAIL", "RAIL", "WALK", "SUBWAY", "WALK", "BUS", "WALK")
     );
   }
+
+  @Test
+  public void vehiclePositions() {
+    SmokeTest.assertThereArePatternsWithVehiclePositions();
+  }
 }
