@@ -15,11 +15,10 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.util.PolylineEncoder;
@@ -76,12 +75,15 @@ public class BicycleRoutingTest {
     request.setTo(to);
     request.preferences().withBike(it -> it.setOptimizeType(BicycleOptimizeType.QUICK));
 
-    request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);
-    var temporaryVertices = new TemporaryVerticesContainer(graph, request);
-    RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
-
+    request.journey().direct().setMode(StreetMode.BIKE);
+    var temporaryVertices = new TemporaryVerticesContainer(
+      graph,
+      request,
+      request.journey().direct().mode(),
+      request.journey().direct().mode()
+    );
     var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
-    var paths = gpf.graphPathFinderEntryPoint(routingContext);
+    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneId.of("Europe/Berlin"),

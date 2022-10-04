@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -73,7 +73,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
     TransitDataProviderFilter filter,
-    RoutingContext routingContext
+    RouteRequest request
   ) {
     this.transferService = transitLayer.getTransferService();
     this.transitLayer = transitLayer;
@@ -93,12 +93,12 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
-    this.transferIndex = transitLayer.getRaptorTransfersForRequest(routingContext);
+    this.transferIndex = transitLayer.getRaptorTransfersForRequest(request);
 
     this.forwardConstrainedTransfers = transitLayer.getForwardConstrainedTransfers();
     this.reverseConstrainedTransfers = transitLayer.getReverseConstrainedTransfers();
 
-    var mcCostParams = GeneralizedCostParametersMapper.map(routingContext.opt, patternIndex);
+    var mcCostParams = GeneralizedCostParametersMapper.map(request, patternIndex);
 
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(

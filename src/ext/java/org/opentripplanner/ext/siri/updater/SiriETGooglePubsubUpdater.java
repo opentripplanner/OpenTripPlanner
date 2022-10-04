@@ -77,7 +77,14 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   /**
    * The number of seconds to wait before reconnecting after a failed connection.
    */
-  private final int reconnectPeriodSec;
+  private final java.time.Duration reconnectPeriod;
+
+  /**
+   * For larger deployments it sometimes takes more than the default 30 seconds to fetch
+   * data, if so this parameter can be increased.
+   */
+  private final java.time.Duration initialGetDataTimeout;
+
   private final SubscriptionAdminClient subscriptionAdminClient;
   private final ProjectSubscriptionName subscriptionName;
   private final ProjectTopicName topic;
@@ -99,14 +106,15 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     TransitModel transitModel,
     SiriTimetableSnapshotSource timetableSnapshot
   ) {
-    this.configRef = config.getConfigRef();
+    this.configRef = config.configRef();
     /*
            URL that responds to HTTP GET which returns all initial data in protobuf-format.
            Will be called once to initialize realtime-data. All updates will be received from Google Cloud Pubsub
           */
-    this.dataInitializationUrl = URI.create(config.getDataInitializationUrl());
-    this.feedId = config.getFeedId();
-    this.reconnectPeriodSec = config.getReconnectPeriodSec();
+    this.dataInitializationUrl = URI.create(config.dataInitializationUrl());
+    this.feedId = config.feedId();
+    this.reconnectPeriod = config.reconnectPeriod();
+    this.initialGetDataTimeout = config.initialGetDataTimeout();
     this.snapshotSource = timetableSnapshot;
 
     // set subscriber
@@ -115,8 +123,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       subscriptionId = "otp-" + UUID.randomUUID().toString();
     }
 
-    String projectName = config.getProjectName();
-    String topicName = config.getTopicName();
+    String projectName = config.projectName();
+    String topicName = config.topicName();
 
     this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
     this.topic = ProjectTopicName.of(projectName, topicName);
@@ -223,7 +231,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         }
       }
       try {
-        Thread.sleep(reconnectPeriodSec * 1000);
+        Thread.sleep(reconnectPeriod.toMillis());
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -283,7 +291,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
       final InputStream data = HttpUtils.getData(
         dataInitializationUrl,
-        java.time.Duration.ofSeconds(30),
+        initialGetDataTimeout,
         Map.of("Content-Type", "application/x-protobuf")
       );
       ByteString value = ByteString.readFrom(data);

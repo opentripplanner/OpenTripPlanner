@@ -6,17 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.api.request.StreetMode;
 
 public class StateEditorTest {
 
   @Test
   public final void testIncrementTimeInSeconds() {
-    Graph graph = new Graph();
-    RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
-    StateEditor stateEditor = new StateEditor(routingContext, null);
+    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementTimeInSeconds(999999999);
@@ -26,10 +22,7 @@ public class StateEditorTest {
 
   @Test
   public final void testWeightIncrement() {
-    Graph graph = new Graph();
-    RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
-    StateEditor stateEditor = new StateEditor(routingContext, null);
+    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(10);
@@ -39,10 +32,7 @@ public class StateEditorTest {
 
   @Test
   public final void testNanWeightIncrement() {
-    Graph graph = new Graph();
-    RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
-    StateEditor stateEditor = new StateEditor(routingContext, null);
+    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NaN);
@@ -52,10 +42,7 @@ public class StateEditorTest {
 
   @Test
   public final void testInfinityWeightIncrement() {
-    Graph graph = new Graph();
-    RouteRequest routingRequest = new RouteRequest();
-    RoutingContext routingContext = new RoutingContext(routingRequest, graph, (Vertex) null, null);
-    StateEditor stateEditor = new StateEditor(routingContext, null);
+    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);

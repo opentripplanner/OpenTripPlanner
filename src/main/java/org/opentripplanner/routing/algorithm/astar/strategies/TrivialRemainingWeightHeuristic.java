@@ -1,7 +1,10 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import org.opentripplanner.routing.core.RoutingContext;
+import java.util.Set;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. For use in testing,
@@ -9,10 +12,13 @@ import org.opentripplanner.routing.core.State;
  */
 public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
-  private static final long serialVersionUID = 1L;
-
   @Override
-  public void initialize(RoutingContext rctx) {}
+  public void initialize(
+    RouteRequest request,
+    StreetMode streetMode,
+    Set<Vertex> fromVertices,
+    Set<Vertex> toVertices
+  ) {}
 
   @Override
   public double estimateRemainingWeight(State s) {

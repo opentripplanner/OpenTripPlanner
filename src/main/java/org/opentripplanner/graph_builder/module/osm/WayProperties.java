@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -11,16 +10,9 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  */
 public class WayProperties {
 
-  /**
-   * A multiplicative parameter expressing how much less safe this way is than the default, in terms
-   * of something like DALYs lost per meter. The first element safety in the direction of the way
-   * and the second is safety in the opposite direction.
-   * TODO change the identifiers to make it clear that this reflects danger, not safety.
-   */
-  private static final P2<Double> defaultSafetyFeatures = new P2<>(1.0, 1.0);
   private final StreetTraversalPermission permission;
-  private final P2<Double> bicycleSafetyFeatures;
-  private final P2<Double> walkSafetyFeatures;
+  private final SafetyFeatures bicycleSafetyFeatures;
+  private final SafetyFeatures walkSafetyFeatures;
 
   public WayProperties(WayPropertiesBuilder wayPropertiesBuilder) {
     permission = wayPropertiesBuilder.getPermission();
@@ -28,11 +20,11 @@ public class WayProperties {
     walkSafetyFeatures = wayPropertiesBuilder.getWalkSafetyFeatures();
   }
 
-  public P2<Double> getBicycleSafetyFeatures() {
+  public SafetyFeatures getBicycleSafetyFeatures() {
     return bicycleSafetyFeatures;
   }
 
-  public P2<Double> getWalkSafetyFeatures() {
+  public SafetyFeatures getWalkSafetyFeatures() {
     return walkSafetyFeatures;
   }
 

@@ -4,8 +4,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
@@ -45,22 +48,12 @@ public class State implements Cloneable {
 
   /* CONSTRUCTORS */
 
-  public State(RoutingContext rctx) {
-    this(
-      rctx.fromVertices == null ? null : rctx.fromVertices.iterator().next(),
-      rctx.opt.dateTime(),
-      rctx,
-      StateData.getInitialStateData(rctx.opt)
-    );
-  }
-
   /**
-   * Create an initial state, forcing vertex to the specified value. Useful for reusing a
-   * RoutingContext in TransitIndex, tests, etc.
+   * Create an initial state, forcing vertex to the specified value. Useful for tests, etc.
    */
-  public State(Vertex vertex, RouteRequest opt, RoutingContext routingContext) {
+  public State(Vertex vertex, RouteRequest opt, StreetMode streetMode) {
     // Since you explicitly specify, the vertex, we don't set the backEdge.
-    this(vertex, opt.dateTime(), routingContext, StateData.getInitialStateData(opt));
+    this(vertex, opt.dateTime(), StateData.getInitialStateData(opt, streetMode));
   }
 
   /**
@@ -68,34 +61,31 @@ public class State implements Cloneable {
    * values. Useful for starting a multiple initial state search, for example when propagating
    * profile results to the street network in RoundBasedProfileRouter.
    */
-  public State(
-    Vertex vertex,
-    Instant startTime,
-    RoutingContext routingContext,
-    StateData stateData
-  ) {
+  public State(Vertex vertex, Instant startTime, StateData stateData) {
     this.weight = 0;
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
-    this.stateData.rctx = routingContext;
     this.stateData.startTime = startTime;
     this.walkDistance = 0;
     this.time = startTime.getEpochSecond();
   }
 
   /**
-   * Create an initial state representing the beginning of a search for the given routing context.
+   * Create an initial state representing the beginning of a search for the given routing request.
    * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
    * states must be created from a parent and associated with an edge.
    */
-  public static Collection<State> getInitialStates(RoutingContext routingContext) {
-    RouteRequest request = routingContext.opt;
+  public static Collection<State> getInitialStates(
+    RouteRequest request,
+    StreetMode streetMode,
+    Set<Vertex> vertices
+  ) {
     Collection<State> states = new ArrayList<>();
-    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request);
-    for (Vertex vertex : routingContext.fromVertices) {
+    List<StateData> initialStateDatas = StateData.getInitialStateDatas(request, streetMode);
+    for (Vertex vertex : vertices) {
       for (StateData stateData : initialStateDatas) {
-        states.add(new State(vertex, request.dateTime(), routingContext, stateData));
+        states.add(new State(vertex, request.dateTime(), stateData));
       }
     }
     return states;
@@ -180,15 +170,16 @@ public class State implements Cloneable {
    */
   public boolean isFinal() {
     // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-    boolean parkAndRide = stateData.opt.parkAndRide;
+    boolean parkAndRide = stateData.requestMode.includesParking();
     boolean vehicleRentingOk;
     boolean vehicleParkAndRideOk;
     if (stateData.opt.arriveBy()) {
-      vehicleRentingOk = !stateData.opt.vehicleRental || !isRentingVehicle();
+      vehicleRentingOk = !stateData.requestMode.includesRenting() || !isRentingVehicle();
       vehicleParkAndRideOk = !parkAndRide || !isVehicleParked();
     } else {
       vehicleRentingOk =
-        !stateData.opt.vehicleRental || (vehicleRentalNotStarted() || vehicleRentalIsFinished());
+        !stateData.requestMode.includesRenting() ||
+        (vehicleRentalNotStarted() || vehicleRentalIsFinished());
       vehicleParkAndRideOk = !parkAndRide || isVehicleParked();
     }
     return vehicleRentingOk && vehicleParkAndRideOk;
@@ -267,12 +258,12 @@ public class State implements Cloneable {
     return stateData.opt;
   }
 
-  public RoutingPreferences getPreferences() {
-    return stateData.opt.preferences();
+  public StreetMode getRequestMode() {
+    return stateData.requestMode;
   }
 
-  public RoutingContext getRoutingContext() {
-    return stateData.rctx;
+  public RoutingPreferences getPreferences() {
+    return stateData.opt.preferences();
   }
 
   /**
@@ -372,6 +363,10 @@ public class State implements Cloneable {
     return stateData.intersectionTraversalCalculator;
   }
 
+  public DataOverlayContext dataOverlayContext() {
+    return stateData.dataOverlayContext;
+  }
+
   protected State clone() {
     State ret;
     try {
@@ -420,7 +415,7 @@ public class State implements Cloneable {
     // It is distributed symmetrically over all preboard and prealight edges.
     var reversedRequest = stateData.opt.copyOfReversed();
     reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
-    var newStateData = StateData.getInitialStateData(reversedRequest);
+    var newStateData = StateData.getInitialStateData(reversedRequest, stateData.requestMode);
     // TODO Check if those three lines are needed:
     // TODO Yes they are. We should instead pass the stateData as such after removing startTime, opt
     // and rctx from it.
@@ -428,6 +423,6 @@ public class State implements Cloneable {
     newStateData.vehicleParked = stateData.vehicleParked;
     newStateData.carPickupState = stateData.carPickupState;
 
-    return new State(this.vertex, getTime(), stateData.rctx, newStateData);
+    return new State(this.vertex, getTime(), newStateData);
   }
 }

@@ -100,20 +100,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     return (modes & getMaskForMode(mode)) != 0;
   }
 
-  /** get this traverse mode as a string that can be fed back into the constructor */
-  public String getAsStr() {
-    String retVal = null;
-    for (TraverseMode m : getModes()) {
-      if (retVal == null) {
-        retVal = "";
-      } else {
-        retVal += ",";
-      }
-      retVal += m;
-    }
-    return retVal;
-  }
-
   /**
    * Clear the mode set so that no modes are included.
    */

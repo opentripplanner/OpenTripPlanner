@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtr
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.StopModel;
 
@@ -130,8 +130,8 @@ public class TransitLayer {
     return transferService;
   }
 
-  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingContext routingContext) {
-    return transferCache.get(transfersByStopIndex, routingContext);
+  public RaptorTransferIndex getRaptorTransfersForRequest(RouteRequest request) {
+    return transferCache.get(transfersByStopIndex, request);
   }
 
   public RaptorRequestTransferCache getTransferCache() {

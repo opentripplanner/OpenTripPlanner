@@ -426,7 +426,7 @@ public class DefaultRoutingRequestType {
           .description("")
           .type(Scalars.GraphQLBoolean)
           .deprecate("Rental is specified by modes")
-          .dataFetcher(env -> request.vehicleRental)
+          .dataFetcher(env -> false)
           .build()
       )
       .field(
@@ -434,7 +434,8 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("parkAndRide")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.parkAndRide)
+          .deprecate("Parking is specified by modes")
+          .dataFetcher(env -> false)
           .build()
       )
       .field(
@@ -442,7 +443,8 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("kissAndRide")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.carPickup)
+          .deprecate("Parking is specified by modes")
+          .dataFetcher(env -> false)
           .build()
       )
       .field(

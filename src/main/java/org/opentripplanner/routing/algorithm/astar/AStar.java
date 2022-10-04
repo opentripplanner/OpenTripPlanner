@@ -4,12 +4,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -31,7 +33,8 @@ public class AStar {
   private static final boolean verbose = LOG.isDebugEnabled();
 
   private final boolean arriveBy;
-  private final RoutingContext rctx;
+  private final Set<Vertex> fromVertices;
+  private final Set<Vertex> toVertices;
   private final RemainingWeightHeuristic heuristic;
   private final SkipEdgeStrategy skipEdgeStrategy;
   private final SearchTerminationStrategy terminationStrategy;
@@ -49,7 +52,9 @@ public class AStar {
     RemainingWeightHeuristic heuristic,
     SkipEdgeStrategy skipEdgeStrategy,
     TraverseVisitor traverseVisitor,
-    RoutingContext rctx,
+    boolean arriveBy,
+    Set<Vertex> fromVertices,
+    Set<Vertex> toVertices,
     SearchTerminationStrategy terminationStrategy,
     DominanceFunction dominanceFunction,
     Duration timeout,
@@ -58,13 +63,13 @@ public class AStar {
     this.heuristic = heuristic;
     this.skipEdgeStrategy = skipEdgeStrategy;
     this.traverseVisitor = traverseVisitor;
-    this.arriveBy = rctx.opt.arriveBy();
+    this.fromVertices = fromVertices;
+    this.toVertices = toVertices;
+    this.arriveBy = arriveBy;
     this.terminationStrategy = terminationStrategy;
     this.timeout = timeout;
 
-    this.rctx = rctx;
     this.spt = new ShortestPathTree(dominanceFunction);
-    this.heuristic.initialize(rctx);
 
     // Initialized with a reasonable size, see #4445
     this.pq = new BinHeap<>(1000);
@@ -180,7 +185,7 @@ public class AStar {
        * Terminate based on timeout?
        */
       if (timeout != null && System.currentTimeMillis() > abortTime) {
-        LOG.warn("Search timeout. origin={} target={}", rctx.fromVertices, rctx.toVertices);
+        LOG.warn("Search timeout. origin={} target={}", fromVertices, toVertices);
         // Rather than returning null to indicate that the search was aborted/timed out, we instead
         // set a flag in the SPT and return it anyway. This allows returning a partial list results
         // even when a timeout occurs.
@@ -207,7 +212,7 @@ public class AStar {
           break;
         }
       }
-      if (rctx.toVertices != null && rctx.toVertices.contains(u.getVertex()) && u.isFinal()) {
+      if (toVertices != null && toVertices.contains(u.getVertex()) && u.isFinal()) {
         targetAcceptedStates.add(u);
 
         // Break out of the search if we've found the requested number of paths.
