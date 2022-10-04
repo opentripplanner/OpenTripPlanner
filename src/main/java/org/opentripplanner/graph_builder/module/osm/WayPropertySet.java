@@ -120,24 +120,20 @@ public class WayPropertySet {
     WayProperties result = rightResult
       .mutate()
       .bicycleSafety(
-        Optional
-          .ofNullable(rightResult.getBicycleSafetyFeatures())
-          .map(safety -> safety.forward())
-          .orElse(defaultBicycleSafetyForPermission.apply(permission, forwardSpeed)),
-        Optional
-          .ofNullable(leftResult.getBicycleSafetyFeatures())
-          .map(safety -> safety.back())
-          .orElse(defaultBicycleSafetyForPermission.apply(permission, backSpeed))
+        rightResult.getBicycleSafetyFeatures() != null
+          ? rightResult.getBicycleSafetyFeatures().forward()
+          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed),
+        leftResult.getBicycleSafetyFeatures() != null
+          ? leftResult.getBicycleSafetyFeatures().back()
+          : defaultBicycleSafetyForPermission.apply(permission, backSpeed)
       )
       .walkSafety(
-        Optional
-          .ofNullable(rightResult.getWalkSafetyFeatures())
-          .map(safety -> safety.forward())
-          .orElse(defaultWalkSafetyForPermission.apply(permission, forwardSpeed)),
-        Optional
-          .ofNullable(leftResult.getWalkSafetyFeatures())
-          .map(safety -> safety.back())
-          .orElse(defaultWalkSafetyForPermission.apply(permission, backSpeed))
+        rightResult.getWalkSafetyFeatures() != null
+          ? rightResult.getWalkSafetyFeatures().forward()
+          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed),
+        leftResult.getWalkSafetyFeatures() != null
+          ? leftResult.getWalkSafetyFeatures().back()
+          : defaultWalkSafetyForPermission.apply(permission, backSpeed)
       )
       .build();
 
