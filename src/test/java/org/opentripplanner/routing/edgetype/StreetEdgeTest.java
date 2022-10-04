@@ -52,7 +52,7 @@ public class StreetEdgeTest {
       pref
         .withStreet(it -> it.withTurnReluctance(1.0))
         .withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0))
-        .withBike(it -> it.setSpeed(5.0f).setReluctance(1.0).setWalkingSpeed(0.8))
+        .withBike(it -> it.withSpeed(5.0f).withReluctance(1.0).withWalkingSpeed(0.8))
         .withCar(it -> it.withSpeed(15.0f).withReluctance(1.0))
     );
 
@@ -148,7 +148,7 @@ public class StreetEdgeTest {
     v1.trafficLight = true;
 
     RouteRequest forward = proto.clone();
-    forward.withPreferences(p -> p.withBike(it -> it.setSpeed(3.0f)));
+    forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
     forward.setMode(TraverseMode.BICYCLE);
 
     State s0 = new State(new RoutingContext(forward, graph, v0, v2));
@@ -157,7 +157,7 @@ public class StreetEdgeTest {
 
     RouteRequest reverse = proto.clone();
     reverse.setArriveBy(true);
-    reverse.withPreferences(p -> p.withBike(it -> it.setSpeed(3.0f)));
+    reverse.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
     reverse.setMode(TraverseMode.BICYCLE);
 
     State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
@@ -211,7 +211,7 @@ public class StreetEdgeTest {
     StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     RouteRequest noPenalty = proto.clone();
-    noPenalty.withPreferences(p -> p.withBike(it -> it.setSwitchTime(0).setSwitchCost(0)));
+    noPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(0).withSwitchCost(0)));
     noPenalty.setMode(TraverseMode.BICYCLE);
 
     State s0 = new State(new RoutingContext(noPenalty, graph, v0, v0));
@@ -220,7 +220,7 @@ public class StreetEdgeTest {
     State s3 = e2.traverse(s2);
 
     RouteRequest withPenalty = proto.clone();
-    withPenalty.withPreferences(p -> p.withBike(it -> it.setSwitchTime(42).setSwitchCost(23)));
+    withPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(42).withSwitchCost(23)));
     withPenalty.setMode(TraverseMode.BICYCLE);
 
     State s4 = new State(new RoutingContext(withPenalty, graph, v0, v0));
@@ -386,10 +386,10 @@ public class StreetEdgeTest {
       pref
         .withBike(bike ->
           bike
-            .setSpeed(SPEED)
-            .setOptimizeType(BicycleOptimizeType.TRIANGLE)
+            .withSpeed(SPEED)
+            .withOptimizeType(BicycleOptimizeType.TRIANGLE)
             .withOptimizeTriangle(it -> it.withTime(1))
-            .setReluctance(1)
+            .withReluctance(1)
         )
         .withWalk(walk -> walk.withReluctance(1))
         .withCar(car -> car.withReluctance(1))

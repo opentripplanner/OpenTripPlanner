@@ -44,7 +44,7 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfWithBikeChanges() {
     var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withBike(b -> b.setReluctance(2.5)).build();
+    var copy = pref.copyOf().withBike(b -> b.withReluctance(2.5)).build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.bike(), copy.bike());

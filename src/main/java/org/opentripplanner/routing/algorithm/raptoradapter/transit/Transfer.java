@@ -61,9 +61,9 @@ public class Transfer {
       // Some values are rounded to ease caching in RaptorRequestTransferCache
       preferences.withBike(bike ->
         bike
-          .setSwitchCost(roundTo100(bike.switchCost()))
-          .setSwitchTime(roundTo100(bike.switchTime()))
-          .setSpeed(roundToHalf(bike.speed()))
+          .withSwitchCost(roundTo100(bike.switchCost()))
+          .withSwitchTime(roundTo100(bike.switchTime()))
+          .withSpeed(roundToHalf(bike.speed()))
       );
 
       // it's a record (immutable) so can be safely reused

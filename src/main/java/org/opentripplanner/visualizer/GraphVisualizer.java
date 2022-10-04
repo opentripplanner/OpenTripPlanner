@@ -484,11 +484,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       });
       preferences.withBike(bike ->
         bike
-          .setSpeed(Float.parseFloat(bikeSpeed.getText()))
+          .withSpeed(Float.parseFloat(bikeSpeed.getText()))
           // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-          .setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
+          .withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
           // there should be a ui element for walk distance and optimize type
-          .setOptimizeType(getSelectedOptimizeType())
+          .withOptimizeType(getSelectedOptimizeType())
       );
     });
 

@@ -151,16 +151,16 @@ public class RoutingRequestMapper {
   private static void mapBikePreferences(NodeAdapter c, BikePreferences.Builder builder) {
     var dft = builder.original();
     builder
-      .setSpeed(c.asDouble("bikeSpeed", dft.speed()))
-      .setReluctance(c.asDouble("bikeReluctance", dft.reluctance()))
-      .setBoardCost(c.asInt("bikeBoardCost", dft.boardCost()))
-      .setParkTime(c.asInt("bikeParkTime", dft.parkTime()))
-      .setParkCost(c.asInt("bikeParkCost", dft.parkCost()))
-      .setWalkingSpeed(c.asDouble("bikeWalkingSpeed", dft.walkingSpeed()))
-      .setWalkingReluctance(c.asDouble("bikeWalkingReluctance", dft.walkingReluctance()))
-      .setSwitchTime(c.asInt("bikeSwitchTime", dft.switchTime()))
-      .setSwitchCost(c.asInt("bikeSwitchCost", dft.switchCost()))
-      .setOptimizeType(c.asEnum("optimize", dft.optimizeType()))
+      .withSpeed(c.asDouble("bikeSpeed", dft.speed()))
+      .withReluctance(c.asDouble("bikeReluctance", dft.reluctance()))
+      .withBoardCost(c.asInt("bikeBoardCost", dft.boardCost()))
+      .withParkTime(c.asInt("bikeParkTime", dft.parkTime()))
+      .withParkCost(c.asInt("bikeParkCost", dft.parkCost()))
+      .withWalkingSpeed(c.asDouble("bikeWalkingSpeed", dft.walkingSpeed()))
+      .withWalkingReluctance(c.asDouble("bikeWalkingReluctance", dft.walkingReluctance()))
+      .withSwitchTime(c.asInt("bikeSwitchTime", dft.switchTime()))
+      .withSwitchCost(c.asInt("bikeSwitchCost", dft.switchCost()))
+      .withOptimizeType(c.asEnum("optimize", dft.optimizeType()))
       .withOptimizeTriangle(it ->
         it
           .withTime(c.asDouble("bikeTriangleTimeFactor", it.time()))

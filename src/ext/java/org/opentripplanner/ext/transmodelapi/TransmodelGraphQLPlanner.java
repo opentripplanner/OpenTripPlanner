@@ -230,10 +230,10 @@ public class TransmodelGraphQLPlanner {
       }
     );
     preferences.withBike(bike -> {
-      callWith.argument("bikeSpeed", bike::setSpeed);
-      callWith.argument("bikeSwitchTime", bike::setSwitchTime);
-      callWith.argument("bikeSwitchCost", bike::setSwitchCost);
-      callWith.argument("bicycleOptimisationMethod", bike::setOptimizeType);
+      callWith.argument("bikeSpeed", bike::withSpeed);
+      callWith.argument("bikeSwitchTime", bike::withSwitchTime);
+      callWith.argument("bikeSwitchCost", bike::withSwitchCost);
+      callWith.argument("bicycleOptimisationMethod", bike::withOptimizeType);
 
       if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
         bike.withOptimizeTriangle(triangle -> {
@@ -284,7 +284,7 @@ public class TransmodelGraphQLPlanner {
       //slower bike speed for bike sharing, based on empirical evidence from DC.
       // TODO - There should be a separate speed preference for rented bike, setting this
       //      - here will cause the different APIs to behave differently
-      preferences.withBike(b -> b.setSpeed(4.3));
+      preferences.withBike(b -> b.withSpeed(4.3));
     }
     preferences.withRental(rental ->
       callWith.argument(
@@ -354,7 +354,7 @@ public class TransmodelGraphQLPlanner {
   ) {
     if (streetReluctance > 0) {
       preferences.withWalk(walk -> walk.withReluctance(streetReluctance));
-      preferences.withBike(bike -> bike.setReluctance(streetReluctance));
+      preferences.withBike(bike -> bike.withReluctance(streetReluctance));
       preferences.withCar(car -> car.withReluctance(streetReluctance));
     }
   }

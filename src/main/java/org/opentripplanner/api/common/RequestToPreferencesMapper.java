@@ -59,16 +59,16 @@ class RequestToPreferencesMapper {
 
   private void mapBike() {
     preferences.withBike(bike -> {
-      setIfNotNull(req.bikeSpeed, bike::setSpeed);
-      setIfNotNull(req.bikeReluctance, bike::setReluctance);
-      setIfNotNull(req.bikeBoardCost, bike::setBoardCost);
-      setIfNotNull(req.bikeWalkingSpeed, bike::setWalkingSpeed);
-      setIfNotNull(req.bikeWalkingReluctance, bike::setWalkingReluctance);
-      setIfNotNull(req.bikeParkCost, bike::setParkCost);
-      setIfNotNull(req.bikeParkTime, bike::setParkTime);
-      setIfNotNull(req.bikeSwitchTime, bike::setSwitchTime);
-      setIfNotNull(req.bikeSwitchCost, bike::setSwitchCost);
-      setIfNotNull(req.bikeOptimizeType, bike::setOptimizeType);
+      setIfNotNull(req.bikeSpeed, bike::withSpeed);
+      setIfNotNull(req.bikeReluctance, bike::withReluctance);
+      setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
+      setIfNotNull(req.bikeWalkingSpeed, bike::withWalkingSpeed);
+      setIfNotNull(req.bikeWalkingReluctance, bike::withWalkingReluctance);
+      setIfNotNull(req.bikeParkCost, bike::withParkCost);
+      setIfNotNull(req.bikeParkTime, bike::withParkTime);
+      setIfNotNull(req.bikeSwitchTime, bike::withSwitchTime);
+      setIfNotNull(req.bikeSwitchCost, bike::withSwitchCost);
+      setIfNotNull(req.bikeOptimizeType, bike::withOptimizeType);
 
       if (req.bikeOptimizeType == BicycleOptimizeType.TRIANGLE) {
         bike.withOptimizeTriangle(triangle -> {
@@ -79,7 +79,7 @@ class RequestToPreferencesMapper {
       }
       if (vehicleRental && req.bikeSpeed == null) {
         //slower bike speed for bike sharing, based on empirical evidence from DC.
-        bike.setSpeed(4.3);
+        bike.withSpeed(4.3);
       }
     });
   }

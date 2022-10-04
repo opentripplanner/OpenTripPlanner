@@ -26,16 +26,16 @@ class BikePreferencesTest {
 
   private final BikePreferences subject = BikePreferences
     .of()
-    .setSpeed(SPEED)
-    .setReluctance(RELUCTANCE)
-    .setBoardCost(BOARD_COST)
-    .setWalkingSpeed(WALKING_SPEED)
-    .setWalkingReluctance(WALKING_RELUCTANCE)
-    .setSwitchTime(SWITCH_TIME)
-    .setSwitchCost(SWITCH_COST)
-    .setParkTime(PARK_TIME)
-    .setParkCost(PARK_COST)
-    .setOptimizeType(OPTIMIZE_TYPE)
+    .withSpeed(SPEED)
+    .withReluctance(RELUCTANCE)
+    .withBoardCost(BOARD_COST)
+    .withWalkingSpeed(WALKING_SPEED)
+    .withWalkingReluctance(WALKING_RELUCTANCE)
+    .withSwitchTime(SWITCH_TIME)
+    .withSwitchCost(SWITCH_COST)
+    .withParkTime(PARK_TIME)
+    .withParkCost(PARK_COST)
+    .withOptimizeType(OPTIMIZE_TYPE)
     .withOptimizeTriangle(it -> it.withSlope(1).build())
     .build();
 
@@ -104,8 +104,8 @@ class BikePreferencesTest {
   @Test
   void testCopyOfEqualsAndHashCode() {
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.copyOf().setSpeed(0.0).build();
-    var same = other.copyOf().setSpeed(SPEED).build();
+    var other = subject.copyOf().withSpeed(0.0).build();
+    var same = other.copyOf().withSpeed(SPEED).build();
     assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
   }
 

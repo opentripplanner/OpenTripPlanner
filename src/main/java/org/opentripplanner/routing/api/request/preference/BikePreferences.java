@@ -235,7 +235,7 @@ public final class BikePreferences implements Serializable {
       return speed;
     }
 
-    public Builder setSpeed(double speed) {
+    public Builder withSpeed(double speed) {
       this.speed = speed;
       return this;
     }
@@ -244,7 +244,7 @@ public final class BikePreferences implements Serializable {
       return reluctance;
     }
 
-    public Builder setReluctance(double reluctance) {
+    public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
       return this;
     }
@@ -253,7 +253,7 @@ public final class BikePreferences implements Serializable {
       return boardCost;
     }
 
-    public Builder setBoardCost(int boardCost) {
+    public Builder withBoardCost(int boardCost) {
       this.boardCost = boardCost;
       return this;
     }
@@ -262,7 +262,7 @@ public final class BikePreferences implements Serializable {
       return walkingSpeed;
     }
 
-    public Builder setWalkingSpeed(double walkingSpeed) {
+    public Builder withWalkingSpeed(double walkingSpeed) {
       this.walkingSpeed = walkingSpeed;
       return this;
     }
@@ -271,7 +271,7 @@ public final class BikePreferences implements Serializable {
       return walkingReluctance;
     }
 
-    public Builder setWalkingReluctance(double walkingReluctance) {
+    public Builder withWalkingReluctance(double walkingReluctance) {
       this.walkingReluctance = walkingReluctance;
       return this;
     }
@@ -280,7 +280,7 @@ public final class BikePreferences implements Serializable {
       return switchTime;
     }
 
-    public Builder setSwitchTime(int switchTime) {
+    public Builder withSwitchTime(int switchTime) {
       this.switchTime = switchTime;
       return this;
     }
@@ -289,7 +289,7 @@ public final class BikePreferences implements Serializable {
       return switchCost;
     }
 
-    public Builder setSwitchCost(int switchCost) {
+    public Builder withSwitchCost(int switchCost) {
       this.switchCost = switchCost;
       return this;
     }
@@ -298,7 +298,7 @@ public final class BikePreferences implements Serializable {
       return parkTime;
     }
 
-    public Builder setParkTime(int parkTime) {
+    public Builder withParkTime(int parkTime) {
       this.parkTime = parkTime;
       return this;
     }
@@ -307,7 +307,7 @@ public final class BikePreferences implements Serializable {
       return parkCost;
     }
 
-    public Builder setParkCost(int parkCost) {
+    public Builder withParkCost(int parkCost) {
       this.parkCost = parkCost;
       return this;
     }
@@ -316,7 +316,7 @@ public final class BikePreferences implements Serializable {
       return optimizeType;
     }
 
-    public Builder setOptimizeType(BicycleOptimizeType optimizeType) {
+    public Builder withOptimizeType(BicycleOptimizeType optimizeType) {
       this.optimizeType = optimizeType;
       return this;
     }

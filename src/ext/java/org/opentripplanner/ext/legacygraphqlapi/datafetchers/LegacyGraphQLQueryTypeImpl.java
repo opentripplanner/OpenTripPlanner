@@ -627,16 +627,16 @@ public class LegacyGraphQLQueryTypeImpl
 
       request.withPreferences(preferences -> {
         preferences.withBike(bike -> {
-          callWith.argument("bikeReluctance", bike::setReluctance);
-          callWith.argument("bikeWalkingReluctance", bike::setWalkingReluctance);
-          callWith.argument("bikeWalkingSpeed", bike::setWalkingSpeed);
-          callWith.argument("bikeSpeed", bike::setSpeed);
-          callWith.argument("bikeSwitchTime", bike::setSwitchTime);
-          callWith.argument("bikeSwitchCost", bike::setSwitchCost);
-          callWith.argument("bikeBoardCost", bike::setBoardCost);
+          callWith.argument("bikeReluctance", bike::withReluctance);
+          callWith.argument("bikeWalkingReluctance", bike::withWalkingReluctance);
+          callWith.argument("bikeWalkingSpeed", bike::withWalkingSpeed);
+          callWith.argument("bikeSpeed", bike::withSpeed);
+          callWith.argument("bikeSwitchTime", bike::withSwitchTime);
+          callWith.argument("bikeSwitchCost", bike::withSwitchCost);
+          callWith.argument("bikeBoardCost", bike::withBoardCost);
 
           if (environment.getArgument("optimize") != null) {
-            bike.setOptimizeType(BicycleOptimizeType.valueOf(environment.getArgument("optimize")));
+            bike.withOptimizeType(BicycleOptimizeType.valueOf(environment.getArgument("optimize")));
           }
           if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
             bike.withOptimizeTriangle(triangle -> {
@@ -710,7 +710,7 @@ public class LegacyGraphQLQueryTypeImpl
           //slower bike speed for bike sharing, based on empirical evidence from DC.
           // TODO - There should be a separate speed preference for rented bike, setting this
           //      - here will cause the different APIs to behave differently
-          preferences.withBike(b -> b.setSpeed(4.3));
+          preferences.withBike(b -> b.withSpeed(4.3));
         }
       });
 

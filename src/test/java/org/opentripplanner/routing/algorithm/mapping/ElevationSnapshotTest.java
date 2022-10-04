@@ -94,7 +94,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.withPreferences(pref ->
       pref.withBike(bike ->
         bike
-          .setOptimizeType(BicycleOptimizeType.TRIANGLE)
+          .withOptimizeType(BicycleOptimizeType.TRIANGLE)
           .withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3))
       )
     );

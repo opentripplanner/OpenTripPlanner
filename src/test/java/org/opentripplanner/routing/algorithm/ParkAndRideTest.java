@@ -153,7 +153,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     var request = new RouteRequest().getStreetSearchRequest(streetMode);
     request.withPreferences(pref ->
       pref
-        .withBike(it -> it.setParkCost(120).setParkTime(60))
+        .withBike(it -> it.withParkCost(120).withParkTime(60))
         .withCar(it -> it.withParkCost(240).withParkTime(180))
     );
     request.setWheelchair(requireWheelChairAccessible);
