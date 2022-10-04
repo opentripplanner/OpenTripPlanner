@@ -16,6 +16,8 @@ import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWe
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
@@ -165,7 +167,12 @@ public class AStarBuilder {
     if (this.initialStates != null) {
       initialStates = this.initialStates;
     } else {
-      initialStates = State.getInitialStates(routeRequest, streetRequest.mode(), origin);
+      AStarRequest aStarRequest = AStarRequestMapper
+        .map(routeRequest)
+        .setMode(streetRequest.mode())
+        .build();
+
+      initialStates = State.getInitialStates(origin, aStarRequest);
 
       if (originBackEdge != null) {
         for (var state : initialStates) {

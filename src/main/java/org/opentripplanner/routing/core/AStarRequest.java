@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import java.time.Instant;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -38,7 +39,9 @@ public class AStarRequest {
   private final VehicleParkingRequest parking;
   private final VehicleRentalRequest rental;
 
+  private final GenericLocation from;
   private final Envelope fromEnvelope;
+  private final GenericLocation to;
   private final Envelope toEnvelope;
 
   protected IntersectionTraversalCalculator intersectionTraversalCalculator =
@@ -46,31 +49,28 @@ public class AStarRequest {
 
   protected DataOverlayContext dataOverlayContext;
 
-  public AStarRequest(Instant startTime, RouteRequest opt, StreetMode mode) {
-    this.startTime = startTime;
-    this.preferences = opt.preferences();
-    this.mode = mode;
-    this.arriveBy = opt.arriveBy();
-    this.wheelchair = opt.wheelchair();
-    this.parking = opt.journey().parking();
-    this.rental = opt.journey().rental();
-    this.fromEnvelope = getEnvelope(opt.from());
-    this.toEnvelope = getEnvelope(opt.to());
+  AStarRequest(AStarRequestBuilder builder) {
+    this.startTime = builder.startTime();
+    this.preferences = builder.preferences();
+    this.mode = builder.mode();
+    this.arriveBy = builder.arriveBy();
+    this.wheelchair = builder.wheelchair();
+    this.parking = builder.parking();
+    this.rental = builder.rental();
+    this.from = builder.from();
+    this.fromEnvelope = getEnvelope(from);
+    this.to = builder.to();
+    this.toEnvelope = getEnvelope(to);
   }
 
-  /**
-   * This constructor is only to be used from the copyOfReversed method
-   */
-  private AStarRequest(AStarRequest original, Instant time) {
-    this.startTime = time;
-    this.preferences = original.preferences.clone();
-    this.mode = original.mode;
-    this.arriveBy = !original.arriveBy;
-    this.wheelchair = original.wheelchair;
-    this.parking = original.parking.clone();
-    this.rental = original.rental.clone();
-    this.fromEnvelope = original.toEnvelope;
-    this.toEnvelope = original.fromEnvelope;
+  @Nonnull
+  public static AStarRequestBuilder of() {
+    return new AStarRequestBuilder();
+  }
+
+  @Nonnull
+  public static AStarRequestBuilder copyOf(AStarRequest original) {
+    return new AStarRequestBuilder(original);
   }
 
   public Instant startTime() {
@@ -106,8 +106,16 @@ public class AStarRequest {
     return rental;
   }
 
+  public GenericLocation from() {
+    return from;
+  }
+
+  public GenericLocation to() {
+    return to;
+  }
+
   public AStarRequest copyOfReversed(Instant time) {
-    return new AStarRequest(this, time);
+    return copyOf(this).setStartTime(time).setArriveBy(!arriveBy).build();
   }
 
   public void setIntersectionTraversalCalculator(

@@ -58,6 +58,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Routi
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -274,11 +275,10 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    AStarRequest aStarRequest = new AStarRequest(
-      routingRequest.dateTime(),
-      routingRequest,
-      routingRequest.journey().egress().mode()
-    );
+    AStarRequest aStarRequest = AStarRequestMapper
+      .map(routingRequest)
+      .setMode(routingRequest.journey().egress().mode())
+      .build();
 
     StateData stateData = StateData.getInitialStateData(aStarRequest);
 
