@@ -12,9 +12,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
-import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 
@@ -43,10 +41,8 @@ public class AStarRequest {
   private final Envelope fromEnvelope;
   private final Envelope toEnvelope;
 
-  protected IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
-    IntersectionTraversalModel.SIMPLE,
-    DrivingDirection.RIGHT
-  );
+  protected IntersectionTraversalCalculator intersectionTraversalCalculator =
+    IntersectionTraversalCalculator.DEFAULT;
 
   protected DataOverlayContext dataOverlayContext;
 
