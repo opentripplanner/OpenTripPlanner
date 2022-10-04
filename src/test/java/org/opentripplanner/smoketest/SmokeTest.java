@@ -1,9 +1,11 @@
 package org.opentripplanner.smoketest;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -18,6 +20,7 @@ import java.util.Set;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.smoketest.util.GraphQLClient;
 import org.opentripplanner.smoketest.util.RestClient;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
@@ -33,21 +36,6 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 public class SmokeTest {
 
   public static final ObjectMapper mapper;
-
-  /**
-   * The Fare class is a little hard to deserialize so we have a custom deserializer as we don't
-   * run any assertions against the fares. (That is done during unit tests.)
-   */
-  static class FareDeserializer extends JsonDeserializer<ItineraryFares> {
-
-    @Override
-    public ItineraryFares deserialize(
-      JsonParser jsonParser,
-      DeserializationContext deserializationContext
-    ) {
-      return null;
-    }
-  }
 
   static {
     var provider = new JSONObjectMapperProvider();
@@ -67,8 +55,8 @@ public class SmokeTest {
    * When we approach the end of the validity of the GTFS feed there might be days when this logic
    * results in failures as the next Monday is after the end of the service period.
    * <p>
-   * This is a problem in particular in the case of MARTA as they only publish new data about 2
-   * days before the expiration date of the old one.
+   * This is a problem in particular in the case of MARTA as they only publish new data about 2 days
+   * before the expiration date of the old one.
    */
   public static LocalDate nextMonday() {
     var today = LocalDate.now();
@@ -110,5 +98,35 @@ public class SmokeTest {
     assertTrue(itineraries.size() > 1);
 
     assertThatItineraryHasModes(itineraries, expectedModes);
+  }
+
+  static void assertThereArePatternsWithVehiclePositions() {
+    GraphQLClient.VehiclePositionResponse positions = GraphQLClient.patternWithVehiclePositionsQuery();
+
+    var vehiclePositions = positions
+      .patterns()
+      .stream()
+      .flatMap(p -> p.vehiclePositions().stream())
+      .toList();
+
+    assertFalse(
+      vehiclePositions.isEmpty(),
+      "Found no patterns that have realtime vehicle positions."
+    );
+  }
+
+  /**
+   * The Fare class is a little hard to deserialize, so we have a custom deserializer as we don't
+   * run any assertions against the fares. (That is done during unit tests.)
+   */
+  static class FareDeserializer extends JsonDeserializer<ItineraryFares> {
+
+    @Override
+    public ItineraryFares deserialize(
+      JsonParser jsonParser,
+      DeserializationContext deserializationContext
+    ) {
+      return null;
+    }
   }
 }

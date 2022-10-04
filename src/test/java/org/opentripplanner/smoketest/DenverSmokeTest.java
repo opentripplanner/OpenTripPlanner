@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.smoketest.util.GraphQLClient;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
@@ -34,46 +35,6 @@ public class DenverSmokeTest {
 
   @Test
   public void vehiclePositions() throws JsonProcessingException {
-    var json = GraphQLClient.sendGraphQLRequest(
-      """
-        query {
-        	patterns {
-        		vehiclePositions {
-        			vehicleId
-        			lastUpdated
-        			trip {
-        				id
-        				gtfsId
-        			}
-        			stopRelationship {
-        				status
-        				stop {
-        					name
-        				}
-        			}
-        		}
-        	}
-        }
-                
-          """
-    );
-
-    var positions = SmokeTest.mapper.treeToValue(json, VehiclePositionResponse.class);
-
-    var vehiclePositions = positions.patterns
-      .stream()
-      .flatMap(p -> p.vehiclePositions.stream())
-      .toList();
-
-    assertFalse(
-      vehiclePositions.isEmpty(),
-      "Found no patterns that have realtime vehicle positions."
-    );
+    SmokeTest.assertThereArePatternsWithVehiclePositions();
   }
-
-  private record Position(String vehicleId) {}
-
-  private record Pattern(List<Position> vehiclePositions) {}
-
-  private record VehiclePositionResponse(List<Pattern> patterns) {}
 }
