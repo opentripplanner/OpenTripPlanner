@@ -66,8 +66,8 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
     );
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_D, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D3m);

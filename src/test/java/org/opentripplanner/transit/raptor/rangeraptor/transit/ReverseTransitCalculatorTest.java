@@ -81,7 +81,7 @@ public class ReverseTransitCalculatorTest {
   public void getTransfers() {
     var subject = create();
     var transitData = new TestTransitData()
-      .withTransfer(STOP_A, TestTransfer.walkTransfer(STOP_B, D1m));
+      .withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D1m));
 
     // Expect transfer from stop A to stop B (reversed)
     var transfersFromStopB = subject.getTransfers(transitData, STOP_B);

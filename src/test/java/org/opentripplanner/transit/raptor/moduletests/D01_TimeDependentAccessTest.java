@@ -49,7 +49,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
           schedule("24:25 24:30 24:35 24:40 24:45")
         )
     );
-    requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_E, D1m));
+    requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walk(STOP_E, D1m));
 
     requestBuilder
       .searchParams()
@@ -68,7 +68,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -90,7 +90,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, T00_00, T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -115,7 +115,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, T00_00, T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -139,7 +139,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, hm2time(0, 18), T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, hm2time(0, 18), T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -162,7 +162,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, hm2time(0, 18), T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, hm2time(0, 18), T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -186,7 +186,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, hm2time(0, 18), T01_00));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, hm2time(0, 18), T01_00));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -208,7 +208,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, T00_00, hm2time(0, 20)));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, hm2time(0, 20)));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -229,7 +229,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, T00_00, hm2time(0, 20)));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, hm2time(0, 20)));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -252,7 +252,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D2m, T00_00, hm2time(0, 20)));
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, hm2time(0, 20)));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -275,9 +275,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addAccessPaths(
-        TestAccessEgress.walkAccessEgress(STOP_B, D2m, hm2time(0, 18), hm2time(0, 20))
-      );
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, hm2time(0, 18), hm2time(0, 20)));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -297,9 +295,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(Duration.ofDays(2))
-      .addAccessPaths(
-        TestAccessEgress.walkAccessEgress(STOP_B, D2m, hm2time(0, 18), hm2time(0, 20))
-      );
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, hm2time(0, 18), hm2time(0, 20)));
 
     var response = raptorService.route(requestBuilder.build(), data);
 
@@ -320,9 +316,7 @@ public class D01_TimeDependentAccessTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addAccessPaths(
-        TestAccessEgress.walkAccessEgress(STOP_B, D2m, hm2time(0, 18), hm2time(0, 20))
-      );
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m, hm2time(0, 18), hm2time(0, 20)));
 
     var response = raptorService.route(requestBuilder.build(), data);
 

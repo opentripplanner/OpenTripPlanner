@@ -130,7 +130,7 @@ public class StopArrivalStateParetoSetTest {
   ) {
     return new AccessStopArrival<>(
       A_TIME,
-      TestAccessEgress.walkAccessEgress(stop, accessDurationInSeconds, cost)
+      TestAccessEgress.walk(stop, accessDurationInSeconds, cost)
     );
   }
 
@@ -153,7 +153,7 @@ public class StopArrivalStateParetoSetTest {
     var prev = prev(round);
     return new TransferStopArrival<>(
       prev,
-      TestTransfer.walkTransfer(stop, ANY, cost - prev.cost()),
+      TestTransfer.transfer(stop, ANY, cost - prev.cost()),
       arrivalTime
     );
   }

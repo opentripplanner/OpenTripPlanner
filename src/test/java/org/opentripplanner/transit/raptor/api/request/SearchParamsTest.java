@@ -11,8 +11,8 @@ public class SearchParamsTest {
   @Test
   public void earliestDepartureTimeOrLatestArrivalTimeIsRequired() {
     var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
-    p.addAccessPaths(TestAccessEgress.walkAccessEgress(1, 30));
-    p.addEgressPaths(TestAccessEgress.walkAccessEgress(2, 20));
+    p.addAccessPaths(TestAccessEgress.walk(1, 30));
+    p.addEgressPaths(TestAccessEgress.walk(2, 20));
 
     assertParamNotValid(p, "'earliestDepartureTime' or 'latestArrivalTime' is required.");
   }
@@ -22,7 +22,7 @@ public class SearchParamsTest {
     var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
     p.earliestDepartureTime(200);
     p.latestArrivalTime(600);
-    p.addEgressPaths(TestAccessEgress.walkAccessEgress(2, 20));
+    p.addEgressPaths(TestAccessEgress.walk(2, 20));
 
     assertParamNotValid(p, "At least one 'accessPath' is required.");
   }
@@ -32,7 +32,7 @@ public class SearchParamsTest {
     var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
     p.earliestDepartureTime(200);
     p.latestArrivalTime(600);
-    p.addAccessPaths(TestAccessEgress.walkAccessEgress(1, 30));
+    p.addAccessPaths(TestAccessEgress.walk(1, 30));
 
     assertParamNotValid(p, "At least one 'egressPath' is required.");
   }
@@ -41,8 +41,8 @@ public class SearchParamsTest {
   public void latestArrivalTimeRequiredWhenDepartAsLateAsPossibleEnabled() {
     var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
     p.earliestDepartureTime(200);
-    p.addAccessPaths(TestAccessEgress.walkAccessEgress(1, 30));
-    p.addEgressPaths(TestAccessEgress.walkAccessEgress(2, 20));
+    p.addAccessPaths(TestAccessEgress.walk(1, 30));
+    p.addEgressPaths(TestAccessEgress.walk(2, 20));
 
     p.preferLateArrival(true);
 
@@ -56,8 +56,8 @@ public class SearchParamsTest {
   public void departAsLateAsPossibleAndTimetableEnabled() {
     var p = new RaptorRequestBuilder<TestTripSchedule>().searchParams();
     p.latestArrivalTime(200);
-    p.addAccessPaths(TestAccessEgress.walkAccessEgress(1, 30));
-    p.addEgressPaths(TestAccessEgress.walkAccessEgress(2, 20));
+    p.addAccessPaths(TestAccessEgress.walk(1, 30));
+    p.addEgressPaths(TestAccessEgress.walk(2, 20));
 
     p.timetableEnabled(true);
     p.preferLateArrival(true);

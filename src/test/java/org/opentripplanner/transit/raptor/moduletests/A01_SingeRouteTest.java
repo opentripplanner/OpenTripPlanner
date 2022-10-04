@@ -59,8 +59,8 @@ public class A01_SingeRouteTest implements RaptorTestConstants {
     );
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D30s))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_D, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetableEnabled(true);

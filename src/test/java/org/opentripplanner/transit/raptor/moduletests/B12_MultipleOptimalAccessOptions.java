@@ -82,11 +82,11 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_A, D0s), flex(STOP_C, D11m));
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D0s), flex(STOP_C, D11m));
 
     data
-      .withTransfer(STOP_B, TestTransfer.walkTransfer(STOP_C, D2m))
-      .withTransfer(STOP_C, TestTransfer.walkTransfer(STOP_D, D2m));
+      .withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m))
+      .withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D2m));
 
     // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -111,7 +111,7 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
   @Test
   public void standardReverseExpectFlex() {
     requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_F, D0s));
+    requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walk(STOP_F, D0s));
 
     assertEquals(EXPECTED_FLEX_STD, runSearch());
   }
@@ -128,10 +128,7 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
     requestBuilder.searchParams().earliestDepartureTime(T00_00);
     requestBuilder
       .searchParams()
-      .addEgressPaths(
-        TestAccessEgress.walkAccessEgress(STOP_E, D3m),
-        TestAccessEgress.walkAccessEgress(STOP_F, D0s)
-      );
+      .addEgressPaths(TestAccessEgress.walk(STOP_E, D3m), TestAccessEgress.walk(STOP_F, D0s));
 
     String actual = runSearch();
 
@@ -145,10 +142,7 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
   private void withFlexAccessAsBestOption() {
     requestBuilder
       .searchParams()
-      .addEgressPaths(
-        TestAccessEgress.walkAccessEgress(STOP_F, D0s),
-        TestAccessEgress.walkAccessEgress(STOP_E, D3m)
-      );
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D0s), TestAccessEgress.walk(STOP_E, D3m));
   }
 
   /**
@@ -158,10 +152,7 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
   private void withTripL1AsBestStartOption() {
     requestBuilder
       .searchParams()
-      .addEgressPaths(
-        TestAccessEgress.walkAccessEgress(STOP_F, D0s),
-        TestAccessEgress.walkAccessEgress(STOP_E, D1m)
-      );
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D0s), TestAccessEgress.walk(STOP_E, D1m));
   }
 
   private String runSearch() {

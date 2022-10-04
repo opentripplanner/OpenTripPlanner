@@ -36,14 +36,14 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
 
   private static final int STOP = 8;
 
-  private static final RaptorAccessEgress WALK_10m = TestAccessEgress.walkAccessEgress(STOP, D10m);
-  private static final RaptorAccessEgress WALK_8m = TestAccessEgress.walkAccessEgress(STOP, D8m);
+  private static final RaptorAccessEgress WALK_10m = TestAccessEgress.walk(STOP, D10m);
+  private static final RaptorAccessEgress WALK_8m = TestAccessEgress.walk(STOP, D8m);
   private static final RaptorAccessEgress FLEX_1x_10m = flex(STOP, D10m, 1);
   private static final RaptorAccessEgress FLEX_1x_8m = flex(STOP, D8m, 1);
   private static final RaptorAccessEgress FLEX_2x_8m = flex(STOP, D8m, 2);
   private static final RaptorAccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1);
   private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress
-    .walkAccessEgress(STOP, D8m)
+    .walk(STOP, D8m)
     .openingHours(T00_00, T01_00);
 
   @Test
@@ -71,7 +71,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30,
       calculateEgressDepartureTime(
         T00_30,
-        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_00, T01_00),
+        TestAccessEgress.walk(STOP, D8m).openingHours(T00_00, T01_00),
         slackProvider,
         calculator
       )
@@ -81,7 +81,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30,
       calculateEgressDepartureTime(
         T00_10,
-        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_30, T01_00),
+        TestAccessEgress.walk(STOP, D8m).openingHours(T00_30, T01_00),
         slackProvider,
         calculator
       )
@@ -92,7 +92,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_10 + D24h,
       calculateEgressDepartureTime(
         T00_31,
-        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_10, T00_30),
+        TestAccessEgress.walk(STOP, D8m).openingHours(T00_10, T00_30),
         slackProvider,
         calculator
       )
@@ -103,7 +103,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       -1,
       calculateEgressDepartureTime(
         T00_30,
-        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(5, 4),
+        TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),
         slackProvider,
         calculator
       )
@@ -135,7 +135,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30,
       calculateEgressDepartureTime(
         T00_30,
-        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(T00_00, T01_00),
+        TestAccessEgress.walk(STOP, D8m).openingHours(T00_00, T01_00),
         slackProvider,
         calculator
       )
@@ -146,7 +146,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30 + D5m,
       calculateEgressDepartureTime(
         T00_40,
-        TestAccessEgress.walkAccessEgress(STOP, D5m).openingHours(T00_10, T00_30),
+        TestAccessEgress.walk(STOP, D5m).openingHours(T00_10, T00_30),
         slackProvider,
         calculator
       )
@@ -157,7 +157,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       T00_30 + D3m - D24h,
       calculateEgressDepartureTime(
         T00_00,
-        TestAccessEgress.walkAccessEgress(STOP, D3m).openingHours(T00_10, T00_30),
+        TestAccessEgress.walk(STOP, D3m).openingHours(T00_10, T00_30),
         slackProvider,
         calculator
       )
@@ -168,7 +168,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
       -1,
       calculateEgressDepartureTime(
         T00_30,
-        TestAccessEgress.walkAccessEgress(STOP, D8m).openingHours(5, 4),
+        TestAccessEgress.walk(STOP, D8m).openingHours(5, 4),
         slackProvider,
         calculator
       )
@@ -262,7 +262,7 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     assertElements(List.of(WALK_8m), res.get(STOP));
 
     // Map 4 elements into 3 groups
-    var walk_99 = TestAccessEgress.walkAccessEgress(99, D1s);
+    var walk_99 = TestAccessEgress.walk(99, D1s);
     res = groupByStop(List.of(WALK_8m, WALK_10m, walk_99));
     int[] keys = res.keys();
     Arrays.sort(keys);

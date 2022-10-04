@@ -36,19 +36,15 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.closing = builder.closing;
   }
 
-  public static TestAccessEgress walkAccessEgress(int stop, int durationInSeconds) {
+  public static TestAccessEgress walk(int stop, int durationInSeconds) {
     return new Builder(stop, durationInSeconds).build();
   }
 
-  public static TestAccessEgress walkAccessEgress(
-    int stop,
-    int durationInSeconds,
-    double walkReluctance
-  ) {
-    return walkAccessEgress(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
+  public static TestAccessEgress walk(int stop, int durationInSeconds, double walkReluctance) {
+    return walk(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
   }
 
-  public static TestAccessEgress walkAccessEgress(int stop, int durationInSeconds, int cost) {
+  public static TestAccessEgress walk(int stop, int durationInSeconds, int cost) {
     return new Builder(stop, durationInSeconds).withCost(cost).build();
   }
 
@@ -66,16 +62,11 @@ public class TestAccessEgress implements RaptorAccessEgress {
    * which is repeatead every 24 hours. This allows the access to only be traversable between for
    * example 08:00 and 16:00 every day.
    */
-  public static TestAccessEgress walkAccessEgress(
-    int stop,
-    int durationInSeconds,
-    int opening,
-    int closing
-  ) {
+  public static TestAccessEgress walk(int stop, int durationInSeconds, int opening, int closing) {
     return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
   }
 
-  public static TestAccessEgress walkAccessEgress(
+  public static TestAccessEgress walk(
     int stop,
     int durationInSeconds,
     int cost,
@@ -132,7 +123,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   public static Collection<RaptorAccessEgress> transfers(int... stopTimes) {
     List<RaptorAccessEgress> legs = new ArrayList<>();
     for (int i = 0; i < stopTimes.length; i += 2) {
-      legs.add(walkAccessEgress(stopTimes[i], stopTimes[i + 1]));
+      legs.add(walk(stopTimes[i], stopTimes[i + 1]));
     }
     return legs;
   }

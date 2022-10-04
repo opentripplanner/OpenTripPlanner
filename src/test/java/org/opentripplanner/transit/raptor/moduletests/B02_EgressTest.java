@@ -42,12 +42,12 @@ public class B02_EgressTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D20s))
       .addEgressPaths(
-        TestAccessEgress.walkAccessEgress(STOP_D, D20m), // Not optimal
-        TestAccessEgress.walkAccessEgress(STOP_E, D7m), // Earliest arrival time: 0:16 + 3m = 0:19
-        TestAccessEgress.walkAccessEgress(STOP_F, D4m), // Best compromise of cost and time
-        TestAccessEgress.walkAccessEgress(STOP_G, D1s) // Lowest cost
+        TestAccessEgress.walk(STOP_D, D20m), // Not optimal
+        TestAccessEgress.walk(STOP_E, D7m), // Earliest arrival time: 0:16 + 3m = 0:19
+        TestAccessEgress.walk(STOP_F, D4m), // Best compromise of cost and time
+        TestAccessEgress.walk(STOP_G, D1s) // Lowest cost
       )
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30);

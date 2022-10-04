@@ -58,8 +58,8 @@ public class A02_SingeRouteRestrictionsTest implements RaptorTestConstants {
     data.withRoute(route(pattern).withTimetable(schedule("00:01, 00:03, 00:05")));
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D30s))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_D, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetableEnabled(true);

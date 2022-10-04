@@ -47,13 +47,13 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
     );
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D1m))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D1m))
       // All egress paths are all pareto-optimal (McRaptor).
       .addEgressPaths(
         flexAndWalk(STOP_C, D7m), // best combination of transfers and time
         flex(STOP_D, D3m, TWO_RIDES), // earliest arrival time
         flexAndWalk(STOP_E, D1m59s, TWO_RIDES), // lowest cost
-        TestAccessEgress.walkAccessEgress(STOP_F, D10m) // lowest num-of-transfers (0)
+        TestAccessEgress.walk(STOP_F, D10m) // lowest num-of-transfers (0)
       );
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 

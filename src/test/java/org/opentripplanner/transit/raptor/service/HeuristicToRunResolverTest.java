@@ -120,6 +120,6 @@ public class HeuristicToRunResolverTest {
   }
 
   private RaptorAccessEgress dummyAccessEgress() {
-    return TestAccessEgress.walkAccessEgress(1, 10);
+    return TestAccessEgress.walk(1, 10);
   }
 }

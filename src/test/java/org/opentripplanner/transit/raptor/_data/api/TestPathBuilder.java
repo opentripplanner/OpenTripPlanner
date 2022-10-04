@@ -43,10 +43,7 @@ public class TestPathBuilder {
    * the access start time and prevent time-shifting it.
    */
   public TestPathBuilder access(int startTime, int duration, int toStop) {
-    return access(
-      startTime,
-      TestAccessEgress.walkAccessEgress(toStop, duration, startTime, startTime)
-    );
+    return access(startTime, TestAccessEgress.walk(toStop, duration, startTime, startTime));
   }
 
   /**
@@ -60,11 +57,11 @@ public class TestPathBuilder {
   }
 
   public TestPathBuilder walk(int duration, int toStop) {
-    return walk(TestTransfer.walkTransfer(toStop, duration));
+    return walk(TestTransfer.transfer(toStop, duration));
   }
 
   public TestPathBuilder walk(int duration, int toStop, int cost) {
-    return walk(TestTransfer.walkTransfer(toStop, duration, cost));
+    return walk(TestTransfer.transfer(toStop, duration, cost));
   }
 
   public TestPathBuilder walk(TestTransfer transfer) {
@@ -96,7 +93,7 @@ public class TestPathBuilder {
   }
 
   public Path<TestTripSchedule> egress(int duration) {
-    return egress(TestAccessEgress.walkAccessEgress(currentStop(), duration));
+    return egress(TestAccessEgress.walk(currentStop(), duration));
   }
 
   public Path<TestTripSchedule> egress(TestAccessEgress transfer) {

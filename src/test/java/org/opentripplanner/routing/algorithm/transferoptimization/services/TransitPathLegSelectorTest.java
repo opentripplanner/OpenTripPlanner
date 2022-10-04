@@ -123,10 +123,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   }
 
   private TransitPathLeg<TestTripSchedule> transitLeg(int egressStop) {
-    TestAccessEgress walk = TestAccessEgress.walkAccessEgress(
-      egressStop,
-      EGRESS_END - EGRESS_START
-    );
+    TestAccessEgress walk = TestAccessEgress.walk(egressStop, EGRESS_END - EGRESS_START);
     var egress = new EgressPathLeg<TestTripSchedule>(
       walk,
       EGRESS_START,

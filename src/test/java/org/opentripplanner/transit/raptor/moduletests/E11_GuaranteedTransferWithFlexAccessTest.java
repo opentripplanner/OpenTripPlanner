@@ -47,13 +47,13 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
 
     data.withRoutes(r1, r2);
     data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
-    data.withTransfer(STOP_A, TestTransfer.walkTransfer(STOP_B, D10m));
+    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
     data.mcCostParamsBuilder().transferCost(100);
 
     requestBuilder
       .searchParams()
       .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_D, D1m));
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D1m));
 
     requestBuilder
       .searchParams()

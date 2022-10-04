@@ -12,7 +12,7 @@ public class Access extends AbstractStopArrival {
     this(
       stop,
       arrivalTime,
-      TestAccessEgress.walkAccessEgress(stop, Math.abs(arrivalTime - departureTime), cost)
+      TestAccessEgress.walk(stop, Math.abs(arrivalTime - departureTime), cost)
     );
   }
 

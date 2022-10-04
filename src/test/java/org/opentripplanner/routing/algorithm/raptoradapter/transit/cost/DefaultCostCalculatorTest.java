@@ -102,10 +102,10 @@ public class DefaultCostCalculatorTest {
     var GENERALIZED_COST = 100;
 
     // transfer cost on stop index 0 is 0 - do not subtract anything
-    var t1 = TestAccessEgress.walkAccessEgress(0, 15, GENERALIZED_COST);
+    var t1 = TestAccessEgress.walk(0, 15, GENERALIZED_COST);
     assertEquals(GENERALIZED_COST, subject.costEgress(t1));
     // transfer cost on stop index 1 is 25 - subtract 25 from generalized cost
-    var t2 = TestAccessEgress.walkAccessEgress(1, 15, 100);
+    var t2 = TestAccessEgress.walk(1, 15, 100);
     assertEquals(GENERALIZED_COST - 25, subject.costEgress(t2));
   }
 

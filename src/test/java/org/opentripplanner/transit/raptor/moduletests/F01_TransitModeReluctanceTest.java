@@ -47,8 +47,8 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_B, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetableEnabled(true);

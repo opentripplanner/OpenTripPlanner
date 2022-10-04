@@ -18,10 +18,7 @@ public class AccessStopArrivalTest {
   private static final int DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 10 * 60;
   private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
-  private static final TestAccessEgress WALK = TestAccessEgress.walkAccessEgress(
-    ALIGHT_STOP,
-    ACCESS_DURATION
-  );
+  private static final TestAccessEgress WALK = TestAccessEgress.walk(ALIGHT_STOP, ACCESS_DURATION);
   private static final int COST = WALK.generalizedCost();
 
   private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(

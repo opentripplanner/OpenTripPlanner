@@ -76,14 +76,14 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .addAccessPaths(
-        TestAccessEgress.walkAccessEgress(STOP_A, D1s),
-        TestAccessEgress.walkAccessEgress(STOP_B, D10s), // Best option
-        TestAccessEgress.walkAccessEgress(STOP_C, D5m)
+        TestAccessEgress.walk(STOP_A, D1s),
+        TestAccessEgress.walk(STOP_B, D10s), // Best option
+        TestAccessEgress.walk(STOP_C, D5m)
       )
       .addEgressPaths(
-        TestAccessEgress.walkAccessEgress(STOP_D, D5m),
-        TestAccessEgress.walkAccessEgress(STOP_E, D10s), // Best option
-        TestAccessEgress.walkAccessEgress(STOP_F, D1s)
+        TestAccessEgress.walk(STOP_D, D5m),
+        TestAccessEgress.walk(STOP_E, D10s), // Best option
+        TestAccessEgress.walk(STOP_F, D1s)
       )
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)

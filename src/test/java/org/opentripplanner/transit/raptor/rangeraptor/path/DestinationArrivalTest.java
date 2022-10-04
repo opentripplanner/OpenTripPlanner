@@ -15,7 +15,7 @@ public class DestinationArrivalTest {
   private static final int ACCESS_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 72;
-  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walkAccessEgress(
+  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walk(
     ACCESS_STOP,
     ACCESS_DURATION
   );
@@ -50,7 +50,7 @@ public class DestinationArrivalTest {
   );
 
   private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
-    TestAccessEgress.walkAccessEgress(TRANSIT_STOP, DESTINATION_DURATION_TIME),
+    TestAccessEgress.walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
     TRANSIT_ARRIVAL,
     TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
     DESTINATION_COST

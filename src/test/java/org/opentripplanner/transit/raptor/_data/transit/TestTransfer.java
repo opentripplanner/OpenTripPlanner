@@ -36,15 +36,15 @@ public class TestTransfer implements RaptorTransfer {
     this.closing = builder.closing;
   }
 
-  public static TestTransfer walkTransfer(int stop, int durationInSeconds) {
+  public static TestTransfer transfer(int stop, int durationInSeconds) {
     return new Builder(stop, durationInSeconds).build();
   }
 
-  public static TestTransfer walkTransfer(int stop, int durationInSeconds, double walkReluctance) {
-    return walkTransfer(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
+  public static TestTransfer transfer(int stop, int durationInSeconds, double walkReluctance) {
+    return transfer(stop, durationInSeconds, walkCost(durationInSeconds, walkReluctance));
   }
 
-  public static TestTransfer walkTransfer(int stop, int durationInSeconds, int cost) {
+  public static TestTransfer transfer(int stop, int durationInSeconds, int cost) {
     return new Builder(stop, durationInSeconds).withCost(cost).build();
   }
 
@@ -54,16 +54,11 @@ public class TestTransfer implements RaptorTransfer {
    * which is repeatead every 24 hours. This allows the access to only be traversable between for
    * example 08:00 and 16:00 every day.
    */
-  public static TestTransfer walkTransfer(
-    int stop,
-    int durationInSeconds,
-    int opening,
-    int closing
-  ) {
+  public static TestTransfer transfer(int stop, int durationInSeconds, int opening, int closing) {
     return new Builder(stop, durationInSeconds).withOpeningHours(opening, closing).build();
   }
 
-  public static TestTransfer walkTransfer(
+  public static TestTransfer transfer(
     int stop,
     int durationInSeconds,
     int cost,
@@ -79,7 +74,7 @@ public class TestTransfer implements RaptorTransfer {
   public static Collection<TestTransfer> transfers(int... stopTimes) {
     List<TestTransfer> legs = new ArrayList<>();
     for (int i = 0; i < stopTimes.length; i += 2) {
-      legs.add(walkTransfer(stopTimes[i], stopTimes[i + 1]));
+      legs.add(transfer(stopTimes[i], stopTimes[i + 1]));
     }
     return legs;
   }

@@ -85,11 +85,8 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static final int TX1_START = time("10:05:15");
   public static final int TX1_END = time("10:06:15");
   public static final int TX1_DURATION = TX1_END - TX1_START;
-  public static final RaptorTransfer TX1_TRANSFER = TestTransfer.walkTransfer(STOP_B, TX1_DURATION);
-  public static final RaptorTransfer TX1_TRANSFER_REV = TestTransfer.walkTransfer(
-    STOP_A,
-    TX1_DURATION
-  );
+  public static final RaptorTransfer TX1_TRANSFER = TestTransfer.transfer(STOP_B, TX1_DURATION);
+  public static final RaptorTransfer TX1_TRANSFER_REV = TestTransfer.transfer(STOP_A, TX1_DURATION);
   public static final int TX1_COST = TX1_TRANSFER.generalizedCost();
 
   // Trip A (B ~ BUS L11 10:08 10:20 ~ C)
@@ -106,11 +103,8 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static final int TX2_START = time("10:20:15");
   public static final int TX2_END = time("10:22:15");
   public static final int TX2_DURATION = TX2_END - TX2_START;
-  public static final RaptorTransfer TX2_TRANSFER = TestTransfer.walkTransfer(STOP_D, TX2_DURATION);
-  public static final RaptorTransfer TX2_TRANSFER_REV = TestTransfer.walkTransfer(
-    STOP_C,
-    TX2_DURATION
-  );
+  public static final RaptorTransfer TX2_TRANSFER = TestTransfer.transfer(STOP_D, TX2_DURATION);
+  public static final RaptorTransfer TX2_TRANSFER_REV = TestTransfer.transfer(STOP_C, TX2_DURATION);
   public static final int TX2_COST = TX2_TRANSFER.generalizedCost();
 
   // Wait 15s (ALIGHT_SLACK)

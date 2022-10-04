@@ -72,12 +72,12 @@ public class G01_HeuristicTest implements RaptorTestConstants {
 
     data.withRoute(route(pattern("R1", STOP_C, STOP_D)).withTimetable(schedule("00:05, 00:08")));
 
-    data.withTransfer(STOP_B, TestTransfer.walkTransfer(STOP_C, D30s));
+    data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D30s));
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_D, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .timetableEnabled(true);
 

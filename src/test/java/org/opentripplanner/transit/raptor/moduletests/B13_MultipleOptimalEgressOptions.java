@@ -83,9 +83,9 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
     // We will test board- and alight-slack in a separate test
     requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
 
-    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_A, D0s));
+    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 
-    data.withTransfer(STOP_B, TestTransfer.walkTransfer(STOP_C, D2m));
+    data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m));
 
     // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -136,19 +136,13 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
   private void withFlexEgressAsBestDestinationArrivalTime() {
     requestBuilder
       .searchParams()
-      .addEgressPaths(
-        flex(STOP_C, D7m, 1, COST_10m),
-        TestAccessEgress.walkAccessEgress(STOP_C, D7m)
-      );
+      .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D7m));
   }
 
   private void withWalkingAsBestDestinationArrivalTime() {
     requestBuilder
       .searchParams()
-      .addEgressPaths(
-        flex(STOP_C, D7m, 1, COST_10m),
-        TestAccessEgress.walkAccessEgress(STOP_C, D5m)
-      );
+      .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D5m));
   }
 
   private String runSearch() {

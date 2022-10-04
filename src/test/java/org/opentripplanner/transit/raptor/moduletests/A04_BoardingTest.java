@@ -107,8 +107,8 @@ public class A04_BoardingTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_A, D1m))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_H, D1m))
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D1m))
+      .addEgressPaths(TestAccessEgress.walk(STOP_H, D1m))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchOneIterationOnly();

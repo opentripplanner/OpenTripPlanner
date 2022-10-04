@@ -70,8 +70,8 @@ public class E02_NotAllowedConstrainedTransferTest implements RaptorTestConstant
     requestBuilder
       .searchParams()
       .constrainedTransfersEnabled(true)
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_C, D30s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_C, D30s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .timetableEnabled(true);

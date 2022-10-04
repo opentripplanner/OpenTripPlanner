@@ -55,7 +55,7 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
     );
 
     // It is not possible to transfer from D -> C
-    data.withTransfer(STOP_C, TestTransfer.walkTransfer(STOP_D, D30s));
+    data.withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30s));
 
     data.withRoute(
       route(pattern("R2", STOP_D, STOP_E))
@@ -67,8 +67,8 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walkAccessEgress(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_E, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
+      .addEgressPaths(TestAccessEgress.walk(STOP_E, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D3m);

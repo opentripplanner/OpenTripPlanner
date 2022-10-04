@@ -44,16 +44,16 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .addAccessPaths(
-        TestAccessEgress.walkAccessEgress(STOP_A, D1s), // Lowest cost
-        TestAccessEgress.walkAccessEgress(STOP_B, D4m), // Best compromise of cost and time
-        TestAccessEgress.walkAccessEgress(STOP_C, D7m), // Latest departure time: 0:16 - 5m = 0:11
-        TestAccessEgress.walkAccessEgress(STOP_D, D20m) // Not optimal
+        TestAccessEgress.walk(STOP_A, D1s), // Lowest cost
+        TestAccessEgress.walk(STOP_B, D4m), // Best compromise of cost and time
+        TestAccessEgress.walk(STOP_C, D7m), // Latest departure time: 0:16 - 5m = 0:11
+        TestAccessEgress.walk(STOP_D, D20m) // Not optimal
       )
       .addEgressPaths(
-        TestAccessEgress.walkAccessEgress(STOP_E, D20m), // Not optimal
-        TestAccessEgress.walkAccessEgress(STOP_F, D7m), // Earliest arrival time: 0:18 + 3m = 0:21
-        TestAccessEgress.walkAccessEgress(STOP_G, D4m), // Best compromise of cost and time
-        TestAccessEgress.walkAccessEgress(STOP_H, D1s) // Lowest cost
+        TestAccessEgress.walk(STOP_E, D20m), // Not optimal
+        TestAccessEgress.walk(STOP_F, D7m), // Earliest arrival time: 0:18 + 3m = 0:21
+        TestAccessEgress.walk(STOP_G, D4m), // Best compromise of cost and time
+        TestAccessEgress.walk(STOP_H, D1s) // Lowest cost
       )
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00);

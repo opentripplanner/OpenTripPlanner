@@ -17,7 +17,7 @@ public class TransferStopArrivalTest {
   private static final int ACCESS_TO_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 300;
-  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walkAccessEgress(
+  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walk(
     ACCESS_TO_STOP,
     ACCESS_DURATION
   );
@@ -34,7 +34,7 @@ public class TransferStopArrivalTest {
   private static final int TRANSFER_TO_STOP = 102;
   private static final int TRANSFER_LEG_DURATION = 360;
   private static final int TRANSFER_ALIGHT_TIME = TRANSIT_ALIGHT_TIME + TRANSFER_LEG_DURATION;
-  private static final TestTransfer TRANSFER_WALK = TestTransfer.walkTransfer(
+  private static final TestTransfer TRANSFER_WALK = TestTransfer.transfer(
     TRANSFER_TO_STOP,
     TRANSFER_LEG_DURATION
   );

@@ -18,7 +18,7 @@ public class TransitStopArrivalTest {
   private static final int ACCESS_TO_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 300;
-  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walkAccessEgress(
+  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walk(
     ACCESS_TO_STOP,
     ACCESS_DURATION
   );

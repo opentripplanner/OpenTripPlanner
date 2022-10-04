@@ -45,12 +45,12 @@ public class B01_AccessTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .addAccessPaths(
-        TestAccessEgress.walkAccessEgress(STOP_B, D1s), // Lowest cost
-        TestAccessEgress.walkAccessEgress(STOP_C, D4m), // Best compromise of cost and time
-        TestAccessEgress.walkAccessEgress(STOP_D, DurationUtils.durationInSeconds("7m")), // Latest departure time
-        TestAccessEgress.walkAccessEgress(STOP_E, DurationUtils.durationInSeconds("13m")) // Not optimal
+        TestAccessEgress.walk(STOP_B, D1s), // Lowest cost
+        TestAccessEgress.walk(STOP_C, D4m), // Best compromise of cost and time
+        TestAccessEgress.walk(STOP_D, DurationUtils.durationInSeconds("7m")), // Latest departure time
+        TestAccessEgress.walk(STOP_E, DurationUtils.durationInSeconds("13m")) // Not optimal
       )
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_F, D1s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D1s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       // Removing the search-window should not have any effect, but it does.

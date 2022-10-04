@@ -53,7 +53,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
       // All access paths are all pareto-optimal (McRaptor).
       .addAccessPaths(
         // lowest num-of-transfers (0)
-        TestAccessEgress.walkAccessEgress(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
+        TestAccessEgress.walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
         // lowest cost
         flexAndWalk(STOP_C, D2m, TWO_RIDES, 2 * COST_ONE_STOP - COST_ONE_SEC),
         // latest departure time
@@ -61,7 +61,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
         // best on combination of transfers and time
         flexAndWalk(STOP_E, D7m, ONE_RIDE, 4 * COST_ONE_STOP)
       )
-      .addEgressPaths(TestAccessEgress.walkAccessEgress(STOP_F, D1m));
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D1m));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 

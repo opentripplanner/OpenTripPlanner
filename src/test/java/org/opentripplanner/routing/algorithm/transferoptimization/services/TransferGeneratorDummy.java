@@ -74,7 +74,7 @@ public class TransferGeneratorDummy {
     int toStop,
     TestTripSchedule toTrip
   ) {
-    var pathTransfer = fromStop == toStop ? null : TestTransfer.walkTransfer(toStop, walkDuration);
+    var pathTransfer = fromStop == toStop ? null : TestTransfer.transfer(toStop, walkDuration);
 
     return new TripToTripTransfer<>(
       departure(fromTrip, fromStop),
@@ -90,7 +90,7 @@ public class TransferGeneratorDummy {
   ) {
     int fromStop = builder.getFromStopIndex();
     int toStop = builder.getToStopIndex();
-    var pathTransfer = fromStop == toStop ? null : TestTransfer.walkTransfer(toStop, walkDuration);
+    var pathTransfer = fromStop == toStop ? null : TestTransfer.transfer(toStop, walkDuration);
 
     return new TripToTripTransfer<>(
       departure(builder.getFromTrip(), builder.getFromStopIndex()),
