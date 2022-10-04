@@ -27,4 +27,33 @@ public class DenverSmokeTest {
       List.of("WALK", "TRAM", "WALK", "BUS", "WALK")
     );
   }
+
+  @Test
+  public void vehiclePositions() {
+    var json = SmokeTest.sendGraphQLRequest(
+      """
+      query {
+      	patterns {
+      		vehiclePositions {
+      			vehicleId
+      			lastUpdated
+      			trip {
+      				id
+      				gtfsId
+      			}
+      			stopRelationship {
+      				status
+      				stop {
+      					name
+      				}
+      			}
+      		}
+      	}
+      }
+              
+        """
+    );
+
+    System.out.println(json);
+  }
 }

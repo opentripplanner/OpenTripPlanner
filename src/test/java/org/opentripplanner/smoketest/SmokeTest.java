@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -161,5 +163,25 @@ public class SmokeTest {
     assertTrue(itineraries.size() > 1);
 
     assertThatItineraryHasModes(itineraries, expectedModes);
+  }
+
+  static JsonNode sendGraphQLRequest(String query) {
+    var uri = URI.create("http://localhost:8080/otp/routers/default/index/graphql");
+    var request = HttpRequest
+      .newBuilder()
+      .POST(HttpRequest.BodyPublishers.ofByteArray(query.getBytes(StandardCharsets.UTF_8)))
+      .uri(uri)
+      .setHeader("Content-Type", "application/graphql")
+      .build();
+
+    System.out.println(request.headers());
+    try {
+      var response = client.send(request, BodyHandlers.ofInputStream());
+
+      assertEquals(200, response.statusCode(), "Status code returned by OTP server was not 200");
+      return SmokeTest.mapper.readTree(response.body());
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
