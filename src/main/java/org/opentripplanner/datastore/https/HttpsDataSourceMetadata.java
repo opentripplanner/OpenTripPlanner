@@ -8,12 +8,13 @@ import java.util.stream.Collectors;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.utils.DateUtils;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * HTTPS data source metadata returned by the HTTP server (HTTP headers).
  */
-public class HttpsDataSourceMetadata {
+class HttpsDataSourceMetadata {
 
   static final String CONTENT_TYPE_APPLICATION_GZIP = "application/gzip";
   static final String CONTENT_TYPE_APPLICATION_ZIP = "application/zip";
@@ -28,7 +29,7 @@ public class HttpsDataSourceMetadata {
   private final long contentLength;
   private final long lastModified;
 
-  public HttpsDataSourceMetadata(List<Header> headers) {
+  HttpsDataSourceMetadata(List<Header> headers) {
     this(
       headers
         .stream()
@@ -37,29 +38,29 @@ public class HttpsDataSourceMetadata {
     );
   }
 
-  public HttpsDataSourceMetadata(Map<String, String> headers) {
+  HttpsDataSourceMetadata(Map<String, String> headers) {
     contentType = headers.get(HttpHeaders.CONTENT_TYPE);
     contentLength = parseLong(headers.get(HttpHeaders.CONTENT_LENGTH));
     lastModified = parseDate(headers.get(HttpHeaders.LAST_MODIFIED));
   }
 
-  public String contentType() {
+  String contentType() {
     return contentType;
   }
 
-  public long contentLength() {
+  long contentLength() {
     return contentLength;
   }
 
-  public long lastModified() {
+  long lastModified() {
     return lastModified;
   }
 
-  public boolean isZipContentType() {
+  boolean isZipContentType() {
     return CONTENT_TYPE_APPLICATION_ZIP.equalsIgnoreCase(contentType());
   }
 
-  public boolean isGzipContentType() {
+  boolean isGzipContentType() {
     return CONTENT_TYPE_APPLICATION_GZIP.equalsIgnoreCase(contentType());
   }
 
@@ -77,7 +78,7 @@ public class HttpsDataSourceMetadata {
     try {
       return Long.parseLong(header);
     } catch (Exception e) {
-      return -1;
+      return DataSource.UNKNOWN;
     }
   }
 
