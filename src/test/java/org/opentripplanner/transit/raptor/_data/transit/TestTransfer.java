@@ -108,68 +108,6 @@ public class TestTransfer implements RaptorTransfer {
   }
 
   @Override
-  public int earliestDepartureTime(int requestedDepartureTime) {
-    if (!hasOpeningHours()) {
-      return requestedDepartureTime;
-    }
-    if (isClosed()) {
-      return -1;
-    }
-
-    int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
-    int specificOpening = days * SECONDS_IN_DAY + opening;
-    int specificClosing = days * SECONDS_IN_DAY + closing;
-
-    if (requestedDepartureTime < specificOpening) {
-      return specificOpening;
-    } else if (requestedDepartureTime > specificClosing) {
-      // return the opening time for the next day
-      return specificOpening + SECONDS_IN_DAY;
-    }
-    return requestedDepartureTime;
-  }
-
-  @Override
-  public int latestArrivalTime(int requestedArrivalTime) {
-    if (!hasOpeningHours()) {
-      return requestedArrivalTime;
-    }
-    if (isClosed()) {
-      return -1;
-    }
-
-    // opening & closing is relative to the departure
-    int requestedDepartureTime = requestedArrivalTime - durationInSeconds();
-    int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
-    int specificOpening = days * SECONDS_IN_DAY + opening;
-    int specificClosing = days * SECONDS_IN_DAY + closing;
-    int closeAtArrival = specificClosing + durationInSeconds();
-
-    if (requestedDepartureTime < specificOpening) {
-      // return the closing for the previous day, offset with durationInSeconds()
-      return closeAtArrival - SECONDS_IN_DAY;
-    } else if (requestedArrivalTime > closeAtArrival) {
-      return closeAtArrival;
-    }
-    return requestedArrivalTime;
-  }
-
-  @Override
-  public boolean hasOpeningHours() {
-    return opening != null || closing != null;
-  }
-
-  @Override
-  public int numberOfRides() {
-    return numberOfRides;
-  }
-
-  @Override
-  public boolean stopReachedOnBoard() {
-    return stopReachedOnBoard;
-  }
-
-  @Override
   public String toString() {
     return asString();
   }

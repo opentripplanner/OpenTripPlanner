@@ -5,6 +5,9 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.transit.raptor.api.transit.AccessEgress;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
+/**
+ * Default implementation of the AccessEgress interface.
+ */
 public class DefaultAccessEgress implements AccessEgress {
 
   private final int stop;
@@ -51,7 +54,9 @@ public class DefaultAccessEgress implements AccessEgress {
   public String toString() {
     return ToStringBuilder
       .of(DefaultAccessEgress.class)
-      .addStr("transfer", asString())
+      .addNum("stop", stop)
+      .addNum("durationInSeconds", durationInSeconds)
+      .addNum("generalizedCost", generalizedCost)
       .addObj("state", lastState)
       .toString();
   }

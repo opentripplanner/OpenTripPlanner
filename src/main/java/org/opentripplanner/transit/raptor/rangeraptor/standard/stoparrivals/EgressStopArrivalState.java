@@ -55,12 +55,8 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
     super.transferToStop(fromStop, arrivalTime, transferPath);
     for (AccessEgress egressPath : egressPaths) {
       if (egressPath.stopReachedOnBoard()) {
-        callback.newDestinationArrival(
-          round,
-          arrivalTime,
-          transferPath.stopReachedOnBoard(),
-          egressPath
-        );
+        // TODO add unit test for this use case
+        callback.newDestinationArrival(round, arrivalTime, false, egressPath);
       }
     }
   }

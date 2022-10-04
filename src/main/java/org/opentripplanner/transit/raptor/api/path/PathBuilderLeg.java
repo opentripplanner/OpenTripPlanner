@@ -109,9 +109,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /** This leg is a transit leg or access/transfer/egress leg with rides (FLEX) */
   public boolean hasRides() {
     return (
-      isTransit() ||
-      (isTransfer() && ((MyTransferLeg) leg).transfer.hasRides()) ||
-      ((isAccess() || isEgress()) && ((MyStreetLeg) leg).streetPath.hasRides())
+      isTransit() || ((isAccess() || isEgress()) && ((MyStreetLeg) leg).streetPath.hasRides())
     );
   }
 

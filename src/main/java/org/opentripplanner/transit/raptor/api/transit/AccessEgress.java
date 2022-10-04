@@ -1,14 +1,42 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.util.time.DurationUtils;
 
+/**
+ * Encapsulate information about an access or egress path. We do not distinguish between
+ * the access (origin to first stop) or egress (last stop to destination),
+ * to Raptor - all these are the same thing.
+ */
 public interface AccessEgress {
-  int durationInSeconds();
-
+  /**
+   * <ul>
+   *     <li>Access: The first stop in the journey, where the access path just arrived at.
+   *     <li>Egress: Last stop before destination, hence not the arrival point, but the departure
+   *     stop.
+   * </ul>
+   * The journey origin, destination and transit path board stop must be part of the context;
+   * hence not a member attribute of this type.
+   */
   int stop();
 
+  /**
+   * The generalized cost of this access/egress in centi-seconds. The value is used to compare with
+   * riding transit, and will be one component of a full itinerary.
+   * <p>
+   * This method is called many times, so care needs to be taken that the value is stored, not
+   * calculated for each invocation.
+   */
   int generalizedCost();
+
+  /**
+   * The time duration to walk or travel the path in seconds. This is not the entire duration from
+   * the journey origin, but just:
+   * <ul>
+   *     <li>Access: journey origin to first stop.
+   *     <li>Egress: last stop to journey destination.
+   * </ul>
+   */
+  int durationInSeconds();
 
   /* TIME-DEPENDENT ACCESS/TRANSFER/EGRESS */
   // The methods below should be only overridden when an AccessEgress is only available at
