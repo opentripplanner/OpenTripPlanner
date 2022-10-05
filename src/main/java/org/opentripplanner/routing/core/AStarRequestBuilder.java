@@ -9,17 +9,15 @@ import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
 public class AStarRequestBuilder {
 
-  private Instant startTime = Instant.now();
-  private StreetMode mode = StreetMode.WALK;
-  private RoutingPreferences preferences = new RoutingPreferences();
-  private boolean arriveBy = false;
-  private boolean wheelchair = false;
-  private VehicleParkingRequest parking = new VehicleParkingRequest();
-  private VehicleRentalRequest rental = new VehicleRentalRequest();
-  private GenericLocation from = null;
-  private GenericLocation to = null;
-
-  AStarRequestBuilder() {}
+  Instant startTime;
+  StreetMode mode;
+  RoutingPreferences preferences;
+  boolean arriveBy;
+  boolean wheelchair;
+  VehicleParkingRequest parking;
+  VehicleRentalRequest rental;
+  GenericLocation from;
+  GenericLocation to;
 
   AStarRequestBuilder(AStarRequest original) {
     this.startTime = original.startTime();
@@ -38,17 +36,9 @@ public class AStarRequestBuilder {
     return this;
   }
 
-  public Instant startTime() {
-    return startTime;
-  }
-
   public AStarRequestBuilder withMode(StreetMode mode) {
     this.mode = mode;
     return this;
-  }
-
-  public StreetMode mode() {
-    return mode;
   }
 
   public AStarRequestBuilder withPreferences(RoutingPreferences preferences) {
@@ -65,17 +55,9 @@ public class AStarRequestBuilder {
     return this;
   }
 
-  public boolean arriveBy() {
-    return arriveBy;
-  }
-
   public AStarRequestBuilder withWheelchair(boolean wheelchair) {
     this.wheelchair = wheelchair;
     return this;
-  }
-
-  public boolean wheelchair() {
-    return wheelchair;
   }
 
   public AStarRequestBuilder withParking(VehicleParkingRequest parking) {
@@ -83,17 +65,9 @@ public class AStarRequestBuilder {
     return this;
   }
 
-  public VehicleParkingRequest parking() {
-    return parking;
-  }
-
   public AStarRequestBuilder withRental(VehicleRentalRequest rental) {
     this.rental = rental;
     return this;
-  }
-
-  public VehicleRentalRequest rental() {
-    return rental;
   }
 
   public AStarRequestBuilder withFrom(GenericLocation from) {
@@ -101,17 +75,9 @@ public class AStarRequestBuilder {
     return this;
   }
 
-  public GenericLocation from() {
-    return from;
-  }
-
   public AStarRequestBuilder withTo(GenericLocation to) {
     this.to = to;
     return this;
-  }
-
-  public GenericLocation to() {
-    return to;
   }
 
   public AStarRequest build() {

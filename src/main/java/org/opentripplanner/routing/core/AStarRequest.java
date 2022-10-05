@@ -22,6 +22,8 @@ import org.opentripplanner.routing.spt.DominanceFunction;
  */
 public class AStarRequest {
 
+  private static final AStarRequest DEFAULT = new AStarRequest();
+
   /**
    * How close to do you have to be to the start or end to be considered "close".
    *
@@ -49,23 +51,40 @@ public class AStarRequest {
 
   protected DataOverlayContext dataOverlayContext;
 
+  /**
+   * Constructor only used for creating a default instance.
+   */
+  private AStarRequest() {
+    this.startTime = Instant.now();
+    this.preferences = new RoutingPreferences();
+    this.mode = StreetMode.WALK;
+    this.arriveBy = false;
+    this.wheelchair = false;
+    this.parking = new VehicleParkingRequest();
+    this.rental = new VehicleRentalRequest();
+    this.from = null;
+    this.fromEnvelope = null;
+    this.to = null;
+    this.toEnvelope = null;
+  }
+
   AStarRequest(AStarRequestBuilder builder) {
-    this.startTime = builder.startTime();
+    this.startTime = builder.startTime;
     this.preferences = builder.preferences();
-    this.mode = builder.mode();
-    this.arriveBy = builder.arriveBy();
-    this.wheelchair = builder.wheelchair();
-    this.parking = builder.parking();
-    this.rental = builder.rental();
-    this.from = builder.from();
+    this.mode = builder.mode;
+    this.arriveBy = builder.arriveBy;
+    this.wheelchair = builder.wheelchair;
+    this.parking = builder.parking;
+    this.rental = builder.rental;
+    this.from = builder.from;
     this.fromEnvelope = createEnvelope(from);
-    this.to = builder.to();
+    this.to = builder.to;
     this.toEnvelope = createEnvelope(to);
   }
 
   @Nonnull
   public static AStarRequestBuilder of() {
-    return new AStarRequestBuilder();
+    return new AStarRequestBuilder(DEFAULT).withStartTime(Instant.now());
   }
 
   @Nonnull
