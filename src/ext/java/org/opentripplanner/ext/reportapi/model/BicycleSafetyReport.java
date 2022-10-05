@@ -28,11 +28,11 @@ public class BicycleSafetyReport {
     wayPropertySet
       .getWayProperties()
       .forEach(p -> {
-        buf.addText(p.getSpecifier().toString());
-        buf.addBoolean(p.isSafetyMixin());
-        buf.addText(p.getProperties().getPermission().toString());
+        buf.addText(p.specifier().toString());
+        buf.addBoolean(p.safetyMixin());
+        buf.addText(p.properties().getPermission().toString());
 
-        var safetyProps = p.getProperties().getBicycleSafetyFeatures();
+        var safetyProps = p.properties().getBicycleSafetyFeatures();
         buf.addNumber(safetyProps.forward());
         buf.addNumber(safetyProps.back());
         buf.newLine();
