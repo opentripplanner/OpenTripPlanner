@@ -40,7 +40,7 @@ public class RaptorTransferIndex {
 
     final AStarRequest aStarRequest = AStarRequestMapper
       .map(request)
-      .setMode(request.journey().transfer().mode())
+      .withMode(request.journey().transfer().mode())
       .build();
 
     for (int fromStop = 0; fromStop < transfersByStopIndex.size(); fromStop++) {

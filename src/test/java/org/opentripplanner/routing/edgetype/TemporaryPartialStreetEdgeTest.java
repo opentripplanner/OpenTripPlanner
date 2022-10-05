@@ -67,7 +67,7 @@ public class TemporaryPartialStreetEdgeTest {
 
   @Test
   public void testTraversal() {
-    AStarRequest request = AStarRequest.of().setMode(StreetMode.CAR).build();
+    AStarRequest request = AStarRequest.of().withMode(StreetMode.CAR).build();
 
     // Partial edge with same endpoints as the parent.
     TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(
@@ -132,7 +132,7 @@ public class TemporaryPartialStreetEdgeTest {
       tempEdges
     );
 
-    AStarRequest request = AStarRequest.of().setMode(StreetMode.CAR).build();
+    AStarRequest request = AStarRequest.of().withMode(StreetMode.CAR).build();
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;

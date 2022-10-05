@@ -160,7 +160,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 
     var builder = AStarRequest.of();
-    builder.setMode(parkingMode);
+    builder.withMode(parkingMode);
     builder.preferences().parking().setUseAvailabilityInformation(realtime);
     this.request = builder.build();
   }

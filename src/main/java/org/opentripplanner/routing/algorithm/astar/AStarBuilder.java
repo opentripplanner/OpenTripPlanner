@@ -169,7 +169,7 @@ public class AStarBuilder {
     } else {
       AStarRequest aStarRequest = AStarRequestMapper
         .map(routeRequest)
-        .setMode(streetRequest.mode())
+        .withMode(streetRequest.mode())
         .build();
 
       initialStates = State.getInitialStates(origin, aStarRequest);

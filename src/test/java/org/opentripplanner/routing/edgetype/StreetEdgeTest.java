@@ -86,7 +86,7 @@ public class StreetEdgeTest {
 
     AStarRequestBuilder options = AStarRequest.copyOf(proto);
 
-    State s0 = new State(v1, options.setMode(StreetMode.WALK).build());
+    State s0 = new State(v1, options.withMode(StreetMode.WALK).build());
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
@@ -101,7 +101,7 @@ public class StreetEdgeTest {
     StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
     e1.setCarSpeed(10.0f);
 
-    State s0 = new State(v1, AStarRequest.copyOf(proto).setMode(StreetMode.CAR).build());
+    State s0 = new State(v1, AStarRequest.copyOf(proto).withMode(StreetMode.CAR).build());
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
@@ -145,15 +145,15 @@ public class StreetEdgeTest {
     AStarRequestBuilder forward = AStarRequest.copyOf(proto);
     forward.preferences().withBike(it -> it.setSpeed(3.0f));
 
-    State s0 = new State(v0, forward.setMode(StreetMode.BIKE).build());
+    State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0);
     State s2 = e1.traverse(s1);
 
     AStarRequestBuilder reverse = AStarRequest.copyOf(proto);
-    reverse.setArriveBy(true);
+    reverse.withArriveBy(true);
     reverse.preferences().withBike(it -> it.setSpeed(3.0f));
 
-    State s3 = new State(v2, reverse.setMode(StreetMode.BIKE).build());
+    State s3 = new State(v2, reverse.withMode(StreetMode.BIKE).build());
     State s4 = e1.traverse(s3);
     State s5 = e0.traverse(s4);
 
@@ -177,14 +177,14 @@ public class StreetEdgeTest {
 
     AStarRequestBuilder forward = AStarRequest.copyOf(proto);
 
-    State s0 = new State(v0, forward.setMode(StreetMode.BIKE).build());
+    State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0);
     State s2 = e1.traverse(s1);
 
     AStarRequestBuilder reverse = AStarRequest.copyOf(proto);
-    reverse.setArriveBy(true);
+    reverse.withArriveBy(true);
 
-    State s3 = new State(v2, reverse.setMode(StreetMode.BIKE).build());
+    State s3 = new State(v2, reverse.withMode(StreetMode.BIKE).build());
     State s4 = e1.traverse(s3);
     State s5 = e0.traverse(s4);
 
@@ -204,7 +204,7 @@ public class StreetEdgeTest {
     AStarRequestBuilder noPenalty = AStarRequest.copyOf(proto);
     noPenalty.preferences().withBike(it -> it.setSwitchTime(0).setSwitchCost(0));
 
-    State s0 = new State(v0, noPenalty.setMode(StreetMode.BIKE).build());
+    State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0);
     State s2 = e1.traverse(s1);
     State s3 = e2.traverse(s2);
@@ -212,7 +212,7 @@ public class StreetEdgeTest {
     AStarRequestBuilder withPenalty = AStarRequest.copyOf(proto);
     withPenalty.preferences().withBike(it -> it.setSwitchTime(42).setSwitchCost(23));
 
-    State s4 = new State(v0, withPenalty.setMode(StreetMode.BIKE).build());
+    State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
     State s5 = e0.traverse(s4);
     State s6 = e1.traverse(s5);
     State s7 = e2.traverse(s6);
@@ -253,8 +253,8 @@ public class StreetEdgeTest {
     StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
     StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
     AStarRequestBuilder aStarRequestBuilder = AStarRequest.copyOf(proto);
-    aStarRequestBuilder.setArriveBy(true);
-    AStarRequest request = aStarRequestBuilder.setMode(StreetMode.WALK).build();
+    aStarRequestBuilder.withArriveBy(true);
+    AStarRequest request = aStarRequestBuilder.withMode(StreetMode.WALK).build();
     State state = new State(v2, Instant.EPOCH, StateData.getInitialStateData(request), request);
 
     e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
@@ -364,7 +364,7 @@ public class StreetEdgeTest {
     double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
     double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
-    var request = AStarRequest.of().setMode(StreetMode.BIKE);
+    var request = AStarRequest.of().withMode(StreetMode.BIKE);
 
     request
       .preferences()

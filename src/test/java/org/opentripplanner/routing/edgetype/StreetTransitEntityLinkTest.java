@@ -81,14 +81,14 @@ class StreetTransitEntityLinkTest {
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 
-    var req = AStarRequest.of().setMode(StreetMode.BIKE);
+    var req = AStarRequest.of().withMode(StreetMode.BIKE);
     AccessibilityPreferences feature;
     if (onlyAccessible) {
       feature = AccessibilityPreferences.ofOnlyAccessible();
     } else {
       feature = AccessibilityPreferences.ofCost(100, 100);
     }
-    req.setWheelchair(true);
+    req.withWheelchair(true);
     req
       .preferences()
       .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));

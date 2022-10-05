@@ -88,7 +88,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
     var req = AStarRequest.of();
-    req.setWheelchair(true);
+    req.withWheelchair(true);
     req
       .preferences()
       .setWheelchair(
@@ -123,7 +123,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     edge.setStairs(true);
 
     var req = AStarRequest.of();
-    req.setWheelchair(true);
+    req.withWheelchair(true);
     req
       .preferences()
       .setWheelchair(
@@ -164,7 +164,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     edge.setWheelchairAccessible(false);
 
     var req = AStarRequest.of();
-    req.setWheelchair(true);
+    req.withWheelchair(true);
     req
       .preferences()
       .setWheelchair(
@@ -205,7 +205,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     var req = AStarRequest.of();
     req.preferences().withWalk(w -> w.setReluctance(walkReluctance));
-    req.setWheelchair(true);
+    req.withWheelchair(true);
 
     var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);

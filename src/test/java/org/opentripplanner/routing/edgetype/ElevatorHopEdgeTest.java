@@ -8,11 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.AStarRequest;
-import org.opentripplanner.routing.core.AStarRequestBuilder;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -35,7 +33,7 @@ class ElevatorHopEdgeTest {
   public void shouldNotTraverse(Accessibility wheelchair) {
     var req = AStarRequest.of();
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
-    req.setWheelchair(true);
+    req.withWheelchair(true);
     req
       .preferences()
       .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
@@ -60,7 +58,7 @@ class ElevatorHopEdgeTest {
     assertNotNull(result);
     assertTrue(result.weight > 1);
 
-    req = AStarRequest.copyOf(req).setWheelchair(true).build();
+    req = AStarRequest.copyOf(req).withWheelchair(true).build();
     var wheelchairResult = traverse(wheelchair, req);
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);

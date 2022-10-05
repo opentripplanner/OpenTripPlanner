@@ -74,8 +74,8 @@ public class RaptorPathToItineraryMapper {
     this.request =
       AStarRequestMapper
         .map(Transfer.prepareTransferRoutingRequest(request))
-        .setArriveBy(false)
-        .setMode(transferMode)
+        .withArriveBy(false)
+        .withMode(transferMode)
         .build();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(

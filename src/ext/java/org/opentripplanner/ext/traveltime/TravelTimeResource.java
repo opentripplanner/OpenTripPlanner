@@ -277,7 +277,7 @@ public class TravelTimeResource {
 
     AStarRequest aStarRequest = AStarRequestMapper
       .map(routingRequest)
-      .setMode(routingRequest.journey().egress().mode())
+      .withMode(routingRequest.journey().egress().mode())
       .build();
 
     StateData stateData = StateData.getInitialStateData(aStarRequest);

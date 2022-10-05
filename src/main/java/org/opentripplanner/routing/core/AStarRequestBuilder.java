@@ -33,7 +33,7 @@ public class AStarRequestBuilder {
     this.to = original.to();
   }
 
-  public AStarRequestBuilder setStartTime(Instant startTime) {
+  public AStarRequestBuilder withStartTime(Instant startTime) {
     this.startTime = startTime;
     return this;
   }
@@ -42,7 +42,7 @@ public class AStarRequestBuilder {
     return startTime;
   }
 
-  public AStarRequestBuilder setMode(StreetMode mode) {
+  public AStarRequestBuilder withMode(StreetMode mode) {
     this.mode = mode;
     return this;
   }
@@ -51,7 +51,7 @@ public class AStarRequestBuilder {
     return mode;
   }
 
-  public AStarRequestBuilder setPreferences(RoutingPreferences preferences) {
+  public AStarRequestBuilder withPreferences(RoutingPreferences preferences) {
     this.preferences = preferences;
     return this;
   }
@@ -60,7 +60,7 @@ public class AStarRequestBuilder {
     return preferences;
   }
 
-  public AStarRequestBuilder setArriveBy(boolean arriveBy) {
+  public AStarRequestBuilder withArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
     return this;
   }
@@ -69,7 +69,7 @@ public class AStarRequestBuilder {
     return arriveBy;
   }
 
-  public AStarRequestBuilder setWheelchair(boolean wheelchair) {
+  public AStarRequestBuilder withWheelchair(boolean wheelchair) {
     this.wheelchair = wheelchair;
     return this;
   }
@@ -78,7 +78,7 @@ public class AStarRequestBuilder {
     return wheelchair;
   }
 
-  public AStarRequestBuilder setParking(VehicleParkingRequest parking) {
+  public AStarRequestBuilder withParking(VehicleParkingRequest parking) {
     this.parking = parking;
     return this;
   }
@@ -87,7 +87,7 @@ public class AStarRequestBuilder {
     return parking;
   }
 
-  public AStarRequestBuilder setRental(VehicleRentalRequest rental) {
+  public AStarRequestBuilder withRental(VehicleRentalRequest rental) {
     this.rental = rental;
     return this;
   }
@@ -96,7 +96,7 @@ public class AStarRequestBuilder {
     return rental;
   }
 
-  public AStarRequestBuilder setFrom(GenericLocation from) {
+  public AStarRequestBuilder withFrom(GenericLocation from) {
     this.from = from;
     return this;
   }
@@ -105,7 +105,7 @@ public class AStarRequestBuilder {
     return from;
   }
 
-  public AStarRequestBuilder setTo(GenericLocation to) {
+  public AStarRequestBuilder withTo(GenericLocation to) {
     this.to = to;
     return this;
   }

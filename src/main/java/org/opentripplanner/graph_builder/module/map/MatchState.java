@@ -15,7 +15,7 @@ import org.opentripplanner.routing.graph.Vertex;
 
 public abstract class MatchState {
 
-  private static final AStarRequest REQUEST = AStarRequest.of().setMode(StreetMode.CAR).build();
+  private static final AStarRequest REQUEST = AStarRequest.of().withMode(StreetMode.CAR).build();
 
   protected static final double NEW_SEGMENT_PENALTY = 0.1;
 

@@ -195,7 +195,7 @@ public class NearbyStopFinder {
     request.setArriveBy(reverseDirection);
     AStarRequest aStarRequest = AStarRequestMapper
       .map(request)
-      .setMode(streetRequest.mode())
+      .withMode(streetRequest.mode())
       .build();
 
     /* Add the origin vertices if they are stops */

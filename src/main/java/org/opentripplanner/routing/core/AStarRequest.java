@@ -58,9 +58,9 @@ public class AStarRequest {
     this.parking = builder.parking();
     this.rental = builder.rental();
     this.from = builder.from();
-    this.fromEnvelope = getEnvelope(from);
+    this.fromEnvelope = createEnvelope(from);
     this.to = builder.to();
-    this.toEnvelope = getEnvelope(to);
+    this.toEnvelope = createEnvelope(to);
   }
 
   @Nonnull
@@ -115,7 +115,7 @@ public class AStarRequest {
   }
 
   public AStarRequest copyOfReversed(Instant time) {
-    return copyOf(this).setStartTime(time).setArriveBy(!arriveBy).build();
+    return copyOf(this).withStartTime(time).withArriveBy(!arriveBy).build();
   }
 
   public void setIntersectionTraversalCalculator(
@@ -150,7 +150,7 @@ public class AStarRequest {
   }
 
   @Nullable
-  private static Envelope getEnvelope(GenericLocation location) {
+  private static Envelope createEnvelope(GenericLocation location) {
     if (location == null) {
       return null;
     }
