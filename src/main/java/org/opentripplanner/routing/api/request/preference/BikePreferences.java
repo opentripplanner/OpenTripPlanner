@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
-import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -21,7 +21,6 @@ public final class BikePreferences implements Serializable {
   public static final BikePreferences DEFAULT = new BikePreferences();
 
   private final double speed;
-
   private final double reluctance;
   private final int boardCost;
   private final double walkingSpeed;
@@ -49,17 +48,17 @@ public final class BikePreferences implements Serializable {
   }
 
   private BikePreferences(Builder builder) {
-    this.speed = roundTo2Decimals(builder.speed);
-    this.reluctance = roundTo2Decimals(builder.reluctance);
-    this.boardCost = builder.boardCost;
-    this.walkingSpeed = roundTo2Decimals(builder.walkingSpeed);
-    this.walkingReluctance = roundTo2Decimals(builder.walkingReluctance);
-    this.switchTime = builder.switchTime;
-    this.switchCost = builder.switchCost;
-    this.parkTime = builder.parkTime;
-    this.parkCost = builder.parkCost;
-    this.optimizeType = builder.optimizeType;
-    this.optimizeTriangle = builder.optimizeTriangle;
+    this.speed = Units.speed(builder.speed);
+    this.reluctance = Units.reluctance(builder.reluctance);
+    this.boardCost = Units.cost(builder.boardCost);
+    this.walkingSpeed = Units.speed(builder.walkingSpeed);
+    this.walkingReluctance = Units.reluctance(builder.walkingReluctance);
+    this.switchTime = Units.slack(builder.switchTime);
+    this.switchCost = Units.cost(builder.switchCost);
+    this.parkTime = Units.slack(builder.parkTime);
+    this.parkCost = Units.cost(builder.parkCost);
+    this.optimizeType = Objects.requireNonNull(builder.optimizeType);
+    this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
   }
 
   public static BikePreferences.Builder of() {

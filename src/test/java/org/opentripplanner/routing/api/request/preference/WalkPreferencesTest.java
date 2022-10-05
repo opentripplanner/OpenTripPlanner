@@ -10,12 +10,17 @@ import org.junit.jupiter.api.Test;
 
 class WalkPreferencesTest {
 
-  private static final double SPEED = 1.71;
+  private static final double SPEED = 1.7111;
+  private static final double EXPECTED_SPEED = 1.71;
   private static final double RELUCTANCE = 2.51;
+  private static final double EXPECTED_RELUCTANCE = 2.5;
   private static final int BOARD_COST = 301;
-  private static final double STAIRS_RELUCTANCE = 3.01;
-  private static final double STAIRS_TIME_FACTOR = 1.31;
-  private static final double SAFETY_FACTOR = 0.51;
+  private static final double STAIRS_RELUCTANCE = 3.011;
+  private static final double EXPECTED_STAIRS_RELUCTANCE = 3.0;
+  private static final double STAIRS_TIME_FACTOR = 1.3111;
+  private static final double EXPECTED_STAIRS_TIME_FACTOR = 1.31;
+  private static final double SAFETY_FACTOR = 0.5111;
+  private static final double EXPECTED_SAFETY_FACTOR = 0.51;
 
   private final WalkPreferences subject = WalkPreferences
     .of()
@@ -29,12 +34,12 @@ class WalkPreferencesTest {
 
   @Test
   void speed() {
-    assertEquals(SPEED, subject.speed());
+    assertEquals(EXPECTED_SPEED, subject.speed());
   }
 
   @Test
   void reluctance() {
-    assertEquals(RELUCTANCE, subject.reluctance());
+    assertEquals(EXPECTED_RELUCTANCE, subject.reluctance());
   }
 
   @Test
@@ -44,17 +49,17 @@ class WalkPreferencesTest {
 
   @Test
   void stairsReluctance() {
-    assertEquals(STAIRS_RELUCTANCE, subject.stairsReluctance());
+    assertEquals(EXPECTED_STAIRS_RELUCTANCE, subject.stairsReluctance());
   }
 
   @Test
   void stairsTimeFactor() {
-    assertEquals(STAIRS_TIME_FACTOR, subject.stairsTimeFactor());
+    assertEquals(EXPECTED_STAIRS_TIME_FACTOR, subject.stairsTimeFactor());
   }
 
   @Test
   void safetyFactor() {
-    assertEquals(SAFETY_FACTOR, subject.safetyFactor());
+    assertEquals(EXPECTED_SAFETY_FACTOR, subject.safetyFactor());
   }
 
   @Test
@@ -73,7 +78,7 @@ class WalkPreferencesTest {
   void testToSting() {
     assertEquals("WalkPreferences{}", WalkPreferences.DEFAULT.toString());
     assertEquals(
-      "WalkPreferences{speed: 1.71, reluctance: 2.51, boardCost: 301, stairsReluctance: 3.01, stairsTimeFactor: 1.31, safetyFactor: 0.51}",
+      "WalkPreferences{speed: 1.71, reluctance: 2.5, boardCost: 301, stairsReluctance: 3.0, stairsTimeFactor: 1.31, safetyFactor: 0.51}",
       subject.toString()
     );
   }

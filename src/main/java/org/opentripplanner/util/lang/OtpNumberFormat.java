@@ -9,7 +9,7 @@ public class OtpNumberFormat {
 
   private static final String NULL_VALUE = "null";
   private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(
-    Locale.US
+    Locale.ROOT
   );
 
   private DecimalFormat integerFormat;
@@ -65,6 +65,16 @@ public class OtpNumberFormat {
     if (decimalFormat == null) {
       decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
     }
+    return decimalFormat.format(value);
+  }
+
+  public static String formatZeroDecimal(double value) {
+    var decimalFormat = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
+    return decimalFormat.format(value);
+  }
+
+  public static String formatTwoDecimals(double value) {
+    var decimalFormat = new DecimalFormat("#,##0.0#", DECIMAL_SYMBOLS);
     return decimalFormat.format(value);
   }
 }

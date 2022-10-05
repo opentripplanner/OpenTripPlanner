@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -27,10 +28,10 @@ public final class ElevatorPreferences implements Serializable {
   }
 
   private ElevatorPreferences(Builder builder) {
-    this.boardCost = builder.boardCost;
-    this.boardTime = builder.boardTime;
-    this.hopCost = builder.hopCost;
-    this.hopTime = builder.hopTime;
+    this.boardCost = Units.cost(builder.boardCost);
+    this.boardTime = Units.slack(builder.boardTime);
+    this.hopCost = Units.cost(builder.hopCost);
+    this.hopTime = Units.slack(builder.hopTime);
   }
 
   public static Builder of() {

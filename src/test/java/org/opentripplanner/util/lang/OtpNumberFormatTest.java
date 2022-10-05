@@ -24,4 +24,11 @@ public class OtpNumberFormatTest {
     assertEquals("$9999.99", OtpNumberFormat.formatCostCenti(999_999));
     assertEquals("$10000", OtpNumberFormat.formatCostCenti(1_000_000));
   }
+
+  @Test
+  void formatDouble() {
+    assertEquals("1,234", OtpNumberFormat.formatZeroDecimal(1234.49));
+    assertEquals("1,235", OtpNumberFormat.formatZeroDecimal(1234.51));
+    assertEquals("1,234.57", OtpNumberFormat.formatTwoDecimals(1234.5678));
+  }
 }

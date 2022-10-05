@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -152,10 +153,10 @@ public final class VehicleRentalPreferences implements Serializable {
 
     private Builder(VehicleRentalPreferences original) {
       this.original = original;
-      this.pickupTime = original.pickupTime;
-      this.pickupCost = original.pickupCost;
-      this.dropoffTime = original.dropoffTime;
-      this.dropoffCost = original.dropoffCost;
+      this.pickupTime = Units.slack(original.pickupTime);
+      this.pickupCost = Units.cost(original.pickupCost);
+      this.dropoffTime = Units.slack(original.dropoffTime);
+      this.dropoffCost = Units.cost(original.dropoffCost);
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =
         original.arrivingInRentalVehicleAtDestinationCost;

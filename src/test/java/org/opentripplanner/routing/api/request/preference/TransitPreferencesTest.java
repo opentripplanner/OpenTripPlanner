@@ -16,8 +16,6 @@ import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 
 class TransitPreferencesTest {
 
-  private static final int BOARD_SLACK = 45;
-  private static final int ALIGHT_SLACK = 35;
   private static final int OTHER_THAN_PREFERRED_ROUTES_PENALTY = 350;
   private static final Map<TransitMode, Double> RELUCTANCE_FOR_MODE = Map.of(
     TransitMode.AIRPLANE,
@@ -110,7 +108,7 @@ class TransitPreferencesTest {
       "alightSlack: DurationForTransitMode{default:15s, AIRPLANE:25m}, " +
       "reluctanceForMode: {AIRPLANE=2.1}, " +
       "otherThanPreferredRoutesPenalty: 350, " +
-      "unpreferredCost: f(x) = 300.0 + 1.15 x, " +
+      "unpreferredCost: f(x) = 300 + 1.15 x, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +
       "raptor: RaptorPreferences{searchDirection: REVERSE}" +

@@ -82,7 +82,7 @@ public class RoutingPreferencesTest {
           AccessibilityPreferences.ofOnlyAccessible(),
           AccessibilityPreferences.ofOnlyAccessible(),
           5,
-          10,
+          0.01,
           12,
           3
         )

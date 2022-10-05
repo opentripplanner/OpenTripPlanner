@@ -1,11 +1,9 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.routing.api.request.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class RequestFunctionsTest {
 
@@ -20,14 +18,14 @@ public class RequestFunctionsTest {
 
   @Test
   public void testToString() {
-    assertEquals("f(x) = 2.0 + 3.0 x", RequestFunctions.createLinearFunction(2.0, 3.0).toString());
+    assertEquals("f(x) = 2 + 3.0 x", RequestFunctions.createLinearFunction(2.0, 3.0).toString());
   }
 
   @Test
   public void parse() {
-    assertEquals("f(x) = 2.0 + 3.0 x", RequestFunctions.parse("2+3x").toString());
-    assertEquals("f(x) = 2.0 + 3.0 x", RequestFunctions.parse(" 2 + 3 X ").toString());
-    assertEquals("f(x) = 5.1 + 3.1415 x", RequestFunctions.parse("5.1 + 3.1415 x").toString());
+    assertEquals("f(x) = 2 + 3.0 x", RequestFunctions.parse("2+3x").toString());
+    assertEquals("f(x) = 2 + 3.0 x", RequestFunctions.parse(" 2 + 3 X ").toString());
+    assertEquals("f(x) = 5 + 3.14 x", RequestFunctions.parse("5.123 + 3.1415 x").toString());
   }
 
   @Test

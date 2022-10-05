@@ -104,7 +104,7 @@ class BikePreferencesTest {
   @Test
   void testCopyOfEqualsAndHashCode() {
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.copyOf().withSpeed(0.0).build();
+    var other = subject.copyOf().withSpeed(0.7).build();
     var same = other.copyOf().withSpeed(SPEED).build();
     assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
   }

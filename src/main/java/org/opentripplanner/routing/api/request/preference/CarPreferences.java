@@ -1,10 +1,9 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -43,15 +42,15 @@ public final class CarPreferences implements Serializable {
   }
 
   private CarPreferences(Builder builder) {
-    this.speed = roundTo2Decimals(builder.speed);
-    this.reluctance = roundTo2Decimals(builder.reluctance);
-    this.parkTime = builder.parkTime;
-    this.parkCost = builder.parkCost;
-    this.pickupTime = builder.pickupTime;
-    this.pickupCost = builder.pickupCost;
-    this.dropoffTime = builder.dropoffTime;
-    this.accelerationSpeed = roundTo2Decimals(builder.accelerationSpeed);
-    this.decelerationSpeed = roundTo2Decimals(builder.decelerationSpeed);
+    this.speed = Units.speed(builder.speed);
+    this.reluctance = Units.reluctance(builder.reluctance);
+    this.parkTime = Units.slack(builder.parkTime);
+    this.parkCost = Units.cost(builder.parkCost);
+    this.pickupTime = Units.slack(builder.pickupTime);
+    this.pickupCost = Units.cost(builder.pickupCost);
+    this.dropoffTime = Units.slack(builder.dropoffTime);
+    this.accelerationSpeed = Units.acceleration(builder.accelerationSpeed);
+    this.decelerationSpeed = Units.acceleration(builder.decelerationSpeed);
   }
 
   public static CarPreferences.Builder of() {

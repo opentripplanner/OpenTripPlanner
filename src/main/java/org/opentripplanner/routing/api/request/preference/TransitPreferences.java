@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -46,7 +47,7 @@ public final class TransitPreferences implements Serializable {
     this.boardSlack = requireNonNull(builder.boardSlack);
     this.alightSlack = requireNonNull(builder.alightSlack);
     this.reluctanceForMode = Map.copyOf(requireNonNull(builder.reluctanceForMode));
-    this.otherThanPreferredRoutesPenalty = builder.otherThanPreferredRoutesPenalty;
+    this.otherThanPreferredRoutesPenalty = Units.cost(builder.otherThanPreferredRoutesPenalty);
     this.unpreferredCost = requireNonNull(builder.unpreferredCost);
     this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
     this.includePlannedCancellations = builder.includePlannedCancellations;

@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.api;
 
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.util.lang.DoubleUtils;
 
 /**
  * Input parameters for {@link TransitGeneralizedCostFilter}
@@ -15,4 +16,15 @@ import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction
 public record TransitGeneralizedCostFilterParams(
   DoubleAlgorithmFunction costLimitFunction,
   double intervalRelaxFactor
-) {}
+) {
+  public TransitGeneralizedCostFilterParams(
+    DoubleAlgorithmFunction costLimitFunction,
+    double intervalRelaxFactor
+  ) {
+    if (intervalRelaxFactor < 0.0) {
+      throw new IllegalArgumentException("Negative value not expected: " + intervalRelaxFactor);
+    }
+    this.costLimitFunction = costLimitFunction;
+    this.intervalRelaxFactor = DoubleUtils.roundTo2Decimals(intervalRelaxFactor);
+  }
+}

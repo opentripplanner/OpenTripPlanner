@@ -1,9 +1,13 @@
 package org.opentripplanner.routing.api.request.framework;
 
+import static org.opentripplanner.util.lang.OtpNumberFormat.formatTwoDecimals;
+import static org.opentripplanner.util.lang.OtpNumberFormat.formatZeroDecimal;
+
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.util.lang.DoubleUtils;
 
 /**
  * This is a factory for creating functions which can be used as parameters in the {@link
@@ -85,8 +89,8 @@ public class RequestFunctions {
     private final double b;
 
     public LinearFunction(double constant, double coefficient) {
-      this.a = constant;
-      this.b = coefficient;
+      this.a = DoubleUtils.roundToZeroDecimals(constant);
+      this.b = DoubleUtils.roundTo2Decimals(coefficient);
     }
 
     @Override
@@ -96,7 +100,7 @@ public class RequestFunctions {
 
     @Override
     public String toString() {
-      return "f(x) = " + a + " + " + b + " x";
+      return "f(x) = %s + %s x".formatted(formatZeroDecimal(a), formatTwoDecimals(b));
     }
 
     String serialize() {

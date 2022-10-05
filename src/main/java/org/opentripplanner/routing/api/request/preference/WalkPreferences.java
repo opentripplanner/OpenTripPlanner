@@ -5,7 +5,7 @@ import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -36,12 +36,12 @@ public final class WalkPreferences implements Serializable {
   }
 
   private WalkPreferences(Builder builder) {
-    this.speed = DoubleUtils.roundTo2Decimals(builder.speed);
-    this.reluctance = DoubleUtils.roundTo2Decimals(builder.reluctance);
-    this.boardCost = builder.boardCost;
-    this.stairsReluctance = DoubleUtils.roundTo2Decimals(builder.stairsReluctance);
-    this.stairsTimeFactor = DoubleUtils.roundTo2Decimals(builder.stairsTimeFactor);
-    this.safetyFactor = DoubleUtils.roundTo2Decimals(builder.safetyFactor);
+    this.speed = Units.speed(builder.speed);
+    this.reluctance = Units.reluctance(builder.reluctance);
+    this.boardCost = Units.cost(builder.boardCost);
+    this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
+    this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
+    this.safetyFactor = Units.reluctance(builder.safetyFactor);
   }
 
   public static Builder of() {

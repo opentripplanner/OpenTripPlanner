@@ -2,12 +2,12 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
-import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -19,6 +19,7 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public final class TransferPreferences implements Serializable {
 
   public static final TransferPreferences DEFAULT = new TransferPreferences();
+  private static final int MAX_NUMBER_OF_TRANSFERS = 30;
 
   private final int cost;
   private final int slack;
@@ -37,12 +38,12 @@ public final class TransferPreferences implements Serializable {
   }
 
   private TransferPreferences(Builder builder) {
-    this.cost = builder.cost;
-    this.slack = builder.slack;
-    this.waitReluctance = roundTo2Decimals(builder.waitReluctance);
-    this.maxTransfers = builder.maxTransfers;
+    this.cost = Units.cost(builder.cost);
+    this.slack = Units.slack(builder.slack);
+    this.waitReluctance = Units.reluctance(builder.waitReluctance);
+    this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
     this.optimization = requireNonNull(builder.optimization);
-    this.nonpreferredCost = builder.nonpreferredCost;
+    this.nonpreferredCost = Units.cost(builder.nonpreferredCost);
   }
 
   public static Builder of() {

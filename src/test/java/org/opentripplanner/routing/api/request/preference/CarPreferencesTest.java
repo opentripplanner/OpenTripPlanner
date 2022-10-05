@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 
 class CarPreferencesTest {
 
-  private static final double SPEED = 20.0;
-  private static final double RELUCTANCE = 1.1;
+  private static final double SPEED = 20.111;
+  private static final double EXPECTED_SPEED = 20.0;
+  private static final double RELUCTANCE = 5.111;
+  private static final double EXPECTED_RELUCTANCE = 5.1;
   private static final int PARK_TIME = 300;
   private static final int PARK_COST = 250;
   private static final int PICKUP_TIME = 600;
@@ -33,12 +35,12 @@ class CarPreferencesTest {
 
   @Test
   void speed() {
-    assertEquals(SPEED, subject.speed());
+    assertEquals(EXPECTED_SPEED, subject.speed());
   }
 
   @Test
   void reluctance() {
-    assertEquals(RELUCTANCE, subject.reluctance());
+    assertEquals(EXPECTED_RELUCTANCE, subject.reluctance());
   }
 
   @Test
@@ -94,7 +96,7 @@ class CarPreferencesTest {
     assertEquals(
       "CarPreferences{" +
       "speed: 20.0, " +
-      "reluctance: 1.1, " +
+      "reluctance: 5.1, " +
       "parkTime: 300, " +
       "parkCost: 250, " +
       "pickupTime: 600, " +

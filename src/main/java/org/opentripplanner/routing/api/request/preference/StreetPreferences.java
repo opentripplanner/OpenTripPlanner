@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request.preference;
 import static java.time.Duration.ofHours;
 import static java.time.Duration.ofMinutes;
 import static java.util.Objects.requireNonNull;
-import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -12,6 +11,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
 import org.opentripplanner.util.lang.DoubleUtils;
@@ -45,7 +45,7 @@ public final class StreetPreferences implements Serializable {
   }
 
   private StreetPreferences(Builder builder) {
-    this.turnReluctance = roundTo2Decimals(builder.turnReluctance);
+    this.turnReluctance = Units.reluctance(builder.turnReluctance);
     this.drivingDirection = requireNonNull(builder.drivingDirection);
     this.elevator = requireNonNull(builder.elevator);
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);

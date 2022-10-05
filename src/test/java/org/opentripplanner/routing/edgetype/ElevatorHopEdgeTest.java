@@ -36,7 +36,7 @@ class ElevatorHopEdgeTest {
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
     req.setWheelchair(true);
     req.withPreferences(pref ->
-      pref.withWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25))
+      pref.withWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 0.5, 10, 25))
     );
     State result = traverse(wheelchair, req);
     assertNull(result);

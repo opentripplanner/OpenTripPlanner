@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.util.Objects;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -11,7 +12,11 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public final class AccessibilityPreferences {
 
-  private static final int NOT_SET = -1;
+  /**
+   * Set the unknown cost to a very high number, so in case it is used accidentally it
+   * will not cause any harm.
+   */
+  private static final int NOT_SET = 9_999_999;
 
   private static final AccessibilityPreferences ONLY_CONSIDER_ACCESSIBLE = new AccessibilityPreferences(
     true,
@@ -29,8 +34,8 @@ public final class AccessibilityPreferences {
     int inaccessibleCost
   ) {
     this.onlyConsiderAccessible = onlyConsiderAccessible;
-    this.unknownCost = unknownCost;
-    this.inaccessibleCost = inaccessibleCost;
+    this.unknownCost = Units.cost(unknownCost);
+    this.inaccessibleCost = Units.cost(inaccessibleCost);
   }
 
   /**

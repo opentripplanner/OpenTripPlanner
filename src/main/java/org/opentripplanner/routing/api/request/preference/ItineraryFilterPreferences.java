@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * Group by Similarity filter parameters
@@ -45,14 +47,15 @@ public final class ItineraryFilterPreferences {
 
   private ItineraryFilterPreferences(Builder builder) {
     this.debug = builder.debug;
-    this.groupSimilarityKeepOne = builder.groupSimilarityKeepOne;
-    this.groupSimilarityKeepThree = builder.groupSimilarityKeepThree;
+    this.groupSimilarityKeepOne = Units.reluctance(builder.groupSimilarityKeepOne);
+    this.groupSimilarityKeepThree = Units.reluctance(builder.groupSimilarityKeepThree);
     this.groupedOtherThanSameLegsMaxCostMultiplier =
-      builder.groupedOtherThanSameLegsMaxCostMultiplier;
-    this.transitGeneralizedCostLimit = builder.transitGeneralizedCostLimit;
-    this.nonTransitGeneralizedCostLimit = builder.nonTransitGeneralizedCostLimit;
-    this.bikeRentalDistanceRatio = builder.bikeRentalDistanceRatio;
-    this.parkAndRideDurationRatio = builder.parkAndRideDurationRatio;
+      Units.reluctance(builder.groupedOtherThanSameLegsMaxCostMultiplier);
+    this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
+    this.nonTransitGeneralizedCostLimit =
+      Objects.requireNonNull(builder.nonTransitGeneralizedCostLimit);
+    this.bikeRentalDistanceRatio = Units.ratio(builder.bikeRentalDistanceRatio);
+    this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
     this.filterItinerariesWithSameFirstOrLastTrip =
       builder.filterItinerariesWithSameFirstOrLastTrip;
     this.accessibilityScore = builder.accessibilityScore;

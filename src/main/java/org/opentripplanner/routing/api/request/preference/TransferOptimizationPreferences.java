@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
-import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
 
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -33,10 +33,10 @@ public final class TransferOptimizationPreferences
 
   private TransferOptimizationPreferences(Builder builder) {
     this.optimizeTransferWaitTime = builder.optimizeTransferWaitTime;
-    this.minSafeWaitTimeFactor = roundTo2Decimals(builder.minSafeWaitTimeFactor);
-    this.backTravelWaitTimeFactor = roundTo2Decimals(builder.backTravelWaitTimeFactor);
+    this.minSafeWaitTimeFactor = Units.reluctance(builder.minSafeWaitTimeFactor);
+    this.backTravelWaitTimeFactor = Units.reluctance(builder.backTravelWaitTimeFactor);
     this.extraStopBoardAlightCostsFactor =
-      roundTo2Decimals(builder.extraStopBoardAlightCostsFactor);
+      Units.reluctance(builder.extraStopBoardAlightCostsFactor);
   }
 
   public static Builder of() {
