@@ -55,7 +55,9 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
     super.transferToStop(fromStop, arrivalTime, transferPath);
     for (RaptorAccessEgress egressPath : egressPaths) {
       if (egressPath.stopReachedOnBoard()) {
-        // TODO add unit test for this use case
+        // Raptor does not support currently egress directly after flex access.
+        // There has to be at least one transit in between.
+        // Hence stopReachedOnBoard=false
         callback.newDestinationArrival(round, arrivalTime, false, egressPath);
       }
     }
