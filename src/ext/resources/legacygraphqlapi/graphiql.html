@@ -1,10 +1,3 @@
-<!--
- *  Copyright (c) 2021 GraphQL Contributors
- *  All rights reserved.
- *
- *  This source code is licensed under the license found in the
- *  LICENSE file in the root directory of this source tree.
--->
 <!DOCTYPE html>
 <html>
 <head>
@@ -119,7 +112,7 @@
 
   function graphQLFetcher(graphQLParams) {
     return fetch(
-            // this file is server on /otp/routers/default/index/graphql/graphiql so the single
+            // this file is server on /otp/routers/default/index/graphql/graphiql so the single dot
             // tells graphiql to look for the graphql endpoint at /otp/routers/default/index/graphql
             '.',
             {
@@ -138,6 +131,7 @@
     });
   }
 
+  const header = React.createElement("a", { className: "graphiql-logo-link" }, "OTP GraphQL Explorer");
   ReactDOM.render(
           React.createElement(GraphiQL, {
             fetcher: graphQLFetcher,
@@ -148,11 +142,10 @@
             onEditQuery: onEditQuery,
             onEditVariables: onEditVariables,
             onEditOperationName: onEditOperationName,
-            defaultEditorToolsVisibility: true,
-            children: [
-                    React.createElement(GraphiQL.Logo, { title: "OTP GraphQL exp"})
-            ]
-          }),
+            defaultEditorToolsVisibility: true
+          },
+                  React.createElement(GraphiQL.Logo, {}, header )
+          ),
           document.getElementById('graphiql'),
   );
 </script>
