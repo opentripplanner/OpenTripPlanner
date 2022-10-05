@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.test.support.VariableSource;
@@ -43,9 +43,9 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RouteRequest();
+    var req = AStarRequest.of();
     req.preferences().withWalk(w -> w.setReluctance(walkReluctance));
-    State result = traverse(edge, req, StreetMode.WALK);
+    State result = traverse(edge, req.withMode(StreetMode.WALK).build());
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
 
@@ -65,10 +65,10 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RouteRequest();
+    var req = AStarRequest.of();
     req.preferences().withBike(bike -> bike.setReluctance(bikeReluctance));
 
-    State result = traverse(edge, req, StreetMode.BIKE);
+    State result = traverse(edge, req.withMode(StreetMode.BIKE).build());
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
 
@@ -88,10 +88,10 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     double length = 100;
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RouteRequest();
+    var req = AStarRequest.of();
     req.preferences().car().setReluctance(carReluctance);
 
-    State result = traverse(edge, req, StreetMode.CAR);
+    State result = traverse(edge, req.withMode(StreetMode.CAR).build());
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
 
@@ -111,16 +111,16 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
 
-    var req = new RouteRequest();
+    var req = AStarRequest.of();
     req.preferences().withWalk(w -> w.setStairsReluctance(stairsReluctance));
-
-    var result = traverse(edge, req, StreetMode.WALK);
+    req.withMode(StreetMode.WALK);
+    var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(23, result.getElapsedTimeSeconds());
 
     edge.setStairs(false);
-    var notStairsResult = traverse(edge, req, StreetMode.WALK);
+    var notStairsResult = traverse(edge, req.build());
     assertEquals(15, (long) notStairsResult.weight);
   }
 
@@ -145,21 +145,21 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     );
     edge.setWalkSafetyFactor(2);
 
-    var req = new RouteRequest();
+    var req = AStarRequest.of();
     req.preferences().withWalk(w -> w.setSafetyFactor(walkSafetyFactor));
-
-    var result = traverse(edge, req, StreetMode.WALK);
+    req.withMode(StreetMode.WALK);
+    var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(8, result.getElapsedTimeSeconds());
 
     edge.setWalkSafetyFactor(1);
-    var defaultSafetyResult = traverse(edge, req, StreetMode.WALK);
+    var defaultSafetyResult = traverse(edge, req.build());
     assertEquals(15, (long) defaultSafetyResult.weight);
   }
 
-  private State traverse(StreetEdge edge, RouteRequest req, StreetMode streetMode) {
-    var state = new State(V1, req, streetMode);
+  private State traverse(StreetEdge edge, AStarRequest request) {
+    var state = new State(V1, request);
 
     assertEquals(0, state.weight);
     return edge.traverse(state);

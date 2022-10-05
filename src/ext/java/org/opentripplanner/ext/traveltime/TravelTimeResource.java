@@ -57,6 +57,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -123,6 +125,7 @@ public class TravelTimeResource {
       startTime = Instant.now();
     }
 
+    routingRequest.setDateTime(startTime);
     endTime = startTime.plus(traveltimeRequest.maxCutoff);
 
     ZoneId zoneId = transitService.getTimeZone();
@@ -272,14 +275,16 @@ public class TravelTimeResource {
   ) {
     List<State> initialStates = new ArrayList<>();
 
-    StateData stateData = StateData.getInitialStateData(
-      routingRequest,
-      routingRequest.journey().egress().mode()
-    );
+    AStarRequest aStarRequest = AStarRequestMapper
+      .map(routingRequest)
+      .withMode(routingRequest.journey().egress().mode())
+      .build();
+
+    StateData stateData = StateData.getInitialStateData(aStarRequest);
 
     for (var vertex : temporaryVertices.getFromVertices()) {
       // TODO StateData should be of direct mode here
-      initialStates.add(new State(vertex, startTime, stateData));
+      initialStates.add(new State(vertex, startTime, stateData, aStarRequest));
     }
 
     // TODO - Add a method to return all Stops, not StopLocations
@@ -290,10 +295,8 @@ public class TravelTimeResource {
         Vertex v = graph.getStopVertexForStopId(stop.getId());
         if (v != null) {
           Instant time = startOfTime.plusSeconds(arrivalTime).toInstant();
-          State s = new State(v, time, stateData.clone());
+          State s = new State(v, time, stateData.clone(), aStarRequest);
           s.weight = startTime.until(time, ChronoUnit.SECONDS);
-          // TODO: This shouldn't be overridden in state initialization
-          s.stateData.startTime = stateData.startTime;
           initialStates.add(s);
         }
       }

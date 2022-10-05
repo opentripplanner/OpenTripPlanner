@@ -89,7 +89,7 @@ public abstract class DominanceFunction implements Serializable {
       (a.backEdge instanceof StreetEdge) &&
       a.getBackMode() != null &&
       a.getBackMode().isDriving() &&
-      a.getOptions().isCloseToStartOrEnd(a.getVertex())
+      a.getRequest().isCloseToStartOrEnd(a.getVertex())
     ) {
       return false;
     }
