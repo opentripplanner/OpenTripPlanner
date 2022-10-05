@@ -32,4 +32,9 @@ public class SeptaSmokeTest {
   public void vehiclePositions() {
     SmokeTest.assertThereArePatternsWithVehiclePositions();
   }
+
+  @Test
+  public void bikeRentalStations() {
+    SmokeTest.assertThatThereAreVehicleRentalStations();
+  }
 }

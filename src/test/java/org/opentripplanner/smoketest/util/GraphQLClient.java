@@ -3,6 +3,7 @@ package org.opentripplanner.smoketest.util;
 import static org.opentripplanner.smoketest.SmokeTest.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.URI;
@@ -52,6 +53,34 @@ public class GraphQLClient {
     }
   }
 
+  public static List<VehicleRentalStation> vehicleRentalStations() {
+    var json = GraphQLClient.sendGraphQLRequest(
+      """
+        query {
+        	vehicleRentalStations{
+        		name
+        		lat
+        		lon
+        		realtime
+        		vehiclesAvailable
+        	}
+        }
+          """
+    );
+
+    try {
+      List<VehicleRentalStation> stations = SmokeTest.mapper.readValue(
+        json.path("vehicleRentalStations").toString(),
+        new TypeReference<>() {}
+      );
+
+      LOG.info("Fetched {} vehicle rental stations", stations.size());
+      return stations;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public static JsonNode sendGraphQLRequest(String query) {
     var body = mapper.createObjectNode();
     body.put("query", query);
@@ -78,6 +107,8 @@ public class GraphQLClient {
       throw new RuntimeException(e);
     }
   }
+
+  public record VehicleRentalStation(String name, float lat, float lon) {}
 
   public record Position(String vehicleId) {}
 

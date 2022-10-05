@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -61,6 +60,11 @@ public class SmokeTest {
   public static LocalDate nextMonday() {
     var today = LocalDate.now();
     return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+  }
+
+  public static void assertThatThereAreVehicleRentalStations() {
+    var stations = GraphQLClient.vehicleRentalStations();
+    assertFalse(stations.isEmpty(), "Found no vehicle rental stations.");
   }
 
   /**
