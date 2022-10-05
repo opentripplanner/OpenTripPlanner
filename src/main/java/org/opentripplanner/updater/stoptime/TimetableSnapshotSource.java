@@ -270,7 +270,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripDescriptor
         );
 
-        Result<?, UpdateError> maybeError =
+        Result<?, UpdateError> result =
           switch (tripScheduleRelationship) {
             case SCHEDULED -> handleScheduledTrip(
               tripUpdate,
@@ -295,7 +295,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
           };
 
-        if (maybeError.isSuccess()) {
+        results.add(result);
+        if (result.isSuccess()) {
           debug(tripId, "Failed to apply TripUpdate.");
           LOG.trace(" Contents: {}", tripUpdate);
           if (failuresByRelationship.containsKey(tripScheduleRelationship)) {
