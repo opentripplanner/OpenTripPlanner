@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -180,6 +182,18 @@ public class LegacyGraphQLAPI {
     } catch (InterruptedException e) {
       LOG.error("Batch query interrupted", e);
       throw new RuntimeException(e);
+    }
+  }
+
+  @GET
+  @Path("/graphiql")
+  @Produces(MediaType.TEXT_HTML)
+  public Response graphiql() {
+    var is = getClass().getResourceAsStream("/legacygraphqlapi/graphiql.html");
+    try {
+      return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
+    } catch (IOException e) {
+      return Response.serverError().build();
     }
   }
 }
