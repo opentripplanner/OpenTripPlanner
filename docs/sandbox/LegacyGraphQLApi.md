@@ -48,6 +48,10 @@ curl --request POST \
   --data '{"query":"query stops {\n  stops {\n    gtfsId\n    name\n  }\n}\n","operationName":"stops"}'
 ```
 
+## Built-in API client
+
+A browser based GraphQL API client is available at `http://localhost:8080/otp/routers/default/index/graphql/graphiql` 
+
 ### OTP2 Official GraphQL API (Not available)
 
 We **plan** to make a new offical OTP2 API, replacing the REST API. The plan is to base the new API
