@@ -4,7 +4,6 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.List;
-import java.util.Optional;
 import org.opentripplanner.common.model.Result;
 import org.opentripplanner.model.UpdateError;
 
@@ -17,13 +16,10 @@ public record UpdateResult(
     return new UpdateResult(0, 0, ArrayListMultimap.create());
   }
 
-  public static UpdateResult ofOptions(List<Optional<UpdateError>> results) {
-    var errors = results.stream().filter(Optional::isPresent).map(Optional::get).toList();
-    var successfullyApplied = results.stream().filter(Optional::isEmpty).count();
+  public static UpdateResult ofResults(List<Result<?, UpdateError>> results) {
+    var errors = results.stream().filter(Result::isFailure).map(Result::failureValue).toList();
+    var successfullyApplied = results.stream().filter(Result::isSuccess).count();
     var errorIndex = Multimaps.index(errors, UpdateError::errorType);
     return new UpdateResult((int) successfullyApplied, errors.size(), errorIndex);
-  }
-  public static UpdateResult ofResults(List<Result<?, UpdateError>> results) {
-    return ofOptions(results.stream().map(Result::optionalFailure).toList());
   }
 }

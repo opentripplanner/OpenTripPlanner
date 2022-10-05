@@ -26,14 +26,6 @@ public abstract sealed class Result<T, E> {
     return new Success<>(null);
   }
 
-  public Optional<E> optionalFailure() {
-    if (isSuccess()) {
-      return Optional.empty();
-    } else {
-      return Optional.of(failureValue());
-    }
-  }
-
   /**
    * Get the value contained with an erased type. If you want to use the typed version of the value
    * use {@link Result#ifFailure(Consumer)} or  {@link Result#ifSuccess(Consumer)}}.
