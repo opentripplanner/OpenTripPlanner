@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -34,57 +32,6 @@ public class Transfer {
     this.toStop = toStopIndex;
     this.distanceMeters = distanceMeters;
     this.edges = null;
-  }
-
-  public static RouteRequest prepareTransferRoutingRequest(RouteRequest request) {
-    RouteRequest rr = request.getStreetSearchRequest(request.journey().transfer().mode());
-
-    rr.setArriveBy(false);
-    rr.setDateTime(Instant.ofEpochSecond(0));
-    rr.setFrom(null);
-    rr.setTo(null);
-
-    // TODO VIA - Remove all rounding logic from here and move it into the Preference type
-    //          - constructors - We should cache and route on the same normalized values to be
-    //          - consistent.
-
-    rr.withPreferences(preferences -> {
-      preferences.withWalk(walk ->
-        walk
-          .withSpeed(roundToHalf(walk.speed()))
-          .withReluctance(roundTo(walk.reluctance(), 1))
-          .withStairsReluctance(roundTo(walk.stairsReluctance(), 1))
-          .withStairsTimeFactor(roundTo(walk.stairsTimeFactor(), 1))
-          .withSafetyFactor(roundTo(walk.safetyFactor(), 1))
-      );
-
-      // Some values are rounded to ease caching in RaptorRequestTransferCache
-      preferences.withBike(bike ->
-        bike
-          .withSwitchCost(roundTo100(bike.switchCost()))
-          .withSwitchTime(roundTo100(bike.switchTime()))
-          .withSpeed(roundToHalf(bike.speed()))
-      );
-
-      // it's a record (immutable) so can be safely reused
-      preferences.withWheelchair(request.preferences().wheelchair());
-
-      preferences.withStreet(streetBuilder -> {
-        var street = preferences.street();
-        streetBuilder.withTurnReluctance(roundTo(street.turnReluctance(), 1));
-
-        streetBuilder.withElevator(builder -> {
-          var elevator = street.elevator();
-          builder
-            .withBoardCost(roundTo100(elevator.boardCost()))
-            .withBoardTime(roundTo100(elevator.boardTime()))
-            .withHopCost(roundTo100(elevator.hopCost()))
-            .withHopTime(roundTo100(elevator.hopTime()));
-        });
-      });
-    });
-
-    return rr;
   }
 
   public List<Coordinate> getCoordinates() {
@@ -143,21 +90,5 @@ public class Transfer {
         RaptorCostConverter.toRaptorCost(s.getWeight())
       )
     );
-  }
-
-  private static double roundToHalf(double input) {
-    return ((int) (input * 2 + 0.5)) / 2.0;
-  }
-
-  private static double roundTo(double input, int decimals) {
-    return Math.round(input * Math.pow(10, decimals)) / Math.pow(10, decimals);
-  }
-
-  private static int roundTo100(int input) {
-    if (input > 0 && input < 100) {
-      return 100;
-    }
-
-    return ((input + 50) / 100) * 100;
   }
 }

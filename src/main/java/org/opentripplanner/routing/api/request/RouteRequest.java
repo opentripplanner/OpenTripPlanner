@@ -251,6 +251,15 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* INSTANCE METHODS */
 
+  public RouteRequest copyAndPrepareForTransferRouting() {
+    var rr = getStreetSearchRequest(journey().transfer().mode());
+    rr.setArriveBy(false);
+    rr.setDateTime(Instant.ofEpochSecond(0));
+    rr.setFrom(null);
+    rr.setTo(null);
+    return rr;
+  }
+
   public RouteRequest getStreetSearchRequest(StreetMode streetMode) {
     RouteRequest streetRequest = this.clone();
     streetRequest.streetSubRequestModes = new TraverseModeSet();
