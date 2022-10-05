@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.model.UpdateError;
 
 public record UpdateResult(
@@ -21,5 +22,8 @@ public record UpdateResult(
     var successfullyApplied = results.stream().filter(Optional::isEmpty).count();
     var errorIndex = Multimaps.index(errors, UpdateError::errorType);
     return new UpdateResult((int) successfullyApplied, errors.size(), errorIndex);
+  }
+  public static UpdateResult ofResults(List<Result<?, UpdateError>> results) {
+    return ofOptions(results.stream().map(Result::optionalFailure).toList());
   }
 }
