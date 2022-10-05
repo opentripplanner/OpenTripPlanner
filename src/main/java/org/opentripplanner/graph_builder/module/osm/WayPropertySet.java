@@ -89,12 +89,12 @@ public class WayPropertySet {
     List<WayProperties> leftMixins = new ArrayList<>();
     List<WayProperties> rightMixins = new ArrayList<>();
     for (WayPropertyPicker picker : wayProperties) {
-      OSMSpecifier specifier = picker.getSpecifier();
-      WayProperties wayProperties = picker.getProperties();
+      OSMSpecifier specifier = picker.specifier();
+      WayProperties wayProperties = picker.properties();
       P2<Integer> score = specifier.matchScores(way);
       int leftScore = score.first;
       int rightScore = score.second;
-      if (picker.isSafetyMixin()) {
+      if (picker.safetyMixin()) {
         if (leftScore > 0) {
           leftMixins.add(wayProperties);
         }

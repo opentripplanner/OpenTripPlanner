@@ -6,49 +6,13 @@ package org.opentripplanner.graph_builder.module.osm;
  * WayPropertyPickers may be mixins, in which case they do not need to beat out all the other
  * WayPropertyPickers. Instead, their safety values will be applied to all ways that they match
  * multiplicatively.
+ *
+ * @param safetyMixin If this value is true, and this picker's specifier applies to a given way,
+ *                    then this picker is never chosen as the most applicable value, and the final
+ *                    safety will be multiplied by this value. More than one mixin may apply.
  */
-public class WayPropertyPicker {
-
-  private OSMSpecifier specifier;
-
-  private WayProperties properties;
-
-  private boolean safetyMixin;
-
-  public WayPropertyPicker() {}
-
-  public WayPropertyPicker(OSMSpecifier specifier, WayProperties properties, boolean mixin) {
-    this.specifier = specifier;
-    this.properties = properties;
-    this.safetyMixin = mixin;
-  }
-
-  public OSMSpecifier getSpecifier() {
-    return specifier;
-  }
-
-  public void setSpecifier(OSMSpecifier specifier) {
-    this.specifier = specifier;
-  }
-
-  public WayProperties getProperties() {
-    return properties;
-  }
-
-  public void setProperties(WayProperties properties) {
-    this.properties = properties;
-  }
-
-  /**
-   * If this value is true, and this picker's specifier applies to a given way, then this picker is
-   * never chosen as the most applicable value, and the final safety will be multiplied by this
-   * value. More than one mixin may apply.
-   */
-  public boolean isSafetyMixin() {
-    return safetyMixin;
-  }
-
-  public void setSafetyMixin(boolean mixin) {
-    this.safetyMixin = mixin;
-  }
-}
+public record WayPropertyPicker(
+  OSMSpecifier specifier,
+  WayProperties properties,
+  boolean safetyMixin
+) {}
