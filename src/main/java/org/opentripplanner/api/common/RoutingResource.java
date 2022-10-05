@@ -744,8 +744,6 @@ public abstract class RoutingResource {
         journey.setModes(modes.getRequestModes());
       }
 
-
-
       {
         var rental = journey.rental();
         setIfNotNull(
@@ -791,12 +789,7 @@ public abstract class RoutingResource {
 
     request.withPreferences(preferences -> {
       // Map all preferences, not dependency on 'vehicleRental' and 'isTripPlannedForNow'.
-      new RequestToPreferencesMapper(
-        this,
-        preferences,
-        request.isTripPlannedForNow()
-      )
-        .map();
+      new RequestToPreferencesMapper(this, preferences, request.isTripPlannedForNow()).map();
 
       if (OTPFeature.DataOverlay.isOn()) {
         var dataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);

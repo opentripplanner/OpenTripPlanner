@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,8 +7,8 @@ import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
@@ -35,7 +34,7 @@ public class Transfer {
     this.edges = null;
   }
 
-    public List<Coordinate> getCoordinates() {
+  public List<Coordinate> getCoordinates() {
     List<Coordinate> coordinates = new ArrayList<>();
     if (edges == null) {
       return coordinates;
@@ -60,7 +59,7 @@ public class Transfer {
     return edges;
   }
 
-  public Optional<RaptorTransfer> asRaptorTransfer(RouteRequest request) {
+  public Optional<RaptorTransfer> asRaptorTransfer(AStarRequest request) {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();
@@ -73,11 +72,7 @@ public class Transfer {
       );
     }
 
-    StateEditor se = new StateEditor(
-      request,
-      request.journey().transfer().mode(),
-      edges.get(0).getFromVertex()
-    );
+    StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
     se.setTimeSeconds(0);
 
     State s = se.makeState();

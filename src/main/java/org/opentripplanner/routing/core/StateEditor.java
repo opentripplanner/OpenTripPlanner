@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
@@ -30,8 +28,8 @@ public class StateEditor {
 
   /* CONSTRUCTORS */
 
-  public StateEditor(RouteRequest request, StreetMode streetMode, Vertex v) {
-    child = new State(v, request, streetMode);
+  public StateEditor(Vertex v, AStarRequest request) {
+    child = new State(v, request);
   }
 
   public StateEditor(State parent, Edge e) {
@@ -66,7 +64,7 @@ public class StateEditor {
       // from and to vertices are the same on eg. vehicle rental and parking vertices, thus, we
       // can't know the direction of travel from the above check. The expression below is simplified
       // fromVertex.equals(toVertex) ? parent.getOptions().arriveBy : false;
-      traversingBackward = fromVertex.equals(toVertex) && parent.getOptions().arriveBy();
+      traversingBackward = fromVertex.equals(toVertex) && parent.getRequest().arriveBy();
       child.vertex = toVertex;
     } else if (parentVertex.equals(toVertex)) {
       traversingBackward = true;
@@ -80,7 +78,7 @@ public class StateEditor {
       defectiveTraversal = true;
     }
 
-    if (traversingBackward != parent.getOptions().arriveBy()) {
+    if (traversingBackward != parent.getRequest().arriveBy()) {
       LOG.error(
         "Actual traversal direction does not match traversal direction in TraverseOptions."
       );
