@@ -608,7 +608,7 @@ public abstract class RoutingResource {
    * Unit is seconds. Default value is 0.
    */
   @QueryParam("boardSlack")
-  Integer boardSlack;
+  protected Integer boardSlack;
 
   /**
    * The number of seconds to add after alighting a transit leg. It is recommended to use the
@@ -617,7 +617,7 @@ public abstract class RoutingResource {
    * Unit is seconds. Default value is 0.
    */
   @QueryParam("alightSlack")
-  Integer alightSlack;
+  protected Integer alightSlack;
 
   @QueryParam("locale")
   private String locale;
@@ -666,17 +666,17 @@ public abstract class RoutingResource {
   private Boolean disableAlertFiltering;
 
   @QueryParam("debugItineraryFilter")
-  Boolean debugItineraryFilter;
+  protected Boolean debugItineraryFilter;
 
   /**
    * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this
    * query.
    */
   @QueryParam("geoidElevation")
-  Boolean geoidElevation;
+  protected Boolean geoidElevation;
 
   @QueryParam("useVehicleParkingAvailabilityInformation")
-  Boolean useVehicleParkingAvailabilityInformation;
+  protected Boolean useVehicleParkingAvailabilityInformation;
 
   @QueryParam("debugRaptorStops")
   private String debugRaptorStops;
@@ -706,8 +706,8 @@ public abstract class RoutingResource {
     // The routing request should already contain defaults, which are set when it is initialized or
     // in the JSON router configuration and cloned. We check whether each parameter was supplied
     // before overwriting the default.
-    setIfNotNull(fromPlace, it2 -> request.setFrom(fromOldStyleString(it2)));
-    setIfNotNull(toPlace, it1 -> request.setTo(fromOldStyleString(it1)));
+    setIfNotNull(fromPlace, it -> request.setFrom(fromOldStyleString(it)));
+    setIfNotNull(toPlace, it -> request.setTo(fromOldStyleString(it)));
 
     {
       //FIXME: move into setter method on routing request
@@ -743,6 +743,9 @@ public abstract class RoutingResource {
       if (modes != null && !modes.qModes.isEmpty()) {
         journey.setModes(modes.getRequestModes());
       }
+
+
+
       {
         var rental = journey.rental();
         setIfNotNull(
@@ -762,14 +765,17 @@ public abstract class RoutingResource {
 
       {
         var transit = journey.transit();
-        setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
+        // Filter Agencies
         setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
-        setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
         setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
-        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
-        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
         setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
         setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+        // Filter Routes
+        setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
+        setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
+        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
+        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+        // Filter Trips
         setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
       }
       {
@@ -779,30 +785,26 @@ public abstract class RoutingResource {
       }
     }
 
+    if (locale != null) {
+      request.setLocale(Locale.forLanguageTag(locale.replaceAll("-", "_")));
+    }
+
     request.withPreferences(preferences -> {
       // Map all preferences, not dependency on 'vehicleRental' and 'isTripPlannedForNow'.
       new RequestToPreferencesMapper(
         this,
         preferences,
-        request.vehicleRental,
         request.isTripPlannedForNow()
       )
         .map();
 
       if (OTPFeature.DataOverlay.isOn()) {
-        preferences.withSystem(sysBuilder -> {
-          var dataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
-          if (!dataOverlayParameters.isEmpty()) {
-            sysBuilder.withDataOverlay(dataOverlayParameters);
-          }
-        });
+        var dataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+        if (!dataOverlayParameters.isEmpty()) {
+          preferences.withSystem(it -> it.withDataOverlay(dataOverlayParameters));
+        }
       }
     });
-
-    if (locale != null) {
-      request.setLocale(Locale.forLanguageTag(locale.replaceAll("-", "_")));
-    }
-
     return request;
   }
 }

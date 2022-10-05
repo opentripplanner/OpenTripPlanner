@@ -9,13 +9,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.test.support.VariableSource;
 
@@ -24,10 +22,8 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
   StreetVertex V1;
   StreetVertex V2;
 
-  Graph graph;
-
   public StreetEdgeWheelchairCostTest() {
-    TestOtpModel model = modelOf(
+    modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -36,7 +32,6 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
         }
       }
     );
-    graph = model.graph();
   }
 
   static Stream<Arguments> slopeCases = Stream.of(
@@ -220,8 +215,7 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
   }
 
   private State traverse(StreetEdge edge, RouteRequest req) {
-    var ctx = new RoutingContext(req, graph, V1, V2);
-    var state = new State(ctx);
+    var state = new State(V1, req, StreetMode.WALK);
 
     assertEquals(0, state.weight);
     return edge.traverse(state);

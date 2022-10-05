@@ -1,9 +1,12 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
@@ -24,16 +27,12 @@ public class VehicleRentalEdge extends Edge {
   }
 
   public State traverse(State s0) {
-    if (!s0.getOptions().vehicleRental) {
+    if (!s0.getRequestMode().includesRenting()) {
       return null;
     }
 
-    var options = s0.getOptions();
-
-    if (
-      !options.allowedRentalFormFactors.isEmpty() &&
-      !options.allowedRentalFormFactors.contains(formFactor)
-    ) {
+    var allowedRentalFormFactors = allowedModes(s0.getRequestMode());
+    if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
       return null;
     }
 
@@ -44,6 +43,7 @@ public class VehicleRentalEdge extends Edge {
     String network = station.getNetwork();
     var preferences = s0.getPreferences();
     boolean realtimeAvailability = preferences.rental().useAvailabilityInformation();
+    var options = s0.getOptions();
     var vehicleRental = options.journey().rental();
 
     if (station.networkIsNotAllowed(vehicleRental)) {
@@ -148,11 +148,11 @@ public class VehicleRentalEdge extends Edge {
             return null;
           }
           if (
-            !options.allowedRentalFormFactors.isEmpty() &&
+            !allowedRentalFormFactors.isEmpty() &&
             station
               .getAvailableDropoffFormFactors(realtimeAvailability)
               .stream()
-              .noneMatch(formFactor -> options.allowedRentalFormFactors.contains(formFactor))
+              .noneMatch(allowedRentalFormFactors::contains)
           ) {
             return null;
           }
@@ -208,5 +208,14 @@ public class VehicleRentalEdge extends Edge {
     }
 
     return rentedNetwork.equals(stationNetwork);
+  }
+
+  private static Set<FormFactor> allowedModes(StreetMode streetMode) {
+    return switch (streetMode) {
+      case BIKE_RENTAL -> Set.of(RentalVehicleType.FormFactor.BICYCLE);
+      case SCOOTER_RENTAL -> Set.of(RentalVehicleType.FormFactor.SCOOTER);
+      case CAR_RENTAL -> Set.of(RentalVehicleType.FormFactor.CAR);
+      default -> Set.of();
+    };
   }
 }

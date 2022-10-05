@@ -46,12 +46,13 @@ which are also part of the sandbox code.
 
 The classes and their maintainers are as follows:
 
-| class                                                          | maintainer                                                |
-|----------------------------------------------------------------|-----------------------------------------------------------|
-| HighestFareInFreeTransferWindowFareServiceDutchFareServiceImpl | IBI Group ([David Emory](mailto:david.emory@ibigroup.com) |
-| NycFareServiceImpl                                             | unmaintained                                              |
-| SFBayFareServiceImpl                                           | unmaintained                                              |
-| HSLFareServiceImpl                                             | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com)) |
+| class                                      | maintainer                                                 |
+|--------------------------------------------|------------------------------------------------------------|
+| HighestFareInFreeTransferWindowFareService | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
+| AtlantaFareService                         | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
+| HSLFareServiceImpl                         | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com))  |
+| NycFareServiceImpl                         | unmaintained                                               |
+| SFBayFareServiceImpl                       | unmaintained                                               |
 
 ## Removed fare calculators
 

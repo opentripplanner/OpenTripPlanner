@@ -204,17 +204,6 @@ class TripPatternMapper {
       return result;
     }
 
-    // TODO OTP2 - Trips containing AreaStops are not added to StopPatterns until support
-    //           - for this is added.
-    if (
-      result.tripStopTimes
-        .get(trips.get(0))
-        .stream()
-        .anyMatch(t -> t.getStop() instanceof AreaStop || t.getStop() instanceof GroupStop)
-    ) {
-      return result;
-    }
-
     // Create StopPattern from any trip (since they are part of the same JourneyPattern)
     StopPattern stopPattern = deduplicator.deduplicateObject(
       StopPattern.class,

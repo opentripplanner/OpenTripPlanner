@@ -2,12 +2,15 @@ package org.opentripplanner.netex.loader.parser;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
 import org.rutebanken.netex.model.GeneralFrame;
 import org.rutebanken.netex.model.InfrastructureFrame;
+import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.rutebanken.netex.model.ResourceFrame;
 import org.rutebanken.netex.model.ServiceCalendarFrame;
@@ -15,6 +18,7 @@ import org.rutebanken.netex.model.ServiceFrame;
 import org.rutebanken.netex.model.SiteFrame;
 import org.rutebanken.netex.model.TimetableFrame;
 import org.rutebanken.netex.model.VersionFrameDefaultsStructure;
+import org.rutebanken.netex.model.VersionFrame_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,12 +91,7 @@ public class NetexDocumentParser {
     // Declare some ugly types to prevent obstructing the reading later...
     Collection<JAXBElement<? extends Common_VersionFrameStructure>> frames;
 
-    // TODO OTP2 #2781 - Frame defaults can be set on any frame according to the Norwegian
-    //                 - profile. This only set it on the composite frame, and further
-    //                 - overriding it at a sub-level will not be acknowledged, or even
-    //                 - given any kind of warning. This should be fixed as part of Issue
-    //                 - https://github.com/opentripplanner/OpenTripPlanner/issues/2781
-    parseFrameDefaultsLikeTimeZone(frame.getFrameDefaults());
+    netexIndex.timeZone.set(resolveTimeZone(frame.getFrameDefaults()));
 
     frames = frame.getFrames().getCommonFrame();
 
@@ -101,22 +100,27 @@ public class NetexDocumentParser {
     }
   }
 
-  private void parseFrameDefaultsLikeTimeZone(VersionFrameDefaultsStructure frameDefaults) {
-    String timeZone = "GMT";
-
-    if (
-      frameDefaults != null &&
-      frameDefaults.getDefaultLocale() != null &&
-      frameDefaults.getDefaultLocale().getTimeZone() != null
-    ) {
-      timeZone = frameDefaults.getDefaultLocale().getTimeZone();
-    }
-
-    netexIndex.timeZone.set(timeZone);
-  }
-
   private <T> void parse(T node, NetexParser<T> parser) {
     parser.parse(node);
     parser.setResultOnIndex(netexIndex);
+
+    if (node instanceof VersionFrame_VersionStructure frame) {
+      netexIndex.timeZone.set(resolveTimeZone(frame.getFrameDefaults()));
+    }
+  }
+
+  private String resolveTimeZone(VersionFrameDefaultsStructure frameDefaults) {
+    if (frameDefaults != null) {
+      var defaultLocale = frameDefaults.getDefaultLocale();
+      if (defaultLocale != null && defaultLocale.getTimeZone() != null) {
+        return defaultLocale.getTimeZone();
+      }
+    }
+    // Fallback to previously set time zone in hierarchy
+    if (netexIndex.timeZone.get() != null) {
+      return netexIndex.timeZone.get();
+    }
+    // Fallback to GMT if no time zone exists in hierarchy
+    return "GMT";
   }
 }

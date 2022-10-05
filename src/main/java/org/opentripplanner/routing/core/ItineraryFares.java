@@ -76,10 +76,6 @@ public class ItineraryFares {
     return fare.keySet();
   }
 
-  public void addLegProducts(Collection<LegProducts> legProducts) {
-    legProducts.forEach(lp -> this.legProducts.putAll(lp.leg(), lp.products()));
-  }
-
   @Override
   public int hashCode() {
     return Objects.hash(fare, details, itineraryProducts, legProducts);
@@ -100,5 +96,14 @@ public class ItineraryFares {
   @Override
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
+  }
+
+  public void addLegProducts(Collection<LegProducts> legProducts) {
+    legProducts.forEach(lp ->
+      this.legProducts.putAll(
+          lp.leg(),
+          lp.products().stream().map(LegProducts.ProductWithTransfer::product).toList()
+        )
+    );
   }
 }

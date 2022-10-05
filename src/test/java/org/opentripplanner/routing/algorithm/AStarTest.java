@@ -13,7 +13,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
@@ -92,7 +91,9 @@ public class AStarTest {
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(to);
@@ -120,7 +121,9 @@ public class AStarTest {
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(from);
@@ -172,7 +175,9 @@ public class AStarTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(to);
@@ -217,7 +222,9 @@ public class AStarTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(from);
@@ -256,7 +263,9 @@ public class AStarTest {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setTerminationStrategy(strategy)
-      .setContext(new RoutingContext(request, graph, v1, v2))
+      .setRequest(request)
+      .setFrom(v1)
+      .setTo(v2)
       .getShortestPathTree();
 
     for (Vertex v : targets) {

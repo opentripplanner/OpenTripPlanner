@@ -31,10 +31,10 @@ public class RoutingRequestMapper {
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
   public static RouteRequest mapRoutingRequest(NodeAdapter c) {
-    RouteRequest dftReq = new RouteRequest();
+    RouteRequest dft = new RouteRequest();
 
     if (c.isEmpty()) {
-      return dftReq;
+      return dft;
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
@@ -48,7 +48,7 @@ public class RoutingRequestMapper {
     vehicleRental.setAllowedNetworks(
       c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
     );
-    request.setArriveBy(c.asBoolean("arriveBy", dftReq.arriveBy()));
+    request.setArriveBy(c.asBoolean("arriveBy", dft.arriveBy()));
     vehicleParking.setBannedTags(
       c.asTextSet("bannedVehicleParkingTags", vehicleParking.bannedTags())
     );
@@ -66,19 +66,15 @@ public class RoutingRequestMapper {
         )
       );
 
-    request.carPickup = c.asBoolean("kissAndRide", dftReq.carPickup);
-    request.setLocale(c.asLocale("locale", dftReq.locale()));
+    request.setLocale(c.asLocale("locale", dft.locale()));
 
     request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
 
-    request.setNumItineraries(c.asInt("numItineraries", dftReq.numItineraries()));
-    request.parkAndRide = c.asBoolean("parkAndRide", dftReq.parkAndRide);
-    request.setSearchWindow(c.asDuration("searchWindow", dftReq.searchWindow()));
+    request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
+    request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
     vehicleParking.setRequiredTags(
       c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
-
-    request.vehicleRental = c.asBoolean("allowBikeRental", dftReq.vehicleRental);
 
     request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));
 

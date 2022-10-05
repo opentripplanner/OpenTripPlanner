@@ -194,7 +194,7 @@ public class TransmodelGraphQLPlanner {
     }
 
     request.withPreferences(preferences -> {
-      mapPreferences(environment, callWith, preferences, request.vehicleRental);
+      mapPreferences(environment, callWith, preferences);
     });
 
     /*
@@ -216,8 +216,7 @@ public class TransmodelGraphQLPlanner {
   private void mapPreferences(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    RoutingPreferences.Builder preferences,
-    boolean vehicleRental
+    RoutingPreferences.Builder preferences
   ) {
     preferences.withWalk(b -> {
       callWith.argument("walkBoardCost", b::withBoardCost);
@@ -280,12 +279,6 @@ public class TransmodelGraphQLPlanner {
       callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);
       ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
     });
-    if (vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
-      //slower bike speed for bike sharing, based on empirical evidence from DC.
-      // TODO - There should be a separate speed preference for rented bike, setting this
-      //      - here will cause the different APIs to behave differently
-      preferences.withBike(b -> b.withSpeed(4.3));
-    }
     preferences.withRental(rental ->
       callWith.argument(
         "useBikeRentalAvailabilityInformation",

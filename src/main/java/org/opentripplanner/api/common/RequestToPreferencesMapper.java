@@ -10,18 +10,15 @@ class RequestToPreferencesMapper {
 
   private final RoutingResource req;
   private final RoutingPreferences.Builder preferences;
-  private final boolean vehicleRental;
   private final boolean isPlannedForNow;
 
   RequestToPreferencesMapper(
     RoutingResource req,
     RoutingPreferences.Builder preferences,
-    boolean vehicleRental,
     boolean isPlannedForNow
   ) {
     this.req = req;
     this.preferences = preferences;
-    this.vehicleRental = vehicleRental;
     this.isPlannedForNow = isPlannedForNow;
   }
 
@@ -76,10 +73,6 @@ class RequestToPreferencesMapper {
           setIfNotNull(req.triangleSlopeFactor, triangle::withSlope);
           setIfNotNull(req.triangleSafetyFactor, triangle::withSafety);
         });
-      }
-      if (vehicleRental && req.bikeSpeed == null) {
-        //slower bike speed for bike sharing, based on empirical evidence from DC.
-        bike.withSpeed(4.3);
       }
     });
   }

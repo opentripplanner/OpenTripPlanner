@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,8 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 public class StopAndStationMapperTest {
+
+  public static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("Europe/Oslo");
 
   @Test
   public void testWheelChairBoarding() {
@@ -68,6 +71,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
+      DEFAULT_TIME_ZONE,
       DataImportIssueStore.noopIssueStore()
     );
 
@@ -146,6 +150,7 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       quaysById,
       null,
+      DEFAULT_TIME_ZONE,
       DataImportIssueStore.noopIssueStore()
     );
 
@@ -186,6 +191,9 @@ public class StopAndStationMapperTest {
     assertEquals(59.909911, childStop1.getLat(), 0.0001);
     assertEquals(10.753008, childStop1.getLon(), 0.0001);
     assertEquals("A", childStop1.getPlatformCode());
+
+    assertEquals(DEFAULT_TIME_ZONE, parentStop.getTimezone());
+    assertEquals(DEFAULT_TIME_ZONE, childStop1.getTimeZone());
   }
 
   private static StopPlace createStopPlace(

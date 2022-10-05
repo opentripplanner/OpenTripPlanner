@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -150,11 +150,11 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     Set<String> requiredTags,
     boolean arriveBy
   ) {
-    var request = new RouteRequest().getStreetSearchRequest(streetMode);
-    request.withPreferences(pref ->
-      pref
-        .withBike(it -> it.withParkCost(120).withParkTime(60))
-        .withCar(it -> it.withParkCost(240).withParkTime(180))
+    var request = new RouteRequest();
+    request.withPreferences(preferences ->
+      preferences
+        .withBike(b -> b.withParkCost(120).withParkTime(60))
+        .withCar(c -> c.withParkCost(240).withParkTime(180))
     );
     request.setWheelchair(requireWheelChairAccessible);
     request.journey().parking().setBannedTags(bannedTags);
@@ -163,7 +163,10 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
 
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, fromVertex, toVertex))
+      .setRequest(request)
+      .setStreetRequest(new StreetRequest(streetMode))
+      .setFrom(fromVertex)
+      .setTo(toVertex)
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

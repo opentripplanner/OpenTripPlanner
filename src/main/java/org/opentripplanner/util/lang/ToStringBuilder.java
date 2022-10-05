@@ -1,6 +1,7 @@
 package org.opentripplanner.util.lang;
 
 import static java.lang.Boolean.TRUE;
+import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -279,17 +280,20 @@ public class ToStringBuilder {
     return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
   }
 
+  /**
+   * Same as {@link #addDuration(String, Duration, Duration)} with ignore-value {@code null}.
+   */
   public ToStringBuilder addDuration(String name, Duration duration) {
     return addDuration(name, duration, null);
   }
 
+  /**
+   * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix.
+   */
   public ToStringBuilder addDuration(String name, Duration duration, Duration ignoreValue) {
-    return addIfNotIgnored(
-      name,
-      duration,
-      ignoreValue,
-      d -> DurationUtils.durationToStr((int) d.toSeconds())
-    );
+    return addIfNotIgnored(name, duration, ignoreValue, d -> durationToStr((int) d.toSeconds()));
   }
 
   @Override

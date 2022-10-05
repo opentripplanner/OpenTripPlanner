@@ -2,7 +2,10 @@ package org.opentripplanner.transit.model.framework;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -72,15 +75,21 @@ public class EntityById<E extends TransitEntity> {
   }
 
   public int removeIf(Predicate<E> test) {
-    Collection<E> newSet = map
-      .values()
-      .stream()
-      .filter(Predicate.not(test))
-      .collect(Collectors.toList());
+    return removeIf(test, null);
+  }
+
+  public int removeIf(Predicate<E> test, Consumer<E> callback) {
+    Collection<E> oldSet = map.values();
+    Collection<E> newSet = oldSet.stream().filter(Predicate.not(test)).collect(Collectors.toList());
 
     int size = map.size();
     if (newSet.size() == size) {
       return 0;
+    }
+    if (callback != null) {
+      var removed = new HashSet<>(oldSet);
+      removed.removeAll(Set.copyOf(newSet));
+      removed.forEach(callback);
     }
     map.clear();
     addAll(newSet);

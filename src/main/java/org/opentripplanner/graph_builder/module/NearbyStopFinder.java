@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MinMap;
+import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
@@ -22,12 +23,11 @@ import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -58,22 +58,12 @@ public class NearbyStopFinder {
 
   public final boolean useStreets;
 
-  private final Graph graph;
-
   private final TransitService transitService;
 
   private final Duration durationLimit;
+  private final DataOverlayContext dataOverlayContext;
 
   private DirectGraphFinder directGraphFinder;
-
-  /**
-   * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search
-   * via the street network or straight line distance based on the presence of OSM street data in
-   * the graph.
-   */
-  public NearbyStopFinder(Graph graph, TransitService transitService, Duration durationLimit) {
-    this(graph, transitService, durationLimit, graph.hasStreets);
-  }
 
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
@@ -82,13 +72,13 @@ public class NearbyStopFinder {
    *                   distance.
    */
   public NearbyStopFinder(
-    Graph graph,
     TransitService transitService,
     Duration durationLimit,
+    DataOverlayContext dataOverlayContext,
     boolean useStreets
   ) {
-    this.graph = graph;
     this.transitService = transitService;
+    this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
     this.durationLimit = durationLimit;
 
@@ -109,6 +99,7 @@ public class NearbyStopFinder {
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
     RouteRequest routingRequest,
+    StreetRequest streetRequest,
     boolean reverseDirection
   ) {
     /* Track the closest stop on each pattern passing nearby. */
@@ -120,7 +111,8 @@ public class NearbyStopFinder {
     /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
     for (NearbyStop nearbyStop : findNearbyStops(
       vertex,
-      routingRequest.clone(),
+      routingRequest,
+      streetRequest,
       reverseDirection
     )) {
       StopLocation ts1 = nearbyStop.stop;
@@ -166,10 +158,16 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStops(
     Vertex vertex,
     RouteRequest routingRequest,
+    StreetRequest streetRequest,
     boolean reverseDirection
   ) {
     if (useStreets) {
-      return findNearbyStopsViaStreets(Set.of(vertex), reverseDirection, routingRequest);
+      return findNearbyStopsViaStreets(
+        Set.of(vertex),
+        reverseDirection,
+        routingRequest,
+        streetRequest
+      );
     } else {
       return findNearbyStopsViaDirectTransfers(vertex);
     }
@@ -186,18 +184,13 @@ public class NearbyStopFinder {
   public List<NearbyStop> findNearbyStopsViaStreets(
     Set<Vertex> originVertices,
     boolean reverseDirection,
-    RouteRequest routingRequest
+    RouteRequest originalRequest,
+    StreetRequest streetRequest
   ) {
+    RouteRequest request = originalRequest.clone();
     List<NearbyStop> stopsFound = new ArrayList<>();
 
-    routingRequest.setArriveBy(reverseDirection);
-
-    RoutingContext routingContext;
-    if (!reverseDirection) {
-      routingContext = new RoutingContext(routingRequest, graph, originVertices, null);
-    } else {
-      routingContext = new RoutingContext(routingRequest, graph, null, originVertices);
-    }
+    request.setArriveBy(reverseDirection);
 
     /* Add the origin vertices if they are stops */
     for (Vertex vertex : originVertices) {
@@ -207,21 +200,25 @@ public class NearbyStopFinder {
             tsv.getStop(),
             0,
             Collections.emptyList(),
-            new State(vertex, routingRequest, routingContext)
+            new State(vertex, request, streetRequest.mode())
           )
         );
       }
     }
 
     // Return only the origin vertices if there are no valid street modes
-    if (!routingRequest.streetSubRequestModes.isValid()) {
+    if (streetRequest.mode() == StreetMode.NOT_SET) {
       return stopsFound;
     }
 
     ShortestPathTree spt = AStarBuilder
-      .allDirections(getSkipEdgeStrategy(reverseDirection, routingRequest))
+      .allDirections(getSkipEdgeStrategy(reverseDirection, request))
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
-      .setContext(routingContext)
+      .setRequest(request)
+      .setStreetRequest(streetRequest)
+      .setFrom(reverseDirection ? null : originVertices)
+      .setTo(reverseDirection ? originVertices : null)
+      .setDataOverlayContext(dataOverlayContext)
       .getShortestPathTree();
 
     // Only used if OTPFeature.FlexRouting.isOn()
