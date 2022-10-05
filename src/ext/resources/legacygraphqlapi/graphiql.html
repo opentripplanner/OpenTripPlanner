@@ -42,11 +42,14 @@
 <div id="graphiql">Loading...</div>
 <script src="https://unpkg.com/graphiql@2.0.8/graphiql.min.js" type="application/javascript" ></script>
 <script>
-  var defaultQuery = 'query {\n' +
-          '  routes {\n' +
-          '    longName\n' +
-          '  }\n' +
-          '}';
+  const defaultQuery = `
+query {
+  routes {
+    shortName
+    longName
+  }
+}
+`;
 
   // Parse the search string to get url parameters.
   var search = window.location.search;
