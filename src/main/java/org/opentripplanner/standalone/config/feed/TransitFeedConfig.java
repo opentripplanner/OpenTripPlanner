@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**

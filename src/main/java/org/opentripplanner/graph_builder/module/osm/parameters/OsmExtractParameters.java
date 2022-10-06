@@ -4,8 +4,8 @@ import java.net.URI;
 import java.time.ZoneId;
 import java.util.Objects;
 import java.util.Optional;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.standalone.config.feed.DataSourceConfig;
 
 /**
  * Configure an OpenStreetMap extract.
