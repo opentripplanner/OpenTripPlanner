@@ -3,11 +3,11 @@ package org.opentripplanner.graph_builder.module.ned.parameter;
 import java.net.URI;
 import java.util.List;
 
-public class DemExtractsConfig {
+public class DemExtractParametersList {
 
   private final List<DemExtractParameters> extracts;
 
-  public DemExtractsConfig(List<DemExtractParameters> demExtractParameters) {
+  public DemExtractParametersList(List<DemExtractParameters> demExtractParameters) {
     this.extracts = List.copyOf(demExtractParameters);
   }
 

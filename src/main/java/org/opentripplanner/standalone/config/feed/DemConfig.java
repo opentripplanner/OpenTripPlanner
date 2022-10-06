@@ -4,7 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
-import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractsConfig;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -12,8 +12,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class DemConfig {
 
-  public static DemExtractsConfig mapDemConfig(NodeAdapter root, String parameterName) {
-    return new DemExtractsConfig(
+  public static DemExtractParametersList mapDemConfig(NodeAdapter root, String parameterName) {
+    return new DemExtractParametersList(
       root
         .of(parameterName)
         .withDoc(NA, /*TODO DOC*/"TODO")
