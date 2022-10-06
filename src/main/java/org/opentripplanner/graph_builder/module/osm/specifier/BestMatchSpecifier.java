@@ -1,10 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -48,9 +45,9 @@ public class BestMatchSpecifier implements OsmSpecifier {
         )
       );
     } else if (spec.contains("|")) {
-      logicalORPairs = getPairsFromString(spec, "\\|");
+      logicalORPairs = OsmSpecifier.getPairsFromString(spec, "\\|");
     } else {
-      logicalANDPairs = getPairsFromString(spec, ";");
+      logicalANDPairs = OsmSpecifier.getPairsFromString(spec, ";");
     }
   }
 
@@ -116,17 +113,6 @@ public class BestMatchSpecifier implements OsmSpecifier {
     return !logicalORPairs.isEmpty();
   }
 
-  private List<Tag> getPairsFromString(String spec, String separator) {
-    return Arrays
-      .stream(spec.split(separator))
-      .filter(p -> !p.isEmpty())
-      .map(pair -> {
-        var kv = pair.split("=");
-        return new Tag(kv[0], kv[1]);
-      })
-      .collect(Collectors.toList());
-  }
-
   private Scores computeORScore(OSMWithTags match) {
     // not sure if we should calculate a proper score as it doesn't make a huge amount of sense to do it for
     // logical OR conditions
@@ -184,7 +170,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
    */
   private static int getTagScore(String value, String matchValue) {
     // either this matches on a wildcard, or it matches exactly
-    if (matchesWildcard(value, matchValue)) {
+    if (OsmSpecifier.matchesWildcard(value, matchValue)) {
       return 1; // wildcard matches are basically tiebreakers
     } else if (value.equals(matchValue)) {
       return 100;
@@ -202,15 +188,5 @@ public class BestMatchSpecifier implements OsmSpecifier {
         return 0;
       }
     }
-  }
-
-  private static boolean matchesWildcard(String value, String matchValue) {
-    return matchValue != null && value != null && value.equals("*");
-  }
-
-  private static boolean matchValue(String value, String matchValue) {
-    return (
-      (Objects.nonNull(value) && value.equals(matchValue)) || matchesWildcard(value, matchValue)
-    );
   }
 }

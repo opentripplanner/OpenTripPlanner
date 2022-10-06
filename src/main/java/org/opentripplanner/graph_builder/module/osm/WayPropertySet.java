@@ -299,8 +299,7 @@ public class WayPropertySet {
   }
 
   public boolean equals(Object o) {
-    if (o instanceof WayPropertySet) {
-      WayPropertySet other = (WayPropertySet) o;
+    if (o instanceof WayPropertySet other) {
       return (
         defaultProperties.equals(other.defaultProperties) &&
         wayProperties.equals(other.wayProperties) &&
@@ -338,10 +337,22 @@ public class WayPropertySet {
 
     float metersSecond;
 
-    if (units == "kmh" || units == "km/h" || units == "kmph" || units == "kph") metersSecond =
-      0.277778f * originalUnits; else if (units == "mph") metersSecond =
-      0.446944f * originalUnits; else if (units == "knots") metersSecond =
-      0.514444f * originalUnits; else return null;
+    switch (units) {
+      case "kmh":
+      case "km/h":
+      case "kmph":
+      case "kph":
+        metersSecond = 0.277778f * originalUnits;
+        break;
+      case "mph":
+        metersSecond = 0.446944f * originalUnits;
+        break;
+      case "knots":
+        metersSecond = 0.514444f * originalUnits;
+        break;
+      default:
+        return null;
+    }
 
     return metersSecond;
   }
