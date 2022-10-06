@@ -1,11 +1,8 @@
 package org.opentripplanner.standalone.config.feed;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-
 import java.net.URI;
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Configure an OpenStreetMap extract.
@@ -26,23 +23,6 @@ public class OsmExtractConfigBuilder {
    * The timezone to use to resolve opening hours in this extract.
    */
   private ZoneId timeZone;
-
-  public static OsmExtractConfigBuilder of(NodeAdapter config) {
-    OsmExtractConfigBuilder osmExtractConfigBuilder = new OsmExtractConfigBuilder();
-    osmExtractConfigBuilder.source =
-      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
-    String osmTagMapping = config
-      .of("osmTagMapping")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asString(null);
-    if (osmTagMapping != null) {
-      osmExtractConfigBuilder.osmWayPropertySet = WayPropertySetSource.fromConfig(osmTagMapping);
-    }
-    osmExtractConfigBuilder.timeZone =
-      config.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
-    return osmExtractConfigBuilder;
-  }
 
   public OsmExtractConfigBuilder withSource(URI source) {
     this.source = source;

@@ -24,6 +24,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemExtractsConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
@@ -620,15 +621,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asUri(null);
 
-    osm =
-      new OsmExtractsConfig(
-        root
-          .of("osm")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    osm = OsmConfig.mapOsmConfig(root, "osm");
     dem =
       new DemExtractsConfig(
         (

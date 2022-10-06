@@ -27,13 +27,10 @@ public class OsmDefaultsConfig {
 
   public OsmDefaultsConfig(NodeAdapter config) {
     this(
-      WayPropertySetSource.fromConfig(
-        config
-          .of("osmTagMapping")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asString("default")
-      ),
+      config
+        .of("osmTagMapping")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asEnum(WayPropertySetSource.Source.DEFAULT).getInstance(),
       config.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null)
     );
   }

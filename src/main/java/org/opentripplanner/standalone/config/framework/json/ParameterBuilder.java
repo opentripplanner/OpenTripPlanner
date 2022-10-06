@@ -314,6 +314,7 @@ public class ParameterBuilder {
     return ofOptionalString(REGEXP, defaultValue, Pattern::compile);
   }
 
+  /** Required URI, OTP support a limited set of URIs. */
   public URI asUri() {
     return ofRequired(ConfigType.URI, n -> parseUri(n.asText()));
   }
