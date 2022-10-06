@@ -36,7 +36,12 @@ public abstract class SiriAzureUpdaterConfig {
     );
 
     if (c.exist("history")) {
-      NodeAdapter history = c.path("history");
+      NodeAdapter history = c
+        .of("history")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject();
       parameters.setDataInitializationUrl(
         history
           .of("url")

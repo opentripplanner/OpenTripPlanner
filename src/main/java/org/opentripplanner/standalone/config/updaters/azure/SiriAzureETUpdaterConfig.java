@@ -12,7 +12,12 @@ public class SiriAzureETUpdaterConfig extends SiriAzureUpdaterConfig {
     populateConfig(parameters, configRef, c);
 
     if (c.exist("history")) {
-      NodeAdapter history = c.path("history");
+      NodeAdapter history = c
+        .of("history")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject();
 
       String fromDateTime = history
         .of("fromDateTime")

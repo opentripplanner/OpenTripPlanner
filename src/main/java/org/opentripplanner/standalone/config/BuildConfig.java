@@ -483,7 +483,15 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("distanceBetweenElevationSamples")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
-    elevationBucket = S3BucketConfig.fromConfig(root.path("elevationBucket"));
+    elevationBucket =
+      S3BucketConfig.fromConfig(
+        root
+          .of("elevationBucket")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
     elevationUnitMultiplier =
       root.of("elevationUnitMultiplier").withDoc(NA, /*TODO DOC*/"TODO").asDouble(1);
     embedRouterConfig =
@@ -564,7 +572,12 @@ public class BuildConfig implements OtpDataStoreConfig {
     discardMinTransferTimes =
       root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
 
-    var localFileNamePatternsConfig = root.path("localFileNamePatterns");
+    var localFileNamePatternsConfig = root
+      .of("localFileNamePatterns")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObject();
     gtfsLocalFilePattern =
       localFileNamePatternsConfig
         .of("gtfs")
@@ -607,21 +620,83 @@ public class BuildConfig implements OtpDataStoreConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asUri(null);
 
-    osm = new OsmExtractsConfig(root.path("osm"));
-    dem = new DemExtractsConfig((root.path("dem")));
-    transitFeeds = new TransitFeedsConfig(root.path("transitFeeds"));
+    osm =
+      new OsmExtractsConfig(
+        root
+          .of("osm")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    dem =
+      new DemExtractsConfig(
+        (
+          root
+            .of("dem")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .withDescription(/*TODO DOC*/"TODO")
+            .asObject()
+        )
+      );
+    transitFeeds =
+      new TransitFeedsConfig(
+        root
+          .of("transitFeeds")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
-    netexDefaults = new NetexDefaultsConfig(root.path("netexDefaults"));
-    osmDefaults = new OsmDefaultsConfig(root.path("osmDefaults"));
-    dataOverlay = DataOverlayConfigMapper.map(root.path("dataOverlay"));
+    netexDefaults =
+      new NetexDefaultsConfig(
+        root
+          .of("netexDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    osmDefaults =
+      new OsmDefaultsConfig(
+        root
+          .of("osmDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    dataOverlay =
+      DataOverlayConfigMapper.map(
+        root
+          .of("dataOverlay")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
-    if (root.path("transferRequests").isNonEmptyArray()) {
+    if (
+      root
+        .of("transferRequests")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isNonEmptyArray()
+    ) {
       transferRequests =
         root
-          .path("transferRequests")
+          .of("transferRequests")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
           .asList()
           .stream()
           .map(RoutingRequestMapper::mapRoutingRequest)

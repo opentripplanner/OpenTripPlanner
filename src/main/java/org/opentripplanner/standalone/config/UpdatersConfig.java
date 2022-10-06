@@ -101,13 +101,37 @@ public class UpdatersConfig implements UpdatersParameters {
     this.vehicleRentalServiceDirectoryFetcherParameters =
       VehicleRentalServiceDirectoryFetcherConfig.create(
         rootAdapter.exist("vehicleRentalServiceDirectory")
-          ? rootAdapter.path("vehicleRentalServiceDirectory")
-          : rootAdapter.path("bikeRentalServiceDirectory") // TODO: deprecated, remove in next major version
+          ? rootAdapter
+            .of("vehicleRentalServiceDirectory")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .withDescription(/*TODO DOC*/"TODO")
+            .asObject()
+          : rootAdapter
+            .of("bikeRentalServiceDirectory")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .withDescription(/*TODO DOC*/"TODO")
+            .asObject() // TODO: deprecated, remove in next major version
       );
 
-    timetableUpdates = timetableUpdates(rootAdapter.path("timetableUpdates"));
+    timetableUpdates =
+      timetableUpdates(
+        rootAdapter
+          .of("timetableUpdates")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
-    List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
+    List<NodeAdapter> updaters = rootAdapter
+      .of("updaters")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObject()
+      .asList();
 
     for (NodeAdapter conf : updaters) {
       String type = conf

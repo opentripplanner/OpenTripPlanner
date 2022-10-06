@@ -4,11 +4,8 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.ItineraryFiltersMapper.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Set;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -112,13 +109,22 @@ public class RoutingRequestMapper {
 
     request.setWheelchair(
       c
-        .path("wheelchairAccessibility")
+        .of("wheelchairAccessibility")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
         .of("enabled")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asBoolean(false)
     );
 
-    NodeAdapter unpreferred = c.path("unpreferred");
+    NodeAdapter unpreferred = c
+      .of("unpreferred")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObject();
     request
       .journey()
       .transit()
@@ -155,8 +161,27 @@ public class RoutingRequestMapper {
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withParking(mapParkingPreferences(c, preferences));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
-    preferences.withWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
-    preferences.withItineraryFilter(it -> mapItineraryFilterParams(c.path("itineraryFilters"), it));
+    preferences.withWheelchair(
+      mapAccessibilityRequest(
+        c
+          .of("wheelchairAccessibility")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      )
+    );
+    preferences.withItineraryFilter(it -> {
+      mapItineraryFilterParams(
+        c
+          .of("itineraryFilters")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject(),
+        it
+      );
+    });
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {
@@ -388,7 +413,16 @@ public class RoutingRequestMapper {
           .asDuration(dft.maxJourneyDuration())
       );
     if (OTPFeature.DataOverlay.isOn()) {
-      builder.withDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
+      builder.withDataOverlay(
+        DataOverlayParametersMapper.map(
+          c
+            .of("dataOverlay")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .withDescription(/*TODO DOC*/"TODO")
+            .asObject()
+        )
+      );
     }
   }
 
@@ -406,7 +440,16 @@ public class RoutingRequestMapper {
       .withWaitReluctance(
         c.of("waitReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.waitReluctance())
       )
-      .withOptimization(mapTransferOptimization(c.path("transferOptimization")));
+      .withOptimization(
+        mapTransferOptimization(
+          c
+            .of("transferOptimization")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .withDescription(/*TODO DOC*/"TODO")
+            .asObject()
+        )
+      );
   }
 
   private static VehicleParkingPreferences mapParkingPreferences(

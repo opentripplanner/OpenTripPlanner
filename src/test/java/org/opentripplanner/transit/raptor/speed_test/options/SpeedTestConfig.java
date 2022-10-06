@@ -55,8 +55,24 @@ public class SpeedTestConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString();
-    transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
-    request = mapRoutingRequest(adapter.path("routingDefaults"));
+    transitRoutingParams =
+      new TransitRoutingConfig(
+        adapter
+          .of("tuningParameters")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    request =
+      mapRoutingRequest(
+        adapter
+          .of("routingDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
   }
 
   public static SpeedTestConfig config(File dir) {

@@ -35,8 +35,22 @@ public class DataOverlayConfigMapper {
         .withExample(/*TODO DOC*/"TODO")
         .asString(),
       c.of("timeFormat").withDoc(NA, /*TODO DOC*/"TODO").asEnum(TimeUnit.class),
-      mapIndexVariables(c.path("indexVariables")),
-      mapRequestParameters(c.path("requestParameters"))
+      mapIndexVariables(
+        c
+          .of("indexVariables")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      ),
+      mapRequestParameters(
+        c
+          .of("requestParameters")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      )
     );
   }
 

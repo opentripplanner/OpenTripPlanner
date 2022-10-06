@@ -63,13 +63,54 @@ public class RouterConfig implements Serializable {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null);
-    this.transmodelApi = new TransmodelAPIConfig(root.path("transmodelApi"));
+    this.transmodelApi =
+      new TransmodelAPIConfig(
+        root
+          .of("transmodelApi")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
-    this.transitConfig = new TransitRoutingConfig(root.path("transit"));
-    this.routingRequestDefaults = mapRoutingRequest(root.path("routingDefaults"));
+    this.transitConfig =
+      new TransitRoutingConfig(
+        root
+          .of("transit")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    this.routingRequestDefaults =
+      mapRoutingRequest(
+        root
+          .of("routingDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
     this.updatersParameters = new UpdatersConfig(root);
-    this.vectorTileLayers = new VectorTileConfig(root.path("vectorTileLayers").asList());
-    this.flexConfig = new FlexConfig(root.path("flex"));
+    this.vectorTileLayers =
+      new VectorTileConfig(
+        root
+          .of("vectorTileLayers")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+          .asList()
+      );
+    this.flexConfig =
+      new FlexConfig(
+        root
+          .of("flex")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);

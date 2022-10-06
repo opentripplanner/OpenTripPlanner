@@ -66,7 +66,14 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
     this.dynamicSearchWindowCoefficients =
-      new DynamicSearchWindowConfig(c.path("dynamicSearchWindow"));
+      new DynamicSearchWindowConfig(
+        c
+          .of("dynamicSearchWindow")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
   }
 
   @Override

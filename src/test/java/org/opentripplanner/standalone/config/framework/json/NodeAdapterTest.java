@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
@@ -39,18 +40,63 @@ public class NodeAdapterTest {
   @Test
   public void isEmpty() {
     NodeAdapter subject = newNodeAdapterForTest("");
-    assertTrue(subject.path("alf").isEmpty());
+    assertTrue(
+      subject
+        .of("alf")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isEmpty()
+    );
 
     subject = newNodeAdapterForTest("{}");
-    assertTrue(subject.path("alf").isEmpty());
-    assertTrue(subject.path("alfa").path("bet").isEmpty());
+    assertTrue(
+      subject
+        .of("alf")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isEmpty()
+    );
+    assertTrue(
+      subject
+        .of("alfa")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .of("bet")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isEmpty()
+    );
   }
 
   @Test
   public void path() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
-    assertFalse(subject.path("foo").isEmpty());
-    assertTrue(subject.path("missingObject").isEmpty());
+    assertFalse(
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isEmpty()
+    );
+    assertTrue(
+      subject
+        .of("missingObject")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isEmpty()
+    );
   }
 
   @Test
@@ -133,7 +179,16 @@ public class NodeAdapterTest {
   @Test
   public void rawAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
-    assertEquals("TEXT", subject.path("aText").asText());
+    assertEquals(
+      "TEXT",
+      subject
+        .of("aText")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .asText()
+    );
   }
 
   @Test
@@ -456,16 +511,61 @@ public class NodeAdapterTest {
   @Test
   public void isNonEmptyArray() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : ['A'], bar: [], foobar: true }");
-    assertTrue(subject.path("foo").isNonEmptyArray());
-    assertFalse(subject.path("bar").isNonEmptyArray());
-    assertFalse(subject.path("foobar").isNonEmptyArray());
-    assertFalse(subject.path("missing").isNonEmptyArray());
+    assertTrue(
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isNonEmptyArray()
+    );
+    assertFalse(
+      subject
+        .of("bar")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isNonEmptyArray()
+    );
+    assertFalse(
+      subject
+        .of("foobar")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isNonEmptyArray()
+    );
+    assertFalse(
+      subject
+        .of("missing")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isNonEmptyArray()
+    );
   }
 
   @Test
   public void deduplicateChildren() {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : { enabled: true } }");
-    assertSame(subject.path("foo"), subject.path("foo"));
+    assertSame(
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject(),
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+    );
   }
 
   @Test
@@ -475,7 +575,16 @@ public class NodeAdapterTest {
     var buf = new StringBuilder();
 
     // When: Access ONLY parameter 'a', but not 'b'
-    assertTrue(subject.path("foo").of("a").asBoolean());
+    assertTrue(
+      subject
+        .of("foo")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .of("a")
+        .asBoolean()
+    );
 
     // Then: expect 'b' to be unused
     subject.logAllUnusedParameters(buf::append);

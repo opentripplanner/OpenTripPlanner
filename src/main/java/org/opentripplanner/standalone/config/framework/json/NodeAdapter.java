@@ -122,18 +122,6 @@ public class NodeAdapter {
     return json.isMissingNode();
   }
 
-  /**
-   * @deprecated Inline
-   */
-  @Deprecated
-  public NodeAdapter path(String paramName) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
-      .asObject();
-  }
-
   public <T> List<T> asList(String paramName, Function<NodeAdapter, T> mapper) {
     return of(paramName)
       .withDoc(NA, /*TODO DOC*/"TODO")
