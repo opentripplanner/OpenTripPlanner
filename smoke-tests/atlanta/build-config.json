@@ -1,0 +1,6 @@
+{
+  "fares": "atlanta",
+  "osmDefaults": {
+    "osmTagMapping": "atlanta"
+  }
+}

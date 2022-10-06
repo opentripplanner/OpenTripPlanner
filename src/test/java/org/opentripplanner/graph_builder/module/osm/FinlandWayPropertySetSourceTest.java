@@ -23,13 +23,23 @@ public class FinlandWayPropertySetSourceTest {
     OSMWithTags primaryWay = new OSMWithTags();
     primaryWay.addTag("highway", "primary");
     primaryWay.addTag("oneway", "no");
+    OSMWithTags livingStreetWay = new OSMWithTags();
+    livingStreetWay.addTag("highway", "living_street");
     OSMWithTags footway = new OSMWithTags();
     footway.addTag("highway", "footway");
     OSMWithTags sidewalk = new OSMWithTags();
     sidewalk.addTag("footway", "sidewalk");
     sidewalk.addTag("highway", "footway");
     assertEquals(2.06, wps.getDataForWay(primaryWay).getBicycleSafetyFeatures().forward(), epsilon);
+    // way with high speed limit, has higher walk safety factor
     assertEquals(1.8, wps.getDataForWay(primaryWay).getWalkSafetyFeatures().forward(), epsilon);
+    assertEquals(1.8, wps.getDataForWay(primaryWay).getWalkSafetyFeatures().back(), epsilon);
+    // way with low speed limit, has lower walk safety factor
+    assertEquals(
+      1.45,
+      wps.getDataForWay(livingStreetWay).getWalkSafetyFeatures().forward(),
+      epsilon
+    );
     assertEquals(1.1, wps.getDataForWay(footway).getWalkSafetyFeatures().forward(), epsilon);
     assertEquals(1.0, wps.getDataForWay(sidewalk).getWalkSafetyFeatures().forward(), epsilon);
   }
@@ -47,8 +57,8 @@ public class FinlandWayPropertySetSourceTest {
       wps.getDataForWay(wayWithMixins).getBicycleSafetyFeatures().forward(),
       epsilon
     );
-    // 1.8 is the default walk safety for a way with ALL permissions
-    assertEquals(1.8, wps.getDataForWay(wayWithMixins).getWalkSafetyFeatures().forward(), epsilon);
+    // 1.6 is the default walk safety for a way with ALL permissions and speed limit > 35 and <= 60 kph
+    assertEquals(1.6, wps.getDataForWay(wayWithMixins).getWalkSafetyFeatures().forward(), epsilon);
 
     OSMWithTags wayWithMixinsAndCustomSafety = new OSMWithTags();
     // highway=service has custom bicycle safety of 1.1 but no custom walk safety
@@ -61,9 +71,9 @@ public class FinlandWayPropertySetSourceTest {
       wps.getDataForWay(wayWithMixinsAndCustomSafety).getBicycleSafetyFeatures().forward(),
       epsilon
     );
-    // 1.8 is the default walk safety for a way with ALL permissions
+    // 1.6 is the default walk safety for a way with ALL permissions and speed limit <= 35 kph
     assertEquals(
-      1.8,
+      1.45,
       wps.getDataForWay(wayWithMixinsAndCustomSafety).getWalkSafetyFeatures().forward(),
       epsilon
     );
