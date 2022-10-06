@@ -42,8 +42,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private boolean isPrimed = false;
   private String subscriptionName;
 
-  protected final boolean fuzzyTripMatching;
-
   protected String feedId;
 
   /**
@@ -62,8 +60,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.dataInitializationUrl = config.getDataInitializationUrl();
     this.timeout = config.getTimeout();
     this.feedId = config.getFeedId();
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
-    this.fuzzyTripMatching = config.isFuzzyTripMatching();
+    this.fuzzyTripMatcher =
+      config.isFuzzyTripMatching()
+        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+        : null;
   }
 
   /**

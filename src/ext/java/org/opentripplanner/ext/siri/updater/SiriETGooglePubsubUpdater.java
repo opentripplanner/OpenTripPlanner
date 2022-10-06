@@ -134,7 +134,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
     this.topic = ProjectTopicName.of(projectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
+    this.fuzzyTripMatcher =
+      config.fuzzyTripMatching()
+        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+        : null;
 
     try {
       if (

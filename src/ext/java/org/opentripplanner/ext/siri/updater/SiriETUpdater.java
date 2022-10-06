@@ -72,7 +72,10 @@ public class SiriETUpdater extends PollingGraphUpdater {
     this.snapshotSource = timetableSnapshot;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
+    this.fuzzyTripMatcher =
+      config.isFuzzyTripMatching()
+        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+        : null;
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",

@@ -21,7 +21,11 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +63,7 @@ public class SiriAlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
   private final String feedId;
-  private final TransitModel transitModel;
+  private final TransitService transitService;
   private final Set<TransitAlert> alerts = new HashSet<>();
   private TransitAlertService transitAlertService;
   /** How long before the posted start of an event it should be displayed to users */
@@ -68,7 +72,7 @@ public class SiriAlertsUpdateHandler {
 
   public SiriAlertsUpdateHandler(String feedId, TransitModel transitModel) {
     this.feedId = feedId;
-    this.transitModel = transitModel;
+    this.transitService = new DefaultTransitService(transitModel);
   }
 
   public void update(ServiceDelivery delivery) {
@@ -225,7 +229,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
 
-          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue(), feedId);
+          FeedScopedId stopId = getStop(stopPointRef.getValue(), feedId, transitService);
 
           if (stopId == null) {
             stopId = new FeedScopedId(feedId, stopPointRef.getValue());
@@ -242,7 +246,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
 
-          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue(), feedId);
+          FeedScopedId stopId = getStop(stopPlace.getValue(), feedId, transitService);
 
           if (stopId == null) {
             stopId = new FeedScopedId(feedId, stopPlace.getValue());
@@ -288,9 +292,10 @@ public class SiriAlertsUpdateHandler {
 
               if (!affectedStops.isEmpty()) {
                 for (AffectedStopPointStructure affectedStop : affectedStops) {
-                  FeedScopedId stop = siriFuzzyTripMatcher.getStop(
+                  FeedScopedId stop = getStop(
                     affectedStop.getStopPointRef().getValue(),
-                    feedId
+                    feedId,
+                    transitService
                   );
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -343,9 +348,10 @@ public class SiriAlertsUpdateHandler {
             for (VehicleJourneyRef vehicleJourneyRef : vehicleJourneyReves) {
               List<FeedScopedId> tripIds = new ArrayList<>();
 
-              FeedScopedId tripIdFromVehicleJourney = siriFuzzyTripMatcher.getTripId(
+              FeedScopedId tripIdFromVehicleJourney = getTripId(
                 vehicleJourneyRef.getValue(),
-                feedId
+                feedId,
+                transitService
               );
 
               ZonedDateTime originAimedDepartureTime = affectedVehicleJourney.getOriginAimedDepartureTime() !=
@@ -361,7 +367,7 @@ public class SiriAlertsUpdateHandler {
 
               if (tripIdFromVehicleJourney != null) {
                 tripIds.add(tripIdFromVehicleJourney);
-              } else {
+              } else if (siriFuzzyTripMatcher != null) {
                 tripIds =
                   siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDateAndMode(
                     vehicleJourneyRef.getValue(),
@@ -374,9 +380,10 @@ public class SiriAlertsUpdateHandler {
               for (FeedScopedId tripId : tripIds) {
                 if (!affectedStops.isEmpty()) {
                   for (AffectedStopPointStructure affectedStop : affectedStops) {
-                    FeedScopedId stop = siriFuzzyTripMatcher.getStop(
+                    FeedScopedId stop = getStop(
                       affectedStop.getStopPointRef().getValue(),
-                      feedId
+                      feedId,
+                      transitService
                     );
                     if (stop == null) {
                       stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -399,7 +406,7 @@ public class SiriAlertsUpdateHandler {
             final DataFrameRefStructure dataFrameRef = framedVehicleJourneyRef.getDataFrameRef();
             final String datedVehicleJourneyRef = framedVehicleJourneyRef.getDatedVehicleJourneyRef();
 
-            FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef, feedId);
+            FeedScopedId tripId = getTripId(datedVehicleJourneyRef, feedId, transitService);
 
             if (tripId != null) {
               LocalDate serviceDate = null;
@@ -409,9 +416,10 @@ public class SiriAlertsUpdateHandler {
 
               if (!affectedStops.isEmpty()) {
                 for (AffectedStopPointStructure affectedStop : affectedStops) {
-                  FeedScopedId stop = siriFuzzyTripMatcher.getStop(
+                  FeedScopedId stop = getStop(
                     affectedStop.getStopPointRef().getValue(),
-                    feedId
+                    feedId,
+                    transitService
                   );
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -442,6 +450,40 @@ public class SiriAlertsUpdateHandler {
     }
 
     return alert;
+  }
+
+  private static FeedScopedId getStop(
+    String siriStopId,
+    String feedId,
+    TransitService transitService
+  ) {
+    FeedScopedId id = new FeedScopedId(feedId, siriStopId);
+    if (transitService.getRegularStop(id) != null) {
+      return id;
+    } else if (transitService.getStationById(id) != null) {
+      return id;
+    }
+
+    return null;
+  }
+
+  private static FeedScopedId getTripId(
+    String vehicleJourney,
+    String feedId,
+    TransitService transitService
+  ) {
+    Trip trip = transitService.getTripForId(new FeedScopedId(feedId, vehicleJourney));
+    if (trip != null) {
+      return trip.getId();
+    }
+    //Attempt to find trip using datedServiceJourneys
+    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
+      new FeedScopedId(feedId, vehicleJourney)
+    );
+    if (tripOnServiceDate != null) {
+      return tripOnServiceDate.getTrip().getId();
+    }
+    return null;
   }
 
   private long getEpochSecond(ZonedDateTime startTime) {

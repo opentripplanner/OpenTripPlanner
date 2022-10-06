@@ -20,6 +20,7 @@ public class SiriETUpdaterParameters
   private final String requestorRef;
   private final int timeoutSec;
   private final int previewIntervalMinutes;
+  private final boolean fuzzyTripMatching;
 
   public SiriETUpdaterParameters(
     String configRef,
@@ -32,7 +33,8 @@ public class SiriETUpdaterParameters
     int frequencySec,
     String requestorRef,
     int timeoutSec,
-    int previewIntervalMinutes
+    int previewIntervalMinutes,
+    boolean fuzzyTripMatching
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -45,6 +47,7 @@ public class SiriETUpdaterParameters
     this.requestorRef = requestorRef;
     this.timeoutSec = timeoutSec;
     this.previewIntervalMinutes = previewIntervalMinutes;
+    this.fuzzyTripMatching = fuzzyTripMatching;
   }
 
   public String getFeedId() {
@@ -80,6 +83,10 @@ public class SiriETUpdaterParameters
   @Override
   public String getConfigRef() {
     return configRef;
+  }
+
+  public boolean isFuzzyTripMatching() {
+    return fuzzyTripMatching;
   }
 
   public SiriETHttpTripUpdateSource.Parameters sourceParameters() {

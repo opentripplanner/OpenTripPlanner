@@ -18,7 +18,8 @@ public class SiriETUpdaterConfig {
       c.asInt("frequencySec", 60),
       c.asText("requestorRef", "otp-" + UUID.randomUUID()),
       c.asInt("timeoutSec", -1),
-      c.asInt("previewIntervalMinutes", -1)
+      c.asInt("previewIntervalMinutes", -1),
+      c.asBoolean("fuzzyTripMatching", false)
     );
   }
 }

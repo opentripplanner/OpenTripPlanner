@@ -62,6 +62,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.EstimatedVersionFrameStructure;
 import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityCancellationStructure;
@@ -250,23 +251,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
   }
 
-  public UpdateResult applyEstimatedTimetable(
-    final TransitModel transitModel,
-    final SiriFuzzyTripMatcher fuzzyTripMatcher,
-    final String feedId,
-    final boolean fullDataset,
-    final List<EstimatedTimetableDeliveryStructure> updates
-  ) {
-    return this.applyEstimatedTimetable(
-        transitModel,
-        fuzzyTripMatcher,
-        feedId,
-        fullDataset,
-        updates,
-        false
-      );
-  }
-
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
@@ -280,8 +264,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     final SiriFuzzyTripMatcher fuzzyTripMatcher,
     final String feedId,
     final boolean fullDataset,
-    final List<EstimatedTimetableDeliveryStructure> updates,
-    final boolean fuzzyTripMatching
+    final List<EstimatedTimetableDeliveryStructure> updates
   ) {
     if (updates == null) {
       LOG.warn("updates is null");
@@ -300,7 +283,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       for (EstimatedTimetableDeliveryStructure etDelivery : updates) {
-        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher, fuzzyTripMatching);
+        var res = apply(etDelivery, transitModel, feedId, fuzzyTripMatcher);
         results.addAll(res);
       }
 
@@ -327,8 +310,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     EstimatedTimetableDeliveryStructure etDelivery,
     TransitModel transitModel,
     String feedId,
-    SiriFuzzyTripMatcher fuzzyTripMatcher,
-    boolean fuzzyTripMatching
+    SiriFuzzyTripMatcher fuzzyTripMatcher
   ) {
     List<Result<?, UpdateError>> results = new ArrayList<>();
     List<EstimatedVersionFrameStructure> estimatedJourneyVersions = etDelivery.getEstimatedJourneyVersionFrames();
@@ -354,13 +336,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             }
           } else {
             // Updated trip
-            var result = handleModifiedTrip(
-              transitModel,
-              fuzzyTripMatcher,
-              feedId,
-              journey,
-              fuzzyTripMatching
-            );
+            var result = handleModifiedTrip(transitModel, fuzzyTripMatcher, feedId, journey);
             result.ifSuccess(ignored -> results.add(Result.success()));
             result.ifFailure(failures -> {
               failures.stream().map(Result::failure).forEach(results::add);
@@ -406,41 +382,42 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
     if (
-      activity.getMonitoredVehicleJourney() == null ||
-      activity.getMonitoredVehicleJourney().getVehicleRef() == null ||
-      activity.getMonitoredVehicleJourney().getLineRef() == null
+      monitoredVehicleJourney == null ||
+      monitoredVehicleJourney.getVehicleRef() == null ||
+      monitoredVehicleJourney.getLineRef() == null
     ) {
       //No vehicle reference or line reference
       return false;
     }
 
-    Boolean isMonitored = activity.getMonitoredVehicleJourney().isMonitored();
+    Boolean isMonitored = monitoredVehicleJourney.isMonitored();
     if (isMonitored != null && !isMonitored) {
       //Vehicle is reported as NOT monitored
       return false;
     }
 
-    Set<Trip> trips = fuzzyTripMatcher.match(activity, feedId);
+    Set<Trip> trips = fuzzyTripMatcher.match(monitoredVehicleJourney, feedId);
 
     if (trips == null || trips.isEmpty()) {
       if (keepLogging) {
         String lineRef =
           (
-            activity.getMonitoredVehicleJourney().getLineRef() != null
-              ? activity.getMonitoredVehicleJourney().getLineRef().getValue()
+            monitoredVehicleJourney.getLineRef() != null
+              ? monitoredVehicleJourney.getLineRef().getValue()
               : null
           );
         String vehicleRef =
           (
-            activity.getMonitoredVehicleJourney().getVehicleRef() != null
-              ? activity.getMonitoredVehicleJourney().getVehicleRef().getValue()
+            monitoredVehicleJourney.getVehicleRef() != null
+              ? monitoredVehicleJourney.getVehicleRef().getValue()
               : null
           );
         String tripId =
           (
-            activity.getMonitoredVehicleJourney().getCourseOfJourneyRef() != null
-              ? activity.getMonitoredVehicleJourney().getCourseOfJourneyRef().getValue()
+            monitoredVehicleJourney.getCourseOfJourneyRef() != null
+              ? monitoredVehicleJourney.getCourseOfJourneyRef().getValue()
               : null
           );
         LOG.debug(
@@ -456,16 +433,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     //Find the trip that best corresponds to MonitoredVehicleJourney
-    Trip trip = getTripForJourney(trips, activity.getMonitoredVehicleJourney());
+    Trip trip = getTripForJourney(trips, monitoredVehicleJourney);
 
     if (trip == null) {
       return false;
     }
 
-    final Set<TripPattern> patterns = getPatternsForTrip(
-      trips,
-      activity.getMonitoredVehicleJourney()
-    );
+    final Set<TripPattern> patterns = getPatternsForTrip(trips, monitoredVehicleJourney);
 
     if (patterns == null) {
       return false;
@@ -667,7 +641,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     for (int i = 0; i < estimatedCalls.size(); i++) {
       EstimatedCall estimatedCall = estimatedCalls.get(i);
 
-      var stop = getStopForStopId(feedId, estimatedCall.getStopPointRef().getValue());
+      var stop = transitService.getRegularStop(
+        new FeedScopedId(feedId, estimatedCall.getStopPointRef().getValue())
+      );
 
       StopTime stopTime = new StopTime();
       stopTime.setStop(stop);
@@ -870,8 +846,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TransitModel transitModel,
     SiriFuzzyTripMatcher fuzzyTripMatcher,
     String feedId,
-    EstimatedVehicleJourney estimatedVehicleJourney,
-    boolean fuzzyTripMatching
+    EstimatedVehicleJourney estimatedVehicleJourney
   ) {
     //Check if EstimatedVehicleJourney is reported as NOT monitored
     if (estimatedVehicleJourney.isMonitored() != null && !estimatedVehicleJourney.isMonitored()) {
@@ -909,9 +884,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     Set<TripTimes> times = new HashSet<>();
     Set<TripPattern> patterns = new HashSet<>();
 
-    Trip tripMatchedByServiceJourneyId = fuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
+    Trip tripMatchedByServiceJourneyId = SiriFuzzyTripMatcher.findTripByDatedVehicleJourneyRef(
       estimatedVehicleJourney,
-      feedId
+      feedId,
+      transitService
     );
 
     if (tripMatchedByServiceJourneyId != null) {
@@ -941,7 +917,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           return Result.failure(List.of(updateResult.failureValue()));
         }
       }
-    } else if (fuzzyTripMatching) {
+    } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       Set<Trip> trips = fuzzyTripMatcher.match(estimatedVehicleJourney, feedId);
 
@@ -1011,11 +987,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       for (TripPattern pattern : patterns) {
         if (tripTimes.getNumStops() == pattern.numberOfStops()) {
           if (!tripTimes.isCanceled()) {
-            /*
-                          UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest realtime-update
-                          to replace previous update regardless of realtimestate
-                         */
-
+            // UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest
+            // realtime-update to replace previous update regardless of realtimestate
             cancelScheduledTrip(trip, serviceDate);
 
             // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
@@ -1250,7 +1223,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private Set<TripPattern> getPatternsForTrip(
     Set<Trip> matches,
-    VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney
   ) {
     if (monitoredVehicleJourney.getOriginRef() == null) {
       return null;
@@ -1419,7 +1392,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private Trip getTripForJourney(
     Set<Trip> trips,
-    VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney
   ) {
     ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
     if (date == null) {
@@ -1555,16 +1528,5 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     } else {
       return null;
     }
-  }
-
-  /**
-   * Retrieve stop given a feed id and stop id.
-   *
-   * @param feedId feed id for the stop id
-   * @param stopId trip id without the agency
-   * @return stop or null if stop doesn't exist
-   */
-  private StopLocation getStopForStopId(String feedId, String stopId) {
-    return transitService.getRegularStop(new FeedScopedId(feedId, stopId));
   }
 }
