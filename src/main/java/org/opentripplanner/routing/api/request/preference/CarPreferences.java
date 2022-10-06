@@ -44,11 +44,11 @@ public final class CarPreferences implements Serializable {
   private CarPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.parkTime = Units.slack(builder.parkTime);
+    this.parkTime = Units.duration(builder.parkTime);
     this.parkCost = Units.cost(builder.parkCost);
-    this.pickupTime = Units.slack(builder.pickupTime);
+    this.pickupTime = Units.duration(builder.pickupTime);
     this.pickupCost = Units.cost(builder.pickupCost);
-    this.dropoffTime = Units.slack(builder.dropoffTime);
+    this.dropoffTime = Units.duration(builder.dropoffTime);
     this.accelerationSpeed = Units.acceleration(builder.accelerationSpeed);
     this.decelerationSpeed = Units.acceleration(builder.decelerationSpeed);
   }

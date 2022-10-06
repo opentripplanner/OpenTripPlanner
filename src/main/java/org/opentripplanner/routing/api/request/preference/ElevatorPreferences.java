@@ -29,9 +29,9 @@ public final class ElevatorPreferences implements Serializable {
 
   private ElevatorPreferences(Builder builder) {
     this.boardCost = Units.cost(builder.boardCost);
-    this.boardTime = Units.slack(builder.boardTime);
+    this.boardTime = Units.duration(builder.boardTime);
     this.hopCost = Units.cost(builder.hopCost);
-    this.hopTime = Units.slack(builder.hopTime);
+    this.hopTime = Units.duration(builder.hopTime);
   }
 
   public static Builder of() {

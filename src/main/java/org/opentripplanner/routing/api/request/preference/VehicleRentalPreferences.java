@@ -153,9 +153,9 @@ public final class VehicleRentalPreferences implements Serializable {
 
     private Builder(VehicleRentalPreferences original) {
       this.original = original;
-      this.pickupTime = Units.slack(original.pickupTime);
+      this.pickupTime = Units.duration(original.pickupTime);
       this.pickupCost = Units.cost(original.pickupCost);
-      this.dropoffTime = Units.slack(original.dropoffTime);
+      this.dropoffTime = Units.duration(original.dropoffTime);
       this.dropoffCost = Units.cost(original.dropoffCost);
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =

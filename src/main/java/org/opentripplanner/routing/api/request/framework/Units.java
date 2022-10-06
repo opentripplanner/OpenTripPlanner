@@ -54,9 +54,9 @@ public class Units {
   }
 
   /**
-   * Time/slack/duration - A constant amount of time.
+   * Amount of time/slack/duration in seconds - A constant amount of time.
    */
-  public static int slack(int seconds) {
+  public static int duration(int seconds) {
     if (seconds < 0) {
       throw new IllegalArgumentException("Negative slack/time/duration not expected: " + seconds);
     }

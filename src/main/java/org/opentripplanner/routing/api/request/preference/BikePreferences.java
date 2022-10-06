@@ -53,9 +53,9 @@ public final class BikePreferences implements Serializable {
     this.boardCost = Units.cost(builder.boardCost);
     this.walkingSpeed = Units.speed(builder.walkingSpeed);
     this.walkingReluctance = Units.reluctance(builder.walkingReluctance);
-    this.switchTime = Units.slack(builder.switchTime);
+    this.switchTime = Units.duration(builder.switchTime);
     this.switchCost = Units.cost(builder.switchCost);
-    this.parkTime = Units.slack(builder.parkTime);
+    this.parkTime = Units.duration(builder.parkTime);
     this.parkCost = Units.cost(builder.parkCost);
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);

@@ -39,7 +39,7 @@ public final class TransferPreferences implements Serializable {
 
   private TransferPreferences(Builder builder) {
     this.cost = Units.cost(builder.cost);
-    this.slack = Units.slack(builder.slack);
+    this.slack = Units.duration(builder.slack);
     this.waitReluctance = Units.reluctance(builder.waitReluctance);
     this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
     this.optimization = requireNonNull(builder.optimization);

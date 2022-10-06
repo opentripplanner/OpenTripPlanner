@@ -24,10 +24,10 @@ class UnitsTest {
   }
 
   @Test
-  void slack() {
-    assertEquals(0, Units.slack(0));
-    assertEquals(10_000, Units.slack(10_000));
-    assertThrows(IllegalArgumentException.class, () -> Units.slack(-1));
+  void duration() {
+    assertEquals(0, Units.duration(0));
+    assertEquals(10_000, Units.duration(10_000));
+    assertThrows(IllegalArgumentException.class, () -> Units.duration(-1));
   }
 
   @Test
