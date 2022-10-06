@@ -27,6 +27,7 @@
 - Implement allowedBikeRentalNetworks while deprecating it and add allowedVehicleRentalNetworks and bannedVehicleRentalNetworks. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4279)
 - Filters place types in legacy GraphQL API so that a bike park type is not returned if a vehicle parking has no bicycle spaces and car park type is not returned if a parking has no car spaces. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4296)
 - Include departures with skipped stops in the Stop type's stopTimesForPattern query. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4299)
+- Implement support for omitCanceled parameter in some stop's stoptime queries (October 2023, https://github.com/opentripplanner/OpenTripPlanner/pull/4504)
 
 ## Documentation
 
