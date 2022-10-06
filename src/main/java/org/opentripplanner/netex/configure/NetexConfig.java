@@ -15,8 +15,8 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
 import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
+import org.opentripplanner.standalone.config.feed.NetexFeedParametersBuilder;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -42,7 +42,7 @@ public class NetexConfig {
     ZipFileDataSource dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
     ConfiguredDataSource<NetexFeedParameters> netexConfiguredDataSource = new ConfiguredDataSource<>(
       dataSource,
-      new NetexFeedConfigBuilder().withSource(dataSource.uri()).build()
+      new NetexFeedParametersBuilder().withSource(dataSource.uri()).build()
     );
     return new NetexConfig(builderParams).netexBundle(netexConfiguredDataSource);
   }

@@ -48,7 +48,7 @@ public class TransitFeedParametersList {
               .asString()
           )
         )
-        .map(feedConfig -> NetexFeedConfigBuilder.of(feedConfig).build())
+        .map(feedConfig -> NetexFeedParametersBuilder.of(feedConfig).build())
         .toList();
   }
 

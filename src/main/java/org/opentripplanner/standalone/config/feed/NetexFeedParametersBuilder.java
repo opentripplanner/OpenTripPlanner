@@ -9,81 +9,69 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 /**
  * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultsConfig}
  */
-public class NetexFeedConfigBuilder {
+public class NetexFeedParametersBuilder {
 
   private URI source;
 
   private String feedId;
 
-  /**
-   * Overrides {@link NetexDefaultsConfig#sharedFilePattern}
-   */
   private Pattern sharedFilePattern;
 
-  /**
-   * Overrides {@link NetexDefaultsConfig#sharedGroupFilePattern}
-   */
   private Pattern sharedGroupFilePattern;
 
-  /**
-   * Overrides {@link NetexDefaultsConfig#ignoreFilePattern}
-   */
   private Pattern ignoreFilePattern;
 
-  /**
-   * Overrides {@link NetexDefaultsConfig#groupFilePattern}
-   */
   private Pattern groupFilePattern;
 
-  public NetexFeedConfigBuilder withSource(URI source) {
+  public NetexFeedParametersBuilder withSource(URI source) {
     this.source = source;
     return this;
   }
 
-  public NetexFeedConfigBuilder withFeedId(String feedId) {
+  public NetexFeedParametersBuilder withFeedId(String feedId) {
     this.feedId = feedId;
     return this;
   }
 
-  public NetexFeedConfigBuilder withSharedFilePattern(Pattern sharedFilePattern) {
+  public NetexFeedParametersBuilder withSharedFilePattern(Pattern sharedFilePattern) {
     this.sharedFilePattern = sharedFilePattern;
     return this;
   }
 
-  public NetexFeedConfigBuilder withSharedGroupFilePattern(Pattern sharedGroupFilePattern) {
+  public NetexFeedParametersBuilder withSharedGroupFilePattern(Pattern sharedGroupFilePattern) {
     this.sharedGroupFilePattern = sharedGroupFilePattern;
     return this;
   }
 
-  public NetexFeedConfigBuilder withGroupFilePattern(Pattern groupFilePattern) {
+  public NetexFeedParametersBuilder withGroupFilePattern(Pattern groupFilePattern) {
     this.groupFilePattern = groupFilePattern;
     return this;
   }
 
-  public NetexFeedConfigBuilder withIgnoreFilePattern(Pattern ignoreFilePattern) {
+  public NetexFeedParametersBuilder withIgnoreFilePattern(Pattern ignoreFilePattern) {
     this.ignoreFilePattern = ignoreFilePattern;
     return this;
   }
 
-  public static NetexFeedConfigBuilder of(NodeAdapter config) {
-    NetexFeedConfigBuilder netexFeedConfigBuilder = new NetexFeedConfigBuilder();
-    netexFeedConfigBuilder.source =
+  public static NetexFeedParametersBuilder of(NodeAdapter config) {
+    NetexFeedParametersBuilder builder = new NetexFeedParametersBuilder();
+    builder.source =
       config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
-    netexFeedConfigBuilder.feedId =
+    builder.feedId =
       config
         .of("feedId")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null);
-    netexFeedConfigBuilder.sharedFilePattern =
+    builder.sharedFilePattern =
       config.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    netexFeedConfigBuilder.sharedGroupFilePattern =
+    builder.sharedGroupFilePattern =
       config.of("sharedGroupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    netexFeedConfigBuilder.ignoreFilePattern =
+    builder.ignoreFilePattern =
       config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    netexFeedConfigBuilder.groupFilePattern =
+    builder.groupFilePattern =
       config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    return netexFeedConfigBuilder;
+    return builder;
   }
 
   public NetexFeedParameters build() {
