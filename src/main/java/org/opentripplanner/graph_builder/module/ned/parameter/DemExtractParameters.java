@@ -9,7 +9,7 @@ import org.opentripplanner.standalone.config.feed.DataSourceConfig;
  * Configuration of a DEM extract. Example:
  * {@code "dem" : [ {source: "file:///path/to/otp/norway-dem.tif"} ] }
  */
-public class DemExtractConfig implements DataSourceConfig {
+public class DemExtractParameters implements DataSourceConfig {
 
   private final URI source;
 
@@ -20,7 +20,7 @@ public class DemExtractConfig implements DataSourceConfig {
    */
   private final Double elevationUnitMultiplier;
 
-  DemExtractConfig(DemExtractConfigBuilder builder) {
+  DemExtractParameters(DemExtractConfigBuilder builder) {
     source = Objects.requireNonNull(builder.source());
     elevationUnitMultiplier = builder.elevationUnitMultiplier();
   }
