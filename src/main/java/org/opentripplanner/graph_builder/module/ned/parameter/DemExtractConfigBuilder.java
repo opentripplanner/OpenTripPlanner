@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.graph_builder.module.ned.parameter;
 
 import java.net.URI;
 
