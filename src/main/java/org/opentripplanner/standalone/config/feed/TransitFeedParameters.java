@@ -11,7 +11,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 /**
  * Configuration for a transit data feed.
  */
-public class TransitFeedConfig implements DataSourceConfig {
+public class TransitFeedParameters implements DataSourceConfig {
 
   /**
    * The unique ID for this feed.
@@ -27,7 +27,12 @@ public class TransitFeedConfig implements DataSourceConfig {
    */
   private final URI source;
 
-  public TransitFeedConfig(NodeAdapter config) {
+  public TransitFeedParameters(URI source, String feedId) {
+    this.source = Objects.requireNonNull(source);
+    this.feedId = feedId;
+  }
+
+  public TransitFeedParameters(NodeAdapter config) {
     this(
       config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
       config
@@ -36,11 +41,6 @@ public class TransitFeedConfig implements DataSourceConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asString(null)
     );
-  }
-
-  public TransitFeedConfig(URI source, String feedId) {
-    this.source = Objects.requireNonNull(source);
-    this.feedId = feedId;
   }
 
   @Override

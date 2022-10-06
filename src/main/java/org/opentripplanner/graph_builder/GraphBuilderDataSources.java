@@ -24,10 +24,10 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
-import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
-import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
+import org.opentripplanner.standalone.config.feed.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +141,7 @@ public class GraphBuilderDataSources {
       .orElse(new DemExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
-  public Iterable<ConfiguredDataSource<GtfsFeedConfig>> getGtfsConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
     return inputData
       .get(GTFS)
       .stream()
@@ -149,7 +149,7 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private GtfsFeedConfig getGtfsFeedConfig(DataSource dataSource) {
+  private GtfsFeedParameters getGtfsFeedConfig(DataSource dataSource) {
     return buildConfig.transitFeeds.gtfsFeedConfigs
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
@@ -157,7 +157,7 @@ public class GraphBuilderDataSources {
       .orElse(new GtfsFeedConfigBuilder().withSource(dataSource.uri()).build());
   }
 
-  public Iterable<ConfiguredDataSource<NetexFeedConfig>> getNetexConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<NetexFeedParameters>> getNetexConfiguredDatasource() {
     return inputData
       .get(NETEX)
       .stream()
@@ -165,7 +165,7 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private NetexFeedConfig getNetexFeedConfig(DataSource dataSource) {
+  private NetexFeedParameters getNetexFeedConfig(DataSource dataSource) {
     return buildConfig.transitFeeds.netexFeedConfigs
       .stream()
       .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
