@@ -39,8 +39,9 @@ public class LegacyGraphQLTicketTypeImpl
       DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
       symbols.setDecimalSeparator('.');
       format.setDecimalFormatSymbols(symbols);
-      String price = format
-        .format(((FareRuleSet) environment.getSource()).getFareAttribute().getPrice());
+      String price = format.format(
+        ((FareRuleSet) environment.getSource()).getFareAttribute().getPrice()
+      );
       return Double.valueOf(price);
     };
   }

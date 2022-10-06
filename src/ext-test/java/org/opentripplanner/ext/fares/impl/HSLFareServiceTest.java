@@ -333,7 +333,9 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     // Itineraries with agency specific fare
     Itinerary d1 = newItinerary(D1, T11_06).bus(routeAgency1, 1, T11_20, T11_30, D2).build();
-    args.add( Arguments.of("Ride with agency 1", hslFareService, d1, List.of(fareAttributeD.getId())));
+    args.add(
+      Arguments.of("Ride with agency 1", hslFareService, d1, List.of(fareAttributeD.getId()))
+    );
 
     Itinerary d2 = newItinerary(D1, T11_06).bus(routeAgency2, 1, T11_20, T11_30, D2).build();
     args.add(
