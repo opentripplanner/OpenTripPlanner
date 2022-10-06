@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.ned.parameter;
 
 import java.net.URI;
 
-public class DemExtractConfigBuilder {
+public class DemExtractParametersBuilder {
 
   private URI source;
   private Double elevationUnitMultiplier;
@@ -11,7 +11,7 @@ public class DemExtractConfigBuilder {
     return source;
   }
 
-  public DemExtractConfigBuilder withSource(URI source) {
+  public DemExtractParametersBuilder withSource(URI source) {
     this.source = source;
     return this;
   }
@@ -20,7 +20,7 @@ public class DemExtractConfigBuilder {
     return elevationUnitMultiplier;
   }
 
-  public DemExtractConfigBuilder withElevationUnitMultiplier(Double elevationUnitMultiplier) {
+  public DemExtractParametersBuilder withElevationUnitMultiplier(Double elevationUnitMultiplier) {
     this.elevationUnitMultiplier = elevationUnitMultiplier;
     return this;
   }

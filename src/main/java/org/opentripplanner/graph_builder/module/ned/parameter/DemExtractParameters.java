@@ -20,7 +20,7 @@ public class DemExtractParameters implements DataSourceConfig {
    */
   private final Double elevationUnitMultiplier;
 
-  DemExtractParameters(DemExtractConfigBuilder builder) {
+  DemExtractParameters(DemExtractParametersBuilder builder) {
     source = Objects.requireNonNull(builder.source());
     elevationUnitMultiplier = builder.elevationUnitMultiplier();
   }

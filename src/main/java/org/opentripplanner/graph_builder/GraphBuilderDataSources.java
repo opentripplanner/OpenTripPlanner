@@ -17,8 +17,8 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractConfigBuilder;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -139,7 +139,7 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new DemExtractConfigBuilder().withSource(dataSource.uri()).build());
+      .orElse(new DemExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<GtfsFeedConfig>> getGtfsConfiguredDatasource() {
