@@ -12,6 +12,7 @@ import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,8 +74,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     return transitAlertService;
   }
 
+  @Override
   public String toString() {
-    return "GtfsRealtimeUpdater(" + url + ")";
+    return ToStringBuilder.of(this.getClass()).addStr("url", url).toString();
   }
 
   @Override

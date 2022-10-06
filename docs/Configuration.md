@@ -256,7 +256,7 @@ The main optimization goal for the OTP server is minimizing response time.
   Thus _TLBFS_ mode (`-XX:+UseHugeTLBFS`) should be the first choice.
 - If _TLBFS_ mode is not an option,  _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) can be used instead, with additional provisions to mitigate the risk of latency spikes:  
 The physical memory can be committed upfront, at JVM startup time. This can be done by forcing a fixed heap size and pre-touching the memory.  
-Example: `-Xms18g -Xmx18g -XX:-UseTransparentHugePages -XX:+AlwaysPreTouch`  
+Example: `-Xms18g -Xmx18g -XX:+UseTransparentHugePages -XX:+AlwaysPreTouch`  
 
 ## Graph Builder
 The Graph Builder is the non-interactive mode used to build street graphs and transit graphs.     

@@ -47,8 +47,8 @@ public class DirectoryDataSourceTest {
     assertEquals(DIRNAME, subject.name());
     assertEquals(expectedPath, subject.path());
     assertEquals(REPORT, subject.type());
-    assertEquals(0L, subject.lastModified());
-    assertEquals(0L, subject.size());
+    assertEquals(DataSource.UNKNOWN, subject.lastModified());
+    assertEquals(DataSource.UNKNOWN, subject.size());
     assertFalse(subject.exists());
     assertTrue(subject.isWritable());
 
@@ -99,6 +99,6 @@ public class DirectoryDataSourceTest {
   }
 
   private String toString(Collection<DataSource> sources) {
-    return sources.stream().map(DataSource::name).collect(Collectors.toList()).toString();
+    return sources.stream().map(DataSource::name).sorted().toList().toString();
   }
 }

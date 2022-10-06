@@ -10,7 +10,6 @@ import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
@@ -244,7 +243,7 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
+    RouteRequest transferRoutingRequest = request.copyAndPrepareForTransferRouting();
 
     return new RaptorRoutingRequestTransitData(
       transitLayer,

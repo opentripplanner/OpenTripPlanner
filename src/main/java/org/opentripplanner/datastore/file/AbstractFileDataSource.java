@@ -46,12 +46,16 @@ public abstract class AbstractFileDataSource implements DataSource {
 
   @Override
   public final long size() {
-    return file.length();
+    // file.length() may return 0, map this to unknown
+    long value = file.length();
+    return value != 0L ? value : DataSource.UNKNOWN;
   }
 
   @Override
   public final long lastModified() {
-    return file.lastModified();
+    // file.lastModified() may return 0, map this to unknown
+    long value = file.lastModified();
+    return value != 0L ? value : DataSource.UNKNOWN;
   }
 
   @Override
@@ -62,8 +66,8 @@ public abstract class AbstractFileDataSource implements DataSource {
   @Override
   public boolean isWritable() {
     // We assume we can write to a file if the parent directory exist, and if the
-    // file it self exist then it must be writable. If the file do not exist
-    // we assume we can create a new file and write to it - there is no check on this.
+    // file exist then it must be writable. If the file do not exist we assume we
+    // can create a new file and write to it - there is no check on this.
     return file.getParentFile().exists() && (!file.exists() || file.canWrite());
   }
 

@@ -24,7 +24,8 @@ public class SiriETUpdaterConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asString("otp-" + UUID.randomUUID()),
       c.of("timeoutSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("previewIntervalMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
+      c.of("previewIntervalMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
+      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
     );
   }
 }

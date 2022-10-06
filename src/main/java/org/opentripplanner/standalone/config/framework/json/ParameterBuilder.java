@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -32,11 +33,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
@@ -132,8 +133,18 @@ public class ParameterBuilder {
     return ofOptional(STRING, defaultValue, JsonNode::asText);
   }
 
-  public List<String> asStringList(List<String> defaultValue) {
-    return ofArrayAsList(STRING, defaultValue, JsonNode::asText);
+  public Set<String> asStringSet(Collection<String> defaultValue) {
+    List<String> dft = (defaultValue instanceof List<String>)
+      ? (List<String>) defaultValue
+      : List.copyOf(defaultValue);
+    return Set.copyOf(ofArrayAsList(STRING, dft, JsonNode::asText));
+  }
+
+  public List<String> asStringList(Collection<String> defaultValue) {
+    List<String> dft = (defaultValue instanceof List<String>)
+      ? (List<String>) defaultValue
+      : List.copyOf(defaultValue);
+    return ofArrayAsList(STRING, dft, JsonNode::asText);
   }
 
   public Map<String, String> asStringMap() {
@@ -202,15 +213,14 @@ public class ParameterBuilder {
     if (mapNode.isEmpty()) {
       return Map.of();
     }
-
     EnumMap<E, T> result = new EnumMap<>(enumType);
 
-    for (E v : enumType.getEnumConstants()) {
-      var key = v.name();
-      if (mapNode.exist(key)) {
-        var child = mapNode.rawNode(key);
-        result.put(v, parseConfigType(elementType, child));
-      }
+    Iterator<String> it = mapNode.listExistingChildNodes();
+    while (it.hasNext()) {
+      String name = it.next();
+      E key = parseEnum(name, enumType);
+      var child = mapNode.rawNode(name);
+      result.put(key, parseConfigType(elementType, child));
     }
     return result;
   }
@@ -328,7 +338,7 @@ public class ParameterBuilder {
     return buildAndListValues(defaultValues, it -> FeedScopedId.parseId(it.asText()));
   }
 
-  public DoubleFunction<Double> asLinearFunction(DoubleFunction<Double> defaultValue) {
+  public DoubleAlgorithmFunction asLinearFunction(DoubleAlgorithmFunction defaultValue) {
     return ofOptional(LINEAR_FUNCTION, defaultValue, n -> parseLinearFunction(n.asText()));
   }
 
@@ -525,7 +535,7 @@ public class ParameterBuilder {
     };
   }
 
-  private DoubleFunction<Double> parseLinearFunction(String text) {
+  private DoubleAlgorithmFunction parseLinearFunction(String text) {
     try {
       return RequestFunctions.parse(text);
     } catch (IllegalArgumentException ignore) {
@@ -533,7 +543,7 @@ public class ParameterBuilder {
         "Unable to parse linear function: " +
         text +
         ". Expected format: " +
-        "\"a + b x\" (\"2.0 + 7.1 x\")."
+        "\"a + b x\" (\"60 + 7.1 x\")."
       );
     }
   }

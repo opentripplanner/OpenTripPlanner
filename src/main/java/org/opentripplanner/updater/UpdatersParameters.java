@@ -10,7 +10,7 @@ import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
+import org.opentripplanner.updater.stoptime.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -26,7 +26,7 @@ public interface UpdatersParameters {
 
   List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters();
 
-  List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters();
+  List<PollingTripUpdaterParameters> getPollingStoptimeUpdaterParameters();
 
   List<VehiclePositionsUpdaterParameters> getVehiclePositionsUpdaterParameters();
 

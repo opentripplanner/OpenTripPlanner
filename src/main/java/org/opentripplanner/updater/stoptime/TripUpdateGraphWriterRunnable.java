@@ -3,6 +3,7 @@ package org.opentripplanner.updater.stoptime;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -26,6 +27,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
   private final String feedId;
+  private final Consumer<UpdateResult> sendMetrics;
   private final TimetableSnapshotSource snapshotSource;
 
   TripUpdateGraphWriterRunnable(
@@ -34,7 +36,8 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     boolean fullDataset,
     List<TripUpdate> updates,
-    String feedId
+    String feedId,
+    Consumer<UpdateResult> sendMetrics
   ) {
     this.snapshotSource = snapshotSource;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
@@ -42,16 +45,18 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     this.fullDataset = fullDataset;
     this.updates = Objects.requireNonNull(updates);
     this.feedId = Objects.requireNonNull(feedId);
+    this.sendMetrics = sendMetrics;
   }
 
   @Override
   public void run(Graph graph, TransitModel transitModel) {
-    snapshotSource.applyTripUpdates(
+    var result = snapshotSource.applyTripUpdates(
       fuzzyTripMatcher,
       backwardsDelayPropagationType,
       fullDataset,
       updates,
       feedId
     );
+    sendMetrics.accept(result);
   }
 }

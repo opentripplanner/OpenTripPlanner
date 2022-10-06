@@ -7,7 +7,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -26,10 +26,26 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission = permission ->
+    BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission = (
+        permission,
+        speedLimit
+      ) ->
       switch (permission) {
-        case ALL, PEDESTRIAN_AND_CAR -> 1.8;
-        case PEDESTRIAN_AND_BICYCLE -> 1.3;
+        case ALL, PEDESTRIAN_AND_CAR -> {
+          // ~35kph or under
+          if (speedLimit <= 9.75f) {
+            yield 1.45;
+          }
+          // ~60kph or under
+          else if (speedLimit <= 16.65f) {
+            yield 1.6;
+          }
+          // over ~60kph
+          else {
+            yield 1.8;
+          }
+        }
+        case PEDESTRIAN_AND_BICYCLE -> 1.15;
         case PEDESTRIAN -> 1.1;
         // these don't include walking
         case BICYCLE_AND_CAR, BICYCLE, CAR, NONE -> 1.8;
@@ -80,14 +96,36 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
     /*
      * Automobile speeds in Finland. General speed limit is 80kph unless signs says otherwise.
-     *
      */
-    props.setCarSpeed("highway=motorway", 27.77f); // = 100kph. Varies between 80 - 120 kph depending on road and season.
-    props.setCarSpeed("highway=motorway_link", 15); // = 54kph
-    props.setCarSpeed("highway=trunk", 22.22f); // 80kph "Valtatie"
-    props.setCarSpeed("highway=trunk_link", 15); // = 54kph
-    props.setCarSpeed("highway=primary", 22.22f); // 80kph "Kantatie"
-    props.setCarSpeed("highway=primary_link", 15); // = 54kph
+    // = 100kph. Varies between 80 - 120 kph depending on road and season.
+    props.setCarSpeed("highway=motorway", 27.77f);
+    // = 54kph
+    props.setCarSpeed("highway=motorway_link", 15);
+    // 80kph "Valtatie"
+    props.setCarSpeed("highway=trunk", 22.22f);
+    // = 54kph
+    props.setCarSpeed("highway=trunk_link", 15);
+    // 80kph "Kantatie"
+    props.setCarSpeed("highway=primary", 22.22f);
+    // = 54kph
+    props.setCarSpeed("highway=primary_link", 15);
+    // ~= 70kph
+    props.setCarSpeed("highway=secondary", 19.45f);
+    // = 54kph
+    props.setCarSpeed("highway=secondary_link", 15);
+    // ~= 60kph
+    props.setCarSpeed("highway=tertiary", 16.65f);
+    // ~= 40 kph
+    props.setCarSpeed("highway=tertiary_link", 11.2f);
+    props.setCarSpeed("highway=unclassified", 11.2f);
+    props.setCarSpeed("highway=road", 11.2f);
+    // ~= 35 kph
+    props.setCarSpeed("highway=residential", 9.75f);
+    // ~= 20 kph
+    props.setCarSpeed("highway=service", 5.55f);
+    props.setCarSpeed("highway=living_street", 5.55f);
+    // ~= 16 kph
+    props.setCarSpeed("highway=track", 4.5f);
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);

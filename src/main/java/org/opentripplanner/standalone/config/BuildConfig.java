@@ -556,13 +556,11 @@ public class BuildConfig implements OtpDataStoreConfig {
     maxElevationPropagationMeters =
       root.of("maxElevationPropagationMeters").withDoc(NA, /*TODO DOC*/"TODO").asInt(2000);
     boardingLocationTags =
-      Set.copyOf(
-        root
-          .of("boardingLocationTags")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asStringList(List.copyOf(Set.of("ref")))
-      );
+      root
+        .of("boardingLocationTags")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asStringSet(List.copyOf(Set.of("ref")));
     discardMinTransferTimes =
       root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
 

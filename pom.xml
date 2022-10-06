@@ -22,14 +22,14 @@
     </scm>
 
     <properties>
-        <otp.serialization.version.id>66</otp.serialization.version.id>
+        <otp.serialization.version.id>67</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>27.0</geotools.version>
         <google.dagger.version>2.42</google.dagger.version>
         <jackson.version>2.13.3</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.8.2</junit.version>
-        <micrometer.version>1.8.3</micrometer.version>
+        <micrometer.version>1.8.10</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <lucene.version>9.1.0</lucene.version>

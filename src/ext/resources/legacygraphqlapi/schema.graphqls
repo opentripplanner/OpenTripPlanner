@@ -2435,6 +2435,8 @@ type QueryType {
         """
         How much less bad is waiting at the beginning of the trip (replaces
         `waitReluctance` on the first boarding). Default value: 0.4
+
+        Deprecated, not used, the timetable-view replaces this functionality.
         """
         waitAtBeginningFactor: Float
 

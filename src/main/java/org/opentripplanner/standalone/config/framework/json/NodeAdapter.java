@@ -195,6 +195,10 @@ public class NodeAdapter {
     return json.toPrettyString();
   }
 
+  public Iterator<String> listExistingChildNodes() {
+    return json.fieldNames();
+  }
+
   /* private methods */
 
   NodeAdapter path(String paramName, JsonNode node) {

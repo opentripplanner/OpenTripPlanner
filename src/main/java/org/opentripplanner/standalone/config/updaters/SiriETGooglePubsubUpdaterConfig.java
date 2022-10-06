@@ -30,7 +30,8 @@ public class SiriETGooglePubsubUpdaterConfig {
         .of("initialGetDataTimeout")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asDuration(INITIAL_GET_DATA_TIMEOUT),
-      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
+      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
     );
   }
 }

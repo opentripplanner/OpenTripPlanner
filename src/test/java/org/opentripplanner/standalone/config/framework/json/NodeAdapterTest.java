@@ -178,7 +178,10 @@ public class NodeAdapterTest {
   @Test
   public void asEnumMapWithUnknownValue() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : { unknown : 7 } }");
-    assertEquals(Map.<AnEnum, Double>of(), subject.of("key").asEnumMap(AnEnum.class, Double.class));
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.of("key").asEnumMap(AnEnum.class, Double.class)
+    );
 
     // Assert unknown parameter is logged at warning level and with full pathname
     var buf = new StringBuilder();
@@ -188,13 +191,26 @@ public class NodeAdapterTest {
 
   @Test
   public void asEnumMapAllKeysRequired() {
-    // Require all enum values to exist (if param exist)
-    NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false, C: true } }");
+    var subject = newNodeAdapterForTest("{ key : { A: true, b: false, a_B_c: true } }");
     assertEquals(
-      Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.C, true),
+      Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.A_B_C, true),
       subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
     assertNull(subject.of("missing-key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class));
+
+    var subjectMissingB = newNodeAdapterForTest("{ key : { A: true, a_B_c: true } }");
+    assertThrows(
+      OtpAppException.class,
+      () -> subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    );
+
+    var subjectWithExtraNode = newNodeAdapterForTest(
+      "{ key : { A: true, b: false, a_B_c: true, extra: true } }"
+    );
+    assertThrows(
+      OtpAppException.class,
+      () -> subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    );
   }
 
   @Test
@@ -405,8 +421,8 @@ public class NodeAdapterTest {
 
   @Test
   public void linearFunction() {
-    NodeAdapter subject = newNodeAdapterForTest("{ key : '4+8x' }");
-    assertEquals("f(x) = 4.0 + 8.0 x", subject.of("key").asLinearFunction(null).toString());
+    NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
+    assertEquals("f(x) = 400 + 8.0 x", subject.of("key").asLinearFunction(null).toString());
     assertNull(subject.of("no-key").asLinearFunction(null));
   }
 
@@ -469,8 +485,7 @@ public class NodeAdapterTest {
   private enum AnEnum {
     A,
     B,
-    C,
-    A_B_C
+    A_B_C,
   }
 
   private record ARecord(String a) {}

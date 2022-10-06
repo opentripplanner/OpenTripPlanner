@@ -1,29 +1,64 @@
 package org.opentripplanner.routing.api.request.preference;
 
-// TODO VIA (Thomas): Javadoc
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.function.Consumer;
+import org.opentripplanner.routing.api.request.framework.Units;
+import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
-public class CarPreferences implements Cloneable, Serializable {
+/**
+ * The car preferences contain all speed, reluctance, cost and factor preferences for driving
+ * related to street routing. The values are normalized(rounded) so the class can used as a cache
+ * key.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
+ */
+public final class CarPreferences implements Serializable {
 
-  private double speed = 40.0;
-  private double reluctance = 2.0;
-  private int parkTime = 60;
-  private int parkCost = 120;
-  private int dropoffTime = 120;
-  private int pickupTime = 60;
-  private int pickupCost = 120;
-  private double decelerationSpeed = 2.9;
-  private double accelerationSpeed = 2.9;
+  public static final CarPreferences DEFAULT = new CarPreferences();
 
-  public CarPreferences clone() {
-    try {
-      var clone = (CarPreferences) super.clone();
+  private final double speed;
+  private final double reluctance;
+  private final int parkTime;
+  private final int parkCost;
+  private final int pickupTime;
+  private final int pickupCost;
+  private final int dropoffTime;
+  private final double accelerationSpeed;
+  private final double decelerationSpeed;
 
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
+  /** Create a new instance with default values. */
+  private CarPreferences() {
+    this.speed = 40.0;
+    this.reluctance = 2.0;
+    this.parkTime = 60;
+    this.parkCost = 120;
+    this.pickupTime = 60;
+    this.pickupCost = 120;
+    this.dropoffTime = 120;
+    this.accelerationSpeed = 2.9;
+    this.decelerationSpeed = 2.9;
+  }
+
+  private CarPreferences(Builder builder) {
+    this.speed = Units.speed(builder.speed);
+    this.reluctance = Units.reluctance(builder.reluctance);
+    this.parkTime = Units.duration(builder.parkTime);
+    this.parkCost = Units.cost(builder.parkCost);
+    this.pickupTime = Units.duration(builder.pickupTime);
+    this.pickupCost = Units.cost(builder.pickupCost);
+    this.dropoffTime = Units.duration(builder.dropoffTime);
+    this.accelerationSpeed = Units.acceleration(builder.accelerationSpeed);
+    this.decelerationSpeed = Units.acceleration(builder.decelerationSpeed);
+  }
+
+  public static CarPreferences.Builder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public CarPreferences.Builder copyOf() {
+    return new Builder(this);
   }
 
   /**
@@ -35,16 +70,8 @@ public class CarPreferences implements Cloneable, Serializable {
     return speed;
   }
 
-  public void setSpeed(double speed) {
-    this.speed = speed;
-  }
-
   public double reluctance() {
     return reluctance;
-  }
-
-  public void setReluctance(double reluctance) {
-    this.reluctance = reluctance;
   }
 
   /** Time to park a car. */
@@ -52,17 +79,19 @@ public class CarPreferences implements Cloneable, Serializable {
     return parkTime;
   }
 
-  public void setParkTime(int parkTime) {
-    this.parkTime = parkTime;
-  }
-
   /** Cost of parking a car. */
   public int parkCost() {
     return parkCost;
   }
 
-  public void setParkCost(int parkCost) {
-    this.parkCost = parkCost;
+  /** Time of getting in/out of a carPickup (taxi) */
+  public int pickupTime() {
+    return pickupTime;
+  }
+
+  /** Cost of getting in/out of a carPickup (taxi) */
+  public int pickupCost() {
+    return pickupCost;
   }
 
   /**
@@ -73,26 +102,12 @@ public class CarPreferences implements Cloneable, Serializable {
     return dropoffTime;
   }
 
-  public void setDropoffTime(int dropoffTime) {
-    this.dropoffTime = dropoffTime;
-  }
-
-  /** Time of getting in/out of a carPickup (taxi) */
-  public int pickupTime() {
-    return pickupTime;
-  }
-
-  public void setPickupTime(int pickupTime) {
-    this.pickupTime = pickupTime;
-  }
-
-  /** Cost of getting in/out of a carPickup (taxi) */
-  public int pickupCost() {
-    return pickupCost;
-  }
-
-  public void setPickupCost(int pickupCost) {
-    this.pickupCost = pickupCost;
+  /**
+   * The acceleration speed of an automobile, in meters per second per second.
+   * Default is 2.9 m/s^2 (0 mph to 65 mph in 10 seconds)
+   */
+  public double accelerationSpeed() {
+    return accelerationSpeed;
   }
 
   /**
@@ -103,19 +118,139 @@ public class CarPreferences implements Cloneable, Serializable {
     return decelerationSpeed;
   }
 
-  public void setDecelerationSpeed(double decelerationSpeed) {
-    this.decelerationSpeed = decelerationSpeed;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    CarPreferences that = (CarPreferences) o;
+    return (
+      DoubleUtils.doubleEquals(that.speed, speed) &&
+      DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
+      parkTime == that.parkTime &&
+      parkCost == that.parkCost &&
+      pickupTime == that.pickupTime &&
+      pickupCost == that.pickupCost &&
+      dropoffTime == that.dropoffTime &&
+      DoubleUtils.doubleEquals(that.accelerationSpeed, accelerationSpeed) &&
+      DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed)
+    );
   }
 
-  /**
-   * The acceleration speed of an automobile, in meters per second per second.
-   * Default is 2.9 m/s^2 (0 mph to 65 mph in 10 seconds)
-   */
-  public double accelerationSpeed() {
-    return accelerationSpeed;
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      speed,
+      reluctance,
+      parkTime,
+      parkCost,
+      pickupTime,
+      pickupCost,
+      dropoffTime,
+      accelerationSpeed,
+      decelerationSpeed
+    );
   }
 
-  public void setAccelerationSpeed(double accelerationSpeed) {
-    this.accelerationSpeed = accelerationSpeed;
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(CarPreferences.class)
+      .addNum("speed", speed, DEFAULT.speed)
+      .addNum("reluctance", reluctance, DEFAULT.reluctance)
+      .addNum("parkTime", parkTime, DEFAULT.parkTime)
+      .addNum("parkCost", parkCost, DEFAULT.parkCost)
+      .addNum("pickupTime", pickupTime, DEFAULT.pickupTime)
+      .addNum("pickupCost", pickupCost, DEFAULT.pickupCost)
+      .addNum("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
+      .addNum("accelerationSpeed", accelerationSpeed, DEFAULT.accelerationSpeed)
+      .addNum("decelerationSpeed", decelerationSpeed, DEFAULT.decelerationSpeed)
+      .toString();
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public static class Builder {
+
+    private final CarPreferences original;
+    private double speed;
+    private double reluctance;
+    private int parkTime;
+    private int parkCost;
+    private int pickupTime;
+    private int pickupCost;
+    private int dropoffTime;
+    private double accelerationSpeed;
+    private double decelerationSpeed;
+
+    public Builder(CarPreferences original) {
+      this.original = original;
+      this.speed = original.speed;
+      this.reluctance = original.reluctance;
+      this.parkTime = original.parkTime;
+      this.parkCost = original.parkCost;
+      this.pickupTime = original.pickupTime;
+      this.pickupCost = original.pickupCost;
+      this.dropoffTime = original.dropoffTime;
+      this.accelerationSpeed = original.accelerationSpeed;
+      this.decelerationSpeed = original.decelerationSpeed;
+    }
+
+    public CarPreferences original() {
+      return original;
+    }
+
+    public Builder withSpeed(double speed) {
+      this.speed = speed;
+      return this;
+    }
+
+    public Builder withReluctance(double reluctance) {
+      this.reluctance = reluctance;
+      return this;
+    }
+
+    public Builder withParkTime(int parkTime) {
+      this.parkTime = parkTime;
+      return this;
+    }
+
+    public Builder withParkCost(int parkCost) {
+      this.parkCost = parkCost;
+      return this;
+    }
+
+    public Builder withPickupTime(int pickupTime) {
+      this.pickupTime = pickupTime;
+      return this;
+    }
+
+    public Builder withPickupCost(int pickupCost) {
+      this.pickupCost = pickupCost;
+      return this;
+    }
+
+    public Builder withDropoffTime(int dropoffTime) {
+      this.dropoffTime = dropoffTime;
+      return this;
+    }
+
+    public Builder withAccelerationSpeed(double accelerationSpeed) {
+      this.accelerationSpeed = accelerationSpeed;
+      return this;
+    }
+
+    public Builder withDecelerationSpeed(double decelerationSpeed) {
+      this.decelerationSpeed = decelerationSpeed;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
+      return this;
+    }
+
+    public CarPreferences build() {
+      var value = new CarPreferences(this);
+      return original.equals(value) ? original : value;
+    }
   }
 }

@@ -2,10 +2,10 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
 import java.util.Objects;
-import java.util.function.DoubleFunction;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -26,7 +26,7 @@ public class GeneralizedCostParameters {
   private final boolean wheelchairEnabled;
   private final AccessibilityPreferences wheelchairAccessibility;
   private final BitSet unpreferredPatterns;
-  private final DoubleFunction<Double> unpreferredCost;
+  private final DoubleAlgorithmFunction unpreferredCost;
 
   /**
    * Default constructor defines default values. These defaults are overridden by defaults in the
@@ -93,7 +93,7 @@ public class GeneralizedCostParameters {
     return unpreferredPatterns;
   }
 
-  public DoubleFunction<Double> unnpreferredCost() {
+  public DoubleAlgorithmFunction unnpreferredCost() {
     return unpreferredCost;
   }
 

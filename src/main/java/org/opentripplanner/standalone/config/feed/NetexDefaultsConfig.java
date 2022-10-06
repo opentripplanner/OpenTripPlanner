@@ -121,12 +121,10 @@ public class NetexDefaultsConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asString(NETEX_FEED_ID);
     ferryIdsNotAllowedForBicycle =
-      Set.copyOf(
-        config
-          .of("ferryIdsNotAllowedForBicycle")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asStringList(List.copyOf(FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE))
-      );
+      config
+        .of("ferryIdsNotAllowedForBicycle")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asStringSet(FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE);
   }
 }

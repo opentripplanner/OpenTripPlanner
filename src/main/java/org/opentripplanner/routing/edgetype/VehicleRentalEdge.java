@@ -27,11 +27,11 @@ public class VehicleRentalEdge extends Edge {
   }
 
   public State traverse(State s0) {
-    if (!s0.getRequestMode().includesRenting()) {
+    if (!s0.getRequest().mode().includesRenting()) {
       return null;
     }
 
-    var allowedRentalFormFactors = allowedModes(s0.getRequestMode());
+    var allowedRentalFormFactors = allowedModes(s0.getRequest().mode());
     if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
       return null;
     }
@@ -43,15 +43,13 @@ public class VehicleRentalEdge extends Edge {
     String network = station.getNetwork();
     var preferences = s0.getPreferences();
     boolean realtimeAvailability = preferences.rental().useAvailabilityInformation();
-    var options = s0.getOptions();
-    var vehicleRental = options.journey().rental();
 
-    if (station.networkIsNotAllowed(vehicleRental)) {
+    if (station.networkIsNotAllowed(s0.getRequest().rental())) {
       return null;
     }
 
     boolean pickedUp;
-    if (options.arriveBy()) {
+    if (s0.getRequest().arriveBy()) {
       switch (s0.getVehicleRentalState()) {
         case BEFORE_RENTING:
           return null;
@@ -125,7 +123,7 @@ public class VehicleRentalEdge extends Edge {
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
-              vehicleRental.allowArrivingInRentedVehicleAtDestination() &&
+              s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
               station.isArrivingInRentalVehicleAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
           }

@@ -5,14 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 
 public class StateEditorTest {
 
   @Test
   public final void testIncrementTimeInSeconds() {
-    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementTimeInSeconds(999999999);
@@ -22,7 +20,7 @@ public class StateEditorTest {
 
   @Test
   public final void testWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(10);
@@ -32,7 +30,7 @@ public class StateEditorTest {
 
   @Test
   public final void testNanWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NaN);
@@ -42,7 +40,7 @@ public class StateEditorTest {
 
   @Test
   public final void testInfinityWeightIncrement() {
-    StateEditor stateEditor = new StateEditor(new RouteRequest(), StreetMode.WALK, null);
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
     stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);

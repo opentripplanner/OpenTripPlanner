@@ -36,7 +36,7 @@ public class GraphPath {
     /* Put path in chronological order */
     State lastState;
     // needed to track repeat invocations of path-reversing methods
-    if (s.getOptions().arriveBy()) {
+    if (s.getRequest().arriveBy()) {
       lastState = s.reverse();
     } else {
       lastState = s;

@@ -32,7 +32,7 @@ class RoutingRequestMapperTest {
             "inaccessibleCost": 6
           },
           "stairsReluctance": 7,
-          "maxSlope": 8,
+          "maxSlope": 0.085,
           "slopeExceededReluctance": 9,
           "inaccessibleStreetReluctance": 10
         }
@@ -62,7 +62,7 @@ class RoutingRequestMapperTest {
     assertEquals(6, accessibility.elevator().inaccessibleCost());
 
     assertEquals(7.0, accessibility.stairsReluctance());
-    assertEquals(8.0, accessibility.maxSlope());
+    assertEquals(.085, accessibility.maxSlope());
     assertEquals(9.0, accessibility.slopeExceededReluctance());
     assertEquals(10.0, accessibility.inaccessibleStreetReluctance());
   }

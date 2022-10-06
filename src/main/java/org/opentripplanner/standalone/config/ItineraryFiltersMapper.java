@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.config;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,53 +13,78 @@ public class ItineraryFiltersMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(ItineraryFiltersMapper.class);
 
-  public static ItineraryFilterParameters map(NodeAdapter c) {
-    ItineraryFilterParameters dft = ItineraryFilterParameters.createDefault();
-
+  public static void mapItineraryFilterParams(
+    NodeAdapter c,
+    ItineraryFilterPreferences.Builder builder
+  ) {
     if (c.isEmpty()) {
-      return dft;
+      return;
     }
+    var dft = builder.original();
 
-    return new ItineraryFilterParameters(
-      c.of("debug").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.debug),
-      c
-        .of("groupSimilarityKeepOne")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDouble(dft.groupSimilarityKeepOne),
-      c
-        .of("groupSimilarityKeepThree")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDouble(dft.groupSimilarityKeepThree),
-      c
-        .of("groupedOtherThanSameLegsMaxCostMultiplier")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDouble(dft.groupedOtherThanSameLegsMaxCostMultiplier),
-      parseTransitGeneralizedCostLimit(
-        c.path("transitGeneralizedCostLimit"),
-        dft.transitGeneralizedCostLimit
-      ),
-      c
-        .of("nonTransitGeneralizedCostLimit")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asLinearFunction(dft.nonTransitGeneralizedCostLimit),
-      c
-        .of("bikeRentalDistanceRatio")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDouble(dft.bikeRentalDistanceRatio),
-      c
-        .of("parkAndRideDurationRatio")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDouble(dft.parkAndRideDurationRatio),
-      c
-        .of("filterItinerariesWithSameFirstOrLastTrip")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip),
-      c.of("accessibilityScore").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.accessibilityScore),
-      c
-        .of("removeItinerariesWithSameRoutesAndStops")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asBoolean(dft.removeItinerariesWithSameRoutesAndStops)
-    );
+    builder
+      .withDebug(c.of("debug").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.debug()))
+      .withGroupSimilarityKeepOne(
+        c
+          .of("groupSimilarityKeepOne")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dft.groupSimilarityKeepOne())
+      )
+      .withGroupSimilarityKeepThree(
+        c
+          .of("groupSimilarityKeepThree")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dft.groupSimilarityKeepThree())
+      )
+      .withGroupedOtherThanSameLegsMaxCostMultiplier(
+        c
+          .of("groupedOtherThanSameLegsMaxCostMultiplier")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dft.groupedOtherThanSameLegsMaxCostMultiplier())
+      )
+      .withTransitGeneralizedCostLimit(
+        parseTransitGeneralizedCostLimit(
+          c.path("transitGeneralizedCostLimit"),
+          dft.transitGeneralizedCostLimit()
+        )
+      )
+      .withNonTransitGeneralizedCostLimit(
+        c
+          .of("nonTransitGeneralizedCostLimit")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
+      )
+      .withBikeRentalDistanceRatio(
+        c
+          .of("bikeRentalDistanceRatio")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dft.bikeRentalDistanceRatio())
+      )
+      .withParkAndRideDurationRatio(
+        c
+          .of("parkAndRideDurationRatio")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dft.parkAndRideDurationRatio())
+      )
+      .withFilterItinerariesWithSameFirstOrLastTrip(
+        c
+          .of("filterItinerariesWithSameFirstOrLastTrip")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip())
+      )
+      .withAccessibilityScore(
+        c
+          .of("accessibilityScore")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(dft.useAccessibilityScore())
+      )
+      .withRemoveItinerariesWithSameRoutesAndStops(
+        c
+          .of("removeItinerariesWithSameRoutesAndStops")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asBoolean(dft.removeItinerariesWithSameRoutesAndStops())
+      )
+      .build();
   }
 
   private static TransitGeneralizedCostFilterParams parseTransitGeneralizedCostLimit(

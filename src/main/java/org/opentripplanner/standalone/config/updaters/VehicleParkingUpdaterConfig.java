@@ -92,13 +92,11 @@ public class VehicleParkingUpdaterConfig {
             .withExample(/*TODO DOC*/"TODO")
             .asStringMap(),
           new ArrayList<>(
-            Set.copyOf(
-              c
-                .of("tags")
-                .withDoc(NA, /*TODO DOC*/"TODO")
-                .withExample(/*TODO DOC*/"TODO")
-                .asStringList(List.copyOf(Set.of()))
-            )
+            c
+              .of("tags")
+              .withDoc(NA, /*TODO DOC*/"TODO")
+              .withExample(/*TODO DOC*/"TODO")
+              .asStringSet(Set.of())
           ),
           sourceType,
           timeZone

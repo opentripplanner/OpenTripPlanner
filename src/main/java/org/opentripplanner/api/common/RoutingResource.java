@@ -1,13 +1,14 @@
 package org.opentripplanner.api.common;
 
+import static org.opentripplanner.api.common.LocationStringParser.fromOldStyleString;
+import static org.opentripplanner.api.common.RequestToPreferencesMapper.setIfNotNull;
+
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.Consumer;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -19,7 +20,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.util.OTPFeature;
@@ -215,10 +215,6 @@ public abstract class RoutingResource {
    */
   @QueryParam("waitReluctance")
   protected Double waitReluctance;
-
-  /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
-  @QueryParam("waitAtBeginningFactor")
-  protected Double waitAtBeginningFactor;
 
   /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
   @QueryParam("walkSpeed")
@@ -612,7 +608,7 @@ public abstract class RoutingResource {
    * Unit is seconds. Default value is 0.
    */
   @QueryParam("boardSlack")
-  private Integer boardSlack;
+  protected Integer boardSlack;
 
   /**
    * The number of seconds to add after alighting a transit leg. It is recommended to use the
@@ -621,7 +617,7 @@ public abstract class RoutingResource {
    * Unit is seconds. Default value is 0.
    */
   @QueryParam("alightSlack")
-  private Integer alightSlack;
+  protected Integer alightSlack;
 
   @QueryParam("locale")
   private String locale;
@@ -662,21 +658,25 @@ public abstract class RoutingResource {
   @Deprecated
   private Boolean useRequestedDateTimeInMaxHours;
 
+  /**
+   * @deprecated This is not supported in OTP2.
+   */
   @QueryParam("disableAlertFiltering")
+  @Deprecated
   private Boolean disableAlertFiltering;
 
   @QueryParam("debugItineraryFilter")
-  private Boolean debugItineraryFilter;
+  protected Boolean debugItineraryFilter;
 
   /**
    * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this
    * query.
    */
   @QueryParam("geoidElevation")
-  private Boolean geoidElevation;
+  protected Boolean geoidElevation;
 
   @QueryParam("useVehicleParkingAvailabilityInformation")
-  private Boolean useVehicleParkingAvailabilityInformation;
+  protected Boolean useVehicleParkingAvailabilityInformation;
 
   @QueryParam("debugRaptorStops")
   private String debugRaptorStops;
@@ -702,18 +702,12 @@ public abstract class RoutingResource {
    */
   protected RouteRequest buildRequest(MultivaluedMap<String, String> queryParameters) {
     RouteRequest request = serverContext.defaultRouteRequest();
-    RoutingPreferences preferences = request.preferences();
 
     // The routing request should already contain defaults, which are set when it is initialized or
     // in the JSON router configuration and cloned. We check whether each parameter was supplied
     // before overwriting the default.
-    if (fromPlace != null) {
-      request.setFrom(LocationStringParser.fromOldStyleString(fromPlace));
-    }
-
-    if (toPlace != null) {
-      request.setTo(LocationStringParser.fromOldStyleString(toPlace));
-    }
+    setIfNotNull(fromPlace, it -> request.setFrom(fromOldStyleString(it)));
+    setIfNotNull(toPlace, it -> request.setTo(fromOldStyleString(it)));
 
     {
       //FIXME: move into setter method on routing request
@@ -737,237 +731,73 @@ public abstract class RoutingResource {
       }
     }
 
-    if (searchWindow != null) {
-      request.setSearchWindow(Duration.ofSeconds(searchWindow));
-    }
-    if (pageCursor != null) {
-      request.setPageCursorFromEncoded(pageCursor);
-    }
-    if (timetableView != null) {
-      request.setTimetableView(timetableView);
-    }
+    setIfNotNull(searchWindow, it -> request.setSearchWindow(Duration.ofSeconds(it)));
+    setIfNotNull(pageCursor, request::setPageCursorFromEncoded);
+    setIfNotNull(timetableView, request::setTimetableView);
+    setIfNotNull(wheelchair, request::setWheelchair);
+    setIfNotNull(numItineraries, request::setNumItineraries);
 
-    if (wheelchair != null) {
-      request.setWheelchair(wheelchair);
-    }
-
-    if (numItineraries != null) {
-      request.setNumItineraries(numItineraries);
-    }
-
-    if (carReluctance != null) {
-      preferences.car().setReluctance(carReluctance);
-    }
-
-    preferences.withWalk(walk -> {
-      if (walkReluctance != null) {
-        walk.setReluctance(walkReluctance);
+    {
+      var journey = request.journey();
+      /* Temporary code to get bike/car parking and renting working. */
+      if (modes != null && !modes.qModes.isEmpty()) {
+        journey.setModes(modes.getRequestModes());
       }
-      if (walkSpeed != null) {
-        walk.setSpeed(walkSpeed);
-      }
-      if (walkBoardCost != null) {
-        walk.setBoardCost(walkBoardCost);
-      }
-      if (walkSafetyFactor != null) {
-        walk.setSafetyFactor(walkSafetyFactor);
-      }
-    });
 
-    if (waitReluctance != null) {
-      preferences.transfer().setWaitReluctance(waitReluctance);
-    }
-
-    if (waitAtBeginningFactor != null) {
-      preferences.transfer().setWaitAtBeginningFactor(waitAtBeginningFactor);
-    }
-
-    preferences.withBike(bike -> {
-      setIfNotNull(bikeSpeed, bike::setSpeed);
-      setIfNotNull(bikeReluctance, bike::setReluctance);
-      setIfNotNull(bikeBoardCost, bike::setBoardCost);
-      setIfNotNull(bikeWalkingSpeed, bike::setWalkingSpeed);
-      setIfNotNull(bikeWalkingReluctance, bike::setWalkingReluctance);
-      setIfNotNull(bikeParkCost, bike::setParkCost);
-      setIfNotNull(bikeParkTime, bike::setParkTime);
-      setIfNotNull(bikeSwitchTime, bike::setSwitchTime);
-      setIfNotNull(bikeSwitchCost, bike::setSwitchCost);
-      setIfNotNull(bikeOptimizeType, bike::setOptimizeType);
-
-      if (bikeOptimizeType == BicycleOptimizeType.TRIANGLE) {
-        bike.withOptimizeTriangle(triangle -> {
-          setIfNotNull(triangleTimeFactor, triangle::withTime);
-          setIfNotNull(triangleSlopeFactor, triangle::withSlope);
-          setIfNotNull(triangleSafetyFactor, triangle::withSafety);
-        });
-      }
-    });
-
-    if (allowKeepingRentedBicycleAtDestination != null) {
-      request
-        .journey()
-        .rental()
-        .setAllowArrivingInRentedVehicleAtDestination(allowKeepingRentedBicycleAtDestination);
-    }
-
-    if (keepingRentedBicycleAtDestinationCost != null) {
-      preferences
-        .rental()
-        .setArrivingInRentalVehicleAtDestinationCost(keepingRentedBicycleAtDestinationCost);
-    }
-
-    if (allowedVehicleRentalNetworks != null) {
-      request.journey().rental().setAllowedNetworks(allowedVehicleRentalNetworks);
-    }
-
-    if (bannedVehicleRentalNetworks != null) {
-      request.journey().rental().setBannedNetworks(bannedVehicleRentalNetworks);
-    }
-
-    if (carParkCost != null) {
-      preferences.car().setParkCost(carParkCost);
-    }
-
-    if (carParkTime != null) {
-      preferences.car().setParkTime(carParkTime);
-    }
-
-    if (bannedVehicleParkingTags != null) {
-      request.journey().parking().setBannedTags(bannedVehicleParkingTags);
-    }
-
-    if (requiredVehicleParkingTags != null) {
-      request.journey().parking().setRequiredTags(requiredVehicleParkingTags);
-    }
-
-    if (arriveBy != null) {
-      request.setArriveBy(arriveBy);
-    }
-
-    // TODO VIA (Leonard): 2022-08-24 should we just skip this step?
-    // It will be refactored anyway
-    //    if (intermediatePlaces != null) {
-    //      request.setIntermediatePlacesFromStrings(intermediatePlaces);
-    //    }
-    if (preferredRoutes != null) {
-      request.journey().transit().setPreferredRoutesFromString(preferredRoutes);
-    }
-    if (otherThanPreferredRoutesPenalty != null) {
-      preferences.transit().setOtherThanPreferredRoutesPenalty(otherThanPreferredRoutesPenalty);
-    }
-    if (preferredAgencies != null) {
-      request.journey().transit().setPreferredAgenciesFromString(preferredAgencies);
-    }
-    if (unpreferredRoutes != null) {
-      request.journey().transit().setUnpreferredRoutesFromString(unpreferredRoutes);
-    }
-    if (unpreferredAgencies != null) {
-      request.journey().transit().setUnpreferredAgenciesFromString(unpreferredAgencies);
-    }
-    if (bannedRoutes != null) {
-      request.journey().transit().setBannedRoutesFromString(bannedRoutes);
-    }
-    if (whiteListedRoutes != null) {
-      request.journey().transit().setWhiteListedRoutesFromString(whiteListedRoutes);
-    }
-    if (bannedAgencies != null) {
-      request.journey().transit().setBannedAgenciesFromSting(bannedAgencies);
-    }
-    if (whiteListedAgencies != null) {
-      request.journey().transit().setWhiteListedAgenciesFromSting(whiteListedAgencies);
-    }
-    if (bannedTrips != null) {
-      request.journey().transit().setBannedTripsFromString(bannedTrips);
-    }
-    // The "Least transfers" optimization is accomplished via an increased transfer penalty.
-    // See comment on RoutingRequest.transferPentalty.
-    if (transferPenalty != null) {
-      preferences.transfer().setCost(transferPenalty);
-    }
-
-    /* Temporary code to get bike/car parking and renting working. */
-    if (modes != null && !modes.qModes.isEmpty()) {
-      request.journey().setModes(modes.getRequestModes());
-    }
-
-    var transitPref = preferences.transit();
-
-    if (boardSlack != null) {
-      transitPref.withBoardSlack(b -> b.withDefaultSec(boardSlack));
-    }
-
-    if (alightSlack != null) {
-      transitPref.withBoardSlack(b -> b.withDefaultSec(alightSlack));
-    }
-
-    if (minTransferTime != null) {
-      int alightAndBoardSlack =
-        (
-          transitPref.boardSlack().defaultValueSeconds() +
-          transitPref.alightSlack().defaultValueSeconds()
+      {
+        var rental = journey.rental();
+        setIfNotNull(
+          allowKeepingRentedBicycleAtDestination,
+          rental::setAllowArrivingInRentedVehicleAtDestination
         );
-      if (alightAndBoardSlack > minTransferTime) {
-        throw new IllegalArgumentException(
-          "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
-        );
+        setIfNotNull(allowedVehicleRentalNetworks, rental::setAllowedNetworks);
+        setIfNotNull(bannedVehicleRentalNetworks, rental::setBannedNetworks);
       }
-      preferences.transfer().setSlack(minTransferTime - alightAndBoardSlack);
-    }
+      {
+        var parking = journey.parking();
+        setIfNotNull(bannedVehicleParkingTags, parking::setBannedTags);
+        setIfNotNull(requiredVehicleParkingTags, parking::setRequiredTags);
+      }
 
-    if (nonpreferredTransferPenalty != null) {
-      preferences.transfer().setNonpreferredCost(nonpreferredTransferPenalty);
-    }
+      setIfNotNull(arriveBy, request::setArriveBy);
 
-    if (maxTransfers != null) {
-      preferences.transfer().setMaxTransfers(maxTransfers);
-    }
-
-    preferences.rental().setUseAvailabilityInformation(request.isTripPlannedForNow());
-
-    if (ignoreRealtimeUpdates != null) {
-      preferences.transit().setIgnoreRealtimeUpdates(ignoreRealtimeUpdates);
-    }
-
-    if (disableAlertFiltering != null) {
-      preferences.system().setDisableAlertFiltering(disableAlertFiltering);
-    }
-
-    if (geoidElevation != null) {
-      preferences.system().setGeoidElevation(geoidElevation);
-    }
-
-    if (debugItineraryFilter != null) {
-      preferences.system().itineraryFilters().debug = debugItineraryFilter;
-    }
-
-    request
-      .journey()
-      .transit()
-      .raptorDebugging()
-      .withStops(debugRaptorStops)
-      .withPath(debugRaptorPath);
-
-    if (useVehicleParkingAvailabilityInformation != null) {
-      preferences.parking().setUseAvailabilityInformation(useVehicleParkingAvailabilityInformation);
+      {
+        var transit = journey.transit();
+        // Filter Agencies
+        setIfNotNull(preferredAgencies, transit::setPreferredAgenciesFromString);
+        setIfNotNull(unpreferredAgencies, transit::setUnpreferredAgenciesFromString);
+        setIfNotNull(bannedAgencies, transit::setBannedAgenciesFromSting);
+        setIfNotNull(whiteListedAgencies, transit::setWhiteListedAgenciesFromSting);
+        // Filter Routes
+        setIfNotNull(preferredRoutes, transit::setPreferredRoutesFromString);
+        setIfNotNull(unpreferredRoutes, transit::setUnpreferredRoutesFromString);
+        setIfNotNull(bannedRoutes, transit::setBannedRoutesFromString);
+        setIfNotNull(whiteListedRoutes, transit::setWhiteListedRoutesFromString);
+        // Filter Trips
+        setIfNotNull(bannedTrips, transit::setBannedTripsFromString);
+      }
+      {
+        var debugRaptor = journey.transit().raptorDebugging();
+        setIfNotNull(debugRaptorStops, debugRaptor::withStops);
+        setIfNotNull(debugRaptorPath, debugRaptor::withPath);
+      }
     }
 
     if (locale != null) {
       request.setLocale(Locale.forLanguageTag(locale.replaceAll("-", "_")));
     }
 
-    if (OTPFeature.DataOverlay.isOn()) {
-      var queryDataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
-      if (!queryDataOverlayParameters.isEmpty()) {
-        preferences.system().setDataOverlay(queryDataOverlayParameters);
+    request.withPreferences(preferences -> {
+      // Map all preferences, note dependency on 'isTripPlannedForNow'.
+      new RequestToPreferencesMapper(this, preferences, request.isTripPlannedForNow()).map();
+
+      if (OTPFeature.DataOverlay.isOn()) {
+        var dataOverlayParameters = DataOverlayParameters.parseQueryParams(queryParameters);
+        if (!dataOverlayParameters.isEmpty()) {
+          preferences.withSystem(it -> it.withDataOverlay(dataOverlayParameters));
+        }
       }
-    }
-
+    });
     return request;
-  }
-
-  private static <T> void setIfNotNull(T value, @NotNull Consumer<T> body) {
-    if (value != null) {
-      body.accept(value);
-    }
   }
 }

@@ -4,7 +4,8 @@ import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.opentripplanner.util.lang.DoubleUtils;
+import java.util.function.Consumer;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -12,9 +13,9 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * related to street and transit routing. The values are normalized(rounded) so the class
  * can used as a cache key.
  * <p>
- * THIS CLASS IS IMMUTABLE AND THREAD SAFE.
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class WalkPreferences implements Serializable {
+public final class WalkPreferences implements Serializable {
 
   public static final WalkPreferences DEFAULT = new WalkPreferences();
 
@@ -35,12 +36,12 @@ public class WalkPreferences implements Serializable {
   }
 
   private WalkPreferences(Builder builder) {
-    this.speed = DoubleUtils.roundTo2Decimals(builder.speed);
-    this.reluctance = DoubleUtils.roundTo2Decimals(builder.reluctance);
-    this.boardCost = builder.boardCost;
-    this.stairsReluctance = DoubleUtils.roundTo2Decimals(builder.stairsReluctance);
-    this.stairsTimeFactor = DoubleUtils.roundTo2Decimals(builder.stairsTimeFactor);
-    this.safetyFactor = DoubleUtils.roundTo2Decimals(builder.safetyFactor);
+    this.speed = Units.speed(builder.speed);
+    this.reluctance = Units.reluctance(builder.reluctance);
+    this.boardCost = Units.cost(builder.boardCost);
+    this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
+    this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
+    this.safetyFactor = Units.reluctance(builder.safetyFactor);
   }
 
   public static Builder of() {
@@ -167,11 +168,15 @@ public class WalkPreferences implements Serializable {
       this.safetyFactor = original.safetyFactor;
     }
 
+    public WalkPreferences original() {
+      return original;
+    }
+
     public double speed() {
       return speed;
     }
 
-    public Builder setSpeed(double speed) {
+    public Builder withSpeed(double speed) {
       this.speed = speed;
       return this;
     }
@@ -180,7 +185,7 @@ public class WalkPreferences implements Serializable {
       return reluctance;
     }
 
-    public Builder setReluctance(double reluctance) {
+    public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
       return this;
     }
@@ -189,7 +194,7 @@ public class WalkPreferences implements Serializable {
       return boardCost;
     }
 
-    public Builder setBoardCost(int boardCost) {
+    public Builder withBoardCost(int boardCost) {
       this.boardCost = boardCost;
       return this;
     }
@@ -198,7 +203,7 @@ public class WalkPreferences implements Serializable {
       return stairsReluctance;
     }
 
-    public Builder setStairsReluctance(double stairsReluctance) {
+    public Builder withStairsReluctance(double stairsReluctance) {
       this.stairsReluctance = stairsReluctance;
       return this;
     }
@@ -207,7 +212,7 @@ public class WalkPreferences implements Serializable {
       return stairsTimeFactor;
     }
 
-    public Builder setStairsTimeFactor(double stairsTimeFactor) {
+    public Builder withStairsTimeFactor(double stairsTimeFactor) {
       this.stairsTimeFactor = stairsTimeFactor;
       return this;
     }
@@ -216,7 +221,7 @@ public class WalkPreferences implements Serializable {
       return safetyFactor;
     }
 
-    public Builder setSafetyFactor(double safetyFactor) {
+    public Builder withSafetyFactor(double safetyFactor) {
       if (safetyFactor < 0) {
         this.safetyFactor = 0;
       } else if (safetyFactor > 1) {
@@ -224,6 +229,11 @@ public class WalkPreferences implements Serializable {
       } else {
         this.safetyFactor = safetyFactor;
       }
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 
