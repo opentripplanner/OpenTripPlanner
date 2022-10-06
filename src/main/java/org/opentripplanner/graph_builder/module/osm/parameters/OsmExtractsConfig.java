@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ public class OsmExtractsConfig {
 
   public final List<OsmExtractConfig> osmExtractConfigs;
 
-  public OsmExtractsConfig(List<OsmExtractConfig> osmExtractConfigs) {
+  public OsmExtractsConfig(Collection<OsmExtractConfig> osmExtractConfigs) {
     this.osmExtractConfigs = List.copyOf(osmExtractConfigs);
   }
 
