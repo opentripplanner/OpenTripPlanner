@@ -121,6 +121,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove filtering of flex patterns in NeTEX import [#4493](https://github.com/opentripplanner/OpenTripPlanner/pull/4493)
 - Make walk and bicycle safety defaults adjustable based on speed limits on ways [#4484](https://github.com/opentripplanner/OpenTripPlanner/pull/4484)
 - Metrics for realtime trip updaters [#4471](https://github.com/opentripplanner/OpenTripPlanner/pull/4471)
+- Enable fuzzyTripMatching in other SIRI-ET updaters [#4495](https://github.com/opentripplanner/OpenTripPlanner/pull/4495)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
