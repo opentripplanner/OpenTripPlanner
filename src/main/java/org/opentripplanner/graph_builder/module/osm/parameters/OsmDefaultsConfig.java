@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
@@ -30,7 +30,8 @@ public class OsmDefaultsConfig {
       config
         .of("osmTagMapping")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .asEnum(WayPropertySetSource.Source.DEFAULT).getInstance(),
+        .asEnum(WayPropertySetSource.Source.DEFAULT)
+        .getInstance(),
       config.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null)
     );
   }

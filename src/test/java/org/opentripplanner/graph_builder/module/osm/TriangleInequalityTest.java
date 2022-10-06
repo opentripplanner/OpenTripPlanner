@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -31,9 +34,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class TriangleInequalityTest {

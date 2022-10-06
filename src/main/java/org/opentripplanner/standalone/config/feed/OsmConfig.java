@@ -3,6 +3,9 @@ package org.opentripplanner.standalone.config.feed;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**

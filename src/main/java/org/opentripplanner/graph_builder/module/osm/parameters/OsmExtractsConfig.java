@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
 import java.util.List;

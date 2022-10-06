@@ -69,7 +69,13 @@ public interface WayPropertySetSource {
    * enum name and the actual implementation.
    */
   enum Source {
-    DEFAULT, NORWAY, UK, FINLAND, GERMANY, ATLANTA, HOUSTON;
+    DEFAULT,
+    NORWAY,
+    UK,
+    FINLAND,
+    GERMANY,
+    ATLANTA,
+    HOUSTON;
 
     public WayPropertySetSource getInstance() {
       return switch (this) {
