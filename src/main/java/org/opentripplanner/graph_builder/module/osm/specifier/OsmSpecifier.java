@@ -26,17 +26,22 @@ public interface OsmSpecifier {
    * Tags in this specifier are matched against those for the left and right side of the OSM way
    * separately. See: http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
    *
-   * @param match an OSM tagged object to compare to this specifier
+   * @param way an OSM tagged object to compare to this specifier
    */
-  Scores matchScores(OSMWithTags match);
+  Scores matchScores(OSMWithTags way);
 
   /**
    * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
-   * exactly the same thing as matchScores but without regard for :left and :right.
+   * exactly the same thing as {@link OsmSpecifier#matchScores(OSMWithTags)} but without regard for
+   * :left and :right.
    */
-  int matchScore(OSMWithTags match);
+  int matchScore(OSMWithTags way);
 
-  record Tag(String key, String value) {}
+  record Tag(String key, String value) {
+    public boolean isWildcard() {
+      return value.equals("*");
+    }
+  }
 
   record Scores(int left, int right) {}
 }

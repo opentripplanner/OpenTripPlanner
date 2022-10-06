@@ -22,18 +22,18 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OSMWithTags match) {
-    return computeScores(match);
+  public Scores matchScores(OSMWithTags way) {
+    return computeScores(way);
   }
 
   @Override
-  public int matchScore(OSMWithTags match) {
+  public int matchScore(OSMWithTags way) {
     int score = 0;
     int matches = 0;
     for (var pair : pairs) {
       String tag = pair.key();
       String value = pair.value();
-      String matchValue = match.getTag(tag);
+      String matchValue = way.getTag(tag);
       int tagScore = getTagScore(value, matchValue);
       score += tagScore;
       if (tagScore > 0) {
