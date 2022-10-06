@@ -7,7 +7,7 @@ import org.opentripplanner.util.time.DurationUtils;
  */
 public interface RaptorTransfer {
   /**
-   *  Stop index where the path arrive at.
+   * Stop index where the path arrives at.
    * The journey origin, destination and transit path board stop must be part of the context;
    * hence not a member attribute of this type.
    */
