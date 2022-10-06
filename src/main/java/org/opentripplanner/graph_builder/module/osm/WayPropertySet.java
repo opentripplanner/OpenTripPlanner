@@ -92,24 +92,22 @@ public class WayPropertySet {
     for (WayPropertyPicker picker : wayProperties) {
       OsmSpecifier specifier = picker.specifier();
       WayProperties wayProperties = picker.properties();
-      P2<Integer> score = specifier.matchScores(way);
-      int leftScore = score.first;
-      int rightScore = score.second;
+      var score = specifier.matchScores(way);
       if (picker.safetyMixin()) {
-        if (leftScore > 0) {
+        if (score.left() > 0) {
           leftMixins.add(wayProperties);
         }
-        if (rightScore > 0) {
+        if (score.right() > 0) {
           rightMixins.add(wayProperties);
         }
       } else {
-        if (leftScore > bestLeftScore) {
+        if (score.left() > bestLeftScore) {
           leftResult = wayProperties;
-          bestLeftScore = leftScore;
+          bestLeftScore = score.left();
         }
-        if (rightScore > bestRightScore) {
+        if (score.right() > bestRightScore) {
           rightResult = wayProperties;
-          bestRightScore = rightScore;
+          bestRightScore = score.right();
         }
       }
     }

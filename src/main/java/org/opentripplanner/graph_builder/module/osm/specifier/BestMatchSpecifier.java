@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -30,8 +29,8 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  */
 public class BestMatchSpecifier implements OsmSpecifier {
 
-  private List<OsmTag> logicalANDPairs = new ArrayList<>(3);
-  private List<OsmTag> logicalORPairs = new ArrayList<>(3);
+  private List<Tag> logicalANDPairs = new ArrayList<>(3);
+  private List<Tag> logicalORPairs = new ArrayList<>(3);
 
   public BestMatchSpecifier(String spec) {
     if (spec.contains("|") && spec.contains(";")) {
@@ -66,7 +65,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * @param match an OSM tagged object to compare to this specifier
    */
   @Override
-  public P2<Integer> matchScores(OSMWithTags match) {
+  public Scores matchScores(OSMWithTags match) {
     if (!logicalANDPairs.isEmpty()) {
       return computeANDScore(match);
     } else {
@@ -117,29 +116,29 @@ public class BestMatchSpecifier implements OsmSpecifier {
     return !logicalORPairs.isEmpty();
   }
 
-  private List<OsmTag> getPairsFromString(String spec, String separator) {
+  private List<Tag> getPairsFromString(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
-        return new OsmTag(kv[0], kv[1]);
+        return new Tag(kv[0], kv[1]);
       })
       .collect(Collectors.toList());
   }
 
-  private P2<Integer> computeORScore(OSMWithTags match) {
+  private Scores computeORScore(OSMWithTags match) {
     // not sure if we should calculate a proper score as it doesn't make a huge amount of sense to do it for
     // logical OR conditions
     var oneOfORPairMatches = logicalORPairs
       .stream()
       .anyMatch(pair -> match.isTag(pair.key(), pair.value()));
     if (oneOfORPairMatches) {
-      return new P2<>(1, 1);
-    } else return new P2<>(0, 0);
+      return new Scores(1, 1);
+    } else return new Scores(0, 0);
   }
 
-  private P2<Integer> computeANDScore(OSMWithTags way) {
+  private Scores computeANDScore(OSMWithTags way) {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
@@ -174,7 +173,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
     leftScore += allMatchLeftBonus;
     int allMatchRightBonus = (rightMatches == logicalANDPairs.size()) ? 10 : 0;
     rightScore += allMatchRightBonus;
-    return new P2<>(leftScore, rightScore);
+    return new Scores(leftScore, rightScore);
   }
 
   /**
