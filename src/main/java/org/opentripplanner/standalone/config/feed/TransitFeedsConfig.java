@@ -13,10 +13,10 @@ public class TransitFeedsConfig {
   private static final String FEED_TYPE_NETEX = "NETEX";
 
   @Nonnull
-  public final List<NetexFeedConfig> netexFeedConfigs;
+  public final List<NetexFeedParameters> netexFeedConfigs;
 
   @Nonnull
-  public final List<GtfsFeedConfig> gtfsFeedConfigs;
+  public final List<GtfsFeedParameters> gtfsFeedConfigs;
 
   public TransitFeedsConfig(NodeAdapter config) {
     List<NodeAdapter> feedConfigs = config.asList();
@@ -53,10 +53,10 @@ public class TransitFeedsConfig {
   }
 
   public List<URI> gtfsFiles() {
-    return gtfsFeedConfigs.stream().map(TransitFeedConfig::source).toList();
+    return gtfsFeedConfigs.stream().map(TransitFeedParameters::source).toList();
   }
 
   public List<URI> netexFiles() {
-    return netexFeedConfigs.stream().map(TransitFeedConfig::source).toList();
+    return netexFeedConfigs.stream().map(TransitFeedParameters::source).toList();
   }
 }

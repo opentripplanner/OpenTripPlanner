@@ -15,8 +15,8 @@ import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -40,7 +40,7 @@ public class NetexConfig {
 
   public static NetexBundle netexBundleForTest(BuildConfig builderParams, File netexZipFile) {
     ZipFileDataSource dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
-    ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource = new ConfiguredDataSource<>(
+    ConfiguredDataSource<NetexFeedParameters> netexConfiguredDataSource = new ConfiguredDataSource<>(
       dataSource,
       new NetexFeedConfigBuilder().withSource(dataSource.uri()).build()
     );
@@ -48,14 +48,14 @@ public class NetexConfig {
   }
 
   public NetexModule createNetexModule(
-    Iterable<ConfiguredDataSource<NetexFeedConfig>> netexSources,
+    Iterable<ConfiguredDataSource<NetexFeedParameters>> netexSources,
     TransitModel transitModel,
     Graph graph,
     DataImportIssueStore issueStore
   ) {
     List<NetexBundle> netexBundles = new ArrayList<>();
 
-    for (ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource : netexSources) {
+    for (ConfiguredDataSource<NetexFeedParameters> netexConfiguredDataSource : netexSources) {
       netexBundles.add(netexBundle(netexConfiguredDataSource));
     }
 
@@ -71,7 +71,9 @@ public class NetexConfig {
   }
 
   /** public to enable testing */
-  private NetexBundle netexBundle(ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource) {
+  private NetexBundle netexBundle(
+    ConfiguredDataSource<NetexFeedParameters> netexConfiguredDataSource
+  ) {
     String configuredFeedId = netexConfiguredDataSource
       .config()
       .feedId()
@@ -87,9 +89,9 @@ public class NetexConfig {
   }
 
   private NetexDataSourceHierarchy hierarchy(
-    ConfiguredDataSource<NetexFeedConfig> netexConfiguredDataSource
+    ConfiguredDataSource<NetexFeedParameters> netexConfiguredDataSource
   ) {
-    NetexFeedConfig netexFeedConfig = netexConfiguredDataSource.config();
+    NetexFeedParameters netexFeedConfig = netexConfiguredDataSource.config();
     NetexDefaultsConfig netexDefaultsConfig = buildParams.netexDefaults;
     Pattern ignoreFilePattern = netexFeedConfig
       .ignoreFilePattern()

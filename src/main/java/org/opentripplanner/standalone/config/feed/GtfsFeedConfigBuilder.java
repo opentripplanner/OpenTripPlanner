@@ -32,8 +32,8 @@ public class GtfsFeedConfigBuilder {
     return this;
   }
 
-  public GtfsFeedConfig build() {
-    return new GtfsFeedConfig(this);
+  public GtfsFeedParameters build() {
+    return new GtfsFeedParameters(this);
   }
 
   public URI getSource() {

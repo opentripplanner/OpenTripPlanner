@@ -86,8 +86,8 @@ public class NetexFeedConfigBuilder {
     return netexFeedConfigBuilder;
   }
 
-  public NetexFeedConfig build() {
-    return new NetexFeedConfig(this);
+  public NetexFeedParameters build() {
+    return new NetexFeedParameters(this);
   }
 
   public URI getSource() {

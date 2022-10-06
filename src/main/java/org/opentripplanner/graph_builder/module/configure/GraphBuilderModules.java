@@ -36,7 +36,7 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
+import org.opentripplanner.standalone.config.feed.GtfsFeedParameters;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -84,7 +84,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (ConfiguredDataSource<GtfsFeedConfig> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+    for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
       GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
 
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();

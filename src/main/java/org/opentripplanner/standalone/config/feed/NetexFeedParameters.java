@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultsConfig}
  * Example: {@code [ {type="netex", source: "file:///path/to/otp/norway-netex.zip"} ] }
  */
-public class NetexFeedConfig extends TransitFeedConfig {
+public class NetexFeedParameters extends TransitFeedParameters {
 
   /**
    *
@@ -29,7 +29,7 @@ public class NetexFeedConfig extends TransitFeedConfig {
    */
   private final Pattern groupFilePattern;
 
-  NetexFeedConfig(NetexFeedConfigBuilder netexFeedConfigBuilder) {
+  NetexFeedParameters(NetexFeedConfigBuilder netexFeedConfigBuilder) {
     super(netexFeedConfigBuilder.getSource(), netexFeedConfigBuilder.getFeedId());
     this.sharedFilePattern = netexFeedConfigBuilder.getSharedFilePattern();
     this.sharedGroupFilePattern = netexFeedConfigBuilder.getSharedGroupFilePattern();
