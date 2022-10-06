@@ -156,8 +156,14 @@ public class ParameterBuilder {
     return buildObject();
   }
 
+  /**
+   * Return a list with objects of type {@code T}. The given {@code mapper} is used to map
+   * the nested child JSON nodes into elements.
+   * <p>
+   * An empty list is returned if there is no elements in the list or the list is not present.
+   */
   public <T> List<T> asObjects(Function<NodeAdapter, T> mapper) {
-    info.withRequired().withArray(OBJECT);
+    info.withOptional("[]").withArray(OBJECT);
     return buildAndListComplexArrayElements(List.of(), mapper);
   }
 
