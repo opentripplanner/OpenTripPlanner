@@ -48,7 +48,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.stoptime.UpdateResult;
+import org.opentripplanner.updater.trip.UpdateResult;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;

@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.stoptime.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 public class PollingStoptimeUpdaterConfig {

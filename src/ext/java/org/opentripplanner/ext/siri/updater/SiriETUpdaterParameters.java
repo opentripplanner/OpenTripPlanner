@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public class SiriETUpdaterParameters
   implements PollingGraphUpdaterParameters, UrlUpdaterParameters {

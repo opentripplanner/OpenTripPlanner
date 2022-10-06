@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.vehicle_positions.VehiclePositionsUpdaterParameters;
+import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 public class VehiclePositionsUpdaterConfig {
