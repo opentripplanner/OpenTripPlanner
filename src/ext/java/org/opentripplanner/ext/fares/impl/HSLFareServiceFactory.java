@@ -78,11 +78,13 @@ public class HSLFareServiceFactory extends DefaultFareServiceFactory {
   public FareService makeFareService() {
     HSLFareServiceImpl fareService = new HSLFareServiceImpl();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
+    if(LOG.isDebugEnabled()) {
     for (FareRuleSet ruleSet : regularFareRules.values()) {
       LOG.debug("farerule {}", ruleSet);
       LOG.debug("ruleattr {}", ruleSet.getFareAttribute());
       LOG.debug("hasAgency {}", ruleSet.hasAgencyDefined());
       LOG.debug("agency {}", ruleSet.getAgency());
+    }
     }
     return fareService;
   }
