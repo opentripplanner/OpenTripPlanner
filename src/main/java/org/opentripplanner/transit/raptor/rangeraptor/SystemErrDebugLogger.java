@@ -123,7 +123,7 @@ public class SystemErrDebugLogger implements DebugLogger {
         TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
         TimeUtils.timeToStrLong(p.egressLeg().toTime()),
         DurationUtils.durationToStr(p.durationInSeconds()),
-        OtpNumberFormat.formatCost(p.generalizedCost()),
+        OtpNumberFormat.formatCostCenti(p.generalizedCost()),
         details(e.action().toString(), e.reason(), e.element().toString())
       )
     );

@@ -50,7 +50,6 @@ import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
@@ -133,7 +132,7 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(routingRequest);
+    RouteRequest transferRoutingRequest = routingRequest.copyAndPrepareForTransferRouting();
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
@@ -224,10 +223,11 @@ public class TravelTimeResource {
   private ZSampleGrid<WTWD> getSampleGrid() {
     final RouteRequest accessRequest = routingRequest.clone();
 
-    accessRequest
-      .preferences()
-      .street()
-      .initMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of());
+    accessRequest.withPreferences(preferences ->
+      preferences.withStreet(it ->
+        it.withMaxAccessEgressDuration(traveltimeRequest.maxAccessDuration, Map.of())
+      )
+    );
 
     try (
       var temporaryVertices = new TemporaryVerticesContainer(

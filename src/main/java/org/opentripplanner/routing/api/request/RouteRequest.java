@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
+import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -88,6 +89,10 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public RoutingPreferences preferences() {
     return preferences;
+  }
+
+  public void withPreferences(Consumer<RoutingPreferences.Builder> body) {
+    this.preferences = preferences.copyOf().apply(body).build();
   }
 
   /**
@@ -193,6 +198,15 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* INSTANCE METHODS */
 
+  public RouteRequest copyAndPrepareForTransferRouting() {
+    var rr = clone();
+    rr.setArriveBy(false);
+    rr.setDateTime(Instant.ofEpochSecond(0));
+    rr.setFrom(null);
+    rr.setTo(null);
+    return rr;
+  }
+
   /**
    * This method is used to clone the default message, and insert a current time. A typical use-case
    * is to copy the default request(from router-config), and then set all user specified parameters
@@ -208,7 +222,6 @@ public class RouteRequest implements Cloneable, Serializable {
   public RouteRequest clone() {
     try {
       RouteRequest clone = (RouteRequest) super.clone();
-      clone.preferences = preferences.clone();
       clone.journey = journey.clone();
 
       return clone;
@@ -220,12 +233,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public String toString() {
     return toString(" ");
-  }
-
-  public RouteRequest copyOfReversed() {
-    RouteRequest ret = this.clone();
-    ret.setArriveBy(!ret.arriveBy);
-    return ret;
   }
 
   /** The start location */

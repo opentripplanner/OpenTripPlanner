@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import java.time.Instant;
+import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -22,7 +23,7 @@ public class AStarRequestBuilder {
   AStarRequestBuilder(AStarRequest original) {
     this.startTime = original.startTime();
     this.mode = original.mode();
-    this.preferences = original.preferences().clone();
+    this.preferences = original.preferences();
     this.arriveBy = original.arriveBy();
     this.wheelchair = original.wheelchair();
     this.parking = original.parking().clone();
@@ -46,8 +47,8 @@ public class AStarRequestBuilder {
     return this;
   }
 
-  public RoutingPreferences preferences() {
-    return preferences;
+  public AStarRequestBuilder withPreferences(Consumer<RoutingPreferences.Builder> body) {
+    return withPreferences(preferences.copyOf().apply(body).build());
   }
 
   public AStarRequestBuilder withArriveBy(boolean arriveBy) {

@@ -578,15 +578,17 @@ public class BikeRentalTest extends GraphRoutingTest {
       toVertex,
       arriveBy,
       options -> {
-        options.preferences().rental().setUseAvailabilityInformation(useAvailabilityInformation);
+        options.withPreferences(p ->
+          p.withRental(rental ->
+            rental
+              .withUseAvailabilityInformation(useAvailabilityInformation)
+              .withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost)
+          )
+        );
         options
           .journey()
           .rental()
           .setAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
-        options
-          .preferences()
-          .rental()
-          .setArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
       }
     );
   }
@@ -598,13 +600,14 @@ public class BikeRentalTest extends GraphRoutingTest {
     Consumer<RouteRequest> optionsSetter
   ) {
     var request = new RouteRequest();
-    var preferences = request.preferences();
 
     request.setArriveBy(arriveBy);
-    preferences.rental().setPickupTime(42);
-    preferences.rental().setPickupCost(62);
-    preferences.rental().setDropoffCost(33);
-    preferences.rental().setDropoffTime(15);
+
+    request.withPreferences(preferences ->
+      preferences.withRental(rental ->
+        rental.withPickupTime(42).withPickupCost(62).withDropoffCost(33).withDropoffTime(15)
+      )
+    );
 
     optionsSetter.accept(request);
 

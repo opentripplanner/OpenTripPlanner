@@ -1,40 +1,66 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
+import static org.opentripplanner.routing.api.request.framework.RequestFunctions.createLinearFunction;
 
 import java.io.Serializable;
-import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.RaptorOptions;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.api.request.framework.DurationForEnumBuilder;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Preferences for transit routing.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class TransitPreferences implements Cloneable, Serializable {
+public final class TransitPreferences implements Serializable {
 
-  private DurationForEnum<TransitMode> boardSlack = DurationForEnum.of(TransitMode.class).build();
-  private DurationForEnum<TransitMode> alightSlack = DurationForEnum.of(TransitMode.class).build();
+  public static final TransitPreferences DEFAULT = new TransitPreferences();
 
-  private Map<TransitMode, Double> reluctanceForMode = new HashMap<>();
+  private final DurationForEnum<TransitMode> boardSlack;
+  private final DurationForEnum<TransitMode> alightSlack;
+  private final Map<TransitMode, Double> reluctanceForMode;
+  private final int otherThanPreferredRoutesPenalty;
+  private final DoubleAlgorithmFunction unpreferredCost;
+  private final boolean ignoreRealtimeUpdates;
+  private final boolean includePlannedCancellations;
+  private final RaptorPreferences raptor;
 
-  private int otherThanPreferredRoutesPenalty = 300;
+  private TransitPreferences() {
+    this.boardSlack = this.alightSlack = DurationForEnum.of(TransitMode.class).build();
+    this.reluctanceForMode = Map.of();
+    this.otherThanPreferredRoutesPenalty = 300;
+    this.unpreferredCost = createLinearFunction(0.0, DEFAULT_ROUTE_RELUCTANCE);
+    this.ignoreRealtimeUpdates = false;
+    this.includePlannedCancellations = false;
+    this.raptor = RaptorPreferences.DEFAULT;
+  }
 
-  private DoubleFunction<Double> unpreferredCost = RequestFunctions.createLinearFunction(
-    0.0,
-    DEFAULT_ROUTE_RELUCTANCE
-  );
+  private TransitPreferences(Builder builder) {
+    this.boardSlack = requireNonNull(builder.boardSlack);
+    this.alightSlack = requireNonNull(builder.alightSlack);
+    this.reluctanceForMode = Map.copyOf(requireNonNull(builder.reluctanceForMode));
+    this.otherThanPreferredRoutesPenalty = Units.cost(builder.otherThanPreferredRoutesPenalty);
+    this.unpreferredCost = requireNonNull(builder.unpreferredCost);
+    this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
+    this.includePlannedCancellations = builder.includePlannedCancellations;
+    this.raptor = requireNonNull(builder.raptor);
+  }
 
-  private boolean ignoreRealtimeUpdates = false;
-  private boolean includePlannedCancellations = false;
+  public static Builder of() {
+    return DEFAULT.copyOf();
+  }
 
-  private RaptorOptions raptorOptions = new RaptorOptions();
+  public Builder copyOf() {
+    return new Builder(this);
+  }
 
   /**
    * Has information how much time boarding a vehicle takes; The number of seconds to add before
@@ -49,15 +75,6 @@ public class TransitPreferences implements Cloneable, Serializable {
    */
   public DurationForEnum<TransitMode> boardSlack() {
     return boardSlack;
-  }
-
-  public void initBoardSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
-    withBoardSlack(builder -> builder.withDefault(defaultValue).withValues(values));
-  }
-
-  public TransitPreferences withBoardSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
-    this.boardSlack = this.boardSlack.copyOf(body);
-    return this;
   }
 
   /**
@@ -75,36 +92,21 @@ public class TransitPreferences implements Cloneable, Serializable {
     return alightSlack;
   }
 
-  public void initAlightSlack(Duration defaultValue, Map<TransitMode, Duration> values) {
-    withAlightSlack(builder -> builder.withDefault(defaultValue).withValues(values));
-  }
-
-  public TransitPreferences withAlightSlack(Consumer<DurationForEnumBuilder<TransitMode>> body) {
-    this.alightSlack = this.alightSlack.copyOf(body);
-    return this;
-  }
-
   /**
-   * Transit reluctance per mode. Use this to add a advantage(<1.0) to specific modes, or to add a
-   * penalty to other modes (> 1.0). The type used here it the internal model {@link TransitMode}
+   * Transit reluctance per mode. Use this to add an advantage(<1.0) to specific modes, or to add a
+   * penalty to other modes (> 1.0). The type used here is the internal model {@link TransitMode}
    * make sure to create a mapping for this before using it on the API.
    * <p>
-   * If set, the alight-slack-for-mode override the default value {@code 1.0}.
+   * If set, it overrides the default value {@code 1.0}.
    * <p>
-   * This is a scalar multiplied with the time in second on board the transit vehicle. Default value
+   * This is a scalar multiplied with the time in second on-board the transit vehicle. Default value
    * is not-set(empty map).
+   * <p>
+   * The returned map is READ-ONLY and IMMUTABLE. The map is not an EnumMap(mutable), so convert
+   * the type into something more performant if needed.
    */
   public Map<TransitMode, Double> reluctanceForMode() {
     return reluctanceForMode;
-  }
-
-  public void setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
-    this.reluctanceForMode = reluctanceForMode;
-  }
-
-  @Deprecated
-  public void setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
-    this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
   }
 
   /**
@@ -122,16 +124,8 @@ public class TransitPreferences implements Cloneable, Serializable {
    * A cost function used to calculate penalty for an unpreferred route. Function should return
    * number of seconds that we are willing to wait for preferred route.
    */
-  public DoubleFunction<Double> unpreferredCost() {
+  public DoubleAlgorithmFunction unpreferredCost() {
     return unpreferredCost;
-  }
-
-  public void setUnpreferredCost(DoubleFunction<Double> unpreferredCost) {
-    this.unpreferredCost = unpreferredCost;
-  }
-
-  public void setUnpreferredCostString(String constFunction) {
-    unpreferredCost = RequestFunctions.parse(constFunction);
   }
 
   /**
@@ -139,14 +133,6 @@ public class TransitPreferences implements Cloneable, Serializable {
    */
   public boolean ignoreRealtimeUpdates() {
     return ignoreRealtimeUpdates;
-  }
-
-  public void setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
-    this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
-  }
-
-  public void setIncludePlannedCancellations(boolean includePlannedCancellations) {
-    this.includePlannedCancellations = includePlannedCancellations;
   }
 
   /**
@@ -159,24 +145,157 @@ public class TransitPreferences implements Cloneable, Serializable {
   /**
    * Set of options to use with Raptor. These are available here for testing purposes.
    */
-  public RaptorOptions raptorOptions() {
-    return raptorOptions;
+  public RaptorPreferences raptor() {
+    return raptor;
   }
 
-  public TransitPreferences clone() {
-    try {
-      // TODO VIA (Thomas): 2022-08-26 skipping unpreferredRouteCost (that's how it was before)
-      var clone = (TransitPreferences) super.clone();
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransitPreferences that = (TransitPreferences) o;
+    return (
+      otherThanPreferredRoutesPenalty == that.otherThanPreferredRoutesPenalty &&
+      ignoreRealtimeUpdates == that.ignoreRealtimeUpdates &&
+      includePlannedCancellations == that.includePlannedCancellations &&
+      boardSlack.equals(that.boardSlack) &&
+      alightSlack.equals(that.alightSlack) &&
+      reluctanceForMode.equals(that.reluctanceForMode) &&
+      unpreferredCost.equals(that.unpreferredCost) &&
+      raptor.equals(that.raptor)
+    );
+  }
 
-      clone.boardSlack = this.boardSlack;
-      clone.alightSlack = alightSlack;
-      clone.reluctanceForMode = new HashMap<>(reluctanceForMode);
-      clone.raptorOptions = new RaptorOptions(raptorOptions);
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      boardSlack,
+      alightSlack,
+      reluctanceForMode,
+      otherThanPreferredRoutesPenalty,
+      unpreferredCost,
+      ignoreRealtimeUpdates,
+      includePlannedCancellations,
+      raptor
+    );
+  }
 
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TransitPreferences.class)
+      .addObj("boardSlack", boardSlack, DEFAULT.boardSlack)
+      .addObj("alightSlack", alightSlack, DEFAULT.alightSlack)
+      .addObj("reluctanceForMode", reluctanceForMode, DEFAULT.reluctanceForMode)
+      .addNum(
+        "otherThanPreferredRoutesPenalty",
+        otherThanPreferredRoutesPenalty,
+        DEFAULT.otherThanPreferredRoutesPenalty
+      )
+      .addObj("unpreferredCost", unpreferredCost, DEFAULT.unpreferredCost)
+      .addBoolIfTrue(
+        "ignoreRealtimeUpdates",
+        ignoreRealtimeUpdates != DEFAULT.ignoreRealtimeUpdates
+      )
+      .addBoolIfTrue(
+        "includePlannedCancellations",
+        includePlannedCancellations != DEFAULT.includePlannedCancellations
+      )
+      .addObj("raptor", raptor, DEFAULT.raptor)
+      .toString();
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public static class Builder {
+
+    private final TransitPreferences original;
+
+    private DurationForEnum<TransitMode> boardSlack;
+    private DurationForEnum<TransitMode> alightSlack;
+    private Map<TransitMode, Double> reluctanceForMode;
+    private int otherThanPreferredRoutesPenalty;
+    private DoubleAlgorithmFunction unpreferredCost;
+    private boolean ignoreRealtimeUpdates;
+    private boolean includePlannedCancellations;
+    private RaptorPreferences raptor;
+
+    public Builder(TransitPreferences original) {
+      this.original = original;
+      this.boardSlack = original.boardSlack;
+      this.alightSlack = original.alightSlack;
+      this.reluctanceForMode = original.reluctanceForMode;
+      this.otherThanPreferredRoutesPenalty = original.otherThanPreferredRoutesPenalty;
+      this.unpreferredCost = original.unpreferredCost;
+      this.ignoreRealtimeUpdates = original.ignoreRealtimeUpdates;
+      this.includePlannedCancellations = original.includePlannedCancellations;
+      this.raptor = original.raptor;
+    }
+
+    public TransitPreferences original() {
+      return original;
+    }
+
+    public Builder withBoardSlack(Consumer<DurationForEnum.Builder<TransitMode>> body) {
+      this.boardSlack = this.boardSlack.copyOf().apply(body).build();
+      return this;
+    }
+
+    public Builder withDefaultBoardSlackSec(int defaultValue) {
+      return withBoardSlack(it -> it.withDefaultSec(defaultValue));
+    }
+
+    public Builder withAlightSlack(Consumer<DurationForEnum.Builder<TransitMode>> body) {
+      this.alightSlack = this.alightSlack.copyOf().apply(body).build();
+      return this;
+    }
+
+    public Builder withDefaultAlightSlackSec(int defaultValue) {
+      return withAlightSlack(it -> it.withDefaultSec(defaultValue));
+    }
+
+    public Builder setReluctanceForMode(Map<TransitMode, Double> reluctanceForMode) {
+      this.reluctanceForMode = reluctanceForMode;
+      return this;
+    }
+
+    @Deprecated
+    public Builder setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
+      this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
+      return this;
+    }
+
+    public Builder setUnpreferredCost(DoubleAlgorithmFunction unpreferredCost) {
+      this.unpreferredCost = unpreferredCost;
+      return this;
+    }
+
+    public Builder setUnpreferredCostString(String constFunction) {
+      return setUnpreferredCost(RequestFunctions.parse(constFunction));
+    }
+
+    public Builder setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {
+      this.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
+      return this;
+    }
+
+    public Builder setIncludePlannedCancellations(boolean includePlannedCancellations) {
+      this.includePlannedCancellations = includePlannedCancellations;
+      return this;
+    }
+
+    public Builder withRaptor(Consumer<RaptorPreferences.Builder> body) {
+      this.raptor = raptor.copyOf().apply(body).build();
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
+      return this;
+    }
+
+    TransitPreferences build() {
+      var value = new TransitPreferences(this);
+      return original.equals(value) ? original : value;
     }
   }
 }

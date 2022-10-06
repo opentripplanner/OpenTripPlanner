@@ -12,7 +12,6 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Edge;
@@ -111,7 +110,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
-          RouteRequest streetRequest = Transfer.prepareTransferRoutingRequest(transferProfile);
+          RouteRequest streetRequest = transferProfile.copyAndPrepareForTransferRouting();
 
           for (NearbyStop sd : findNearbyStops(
             nearbyStopFinder,

@@ -132,12 +132,15 @@ public class TemporaryPartialStreetEdgeTest {
       tempEdges
     );
 
-    AStarRequest request = AStarRequest.of().withMode(StreetMode.CAR).build();
+    AStarRequest request = AStarRequest
+      .of()
+      .withMode(StreetMode.CAR)
+      .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(1.0)))
+      .build();
 
     // All intersections take 10 minutes - we'll notice if one isn't counted.
     double turnDurationSecs = 10.0 * 60.0;
     var calculator = new ConstantIntersectionTraversalCalculator(turnDurationSecs);
-    request.preferences().street().setTurnReluctance(1.0);
 
     State s0 = new State(v1, request);
     s0.getRequest().setIntersectionTraversalCalculator(calculator);

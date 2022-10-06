@@ -73,7 +73,7 @@ public class RaptorPathToItineraryMapper {
     this.transferMode = request.journey().transfer().mode();
     this.request =
       AStarRequestMapper
-        .map(Transfer.prepareTransferRoutingRequest(request))
+        .map(request.copyAndPrepareForTransferRouting())
         .withArriveBy(false)
         .withMode(transferMode)
         .build();

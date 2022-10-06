@@ -400,8 +400,10 @@ public class State implements Cloneable {
   }
 
   private State reversedClone() {
-    AStarRequest reversedRequest = request.copyOfReversed(getTime());
-    reversedRequest.preferences().rental().setUseAvailabilityInformation(false);
+    AStarRequest reversedRequest = request
+      .copyOfReversed(getTime())
+      .withPreferences(p -> p.withRental(r -> r.withUseAvailabilityInformation(false)))
+      .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;
     return new State(this.vertex, getTime(), newStateData, reversedRequest);

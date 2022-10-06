@@ -109,18 +109,24 @@ public class ValueObjectToStringBuilderTest {
 
   @Test
   public void addCost() {
+    assertEquals("null", subject().addCostCenti(null).toString());
+    assertEquals("", subject().skipNull().addCostCenti(null).toString());
+    assertEquals("$-0.01", subject().addCostCenti(-1).toString());
+    assertEquals("$0", subject().addCostCenti(0).toString());
+    assertEquals("$0.01", subject().addCostCenti(1).toString());
+    assertEquals("$1", subject().addCostCenti(100).toString());
+    assertEquals("$100.01", subject().addCostCenti(10001).toString());
+
     assertEquals("null", subject().addCost(null).toString());
     assertEquals("", subject().skipNull().addCost(null).toString());
-    assertEquals("$-0.01", subject().addCost(-1).toString());
+    assertEquals("$-1", subject().addCost(-1).toString());
     assertEquals("$0", subject().addCost(0).toString());
-    assertEquals("$0.01", subject().addCost(1).toString());
-    assertEquals("$1", subject().addCost(100).toString());
-    assertEquals("$100.01", subject().addCost(10001).toString());
+    assertEquals("$100", subject().addCost(100).toString());
 
-    assertEquals("null", subject().addCost(null, "pip").toString());
-    assertEquals("", subject().skipNull().addCost(null, "pip").toString());
-    assertEquals("$-0.01pip", subject().addCost(-1, "pip").toString());
-    assertEquals("$1pip", subject().addCost(100, "pip").toString());
+    assertEquals("null", subject().addCostCenti(null, "pip").toString());
+    assertEquals("", subject().skipNull().addCostCenti(null, "pip").toString());
+    assertEquals("$-0.01pip", subject().addCostCenti(-1, "pip").toString());
+    assertEquals("$1pip", subject().addCostCenti(100, "pip").toString());
   }
 
   private ValueObjectToStringBuilder subject() {

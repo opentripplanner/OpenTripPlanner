@@ -1,12 +1,22 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import java.util.Objects;
+import org.opentripplanner.routing.api.request.framework.Units;
+import org.opentripplanner.util.lang.ToStringBuilder;
+
 /**
  * Preferences for how to treat trips or stops with accessibility restrictions, like wheelchair
  * accessibility.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public class AccessibilityPreferences {
+public final class AccessibilityPreferences {
 
-  private static final int NOT_SET = -1;
+  /**
+   * Set the unknown cost to a very high number, so in case it is used accidentally it
+   * will not cause any harm.
+   */
+  private static final int NOT_SET = 9_999_999;
 
   private static final AccessibilityPreferences ONLY_CONSIDER_ACCESSIBLE = new AccessibilityPreferences(
     true,
@@ -24,8 +34,8 @@ public class AccessibilityPreferences {
     int inaccessibleCost
   ) {
     this.onlyConsiderAccessible = onlyConsiderAccessible;
-    this.unknownCost = unknownCost;
-    this.inaccessibleCost = inaccessibleCost;
+    this.unknownCost = Units.cost(unknownCost);
+    this.inaccessibleCost = Units.cost(inaccessibleCost);
   }
 
   /**
@@ -61,5 +71,35 @@ public class AccessibilityPreferences {
    */
   public int inaccessibleCost() {
     return inaccessibleCost;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AccessibilityPreferences that = (AccessibilityPreferences) o;
+    return (
+      onlyConsiderAccessible == that.onlyConsiderAccessible &&
+      unknownCost == that.unknownCost &&
+      inaccessibleCost == that.inaccessibleCost
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(onlyConsiderAccessible, unknownCost, inaccessibleCost);
+  }
+
+  @Override
+  public String toString() {
+    if (onlyConsiderAccessible) {
+      return "OnlyConsiderAccessible";
+    }
+
+    return ToStringBuilder
+      .of(AccessibilityPreferences.class)
+      .addCost("unknownCost", unknownCost, NOT_SET)
+      .addCost("inaccessibleCost", inaccessibleCost, NOT_SET)
+      .toString();
   }
 }
