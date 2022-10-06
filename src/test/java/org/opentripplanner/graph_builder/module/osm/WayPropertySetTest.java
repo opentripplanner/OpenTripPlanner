@@ -7,6 +7,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.WayTestData;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
@@ -33,7 +34,10 @@ class WayPropertySetTest {
       @Override
       public void populateProperties(WayPropertySet props) {
         props.setProperties("highway=primary", withModes(CAR));
-        props.setProperties("highway=footway;layer=-1;tunnel=yes;indoor=yes", withModes(NONE));
+        props.setProperties(
+          new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
+          withModes(NONE)
+        );
       }
     };
     source.populateProperties(wps);
