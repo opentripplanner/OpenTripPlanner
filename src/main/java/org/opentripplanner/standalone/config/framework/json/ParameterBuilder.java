@@ -506,6 +506,11 @@ public class ParameterBuilder {
     }
   }
 
+  /**
+   * Somehow Java do not provide a parse method for parsing Locale on the standard form
+   * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that.
+   * The separator used should be underscore({@code '_'}), space({@code ' '}) or hyphen({@code '-'}).
+   */
   private Locale parseLocale(String text) {
     String[] parts = text.split("[-_ ]+");
     return switch (parts.length) {
