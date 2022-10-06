@@ -24,18 +24,24 @@ public enum ConfigType {
   ENUM_SET(JsonType.object, "List of enum string values", "[ RAIL, TRAM ]"),
   LOCALE(
     JsonType.string,
-    "_`Language[\\_country[\\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).",
+    "_`Language[\\_country[\\_variant]]`_. A Locale object represents a specific " +
+    "geographical, political, or cultural region. For more information see the [Java 11 Locale]" +
+    "(https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).",
     "en_US, nn_NO"
   ),
   DATE(JsonType.string, "Local date. The format is _YYYY-MM-DD_ (ISO-8601).", "2020-09-21"),
   DATE_OR_PERIOD(
     JsonType.string,
-    "A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number.",
+    "A _local date_, or a _period_ relative to today. The local date has the format " +
+    "`YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer " +
+    "number.",
     "P1Y, -P3M2D, P1D"
   ),
   DURATION(
     JsonType.string,
-    "A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where `n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not case sensitive.",
+    "A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where " +
+    "`n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not " +
+    "case sensitive.",
     "3h, 2m, 1d5h2m3s, -P2dT-1s, P-2dT1s"
   ),
   REGEXP(
@@ -45,19 +51,23 @@ public enum ConfigType {
   ),
   URI(
     JsonType.string,
-    "An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path.",
-    "'gs://bucket/path/a.obj', 'http://foo.bar/', 'file:///Users/x/local/file' 'myGraph.obj', '../street/streetGraph-${otp.serialization.version.id}.obj'"
+    "An URI path to a resource like a file or a URL. Relative URIs are resolved relative " +
+    "to the OTP base path.",
+    "'gs://bucket/path/a.obj', 'http://foo.bar/', 'file:///Users/x/local/file', " +
+    "'myGraph.obj', '../street/streetGraph-${otp.serialization.version.id}.obj'"
   ),
   ZONE_ID(JsonType.string, "TODO", "TODO"),
   FEED_SCOPED_ID(JsonType.string, "FeedScopedId", "FEED_ID:1001"),
   LINEAR_FUNCTION(
     JsonType.string,
-    "A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x`",
+    "A linear function with one input parameter(x) used to calculate a value. Usually " +
+    "used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 " +
+    "times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x`",
     "'600 + 2.0 x'"
   ),
   MAP(
     JsonType.object,
-    "List of key/value pairs, where the key is a string and the value can be any given type.",
+    "List of key/value pairs, where the key is a string and the value can be any given " + "type.",
     "{ 'one': 1.2, 'two': 2.3 }"
   ),
   OBJECT(
