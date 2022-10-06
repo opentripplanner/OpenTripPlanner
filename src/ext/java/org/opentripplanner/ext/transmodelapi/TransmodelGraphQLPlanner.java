@@ -347,7 +347,9 @@ public class TransmodelGraphQLPlanner {
   ) {
     if (streetReluctance > 0) {
       preferences.withWalk(walk -> walk.withReluctance(streetReluctance));
-      preferences.withBike(bike -> bike.withReluctance(streetReluctance));
+      preferences.withBike(bike ->
+        bike.withReluctance(streetReluctance).withWalkingReluctance(streetReluctance * 2.7)
+      );
       preferences.withCar(car -> car.withReluctance(streetReluctance));
     }
   }

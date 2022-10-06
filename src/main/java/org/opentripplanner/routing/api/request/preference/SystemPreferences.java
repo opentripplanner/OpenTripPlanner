@@ -13,7 +13,7 @@ import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
- * Configure system related features - a system feature is an none-functional feature. It
+ * Configure system related features - a system feature is a non-functional feature. It
  * describes how the system should work, but not change the output of a travel request.
  * <p>
  * Some parameters in this class are related to functional-features, but does not have a clear

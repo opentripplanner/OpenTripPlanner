@@ -11,7 +11,7 @@ import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
- * Parameters for doing
+ * Parameters for doing transfers between transit legs.
  *
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.

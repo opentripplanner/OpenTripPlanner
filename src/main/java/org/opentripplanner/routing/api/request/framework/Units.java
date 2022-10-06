@@ -38,7 +38,7 @@ public class Units {
    * Number of decimals used are: 2 for values less than 2.0, 1 for values less than 10.0, and
    * zero for values above 10.0.
    * <p>
-   * Unit: meters per second (scalar)
+   * Unit: Human cost per second of actual time (scalar)
    */
   public static double reluctance(double value) {
     if (value < 0.0) {

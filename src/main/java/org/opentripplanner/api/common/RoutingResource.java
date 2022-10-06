@@ -788,7 +788,7 @@ public abstract class RoutingResource {
     }
 
     request.withPreferences(preferences -> {
-      // Map all preferences, not dependency on 'vehicleRental' and 'isTripPlannedForNow'.
+      // Map all preferences, note dependency on 'isTripPlannedForNow'.
       new RequestToPreferencesMapper(this, preferences, request.isTripPlannedForNow()).map();
 
       if (OTPFeature.DataOverlay.isOn()) {

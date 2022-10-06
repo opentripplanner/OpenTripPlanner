@@ -284,7 +284,7 @@ public class DefaultRoutingRequestType {
             "Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing to wait for preferred route."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> 0)
+          .dataFetcher(env -> preferences.transit().otherThanPreferredRoutesPenalty())
           .build()
       )
       .field(
