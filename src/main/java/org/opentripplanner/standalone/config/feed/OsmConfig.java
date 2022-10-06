@@ -5,6 +5,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import java.net.URI;
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
