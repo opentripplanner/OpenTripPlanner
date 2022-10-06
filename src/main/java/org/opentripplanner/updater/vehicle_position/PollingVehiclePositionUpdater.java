@@ -10,6 +10,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,9 +86,9 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     }
   }
 
+  @Override
   public String toString() {
-    String s = (vehiclePositionSource == null) ? "NONE" : vehiclePositionSource.toString();
-    return "Streaming vehicle position updater with update source = " + s;
+    return ToStringBuilder.of(this.getClass()).addObj("source", vehiclePositionSource).toString();
   }
 
   private static TripPattern getPatternIncludingRealtime(
