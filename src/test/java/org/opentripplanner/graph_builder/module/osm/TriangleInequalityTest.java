@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -58,13 +58,13 @@ public class TriangleInequalityTest {
       )
     );
     FileDataSource dataSource = new FileDataSource(file, FileType.OSM);
-    ConfiguredDataSource<OsmExtractConfig> source = new ConfiguredDataSource<>(
+    ConfiguredDataSource<OsmExtractParameters> source = new ConfiguredDataSource<>(
       dataSource,
-      new OsmExtractConfigBuilder().withSource(dataSource.uri()).build()
+      new OsmExtractParametersBuilder().withSource(dataSource.uri()).build()
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(
       source,
-      new OsmDefaultsConfig(),
+      new OsmDefaultParameters(),
       true
     );
 

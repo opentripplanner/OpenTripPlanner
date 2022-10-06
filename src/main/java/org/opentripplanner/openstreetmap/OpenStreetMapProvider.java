@@ -13,9 +13,9 @@ import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.openstreetmap.model.OSMProvider;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -51,26 +51,26 @@ public class OpenStreetMapProvider implements OSMProvider {
     this(
       new ConfiguredDataSource<>(
         fileDataSource,
-        new OsmExtractConfigBuilder().withSource(fileDataSource.uri()).build()
+        new OsmExtractParametersBuilder().withSource(fileDataSource.uri()).build()
       ),
-      new OsmDefaultsConfig(),
+      new OsmDefaultParameters(),
       cacheDataInMem
     );
   }
 
   public OpenStreetMapProvider(
-    ConfiguredDataSource<OsmExtractConfig> osmExtractConfigConfiguredDataSource,
-    OsmDefaultsConfig osmDefaultsConfig,
+    ConfiguredDataSource<OsmExtractParameters> osmExtractConfigConfiguredDataSource,
+    OsmDefaultParameters defaults,
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
     this.zoneId =
-      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
+      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(defaults.timeZone);
     this.wayPropertySetSource =
       osmExtractConfigConfiguredDataSource
         .config()
         .osmWayPropertySet()
-        .orElse(osmDefaultsConfig.osmWayPropertySetSource);
+        .orElse(defaults.osmWayPropertySetSource);
     this.wayPropertySet = new WayPropertySet();
     wayPropertySetSource.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;

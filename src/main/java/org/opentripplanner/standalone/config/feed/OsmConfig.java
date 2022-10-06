@@ -3,9 +3,9 @@ package org.opentripplanner.standalone.config.feed;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -14,8 +14,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class OsmConfig {
 
-  public static OsmDefaultsConfig mapOsmDefaults(NodeAdapter root, String parameterName) {
-    return new OsmDefaultsConfig(
+  public static OsmDefaultParameters mapOsmDefaults(NodeAdapter root, String parameterName) {
+    return new OsmDefaultParameters(
       root
         .of(parameterName)
         .withDoc(NA, /*TODO DOC*/"TODO")
@@ -36,8 +36,8 @@ public class OsmConfig {
     );
   }
 
-  private static OsmExtractConfig mapOsmExtractConfig(NodeAdapter config) {
-    var builder = new OsmExtractConfigBuilder();
+  private static OsmExtractParameters mapOsmExtractConfig(NodeAdapter config) {
+    var builder = new OsmExtractParametersBuilder();
 
     builder.withSource(
       config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri()
