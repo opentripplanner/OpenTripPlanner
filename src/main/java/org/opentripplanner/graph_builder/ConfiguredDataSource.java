@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder;
 
 import java.util.Objects;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.standalone.config.feed.DataSourceConfig;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
 /**
  *
