@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class DefaultWayPropertySetSourceTest {
@@ -119,7 +120,7 @@ public class DefaultWayPropertySetSourceTest {
    */
   private SpeedPicker getSpeedPicker(String specifier, float speed) {
     SpeedPicker sp = new SpeedPicker();
-    sp.specifier = new OSMSpecifier(specifier);
+    sp.specifier = new BestMatchSpecifier(specifier);
     sp.speed = speed;
     return sp;
   }

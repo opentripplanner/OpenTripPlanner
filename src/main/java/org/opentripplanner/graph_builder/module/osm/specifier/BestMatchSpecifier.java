@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.specifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,12 +28,12 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * <p>
  * Logical ORs are only implemented for mixins without wildcards.
  */
-public class OSMSpecifier {
+public class BestMatchSpecifier implements OsmSpecifier {
 
-  private List<P2<String>> logicalANDPairs = new ArrayList<>(3);
-  private List<P2<String>> logicalORPairs = new ArrayList<>(3);
+  private List<OsmTag> logicalANDPairs = new ArrayList<>(3);
+  private List<OsmTag> logicalORPairs = new ArrayList<>(3);
 
-  public OSMSpecifier(String spec) {
+  public BestMatchSpecifier(String spec) {
     if (spec.contains("|") && spec.contains(";")) {
       throw new RuntimeException(
         String.format(
@@ -65,6 +65,7 @@ public class OSMSpecifier {
    *
    * @param match an OSM tagged object to compare to this specifier
    */
+  @Override
   public P2<Integer> matchScores(OSMWithTags match) {
     if (!logicalANDPairs.isEmpty()) {
       return computeANDScore(match);
@@ -77,12 +78,13 @@ public class OSMSpecifier {
    * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
    * exactly the same thing as matchScores but without regard for :left and :right.
    */
+  @Override
   public int matchScore(OSMWithTags match) {
     int score = 0;
     int matches = 0;
-    for (P2<String> pair : logicalANDPairs) {
-      String tag = pair.first.toLowerCase();
-      String value = pair.second.toLowerCase();
+    for (var pair : logicalANDPairs) {
+      String tag = pair.key().toLowerCase();
+      String value = pair.value().toLowerCase();
       String matchValue = match.getTag(tag);
       int tagScore = getTagScore(value, matchValue);
       score += tagScore;
@@ -96,16 +98,16 @@ public class OSMSpecifier {
 
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    for (P2<String> pair : logicalANDPairs) {
-      builder.append(pair.first);
+    for (var pair : logicalANDPairs) {
+      builder.append(pair.key());
       builder.append("=");
-      builder.append(pair.second);
+      builder.append(pair.value());
       builder.append(";");
     }
-    for (P2<String> pair : logicalORPairs) {
-      builder.append(pair.first);
+    for (var pair : logicalORPairs) {
+      builder.append(pair.value());
       builder.append("=");
-      builder.append(pair.second);
+      builder.append(pair.value());
       builder.append("|");
     }
     return builder.toString();
@@ -115,13 +117,13 @@ public class OSMSpecifier {
     return !logicalORPairs.isEmpty();
   }
 
-  private List<P2<String>> getPairsFromString(String spec, String separator) {
+  private List<OsmTag> getPairsFromString(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
-        return new P2<>(kv[0], kv[1]);
+        return new OsmTag(kv[0], kv[1]);
       })
       .collect(Collectors.toList());
   }
@@ -131,7 +133,7 @@ public class OSMSpecifier {
     // logical OR conditions
     var oneOfORPairMatches = logicalORPairs
       .stream()
-      .anyMatch(pair -> match.isTag(pair.first, pair.second));
+      .anyMatch(pair -> match.isTag(pair.key(), pair.value()));
     if (oneOfORPairMatches) {
       return new P2<>(1, 1);
     } else return new P2<>(0, 0);
@@ -141,17 +143,11 @@ public class OSMSpecifier {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
-    var allTagsMatch = logicalANDPairs
-      .stream()
-      .allMatch(p -> matchValue(way.getTag(p.first), p.second));
-    if (!allTagsMatch) {
-      return new P2<>(0, 0);
-    }
-    for (P2<String> pair : logicalANDPairs) {
+    for (var pair : logicalANDPairs) {
       // TODO why are we repeatedly converting these to lower case every time they are used?
       // Probably because it used to be possible to set them from Spring XML.
-      String tag = pair.first.toLowerCase();
-      String value = pair.second.toLowerCase();
+      String tag = pair.key().toLowerCase();
+      String value = pair.value().toLowerCase();
       String leftMatchValue = way.getTag(tag + ":left");
       String rightMatchValue = way.getTag(tag + ":right");
       String matchValue = way.getTag(tag);
@@ -187,7 +183,7 @@ public class OSMSpecifier {
    * points, and a wildcard match is worth only one point, to serve as a tiebreaker. A score of 0
    * means they do not match.
    */
-  private int getTagScore(String value, String matchValue) {
+  private static int getTagScore(String value, String matchValue) {
     // either this matches on a wildcard, or it matches exactly
     if (matchesWildcard(value, matchValue)) {
       return 1; // wildcard matches are basically tiebreakers

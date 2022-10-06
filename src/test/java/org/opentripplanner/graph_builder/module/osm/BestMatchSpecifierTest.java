@@ -3,12 +3,14 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-class OSMSpecifierTest {
+class BestMatchSpecifierTest {
 
-  OSMSpecifier highwayPrimary = new OSMSpecifier("highway=primary");
-  OSMSpecifier pedestrianUndergroundTunnel = new OSMSpecifier(
+  OsmSpecifier highwayPrimary = new BestMatchSpecifier("highway=primary");
+  OsmSpecifier pedestrianUndergroundTunnel = new BestMatchSpecifier(
     "highway=footway;layer=-1;tunnel=yes;indoor=yes"
   );
 

@@ -8,6 +8,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -615,9 +616,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     populateNotesAndNames(props);
 
     // slope overrides
-    props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
   }
 
   public void populateNotesAndNames(WayPropertySet props) {
