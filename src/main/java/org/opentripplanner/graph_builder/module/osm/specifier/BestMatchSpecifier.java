@@ -65,8 +65,8 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int score = 0;
     int matches = 0;
     for (var pair : logicalANDPairs) {
-      String tag = pair.key().toLowerCase();
-      String value = pair.value().toLowerCase();
+      String tag = pair.key();
+      String value = pair.value();
       String matchValue = match.getTag(tag);
       int tagScore = getTagScore(value, matchValue);
       score += tagScore;
@@ -93,10 +93,6 @@ public class BestMatchSpecifier implements OsmSpecifier {
       builder.append("|");
     }
     return builder.toString();
-  }
-
-  public boolean containsLogicalOr() {
-    return !logicalORPairs.isEmpty();
   }
 
   /**
@@ -143,10 +139,8 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int leftMatches = 0, rightMatches = 0;
 
     for (var pair : logicalANDPairs) {
-      // TODO why are we repeatedly converting these to lower case every time they are used?
-      // Probably because it used to be possible to set them from Spring XML.
-      String tag = pair.key().toLowerCase();
-      String value = pair.value().toLowerCase();
+      String tag = pair.key();
+      String value = pair.value();
       String leftMatchValue = way.getTag(tag + ":left");
       String rightMatchValue = way.getTag(tag + ":right");
       String matchValue = way.getTag(tag);
