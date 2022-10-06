@@ -10,9 +10,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.test.support.VariableSource;
@@ -88,11 +87,10 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
 
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
-    var req = new RouteRequest();
-    req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(
+    var req = AStarRequest.of();
+    req.withWheelchair(true);
+    req.withPreferences(preferences ->
+      preferences.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -102,8 +100,9 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
           reluctance,
           10
         )
-      );
-    State result = traverse(edge, req);
+      )
+    );
+    State result = traverse(edge, req.build());
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
   }
@@ -123,11 +122,10 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setStairs(true);
 
-    var req = new RouteRequest();
-    req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(
+    var req = AStarRequest.of();
+    req.withWheelchair(true);
+    req.withPreferences(preferences ->
+      preferences.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -137,15 +135,16 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
           1.1f,
           stairsReluctance
         )
-      );
+      )
+    );
 
-    req.preferences().withWalk(w -> w.setReluctance(1.0));
+    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
 
-    var result = traverse(edge, req);
+    var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     edge.setStairs(false);
-    var notStairsResult = traverse(edge, req);
+    var notStairsResult = traverse(edge, req.build());
     assertEquals(7, (long) notStairsResult.weight);
   }
 
@@ -164,11 +163,10 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     edge.setWheelchairAccessible(false);
 
-    var req = new RouteRequest();
-    req.setWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(
+    var req = AStarRequest.of();
+    req.withWheelchair(true);
+    req.withPreferences(preferences ->
+      preferences.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -178,14 +176,15 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
           1.1f,
           25
         )
-      );
+      )
+    );
 
-    var result = traverse(edge, req);
+    var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     // reluctance should have no effect when the edge is accessible
     edge.setWheelchairAccessible(true);
-    var accessibleResult = traverse(edge, req);
+    var accessibleResult = traverse(edge, req.build());
     assertEquals(15, (long) accessibleResult.weight);
   }
 
@@ -204,18 +203,18 @@ class StreetEdgeWheelchairCostTest extends GraphRoutingTest {
     double length = 10;
     var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
 
-    var req = new RouteRequest();
-    req.preferences().withWalk(w -> w.setReluctance(walkReluctance));
-    req.setWheelchair(true);
+    var req = AStarRequest.of();
+    req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
+    req.withWheelchair(true);
 
-    var result = traverse(edge, req);
+    var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(8, result.getElapsedTimeSeconds());
   }
 
-  private State traverse(StreetEdge edge, RouteRequest req) {
-    var state = new State(V1, req, StreetMode.WALK);
+  private State traverse(StreetEdge edge, AStarRequest req) {
+    var state = new State(V1, req);
 
     assertEquals(0, state.weight);
     return edge.traverse(state);

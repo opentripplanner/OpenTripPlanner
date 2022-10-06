@@ -3,11 +3,11 @@ package org.opentripplanner.updater.stoptime;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
-public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterParameters {
+public class PollingTripUpdaterParameters
+  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
 
   private final String configRef;
   private final int frequencySec;
-  private final int logFrequency;
   private final int maxSnapshotFrequencyMs;
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
@@ -19,10 +19,9 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   private final String httpSourceUrl;
   private final String fileSource;
 
-  public PollingStoptimeUpdaterParameters(
+  public PollingTripUpdaterParameters(
     String configRef,
     int frequencySec,
-    int logFrequency,
     int maxSnapshotFrequencyMs,
     boolean purgeExpiredData,
     boolean fuzzyTripMatching,
@@ -34,7 +33,6 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   ) {
     this.configRef = configRef;
     this.frequencySec = frequencySec;
-    this.logFrequency = logFrequency;
     this.maxSnapshotFrequencyMs = maxSnapshotFrequencyMs;
     this.purgeExpiredData = purgeExpiredData;
     this.fuzzyTripMatching = fuzzyTripMatching;
@@ -51,6 +49,11 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
   }
 
   @Override
+  public String getUrl() {
+    return httpSourceUrl;
+  }
+
+  @Override
   public String getConfigRef() {
     return configRef;
   }
@@ -59,16 +62,8 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
     return sourceType;
   }
 
-  String getFeedId() {
+  public String getFeedId() {
     return feedId;
-  }
-
-  int getLogFrequency() {
-    return logFrequency;
-  }
-
-  int getMaxSnapshotFrequencyMs() {
-    return maxSnapshotFrequencyMs;
   }
 
   boolean purgeExpiredData() {

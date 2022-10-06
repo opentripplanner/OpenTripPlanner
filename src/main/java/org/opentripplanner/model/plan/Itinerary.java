@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.util.lang.DoubleUtils;
@@ -160,7 +161,7 @@ public class Itinerary {
    * An itinerary can be flagged for removal with a system notice.
    * <p>
    * For example when tuning or manually testing the itinerary-filter-chain it you can enable {@link
-   * org.opentripplanner.routing.api.request.ItineraryFilterParameters#debug} and instead of
+   * ItineraryFilterPreferences#debug} and instead of
    * removing itineraries from the result the itineraries will be tagged by the filters instead.
    * This enables investigating, why an expected itinerary is missing from the result set. It can be
    * also used by other filters to see the already filtered itineraries.

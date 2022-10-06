@@ -86,7 +86,7 @@ public class AStarTest {
   public void testForward() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
@@ -115,7 +115,7 @@ public class AStarTest {
   public void testBack() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     request.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
@@ -155,7 +155,7 @@ public class AStarTest {
   public void testForwardExtraEdges() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
       "near_shilshole_22nd",
@@ -201,7 +201,7 @@ public class AStarTest {
   public void testBackExtraEdges() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     request.setArriveBy(true);
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
@@ -248,7 +248,7 @@ public class AStarTest {
   public void testMultipleTargets() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     Set<Vertex> targets = new HashSet<>();
     targets.add(graph.getVertex("shilshole_22nd"));

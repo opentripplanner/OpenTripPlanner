@@ -8,8 +8,6 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import java.util.function.Function;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -44,16 +42,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
   /* Populate properties on existing WayPropertySet */
   public void populateProperties(WayPropertySet props) {
-    Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission = props.getDefaultBicycleSafetyForPermission();
-    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission = props.getDefaultWalkSafetyForPermission();
-    WayProperties allWayProperties = withModes(ALL)
-      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
-    WayProperties noneWayProperties = withModes(NONE)
-      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
-    WayProperties pedestrianWayProperties = withModes(PEDESTRIAN)
-      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
-    WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE)
-      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
+    WayProperties allWayProperties = withModes(ALL).build();
+    WayProperties noneWayProperties = withModes(NONE).build();
+    WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
+    WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE).build();
     /* no bicycle tags */
 
     /* NONE */

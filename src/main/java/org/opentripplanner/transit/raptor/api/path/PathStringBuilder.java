@@ -112,7 +112,7 @@ public class PathStringBuilder {
     if (cost == defaultValue) {
       return this;
     }
-    space().append(OtpNumberFormat.formatCost(cost));
+    space().append(OtpNumberFormat.formatCostCenti(cost));
     if (unit != null) {
       append(unit);
     }

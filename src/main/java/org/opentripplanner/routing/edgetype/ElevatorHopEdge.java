@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -84,11 +83,10 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   @Override
   public State traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
-    RouteRequest request = s0.getOptions();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
-    if (request.wheelchair()) {
+    if (s0.getRequest().wheelchair()) {
       if (
         wheelchairAccessibility != Accessibility.POSSIBLE &&
         preferences.wheelchair().elevator().onlyConsiderAccessible()
@@ -116,12 +114,14 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     }
 
     s1.incrementWeight(
-      this.travelTime > 0 ? this.travelTime : (preferences.street().elevatorHopCost() * this.levels)
+      this.travelTime > 0
+        ? this.travelTime
+        : (preferences.street().elevator().hopCost() * this.levels)
     );
     s1.incrementTimeInSeconds(
       this.travelTime > 0
         ? this.travelTime
-        : (int) (preferences.street().elevatorHopTime() * this.levels)
+        : (int) (preferences.street().elevator().hopTime() * this.levels)
     );
     return s1.makeState();
   }

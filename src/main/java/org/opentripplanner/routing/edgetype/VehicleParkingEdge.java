@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
@@ -51,11 +50,11 @@ public class VehicleParkingEdge extends Edge {
 
   @Override
   public State traverse(State s0) {
-    if (!s0.getRequestMode().includesParking()) {
+    if (!s0.getRequest().mode().includesParking()) {
       return null;
     }
 
-    if (s0.getOptions().arriveBy()) {
+    if (s0.getRequest().arriveBy()) {
       return traverseUnPark(s0);
     } else {
       return traversePark(s0);
@@ -87,7 +86,7 @@ public class VehicleParkingEdge extends Edge {
       return null;
     }
 
-    StreetMode streetMode = s0.getRequestMode();
+    StreetMode streetMode = s0.getRequest().mode();
 
     if (streetMode.includesBiking()) {
       final BikePreferences bike = s0.getPreferences().bike();
@@ -101,14 +100,11 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traverseUnPark(State s0, int parkingCost, int parkingTime, TraverseMode mode) {
-    RoutingPreferences preferences = s0.getPreferences();
-    RouteRequest request = s0.getOptions();
-
     if (
       !vehicleParking.hasSpacesAvailable(
         mode,
-        request.wheelchair(),
-        preferences.parking().useAvailabilityInformation()
+        s0.getRequest().wheelchair(),
+        s0.getPreferences().parking().useAvailabilityInformation()
       )
     ) {
       return null;
@@ -122,7 +118,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0) {
-    StreetMode streetMode = s0.getRequestMode();
+    StreetMode streetMode = s0.getRequest().mode();
     RoutingPreferences preferences = s0.getPreferences();
 
     if (!streetMode.includesWalking() || s0.isVehicleParked()) {
@@ -144,14 +140,11 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State traversePark(State s0, int parkingCost, int parkingTime) {
-    RoutingPreferences preferences = s0.getPreferences();
-    RouteRequest request = s0.getOptions();
-
     if (
       !vehicleParking.hasSpacesAvailable(
         s0.getNonTransitMode(),
-        request.wheelchair(),
-        preferences.parking().useAvailabilityInformation()
+        s0.getRequest().wheelchair(),
+        s0.getPreferences().parking().useAvailabilityInformation()
       )
     ) {
       return null;

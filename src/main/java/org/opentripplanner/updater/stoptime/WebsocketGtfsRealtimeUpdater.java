@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.ws.WebSocket;
 import org.asynchttpclient.ws.WebSocketListener;
@@ -20,6 +21,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.stoptime.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +73,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
+  private final Consumer<UpdateResult> recordMetrics;
+
   public WebsocketGtfsRealtimeUpdater(
     WebsocketGtfsRealtimeUpdaterParameters parameters,
     TimetableSnapshotSource snapshotSource,
@@ -84,6 +88,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     this.snapshotSource = snapshotSource;
     this.fuzzyTripMatcher =
       new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
+    this.recordMetrics = TripUpdateMetrics.streaming(parameters);
   }
 
   @Override
@@ -195,7 +200,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
           backwardsDelayPropagationType,
           fullDataset,
           updates,
-          feedId
+          feedId,
+          recordMetrics
         );
         saveResultOnGraph.execute(runnable);
       }

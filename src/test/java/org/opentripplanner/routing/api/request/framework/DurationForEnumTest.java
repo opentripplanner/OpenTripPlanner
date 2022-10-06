@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.framework;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,6 +35,11 @@ class DurationForEnumTest {
   void defaultValue() {
     assertEquals(DEFAULT, subject.defaultValue());
     assertEquals(DEFAULT.toSeconds(), subject.defaultValueSeconds());
+
+    assertThrows(
+      NullPointerException.class,
+      () -> DurationForEnum.of(StreetMode.class).withDefault(null).build()
+    );
   }
 
   @Test
@@ -65,31 +71,36 @@ class DurationForEnumTest {
   }
 
   @Test
-  void toChangeTheBuilderAfterTheBuildMethodIsCalledIsNotAllowed() {
+  void reuseBuilderToMakeDiffrentObjects() {
     var builder = DurationForEnum.of(StreetMode.class);
-    builder.build();
-    assertThrows(IllegalStateException.class, () -> builder.with(StreetMode.WALK, WALK_VALUE));
+    var defaultValue = builder.build();
+    builder.with(StreetMode.WALK, D10s);
+    var withWalkSet = builder.build();
+
+    assertNotSame(defaultValue, withWalkSet);
+    assertEquals(D10s, withWalkSet.valueOf(StreetMode.WALK));
   }
 
   @Test
   void copyOf() {
     // with new default, keep map
-    var copy = subject.copyOf(b -> b.withDefaultSec(10));
+    var copy = subject.copyOf().apply(b3 -> b3.withDefaultSec(10)).build();
     assertEquals(D10s, copy.valueOf(StreetMode.BIKE));
     assertEquals(WALK_VALUE, copy.valueOf(StreetMode.WALK));
 
     // with new map values, keep walk and default
-    copy = subject.copyOf(b -> b.with(StreetMode.BIKE, D10s));
+    copy = subject.copyOf().apply(b2 -> b2.with(StreetMode.BIKE, D10s)).build();
     assertEquals(WALK_VALUE, copy.valueOf(StreetMode.WALK));
     assertEquals(D10s, copy.valueOf(StreetMode.BIKE));
     assertEquals(DEFAULT, copy.valueOf(StreetMode.CAR));
 
     // with override map value
-    copy = subject.copyOf(b -> b.with(StreetMode.WALK, D10s));
+    copy = subject.copyOf().apply(b1 -> b1.with(StreetMode.WALK, D10s)).build();
     assertEquals(D10s, copy.valueOf(StreetMode.WALK));
 
     // with no "real" changes -> return original
-    copy = subject.copyOf(b -> b.withDefault(DEFAULT).with(StreetMode.WALK, WALK_VALUE));
+    copy =
+      subject.copyOf().apply(b -> b.withDefault(DEFAULT).with(StreetMode.WALK, WALK_VALUE)).build();
     assertSame(subject, copy);
   }
 }

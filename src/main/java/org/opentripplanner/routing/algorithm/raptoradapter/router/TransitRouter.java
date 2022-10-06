@@ -244,7 +244,7 @@ public class TransitRouter {
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
     TransitLayer transitLayer
   ) {
-    RouteRequest transferRoutingRequest = Transfer.prepareTransferRoutingRequest(request);
+    RouteRequest transferRoutingRequest = request.copyAndPrepareForTransferRouting();
 
     return new RaptorRoutingRequestTransitData(
       transitLayer,
