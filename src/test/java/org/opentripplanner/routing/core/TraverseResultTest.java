@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 
 public class TraverseResultTest {
 
@@ -16,12 +14,10 @@ public class TraverseResultTest {
 
     /* note: times are rounded to seconds toward zero */
 
+    AStarRequest aStarRequest = AStarRequest.of().build();
     for (int i = 0; i < 4; i++) {
-      State r = new State(
-        null,
-        Instant.ofEpochSecond(i * 1000),
-        StateData.getInitialStateData(new RouteRequest(), StreetMode.WALK)
-      );
+      StateData stateData = StateData.getInitialStateData(aStarRequest);
+      State r = new State(null, Instant.ofEpochSecond(i * 1000), stateData, aStarRequest);
       resultChain = r.addToExistingResultChain(resultChain);
     }
 

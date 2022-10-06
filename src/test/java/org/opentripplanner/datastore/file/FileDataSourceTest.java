@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.datastore.api.DataSource;
 
 public class FileDataSourceTest {
 
@@ -44,8 +45,8 @@ public class FileDataSourceTest {
     assertEquals(FILENAME, subject.name());
     assertEquals(expectedPath, subject.path());
     assertEquals(GRAPH, subject.type());
-    assertEquals(0L, subject.lastModified());
-    assertEquals(0L, subject.size());
+    assertEquals(DataSource.UNKNOWN, subject.lastModified());
+    assertEquals(DataSource.UNKNOWN, subject.size());
     assertFalse(subject.exists());
     assertTrue(subject.isWritable());
 

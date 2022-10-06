@@ -24,6 +24,8 @@ import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestBuilder;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -512,8 +514,8 @@ public class TestHalfEdges {
 
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
-    RouteRequest req = new RouteRequest();
-    State traversedOne = new State(start, req, req.journey().direct().mode());
+    AStarRequestBuilder req = AStarRequest.of();
+    State traversedOne = new State(start, req.build());
     State currentState;
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
@@ -545,7 +547,7 @@ public class TestHalfEdges {
       StreetNotesService.WHEELCHAIR_MATCHER
     );
 
-    req.setWheelchair(true);
+    req.withWheelchair(true);
 
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -557,7 +559,7 @@ public class TestHalfEdges {
         tempEdges
       );
 
-    traversedOne = new State(start, req, req.journey().direct().mode());
+    traversedOne = new State(start, req.build());
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
       if (currentState != null) {

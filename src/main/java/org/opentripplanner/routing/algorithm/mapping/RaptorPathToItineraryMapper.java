@@ -20,6 +20,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Trans
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -45,8 +47,8 @@ public class RaptorPathToItineraryMapper {
 
   private final TransitLayer transitLayer;
 
-  private final RouteRequest request;
-
+  private final AStarRequest request;
+  private final StreetMode transferMode;
   private final ZonedDateTime transitSearchTimeZero;
 
   private final GraphPathToItineraryMapper graphPathToItineraryMapper;
@@ -68,7 +70,13 @@ public class RaptorPathToItineraryMapper {
   ) {
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
-    this.request = request;
+    this.transferMode = request.journey().transfer().mode();
+    this.request =
+      AStarRequestMapper
+        .map(Transfer.prepareTransferRoutingRequest(request))
+        .withArriveBy(false)
+        .withMode(transferMode)
+        .build();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
         transitService.getTimeZone(),
@@ -98,9 +106,7 @@ public class RaptorPathToItineraryMapper {
         legs.addAll(
           mapTransferLeg(
             pathLeg.asTransferLeg(),
-            request.journey().transfer().mode() == StreetMode.BIKE
-              ? TraverseMode.BICYCLE
-              : TraverseMode.WALK
+            transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
           )
         );
       }
@@ -255,16 +261,7 @@ public class RaptorPathToItineraryMapper {
           .build()
       );
     } else {
-      // A RoutingRequest must be constructed so that the edges may be re-traversed to create the
-      // leg(s) from the list of edges.
-      RouteRequest traverseRequest = Transfer.prepareTransferRoutingRequest(request);
-      traverseRequest.setArriveBy(false);
-
-      StateEditor se = new StateEditor(
-        traverseRequest,
-        request.journey().transfer().mode(),
-        edges.get(0).getFromVertex()
-      );
+      StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
       se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
 
       State s = se.makeState();

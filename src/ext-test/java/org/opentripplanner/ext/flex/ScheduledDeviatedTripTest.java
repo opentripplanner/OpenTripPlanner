@@ -27,7 +27,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.State;
@@ -270,11 +270,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       stopLocation,
       0,
       List.of(),
-      new State(
-        new StreetLocation(id, new Coordinate(0, 0), id),
-        new RouteRequest(),
-        StreetMode.WALK
-      )
+      new State(new StreetLocation(id, new Coordinate(0, 0), id), AStarRequest.of().build())
     );
   }
 
