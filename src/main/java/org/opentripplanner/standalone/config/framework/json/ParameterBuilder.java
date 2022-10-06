@@ -46,7 +46,7 @@ public class ParameterBuilder {
 
   /**
    * The node-info builder is used while parsing a configuration file to "build" information about
-   * parameter "under construction". This meta information is used later, fr example to generate
+   * parameter "under construction". This meta information is used later, for example to generate
    * user documentation.
    */
   private final NodeInfoBuilder info = NodeInfo.of();
