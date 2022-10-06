@@ -388,6 +388,10 @@ public class WayPropertySet {
     this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;
   }
 
+  public void setMixinProperties(OsmSpecifier spec, WayPropertiesBuilder properties) {
+    addProperties(spec, properties.build(), true);
+  }
+
   public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
     setMixinProperties(spec, properties.build());
   }

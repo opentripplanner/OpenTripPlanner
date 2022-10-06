@@ -9,6 +9,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PED
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -498,7 +499,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.7));
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      withModes(ALL).bicycleSafety(0.7)
+    );
 
     /*
      * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California

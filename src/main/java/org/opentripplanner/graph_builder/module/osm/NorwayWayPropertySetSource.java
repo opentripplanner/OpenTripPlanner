@@ -10,6 +10,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PED
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
@@ -619,7 +620,10 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
 
     //relation properties are copied over to ways
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.8));
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      withModes(ALL).bicycleSafety(0.7)
+    );
 
     props.setProperties(
       "highway=busway",

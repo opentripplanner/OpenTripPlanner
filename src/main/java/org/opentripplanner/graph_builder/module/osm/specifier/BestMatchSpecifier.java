@@ -1,70 +1,36 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Specifies a class of OSM tagged entities (e.g. ways) by a list of tags and their values (which
  * may be wildcards). The OSMSpecifier which matches the most tags on an OSM entity will win. In the
- * event that several OSMSpecifiers match the same number of tags, the one that does so using less
+ * event that several OSMSpecifiers match the same number of tags, the one that does so using fewer
  * wildcards will win. For example, if one OSMSpecifier has the tags (highway=residential,
  * cycleway=*) and another has (highway=residential, surface=paved) and a way has the tags
- * (highway=residential, cycleway=lane, surface=paved) the second OSMSpecifier will be applied to
- * that way (2 exact matches beats 1 exact match and a wildcard match).
- * <p>
- * You can also use a logical OR condition to specify a match. This indented to be used with a
- * safety mixin.
- * <p>
- * For example if you specify "lcn=yes|rnc=yes|ncn=yes" then this will match if one of these tags
- * matches.
- * <p>
- * If you would add 3 separate matches that would mean that a way that is tagged with all of them
- * would receive too high a safety value leading to undesired detours.
- * <p>
- * Logical ORs are only implemented for mixins without wildcards.
+ * (highway=residential, cycleway=lane, surface=paved) the second specifier will be applied to that
+ * way (2 exact matches beats 1 exact match and a wildcard match).
  */
 public class BestMatchSpecifier implements OsmSpecifier {
 
-  private List<Tag> logicalANDPairs = new ArrayList<>(3);
-  private List<Tag> logicalORPairs = new ArrayList<>(3);
+  private final List<Tag> pairs;
 
   public BestMatchSpecifier(String spec) {
-    if (spec.contains("|") && spec.contains(";")) {
-      throw new RuntimeException(
-        String.format(
-          "You cannot mix logical AND (';') and logical OR ('|') in same OSM spec: '%s'",
-          spec
-        )
-      );
-    } else if (spec.contains("|") && spec.contains("*")) {
-      throw new RuntimeException(
-        String.format(
-          "You cannot mix logical OR ('|') and wildcards ('*') in the same OSM spec: '%s'",
-          spec
-        )
-      );
-    } else if (spec.contains("|")) {
-      logicalORPairs = OsmSpecifier.getTagsFromString(spec, "\\|");
-    } else {
-      logicalANDPairs = OsmSpecifier.getTagsFromString(spec, ";");
-    }
+    pairs = OsmSpecifier.getTagsFromString(spec, ";");
   }
 
   @Override
   public Scores matchScores(OSMWithTags match) {
-    if (!logicalANDPairs.isEmpty()) {
-      return computeANDScore(match);
-    } else {
-      return computeORScore(match);
-    }
+    return computeScores(match);
   }
 
   @Override
   public int matchScore(OSMWithTags match) {
     int score = 0;
     int matches = 0;
-    for (var pair : logicalANDPairs) {
+    for (var pair : pairs) {
       String tag = pair.key();
       String value = pair.value();
       String matchValue = match.getTag(tag);
@@ -74,25 +40,13 @@ public class BestMatchSpecifier implements OsmSpecifier {
         matches += 1;
       }
     }
-    score += matches == logicalANDPairs.size() ? 10 : 0;
+    score += matches == pairs.size() ? 10 : 0;
     return score;
   }
 
+  @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    for (var pair : logicalANDPairs) {
-      builder.append(pair.key());
-      builder.append("=");
-      builder.append(pair.value());
-      builder.append(";");
-    }
-    for (var pair : logicalORPairs) {
-      builder.append(pair.value());
-      builder.append("=");
-      builder.append(pair.value());
-      builder.append("|");
-    }
-    return builder.toString();
+    return ToStringBuilder.of(this.getClass()).addObj("pairs", pairs).toString();
   }
 
   /**
@@ -123,22 +77,11 @@ public class BestMatchSpecifier implements OsmSpecifier {
     }
   }
 
-  private Scores computeORScore(OSMWithTags match) {
-    // not sure if we should calculate a proper score as it doesn't make a huge amount of sense to do it for
-    // logical OR conditions
-    var oneOfORPairMatches = logicalORPairs
-      .stream()
-      .anyMatch(pair -> match.isTag(pair.key(), pair.value()));
-    if (oneOfORPairMatches) {
-      return new Scores(1, 1);
-    } else return new Scores(0, 0);
-  }
-
-  private Scores computeANDScore(OSMWithTags way) {
+  private Scores computeScores(OSMWithTags way) {
     int leftScore = 0, rightScore = 0;
     int leftMatches = 0, rightMatches = 0;
 
-    for (var pair : logicalANDPairs) {
+    for (var pair : pairs) {
       String tag = pair.key();
       String value = pair.value();
       String leftMatchValue = way.getTag(tag + ":left");
@@ -163,9 +106,9 @@ public class BestMatchSpecifier implements OsmSpecifier {
       }
     }
 
-    int allMatchLeftBonus = (leftMatches == logicalANDPairs.size()) ? 10 : 0;
+    int allMatchLeftBonus = (leftMatches == pairs.size()) ? 10 : 0;
     leftScore += allMatchLeftBonus;
-    int allMatchRightBonus = (rightMatches == logicalANDPairs.size()) ? 10 : 0;
+    int allMatchRightBonus = (rightMatches == pairs.size()) ? 10 : 0;
     rightScore += allMatchRightBonus;
     return new Scores(leftScore, rightScore);
   }

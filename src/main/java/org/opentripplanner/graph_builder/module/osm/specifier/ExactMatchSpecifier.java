@@ -14,7 +14,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-    var allTagsMatch = pairs.stream().allMatch(p -> matchValue(way.getTag(p.key()), p.value()));
+    var allTagsMatch = matchesExactly(way);
     if (allTagsMatch) {
       return new Scores(Integer.MAX_VALUE, Integer.MAX_VALUE);
     } else {
@@ -25,6 +25,10 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   @Override
   public int matchScore(OSMWithTags match) {
     return 0;
+  }
+
+  public boolean matchesExactly(OSMWithTags way) {
+    return pairs.stream().allMatch(p -> matchValue(way.getTag(p.key()), p.value()));
   }
 
   private static boolean matchValue(String value, String matchValue) {
