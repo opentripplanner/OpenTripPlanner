@@ -7,7 +7,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class TransitFeedsConfig {
+public class TransitFeedParametersList {
 
   private static final String FEED_TYPE_GTFS = "GTFS";
   private static final String FEED_TYPE_NETEX = "NETEX";
@@ -18,7 +18,7 @@ public class TransitFeedsConfig {
   @Nonnull
   public final List<GtfsFeedParameters> gtfsFeedConfigs;
 
-  public TransitFeedsConfig(NodeAdapter config) {
+  public TransitFeedParametersList(NodeAdapter config) {
     List<NodeAdapter> feedConfigs = config.asList();
 
     gtfsFeedConfigs =
