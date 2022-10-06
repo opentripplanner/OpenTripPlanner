@@ -155,7 +155,8 @@ class StopTimesHelperTest {
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
       2,
-      ArrivalDeparture.BOTH
+      ArrivalDeparture.BOTH,
+      true
     );
 
     assertEquals(1, stopTimes.size());
@@ -180,7 +181,8 @@ class StopTimesHelperTest {
       serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
       Duration.ofHours(24),
       2,
-      ArrivalDeparture.BOTH
+      ArrivalDeparture.BOTH,
+      true
     );
 
     assertEquals(1, stopTimes.size());
@@ -206,7 +208,8 @@ class StopTimesHelperTest {
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(48),
       2,
-      ArrivalDeparture.BOTH
+      ArrivalDeparture.BOTH,
+      true
     );
 
     assertEquals(2, stopTimes.size());
@@ -235,7 +238,8 @@ class StopTimesHelperTest {
       transitService,
       transitService.getRegularStop(stopId),
       serviceDate,
-      ArrivalDeparture.BOTH
+      ArrivalDeparture.BOTH,
+      true
     );
 
     assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
