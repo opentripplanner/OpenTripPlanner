@@ -25,7 +25,7 @@ public class DemExtractConfigBuilder {
     return this;
   }
 
-  public DemExtractConfig build() {
-    return new DemExtractConfig(this);
+  public DemExtractParameters build() {
+    return new DemExtractParameters(this);
   }
 }

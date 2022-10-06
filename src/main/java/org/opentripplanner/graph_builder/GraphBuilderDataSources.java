@@ -17,8 +17,8 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractConfig;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -124,7 +124,7 @@ public class GraphBuilderDataSources {
       .orElse(new OsmExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
-  public Iterable<ConfiguredDataSource<DemExtractConfig>> getDemConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDatasource() {
     return inputData
       .get(DEM)
       .stream()
@@ -132,7 +132,7 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
+  private DemExtractParameters getDemExtractConfig(DataSource dataSource) {
     return buildConfig.dem
       .demExtracts()
       .stream()

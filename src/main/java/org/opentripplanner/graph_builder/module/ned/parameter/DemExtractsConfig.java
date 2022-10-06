@@ -5,17 +5,17 @@ import java.util.List;
 
 public class DemExtractsConfig {
 
-  private final List<DemExtractConfig> demExtractConfigs;
+  private final List<DemExtractParameters> extracts;
 
-  public DemExtractsConfig(List<DemExtractConfig> demExtractConfigs) {
-    this.demExtractConfigs = List.copyOf(demExtractConfigs);
+  public DemExtractsConfig(List<DemExtractParameters> demExtractParameters) {
+    this.extracts = List.copyOf(demExtractParameters);
   }
 
-  public List<DemExtractConfig> demExtracts() {
-    return demExtractConfigs;
+  public List<DemExtractParameters> demExtracts() {
+    return extracts;
   }
 
   public List<URI> demFiles() {
-    return demExtractConfigs.stream().map(DemExtractConfig::source).toList();
+    return extracts.stream().map(DemExtractParameters::source).toList();
   }
 }
