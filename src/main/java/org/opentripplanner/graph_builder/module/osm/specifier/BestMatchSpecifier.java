@@ -45,22 +45,12 @@ public class BestMatchSpecifier implements OsmSpecifier {
         )
       );
     } else if (spec.contains("|")) {
-      logicalORPairs = OsmSpecifier.getPairsFromString(spec, "\\|");
+      logicalORPairs = OsmSpecifier.getTagsFromString(spec, "\\|");
     } else {
-      logicalANDPairs = OsmSpecifier.getPairsFromString(spec, ";");
+      logicalANDPairs = OsmSpecifier.getTagsFromString(spec, ";");
     }
   }
 
-  /**
-   * Calculates a pair of scores expressing how well an OSM entity's tags match this specifier.
-   * <p>
-   * Tags in this specifier are matched against those for the left and right side of the OSM way
-   * separately. See: http://wiki.openstreetmap.org/wiki/Forward_%26_backward,_left_%26_right
-   * TODO: we should probably support forward/backward as well.
-   * TODO: simply count the number of full, partial, and wildcard matches instead of using a scoring system.
-   *
-   * @param match an OSM tagged object to compare to this specifier
-   */
   @Override
   public Scores matchScores(OSMWithTags match) {
     if (!logicalANDPairs.isEmpty()) {
@@ -70,10 +60,6 @@ public class BestMatchSpecifier implements OsmSpecifier {
     }
   }
 
-  /**
-   * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
-   * exactly the same thing as matchScores but without regard for :left and :right.
-   */
   @Override
   public int matchScore(OSMWithTags match) {
     int score = 0;
@@ -111,6 +97,34 @@ public class BestMatchSpecifier implements OsmSpecifier {
 
   public boolean containsLogicalOr() {
     return !logicalORPairs.isEmpty();
+  }
+
+  /**
+   * Calculates a score indicating how well an OSM tag value matches the given matchValue. An exact
+   * match is worth 100 points, a partial match on the part of the value before a colon is worth 75
+   * points, and a wildcard match is worth only one point, to serve as a tiebreaker. A score of 0
+   * means they do not match.
+   */
+  private static int getTagScore(String value, String matchValue) {
+    // either this matches on a wildcard, or it matches exactly
+    if (OsmSpecifier.matchesWildcard(value, matchValue)) {
+      return 1; // wildcard matches are basically tiebreakers
+    } else if (value.equals(matchValue)) {
+      return 100;
+    } else {
+      if (value.contains(":")) {
+        // treat cases like cobblestone:flattened as cobblestone if a more-specific match
+        // does not apply
+        value = value.split(":", 2)[0];
+        if (value.equals(matchValue)) {
+          return 75;
+        } else {
+          return 0;
+        }
+      } else {
+        return 0;
+      }
+    }
   }
 
   private Scores computeORScore(OSMWithTags match) {
@@ -160,33 +174,5 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int allMatchRightBonus = (rightMatches == logicalANDPairs.size()) ? 10 : 0;
     rightScore += allMatchRightBonus;
     return new Scores(leftScore, rightScore);
-  }
-
-  /**
-   * Calculates a score indicating how well an OSM tag value matches the given matchValue. An exact
-   * match is worth 100 points, a partial match on the part of the value before a colon is worth 75
-   * points, and a wildcard match is worth only one point, to serve as a tiebreaker. A score of 0
-   * means they do not match.
-   */
-  private static int getTagScore(String value, String matchValue) {
-    // either this matches on a wildcard, or it matches exactly
-    if (OsmSpecifier.matchesWildcard(value, matchValue)) {
-      return 1; // wildcard matches are basically tiebreakers
-    } else if (value.equals(matchValue)) {
-      return 100;
-    } else {
-      if (value.contains(":")) {
-        // treat cases like cobblestone:flattened as cobblestone if a more-specific match
-        // does not apply
-        value = value.split(":", 2)[0];
-        if (value.equals(matchValue)) {
-          return 75;
-        } else {
-          return 0;
-        }
-      } else {
-        return 0;
-      }
-    }
   }
 }

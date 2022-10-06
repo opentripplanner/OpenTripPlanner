@@ -9,7 +9,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   private final List<Tag> pairs;
 
   public ExactMatchSpecifier(String spec) {
-    this.pairs = OsmSpecifier.getPairsFromString(spec, ";");
+    this.pairs = OsmSpecifier.getTagsFromString(spec, ";");
   }
 
   @Override

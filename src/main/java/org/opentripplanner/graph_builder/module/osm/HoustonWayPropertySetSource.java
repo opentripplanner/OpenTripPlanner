@@ -6,6 +6,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BIC
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
+import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
+
 /**
  * OSM way properties for the Houston, Texas, USA area.
  * <p>
@@ -22,16 +24,11 @@ public class HoustonWayPropertySetSource implements WayPropertySetSource {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    props.setProperties("highway=*;layer=-1;tunnel=yes;indoor=yes", withModes(ALL));
-    props.setProperties("highway=cycleway;tunnel=yes;indoor=yes", withModes(BICYCLE));
-    // sadly we need these permutations since otherwise they would match with the final props
-    // I'm not sure if this is a bug or working as intended
-    props.setProperties("highway=footway;tunnel=yes;indoor=yes", withModes(PEDESTRIAN));
-    props.setProperties("highway=footway;tunnel=yes;layer=-1", withModes(PEDESTRIAN));
-    props.setProperties("highway=footway", withModes(PEDESTRIAN));
-
     // Disallow any use of underground indoor pedestrian tunnels
-    props.setProperties("highway=footway;layer=-1;tunnel=yes;indoor=yes", withModes(NONE));
+    props.setProperties(
+      new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
+      withModes(NONE)
+    );
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
   }

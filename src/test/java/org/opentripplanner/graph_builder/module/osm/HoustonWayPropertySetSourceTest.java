@@ -2,9 +2,9 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
-import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -41,7 +41,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("name", "Harris County Tunnel");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -52,7 +52,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(PEDESTRIAN, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -66,7 +66,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("surface", "concrete");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(BICYCLE, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
 
     // https://www.openstreetmap.org/way/101884176
     tunnel = new OSMWithTags();
@@ -74,7 +74,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("layer", "-1");
     tunnel.addTag("name", "Hogg Woods Trail");
     tunnel.addTag("tunnel", "yes");
-    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(PEDESTRIAN_AND_BICYCLE, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test
@@ -106,7 +106,7 @@ class HoustonWayPropertySetSourceTest {
     tunnel.addTag("oneway", "yes");
     tunnel.addTag("tunnel", "yes");
 
-    assertEquals(ALL, wps.getDataForWay(tunnel).getPermission());
+    assertEquals(CAR, wps.getDataForWay(tunnel).getPermission());
   }
 
   @Test

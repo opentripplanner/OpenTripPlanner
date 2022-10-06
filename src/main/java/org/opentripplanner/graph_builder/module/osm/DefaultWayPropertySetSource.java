@@ -37,7 +37,6 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  *
  * @author bdferris, novalis
  * @see WayPropertySetSource
- * @see OpenStreetMapModule
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 

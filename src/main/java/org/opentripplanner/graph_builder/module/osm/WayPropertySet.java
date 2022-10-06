@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
@@ -264,12 +263,7 @@ public class WayPropertySet {
     return result;
   }
 
-  public void addProperties(BestMatchSpecifier spec, WayProperties properties, boolean mixin) {
-    if (!mixin && spec.containsLogicalOr()) {
-      throw new RuntimeException(
-        String.format("The logical OR operator ('|') is only implemented for mixins. Spec %s", spec)
-      );
-    }
+  public void addProperties(OsmSpecifier spec, WayProperties properties, boolean mixin) {
     wayProperties.add(new WayPropertyPicker(spec, properties, mixin));
   }
 
@@ -402,12 +396,20 @@ public class WayPropertySet {
     addProperties(new BestMatchSpecifier(spec), properties, true);
   }
 
-  public void setProperties(String spec, WayPropertiesBuilder properties) {
-    setProperties(spec, properties.build());
+  public void setProperties(String s, WayProperties props) {
+    setProperties(new BestMatchSpecifier(s), props);
   }
 
-  public void setProperties(String spec, WayProperties properties) {
-    addProperties(new BestMatchSpecifier(spec), properties, false);
+  public void setProperties(String spec, WayPropertiesBuilder properties) {
+    setProperties(new BestMatchSpecifier(spec), properties);
+  }
+
+  public void setProperties(OsmSpecifier spec, WayProperties properties) {
+    addProperties(spec, properties, false);
+  }
+
+  public void setProperties(OsmSpecifier spec, WayPropertiesBuilder properties) {
+    addProperties(spec, properties.build(), false);
   }
 
   public void setCarSpeed(String spec, float speed) {
