@@ -14,6 +14,7 @@ import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
+import org.opentripplanner.datastore.https.HttpsDataSourceRepository;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 
 /**
@@ -57,6 +58,9 @@ public abstract class DataStoreModule {
     if (gsRepository != null) {
       repositories.add(gsRepository);
     }
+
+    repositories.add(new HttpsDataSourceRepository());
+
     // The file data storage repository should be last, to allow
     // other repositories to "override" and grab files analyzing the
     // datasource uri passed in

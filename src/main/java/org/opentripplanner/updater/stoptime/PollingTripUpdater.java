@@ -2,11 +2,13 @@ package org.opentripplanner.updater.stoptime;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
+import java.util.function.Consumer;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.stoptime.metrics.BatchTripUpdateMetrics;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * rt.feedId = TA
  * </pre>
  */
-public class PollingStoptimeUpdater extends PollingGraphUpdater {
+public class PollingTripUpdater extends PollingGraphUpdater {
 
-  private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PollingTripUpdater.class);
 
   private final TripUpdateSource updateSource;
   private final TimetableSnapshotSource snapshotSource;
@@ -37,23 +39,23 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
   private final String feedId;
 
   /**
-   * Defines when delays are propagated to previous stops and if these stops are given
-   * the NO_DATA flag.
+   * Defines when delays are propagated to previous stops and if these stops are given the NO_DATA
+   * flag.
    */
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
+  private final Consumer<UpdateResult> recordMetrics;
 
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
-
   /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-  public PollingStoptimeUpdater(
-    PollingStoptimeUpdaterParameters parameters,
+  public PollingTripUpdater(
+    PollingTripUpdaterParameters parameters,
     TransitModel transitModel,
     TimetableSnapshotSource snapshotSource
   ) {
@@ -61,13 +63,14 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     // Create update streamer from preferences
     this.feedId = parameters.getFeedId();
     this.updateSource = createSource(parameters);
-
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;
     if (parameters.fuzzyTripMatching()) {
       this.fuzzyTripMatcher =
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
+
+    this.recordMetrics = BatchTripUpdateMetrics.batch(parameters);
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
@@ -99,7 +102,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         backwardsDelayPropagationType,
         fullDataset,
         updates,
-        feedId
+        feedId,
+        recordMetrics
       );
       saveResultOnGraph.execute(runnable);
     }
@@ -115,7 +119,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
       .toString();
   }
 
-  private static TripUpdateSource createSource(PollingStoptimeUpdaterParameters parameters) {
+  private static TripUpdateSource createSource(PollingTripUpdaterParameters parameters) {
     switch (parameters.getSourceType()) {
       case GTFS_RT_HTTP:
         return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());

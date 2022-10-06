@@ -8,10 +8,10 @@ import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
@@ -81,19 +81,19 @@ class StreetTransitEntityLinkTest {
       .withModes(Set.of(TransitMode.RAIL))
       .build();
 
-    var req = new RouteRequest();
+    var req = AStarRequest.of().withMode(StreetMode.BIKE);
     AccessibilityPreferences feature;
     if (onlyAccessible) {
       feature = AccessibilityPreferences.ofOnlyAccessible();
     } else {
       feature = AccessibilityPreferences.ofCost(100, 100);
     }
-    req.setWheelchair(true);
+    req.withWheelchair(true);
     req
       .preferences()
       .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
 
     var edge = new StreetTransitStopLink(from, to);
-    return edge.traverse(new State(from, req, StreetMode.BIKE));
+    return edge.traverse(new State(from, req.build()));
   }
 }

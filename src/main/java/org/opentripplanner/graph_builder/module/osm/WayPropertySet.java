@@ -9,8 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.common.model.P2;
@@ -37,8 +38,8 @@ public class WayPropertySet {
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
   /** Sets 1.0 as default safety value for all permissions. */
-  private final Function<StreetTraversalPermission, Double> DEFAULT_SAFETY_RESOLVER =
-    (permission -> 1.0);
+  private final BiFunction<StreetTraversalPermission, Float, Double> DEFAULT_SAFETY_RESOLVER =
+    ((permission, speedLimit) -> 1.0);
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -53,17 +54,17 @@ public class WayPropertySet {
   private final Pattern maxSpeedPattern;
   /** The automobile speed for street segments that do not match any SpeedPicker. */
   public Float defaultSpeed;
-  /** Resolves safety value for each {@link StreetTraversalPermission}. */
-  public Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission;
-  /** Resolves safety value for each {@link StreetTraversalPermission}. */
-  public Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission;
+  /** Resolves walk safety value for each {@link StreetTraversalPermission}. */
+  private BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission;
+  /** Resolves bicycle safety value for each {@link StreetTraversalPermission}. */
+  private BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
-  public WayProperties defaultProperties;
+  private final WayProperties defaultProperties;
 
   public WayPropertySet() {
     /* sensible defaults */
-    defaultProperties = withModes(ALL).build(DEFAULT_SAFETY_RESOLVER, DEFAULT_SAFETY_RESOLVER);
     defaultSpeed = 11.2f; // 11.2 m/s ~= 25 mph ~= 40 kph, standard speed limit in the US
+    defaultProperties = withModes(ALL).build();
     wayProperties = new ArrayList<>();
     creativeNamers = new ArrayList<>();
     slopeOverrides = new ArrayList<>();
@@ -74,14 +75,6 @@ public class WayPropertySet {
     maxSpeedPattern = Pattern.compile("^([0-9][.0-9]*)\\s*(kmh|km/h|kmph|kph|mph|knots)?$");
     defaultWalkSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
     defaultBicycleSafetyForPermission = DEFAULT_SAFETY_RESOLVER;
-  }
-
-  public Function<StreetTraversalPermission, Double> getDefaultWalkSafetyForPermission() {
-    return defaultWalkSafetyForPermission;
-  }
-
-  public Function<StreetTraversalPermission, Double> getDefaultBicycleSafetyForPermission() {
-    return defaultBicycleSafetyForPermission;
   }
 
   /**
@@ -96,12 +89,12 @@ public class WayPropertySet {
     List<WayProperties> leftMixins = new ArrayList<>();
     List<WayProperties> rightMixins = new ArrayList<>();
     for (WayPropertyPicker picker : wayProperties) {
-      OSMSpecifier specifier = picker.getSpecifier();
-      WayProperties wayProperties = picker.getProperties();
+      OSMSpecifier specifier = picker.specifier();
+      WayProperties wayProperties = picker.properties();
       P2<Integer> score = specifier.matchScores(way);
       int leftScore = score.first;
       int rightScore = score.second;
-      if (picker.isSafetyMixin()) {
+      if (picker.safetyMixin()) {
         if (leftScore > 0) {
           leftMixins.add(wayProperties);
         }
@@ -120,17 +113,29 @@ public class WayPropertySet {
       }
     }
 
+    float forwardSpeed = getCarSpeedForWay(way, false);
+    float backSpeed = getCarSpeedForWay(way, true);
+    StreetTraversalPermission permission = rightResult.getPermission();
+
     WayProperties result = rightResult
       .mutate()
       .bicycleSafety(
-        rightResult.getBicycleSafetyFeatures().forward(),
-        leftResult.getBicycleSafetyFeatures().back()
+        rightResult.getBicycleSafetyFeatures() != null
+          ? rightResult.getBicycleSafetyFeatures().forward()
+          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed),
+        leftResult.getBicycleSafetyFeatures() != null
+          ? leftResult.getBicycleSafetyFeatures().back()
+          : defaultBicycleSafetyForPermission.apply(permission, backSpeed)
       )
       .walkSafety(
-        rightResult.getWalkSafetyFeatures().forward(),
-        leftResult.getWalkSafetyFeatures().back()
+        rightResult.getWalkSafetyFeatures() != null
+          ? rightResult.getWalkSafetyFeatures().forward()
+          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed),
+        leftResult.getWalkSafetyFeatures() != null
+          ? leftResult.getWalkSafetyFeatures().back()
+          : defaultWalkSafetyForPermission.apply(permission, backSpeed)
       )
-      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
+      .build();
 
     /* apply mixins */
     if (leftMixins.size() > 0) {
@@ -358,42 +363,32 @@ public class WayPropertySet {
 
   /**
    * A custom defaultWalkSafetyForPermission can only be set once. The given function should
-   * provide a default for each permission.
+   * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultWalkSafetyForPermission(
-    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
+    BiFunction<StreetTraversalPermission, Float, Double> defaultWalkSafetyForPermission
   ) {
     if (!this.defaultWalkSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default walk safety resolver was already set");
     }
     this.defaultWalkSafetyForPermission = defaultWalkSafetyForPermission;
-    defaultProperties =
-      defaultProperties
-        .mutate()
-        .walkSafety(defaultWalkSafetyForPermission.apply(defaultProperties.getPermission()))
-        .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
   }
 
   /**
    * A custom defaultBicycleSafetyForPermission can only be set once. The given function should
-   * provide a default for each permission.
+   * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultBicycleSafetyForPermission(
-    Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission
+    BiFunction<StreetTraversalPermission, Float, Double> defaultBicycleSafetyForPermission
   ) {
     if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");
     }
     this.defaultBicycleSafetyForPermission = defaultBicycleSafetyForPermission;
-    defaultProperties =
-      defaultProperties
-        .mutate()
-        .bicycleSafety(defaultBicycleSafetyForPermission.apply(defaultProperties.getPermission()))
-        .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
   }
 
   public void setMixinProperties(String spec, WayPropertiesBuilder properties) {
-    setMixinProperties(spec, properties.build(DEFAULT_SAFETY_RESOLVER, DEFAULT_SAFETY_RESOLVER));
+    setMixinProperties(spec, properties.build());
   }
 
   public void setMixinProperties(String spec, WayProperties properties) {
@@ -401,10 +396,7 @@ public class WayPropertySet {
   }
 
   public void setProperties(String spec, WayPropertiesBuilder properties) {
-    setProperties(
-      spec,
-      properties.build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission)
-    );
+    setProperties(spec, properties.build());
   }
 
   public void setProperties(String spec, WayProperties properties) {
@@ -445,24 +437,32 @@ public class WayPropertySet {
     boolean right
   ) {
     SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
-    double firstBicycle = bicycleSafetyFeatures.forward();
-    double secondBicycle = bicycleSafetyFeatures.back();
+    double forwardBicycle = bicycleSafetyFeatures.forward();
+    double backBicycle = bicycleSafetyFeatures.back();
     SafetyFeatures walkSafetyFeatures = result.getWalkSafetyFeatures();
-    double firstWalk = walkSafetyFeatures.forward();
-    double secondWalk = walkSafetyFeatures.back();
+    double forwardWalk = walkSafetyFeatures.forward();
+    double backWalk = walkSafetyFeatures.back();
     for (WayProperties properties : mixins) {
       if (right) {
-        secondBicycle *= properties.getBicycleSafetyFeatures().back();
-        secondWalk *= properties.getWalkSafetyFeatures().back();
+        if (properties.getBicycleSafetyFeatures() != null) {
+          backBicycle *= properties.getBicycleSafetyFeatures().back();
+        }
+        if (properties.getWalkSafetyFeatures() != null) {
+          backWalk *= properties.getWalkSafetyFeatures().back();
+        }
       } else {
-        firstBicycle *= properties.getBicycleSafetyFeatures().forward();
-        firstWalk *= properties.getWalkSafetyFeatures().forward();
+        if (properties.getBicycleSafetyFeatures() != null) {
+          forwardBicycle *= properties.getBicycleSafetyFeatures().forward();
+        }
+        if (properties.getWalkSafetyFeatures() != null) {
+          forwardWalk *= properties.getWalkSafetyFeatures().forward();
+        }
       }
     }
     return result
       .mutate()
-      .bicycleSafety(firstBicycle, secondBicycle)
-      .walkSafety(firstWalk, secondWalk)
-      .build(defaultBicycleSafetyForPermission, defaultWalkSafetyForPermission);
+      .bicycleSafety(forwardBicycle, backBicycle)
+      .walkSafety(forwardWalk, backWalk)
+      .build();
   }
 }

@@ -25,18 +25,11 @@ public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorTy
     INVALID_STOP_SEQUENCE,
     NOT_IMPLEMENTED_UNSCHEDULED,
     NOT_IMPLEMENTED_DUPLICATED,
-  }
-
-  public static Optional<UpdateError> optional(FeedScopedId tripId, UpdateErrorType errorType) {
-    return Optional.of(new UpdateError(tripId, errorType));
+    NOT_MONITORED,
   }
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {
     return Result.failure(new UpdateError(tripId, errorType));
-  }
-
-  public static Optional<UpdateError> noError() {
-    return Optional.empty();
   }
 
   public static UpdateError noTripId(UpdateErrorType errorType) {

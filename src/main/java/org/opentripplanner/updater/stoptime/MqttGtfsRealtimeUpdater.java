@@ -5,6 +5,7 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -17,6 +18,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.stoptime.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
   private final String configRef;
   private final MemoryPersistence persistence = new MemoryPersistence();
   private final TimetableSnapshotSource snapshotSource;
+  private final Consumer<UpdateResult> recordMetrics;
   private WriteToGraphCallback saveResultOnGraph;
 
   private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher = null;
@@ -73,6 +76,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
       this.fuzzyTripMatcher =
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
+    this.recordMetrics = TripUpdateMetrics.streaming(parameters);
   }
 
   @Override
@@ -172,7 +176,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
             backwardsDelayPropagationType,
             fullDataset,
             updates,
-            feedId
+            feedId,
+            recordMetrics
           )
         );
       }
