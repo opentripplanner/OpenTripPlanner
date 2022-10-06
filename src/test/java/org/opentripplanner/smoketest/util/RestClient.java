@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class RestClient {
 
-  static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
+  static final Logger LOG = LoggerFactory.getLogger(RestClient.class);
 
   static HttpClient client = HttpClient.newHttpClient();
 

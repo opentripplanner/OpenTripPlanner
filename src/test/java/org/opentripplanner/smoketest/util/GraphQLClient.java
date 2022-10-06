@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class GraphQLClient {
 
-  static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
+  static final Logger LOG = LoggerFactory.getLogger(GraphQLClient.class);
 
   static final HttpClient httpClient = HttpClient.newHttpClient();
 
