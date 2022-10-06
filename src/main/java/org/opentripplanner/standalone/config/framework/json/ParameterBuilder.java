@@ -467,7 +467,7 @@ public class ParameterBuilder {
   }
 
   private <T extends Enum<T>> T parseEnum(String value, Class<T> ofType) {
-    var upperCaseValue = value.toUpperCase();
+    var upperCaseValue = value.toUpperCase().replace('-', '_');
     return Stream
       .of(ofType.getEnumConstants())
       .filter(it -> it.name().toUpperCase().equals(upperCaseValue))

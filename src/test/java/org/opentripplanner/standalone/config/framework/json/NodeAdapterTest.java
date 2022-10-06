@@ -139,12 +139,16 @@ public class NodeAdapterTest {
   @Test
   public void asEnum() {
     // Given
-    NodeAdapter subject = newNodeAdapterForTest("{ key : 'A' }");
+    NodeAdapter subject = newNodeAdapterForTest("{ a : 'A', abc : 'a-b-c' }");
 
-    // Then
-    assertEquals(AnEnum.A, subject.of("key").asEnum(AnEnum.B), "Get existing property");
+    // Then with defaults
+    assertEquals(AnEnum.A, subject.of("a").asEnum(AnEnum.B), "Get existing property");
+    assertEquals(AnEnum.A_B_C, subject.of("abc").asEnum(AnEnum.A_B_C), "Get existing property");
     assertEquals(AnEnum.B, subject.of("missing-key").asEnum(AnEnum.B), "Get default value");
-    assertEquals(AnEnum.A, subject.of("key").asEnum(AnEnum.class), "Get existing property");
+    // Then requiered
+    assertEquals(AnEnum.A, subject.of("a").asEnum(AnEnum.class), "Get existing property");
+    assertEquals(AnEnum.A_B_C, subject.of("abc").asEnum(AnEnum.A_B_C), "Get existing property");
+    assertThrows(OtpAppException.class, () -> subject.of("missing-key").asEnum(AnEnum.class));
   }
 
   @Test
@@ -466,6 +470,7 @@ public class NodeAdapterTest {
     A,
     B,
     C,
+    A_B_C
   }
 
   private record ARecord(String a) {}

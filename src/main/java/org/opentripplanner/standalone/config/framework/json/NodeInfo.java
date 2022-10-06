@@ -54,7 +54,6 @@ public record NodeInfo(
     }
   }
 
-
   /**
    * This method will return {@code true} if there is more information than just the basic
    * required info. It is used to be able to list a node in a "details" section of a document in
