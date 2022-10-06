@@ -79,6 +79,6 @@ public class ParameterDetailsList {
   }
 
   String defaultValue(NodeInfo info) {
-    return writer.code(info.type().wrap(info.defaultValue()));
+    return writer.code(info.type().quote(info.defaultValue()));
   }
 }

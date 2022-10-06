@@ -454,7 +454,7 @@ public class ParameterBuilder {
 
   private <T> T parseConfigType(ConfigType elementType, JsonNode child) {
     try {
-      return ConfigType.getParameter(elementType, child);
+      return elementType.valueOf(child);
     } catch (Exception e) {
       throw error(
         "The parameter value '%s' is not of type %s.".formatted(

@@ -122,7 +122,7 @@ public record NodeInfo(
       builder.addText(" Required");
     } else {
       if (defaultValue != null) {
-        builder.addText(" = ").addText(type.wrap(defaultValue));
+        builder.addText(" = ").addText(type.quote(defaultValue));
       } else {
         builder.addText(" Optional");
       }
@@ -134,7 +134,7 @@ public record NodeInfo(
 
   @SuppressWarnings("ConstantConditions")
   private String exampleValueJson(ConfigType type) {
-    return type.wrap(
+    return type.quote(
       switch (type) {
         case BOOLEAN -> exampleOrFallback("true").toString().toLowerCase();
         case DOUBLE -> exampleOrFallback(3.15);

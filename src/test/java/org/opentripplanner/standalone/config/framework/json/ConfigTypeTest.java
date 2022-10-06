@@ -40,13 +40,13 @@ class ConfigTypeTest {
 
   @Test
   void wrap() {
-    assertEquals("A", BOOLEAN.wrap("A"));
-    assertEquals("\"A\"", DURATION.wrap("A"));
-    assertEquals("1", INTEGER.wrap("1"));
-    assertEquals("2.2", DOUBLE.wrap("2.2"));
-    assertEquals("\"Alf\"", ENUM.wrap("Alf"));
-    assertEquals("\"A\"", STRING.wrap("A"));
-    assertEquals("2", LONG.wrap("2"));
+    assertEquals("A", BOOLEAN.quote("A"));
+    assertEquals("\"A\"", DURATION.quote("A"));
+    assertEquals("1", INTEGER.quote("1"));
+    assertEquals("2.2", DOUBLE.quote("2.2"));
+    assertEquals("\"Alf\"", ENUM.quote("Alf"));
+    assertEquals("\"A\"", STRING.quote("A"));
+    assertEquals("2", LONG.quote("2"));
   }
 
   @Test
@@ -74,15 +74,12 @@ class ConfigTypeTest {
 
   @Test
   void getParameter() {
-    assertTrue(ConfigType.<Boolean>getParameter(BOOLEAN, BooleanNode.getTrue()));
-    assertEquals(2.2, ConfigType.getParameter(DOUBLE, DoubleNode.valueOf(2.2)));
-    assertEquals(Duration.ofSeconds(3), ConfigType.getParameter(DURATION, TextNode.valueOf("3s")));
-    assertEquals(12, ConfigType.<Integer>getParameter(INTEGER, IntNode.valueOf(12)));
-    assertEquals(123L, ConfigType.<Long>getParameter(LONG, LongNode.valueOf(123L)));
-    assertEquals("Test", ConfigType.getParameter(STRING, TextNode.valueOf("Test")));
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> ConfigType.getParameter(OBJECT, TextNode.valueOf("Test"))
-    );
+    assertTrue(BOOLEAN.<Boolean>valueOf(BooleanNode.getTrue()));
+    assertEquals(2.2, DOUBLE.valueOf(DoubleNode.valueOf(2.2)));
+    assertEquals(Duration.ofSeconds(3), DURATION.valueOf(TextNode.valueOf("3s")));
+    assertEquals(12, INTEGER.<Integer>valueOf(IntNode.valueOf(12)));
+    assertEquals(123L, LONG.<Long>valueOf(LongNode.valueOf(123L)));
+    assertEquals("Test", STRING.valueOf(TextNode.valueOf("Test")));
+    assertThrows(IllegalArgumentException.class, () -> OBJECT.valueOf(TextNode.valueOf("Test")));
   }
 }

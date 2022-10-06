@@ -73,7 +73,7 @@ abstract class AbstractTable {
     if (info.defaultValue() != null) {
       buf
         .append(" ")
-        .append(writer.code(info.type().wrap(writer.escapeInTable(info.defaultValue()))));
+        .append(writer.code(info.type().quote(writer.escapeInTable(info.defaultValue()))));
     }
     return buf.toString();
   }

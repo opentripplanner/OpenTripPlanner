@@ -103,14 +103,25 @@ public enum ConfigType {
     return name().toLowerCase();
   }
 
-  public String wrap(@Nonnull Object value) {
+  /**
+   * Quote the given {@code value} is the JSON type is a {@code string}.
+   */
+  public String quote(@Nonnull Object value) {
     return type == JsonType.string ? "\"" + value + "\"" : value.toString();
   }
 
+  /**
+   * Return {@code true} if the JSON type is {@code object} or {@code array}. This apply to
+   *
+   */
   public boolean isComplex() {
     return type == JsonType.object || type == JsonType.array;
   }
 
+  /**
+   * Return {@code true} for all map and array types: {@code ARRAY}, {@code MAP}, and
+   * {@code ENUM_MAP}.
+   */
   public boolean isMapOrArray() {
     return EnumSet.of(ARRAY, MAP, ENUM_MAP).contains(this);
   }
@@ -123,6 +134,10 @@ public enum ConfigType {
     array,
   }
 
+  /**
+   * Return the {@link ConfigType} matching the Java type. This method only support the
+   * basic and string types like String and Integer. Do not use this for {@link #isComplex()} types.
+   */
   static ConfigType of(Class<?> javaType) {
     if (Boolean.class.isAssignableFrom(javaType)) {
       return BOOLEAN;
@@ -145,16 +160,20 @@ public enum ConfigType {
     throw new IllegalArgumentException("Type not supported: " + javaType);
   }
 
+  /**
+   * Get basic and string type value of given {@code node}. The "type-safe" {@link JsonNode}
+   * methods are used. This method should not be used with {@link #isComplex()} types.
+   */
   @SuppressWarnings("unchecked")
-  static <T> T getParameter(ConfigType elementType, JsonNode node) {
-    return switch (elementType) {
+  <T> T valueOf(JsonNode node) {
+    return switch (this) {
       case BOOLEAN -> (T) (Boolean) node.asBoolean();
       case DOUBLE -> (T) (Double) node.asDouble();
       case INTEGER -> (T) (Integer) node.asInt();
       case LONG -> (T) (Long) node.asLong();
-      case STRING -> (T) (String) node.asText();
+      case STRING -> (T) node.asText();
       case DURATION -> (T) DurationUtils.duration(node.asText());
-      default -> throw new IllegalArgumentException("Unsupported element type: " + elementType);
+      default -> throw new IllegalArgumentException("Unsupported element type: " + this);
     };
   }
 }
