@@ -29,7 +29,7 @@
         <jackson.version>2.13.3</jackson.version>
         <jersey.version>2.34</jersey.version>
         <junit.version>5.8.2</junit.version>
-        <micrometer.version>1.8.3</micrometer.version>
+        <micrometer.version>1.8.10</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <lucene.version>9.1.0</lucene.version>

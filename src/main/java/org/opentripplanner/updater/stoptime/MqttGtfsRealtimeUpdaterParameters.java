@@ -1,6 +1,6 @@
 package org.opentripplanner.updater.stoptime;
 
-public class MqttGtfsRealtimeUpdaterParameters {
+public class MqttGtfsRealtimeUpdaterParameters implements UrlUpdaterParameters {
 
   private final String configRef;
   private final String feedId;
@@ -28,7 +28,7 @@ public class MqttGtfsRealtimeUpdaterParameters {
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
   }
 
-  String getUrl() {
+  public String getUrl() {
     return url;
   }
 
@@ -36,7 +36,7 @@ public class MqttGtfsRealtimeUpdaterParameters {
     return topic;
   }
 
-  String getFeedId() {
+  public String getFeedId() {
     return feedId;
   }
 
@@ -53,7 +53,7 @@ public class MqttGtfsRealtimeUpdaterParameters {
   }
 
   /** The config name/type for the updater. Used to reference the configuration element. */
-  String getConfigRef() {
+  public String getConfigRef() {
     return configRef;
   }
 }

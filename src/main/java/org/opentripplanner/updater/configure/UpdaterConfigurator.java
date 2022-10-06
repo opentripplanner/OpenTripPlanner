@@ -19,7 +19,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingTripUpdater;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
@@ -141,7 +141,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
       updaters.add(
-        new PollingStoptimeUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
+        new PollingTripUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
       );
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {

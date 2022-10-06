@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
@@ -31,6 +32,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.stoptime.UpdateResult;
+import org.opentripplanner.updater.stoptime.metrics.TripUpdateMetrics;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +104,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private transient long startTime;
   private boolean primed;
 
+  private final Consumer<UpdateResult> recordMetrics;
+
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
     TransitModel transitModel,
@@ -151,6 +156,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+    recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
   @Override
@@ -376,15 +382,17 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
           );
         }
 
-        var f = saveResultOnGraph.execute((graph, transitModel) ->
-          snapshotSource.applyEstimatedTimetable(
+        var f = saveResultOnGraph.execute((graph, transitModel) -> {
+          var results = snapshotSource.applyEstimatedTimetable(
             transitModel,
             fuzzyTripMatcher,
             feedId,
             false,
             estimatedTimetableDeliveries
-          )
-        );
+          );
+
+          recordMetrics.accept(results);
+        });
 
         if (!isPrimed()) {
           try {

@@ -46,7 +46,7 @@ public class ActuatorAPI {
                 }
               }
             }""",
-          uriInfo.getRequestUri().toString()
+          uriInfo.getRequestUri().toString().replace("$/", "")
         )
       )
       .type("application/json")

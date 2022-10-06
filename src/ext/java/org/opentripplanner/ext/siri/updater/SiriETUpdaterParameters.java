@@ -1,8 +1,10 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
 
-public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
+public class SiriETUpdaterParameters
+  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
 
   private final String configRef;
   private final String feedId;
@@ -68,6 +70,11 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
   @Override
   public int getFrequencySec() {
     return frequencySec;
+  }
+
+  @Override
+  public String getUrl() {
+    return sourceParameters().getUrl();
   }
 
   @Override
