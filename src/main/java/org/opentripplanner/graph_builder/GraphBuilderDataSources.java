@@ -117,7 +117,8 @@ public class GraphBuilderDataSources {
   }
 
   private OsmExtractParameters getOsmExtractConfig(DataSource dataSource) {
-    return buildConfig.osm.extracts
+    return buildConfig.osm
+      .extracts()
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
