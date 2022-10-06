@@ -40,7 +40,7 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
+import org.opentripplanner.standalone.config.feed.NetexFeedParametersBuilder;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -264,7 +264,7 @@ public class ConstantsForTests {
             List.of(
               new ConfiguredDataSource<>(
                 NETEX_MINIMAL_DATA_SOURCE,
-                new NetexFeedConfigBuilder().withSource(NETEX_MINIMAL_DATA_SOURCE.uri()).build()
+                new NetexFeedParametersBuilder().withSource(NETEX_MINIMAL_DATA_SOURCE.uri()).build()
               )
             ),
             transitModel,
