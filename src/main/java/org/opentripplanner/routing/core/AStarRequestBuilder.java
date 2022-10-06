@@ -10,8 +10,6 @@ import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
 public class AStarRequestBuilder {
 
-  private final AStarRequest original;
-
   Instant startTime;
   StreetMode mode;
   RoutingPreferences preferences;
@@ -23,10 +21,9 @@ public class AStarRequestBuilder {
   GenericLocation to;
 
   AStarRequestBuilder(AStarRequest original) {
-    this.original = original;
     this.startTime = original.startTime();
     this.mode = original.mode();
-    this.preferences = null;
+    this.preferences = original.preferences();
     this.arriveBy = original.arriveBy();
     this.wheelchair = original.wheelchair();
     this.parking = original.parking().clone();
@@ -45,17 +42,13 @@ public class AStarRequestBuilder {
     return this;
   }
 
-  public RoutingPreferences preferences() {
-    return preferences == null ? original.preferences() : preferences;
-  }
-
   public AStarRequestBuilder withPreferences(RoutingPreferences preferences) {
     this.preferences = preferences;
     return this;
   }
 
   public AStarRequestBuilder withPreferences(Consumer<RoutingPreferences.Builder> body) {
-    return withPreferences(preferences().copyOf().apply(body).build());
+    return withPreferences(preferences.copyOf().apply(body).build());
   }
 
   public AStarRequestBuilder withArriveBy(boolean arriveBy) {

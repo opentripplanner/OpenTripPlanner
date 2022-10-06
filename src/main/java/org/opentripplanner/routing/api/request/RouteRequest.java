@@ -235,12 +235,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return toString(" ");
   }
 
-  public RouteRequest copyOfReversed() {
-    RouteRequest ret = this.clone();
-    ret.setArriveBy(!ret.arriveBy);
-    return ret;
-  }
-
   /** The start location */
   public GenericLocation from() {
     return from;

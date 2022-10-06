@@ -70,7 +70,7 @@ public class AStarRequest {
 
   AStarRequest(AStarRequestBuilder builder) {
     this.startTime = builder.startTime;
-    this.preferences = builder.preferences();
+    this.preferences = builder.preferences;
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;
     this.wheelchair = builder.wheelchair;

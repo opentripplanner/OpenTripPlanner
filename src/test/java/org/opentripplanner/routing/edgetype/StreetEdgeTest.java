@@ -87,9 +87,9 @@ public class StreetEdgeTest {
     StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
     e1.setCarSpeed(10.0f);
 
-    AStarRequestBuilder options = AStarRequest.copyOf(proto);
+    AStarRequest options = AStarRequest.copyOf(proto).withMode(StreetMode.WALK).build();
 
-    State s0 = new State(v1, options.withMode(StreetMode.WALK).build());
+    State s0 = new State(v1, options);
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
