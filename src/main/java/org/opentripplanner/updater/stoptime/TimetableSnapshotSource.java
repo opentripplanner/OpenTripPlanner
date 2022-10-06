@@ -296,7 +296,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           };
 
         results.add(result);
-        if (result.isSuccess()) {
+        if (result.isFailure()) {
           debug(tripId, "Failed to apply TripUpdate.");
           LOG.trace(" Contents: {}", tripUpdate);
           if (failuresByRelationship.containsKey(tripScheduleRelationship)) {
