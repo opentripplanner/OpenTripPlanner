@@ -18,7 +18,7 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
-import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractsConfig;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
@@ -448,7 +448,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Specify parameters for DEM extracts. If not specified OTP will fall back to auto-detection
    * based on the directory provided on the command line.
    */
-  public final DemExtractsConfig dem;
+  public final DemExtractParametersList dem;
 
   /**
    * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
