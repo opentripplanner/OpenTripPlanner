@@ -3,13 +3,12 @@ package org.opentripplanner.smoketest;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.smoketest.util.RestClient;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
@@ -34,7 +33,7 @@ public class AtlantaSmokeTest {
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
-    SmokeTest.basicTest(
+    SmokeTest.basicRouteTest(
       nearGeorgiaStateStation,
       powderSpringsInsideFlexZone1,
       Set.of("TRANSIT", "WALK"),
@@ -49,7 +48,7 @@ public class AtlantaSmokeTest {
       powderSpringsInsideFlexZone1,
       Set.of("FLEX_EGRESS", "WALK", "TRANSIT")
     );
-    var otpResponse = SmokeTest.sendPlanRequest(params);
+    var otpResponse = RestClient.sendPlanRequest(params);
     var itineraries = otpResponse.getPlan().itineraries;
 
     assertTrue(itineraries.size() > 0);

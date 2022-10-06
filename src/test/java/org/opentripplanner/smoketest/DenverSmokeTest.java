@@ -1,12 +1,14 @@
 package org.opentripplanner.smoketest;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.smoketest.util.GraphQLClient;
+import org.opentripplanner.smoketest.util.SmokeTestRequest;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
@@ -23,11 +25,16 @@ public class DenverSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
-    SmokeTest.basicTest(
+    SmokeTest.basicRouteTest(
       southBroadway,
       twinLakes,
       Set.of("TRANSIT", "WALK"),
       List.of("WALK", "TRAM", "WALK", "BUS", "WALK")
     );
+  }
+
+  @Test
+  public void vehiclePositions() {
+    SmokeTest.assertThereArePatternsWithVehiclePositions();
   }
 }

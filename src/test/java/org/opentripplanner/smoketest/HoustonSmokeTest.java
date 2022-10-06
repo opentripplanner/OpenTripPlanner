@@ -1,8 +1,5 @@
 package org.opentripplanner.smoketest;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
-
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
@@ -23,7 +20,7 @@ public class HoustonSmokeTest {
 
   @Test
   public void routeFromSouthToNorth() {
-    SmokeTest.basicTest(
+    SmokeTest.basicRouteTest(
       galvestonRoad,
       northLindale,
       Set.of("TRANSIT", "WALK"),
