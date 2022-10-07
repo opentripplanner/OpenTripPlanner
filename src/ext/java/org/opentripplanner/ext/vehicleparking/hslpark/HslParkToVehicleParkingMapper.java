@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.I18NString;
@@ -64,7 +65,10 @@ public class HslParkToVehicleParkingMapper {
     return jsonNode.get(fieldName).asInt();
   }
 
-  public VehicleParking parsePark(JsonNode jsonNode) {
+  public VehicleParking parsePark(
+    JsonNode jsonNode,
+    Map<VehicleParkingGroup, List<FeedScopedId>> parksForHub
+  ) {
     var vehicleParkId = createIdForNode(jsonNode, "id", feedId);
     try {
       var capacity = parseVehicleSpaces(
@@ -104,6 +108,13 @@ public class HslParkToVehicleParkingMapper {
         .orElse(false);
       var openingHoursByDayType = jsonNode.path("openingHours").path("byDayType");
       var openingHoursCalendar = parseOpeningHours(openingHoursByDayType);
+      VehicleParkingGroup vehicleParkingGroup = null;
+      for (var hub : parksForHub.entrySet()) {
+        if (hub.getValue().contains(vehicleParkId)) {
+          vehicleParkingGroup = hub.getKey();
+          break;
+        }
+      }
 
       return VehicleParking
         .builder()
@@ -127,6 +138,7 @@ public class HslParkToVehicleParkingMapper {
             .walkAccessible(true)
             .carAccessible(carPlaces || wheelChairAccessiblePlaces)
         )
+        .vehicleParkingGroup(vehicleParkingGroup)
         .build();
     } catch (Exception e) {
       log.warn("Error parsing park {}", vehicleParkId, e);

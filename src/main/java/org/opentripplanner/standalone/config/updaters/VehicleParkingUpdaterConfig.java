@@ -37,7 +37,8 @@ public class VehicleParkingUpdaterConfig {
           sourceType,
           c.asInt("utilizationsFrequencySec", 600),
           c.asText("utilizationsUrl", null),
-          timeZone
+          timeZone,
+          c.asText("hubsUrl", null)
         );
       case KML:
         return new KmlUpdaterParameters(

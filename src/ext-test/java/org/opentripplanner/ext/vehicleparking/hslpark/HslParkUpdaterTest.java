@@ -19,6 +19,7 @@ public class HslParkUpdaterTest {
   @Test
   void parseParks() {
     var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
+    var hubsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/hubs.json";
     var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
     var timeZone = ZoneId.of("Europe/Helsinki");
 
@@ -30,7 +31,8 @@ public class HslParkUpdaterTest {
       null,
       30,
       utilizationsUrl,
-      timeZone
+      timeZone,
+      hubsUrl
     );
     var openingHoursCalendarService = new OpeningHoursCalendarService(
       new Deduplicator(),
@@ -130,6 +132,7 @@ public class HslParkUpdaterTest {
   @Test
   void parseParksWithoutTimeZone() {
     var facilitiesUrl = "file:src/ext-test/resources/vehicleparking/hslpark/facilities.json";
+    var hubsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/hubs.json";
     var utilizationsUrl = "file:src/ext-test/resources/vehicleparking/hslpark/utilizations.json";
     ZoneId timeZone = null;
 
@@ -141,7 +144,8 @@ public class HslParkUpdaterTest {
       null,
       30,
       utilizationsUrl,
-      timeZone
+      timeZone,
+      hubsUrl
     );
     var openingHoursCalendarService = new OpeningHoursCalendarService(
       new Deduplicator(),
