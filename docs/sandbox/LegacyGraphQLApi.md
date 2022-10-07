@@ -51,7 +51,7 @@ curl --request POST \
 
 ## Built-in API client
 
-A browser based GraphQL API client is available at `http://localhost:8080/otp/routers/default/index/graphql/graphiql` 
+A browser based GraphQL API client is available at `http://localhost:8080/legacygraphql/graphiql` 
 
 ### OTP2 Official GraphQL API (Not available)
 

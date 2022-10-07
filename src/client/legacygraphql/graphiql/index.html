@@ -99,26 +99,27 @@ query {
   }
 
   function updateURL() {
-    var newSearch =
-            '?' +
-            Object.keys(parameters)
-                    .filter(function(key) {
-                      return Boolean(parameters[key]);
-                    })
-                    .map(function(key) {
-                      return (
-                              encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key])
-                      );
-                    })
-                    .join('&');
-    history.replaceState(null, null, newSearch);
+    if(parameters["query"] !== defaultQuery) {
+
+      var newSearch =
+              '?' +
+              Object.keys(parameters)
+                      .filter(function(key) {
+                        return Boolean(parameters[key]);
+                      })
+                      .map(function(key) {
+                        return (
+                                encodeURIComponent(key) + '=' + encodeURIComponent(parameters[key])
+                        );
+                      })
+                      .join('&');
+      history.replaceState(null, null, newSearch);
+    }
   }
 
-  function graphQLFetcher(graphQLParams) {
+  function graphQLFetcher(graphQLParams) {``
     return fetch(
-            // this file is server on /otp/routers/default/index/graphql/graphiql so the single dot
-            // tells graphiql to look for the graphql endpoint at /otp/routers/default/index/graphql
-            '.',
+            '../otp/routers/default/index/graphql',
             {
               method: 'post',
               headers: {

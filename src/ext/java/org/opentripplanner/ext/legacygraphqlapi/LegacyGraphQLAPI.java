@@ -184,16 +184,4 @@ public class LegacyGraphQLAPI {
       throw new RuntimeException(e);
     }
   }
-
-  @GET
-  @Path("/graphiql")
-  @Produces(MediaType.TEXT_HTML)
-  public Response graphiql() {
-    var is = getClass().getResourceAsStream("/legacygraphqlapi/graphiql.html");
-    try {
-      return Response.ok(new String(is.readAllBytes(), StandardCharsets.UTF_8)).build();
-    } catch (IOException e) {
-      return Response.serverError().build();
-    }
-  }
 }
