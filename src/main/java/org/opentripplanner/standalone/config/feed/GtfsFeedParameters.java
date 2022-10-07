@@ -6,7 +6,7 @@ package org.opentripplanner.standalone.config.feed;
  */
 public class GtfsFeedParameters extends TransitFeedParameters {
 
-  GtfsFeedParameters(GtfsFeedConfigBuilder gtfsFeedConfigBuilder) {
-    super(gtfsFeedConfigBuilder.getSource(), gtfsFeedConfigBuilder.getFeedId());
+  GtfsFeedParameters(GtfsFeedParametersBuilder builder) {
+    super(builder.getSource(), builder.getFeedId());
   }
 }

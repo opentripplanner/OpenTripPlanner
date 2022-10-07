@@ -8,26 +8,26 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 /**
  * Configure a GTFS feed.
  */
-public class GtfsFeedConfigBuilder {
+public class GtfsFeedParametersBuilder {
 
   private URI source;
   private String feedId;
 
-  public static GtfsFeedConfigBuilder of(NodeAdapter config) {
-    GtfsFeedConfigBuilder gtfsFeedConfigBuilder = new GtfsFeedConfigBuilder();
-    gtfsFeedConfigBuilder.source =
+  public static GtfsFeedParametersBuilder of(NodeAdapter config) {
+    GtfsFeedParametersBuilder builder = new GtfsFeedParametersBuilder();
+    builder.source =
       config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
-    gtfsFeedConfigBuilder.feedId =
+    builder.feedId =
       config
         .of("feedId")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(null);
 
-    return gtfsFeedConfigBuilder;
+    return builder;
   }
 
-  public GtfsFeedConfigBuilder withSource(URI source) {
+  public GtfsFeedParametersBuilder withSource(URI source) {
     this.source = source;
     return this;
   }
