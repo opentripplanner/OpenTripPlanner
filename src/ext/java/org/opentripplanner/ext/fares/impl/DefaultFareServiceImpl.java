@@ -222,7 +222,7 @@ public class DefaultFareServiceImpl implements FareService {
    * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs()
    */
   protected boolean shouldCombineInterlinedLegs() {
-    return false;
+    return true;
   }
 
   /**
@@ -235,23 +235,11 @@ public class DefaultFareServiceImpl implements FareService {
   private static List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
     var result = new ArrayList<Leg>();
     for (var leg : fareLegs) {
-      if (leg.isInterlinedWithPreviousLeg() && leg instanceof ScheduledTransitLeg stl) {
+      if (leg.isInterlinedWithPreviousLeg() && leg instanceof ScheduledTransitLeg currentLeg) {
         var previousLeg = (ScheduledTransitLeg) result.get(result.size() - 1);
-        var combinedLeg = new ScheduledTransitLeg(
-          previousLeg.getTripTimes(),
-          previousLeg.getTripPattern(),
-          0,
-          0,
-          previousLeg.getStartTime(),
-          stl.getEndTime(),
-          stl.getServiceDate(),
-          stl.getZoneId(),
-          null,
-          null,
-          0,
-          null
-        );
-        result.add(result.size() - 1, combinedLeg);
+        var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
+        // overwrite the previous leg with the combined one
+        result.set(result.size() - 1, combinedLeg);
       } else {
         result.add(leg);
       }
