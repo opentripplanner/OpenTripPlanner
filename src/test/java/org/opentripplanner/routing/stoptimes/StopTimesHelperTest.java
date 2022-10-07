@@ -93,7 +93,7 @@ class StopTimesHelperTest {
     );
 
     assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
-    assertFalse(hasCancelledTrips(result));
+    assertTrue(hasCancelledTrips(result));
   }
 
   @Test
@@ -109,7 +109,7 @@ class StopTimesHelperTest {
     );
 
     assertEquals(4, result.stream().mapToLong(s -> s.times.size()).sum());
-    assertTrue(hasCancelledTrips(result));
+    assertFalse(hasCancelledTrips(result));
   }
 
   /**
@@ -286,7 +286,7 @@ class StopTimesHelperTest {
   }
 
   boolean hasCancelledTrips(List<StopTimesInPattern> stopTimes) {
-    return stopTimes
+    return !stopTimes
       .stream()
       .filter(s ->
         s.times.stream().anyMatch(tripTimeOnDate -> tripTimeOnDate.isCanceledEffectively())
