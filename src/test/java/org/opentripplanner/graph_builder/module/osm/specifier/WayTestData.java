@@ -32,4 +32,20 @@ public class WayTestData {
     tunnel.addTag("tunnel", "yes");
     return tunnel;
   }
+
+  public static OSMWithTags streetOnBikeRoute() {
+    // https://www.openstreetmap.org/way/26443041 is part of both an lcn relation
+
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("lit", "yes");
+    way.addTag("maxspeed", "30");
+    way.addTag("name", "Schulstraße");
+    way.addTag("oneway", "no");
+    way.addTag("surface", "sett");
+    way.addTag("rcn", "yes");
+    way.addTag("lcn", "yes");
+
+    return way;
+  }
 }

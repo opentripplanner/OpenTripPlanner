@@ -19,8 +19,9 @@ public class HoustonWayPropertySetSource implements WayPropertySetSource {
   public void populateProperties(WayPropertySet props) {
     // Disallow any use of underground indoor pedestrian tunnels
     props.setProperties(
-      // we use an exact match since the default specifier would match more than we want since the
-      // many key/value pairs can lead to high scores
+      // we use an exact match since the default specifier would match more than we want as the
+      // many key/value pairs can lead to high scores for ways that should _not_ be matched, like
+      // regular car tunnels
       new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
       withModes(NONE)
     );

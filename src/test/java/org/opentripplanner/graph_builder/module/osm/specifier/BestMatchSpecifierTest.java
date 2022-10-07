@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-class BestMatchSpecifierTest {
+class BestMatchSpecifierTest extends SpecifierTest {
 
   OsmSpecifier highwayPrimary = new BestMatchSpecifier("highway=primary");
   OsmSpecifier pedestrianUndergroundTunnel = new BestMatchSpecifier(
@@ -15,21 +15,15 @@ class BestMatchSpecifierTest {
   @Test
   public void carTunnel() {
     var tunnel = WayTestData.carTunnel();
-    var result = highwayPrimary.matchScores(tunnel);
-    assertEquals(110, result.left());
-
-    result = pedestrianUndergroundTunnel.matchScores(tunnel);
-    assertEquals(200, result.left());
+    assertScore(110, highwayPrimary, tunnel);
+    assertScore(200, pedestrianUndergroundTunnel, tunnel);
   }
 
   @Test
-  public void pedestrianTunnelSpecificity() {
-    OSMWithTags tunnel = WayTestData.pedestrianTunnel();
+  public void pedestrianTunnel() {
+    var tunnel = WayTestData.pedestrianTunnel();
 
-    var result = highwayPrimary.matchScores(tunnel);
-    assertEquals(0, result.left());
-
-    result = pedestrianUndergroundTunnel.matchScores(tunnel);
-    assertEquals(410, result.left());
+    assertScore(0, highwayPrimary, tunnel);
+    assertScore(410, pedestrianUndergroundTunnel, tunnel);
   }
 }

@@ -1,35 +1,40 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-class ExactMatchSpecifierTest {
+class ExactMatchSpecifierTest extends SpecifierTest {
 
-  OsmSpecifier highwayPrimary = new ExactMatchSpecifier("highway=primary");
-  OsmSpecifier pedestrianUndergroundTunnel = new ExactMatchSpecifier(
+  OsmSpecifier highwayPrimarySpec = new ExactMatchSpecifier("highway=primary");
+
+  OsmSpecifier pedestrianUndergroundTunnelSpec = new ExactMatchSpecifier(
+    "highway=footway;layer=-1;tunnel=yes"
+  );
+  OsmSpecifier pedestrianUndergroundIndoorTunnelSpec = new ExactMatchSpecifier(
     "highway=footway;layer=-1;tunnel=yes;indoor=yes"
   );
 
   @Test
   public void carTunnel() {
     var tunnel = WayTestData.carTunnel();
-    var result = highwayPrimary.matchScores(tunnel);
-    assertEquals(Integer.MAX_VALUE, result.left());
-
-    result = pedestrianUndergroundTunnel.matchScores(tunnel);
-    assertEquals(Integer.MIN_VALUE, result.left());
+    assertScore(200, highwayPrimarySpec, tunnel);
+    assertScore(0, pedestrianUndergroundIndoorTunnelSpec, tunnel);
   }
 
   @Test
   public void pedestrianTunnelSpecificity() {
     OSMWithTags tunnel = WayTestData.pedestrianTunnel();
+    assertScore(0, highwayPrimarySpec, tunnel);
+    assertScore(600, pedestrianUndergroundTunnelSpec, tunnel);
+    assertScore(800, pedestrianUndergroundIndoorTunnelSpec, tunnel);
+  }
 
-    var result = highwayPrimary.matchScores(tunnel);
-    assertEquals(Integer.MIN_VALUE, result.left());
-
-    result = pedestrianUndergroundTunnel.matchScores(tunnel);
-    assertEquals(Integer.MAX_VALUE, result.left());
+  @Test
+  public void throwOnWildcard() {
+    Assertions.assertThrows(
+      IllegalArgumentException.class,
+      () -> new ExactMatchSpecifier("highway=*")
+    );
   }
 }

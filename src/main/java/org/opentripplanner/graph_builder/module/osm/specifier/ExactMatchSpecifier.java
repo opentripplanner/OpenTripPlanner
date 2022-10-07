@@ -18,6 +18,11 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  */
 public class ExactMatchSpecifier implements OsmSpecifier {
 
+  /**
+   * If there is an exact match then the number of pairs are multiplied with this number.
+   * <p>
+   * Must be higher than {@link BestMatchSpecifier#EXACT_MATCH_SCORE}.
+   */
   public static final int MATCH_MULTIPLIER = 200;
   public static final int NO_MATCH_SCORE = 0;
   private final List<Tag> pairs;
@@ -26,7 +31,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   public ExactMatchSpecifier(String spec) {
     pairs = OsmSpecifier.getTagsFromString(spec, ";");
     if (pairs.stream().anyMatch(Tag::isWildcard)) {
-      throw new RuntimeException(
+      throw new IllegalArgumentException(
         "Wildcards are not allowed in %s".formatted(this.getClass().getSimpleName())
       );
     }
@@ -52,9 +57,6 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   private static boolean matchValue(String wayValue, String specValue) {
-    return (
-      (Objects.nonNull(wayValue) && wayValue.equals(specValue)) ||
-      OsmSpecifier.matchesWildcard(wayValue, specValue)
-    );
+    return ((Objects.nonNull(wayValue) && wayValue.equals(specValue)));
   }
 }

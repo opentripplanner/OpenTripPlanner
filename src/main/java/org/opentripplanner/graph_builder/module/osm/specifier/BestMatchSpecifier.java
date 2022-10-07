@@ -15,6 +15,12 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  */
 public class BestMatchSpecifier implements OsmSpecifier {
 
+  /**
+   * If a tag matches completely (both key and value match) this is the score returned for it.
+   *
+   * @see ExactMatchSpecifier#MATCH_MULTIPLIER
+   */
+  public static final int EXACT_MATCH_SCORE = 100;
   private final List<Tag> pairs;
 
   public BestMatchSpecifier(String spec) {
@@ -60,7 +66,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
     if (OsmSpecifier.matchesWildcard(value, matchValue)) {
       return 1; // wildcard matches are basically tiebreakers
     } else if (value.equals(matchValue)) {
-      return 100;
+      return EXACT_MATCH_SCORE;
     } else {
       if (value.contains(":")) {
         // treat cases like cobblestone:flattened as cobblestone if a more-specific match
