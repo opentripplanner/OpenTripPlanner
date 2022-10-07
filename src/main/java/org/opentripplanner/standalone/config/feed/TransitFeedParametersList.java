@@ -33,7 +33,7 @@ public class TransitFeedParametersList {
               .asString()
           )
         )
-        .map(feedConfig -> GtfsFeedConfigBuilder.of(feedConfig).build())
+        .map(feedConfig -> GtfsFeedParametersBuilder.of(feedConfig).build())
         .toList();
 
     netexFeedConfigs =

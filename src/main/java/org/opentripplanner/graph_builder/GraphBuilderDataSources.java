@@ -24,8 +24,8 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
-import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
 import org.opentripplanner.standalone.config.feed.GtfsFeedParameters;
+import org.opentripplanner.standalone.config.feed.GtfsFeedParametersBuilder;
 import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.standalone.config.feed.NetexFeedParametersBuilder;
 import org.opentripplanner.util.OtpAppException;
@@ -154,7 +154,7 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new GtfsFeedConfigBuilder().withSource(dataSource.uri()).build());
+      .orElse(new GtfsFeedParametersBuilder().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<NetexFeedParameters>> getNetexConfiguredDatasource() {
