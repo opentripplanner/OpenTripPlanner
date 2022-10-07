@@ -212,10 +212,26 @@ public class DefaultFareServiceImpl implements FareService {
     return getBestFareAndId(fareType, rides, fareRules).fare;
   }
 
+  /**
+   * Returns true if two interlined legs (those with a stay-seated transfer between them) should be
+   * treated as a single leg.
+   * <p>
+   * This often leads to strange fare results so by default it's disabled.
+   *
+   * @see DefaultFareServiceImpl#combineInterlinedLegs(List)
+   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs()
+   */
   protected boolean shouldCombineInterlinedLegs() {
-    return true;
+    return false;
   }
 
+  /**
+   * This operation is quite poorly defined:
+   * - Should the combined leg have the properties of the first or the second leg?
+   * - What are the indices of the start/end stops?
+   * <p>
+   * For this reason it's best to only activate this feature when you really need it.
+   */
   private static List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
     var result = new ArrayList<Leg>();
     for (var leg : fareLegs) {

@@ -83,10 +83,6 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
     return cost > 0 && cost < Float.POSITIVE_INFINITY;
   }
 
-  /**
-   * Returns true if configured to analyze interlined transfers and the previous edge was an
-   * interline transfer.
-   */
   @Override
   protected boolean shouldCombineInterlinedLegs() {
     return !analyzeInterlinedTransfers;
