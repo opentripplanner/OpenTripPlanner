@@ -18,37 +18,36 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  */
 public class ExactMatchSpecifier implements OsmSpecifier {
 
+  public static final int MATCH_MULTIPLIER = 200;
+  public static final int NO_MATCH_SCORE = 0;
   private final List<Tag> pairs;
+  private final int bestMatchScore;
 
   public ExactMatchSpecifier(String spec) {
-    this.pairs = OsmSpecifier.getTagsFromString(spec, ";");
-    if (this.pairs.stream().anyMatch(Tag::isWildcard)) {
+    pairs = OsmSpecifier.getTagsFromString(spec, ";");
+    if (pairs.stream().anyMatch(Tag::isWildcard)) {
       throw new RuntimeException(
         "Wildcards are not allowed in %s".formatted(this.getClass().getSimpleName())
       );
     }
+    bestMatchScore = pairs.size() * MATCH_MULTIPLIER;
   }
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-    var allTagsMatch = matchesExactly(way);
-    if (allTagsMatch) {
-      return new Scores(Integer.MAX_VALUE, Integer.MAX_VALUE);
-    } else {
-      return new Scores(Integer.MIN_VALUE, Integer.MIN_VALUE);
-    }
+    return Scores.of(matchScore(way));
   }
 
   @Override
   public int matchScore(OSMWithTags way) {
-    if (matchesExactly(way)) {
-      return Integer.MAX_VALUE;
+    if (allTagsMatch(way)) {
+      return bestMatchScore;
     } else {
-      return Integer.MIN_VALUE;
+      return NO_MATCH_SCORE;
     }
   }
 
-  public boolean matchesExactly(OSMWithTags way) {
+  public boolean allTagsMatch(OSMWithTags way) {
     return pairs.stream().allMatch(p -> matchValue(way.getTag(p.key()), p.value()));
   }
 

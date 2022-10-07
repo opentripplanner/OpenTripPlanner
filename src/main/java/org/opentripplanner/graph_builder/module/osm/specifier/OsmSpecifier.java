@@ -4,6 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
+/**
+ * An interface for assigning match scores for OSM entities (mostly ways). The higher the score the
+ * better the match.
+ * <p>
+ * How the scoring logic is implemented is the responsibility of the implementations.
+ */
 public interface OsmSpecifier {
   static boolean matchesWildcard(String value, String matchValue) {
     return matchValue != null && value != null && value.equals("*");
@@ -43,5 +49,9 @@ public interface OsmSpecifier {
     }
   }
 
-  record Scores(int left, int right) {}
+  record Scores(int left, int right) {
+    public static Scores of(int s) {
+      return new Scores(s, s);
+    }
+  }
 }

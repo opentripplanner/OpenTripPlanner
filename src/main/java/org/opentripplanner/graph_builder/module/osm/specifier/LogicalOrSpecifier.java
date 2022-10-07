@@ -27,14 +27,14 @@ public class LogicalOrSpecifier implements OsmSpecifier {
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-    var oneMatchesExactly = subSpecs.stream().anyMatch(subspec -> subspec.matchesExactly(way));
-    if (oneMatchesExactly) {
-      return new Scores(1, 1);
-    } else return new Scores(0, 0);
+    return Scores.of(matchScore(way));
   }
 
   @Override
   public int matchScore(OSMWithTags way) {
-    return 0;
+    var oneMatchesExactly = subSpecs.stream().anyMatch(subspec -> subspec.allTagsMatch(way));
+    if (oneMatchesExactly) {
+      return 1;
+    } else return 0;
   }
 }
