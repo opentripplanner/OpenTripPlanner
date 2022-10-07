@@ -3,12 +3,11 @@ package org.opentripplanner.standalone.config.feed;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class NetexDefaultsConfig {
+public class NetexDefaultParameters {
 
   private static final String EMPTY_STRING_PATTERN = "$^";
 
@@ -102,7 +101,7 @@ public class NetexDefaultsConfig {
    */
   public final Set<String> ferryIdsNotAllowedForBicycle;
 
-  public NetexDefaultsConfig(NodeAdapter config) {
+  public NetexDefaultParameters(NodeAdapter config) {
     ignoreFilePattern =
       config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(IGNORE_FILE_PATTERN);
     sharedFilePattern =

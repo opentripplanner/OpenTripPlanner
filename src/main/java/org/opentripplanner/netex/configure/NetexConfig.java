@@ -14,7 +14,7 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultParameters;
 import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.standalone.config.feed.NetexFeedParametersBuilder;
 import org.opentripplanner.transit.service.TransitModel;
@@ -92,19 +92,17 @@ public class NetexConfig {
     ConfiguredDataSource<NetexFeedParameters> netexConfiguredDataSource
   ) {
     NetexFeedParameters netexFeedConfig = netexConfiguredDataSource.config();
-    NetexDefaultsConfig netexDefaultsConfig = buildParams.netexDefaults;
+    NetexDefaultParameters defaults = buildParams.netexDefaults;
     Pattern ignoreFilePattern = netexFeedConfig
       .ignoreFilePattern()
-      .orElse(netexDefaultsConfig.ignoreFilePattern);
+      .orElse(defaults.ignoreFilePattern);
     Pattern sharedFilePattern = netexFeedConfig
       .sharedFilePattern()
-      .orElse(netexDefaultsConfig.sharedFilePattern);
+      .orElse(defaults.sharedFilePattern);
     Pattern sharedGroupFilePattern = netexFeedConfig
       .sharedGroupFilePattern()
-      .orElse(netexDefaultsConfig.sharedGroupFilePattern);
-    Pattern groupFilePattern = netexFeedConfig
-      .groupFilePattern()
-      .orElse(netexDefaultsConfig.groupFilePattern);
+      .orElse(defaults.sharedGroupFilePattern);
+    Pattern groupFilePattern = netexFeedConfig.groupFilePattern().orElse(defaults.groupFilePattern);
 
     return new NetexDataSourceHierarchy(
       (CompositeDataSource) netexConfiguredDataSource.dataSource()

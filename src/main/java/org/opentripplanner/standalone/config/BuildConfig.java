@@ -26,7 +26,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemConfig;
-import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultParameters;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedParametersList;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -306,7 +306,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * Netex specific build parameters.
    */
-  public final NetexDefaultsConfig netexDefaults;
+  public final NetexDefaultParameters netexDefaults;
 
   /**
    * OpenStreetMap specific build parameters.
@@ -639,7 +639,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
     netexDefaults =
-      new NetexDefaultsConfig(
+      new NetexDefaultParameters(
         root
           .of("netexDefaults")
           .withDoc(NA, /*TODO DOC*/"TODO")
