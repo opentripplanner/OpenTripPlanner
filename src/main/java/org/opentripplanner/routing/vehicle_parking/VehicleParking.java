@@ -97,6 +97,10 @@ public class VehicleParking implements Serializable {
    * The currently available spaces at this vehicle parking.
    */
   private VehicleParkingSpaces availability;
+  /**
+   * The vehicle parking group this parking belongs to.
+   */
+  private final VehicleParkingGroup vehicleParkingGroup;
 
   VehicleParking(
     FeedScopedId id,
@@ -113,7 +117,8 @@ public class VehicleParking implements Serializable {
     boolean carPlaces,
     boolean wheelchairAccessibleCarPlaces,
     VehicleParkingSpaces capacity,
-    VehicleParkingSpaces availability
+    VehicleParkingSpaces availability,
+    VehicleParkingGroup vehicleParkingGroup
   ) {
     this.id = id;
     this.name = name;
@@ -130,6 +135,7 @@ public class VehicleParking implements Serializable {
     this.wheelchairAccessibleCarPlaces = wheelchairAccessibleCarPlaces;
     this.capacity = capacity;
     this.availability = availability;
+    this.vehicleParkingGroup = vehicleParkingGroup;
   }
 
   public static VehicleParkingBuilder builder() {
@@ -187,6 +193,11 @@ public class VehicleParking implements Serializable {
 
   public List<VehicleParkingEntrance> getEntrances() {
     return entrances;
+  }
+
+  @Nullable
+  public VehicleParkingGroup getVehicleParkingGroup() {
+    return vehicleParkingGroup;
   }
 
   public boolean hasBicyclePlaces() {
@@ -282,7 +293,8 @@ public class VehicleParking implements Serializable {
       carPlaces,
       wheelchairAccessibleCarPlaces,
       capacity,
-      entrances
+      entrances,
+      vehicleParkingGroup
     );
   }
 
@@ -310,7 +322,8 @@ public class VehicleParking implements Serializable {
       Objects.equals(openingHoursCalendar, that.openingHoursCalendar) &&
       Objects.equals(note, that.note) &&
       Objects.equals(capacity, that.capacity) &&
-      Objects.equals(entrances, that.entrances)
+      Objects.equals(entrances, that.entrances) &&
+      Objects.equals(vehicleParkingGroup, that.vehicleParkingGroup)
     );
   }
 
@@ -353,6 +366,7 @@ public class VehicleParking implements Serializable {
     private boolean wheelchairAccessibleCarPlaces;
     private VehicleParkingSpaces capacity;
     private VehicleParkingSpaces availability;
+    private VehicleParkingGroup vehicleParkingGroup;
 
     VehicleParkingBuilder() {}
 
@@ -444,6 +458,11 @@ public class VehicleParking implements Serializable {
       return this;
     }
 
+    public VehicleParkingBuilder vehicleParkingGroup(VehicleParkingGroup vehicleParkingGroup) {
+      this.vehicleParkingGroup = vehicleParkingGroup;
+      return this;
+    }
+
     public VehicleParking build() {
       VehicleParkingState state$value = this.state$value;
       if (!this.state$set) {
@@ -465,7 +484,8 @@ public class VehicleParking implements Serializable {
         carPlaces,
         wheelchairAccessibleCarPlaces,
         capacity,
-        availability
+        availability,
+        vehicleParkingGroup
       );
       this.entranceCreators.forEach(vehicleParking::addEntrance);
       return vehicleParking;
