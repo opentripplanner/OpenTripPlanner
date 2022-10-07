@@ -7,14 +7,14 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.newNod
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.feed.NetexDefaultParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-class NetexDefaultsConfigTest {
+class NetexDefaultParametersTest {
 
   @Test
   void testDefaultPatternMatchers() {
-    NetexDefaultsConfig subject = new NetexDefaultsConfig(
+    NetexDefaultParameters subject = new NetexDefaultParameters(
       new NodeAdapter(MissingNode.getInstance(), "NetexParametersTest")
     );
 
@@ -38,7 +38,7 @@ class NetexDefaultsConfigTest {
       "}"
     );
 
-    NetexDefaultsConfig subject = new NetexDefaultsConfig(nodeAdapter);
+    NetexDefaultParameters subject = new NetexDefaultParameters(nodeAdapter);
 
     assertTrue(subject.ignoreFilePattern.matcher(".ignore").matches());
     assertTrue(subject.ignoreFilePattern.matcher("__ignore").matches());

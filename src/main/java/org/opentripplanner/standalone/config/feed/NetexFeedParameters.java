@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultsConfig}
+ * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultParameters}
  * Example: {@code [ {type="netex", source: "file:///path/to/otp/norway-netex.zip"} ] }
  */
 public class NetexFeedParameters extends TransitFeedParameters {
@@ -15,17 +15,17 @@ public class NetexFeedParameters extends TransitFeedParameters {
   private final Pattern sharedFilePattern;
 
   /**
-   * Overrides {@link NetexDefaultsConfig#sharedGroupFilePattern}
+   * Overrides {@link NetexDefaultParameters#sharedGroupFilePattern}
    */
   private final Pattern sharedGroupFilePattern;
 
   /**
-   * Overrides {@link NetexDefaultsConfig#ignoreFilePattern}
+   * Overrides {@link NetexDefaultParameters#ignoreFilePattern}
    */
   private final Pattern ignoreFilePattern;
 
   /**
-   * Overrides {@link NetexDefaultsConfig#groupFilePattern}
+   * Overrides {@link NetexDefaultParameters#groupFilePattern}
    */
   private final Pattern groupFilePattern;
 
@@ -40,7 +40,7 @@ public class NetexFeedParameters extends TransitFeedParameters {
   /**
    *
    * @return an optional custom shared file pattern
-   * that overrides {@link NetexDefaultsConfig#sharedFilePattern}
+   * that overrides {@link NetexDefaultParameters#sharedFilePattern}
    */
   public Optional<Pattern> sharedFilePattern() {
     return Optional.ofNullable(sharedFilePattern);
@@ -49,7 +49,7 @@ public class NetexFeedParameters extends TransitFeedParameters {
   /**
    *
    * @return an optional custom shared group file pattern
-   * that overrides {@link NetexDefaultsConfig#sharedGroupFilePattern}
+   * that overrides {@link NetexDefaultParameters#sharedGroupFilePattern}
    */
   public Optional<Pattern> sharedGroupFilePattern() {
     return Optional.ofNullable(sharedGroupFilePattern);
@@ -58,7 +58,7 @@ public class NetexFeedParameters extends TransitFeedParameters {
   /**
    *
    * @return an optional custom ignored file pattern
-   * that overrides {@link NetexDefaultsConfig#ignoreFilePattern}
+   * that overrides {@link NetexDefaultParameters#ignoreFilePattern}
    */
   public Optional<Pattern> ignoreFilePattern() {
     return Optional.ofNullable(ignoreFilePattern);
@@ -67,7 +67,7 @@ public class NetexFeedParameters extends TransitFeedParameters {
   /**
    *
    * @return an optional custom group file pattern
-   * that overrides {@link NetexDefaultsConfig#groupFilePattern}
+   * that overrides {@link NetexDefaultParameters#groupFilePattern}
    */
   public Optional<Pattern> groupFilePattern() {
     return Optional.ofNullable(groupFilePattern);
