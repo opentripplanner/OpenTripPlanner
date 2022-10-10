@@ -29,7 +29,7 @@ import org.opentripplanner.standalone.config.feed.DemConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultParameters;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedConfig;
-import org.opentripplanner.standalone.config.feed.TransitFeedParametersList;
+import org.opentripplanner.standalone.config.feed.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.util.lang.ObjectUtils;
@@ -461,7 +461,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
    * based on the directory provided on the command line..
    */
-  public final TransitFeedParametersList transitFeeds;
+  public final TransitFeeds transitFeeds;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
