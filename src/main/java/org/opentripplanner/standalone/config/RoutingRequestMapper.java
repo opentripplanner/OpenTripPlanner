@@ -88,7 +88,7 @@ public class RoutingRequestMapper {
           .of("modes")
           .withDoc(NA, /*TODO DOC*/"TODO")
           .withExample(/*TODO DOC*/"TODO")
-          .asCustomStingType(
+          .asCustomStringType(
             RequestModes.defaultRequestModes(),
             s -> new QualifiedModeSet(s).getRequestModes()
           )

@@ -255,7 +255,7 @@ public class ParameterBuilder {
    * the type section in the configuration documents. Also, providing user-friendly messages
    * is left to the caller.
    */
-  public <T> T asCustomStingType(T defaultValue, Function<String, T> mapper) {
+  public <T> T asCustomStringType(T defaultValue, Function<String, T> mapper) {
     return ofOptional(STRING, defaultValue, node -> mapper.apply(node.asText()));
   }
 
@@ -484,7 +484,7 @@ public class ParameterBuilder {
       .findFirst()
       .orElseThrow(() -> {
         throw error(
-          "The parameter value '%s' is not in legal. Expected one of %s.".formatted(
+          "The parameter value '%s' is not legal. Expected one of %s.".formatted(
               value,
               List.of(ofType.getEnumConstants())
             )
