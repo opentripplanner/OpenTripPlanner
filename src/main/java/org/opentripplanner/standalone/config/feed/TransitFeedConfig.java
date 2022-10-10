@@ -4,12 +4,13 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import java.util.List;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TransitFeedConfig {
 
   public static TransitFeedParametersList mapTransitFeeds(NodeAdapter root, String parameterName) {
-    List<TransitFeedParameters> list = root
+    List<DataSourceConfig> list = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
@@ -22,7 +23,7 @@ public class TransitFeedConfig {
     );
   }
 
-  private static TransitFeedParameters mapTransitFeed(NodeAdapter feedNode) {
+  private static DataSourceConfig mapTransitFeed(NodeAdapter feedNode) {
     var type = feedNode
       .of("type")
       .withDoc(V2_2, "The feed input format.")
@@ -33,7 +34,7 @@ public class TransitFeedConfig {
     };
   }
 
-  private static TransitFeedParameters mapGtfsFeed(NodeAdapter node) {
+  private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
     return new GtfsFeedParametersBuilder()
       .withFeedId(
         node
@@ -48,7 +49,7 @@ public class TransitFeedConfig {
       .build();
   }
 
-  private static TransitFeedParameters mapNetexFeed(NodeAdapter feedNode) {
+  private static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode) {
     return new NetexFeedParametersBuilder()
       .withFeedId(
         feedNode
