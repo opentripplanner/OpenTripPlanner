@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -20,11 +19,11 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.datastore.file.TemporaryFileDataSource;
 
-public class ZipStreamDataSourceDecoratorTest {
+class ZipStreamDataSourceDecoratorTest {
 
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
   private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS;
-  public static final List<String> EXPECTED_ZIP_ENTRIES = List.of(
+  static final List<String> EXPECTED_ZIP_ENTRIES = List.of(
     "trips.txt",
     "agency.txt",
     "calendar.txt",
@@ -37,7 +36,7 @@ public class ZipStreamDataSourceDecoratorTest {
     "stops.txt"
   );
 
-  public static final Map<String, Long> EXPECTED_FILE_SIZES = Map.of(
+  static final Map<String, Long> EXPECTED_FILE_SIZES = Map.of(
     "trips.txt",
     19406L,
     "agency.txt",
@@ -61,7 +60,7 @@ public class ZipStreamDataSourceDecoratorTest {
   );
 
   @Test
-  public void testAccessorsForNoneExistingFile() throws IOException {
+  void testAccessorsForNoneExistingFile() throws IOException {
     // Given:
     File target = new File(FILENAME);
     File copyTarget = new File(FILENAME);
@@ -93,7 +92,7 @@ public class ZipStreamDataSourceDecoratorTest {
   }
 
   @Test
-  public void testIO() throws IOException {
+  void testIO() throws IOException {
     // Given:
     File target = new File(FILENAME);
     CompositeDataSource subject = new ZipStreamDataSourceDecorator(
@@ -101,7 +100,7 @@ public class ZipStreamDataSourceDecoratorTest {
     );
 
     Collection<DataSource> content = subject.content();
-    Collection<String> names = content.stream().map(it -> it.name()).collect(Collectors.toList());
+    Collection<String> names = content.stream().map(DataSource::name).toList();
 
     System.out.println(names);
     assertTrue(names.containsAll(EXPECTED_ZIP_ENTRIES), names.toString());
@@ -132,14 +131,13 @@ public class ZipStreamDataSourceDecoratorTest {
         .allMatch(dataSource -> EXPECTED_FILE_SIZES.get(dataSource.name()) == dataSource.size())
     );
     assertTrue(content.stream().allMatch(TemporaryFileDataSource.class::isInstance));
-    assertTrue(content.stream().allMatch(dataSource -> dataSource.size() > 0));
     assertTrue(content.stream().allMatch(DataSource::exists));
     subject.close();
     assertTrue(content.stream().noneMatch(DataSource::exists));
   }
 
   @Test
-  public void testEntryProperties() {
+  void testEntryProperties() {
     // Given:
     File target = new File(FILENAME);
     CompositeDataSource subject = new ZipStreamDataSourceDecorator(
