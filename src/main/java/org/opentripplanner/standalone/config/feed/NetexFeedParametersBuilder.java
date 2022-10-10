@@ -1,10 +1,7 @@
 package org.opentripplanner.standalone.config.feed;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-
 import java.net.URI;
 import java.util.regex.Pattern;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Configure a NeTEx feed. Overrides default values specified in {@link NetexDefaultParameters}
@@ -23,9 +20,8 @@ public class NetexFeedParametersBuilder {
 
   private Pattern groupFilePattern;
 
-  public NetexFeedParametersBuilder withSource(URI source) {
-    this.source = source;
-    return this;
+  public String feedId() {
+    return feedId;
   }
 
   public NetexFeedParametersBuilder withFeedId(String feedId) {
@@ -33,9 +29,26 @@ public class NetexFeedParametersBuilder {
     return this;
   }
 
+  public URI source() {
+    return source;
+  }
+
+  public NetexFeedParametersBuilder withSource(URI source) {
+    this.source = source;
+    return this;
+  }
+
+  public Pattern sharedFilePattern() {
+    return sharedFilePattern;
+  }
+
   public NetexFeedParametersBuilder withSharedFilePattern(Pattern sharedFilePattern) {
     this.sharedFilePattern = sharedFilePattern;
     return this;
+  }
+
+  public Pattern sharedGroupFilePattern() {
+    return sharedGroupFilePattern;
   }
 
   public NetexFeedParametersBuilder withSharedGroupFilePattern(Pattern sharedGroupFilePattern) {
@@ -43,9 +56,17 @@ public class NetexFeedParametersBuilder {
     return this;
   }
 
+  public Pattern groupFilePattern() {
+    return groupFilePattern;
+  }
+
   public NetexFeedParametersBuilder withGroupFilePattern(Pattern groupFilePattern) {
     this.groupFilePattern = groupFilePattern;
     return this;
+  }
+
+  public Pattern ignoreFilePattern() {
+    return ignoreFilePattern;
   }
 
   public NetexFeedParametersBuilder withIgnoreFilePattern(Pattern ignoreFilePattern) {
@@ -53,52 +74,7 @@ public class NetexFeedParametersBuilder {
     return this;
   }
 
-  public static NetexFeedParametersBuilder of(NodeAdapter config) {
-    NetexFeedParametersBuilder builder = new NetexFeedParametersBuilder();
-    builder.source =
-      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri();
-    builder.feedId =
-      config
-        .of("feedId")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
-    builder.sharedFilePattern =
-      config.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    builder.sharedGroupFilePattern =
-      config.of("sharedGroupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    builder.ignoreFilePattern =
-      config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    builder.groupFilePattern =
-      config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null);
-    return builder;
-  }
-
   public NetexFeedParameters build() {
     return new NetexFeedParameters(this);
-  }
-
-  public URI getSource() {
-    return source;
-  }
-
-  public String getFeedId() {
-    return feedId;
-  }
-
-  public Pattern getSharedFilePattern() {
-    return sharedFilePattern;
-  }
-
-  public Pattern getSharedGroupFilePattern() {
-    return sharedGroupFilePattern;
-  }
-
-  public Pattern getIgnoreFilePattern() {
-    return ignoreFilePattern;
-  }
-
-  public Pattern getGroupFilePattern() {
-    return groupFilePattern;
   }
 }
