@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vehicleparking.hslpark;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -81,6 +82,13 @@ public class HslParkUpdaterTest {
       first.getOpeningHours().toString()
     );
 
+    var firstVehicleParkingGroup = first.getVehicleParkingGroup();
+    assertEquals("hslpark:321", firstVehicleParkingGroup.id().toString());
+    assertEquals("HubYksi", firstVehicleParkingGroup.name().toString(new Locale("fi")));
+    assertEquals("HubEn", firstVehicleParkingGroup.name().toString(new Locale("sv")));
+    assertEquals(24.804913, firstVehicleParkingGroup.x());
+    assertEquals(60.176064, firstVehicleParkingGroup.y());
+
     var second = parkingLots.get(1);
     var name = second.getName();
     assertEquals("Kalasatama (Kauppakeskus REDI)", second.getName().toString());
@@ -102,6 +110,7 @@ public class HslParkUpdaterTest {
       "}",
       second.getOpeningHours().toString()
     );
+    assertEquals(firstVehicleParkingGroup, second.getVehicleParkingGroup());
 
     var third = parkingLots.get(2);
     assertEquals("Alberganpromenadi", third.getName().toString());
@@ -114,6 +123,7 @@ public class HslParkUpdaterTest {
     assertTrue(third.hasRealTimeData());
     assertEquals(43, third.getAvailability().getBicycleSpaces());
     assertNull(third.getAvailability().getCarSpaces());
+    assertNotEquals(firstVehicleParkingGroup, third.getVehicleParkingGroup());
 
     var fourth = parkingLots.get(3);
     assertEquals(VehicleParkingState.TEMPORARILY_CLOSED, fourth.getState());
@@ -127,6 +137,7 @@ public class HslParkUpdaterTest {
       "}",
       fourth.getOpeningHours().toString()
     );
+    assertNull(fourth.getVehicleParkingGroup());
   }
 
   @Test
