@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import java.net.URI;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
 public class TransitFeedParametersList {
 
@@ -21,10 +22,10 @@ public class TransitFeedParametersList {
   }
 
   public List<URI> gtfsFiles() {
-    return gtfsFeeds.stream().map(TransitFeedParameters::source).toList();
+    return gtfsFeeds.stream().map(DataSourceConfig::source).toList();
   }
 
   public List<URI> netexFiles() {
-    return netexFeeds.stream().map(TransitFeedParameters::source).toList();
+    return netexFeeds.stream().map(DataSourceConfig::source).toList();
   }
 }
