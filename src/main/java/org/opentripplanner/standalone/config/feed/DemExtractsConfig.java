@@ -2,19 +2,17 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.List;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class DemExtractsConfig {
 
-  public final List<DemExtractConfig> demExtractConfigs;
+  private final List<DemExtractConfig> demExtractConfigs;
 
-  public DemExtractsConfig(NodeAdapter config) {
-    demExtractConfigs =
-      config
-        .asList()
-        .stream()
-        .map(demConfig -> DemExtractConfigBuilder.of(demConfig).build())
-        .toList();
+  public DemExtractsConfig(List<DemExtractConfig> demExtractConfigs) {
+    this.demExtractConfigs = List.copyOf(demExtractConfigs);
+  }
+
+  public List<DemExtractConfig> demExtracts() {
+    return demExtractConfigs;
   }
 
   public List<URI> demFiles() {

@@ -134,7 +134,8 @@ public class GraphBuilderDataSources {
   }
 
   private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
-    return buildConfig.dem.demExtractConfigs
+    return buildConfig.dem
+      .demExtracts()
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
