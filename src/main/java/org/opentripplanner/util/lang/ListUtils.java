@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class CollectionUtils {
+public class ListUtils {
 
   /**
-   * Combine a number of list into a single one.
+   * Combine a number of collections into a single list.
    */
   @SafeVarargs
   public static <T> List<T> combine(Collection<T>... lists) {

@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.lang.CollectionUtils;
+import org.opentripplanner.util.lang.ListUtils;
 
 /**
  * This is a fake leg that combines two interlined legs for the purpose of fare calculation.
@@ -72,7 +72,7 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
 
   @Override
   public List<StopArrival> getIntermediateStops() {
-    return CollectionUtils.combine(first.getIntermediateStops(), second.getIntermediateStops());
+    return ListUtils.combine(first.getIntermediateStops(), second.getIntermediateStops());
   }
 
   @Override
