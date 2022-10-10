@@ -2,6 +2,8 @@ package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode.ALWAYS;
+import static org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
@@ -10,42 +12,60 @@ import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CE
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.network.Route;
 
 class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
 
-  Money tenDollars = Money.usDollars(1000);
+  static final Route route = TransitModelForTest.route("route-1").build();
+  static final Itinerary interlinedWithDifferentRoute = newItinerary(
+    Place.forStop(AIRPORT_STOP),
+    T11_00
+  )
+    .bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+    .staySeatedBus(route, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
+    .build();
 
-  @Test
-  void combineInterlinedLegs() {
-    var service = new CombinedInterlinedLegsFareService(CombinationMode.ALWAYS);
+  static final Itinerary interlinedWithSameRoute = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
+    .bus(route, 1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+    .staySeatedBus(route, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
+    .build();
+  static Money tenDollars = Money.usDollars(1000);
+  static Money twentyDollars = Money.usDollars(2000);
+
+  static Stream<Arguments> testCases = Stream.of(
+    Arguments.of(ALWAYS, interlinedWithSameRoute, tenDollars, "same routes"),
+    Arguments.of(ALWAYS, interlinedWithDifferentRoute, tenDollars, "different routes"),
+    Arguments.of(SAME_ROUTE, interlinedWithSameRoute, tenDollars, "same routes"),
+    Arguments.of(SAME_ROUTE, interlinedWithDifferentRoute, twentyDollars, "different routes")
+  );
+
+  @ParameterizedTest(
+    name = "Itinerary with {3} and combination mode {0} should lead to a fare of {2}"
+  )
+  @VariableSource("testCases")
+  void modeAlways(CombinationMode mode, Itinerary itinerary, Money expectedPrice, String hint) {
+    var service = new CombinedInterlinedLegsFareService(mode);
     service.addFareRules(
       FareType.regular,
       List.of(AIRPORT_TO_CITY_CENTER_SET, INSIDE_CITY_CENTER_SET)
     );
 
-    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
-      .bus(1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
-      .staySeatedBus(
-        TransitModelForTest.route("123").build(),
-        2,
-        T11_12,
-        T11_16,
-        Place.forStop(CITY_CENTER_B_STOP)
-      )
-      .build();
-
-    var fare = service.getCost(itin);
+    var fare = service.getCost(itinerary);
     assertNotNull(fare);
 
     var price = fare.getFare(FareType.regular);
 
-    assertEquals(tenDollars, price);
+    assertEquals(expectedPrice, price);
   }
 }
