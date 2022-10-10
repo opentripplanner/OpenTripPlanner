@@ -337,7 +337,7 @@ public class DefaultFareService implements FareService {
         leg.isInterlinedWithPreviousLeg() &&
         leg instanceof ScheduledTransitLeg currentLeg &&
         result.get(result.size() - 1) instanceof ScheduledTransitLeg previousLeg &&
-        shouldCombineInterlinedLegs(currentLeg, previousLeg)
+        shouldCombineInterlinedLegs(previousLeg, currentLeg)
       ) {
         var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
         // overwrite the previous leg with the combined one
