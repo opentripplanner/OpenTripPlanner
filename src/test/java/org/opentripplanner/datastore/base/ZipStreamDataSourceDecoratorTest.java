@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,29 @@ public class ZipStreamDataSourceDecoratorTest {
     "shapes.txt",
     "stop_times.txt",
     "stops.txt"
+  );
+
+  public static final Map<String, Long> EXPECTED_FILE_SIZES = Map.of(
+    "trips.txt",
+    19406L,
+    "agency.txt",
+    113L,
+    "calendar.txt",
+    351L,
+    "calendar_dates.txt",
+    170L,
+    "fare_attributes.txt",
+    199L,
+    "fare_rules.txt",
+    487L,
+    "routes.txt",
+    228L,
+    "shapes.txt",
+    145880L,
+    "stop_times.txt",
+    269891L,
+    "stops.txt",
+    3141L
   );
 
   @Test
@@ -102,6 +126,11 @@ public class ZipStreamDataSourceDecoratorTest {
     Collection<DataSource> content = subject.content();
     Collection<String> names = content.stream().map(DataSource::name).toList();
     assertTrue(names.containsAll(EXPECTED_ZIP_ENTRIES));
+    assertTrue(
+      content
+        .stream()
+        .allMatch(dataSource -> EXPECTED_FILE_SIZES.get(dataSource.name()) == dataSource.size())
+    );
     assertTrue(content.stream().allMatch(TemporaryFileDataSource.class::isInstance));
     assertTrue(content.stream().allMatch(dataSource -> dataSource.size() > 0));
     assertTrue(content.stream().allMatch(DataSource::exists));
