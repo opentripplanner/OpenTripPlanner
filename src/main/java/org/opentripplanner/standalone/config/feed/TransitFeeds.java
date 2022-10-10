@@ -5,18 +5,11 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
-public class TransitFeeds {
-
-  @Nonnull
-  public final List<NetexFeedParameters> netexFeeds;
-
-  @Nonnull
-  public final List<GtfsFeedParameters> gtfsFeeds;
-
-  public TransitFeeds(
-    List<GtfsFeedParameters> gtfsFeeds,
-    List<NetexFeedParameters> netexFeeds
-  ) {
+public record TransitFeeds(
+  @Nonnull List<GtfsFeedParameters> gtfsFeeds,
+  @Nonnull List<NetexFeedParameters> netexFeeds
+) {
+  public TransitFeeds(List<GtfsFeedParameters> gtfsFeeds, List<NetexFeedParameters> netexFeeds) {
     this.netexFeeds = netexFeeds;
     this.gtfsFeeds = gtfsFeeds;
   }
