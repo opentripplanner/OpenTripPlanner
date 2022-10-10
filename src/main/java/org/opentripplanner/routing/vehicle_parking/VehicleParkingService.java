@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.vehicle_parking;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -16,7 +16,7 @@ public class VehicleParkingService implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final Set<VehicleParking> vehicleParkings = new HashSet<>();
-  private final Map<VehicleParkingGroup, Set<VehicleParking>> vehicleParkingGroups = new HashMap<>();
+  private final Map<VehicleParkingGroup, Set<VehicleParking>> vehicleParkingGroups = new ConcurrentHashMap<>();
 
   /**
    * Adds {@link VehicleParking} to this service and attaches it to an index for
