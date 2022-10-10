@@ -336,7 +336,10 @@ public class NodeAdapterTest {
     // Then
     assertEquals(LocalDate.of(2020, 2, 28), subject.of("a").asDateOrRelativePeriod(null, utc));
 
-    assertEquals(LocalDate.now().minusYears(3), subject.of("b").asDateOrRelativePeriod(null, utc));
+    assertEquals(
+      LocalDate.now(utc).minusYears(3),
+      subject.of("b").asDateOrRelativePeriod(null, utc)
+    );
     assertEquals(
       LocalDate.of(2020, 3, 1),
       subject.of("do-no-exist").asDateOrRelativePeriod("2020-03-01", utc)
