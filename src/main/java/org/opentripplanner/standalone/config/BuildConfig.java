@@ -28,6 +28,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultParameters;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
+import org.opentripplanner.standalone.config.feed.TransitFeedConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedParametersList;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
@@ -625,15 +626,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");
     dem = DemConfig.mapDemConfig(root, "dem");
-    transitFeeds =
-      new TransitFeedParametersList(
-        root
-          .of("transitFeeds")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds");
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));

@@ -30,11 +30,11 @@ public class NetexFeedParameters extends TransitFeedParameters {
   private final Pattern groupFilePattern;
 
   NetexFeedParameters(NetexFeedParametersBuilder builder) {
-    super(builder.getSource(), builder.getFeedId());
-    this.sharedFilePattern = builder.getSharedFilePattern();
-    this.sharedGroupFilePattern = builder.getSharedGroupFilePattern();
-    this.ignoreFilePattern = builder.getIgnoreFilePattern();
-    this.groupFilePattern = builder.getGroupFilePattern();
+    super(builder.source(), builder.feedId());
+    this.sharedFilePattern = builder.sharedFilePattern();
+    this.sharedGroupFilePattern = builder.sharedGroupFilePattern();
+    this.ignoreFilePattern = builder.ignoreFilePattern();
+    this.groupFilePattern = builder.groupFilePattern();
   }
 
   /**

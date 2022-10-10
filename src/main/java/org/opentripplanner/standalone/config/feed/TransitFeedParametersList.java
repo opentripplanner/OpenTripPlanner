@@ -1,62 +1,30 @@
 package org.opentripplanner.standalone.config.feed;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-
 import java.net.URI;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TransitFeedParametersList {
 
-  private static final String FEED_TYPE_GTFS = "GTFS";
-  private static final String FEED_TYPE_NETEX = "NETEX";
+  @Nonnull
+  public final List<NetexFeedParameters> netexFeeds;
 
   @Nonnull
-  public final List<NetexFeedParameters> netexFeedConfigs;
+  public final List<GtfsFeedParameters> gtfsFeeds;
 
-  @Nonnull
-  public final List<GtfsFeedParameters> gtfsFeedConfigs;
-
-  public TransitFeedParametersList(NodeAdapter config) {
-    List<NodeAdapter> feedConfigs = config.asList();
-
-    gtfsFeedConfigs =
-      feedConfigs
-        .stream()
-        .filter(feedConfig ->
-          FEED_TYPE_GTFS.equalsIgnoreCase(
-            feedConfig
-              .of("type")
-              .withDoc(NA, /*TODO DOC*/"TODO")
-              .withExample(/*TODO DOC*/"TODO")
-              .asString()
-          )
-        )
-        .map(feedConfig -> GtfsFeedParametersBuilder.of(feedConfig).build())
-        .toList();
-
-    netexFeedConfigs =
-      feedConfigs
-        .stream()
-        .filter(feedConfig ->
-          FEED_TYPE_NETEX.equalsIgnoreCase(
-            feedConfig
-              .of("type")
-              .withDoc(NA, /*TODO DOC*/"TODO")
-              .withExample(/*TODO DOC*/"TODO")
-              .asString()
-          )
-        )
-        .map(feedConfig -> NetexFeedParametersBuilder.of(feedConfig).build())
-        .toList();
+  public TransitFeedParametersList(
+    List<GtfsFeedParameters> gtfsFeeds,
+    List<NetexFeedParameters> netexFeeds
+  ) {
+    this.netexFeeds = netexFeeds;
+    this.gtfsFeeds = gtfsFeeds;
   }
 
   public List<URI> gtfsFiles() {
-    return gtfsFeedConfigs.stream().map(TransitFeedParameters::source).toList();
+    return gtfsFeeds.stream().map(TransitFeedParameters::source).toList();
   }
 
   public List<URI> netexFiles() {
-    return netexFeedConfigs.stream().map(TransitFeedParameters::source).toList();
+    return netexFeeds.stream().map(TransitFeedParameters::source).toList();
   }
 }
