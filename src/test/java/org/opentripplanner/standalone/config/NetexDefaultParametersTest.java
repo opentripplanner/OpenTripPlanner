@@ -18,11 +18,11 @@ class NetexDefaultParametersTest {
       new NodeAdapter(MissingNode.getInstance(), "NetexParametersTest")
     );
 
-    assertTrue(subject.ignoreFilePattern.matcher("").matches());
-    assertTrue(subject.sharedFilePattern.matcher("shared-data.xml").matches());
-    assertTrue(subject.sharedGroupFilePattern.matcher("RUT-anything-shared.xml").matches());
-    assertTrue(subject.groupFilePattern.matcher("RUT-anything.xml").matches());
-    assertEquals("DefaultFeed", subject.netexFeedId);
+    assertTrue(subject.ignoreFilePattern().matcher("").matches());
+    assertTrue(subject.sharedFilePattern().matcher("shared-data.xml").matches());
+    assertTrue(subject.sharedGroupFilePattern().matcher("RUT-anything-shared.xml").matches());
+    assertTrue(subject.groupFilePattern().matcher("RUT-anything.xml").matches());
+    assertEquals("DefaultFeed", subject.feedId());
   }
 
   @Test
@@ -40,11 +40,11 @@ class NetexDefaultParametersTest {
 
     NetexDefaultParameters subject = new NetexDefaultParameters(nodeAdapter);
 
-    assertTrue(subject.ignoreFilePattern.matcher(".ignore").matches());
-    assertTrue(subject.ignoreFilePattern.matcher("__ignore").matches());
-    assertTrue(subject.sharedFilePattern.matcher("_stops.xml").matches());
-    assertTrue(subject.sharedGroupFilePattern.matcher("_RUT_shared_data.xml").matches());
-    assertTrue(subject.groupFilePattern.matcher("RUT_anything.xml").matches());
-    assertEquals("RB", subject.netexFeedId);
+    assertTrue(subject.ignoreFilePattern().matcher(".ignore").matches());
+    assertTrue(subject.ignoreFilePattern().matcher("__ignore").matches());
+    assertTrue(subject.sharedFilePattern().matcher("_stops.xml").matches());
+    assertTrue(subject.sharedGroupFilePattern().matcher("_RUT_shared_data.xml").matches());
+    assertTrue(subject.groupFilePattern().matcher("RUT_anything.xml").matches());
+    assertEquals("RB", subject.feedId());
   }
 }
