@@ -17,7 +17,7 @@ import org.opentripplanner.util.lang.CollectionUtils;
  * <p>
  * We pretend that two legs are a single one so that you will not be charged twice.
  */
-public class CombinedInterlinedTransitLeg implements TransitLeg {
+class CombinedInterlinedTransitLeg implements TransitLeg {
 
   private final TransitLeg first;
   private final TransitLeg second;
