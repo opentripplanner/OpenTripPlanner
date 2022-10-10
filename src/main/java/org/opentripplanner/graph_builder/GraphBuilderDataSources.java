@@ -151,7 +151,7 @@ public class GraphBuilderDataSources {
   }
 
   private GtfsFeedParameters getGtfsFeedConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds.gtfsFeeds
+    return buildConfig.transitFeeds.gtfsFeeds()
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
@@ -167,7 +167,7 @@ public class GraphBuilderDataSources {
   }
 
   private NetexFeedParameters getNetexFeedConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds.netexFeeds
+    return buildConfig.transitFeeds.netexFeeds()
       .stream()
       .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
       .findFirst()
