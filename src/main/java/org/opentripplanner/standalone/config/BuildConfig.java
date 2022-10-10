@@ -621,6 +621,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asUri(null);
 
+    osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");
     dem =
       new DemExtractsConfig(
@@ -650,15 +651,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       new NetexDefaultsConfig(
         root
           .of("netexDefaults")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
-    osmDefaults =
-      new OsmDefaultsConfig(
-        root
-          .of("osmDefaults")
           .withDoc(NA, /*TODO DOC*/"TODO")
           .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")

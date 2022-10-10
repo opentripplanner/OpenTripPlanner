@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
@@ -12,6 +13,17 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  * This class is responsible for mapping OSM configuration into OSM parameters.
  */
 public class OsmConfig {
+
+  public static OsmDefaultsConfig mapOsmDefaults(NodeAdapter root, String parameterName) {
+    return new OsmDefaultsConfig(
+      root
+        .of(parameterName)
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asEnum(WayPropertySetSource.Source.DEFAULT)
+        .getInstance(),
+      root.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null)
+    );
+  }
 
   public static OsmExtractsConfig mapOsmConfig(NodeAdapter root, String parameterName) {
     return new OsmExtractsConfig(
@@ -24,7 +36,7 @@ public class OsmConfig {
     );
   }
 
-  public static OsmExtractConfig mapOsmExtractConfig(NodeAdapter config) {
+  private static OsmExtractConfig mapOsmExtractConfig(NodeAdapter config) {
     var builder = new OsmExtractConfigBuilder();
 
     builder.withSource(
