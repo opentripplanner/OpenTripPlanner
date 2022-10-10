@@ -111,8 +111,14 @@ public enum ConfigType {
   }
 
   /**
-   * Return {@code true} if the JSON type is {@code object} or {@code array}. This apply to
-   *
+   * Return {@code true} if the JSON type is {@code basic} or {@code string}.
+   */
+  public boolean isSimple() {
+    return type == JsonType.basic || type == JsonType.string;
+  }
+
+  /**
+   * Return {@code true} if the JSON type is {@code object} or {@code array}.
    */
   public boolean isComplex() {
     return type == JsonType.object || type == JsonType.array;

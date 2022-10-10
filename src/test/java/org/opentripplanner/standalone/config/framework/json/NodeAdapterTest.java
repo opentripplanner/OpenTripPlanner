@@ -29,6 +29,7 @@ import org.opentripplanner.util.OtpAppException;
 public class NodeAdapterTest {
 
   public static final Duration D3h = Duration.ofHours(3);
+  public static final String NON_UNUSED_PARAMETERS = "EXPECTED_NONE";
 
   @Test
   public void testAsRawNode() {
@@ -44,6 +45,7 @@ public class NodeAdapterTest {
     subject = newNodeAdapterForTest("{}");
     assertTrue(subject.of("alf").asObject().isEmpty());
     assertTrue(subject.of("alfa").asObject().of("bet").asObject().isEmpty());
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -51,6 +53,7 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
     assertFalse(subject.of("foo").asObject().isEmpty());
     assertTrue(subject.of("missingObject").asObject().isEmpty());
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -98,6 +101,7 @@ public class NodeAdapterTest {
   public void asDoubles() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 2.0, 3.0, 5.0 ] }");
     assertEquals(List.of(2d, 3d, 5d), subject.of("key").asDoubles(null));
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -173,6 +177,7 @@ public class NodeAdapterTest {
       Collections.<AnEnum, Boolean>emptyMap(),
       subject.of("missing-key").asEnumMap(AnEnum.class, Boolean.class)
     );
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -184,9 +189,7 @@ public class NodeAdapterTest {
     );
 
     // Assert unknown parameter is logged at warning level and with full pathname
-    var buf = new StringBuilder();
-    subject.logAllUnusedParameters(buf::append);
-    assertEquals("Unexpected config parameter: 'key.unknown:7' in 'Test'", buf.toString());
+    assertEquals("Unexpected config parameter: 'key.unknown:7' in 'Test'", unusedParams(subject));
   }
 
   @Test
@@ -229,6 +232,7 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : [ 'A', 'B' ] }");
     assertEquals(Set.of(AnEnum.A, AnEnum.B), subject.of("key").asEnumSet(AnEnum.class));
     assertEquals(Set.of(), subject.of("missing-key").asEnumSet(AnEnum.class));
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -257,6 +261,7 @@ public class NodeAdapterTest {
       "[C:12]",
       subject.of("missing-key").asFeedScopedIds(List.of(new FeedScopedId("C", "12"))).toString()
     );
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -270,6 +275,7 @@ public class NodeAdapterTest {
       ),
       subject.of("routes").asFeedScopedIds(List.of())
     );
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -337,6 +343,7 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key1 : ['PT1s', '2h'] }");
     assertEquals("[PT1S, PT2H]", subject.of("key1").asDurations(List.of()).toString());
     assertEquals("[PT3H]", subject.of("missing-key").asDurations(List.of(D3h)).toString());
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -393,6 +400,7 @@ public class NodeAdapterTest {
 
     subject = newNodeAdapterForTest("{ }");
     assertEquals("[]", subject.of("foo").asUris().toString());
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -420,6 +428,7 @@ public class NodeAdapterTest {
 
     assertEquals("[ARecord[a=I], ARecord[a=2]]", result.toString());
     assertEquals("[key : object[] = [] Since 2.0]", subject.parametersSorted().toString());
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -463,6 +472,7 @@ public class NodeAdapterTest {
     assertFalse(subject.of("bar").asObject().isNonEmptyArray());
     assertFalse(subject.of("foobar").asObject().isNonEmptyArray());
     assertFalse(subject.of("missing").asObject().isNonEmptyArray());
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
 
   @Test
@@ -483,6 +493,12 @@ public class NodeAdapterTest {
     // Then: expect 'b' to be unused
     subject.logAllUnusedParameters(buf::append);
     assertEquals("Unexpected config parameter: 'foo.b:false' in 'Test'", buf.toString());
+  }
+
+  private static String unusedParams(NodeAdapter subject) {
+    var buf = new StringBuilder();
+    subject.logAllUnusedParameters(m -> buf.append('\n').append(m));
+    return buf.isEmpty() ? NON_UNUSED_PARAMETERS : buf.substring(1);
   }
 
   private enum AnEnum {

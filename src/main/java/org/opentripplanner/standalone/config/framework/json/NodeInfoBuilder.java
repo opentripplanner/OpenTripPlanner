@@ -131,6 +131,7 @@ class NodeInfoBuilder {
       defaultValue,
       exampleValue,
       required,
+      false,
       deprecated
     );
   }

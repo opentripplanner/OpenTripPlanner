@@ -170,6 +170,7 @@ public class NodeAdapter {
    * track of unused parameters and can not generate documentation for this parameter.
    */
   public JsonNode rawNode(String paramName) {
+    parameters.put(paramName, NodeInfo.ofSkipChild(paramName));
     return json.path(paramName);
   }
 

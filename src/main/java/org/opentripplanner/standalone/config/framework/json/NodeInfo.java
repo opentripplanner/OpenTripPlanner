@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.AR
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.MAP;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,7 @@ public record NodeInfo(
   @Nullable String defaultValue,
   @Nullable Object exampleValue,
   boolean required,
+  boolean skipChild,
   @Nullable DeprecatedInfo deprecated
 ) {
   public NodeInfo {
@@ -52,6 +54,31 @@ public record NodeInfo(
     if (type.isMapOrArray()) {
       Objects.requireNonNull(elementType);
     }
+  }
+
+  /**
+   * For some complex types like Map, we describe the child elements as part of the node-info of
+   * the parent. Hence, we need to skip the child when generating documentation. So, this factory
+   * method is used to generate a placeholder in these cases.
+   * <p>
+   * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
+   *           the child, but that requires a bit of refactoring.
+   */
+  static NodeInfo ofSkipChild(String name) {
+    return new NodeInfo(
+      name,
+      "No doc, parent contains doc.",
+      null,
+      OBJECT,
+      null,
+      null,
+      OtpVersion.NA,
+      null,
+      null,
+      false,
+      true,
+      null
+    );
   }
 
   /**
