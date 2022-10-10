@@ -103,9 +103,7 @@ public class DefaultFareServiceImpl implements FareService {
       .map(Leg.class::cast)
       .toList();
 
-    if (shouldCombineInterlinedLegs()) {
-      fareLegs = combineInterlinedLegs(fareLegs);
-    }
+    fareLegs = combineInterlinedLegs(fareLegs);
 
     // If there are no rides, there's no fare.
     if (fareLegs.isEmpty()) {
@@ -212,80 +210,6 @@ public class DefaultFareServiceImpl implements FareService {
     return getBestFareAndId(fareType, rides, fareRules).fare;
   }
 
-  /**
-   * Returns true if two interlined legs (those with a stay-seated transfer between them) should be
-   * treated as a single leg.
-   * <p>
-   * This often leads to strange fare results so by default it's disabled.
-   *
-   * @see DefaultFareServiceImpl#combineInterlinedLegs(List)
-   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs()
-   */
-  protected boolean shouldCombineInterlinedLegs() {
-    return true;
-  }
-
-  /**
-   * This operation is quite poorly defined:
-   * - Should the combined leg have the properties of the first or the second leg?
-   * - What are the indices of the start/end stops?
-   * <p>
-   * For this reason it's best to only activate this feature when you really need it.
-   */
-  private static List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
-    var result = new ArrayList<Leg>();
-    for (var leg : fareLegs) {
-      if (leg.isInterlinedWithPreviousLeg() && leg instanceof ScheduledTransitLeg currentLeg) {
-        var previousLeg = (ScheduledTransitLeg) result.get(result.size() - 1);
-        var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
-        // overwrite the previous leg with the combined one
-        result.set(result.size() - 1, combinedLeg);
-      } else {
-        result.add(leg);
-      }
-    }
-    return result;
-  }
-
-  private FareSearch performSearch(
-    FareType fareType,
-    List<Leg> rides,
-    Collection<FareRuleSet> fareRules
-  ) {
-    FareSearch r = new FareSearch(rides.size());
-
-    // Dynamic algorithm to calculate fare cost.
-    // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
-    // rides are already edges, so when comparing "via" routes, i -> k is connected
-    // to k+1 -> j.
-    for (int i = 0; i < rides.size(); i++) {
-      // each diagonal
-      for (int j = 0; j < rides.size() - i; j++) {
-        FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
-        float cost = best.fare;
-        if (cost < 0) {
-          LOG.error("negative cost for a ride sequence");
-          cost = Float.POSITIVE_INFINITY;
-        }
-        if (cost < Float.POSITIVE_INFINITY) {
-          r.endOfComponent[j] = j + i;
-          r.next[j][j + i] = j + i;
-        }
-        r.resultTable[j][j + i] = cost;
-        r.fareIds[j][j + i] = best.fareId;
-        for (int k = 0; k < i; k++) {
-          float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
-          if (r.resultTable[j][j + i] > via) {
-            r.resultTable[j][j + i] = via;
-            r.endOfComponent[j] = j + i;
-            r.next[j][j + i] = r.next[j][j + k];
-          }
-        }
-      }
-    }
-    return r;
-  }
-
   protected FareAndId getBestFareAndId(
     FareType fareType,
     List<Leg> legs,
@@ -382,5 +306,85 @@ public class DefaultFareServiceImpl implements FareService {
         break;
     }
     return fare.getPrice();
+  }
+
+  /**
+   * Returns true if two interlined legs (those with a stay-seated transfer between them) should be
+   * treated as a single leg.
+   * <p>
+   * By default it's disabled since this is unspecified in the GTFS fares spec.
+   *
+   * @see DefaultFareServiceImpl#combineInterlinedLegs(List)
+   * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
+   */
+  protected boolean shouldCombineInterlinedLegs(
+    ScheduledTransitLeg currentLeg,
+    ScheduledTransitLeg previousLeg
+  ) {
+    return false;
+  }
+
+  /**
+   * This operation is quite poorly defined: - Should the combined leg have the properties of the
+   * first or the second leg? - What are the indices of the start/end stops?
+   * <p>
+   * For this reason it's best to only activate this feature when you really need it.
+   */
+  private List<Leg> combineInterlinedLegs(List<Leg> fareLegs) {
+    var result = new ArrayList<Leg>();
+    for (var leg : fareLegs) {
+      if (
+        leg.isInterlinedWithPreviousLeg() &&
+        leg instanceof ScheduledTransitLeg currentLeg &&
+        result.get(result.size() - 1) instanceof ScheduledTransitLeg previousLeg &&
+        shouldCombineInterlinedLegs(currentLeg, previousLeg)
+      ) {
+        var combinedLeg = new CombinedInterlinedTransitLeg(previousLeg, currentLeg);
+        // overwrite the previous leg with the combined one
+        result.set(result.size() - 1, combinedLeg);
+      } else {
+        result.add(leg);
+      }
+    }
+    return result;
+  }
+
+  private FareSearch performSearch(
+    FareType fareType,
+    List<Leg> rides,
+    Collection<FareRuleSet> fareRules
+  ) {
+    FareSearch r = new FareSearch(rides.size());
+
+    // Dynamic algorithm to calculate fare cost.
+    // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
+    // rides are already edges, so when comparing "via" routes, i -> k is connected
+    // to k+1 -> j.
+    for (int i = 0; i < rides.size(); i++) {
+      // each diagonal
+      for (int j = 0; j < rides.size() - i; j++) {
+        FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
+        float cost = best.fare;
+        if (cost < 0) {
+          LOG.error("negative cost for a ride sequence");
+          cost = Float.POSITIVE_INFINITY;
+        }
+        if (cost < Float.POSITIVE_INFINITY) {
+          r.endOfComponent[j] = j + i;
+          r.next[j][j + i] = j + i;
+        }
+        r.resultTable[j][j + i] = cost;
+        r.fareIds[j][j + i] = best.fareId;
+        for (int k = 0; k < i; k++) {
+          float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+          if (r.resultTable[j][j + i] > via) {
+            r.resultTable[j][j + i] = via;
+            r.endOfComponent[j] = j + i;
+            r.next[j][j + i] = r.next[j][j + k];
+          }
+        }
+      }
+    }
+    return r;
   }
 }

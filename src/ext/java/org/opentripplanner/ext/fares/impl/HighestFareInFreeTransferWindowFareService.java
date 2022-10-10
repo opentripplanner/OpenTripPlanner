@@ -6,6 +6,7 @@ import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.ItineraryFares;
 
@@ -84,7 +85,10 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
   }
 
   @Override
-  protected boolean shouldCombineInterlinedLegs() {
+  protected boolean shouldCombineInterlinedLegs(
+    ScheduledTransitLeg current,
+    ScheduledTransitLeg previous
+  ) {
     return !analyzeInterlinedTransfers;
   }
 }
