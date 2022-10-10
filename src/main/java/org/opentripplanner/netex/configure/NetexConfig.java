@@ -60,7 +60,7 @@ public class NetexConfig {
     }
 
     return new NetexModule(
-      buildParams.netexDefaults.netexFeedId,
+      buildParams.netexDefaults.feedId(),
       graph,
       transitModel,
       issueStore,
@@ -77,13 +77,13 @@ public class NetexConfig {
     String configuredFeedId = netexConfiguredDataSource
       .config()
       .feedId()
-      .orElse(buildParams.netexDefaults.netexFeedId);
+      .orElse(buildParams.netexDefaults.feedId());
 
     return new NetexBundle(
       configuredFeedId,
       (CompositeDataSource) netexConfiguredDataSource.dataSource(),
       hierarchy(netexConfiguredDataSource),
-      buildParams.netexDefaults.ferryIdsNotAllowedForBicycle,
+      buildParams.netexDefaults.ferryIdsNotAllowedForBicycle(),
       buildParams.maxStopToShapeSnapDistance
     );
   }
@@ -95,14 +95,16 @@ public class NetexConfig {
     NetexDefaultParameters defaults = buildParams.netexDefaults;
     Pattern ignoreFilePattern = netexFeedConfig
       .ignoreFilePattern()
-      .orElse(defaults.ignoreFilePattern);
+      .orElse(defaults.ignoreFilePattern());
     Pattern sharedFilePattern = netexFeedConfig
       .sharedFilePattern()
-      .orElse(defaults.sharedFilePattern);
+      .orElse(defaults.sharedFilePattern());
     Pattern sharedGroupFilePattern = netexFeedConfig
       .sharedGroupFilePattern()
-      .orElse(defaults.sharedGroupFilePattern);
-    Pattern groupFilePattern = netexFeedConfig.groupFilePattern().orElse(defaults.groupFilePattern);
+      .orElse(defaults.sharedGroupFilePattern());
+    Pattern groupFilePattern = netexFeedConfig
+      .groupFilePattern()
+      .orElse(defaults.groupFilePattern());
 
     return new NetexDataSourceHierarchy(
       (CompositeDataSource) netexConfiguredDataSource.dataSource()

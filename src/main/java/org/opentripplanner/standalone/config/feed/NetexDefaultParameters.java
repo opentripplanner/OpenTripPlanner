@@ -23,11 +23,51 @@ public class NetexDefaultParameters {
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
+  private final String feedId;
+
+  private final Pattern ignoreFilePattern;
+
+  private final Pattern sharedFilePattern;
+
+  private final Pattern sharedGroupFilePattern;
+
+  private final Pattern groupFilePattern;
+
+  private final Set<String> ferryIdsNotAllowedForBicycle;
+
+  public NetexDefaultParameters(NodeAdapter config) {
+    ignoreFilePattern =
+      config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(IGNORE_FILE_PATTERN);
+    sharedFilePattern =
+      config.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(SHARED_FILE_PATTERN);
+    sharedGroupFilePattern =
+      config
+        .of("sharedGroupFilePattern")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(SHARED_GROUP_FILE_PATTERN);
+    groupFilePattern =
+      config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(GROUP_FILE_PATTERN);
+    feedId =
+      config
+        .of("netexFeedId")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(NETEX_FEED_ID);
+    ferryIdsNotAllowedForBicycle =
+      config
+        .of("ferryIdsNotAllowedForBicycle")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asStringSet(FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE);
+  }
+
   /**
    * This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field
    * in GTFS file feed_info.txt.
    */
-  public final String netexFeedId;
+  public String feedId() {
+    return feedId;
+  }
 
   /**
    * This field is used to exclude matching <em>files</em> in the module file(zip file entries). The
@@ -37,7 +77,9 @@ public class NetexDefaultParameters {
    *
    * @see #sharedFilePattern
    */
-  public final Pattern ignoreFilePattern;
+  public Pattern ignoreFilePattern() {
+    return ignoreFilePattern;
+  }
 
   /**
    * This field is used to match <em>shared files</em>(zip file entries) in the module file. Shared
@@ -55,7 +97,9 @@ public class NetexDefaultParameters {
    * <p>
    * Default value is <code>'shared-data\.xml'</code>
    */
-  public final Pattern sharedFilePattern;
+  public Pattern sharedFilePattern() {
+    return sharedFilePattern;
+  }
 
   /**
    * This field is used to match <em>shared group files</em> in the module file(zip file entries).
@@ -74,7 +118,9 @@ public class NetexDefaultParameters {
    * @see #sharedFilePattern
    * @see #groupFilePattern
    */
-  public final Pattern sharedGroupFilePattern;
+  public Pattern sharedGroupFilePattern() {
+    return sharedGroupFilePattern;
+  }
 
   /**
    * This field is used to match <em>group files</em> in the module file(zip file entries).
@@ -90,7 +136,9 @@ public class NetexDefaultParameters {
    * @see #sharedFilePattern
    * @see #sharedGroupFilePattern
    */
-  public final Pattern groupFilePattern;
+  public Pattern groupFilePattern() {
+    return groupFilePattern;
+  }
 
   /**
    * Bicycles are allowed on most ferries however Nordic profile doesn't contain a place where
@@ -99,31 +147,7 @@ public class NetexDefaultParameters {
    * For this reason we allow bicycles on ferries by default and allow to override the rare case
    * where this is not the case.
    */
-  public final Set<String> ferryIdsNotAllowedForBicycle;
-
-  public NetexDefaultParameters(NodeAdapter config) {
-    ignoreFilePattern =
-      config.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(IGNORE_FILE_PATTERN);
-    sharedFilePattern =
-      config.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(SHARED_FILE_PATTERN);
-    sharedGroupFilePattern =
-      config
-        .of("sharedGroupFilePattern")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asPattern(SHARED_GROUP_FILE_PATTERN);
-    groupFilePattern =
-      config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(GROUP_FILE_PATTERN);
-    netexFeedId =
-      config
-        .of("netexFeedId")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(NETEX_FEED_ID);
-    ferryIdsNotAllowedForBicycle =
-      config
-        .of("ferryIdsNotAllowedForBicycle")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asStringSet(FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE);
+  public Set<String> ferryIdsNotAllowedForBicycle() {
+    return ferryIdsNotAllowedForBicycle;
   }
 }
