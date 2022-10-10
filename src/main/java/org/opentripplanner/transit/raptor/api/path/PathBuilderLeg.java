@@ -108,9 +108,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   /** This leg is a transit leg or access/transfer/egress leg with rides (FLEX) */
   public boolean hasRides() {
-    return (
-      isTransit() || ((isAccess() || isEgress()) && ((MyStreetLeg) leg).streetPath.hasRides())
-    );
+    return leg.hasRides();
   }
 
   /** This leg is an access/transfer/egress leg without any rides. */
@@ -583,6 +581,8 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       return false;
     }
 
+    boolean hasRides();
+
     int toStop();
 
     PathStringBuilder addToString(PathStringBuilder builder);
@@ -597,6 +597,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     MyStreetLeg(RaptorAccessEgress streetPath) {
       this.streetPath = streetPath;
+    }
+
+    @Override
+    public boolean hasRides() {
+      return streetPath.hasRides();
     }
 
     @Override
@@ -643,6 +648,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
 
     @Override
+    public boolean hasRides() {
+      return false;
+    }
+
+    @Override
     public int toStop() {
       return toStop;
     }
@@ -679,6 +689,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
     @Override
     public boolean isTransit() {
+      return true;
+    }
+
+    @Override
+    public boolean hasRides() {
       return true;
     }
 
