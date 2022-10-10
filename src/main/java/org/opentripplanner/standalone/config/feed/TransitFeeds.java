@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
-public class TransitFeedParametersList {
+public class TransitFeeds {
 
   @Nonnull
   public final List<NetexFeedParameters> netexFeeds;
@@ -13,7 +13,7 @@ public class TransitFeedParametersList {
   @Nonnull
   public final List<GtfsFeedParameters> gtfsFeeds;
 
-  public TransitFeedParametersList(
+  public TransitFeeds(
     List<GtfsFeedParameters> gtfsFeeds,
     List<NetexFeedParameters> netexFeeds
   ) {

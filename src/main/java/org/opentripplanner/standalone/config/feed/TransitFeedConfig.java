@@ -9,7 +9,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TransitFeedConfig {
 
-  public static TransitFeedParametersList mapTransitFeeds(NodeAdapter root, String parameterName) {
+  public static TransitFeeds mapTransitFeeds(NodeAdapter root, String parameterName) {
     List<DataSourceConfig> list = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
@@ -17,7 +17,7 @@ public class TransitFeedConfig {
       .withDescription(/*TODO DOC*/"TODO")
       .asObjects(TransitFeedConfig::mapTransitFeed);
 
-    return new TransitFeedParametersList(
+    return new TransitFeeds(
       filterListOnSubType(list, GtfsFeedParameters.class),
       filterListOnSubType(list, NetexFeedParameters.class)
     );
