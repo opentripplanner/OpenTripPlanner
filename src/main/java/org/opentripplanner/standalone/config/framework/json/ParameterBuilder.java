@@ -158,12 +158,12 @@ public class ParameterBuilder {
 
   public <T> List<T> asObjects(Function<NodeAdapter, T> mapper) {
     info.withRequired().withArray(OBJECT);
-    return buildAndListObjects(List.of(), mapper);
+    return buildAndListComplexArrayElements(List.of(), mapper);
   }
 
   public <T> List<T> asObjects(List<T> defaultValues, Function<NodeAdapter, T> mapper) {
     info.withOptional(defaultValues.isEmpty() ? "[]" : defaultValues.toString()).withArray(OBJECT);
-    return buildAndListObjects(defaultValues, mapper);
+    return buildAndListComplexArrayElements(defaultValues, mapper);
   }
 
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
@@ -184,7 +184,10 @@ public class ParameterBuilder {
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     //noinspection unchecked
     info.withOptional().withEnumSet((Class<Enum<?>>) enumClass);
-    List<T> result = buildAndListValues(List.of(), it -> parseEnum(it.asText(), enumClass));
+    List<T> result = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseEnum(it.asText(), enumClass)
+    );
     return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
   }
 
@@ -335,7 +338,7 @@ public class ParameterBuilder {
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     info.withOptional(defaultValues.toString()).withArray(FEED_SCOPED_ID);
-    return buildAndListValues(defaultValues, it -> FeedScopedId.parseId(it.asText()));
+    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
   }
 
   public DoubleAlgorithmFunction asLinearFunction(DoubleAlgorithmFunction defaultValue) {
@@ -398,7 +401,7 @@ public class ParameterBuilder {
     Function<JsonNode, T> mapper
   ) {
     info.withOptional(String.valueOf(defaultValue)).withArray(elementType);
-    return buildAndListValues(defaultValue, mapper);
+    return buildAndListSimpleArrayElements(defaultValue, mapper);
   }
 
   private <T> Map<String, T> ofOptionalMap(ConfigType elementType, Function<JsonNode, T> mapper) {
@@ -428,7 +431,15 @@ public class ParameterBuilder {
     return target.path(paramName(), node);
   }
 
-  private <T> List<T> buildAndListValues(List<T> defaultValues, Function<JsonNode, T> mapper) {
+  /**
+   * Build node info for "simple" element types(JSON leafs) and list all values. Use
+   * {@link #buildAndListComplexArrayElements(List, Function)} for building array with complex
+   * elements.
+   */
+  private <T> List<T> buildAndListSimpleArrayElements(
+    List<T> defaultValues,
+    Function<JsonNode, T> mapper
+  ) {
     JsonNode array = build();
     if (array.isMissingNode()) {
       return defaultValues;
@@ -443,7 +454,15 @@ public class ParameterBuilder {
     return values;
   }
 
-  private <T> List<T> buildAndListObjects(List<T> defaultValues, Function<NodeAdapter, T> parse) {
+  /**
+   * Build node info for "complex" element types and list all values. Use
+   * {@link #buildAndListSimpleArrayElements(List, Function)} for building array with complex
+   * elements.
+   */
+  private <T> List<T> buildAndListComplexArrayElements(
+    List<T> defaultValues,
+    Function<NodeAdapter, T> parse
+  ) {
     var array = build();
     if (array.isMissingNode()) {
       return defaultValues;
@@ -453,8 +472,12 @@ public class ParameterBuilder {
     }
     List<T> values = new ArrayList<>();
     int i = 0;
+
+    var arrayAdaptor = target.path(paramName(), array);
+
     for (JsonNode node : array) {
-      values.add(parse.apply(target.path("[" + i + "]", node)));
+      var element = arrayAdaptor.path("[" + i + "]", node);
+      values.add(parse.apply(element));
       ++i;
     }
     return values;
