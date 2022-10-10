@@ -19,9 +19,9 @@ public class DemExtractConfig implements DataSourceConfig {
    */
   private final Double elevationUnitMultiplier;
 
-  DemExtractConfig(DemExtractConfigBuilder demExtractConfigBuilder) {
-    source = Objects.requireNonNull(demExtractConfigBuilder.getSource());
-    elevationUnitMultiplier = demExtractConfigBuilder.getElevationUnitMultiplier();
+  DemExtractConfig(DemExtractConfigBuilder builder) {
+    source = Objects.requireNonNull(builder.source());
+    elevationUnitMultiplier = builder.elevationUnitMultiplier();
   }
 
   @Override
