@@ -7,7 +7,11 @@ import java.net.URI;
  */
 public interface DataSourceConfig {
   /**
-   *
+   * URI to data files.
+   * <p>
+   * Example:
+   * {@code "file:///Users/kelvin/otp/netex.zip", "gs://my-bucket/netex.zip"  }
+   * <p>
    * @return the URI to the data source. The source identifies uniquely a data source.
    */
   URI source();
