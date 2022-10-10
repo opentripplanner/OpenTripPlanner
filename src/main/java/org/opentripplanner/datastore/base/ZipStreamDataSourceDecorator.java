@@ -32,11 +32,12 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
   /**
    * Maximum size of an uncompressed zip entry in memory. Larger entries are stored on disk.
    */
-  private static final int MAX_ZIP_ENTRY_SIZE_IN_MEMORY = 2_000_000_000;
+  private static final int DEFAULT_MAX_ZIP_ENTRY_SIZE_IN_MEMORY = 2_000_000_000;
 
   private static final Logger LOG = LoggerFactory.getLogger(ZipStreamDataSourceDecorator.class);
 
   private final DataSource delegate;
+  private final int maxZipEntrySizeInMemory;
 
   /**
    * This store load the zip file into memory; hence we should load the content only once, even at
@@ -56,7 +57,12 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
    * content.
    */
   public ZipStreamDataSourceDecorator(DataSource delegate) {
+    this(delegate, DEFAULT_MAX_ZIP_ENTRY_SIZE_IN_MEMORY);
+  }
+
+  ZipStreamDataSourceDecorator(DataSource delegate, int maxZipEntrySizeInMemory) {
     this.delegate = delegate;
+    this.maxZipEntrySizeInMemory = maxZipEntrySizeInMemory;
   }
 
   @Override
@@ -180,9 +186,9 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
   private void uncompressEntry(ZipInputStream zis, ZipEntry entry) throws IOException {
     ByteArrayOutputStream buf = new ByteArrayOutputStream(4048);
-    long nbCopiedBytes = IOUtils.copyLarge(zis, buf, 0, MAX_ZIP_ENTRY_SIZE_IN_MEMORY + 1L);
+    long nbCopiedBytes = IOUtils.copyLarge(zis, buf, 0, maxZipEntrySizeInMemory + 1L);
     byte[] byteArray = buf.toByteArray();
-    if (nbCopiedBytes <= MAX_ZIP_ENTRY_SIZE_IN_MEMORY) {
+    if (nbCopiedBytes <= maxZipEntrySizeInMemory) {
       content.add(
         new ByteArrayDataSource(
           entry.getName() + " (" + path() + ")",
@@ -200,12 +206,12 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
         entry.getName(),
         name()
       );
-      File tmpFile = Files.createTempFile(entry.getName() + '-', ".tmp").toFile();
+      File tmpFile = Files.createTempFile(null, null).toFile();
       try (OutputStream outputStream = Files.newOutputStream(tmpFile.toPath())) {
         outputStream.write(byteArray);
         zis.transferTo(outputStream);
       }
-      content.add(new TemporaryFileDataSource(tmpFile, type()));
+      content.add(new TemporaryFileDataSource(entry.getName(), tmpFile, type()));
     }
   }
 }

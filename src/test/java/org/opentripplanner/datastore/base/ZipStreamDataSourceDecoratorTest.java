@@ -17,11 +17,24 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.datastore.file.TemporaryFileDataSource;
 
 public class ZipStreamDataSourceDecoratorTest {
 
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
   private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS;
+  public static final List<String> EXPECTED_ZIP_ENTRIES = List.of(
+    "trips.txt",
+    "agency.txt",
+    "calendar.txt",
+    "calendar_dates.txt",
+    "fare_attributes.txt",
+    "fare_rules.txt",
+    "routes.txt",
+    "shapes.txt",
+    "stop_times.txt",
+    "stops.txt"
+  );
 
   @Test
   public void testAccessorsForNoneExistingFile() throws IOException {
@@ -67,23 +80,7 @@ public class ZipStreamDataSourceDecoratorTest {
     Collection<String> names = content.stream().map(it -> it.name()).collect(Collectors.toList());
 
     System.out.println(names);
-    assertTrue(
-      names.containsAll(
-        List.of(
-          "trips.txt",
-          "agency.txt",
-          "calendar.txt",
-          "calendar_dates.txt",
-          "fare_attributes.txt",
-          "fare_rules.txt",
-          "routes.txt",
-          "shapes.txt",
-          "stop_times.txt",
-          "stops.txt"
-        )
-      ),
-      names.toString()
-    );
+    assertTrue(names.containsAll(EXPECTED_ZIP_ENTRIES), names.toString());
 
     DataSource entry = subject.entry("agency.txt");
 
@@ -92,6 +89,24 @@ public class ZipStreamDataSourceDecoratorTest {
 
     // Close zip
     subject.close();
+  }
+
+  @Test
+  void testMaxZipEntrySizeInMemory() throws IOException {
+    File target = new File(FILENAME);
+    // force offloading to disk by setting maxZipEntrySizeInMemory=1
+    CompositeDataSource subject = new ZipStreamDataSourceDecorator(
+      new FileDataSource(target, GTFS),
+      1
+    );
+    Collection<DataSource> content = subject.content();
+    Collection<String> names = content.stream().map(DataSource::name).toList();
+    assertTrue(names.containsAll(EXPECTED_ZIP_ENTRIES));
+    assertTrue(content.stream().allMatch(TemporaryFileDataSource.class::isInstance));
+    assertTrue(content.stream().allMatch(dataSource -> dataSource.size() > 0));
+    assertTrue(content.stream().allMatch(DataSource::exists));
+    subject.close();
+    assertTrue(content.stream().noneMatch(DataSource::exists));
   }
 
   @Test
