@@ -5,7 +5,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.fares.FareService;
 
-public record GtfsFaresService(DefaultFareServiceImpl faresV1, GtfsFaresV2Service faresV2)
+public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service faresV2)
   implements FareService {
   @Override
   public ItineraryFares getCost(Itinerary itinerary) {

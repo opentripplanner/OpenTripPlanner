@@ -42,7 +42,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   @Override
   public FareService makeFareService() {
-    DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+    DefaultFareService fareService = new DefaultFareService();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
 
     var faresV2Service = new GtfsFaresV2Service(fareLegRules, fareTransferRules, stopAreas);

@@ -13,7 +13,7 @@ import org.opentripplanner.routing.core.ItineraryFares;
 /**
  * This calculator is maintained by IBI Group.
  */
-public class HighestFareInFreeTransferWindowFareService extends DefaultFareServiceImpl {
+public class HighestFareInFreeTransferWindowFareService extends DefaultFareService {
 
   private final boolean analyzeInterlinedTransfers;
   private final Duration freeTransferWindow;

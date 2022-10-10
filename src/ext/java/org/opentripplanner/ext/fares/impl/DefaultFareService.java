@@ -75,14 +75,14 @@ class FareAndId {
  * fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
-public class DefaultFareServiceImpl implements FareService {
+public class DefaultFareService implements FareService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultFareService.class);
 
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
   protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
-  public DefaultFareServiceImpl() {
+  public DefaultFareService() {
     fareRulesPerType = new HashMap<>();
   }
 
@@ -314,7 +314,7 @@ public class DefaultFareServiceImpl implements FareService {
    * <p>
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
-   * @see DefaultFareServiceImpl#combineInterlinedLegs(List)
+   * @see DefaultFareService#combineInterlinedLegs(List)
    * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(
