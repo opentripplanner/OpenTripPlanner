@@ -530,7 +530,7 @@ The current list of custom fare type is:
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
-- `highest-fare-in-free-tranfer-window` Will apply the highest observed transit fare (across all
+- `highest-fare-in-free-transfer-window` Will apply the highest observed transit fare (across all
   operators) within a free transfer window, adding to the cost if a trip is boarded outside the free
   transfer window. It accepts the following parameters:
     - `freeTransferWindow` the duration (in ISO8601-ish notation) that free transfers are
