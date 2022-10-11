@@ -67,7 +67,7 @@ public class HslParkToVehicleParkingMapper {
 
   public VehicleParking parsePark(
     JsonNode jsonNode,
-    Map<VehicleParkingGroup, List<FeedScopedId>> parksForHub
+    Map<FeedScopedId, VehicleParkingGroup> hubForPark
   ) {
     var vehicleParkId = createIdForNode(jsonNode, "id", feedId);
     try {
@@ -108,13 +108,7 @@ public class HslParkToVehicleParkingMapper {
         .orElse(false);
       var openingHoursByDayType = jsonNode.path("openingHours").path("byDayType");
       var openingHoursCalendar = parseOpeningHours(openingHoursByDayType);
-      VehicleParkingGroup vehicleParkingGroup = null;
-      for (var hub : parksForHub.entrySet()) {
-        if (hub.getValue().contains(vehicleParkId)) {
-          vehicleParkingGroup = hub.getKey();
-          break;
-        }
-      }
+      VehicleParkingGroup vehicleParkingGroup = hubForPark.get(vehicleParkId);
 
       return VehicleParking
         .builder()

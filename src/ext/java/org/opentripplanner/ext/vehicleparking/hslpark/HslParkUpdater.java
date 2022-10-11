@@ -32,7 +32,7 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
   private long lastFacilitiesFetchTime;
 
   private List<VehicleParking> parks;
-  private Map<VehicleParkingGroup, List<FeedScopedId>> parksForhubs;
+  private Map<FeedScopedId, VehicleParkingGroup> hubForPark;
 
   public HslParkUpdater(
     HslParkUpdaterParameters parameters,
@@ -80,18 +80,18 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
   @Override
   public boolean update() {
     List<VehicleParking> parks = null;
-    Map<VehicleParkingGroup, List<FeedScopedId>> parksForhubs;
+    Map<FeedScopedId, VehicleParkingGroup> hubForPark;
     if (fetchFacilitiesAndHubsNow()) {
-      parksForhubs = hubsDownloader.downloadHubs();
-      if (parksForhubs != null) {
-        parks = facilitiesDownloader.downloadFacilities(parksForhubs);
+      hubForPark = hubsDownloader.downloadHubs();
+      if (hubForPark != null) {
+        parks = facilitiesDownloader.downloadFacilities(hubForPark);
         if (parks != null) {
           lastFacilitiesFetchTime = System.currentTimeMillis();
         }
       }
     } else {
       parks = this.parks;
-      parksForhubs = this.parksForhubs;
+      hubForPark = this.hubForPark;
     }
     if (parks != null) {
       List<HslParkPatch> utilizations = utilizationsDownloader.download();
@@ -111,7 +111,7 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
       synchronized (this) {
         // Update atomically
         this.parks = parks;
-        this.parksForhubs = parksForhubs;
+        this.hubForPark = hubForPark;
       }
       return true;
     }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
@@ -19,20 +18,20 @@ public class HslHubsDownloader {
 
   private static final Logger log = LoggerFactory.getLogger(HslHubsDownloader.class);
   private final String jsonParsePath;
-  private final Function<JsonNode, Map<VehicleParkingGroup, List<FeedScopedId>>> hubsParser;
+  private final Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser;
   private String url;
 
   public HslHubsDownloader(
     String url,
     String jsonParsePath,
-    Function<JsonNode, Map<VehicleParkingGroup, List<FeedScopedId>>> hubsParser
+    Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.hubsParser = hubsParser;
   }
 
-  public Map<VehicleParkingGroup, List<FeedScopedId>> downloadHubs() {
+  public Map<FeedScopedId, VehicleParkingGroup> downloadHubs() {
     if (url == null) {
       log.warn("Cannot download updates, because url is null!");
       return null;
@@ -60,9 +59,9 @@ public class HslHubsDownloader {
     }
   }
 
-  private Map<VehicleParkingGroup, List<FeedScopedId>> parseJSON(InputStream dataStream)
+  private Map<FeedScopedId, VehicleParkingGroup> parseJSON(InputStream dataStream)
     throws IllegalArgumentException, IOException {
-    Map<VehicleParkingGroup, List<FeedScopedId>> out = new HashMap<>();
+    Map<FeedScopedId, VehicleParkingGroup> out = new HashMap<>();
 
     String hubsString = convertStreamToString(dataStream);
 
@@ -85,7 +84,7 @@ public class HslHubsDownloader {
       if (node == null) {
         continue;
       }
-      Map<VehicleParkingGroup, List<FeedScopedId>> parsedElement = hubsParser.apply(node);
+      Map<FeedScopedId, VehicleParkingGroup> parsedElement = hubsParser.apply(node);
       if (parsedElement != null) {
         out.putAll(parsedElement);
       }

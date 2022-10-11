@@ -20,13 +20,13 @@ public class HslFacilitiesDownloader {
 
   private static final Logger log = LoggerFactory.getLogger(HslFacilitiesDownloader.class);
   private final String jsonParsePath;
-  private final BiFunction<JsonNode, Map<VehicleParkingGroup, List<FeedScopedId>>, VehicleParking> facilitiesParser;
+  private final BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser;
   private String url;
 
   public HslFacilitiesDownloader(
     String url,
     String jsonParsePath,
-    BiFunction<JsonNode, Map<VehicleParkingGroup, List<FeedScopedId>>, VehicleParking> facilitiesParser
+    BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser
   ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
@@ -34,7 +34,7 @@ public class HslFacilitiesDownloader {
   }
 
   public List<VehicleParking> downloadFacilities(
-    Map<VehicleParkingGroup, List<FeedScopedId>> parksForHub
+    Map<FeedScopedId, VehicleParkingGroup> hubForPark
   ) {
     if (url == null) {
       log.warn("Cannot download updates, because url is null!");
@@ -46,7 +46,7 @@ public class HslFacilitiesDownloader {
         log.warn("Failed to get data from url {}", url);
         return null;
       }
-      return parseJSON(data, parksForHub);
+      return parseJSON(data, hubForPark);
     } catch (IllegalArgumentException e) {
       log.warn("Error parsing facilities from {}", url, e);
     } catch (JsonProcessingException e) {
@@ -65,7 +65,7 @@ public class HslFacilitiesDownloader {
 
   private List<VehicleParking> parseJSON(
     InputStream dataStream,
-    Map<VehicleParkingGroup, List<FeedScopedId>> parksForHub
+    Map<FeedScopedId, VehicleParkingGroup> hubForPark
   ) throws IllegalArgumentException, IOException {
     ArrayList<VehicleParking> out = new ArrayList<>();
 
@@ -90,7 +90,7 @@ public class HslFacilitiesDownloader {
       if (node == null) {
         continue;
       }
-      VehicleParking parsedElement = facilitiesParser.apply(node, parksForHub);
+      VehicleParking parsedElement = facilitiesParser.apply(node, hubForPark);
       if (parsedElement != null) {
         out.add(parsedElement);
       }

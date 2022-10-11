@@ -36,7 +36,7 @@ public class HslHubToVehicleParkingGroupMapper {
     this.feedId = feedId;
   }
 
-  public Map<VehicleParkingGroup, List<FeedScopedId>> parseHub(JsonNode jsonNode) {
+  public Map<FeedScopedId, VehicleParkingGroup> parseHub(JsonNode jsonNode) {
     var hubId = HslParkToVehicleParkingMapper.createIdForNode(jsonNode, "id", feedId);
     try {
       Map<String, String> translations = new HashMap<>();
@@ -67,7 +67,13 @@ public class HslHubToVehicleParkingGroupMapper {
         return null;
       }
 
-      return Map.of(vehicleParkingGroup, vehicleParkingIds);
+      var hubForPark = new HashMap<FeedScopedId, VehicleParkingGroup>();
+
+      vehicleParkingIds.forEach(vehicleParkingId ->
+        hubForPark.put(vehicleParkingId, vehicleParkingGroup)
+      );
+
+      return hubForPark;
     } catch (Exception e) {
       log.warn("Error parsing hub {}", hubId, e);
       return null;
