@@ -9,6 +9,7 @@
 - Create initial sandbox implementation (January
   2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3796)
 - Add timeZone parameter to hsl and parkapi updaters (September 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4427)
+- Added support for HSL parking hubs (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4510)
 
 ## Documentation
 
