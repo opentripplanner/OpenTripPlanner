@@ -57,10 +57,6 @@ public class HslFacilitiesDownloader {
     return null;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
   private static String convertStreamToString(java.io.InputStream is) {
     try (java.util.Scanner scanner = new java.util.Scanner(is).useDelimiter("\\A")) {
       return scanner.hasNext() ? scanner.next() : "";
