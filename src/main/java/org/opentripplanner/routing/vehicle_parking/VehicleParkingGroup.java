@@ -77,6 +77,11 @@ public class VehicleParkingGroup {
     );
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, x, y);
+  }
+
   public String toString() {
     return String.format(Locale.ROOT, "VehicleParkingGroup(%s at %.6f, %.6f)", name, y, x);
   }
