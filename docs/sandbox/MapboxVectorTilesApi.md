@@ -76,7 +76,7 @@ The feature must be configured in `router-config.json` as follows
       "mapper": "Digitransit",
       "maxZoom": 17,
       "minZoom": 14,
-      "cacheMaxSeconds": 60,
+      "cacheMaxSeconds": 600,
       "expansionFactor": 0.25
     }
   ]
