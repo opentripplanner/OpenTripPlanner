@@ -43,7 +43,8 @@ All updaters have the following parameters in common:
     "facilitiesFrequencySec": 3600,
     "facilitiesUrl": "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
     "utilizationsFrequencySec": 600,
-    "utilizationsUrl": "https://p.hsl.fi/api/v1/utilizations.json?limit=-1"
+    "utilizationsUrl": "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+    "hubsUrl": "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
 }
 ```
 
@@ -57,6 +58,7 @@ All updaters have the following parameters in common:
 - `utilizationsFrequencySec`: how often should the basic information for parks be refetched. Should
   be less than `facilitiesFrequencySec` and if it's < 0, realtime information is never refetched.
   Default `3600`.
+- `hubsUrl` URL that contains parking hubs
 
 <b>To use KML park updater:</b>
 
