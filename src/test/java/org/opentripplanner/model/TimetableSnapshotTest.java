@@ -10,13 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import java.awt.geom.RectangularShape;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,9 +23,8 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 
 public class TimetableSnapshotTest {
 

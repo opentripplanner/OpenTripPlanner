@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 
 public class GtfsRealtimeAlertsUpdaterConfig {
 
