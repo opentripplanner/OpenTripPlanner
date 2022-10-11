@@ -32,59 +32,20 @@ public class DigitransitVehicleParkingGroupPropertyMapper
           parkingObject.put("carPlaces", vehicleParkingPlace.hasCarPlaces());
           parkingObject.put("bicyclePlaces", vehicleParkingPlace.hasBicyclePlaces());
           parkingObject.put("id", vehicleParkingPlace.getId().toString());
-          parkingObject.putAll(mapI18NString("name", vehicleParkingPlace.getName()));
+          // TODO translate name
+          parkingObject.put("name", vehicleParkingPlace.getName().toString());
           return parkingObject;
         })
         .toList()
     );
+    // TODO translate name
     items.addAll(
-      List.of(new T2<>("id", group.id().toString()), new T2<>("vehicleParking", parking))
+      List.of(
+        new T2<>("id", group.id().toString()),
+        new T2<>("name", group.name().toString()),
+        new T2<>("vehicleParking", parking)
+      )
     );
-    items.addAll(listI18NString("name", group.name()));
     return items;
-  }
-
-  private static List<T2<String, Object>> listI18NString(String key, I18NString i18n) {
-    if (i18n == null) {
-      return List.of();
-    }
-
-    var items = new ArrayList<T2<String, Object>>();
-    items.add(new T2<>(key, i18n.toString()));
-
-    if (i18n instanceof TranslatedString) {
-      ((TranslatedString) i18n).getTranslations()
-        .forEach(e -> {
-          if (e.getKey() != null) {
-            items.add(new T2<>(subKey(key, e.getKey()), e.getValue()));
-          }
-        });
-    }
-
-    return items;
-  }
-
-  private static Map<String, String> mapI18NString(String key, I18NString i18n) {
-    if (i18n == null) {
-      return Map.of();
-    }
-
-    var items = new HashMap<String, String>();
-    items.put(key, i18n.toString());
-
-    if (i18n instanceof TranslatedString) {
-      ((TranslatedString) i18n).getTranslations()
-        .forEach(e -> {
-          if (e.getKey() != null) {
-            items.put(subKey(key, e.getKey()), e.getValue());
-          }
-        });
-    }
-
-    return items;
-  }
-
-  private static String subKey(String key, String subkey) {
-    return String.format("%s.%s", key, subkey);
   }
 }
