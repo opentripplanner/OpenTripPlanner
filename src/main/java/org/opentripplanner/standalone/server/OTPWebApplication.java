@@ -64,6 +64,7 @@ public class OTPWebApplication extends Application {
 
     /* Features and Filters: extend Jersey, manipulate requests and responses. */
     classes.add(CorsFilter.class);
+    classes.add(EtagRequestFilter.class);
 
     return classes;
   }
