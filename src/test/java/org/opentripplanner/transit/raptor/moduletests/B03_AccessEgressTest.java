@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathUtils;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -44,16 +44,16 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .addAccessPaths(
-        walk(STOP_A, D1s), // Lowest cost
-        walk(STOP_B, D4m), // Best compromise of cost and time
-        walk(STOP_C, D7m), // Latest departure time: 0:16 - 5m = 0:11
-        walk(STOP_D, D20m) // Not optimal
+        TestAccessEgress.walk(STOP_A, D1s), // Lowest cost
+        TestAccessEgress.walk(STOP_B, D4m), // Best compromise of cost and time
+        TestAccessEgress.walk(STOP_C, D7m), // Latest departure time: 0:16 - 5m = 0:11
+        TestAccessEgress.walk(STOP_D, D20m) // Not optimal
       )
       .addEgressPaths(
-        walk(STOP_E, D20m), // Not optimal
-        walk(STOP_F, D7m), // Earliest arrival time: 0:18 + 3m = 0:21
-        walk(STOP_G, D4m), // Best compromise of cost and time
-        walk(STOP_H, D1s) // Lowest cost
+        TestAccessEgress.walk(STOP_E, D20m), // Not optimal
+        TestAccessEgress.walk(STOP_F, D7m), // Earliest arrival time: 0:18 + 3m = 0:21
+        TestAccessEgress.walk(STOP_G, D4m), // Best compromise of cost and time
+        TestAccessEgress.walk(STOP_H, D1s) // Lowest cost
       )
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00);
