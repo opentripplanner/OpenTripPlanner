@@ -99,7 +99,7 @@ public class SmokeTest {
     var otpResponse = RestClient.sendPlanRequest(request);
     var itineraries = otpResponse.getPlan().itineraries;
 
-    assertTrue(itineraries.size() > 1);
+    assertTrue(itineraries.size() >= 1);
 
     assertThatItineraryHasModes(itineraries, expectedModes);
   }

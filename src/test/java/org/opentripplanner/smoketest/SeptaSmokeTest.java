@@ -8,8 +8,6 @@ import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 /**
  * This smoke test expects an OTP installation running at localhost:8080
- * <p>
- * It uses the REST API to check that a route from Philadelphia's airport to its North can be found.
  */
 @Tag("smoke-test")
 @Tag("septa")
@@ -17,6 +15,9 @@ public class SeptaSmokeTest {
 
   WgsCoordinate airport = new WgsCoordinate(39.876151, -75.245189);
   WgsCoordinate stPetersCemetary = new WgsCoordinate(39.98974, -75.09515);
+
+  WgsCoordinate pierceStreet = new WgsCoordinate(39.93014, -75.18047);
+  WgsCoordinate templeUniversity = new WgsCoordinate(39.98069, -75.14886);
 
   @Test
   public void routeFromAirportToNorthPhiladelphia() {
@@ -36,5 +37,15 @@ public class SeptaSmokeTest {
   @Test
   public void bikeRentalStations() {
     SmokeTest.assertThatThereAreVehicleRentalStations();
+  }
+
+  @Test
+  public void routeWithBikeRental() {
+    SmokeTest.basicRouteTest(
+      pierceStreet,
+      templeUniversity,
+      Set.of("BICYCLE_RENT"),
+      List.of("WALK", "BICYCLE", "WALK")
+    );
   }
 }
