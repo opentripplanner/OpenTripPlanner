@@ -36,6 +36,18 @@ public interface Heuristics {
   int[] bestNumOfTransfersToIntArray(int unreached);
 
   /**
+   * The best overall generalized cost from origin to the given stop.
+   */
+  int bestGeneralizedCost(int stop);
+
+  /**
+   * To plot or debug the generalized cost.
+   *
+   * @param unreached set all unreached values to this value
+   */
+  int[] bestGeneralizedCostToIntArray(int unreached);
+
+  /**
    * The number of stops in the heuristics. This includes all stops also stops not reached.
    */
   int size();

@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
@@ -19,24 +18,21 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   private final Heuristics heuristics;
   private final RoundProvider roundProvider;
   private final DestinationArrivalPaths<T> paths;
-  private final CostCalculator<T> costCalculator;
   private final HeuristicAtStop[] stops;
   private final DebugHandlerFactory<T> debugHandlerFactory;
 
   public HeuristicsProvider() {
-    this(null, null, null, null, null);
+    this(null, null, null, null);
   }
 
   public HeuristicsProvider(
     Heuristics heuristics,
     RoundProvider roundProvider,
     DestinationArrivalPaths<T> paths,
-    CostCalculator<T> costCalculator,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.heuristics = heuristics;
     this.roundProvider = roundProvider;
-    this.costCalculator = costCalculator;
     this.paths = paths;
     this.stops = heuristics == null ? null : new HeuristicAtStop[heuristics.size()];
     this.debugHandlerFactory = debugHandlerFactory;
@@ -109,17 +105,18 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
       stops[stop] =
         createHeuristicAtStop(
           heuristics.bestTravelDuration(stop),
-          heuristics.bestNumOfTransfers(stop)
+          heuristics.bestNumOfTransfers(stop),
+          heuristics.bestGeneralizedCost(stop)
         );
     }
     return stops[stop];
   }
 
-  private HeuristicAtStop createHeuristicAtStop(int bestTravelDuration, int bestNumOfTransfers) {
-    return new HeuristicAtStop(
-      bestTravelDuration,
-      bestNumOfTransfers,
-      costCalculator.calculateMinCost(bestTravelDuration, bestNumOfTransfers)
-    );
+  private HeuristicAtStop createHeuristicAtStop(
+    int bestTravelDuration,
+    int bestNumOfTransfers,
+    int bestCost
+  ) {
+    return new HeuristicAtStop(bestTravelDuration, bestNumOfTransfers, bestCost);
   }
 }

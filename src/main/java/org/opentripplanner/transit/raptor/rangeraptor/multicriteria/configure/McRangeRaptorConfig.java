@@ -81,7 +81,6 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         heuristics,
         context.roundProvider(),
         createDestinationArrivalPaths(),
-        context.costCalculator(),
         context.debugFactory()
       );
     }
