@@ -27,7 +27,6 @@ import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 import org.opentripplanner.standalone.config.feed.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.feed.GtfsFeedParametersBuilder;
 import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
-import org.opentripplanner.standalone.config.feed.NetexFeedParametersBuilder;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,17 +162,8 @@ public class GraphBuilderDataSources {
     return inputData
       .get(NETEX)
       .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getNetexFeedConfig(it)))
+      .map(it -> new ConfiguredDataSource<>(it, (NetexFeedParameters) it))
       .toList();
-  }
-
-  private NetexFeedParameters getNetexFeedConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds
-      .netexFeeds()
-      .stream()
-      .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
-      .findFirst()
-      .orElse(new NetexFeedParametersBuilder().withSource(dataSource.uri()).build());
   }
 
   /**
