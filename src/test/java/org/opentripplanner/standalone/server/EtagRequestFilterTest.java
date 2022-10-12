@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.server;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.ext.vectortiles.VectorTilesResource.APPLICATION_X_PROTOBUF;
 
@@ -20,8 +21,11 @@ import org.opentripplanner.test.support.VariableSource;
 
 class EtagRequestFilterTest {
 
-  static Stream<Arguments> testCases = Stream.of(
-    Arguments.of("GET", 200, APPLICATION_X_PROTOBUF, bytes("hello123"), "\"0c8fc868b\""),
+  static final String vectorTilesResponse = "some vector tiles";
+  static final String vectorTilesEtag = "\"020c17790\"";
+
+  static Stream<Arguments> etagCases = Stream.of(
+    Arguments.of("GET", 200, APPLICATION_X_PROTOBUF, bytes(vectorTilesResponse), vectorTilesEtag),
     Arguments.of("GET", 404, APPLICATION_X_PROTOBUF, bytes("hello123"), null),
     Arguments.of("GET", 200, "application/json", bytes("{}"), null),
     Arguments.of("POST", 200, APPLICATION_X_PROTOBUF, bytes("hello123"), null),
@@ -32,7 +36,7 @@ class EtagRequestFilterTest {
   @ParameterizedTest(
     name = "{0} request with response status={1} type={2}, entity={3} produces ETag header {4}"
   )
-  @VariableSource("testCases")
+  @VariableSource("etagCases")
   void writeEtag(
     String method,
     int status,
@@ -41,11 +45,7 @@ class EtagRequestFilterTest {
     String expectedEtag
   ) throws IOException {
     var request = request(method);
-
-    var response = new ContainerResponse(
-      request,
-      new OutboundJaxrsResponse(Statuses.from(status), new OutboundMessageContext())
-    );
+    var response = response(status, request);
     var headers = response.getHeaders();
     headers.add(EtagRequestFilter.HEADER_CONTENT_TYPE, responseContentType);
     headers.add("Content-Length", entity.length);
@@ -55,6 +55,39 @@ class EtagRequestFilterTest {
     filter.filter(request, response);
 
     assertEquals(expectedEtag, response.getHeaderString(EtagRequestFilter.HEADER_ETAG));
+  }
+
+  static Stream<Arguments> ifNoneMatchCases = Stream.of(
+    Arguments.of("XXX", 200, bytes(vectorTilesResponse)),
+    Arguments.of(vectorTilesEtag, 304, null)
+  );
+
+  @ParameterizedTest(name = "If-None-Match header of {0} should lead to a status code of {2}")
+  @VariableSource("ifNoneMatchCases")
+  void ifNoneMatch(String ifNoneMatch, int expectedStatus, byte[] expectedEntity)
+    throws IOException {
+    var request = request("GET");
+    request.header(EtagRequestFilter.HEADER_IF_NONE_MATCH, ifNoneMatch);
+    var response = response(200, request);
+    var headers = response.getHeaders();
+    headers.add(EtagRequestFilter.HEADER_CONTENT_TYPE, APPLICATION_X_PROTOBUF);
+    var bytes = bytes(vectorTilesResponse);
+    headers.add("Content-Length", bytes.length);
+    response.setEntity(bytes);
+
+    var filter = new EtagRequestFilter();
+    filter.filter(request, response);
+
+    assertEquals(expectedStatus, response.getStatus());
+    assertArrayEquals(expectedEntity, (byte[]) response.getEntity());
+  }
+
+  @Nonnull
+  private static ContainerResponse response(int status, ContainerRequest request) {
+    return new ContainerResponse(
+      request,
+      new OutboundJaxrsResponse(Statuses.from(status), new OutboundMessageContext())
+    );
   }
 
   @Nonnull
