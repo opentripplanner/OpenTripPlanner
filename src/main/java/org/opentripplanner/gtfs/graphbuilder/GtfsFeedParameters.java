@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.gtfs.graphbuilder;
 
 import java.net.URI;
 import java.util.Objects;

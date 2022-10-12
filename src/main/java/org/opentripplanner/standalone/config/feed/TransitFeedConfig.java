@@ -5,6 +5,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.List;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 

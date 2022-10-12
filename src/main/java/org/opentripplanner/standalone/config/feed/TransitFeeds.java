@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 
 public record TransitFeeds(
