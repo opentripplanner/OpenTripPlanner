@@ -55,8 +55,11 @@ public class EtagRequestFilter implements ContainerResponseFilter {
   private static String generateETagHeaderValue(byte[] input) {
     StringBuilder builder = new StringBuilder(11);
     builder.append("\"0");
-    var md5 = Hashing.murmur3_32_fixed().hashBytes(input).asBytes();
-    var hex = Hex.encodeHex(md5);
+    // according to https://softwareengineering.stackexchange.com/questions/49550
+    // Murmur is the fastest hash algorithm and has an acceptable number of collisions.
+    // (It doesn't need to be cryptographically secure.)
+    var hash = Hashing.murmur3_32_fixed().hashBytes(input).asBytes();
+    var hex = Hex.encodeHex(hash);
     builder.append(hex);
     builder.append('"');
     return builder.toString();
