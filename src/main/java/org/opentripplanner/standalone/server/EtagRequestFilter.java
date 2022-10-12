@@ -18,6 +18,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
   public static final String HEADER_IF_NONE_MATCH = "If-None-Match";
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
   public static final String HEADER_CACHE_CONTROL = "Cache-Control";
+  public static final String HEADER_VARY = "Vary";
 
   @Override
   public void filter(ContainerRequestContext request, ContainerResponseContext response)
@@ -31,7 +32,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
       var clientEtag = request.getHeaderString(HEADER_IF_NONE_MATCH);
       var etag = generateETagHeaderValue(bytes);
       var headers = response.getHeaders();
-      headers.add("Vary", "Accept, Accept-Encoding, Accept-Language");
+      headers.add(HEADER_VARY, "Accept, Accept-Encoding, Accept-Language");
       headers.add(HEADER_ETAG, etag);
 
       // if the client's etag matches the generated one then send an empty response
