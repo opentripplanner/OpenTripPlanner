@@ -35,6 +35,8 @@ public class LogicalOrSpecifier implements OsmSpecifier {
     var oneMatchesExactly = subSpecs.stream().anyMatch(subspec -> subspec.allTagsMatch(way));
     if (oneMatchesExactly) {
       return 1;
-    } else return 0;
+    } else {
+      return 0;
+    }
   }
 }
