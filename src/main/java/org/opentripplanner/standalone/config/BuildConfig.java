@@ -23,11 +23,11 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParamet
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemConfig;
 import org.opentripplanner.standalone.config.feed.NetexConfig;
-import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeeds;

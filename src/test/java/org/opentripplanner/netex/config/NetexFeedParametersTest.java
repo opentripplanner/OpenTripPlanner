@@ -1,15 +1,14 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.netex.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.opentripplanner.standalone.config.feed.NetexFeedParameters.DEFAULT;
+import static org.opentripplanner.netex.config.NetexFeedParameters.DEFAULT;
 
 import java.net.URI;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 
 class NetexFeedParametersTest {
 

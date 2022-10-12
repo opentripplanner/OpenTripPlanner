@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.netex.config;
 
 import static java.util.Objects.requireNonNull;
 
