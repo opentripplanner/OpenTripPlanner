@@ -22,7 +22,7 @@ import org.opentripplanner.test.support.VariableSource;
 class EtagRequestFilterTest {
 
   static final String vectorTilesResponse = "some vector tiles";
-  static final String vectorTilesEtag = "\"020c17790\"";
+  static final String vectorTilesEtag = "\"20c17790\"";
 
   static Stream<Arguments> etagCases = Stream.of(
     Arguments.of("GET", 200, APPLICATION_X_PROTOBUF, bytes(vectorTilesResponse), vectorTilesEtag),

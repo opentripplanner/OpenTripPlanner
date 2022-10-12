@@ -17,6 +17,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
   public static final String HEADER_ETAG = "ETag";
   public static final String HEADER_IF_NONE_MATCH = "If-None-Match";
   public static final String HEADER_CONTENT_TYPE = "Content-Type";
+  public static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
   @Override
   public void filter(ContainerRequestContext request, ContainerResponseContext response)
@@ -48,7 +49,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
   ) {
     var statusCode = response.getStatus();
     if (statusCode >= 200 && statusCode < 300 && HttpMethod.GET.matches(request.getMethod())) {
-      String cacheControl = response.getHeaderString("Cache-Control");
+      String cacheControl = response.getHeaderString(HEADER_CACHE_CONTROL);
       return (cacheControl == null || !cacheControl.contains(DIRECTIVE_NO_STORE));
     }
 
@@ -56,8 +57,8 @@ public class EtagRequestFilter implements ContainerResponseFilter {
   }
 
   private static String generateETagHeaderValue(byte[] input) {
-    StringBuilder builder = new StringBuilder(11);
-    builder.append("\"0");
+    StringBuilder builder = new StringBuilder(10);
+    builder.append('"');
     // according to https://softwareengineering.stackexchange.com/questions/49550
     // Murmur is the fastest hash algorithm and has an acceptable number of collisions.
     // (It doesn't need to be cryptographically secure.)
