@@ -10,10 +10,10 @@ import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.NetexModule;
+import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**

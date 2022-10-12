@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.feed;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
+import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.ParameterBuilder;
 
