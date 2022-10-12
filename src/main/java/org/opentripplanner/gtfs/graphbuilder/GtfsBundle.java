@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.model;
+package org.opentripplanner.gtfs.graphbuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,8 +9,6 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.standalone.config.feed.GtfsFeedParameters;
-import org.opentripplanner.standalone.config.feed.GtfsFeedParametersBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
