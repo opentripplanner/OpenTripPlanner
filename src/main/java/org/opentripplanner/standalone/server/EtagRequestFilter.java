@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.server;
 
 import com.google.common.hash.Hashing;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -34,6 +35,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
       // if the client's etag matches the generated one then send an empty response
       if (clientEtag != null && clientEtag.equals(etag)) {
         response.setEntity(null);
+        response.setEntityStream(new ByteArrayOutputStream());
         response.setStatus(HttpStatus.SC_NOT_MODIFIED);
       }
     }
