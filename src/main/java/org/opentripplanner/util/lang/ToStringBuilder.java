@@ -101,8 +101,12 @@ public class ToStringBuilder {
     return this;
   }
 
+  public ToStringBuilder addStr(String name, String value, String ignoreValue) {
+    return addIfNotIgnored(name, value, ignoreValue, v -> "'" + v + "'");
+  }
+
   public ToStringBuilder addStr(String name, String value) {
-    return addIfNotNull(name, value, v -> "'" + v + "'");
+    return addStr(name, value, null);
   }
 
   public ToStringBuilder addEnum(String name, Enum<?> value) {
@@ -123,15 +127,30 @@ public class ToStringBuilder {
 
   /**
    * Use this if you would like a custom toString function to convert the value. If the given value
-   * is null, then the value is not printed. The "Op" (Operation) suffix is necessary to separate
-   * this from {@link #addObj(String, Object, Object)},  when the last argument is null.
+   * is null, then the value is not printed.
+   * <p>
+   * Implementation note! The "Op" (Operation) suffix is necessary to separate this from
+   * {@link #addObj(String, Object, Object)},  when the last argument is null.
    */
   public <T> ToStringBuilder addObjOp(
     String name,
     @Nullable T value,
     Function<T, Object> toObjectOp
   ) {
-    return addIfNotIgnored(name, value, null, v -> nullSafeToString(toObjectOp.apply(v)));
+    return addObjOp(name, value, null, toObjectOp);
+  }
+
+  /**
+   * Use this if you would like a custom toString function to convert the value. If the given value
+   * equals the given {@code ignoreValue}, then the value is not printed.
+   */
+  public <T> ToStringBuilder addObjOp(
+    String name,
+    @Nullable T value,
+    @Nullable T ignoreValue,
+    Function<T, Object> toObjectOp
+  ) {
+    return addIfNotIgnored(name, value, ignoreValue, v -> nullSafeToString(toObjectOp.apply(v)));
   }
 
   public ToStringBuilder addInts(String name, int[] intArray) {
