@@ -26,7 +26,8 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemConfig;
-import org.opentripplanner.standalone.config.feed.NetexDefaultParameters;
+import org.opentripplanner.standalone.config.feed.NetexConfig;
+import org.opentripplanner.standalone.config.feed.NetexFeedParameters;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeeds;
@@ -307,7 +308,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * Netex specific build parameters.
    */
-  public final NetexDefaultParameters netexDefaults;
+  public final NetexFeedParameters netexDefaults;
 
   /**
    * OpenStreetMap specific build parameters.
@@ -632,20 +633,13 @@ public class BuildConfig implements OtpDataStoreConfig {
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");
     dem = DemConfig.mapDemConfig(root, "dem");
-    transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds");
+
+    netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
+    transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
-    netexDefaults =
-      new NetexDefaultParameters(
-        root
-          .of("netexDefaults")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
     dataOverlay =
       DataOverlayConfigMapper.map(
         root

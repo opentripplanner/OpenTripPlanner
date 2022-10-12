@@ -9,13 +9,17 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TransitFeedConfig {
 
-  public static TransitFeeds mapTransitFeeds(NodeAdapter root, String parameterName) {
+  public static TransitFeeds mapTransitFeeds(
+    NodeAdapter root,
+    String parameterName,
+    NetexFeedParameters netexDefaults
+  ) {
     List<DataSourceConfig> list = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
-      .asObjects(TransitFeedConfig::mapTransitFeed);
+      .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
 
     return new TransitFeeds(
       filterListOnSubType(list, GtfsFeedParameters.class),
@@ -23,14 +27,17 @@ public class TransitFeedConfig {
     );
   }
 
-  private static DataSourceConfig mapTransitFeed(NodeAdapter feedNode) {
+  private static DataSourceConfig mapTransitFeed(
+    NodeAdapter feedNode,
+    NetexFeedParameters netexDefaults
+  ) {
     var type = feedNode
       .of("type")
       .withDoc(V2_2, "The feed input format.")
       .asEnum(TransitFeedType.class);
     return switch (type) {
       case GTFS -> mapGtfsFeed(feedNode);
-      case NETEX -> mapNetexFeed(feedNode);
+      case NETEX -> NetexConfig.mapNetexFeed(feedNode, netexDefaults);
     };
   }
 
@@ -45,37 +52,6 @@ public class TransitFeedConfig {
       )
       .withSource(
         node.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri()
-      )
-      .build();
-  }
-
-  private static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode) {
-    return new NetexFeedParametersBuilder()
-      .withFeedId(
-        feedNode
-          .of("feedId")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asString(null)
-      )
-      .withSource(
-        feedNode
-          .of("source")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asUri()
-      )
-      .withSharedFilePattern(
-        feedNode.of("sharedFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null)
-      )
-      .withSharedGroupFilePattern(
-        feedNode.of("sharedGroupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null)
-      )
-      .withIgnoreFilePattern(
-        feedNode.of("ignoreFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null)
-      )
-      .withGroupFilePattern(
-        feedNode.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(null)
       )
       .build();
   }

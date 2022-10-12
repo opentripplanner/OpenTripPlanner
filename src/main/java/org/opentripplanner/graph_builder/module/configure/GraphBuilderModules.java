@@ -31,7 +31,7 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.netex.NetexModule;
-import org.opentripplanner.netex.configure.NetexConfig;
+import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
@@ -113,7 +113,7 @@ public class GraphBuilderModules {
     TransitModel transitModel,
     DataImportIssueStore issueStore
   ) {
-    return new NetexConfig(config)
+    return new NetexConfigure(config)
       .createNetexModule(
         dataSources.getNetexConfiguredDatasource(),
         transitModel,
