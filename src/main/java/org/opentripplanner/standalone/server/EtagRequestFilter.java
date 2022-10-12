@@ -1,12 +1,12 @@
 package org.opentripplanner.standalone.server;
 
+import com.google.common.hash.Hashing;
 import java.io.IOException;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpStatus;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 
@@ -42,7 +42,7 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     ContainerRequestContext request,
     ContainerResponseContext response
   ) {
-    if (response.getLength() == 0) {
+    if (response.getLength() <= 0) {
       return false;
     }
     var statusCode = response.getStatus();
@@ -54,11 +54,10 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     return false;
   }
 
-  private static String generateETagHeaderValue(byte[] output) {
-    // length of " + 0 + 32bits md5 hash + "
-    StringBuilder builder = new StringBuilder(37);
+  private static String generateETagHeaderValue(byte[] input) {
+    StringBuilder builder = new StringBuilder(11);
     builder.append("\"0");
-    var md5 = DigestUtils.getMd5Digest().digest(output);
+    var md5 = Hashing.murmur3_32_fixed().hashBytes(input).asBytes();
     var hex = Hex.encodeHex(md5);
     builder.append(hex);
     builder.append('"');
