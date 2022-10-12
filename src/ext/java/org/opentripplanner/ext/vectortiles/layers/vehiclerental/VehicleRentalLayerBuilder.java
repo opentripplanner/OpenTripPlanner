@@ -21,7 +21,7 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> 
 
   static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalPlace>>> mappers = Map.of(
     MapperType.Digitransit,
-    g -> DigitransitVehicleRentalPropertyMapper.create()
+    g -> new DigitransitVehicleRentalPropertyMapper()
   );
   private final Graph graph;
 
@@ -46,13 +46,10 @@ public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> 
     return service
       .getVehicleRentalPlaces()
       .stream()
-      .map(vehicleRentalStation -> {
-        Coordinate coordinate = new Coordinate(
-          vehicleRentalStation.getLongitude(),
-          vehicleRentalStation.getLatitude()
-        );
+      .map(rental -> {
+        Coordinate coordinate = new Coordinate(rental.getLongitude(), rental.getLatitude());
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        point.setUserData(vehicleRentalStation);
+        point.setUserData(rental);
         return point;
       })
       .collect(Collectors.toList());
