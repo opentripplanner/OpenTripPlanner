@@ -19,6 +19,7 @@ public enum OTPFeature {
   APIGraphInspectorTile(true),
   APIUpdaterStatus(true),
   ConsiderPatternsForDirectTransfers(true),
+  DebugClient(true),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
