@@ -49,7 +49,7 @@ public class NetexDefaultParameters {
       config.of("groupFilePattern").withDoc(NA, /*TODO DOC*/"TODO").asPattern(GROUP_FILE_PATTERN);
     feedId =
       config
-        .of("netexFeedId")
+        .of("feedId")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(NETEX_FEED_ID);

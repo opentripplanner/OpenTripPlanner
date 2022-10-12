@@ -40,7 +40,7 @@ public class NetexBundle implements Closeable {
 
   private final NetexDataSourceHierarchy hierarchy;
 
-  private final String netexFeedId;
+  private final String feedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final double maxStopToShapeSnapDistance;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
@@ -52,13 +52,13 @@ public class NetexBundle implements Closeable {
   private NetexXmlParser xmlParser;
 
   public NetexBundle(
-    String netexFeedId,
+    String feedId,
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
     Set<String> ferryIdsNotAllowedForBicycle,
     double maxStopToShapeSnapDistance
   ) {
-    this.netexFeedId = netexFeedId;
+    this.feedId = feedId;
     this.source = source;
     this.hierarchy = hierarchy;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
@@ -82,7 +82,7 @@ public class NetexBundle implements Closeable {
     mapper =
       new NetexMapper(
         transitBuilder,
-        netexFeedId,
+        feedId,
         deduplicator,
         issueStore,
         ferryIdsNotAllowedForBicycle,

@@ -92,13 +92,13 @@
       "type": "siri-sx-updater",
       "frequencySec": 60,
       "url": "{{ url }}",
-      "feedId": "RB",
+      "feedId": "EN",
       "blockReadinessUntilInitialized": true
     },
     // SIRI ET Google Pubsub updater
     {
       "type": "siri-et-google-pubsub-updater",
-      "feedId": "RB",
+      "feedId": "EN",
       "reconnectPeriodSec": 5,
       "projectName": "entur-ror",
       "topicName": "estimated_timetables",
@@ -110,7 +110,7 @@
       "frequencySec": 20,
       "previewIntervalMinutes": 180,
       "url": "{{ url }}",
-      "feedId": "RB",
+      "feedId": "EN",
       "blockReadinessUntilInitialized": true
     }
   ]

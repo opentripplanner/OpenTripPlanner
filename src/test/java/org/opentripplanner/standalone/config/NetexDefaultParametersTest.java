@@ -28,23 +28,25 @@ class NetexDefaultParametersTest {
   @Test
   void testLoadingConfigAndPatternMatchers() throws IOException {
     NodeAdapter nodeAdapter = newNodeAdapterForTest(
-      "{\n" +
-      "    'moduleFilePattern' : 'netex_.*\\\\.zip',\n" +
-      "    'ignoreFilePattern' : '(__.*|\\\\..*)',\n" +
-      "    'sharedFilePattern' : '_stops.xml',\n" +
-      "    'sharedGroupFilePattern' : '_(\\\\w{3})_shared_data.xml',\n" +
-      "    'groupFilePattern' : '(\\\\w{3})_.*\\\\.xml',\n" +
-      "    'netexFeedId': 'RB'\n" +
-      "}"
+      """
+      {
+        'feedId': 'EN',
+        'moduleFilePattern' : 'netex_.*\\\\.zip',
+        'sharedFilePattern' : '_stops.xml',
+        'sharedGroupFilePattern' : '_(\\\\w{3})_shared_data.xml',
+        'groupFilePattern' : '(\\\\w{3})_.*\\\\.xml',
+        'ignoreFilePattern' : '(__.*|\\\\..*)'
+      }
+      """
     );
 
     NetexDefaultParameters subject = new NetexDefaultParameters(nodeAdapter);
 
-    assertTrue(subject.ignoreFilePattern().matcher(".ignore").matches());
-    assertTrue(subject.ignoreFilePattern().matcher("__ignore").matches());
+    assertEquals("EN", subject.feedId());
     assertTrue(subject.sharedFilePattern().matcher("_stops.xml").matches());
     assertTrue(subject.sharedGroupFilePattern().matcher("_RUT_shared_data.xml").matches());
     assertTrue(subject.groupFilePattern().matcher("RUT_anything.xml").matches());
-    assertEquals("RB", subject.feedId());
+    assertTrue(subject.ignoreFilePattern().matcher(".ignore").matches());
+    assertTrue(subject.ignoreFilePattern().matcher("__ignore").matches());
   }
 }
