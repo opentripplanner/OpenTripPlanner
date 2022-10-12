@@ -23,7 +23,8 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     if (
       isEligibleForEtag(request, response) &&
       hasAllowedContentType(response) &&
-      response.getEntity() instanceof byte[] bytes
+      response.getEntity() instanceof byte[] bytes &&
+      bytes.length > 0
     ) {
       var clientEtag = request.getHeaderString(HEADER_IF_NONE_MATCH);
       var etag = generateETagHeaderValue(bytes);
@@ -42,9 +43,6 @@ public class EtagRequestFilter implements ContainerResponseFilter {
     ContainerRequestContext request,
     ContainerResponseContext response
   ) {
-    if (response.getLength() <= 0) {
-      return false;
-    }
     var statusCode = response.getStatus();
     if (statusCode >= 200 && statusCode < 300 && HttpMethod.GET.matches(request.getMethod())) {
       String cacheControl = response.getHeaderString("Cache-Control");

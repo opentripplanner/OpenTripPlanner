@@ -48,7 +48,6 @@ class EtagRequestFilterTest {
     var response = response(status, request);
     var headers = response.getHeaders();
     headers.add(EtagRequestFilter.HEADER_CONTENT_TYPE, responseContentType);
-    headers.add("Content-Length", entity.length);
     response.setEntity(entity);
 
     var filter = new EtagRequestFilter();
@@ -72,7 +71,6 @@ class EtagRequestFilterTest {
     var headers = response.getHeaders();
     headers.add(EtagRequestFilter.HEADER_CONTENT_TYPE, APPLICATION_X_PROTOBUF);
     var bytes = bytes(vectorTilesResponse);
-    headers.add("Content-Length", bytes.length);
     response.setEntity(bytes);
 
     var filter = new EtagRequestFilter();
