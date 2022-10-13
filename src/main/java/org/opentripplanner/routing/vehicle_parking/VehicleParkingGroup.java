@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -18,13 +19,12 @@ public class VehicleParkingGroup {
 
   private final I18NString name;
 
-  private final double x, y;
+  private final WgsCoordinate coordinate;
 
   VehicleParkingGroup(VehicleParkingGroupBuilder vehicleParkingGroupBuilder) {
     this.id = vehicleParkingGroupBuilder.id;
     this.name = vehicleParkingGroupBuilder.name;
-    this.x = vehicleParkingGroupBuilder.x;
-    this.y = vehicleParkingGroupBuilder.y;
+    this.coordinate = vehicleParkingGroupBuilder.coordinate;
   }
 
   public static VehicleParkingGroupBuilder builder() {
@@ -47,17 +47,10 @@ public class VehicleParkingGroup {
   }
 
   /**
-   * Longitude
+   * The coordinate of the vehicle parking group.
    */
-  public double x() {
-    return x;
-  }
-
-  /**
-   * Latitude
-   */
-  public double y() {
-    return y;
+  public WgsCoordinate coordinate() {
+    return coordinate;
   }
 
   @Override
@@ -70,8 +63,7 @@ public class VehicleParkingGroup {
     }
     final VehicleParkingGroup that = (VehicleParkingGroup) o;
     return (
-      Double.compare(that.x, x) == 0 &&
-      Double.compare(that.y, y) == 0 &&
+      Objects.equals(coordinate, that.coordinate) &&
       Objects.equals(id, that.id) &&
       Objects.equals(name, that.name)
     );
@@ -79,10 +71,16 @@ public class VehicleParkingGroup {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, x, y);
+    return Objects.hash(id, name, coordinate);
   }
 
   public String toString() {
-    return String.format(Locale.ROOT, "VehicleParkingGroup(%s at %.6f, %.6f)", name, y, x);
+    return String.format(
+      Locale.ROOT,
+      "VehicleParkingGroup(%s at %.6f, %.6f)",
+      name,
+      coordinate.latitude(),
+      coordinate.longitude()
+    );
   }
 }

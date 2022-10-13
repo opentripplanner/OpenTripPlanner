@@ -86,8 +86,8 @@ public class HslParkUpdaterTest {
     assertEquals("hslpark:321", firstVehicleParkingGroup.id().toString());
     assertEquals("HubYksi", firstVehicleParkingGroup.name().toString(new Locale("fi")));
     assertEquals("HubEn", firstVehicleParkingGroup.name().toString(new Locale("sv")));
-    assertEquals(24.804913, firstVehicleParkingGroup.x());
-    assertEquals(60.176064, firstVehicleParkingGroup.y());
+    assertEquals(24.804913, firstVehicleParkingGroup.coordinate().longitude());
+    assertEquals(60.176064, firstVehicleParkingGroup.coordinate().latitude());
 
     var second = parkingLots.get(1);
     var name = second.getName();

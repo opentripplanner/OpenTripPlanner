@@ -12,6 +12,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
@@ -59,8 +60,7 @@ public class HslHubToVehicleParkingGroupMapper {
         .builder()
         .withId(hubId)
         .withName(name)
-        .withX(x)
-        .withY(y)
+        .withCoordinate(new WgsCoordinate(y, x))
         .build();
       var vehicleParkingIds = getVehicleParkingIds((ArrayNode) jsonNode.get("facilityIds"), hubId);
       if (vehicleParkingIds == null) {

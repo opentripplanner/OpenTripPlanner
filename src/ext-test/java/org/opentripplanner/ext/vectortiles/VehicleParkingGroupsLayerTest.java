@@ -55,8 +55,7 @@ public class VehicleParkingGroupsLayerTest {
             false
           )
         )
-        .withX(1.1)
-        .withY(1.9)
+        .withCoordinate(new WgsCoordinate(1.9, 1.1))
         .build();
     vehicleParking =
       VehicleParking

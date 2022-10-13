@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.vehicle_parking;
 
 import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleParkingGroupBuilder {
 
   FeedScopedId id;
   I18NString name;
-  double x;
-  double y;
+  WgsCoordinate coordinate;
 
   VehicleParkingGroupBuilder() {}
 
@@ -29,18 +29,10 @@ public class VehicleParkingGroupBuilder {
   }
 
   /**
-   * Longitude
+   * The coordinate of the vehicle parking group
    */
-  public VehicleParkingGroupBuilder withX(double x) {
-    this.x = x;
-    return this;
-  }
-
-  /**
-   * Latitude
-   */
-  public VehicleParkingGroupBuilder withY(double y) {
-    this.y = y;
+  public VehicleParkingGroupBuilder withCoordinate(WgsCoordinate coordinate) {
+    this.coordinate = coordinate;
     return this;
   }
 

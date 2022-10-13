@@ -3,7 +3,6 @@ package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -50,7 +49,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
       .stream()
       .map(vehicleParkingGroupEntry -> {
         var group = vehicleParkingGroupEntry.getKey();
-        Coordinate coordinate = new Coordinate(group.x(), group.y());
+        Coordinate coordinate = group.coordinate().asJtsCoordinate();
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
         var parking = vehicleParkingGroupEntry.getValue();
         var parkingAndGroup = new VehicleParkingAndGroup(group, parking);
