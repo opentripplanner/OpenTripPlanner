@@ -2,9 +2,8 @@ package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -46,13 +47,13 @@ public class E11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
 
     data.withRoutes(r1, r2);
     data.withGuaranteedTransfer(tripA, STOP_C, tripB, STOP_C);
-    data.withTransfer(STOP_A, walk(STOP_B, D10m));
+    data.withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D10m));
     data.mcCostParamsBuilder().transferCost(100);
 
     requestBuilder
       .searchParams()
       .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
-      .addEgressPaths(walk(STOP_D, D1m));
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D1m));
 
     requestBuilder
       .searchParams()

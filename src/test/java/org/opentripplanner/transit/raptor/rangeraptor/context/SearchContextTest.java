@@ -12,20 +12,20 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 class SearchContextTest implements RaptorTestConstants {
 
   private final boolean GET_ACCESS = true;
   private final boolean GET_EGRESS = false;
-  private final RaptorTransfer PATH_A_10s = TestTransfer.walk(STOP_A, D10s);
-  private final RaptorTransfer PATH_A_11s = TestTransfer.walk(STOP_A, D11s);
-  private final RaptorTransfer PATH_B = TestTransfer.walk(STOP_B, D1m);
-  private final RaptorTransfer PATH_C_30s = TestTransfer.walk(STOP_C, D30s);
-  private final RaptorTransfer PATH_C_40s = TestTransfer.walk(STOP_C, D40s);
+  private final RaptorAccessEgress PATH_A_10s = TestAccessEgress.walk(STOP_A, D10s);
+  private final RaptorAccessEgress PATH_A_11s = TestAccessEgress.walk(STOP_A, D11s);
+  private final RaptorAccessEgress PATH_B = TestAccessEgress.walk(STOP_B, D1m);
+  private final RaptorAccessEgress PATH_C_30s = TestAccessEgress.walk(STOP_C, D30s);
+  private final RaptorAccessEgress PATH_C_40s = TestAccessEgress.walk(STOP_C, D40s);
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
 
   @BeforeEach
@@ -76,7 +76,7 @@ class SearchContextTest implements RaptorTestConstants {
     );
   }
 
-  private static List<RaptorTransfer> sort(Collection<RaptorTransfer> c) {
+  private static List<RaptorAccessEgress> sort(Collection<RaptorAccessEgress> c) {
     return c
       .stream()
       .sorted(Comparator.comparingInt(it -> it.stop() * 10_000 + it.durationInSeconds()))

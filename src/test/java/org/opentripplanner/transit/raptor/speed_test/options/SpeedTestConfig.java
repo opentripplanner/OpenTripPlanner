@@ -1,15 +1,17 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +38,41 @@ public class SpeedTestConfig {
   public SpeedTestConfig(JsonNode node) {
     NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
     this.rawNode = node;
-    testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
-    graph = adapter.asUri("graph", null);
-    feedId = adapter.asText("feedId");
-    transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
-    request = mapRoutingRequest(adapter.path("routingDefaults"));
+    testDate =
+      adapter
+        .of("testDate")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
+    graph =
+      adapter
+        .of("graph")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null);
+    feedId =
+      adapter
+        .of("feedId")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString();
+    transitRoutingParams =
+      new TransitRoutingConfig(
+        adapter
+          .of("tuningParameters")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    request =
+      mapRoutingRequest(
+        adapter
+          .of("routingDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
   }
 
   public static SpeedTestConfig config(File dir) {

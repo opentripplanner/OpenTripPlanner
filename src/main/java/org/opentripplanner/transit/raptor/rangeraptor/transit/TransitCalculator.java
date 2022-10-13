@@ -4,6 +4,7 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -87,7 +88,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * <p>
    * Returns -1 if transfer is not possible after the requested departure time
    */
-  int departureTime(RaptorTransfer transfer, int departureTime);
+  int departureTime(RaptorAccessEgress accessPath, int departureTime);
 
   /**
    * Return an iterator, iterating over the minutes in the RangeRaptor algorithm.

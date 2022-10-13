@@ -308,7 +308,8 @@ public class IndexAPI {
       .getStopTimesForStop(
         stop,
         serviceDate,
-        omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
+        omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+        true
       );
     return StopTimesInPatternMapper.mapToApi(stopTimes);
   }

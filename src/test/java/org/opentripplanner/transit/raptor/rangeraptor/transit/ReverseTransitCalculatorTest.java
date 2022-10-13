@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.D1m;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.transit.raptor._data.RaptorTestConstants.STOP_B;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -80,7 +80,8 @@ public class ReverseTransitCalculatorTest {
   @Test
   public void getTransfers() {
     var subject = create();
-    var transitData = new TestTransitData().withTransfer(STOP_A, walk(STOP_B, D1m));
+    var transitData = new TestTransitData()
+      .withTransfer(STOP_A, TestTransfer.transfer(STOP_B, D1m));
 
     // Expect transfer from stop A to stop B (reversed)
     var transfersFromStopB = subject.getTransfers(transitData, STOP_B);

@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
@@ -82,7 +82,7 @@ public class PathStringBuilderTest {
     assertEquals(
       "227 ~ BUS 10:46:05 10:55 ~ 112",
       subject
-        .accessEgress(TestTransfer.walk(227, 0, 0))
+        .accessEgress(TestAccessEgress.walk(227, 0, 0))
         .sep()
         .stop(227)
         .sep()
@@ -90,7 +90,7 @@ public class PathStringBuilderTest {
         .sep()
         .stop(112)
         .sep()
-        .accessEgress(TestTransfer.walk(112, 0, 0))
+        .accessEgress(TestAccessEgress.walk(112, 0, 0))
         .toString()
     );
   }

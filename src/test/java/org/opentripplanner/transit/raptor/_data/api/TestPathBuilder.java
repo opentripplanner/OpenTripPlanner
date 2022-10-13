@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor._data.api;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
@@ -42,25 +43,25 @@ public class TestPathBuilder {
    * the access start time and prevent time-shifting it.
    */
   public TestPathBuilder access(int startTime, int duration, int toStop) {
-    return access(startTime, TestTransfer.walk(toStop, duration, startTime, startTime));
+    return access(startTime, TestAccessEgress.walk(toStop, duration, startTime, startTime));
   }
 
   /**
    * Create access with the given {@code startTime}, but allow the access to be time-shifted
    * according to the opening hours of the given {@code transfer}.
    */
-  public TestPathBuilder access(int startTime, TestTransfer transfer) {
+  public TestPathBuilder access(int startTime, TestAccessEgress transfer) {
     reset(startTime);
     builder.access(transfer);
     return this;
   }
 
   public TestPathBuilder walk(int duration, int toStop) {
-    return walk(TestTransfer.walk(toStop, duration));
+    return walk(TestTransfer.transfer(toStop, duration));
   }
 
   public TestPathBuilder walk(int duration, int toStop, int cost) {
-    return walk(TestTransfer.walk(toStop, duration, cost));
+    return walk(TestTransfer.transfer(toStop, duration, cost));
   }
 
   public TestPathBuilder walk(TestTransfer transfer) {
@@ -92,10 +93,10 @@ public class TestPathBuilder {
   }
 
   public Path<TestTripSchedule> egress(int duration) {
-    return egress(TestTransfer.walk(currentStop(), duration));
+    return egress(TestAccessEgress.walk(currentStop(), duration));
   }
 
-  public Path<TestTripSchedule> egress(TestTransfer transfer) {
+  public Path<TestTripSchedule> egress(TestAccessEgress transfer) {
     builder.egress(transfer);
     return builder.build(startTime);
   }

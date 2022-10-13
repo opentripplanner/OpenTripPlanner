@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
@@ -56,7 +57,7 @@ public final class StdStopArrivals<T extends RaptorTripSchedule> implements Best
     return unreachedMinNumberOfTransfers();
   }
 
-  void setAccessTime(int time, RaptorTransfer access, boolean bestTime) {
+  void setAccessTime(int time, RaptorAccessEgress access, boolean bestTime) {
     final int stop = access.stop();
     var existingArrival = getOrCreateStopIndex(round(), stop);
 

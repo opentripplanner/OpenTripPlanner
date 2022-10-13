@@ -1,5 +1,8 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +32,24 @@ public class S3BucketConfig {
     }
     S3BucketConfig bucketConfig = new S3BucketConfig();
     try {
-      bucketConfig.accessKey = config.asText("accessKey");
-      bucketConfig.secretKey = config.asText("secretKey");
-      bucketConfig.bucketName = config.asText("bucketName");
+      bucketConfig.accessKey =
+        config
+          .of("accessKey")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString();
+      bucketConfig.secretKey =
+        config
+          .of("secretKey")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString();
+      bucketConfig.bucketName =
+        config
+          .of("bucketName")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString();
     } catch (OtpAppException ex) {
       LOG.error(
         "You must specify an accessKey, a secretKey, and a bucketName when " +

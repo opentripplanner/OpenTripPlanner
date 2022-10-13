@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.path;
 
 import java.util.Objects;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -12,12 +12,12 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
 
-  private final RaptorTransfer egress;
+  private final RaptorAccessEgress egress;
   private final int fromTime;
   private final int toTime;
   private final int generalizedCost;
 
-  public EgressPathLeg(RaptorTransfer egress, int fromTime, int toTime, int generalizedCost) {
+  public EgressPathLeg(RaptorAccessEgress egress, int fromTime, int toTime, int generalizedCost) {
     this.egress = egress;
     this.fromTime = fromTime;
     this.toTime = toTime;
@@ -63,7 +63,7 @@ public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLe
     );
   }
 
-  public RaptorTransfer egress() {
+  public RaptorAccessEgress egress() {
     return egress;
   }
 
