@@ -13,31 +13,30 @@ public class PollingStoptimeUpdaterConfig {
   public static PollingTripUpdaterParameters create(String configRef, NodeAdapter c) {
     String file = null;
     String url = null;
-    String sourceTypeStr = c
+    var sourceType = c
       .of("sourceType")
       .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
-      .asString();
-    DataSourceType sourceType;
+      .asEnum(DataSourceType.class);
 
-    if ("gtfs-file".equals(sourceTypeStr)) {
+
+
+    if (sourceType == DataSourceType.GTFS_RT_FILE) {
       file =
         c.of("file").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
-      sourceType = DataSourceType.GTFS_RT_FILE;
-    } else if ("gtfs-http".equals(sourceTypeStr)) {
+    } else if (sourceType == DataSourceType.GTFS_RT_HTTP) {
       url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
-      sourceType = DataSourceType.GTFS_RT_HTTP;
     } else {
       throw new OtpAppException(
         "Polling-stoptime-updater sourece-type is not valid: {}",
-        sourceTypeStr
+        sourceType
       );
     }
 
     // TODO DOC: Deprecate  c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
 
     return new PollingTripUpdaterParameters(
-      configRef + ":" + sourceTypeStr,
+      configRef + ":" + sourceType,
       c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
       c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
       c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
