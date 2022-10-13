@@ -157,18 +157,6 @@ public class WayPropertySetSourceTest {
     assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
   }
 
-  @Test
-  public void testBicycleDismount() {
-    OSMWithTags tags = new OSMWithTags();
-    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
-
-    tags.addTag("bicycle", "dismount");
-
-    assertFalse(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
-    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
-    assertFalse(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
-  }
-
   public OSMWithTags way(String key, String value) {
     var way = new OSMWithTags();
     way.addTag(key, value);

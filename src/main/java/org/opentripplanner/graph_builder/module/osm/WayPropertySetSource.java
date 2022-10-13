@@ -78,7 +78,7 @@ public interface WayPropertySetSource {
   default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String bicycle = way.getTag("bicycle");
     if (bicycle != null) {
-      return doesTagValueDisallowThroughTraffic(bicycle) || "dismount".equals(bicycle);
+      return doesTagValueDisallowThroughTraffic(bicycle);
     } else {
       return isVehicleThroughTrafficExplicitlyDisallowed(way);
     }
