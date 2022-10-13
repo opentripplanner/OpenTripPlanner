@@ -1,39 +1,38 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 public class VehiclePositionsUpdaterConfig {
 
-  private static final Map<String, DataSourceType> CONFIG_MAPPING = new HashMap<>();
-
-  static {
-    CONFIG_MAPPING.put("gtfs-http", DataSourceType.GTFS_RT_VEHICLE_POSITIONS);
-  }
-
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var sourceType = mapStringToSourceType(c.asText("sourceType"));
-    var feedId = c.asText("feedId");
-    var frequencySec = c.asInt("frequencySec", 60);
+    var sourceType = c
+      .of("sourceType")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asEnum(DataSourceType.class);
+    var feedId = c
+      .of("feedId")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asString();
+    var frequencySec = c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60);
 
     switch (sourceType) {
+      // TODO: We should probably only allow one of these?
+      case GTFS_RT_HTTP:
       case GTFS_RT_VEHICLE_POSITIONS:
-        var url = c.asUri("url");
+        var url = c
+          .of("url")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asUri();
         return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequencySec);
       default:
         throw new OtpAppException("The updater source type is unhandled: " + sourceType);
     }
-  }
-
-  private static DataSourceType mapStringToSourceType(String typeKey) {
-    DataSourceType type = CONFIG_MAPPING.get(typeKey);
-    if (type == null) {
-      throw new OtpAppException("The updater source type is unknown: " + typeKey);
-    }
-    return type;
   }
 }

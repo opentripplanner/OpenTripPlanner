@@ -445,7 +445,7 @@ Common to all updater entries that connect to a network resource is the `url` fi
         // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL APIs 
         {
             "type": "vehicle-positions",
-            "sourceType": "gtfs-http",
+            "sourceType": "gtfs-rt-http",
             "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
             "feedId": "1",
             "frequencySec": 60

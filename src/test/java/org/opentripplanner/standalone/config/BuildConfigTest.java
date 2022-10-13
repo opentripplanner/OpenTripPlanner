@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.opentripplanner.standalone.config.JsonSupport.jsonNodeForTest;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeForTest;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;

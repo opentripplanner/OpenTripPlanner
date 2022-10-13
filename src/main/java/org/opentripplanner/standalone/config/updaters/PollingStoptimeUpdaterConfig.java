@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import org.opentripplanner.standalone.config.NodeAdapter;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
@@ -11,31 +13,38 @@ public class PollingStoptimeUpdaterConfig {
   public static PollingTripUpdaterParameters create(String configRef, NodeAdapter c) {
     String file = null;
     String url = null;
-    String sourceTypeStr = c.asText("sourceType");
-    DataSourceType sourceType;
+    var sourceType = c
+      .of("sourceType")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .asEnum(DataSourceType.class);
 
-    if ("gtfs-file".equals(sourceTypeStr)) {
-      file = c.asText("file");
-      sourceType = DataSourceType.GTFS_RT_FILE;
-    } else if ("gtfs-http".equals(sourceTypeStr)) {
-      url = c.asText("url");
-      sourceType = DataSourceType.GTFS_RT_HTTP;
+    if (sourceType == DataSourceType.GTFS_RT_FILE) {
+      file =
+        c.of("file").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
+    } else if (sourceType == DataSourceType.GTFS_RT_HTTP) {
+      url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
     } else {
       throw new OtpAppException(
         "Polling-stoptime-updater sourece-type is not valid: {}",
-        sourceTypeStr
+        sourceType
       );
     }
 
+    // TODO DOC: Deprecate  c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
+
     return new PollingTripUpdaterParameters(
-      configRef + ":" + sourceTypeStr,
-      c.asInt("frequencySec", 60),
-      c.asInt("maxSnapshotFrequencyMs", -1),
-      c.asBoolean("purgeExpiredData", false),
-      c.asBoolean("fuzzyTripMatching", false),
-      c.asEnum("backwardsDelayPropagationType", BackwardsDelayPropagationType.REQUIRED_NO_DATA),
+      configRef + ":" + sourceType,
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
+      c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
+      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+      c
+        .of("backwardsDelayPropagationType")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
       sourceType,
-      c.asText("feedId", null),
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
       url,
       file
     );

@@ -37,4 +37,18 @@ public class StringUtils {
     }
     return value;
   }
+
+  /**
+   * Pad the {@code buffer} so that the length equals the new length. The {@code ch} is appended as
+   * many times as required. If the {@code buffer} length is equals or longer then the
+   * {@code newLenght} then the {@code buffer} is returned unchanged.
+   *
+   * @return the given buffer input for convenient chaining.
+   */
+  public static StringBuilder pad(StringBuilder buffer, char ch, int newLenght) {
+    while (buffer.length() < newLenght) {
+      buffer.append(ch);
+    }
+    return buffer;
+  }
 }

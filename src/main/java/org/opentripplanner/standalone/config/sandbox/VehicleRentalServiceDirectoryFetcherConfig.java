@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.config.sandbox;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VehicleRentalServiceDirectoryFetcherConfig {
 
@@ -11,12 +13,28 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     }
 
     return new VehicleRentalServiceDirectoryFetcherParameters(
-      c.asUri("url"),
-      c.asText("sourcesName", "systems"),
-      c.asText("updaterUrlName", "url"),
-      c.asText("updaterNetworkName", "id"),
-      c.asText("language", null),
-      c.asMap("headers", NodeAdapter::asText)
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
+      c
+        .of("sourcesName")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("systems"),
+      c
+        .of("updaterUrlName")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("url"),
+      c
+        .of("updaterNetworkName")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString("id"),
+      c
+        .of("language")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null),
+      c.of("headers").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asStringMap()
     );
   }
 }
