@@ -287,7 +287,11 @@ public class OSMWithTags {
    * bicycle is denied if bicycle:no, bicycle:dismount, bicycle:license or bicycle:use_sidepath
    */
   public boolean isBicycleExplicitlyDenied() {
-    return isTagDeniedAccess("bicycle") || "dismount".equals(getTag("bicycle")) || "use_sidepath".equals(getTag("bicycle"));
+    return (
+      isTagDeniedAccess("bicycle") ||
+      "dismount".equals(getTag("bicycle")) ||
+      "use_sidepath".equals(getTag("bicycle"))
+    );
   }
 
   /**
