@@ -1,10 +1,20 @@
 {
   "transitServiceStart": "-P3M",
   "transitServiceEnd":  "P1Y",
+  "osmCacheDataInMem" : true,
+  "localFileNamePatterns" : {
+    "osm" : ".*\\.osm\\.pbf"
+  },
+
   "osmDefaults": {
     "timeZone": "Europe/Rome",
     "osmTagMapping": "atlanta"
   },
+  "osm": [{
+    "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
+    "timeZone" : "Europe/Oslo",
+    "osmTagMapping" : "norway"
+  }],
   "netexDefaults" : {
     "sharedFilePattern" : "_stops.xml",
     "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
