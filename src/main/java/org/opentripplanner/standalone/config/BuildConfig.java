@@ -29,6 +29,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemConfig;
 import org.opentripplanner.standalone.config.feed.NetexConfig;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
+import org.opentripplanner.standalone.config.feed.TransferRequestConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -650,29 +651,7 @@ public class BuildConfig implements OtpDataStoreConfig {
           .asObject()
       );
 
-    if (
-      root
-        .of("transferRequests")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .withDescription(/*TODO DOC*/"TODO")
-        .asObject()
-        .isNonEmptyArray()
-    ) {
-      transferRequests =
-        root
-          .of("transferRequests")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-          .asList()
-          .stream()
-          .map(RoutingRequestMapper::mapRoutingRequest)
-          .toList();
-    } else {
-      transferRequests = List.of(new RouteRequest());
-    }
+    transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);

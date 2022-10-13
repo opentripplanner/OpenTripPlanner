@@ -48,7 +48,14 @@
     }
   ],
   "transferRequests": [
-    { "modes": "WALK" },
-    { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }}
+    {
+      "modes": "WALK"
+    },
+    {
+      "modes": "WALK",
+      "wheelchairAccessibility": {
+        "enabled": true
+      }
+    }
   ]
 }
