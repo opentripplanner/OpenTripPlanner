@@ -124,6 +124,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Enable fuzzyTripMatching in other SIRI-ET updaters [#4495](https://github.com/opentripplanner/OpenTripPlanner/pull/4495)
 - Add support for importing zip datasets containing large entries [#4508](https://github.com/opentripplanner/OpenTripPlanner/pull/4508)
 - Add feature toggle for turning off the debug client [#4512](https://github.com/opentripplanner/OpenTripPlanner/pull/4512)
+-  Generate Configuration Documentation - Part 1 [#4478](https://github.com/opentripplanner/OpenTripPlanner/pull/4478)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
