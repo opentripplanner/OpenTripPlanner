@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 /**
@@ -132,7 +132,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int costEgress(RaptorTransfer egress) {
+  public int costEgress(RaptorAccessEgress egress) {
     if (egress.hasRides()) {
       return egress.generalizedCost() + transferCostOnly;
     } else if (stopTransferCost != null) {

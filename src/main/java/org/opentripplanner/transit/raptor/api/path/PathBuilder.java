@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
@@ -119,7 +120,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     );
   }
 
-  public void access(RaptorTransfer access) {
+  public void access(RaptorAccessEgress access) {
     add(PathBuilderLeg.accessLeg(access));
   }
 
@@ -139,7 +140,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     add(PathBuilderLeg.transferLeg(transfer, toStop));
   }
 
-  public void egress(RaptorTransfer egress) {
+  public void egress(RaptorAccessEgress egress) {
     add(PathBuilderLeg.egress(egress));
   }
 

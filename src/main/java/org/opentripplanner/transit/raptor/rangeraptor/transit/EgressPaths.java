@@ -8,17 +8,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 public class EgressPaths {
 
-  private final TIntObjectMap<List<RaptorTransfer>> pathsByStop;
+  private final TIntObjectMap<List<RaptorAccessEgress>> pathsByStop;
 
-  private EgressPaths(TIntObjectMap<List<RaptorTransfer>> pathsByStop) {
+  private EgressPaths(TIntObjectMap<List<RaptorAccessEgress>> pathsByStop) {
     this.pathsByStop = pathsByStop;
   }
 
-  public TIntObjectMap<List<RaptorTransfer>> byStop() {
+  public TIntObjectMap<List<RaptorAccessEgress>> byStop() {
     return pathsByStop;
   }
 
@@ -26,7 +26,7 @@ public class EgressPaths {
     return pathsByStop.keys();
   }
 
-  public Collection<RaptorTransfer> listAll() {
+  public Collection<RaptorAccessEgress> listAll() {
     return pathsByStop
       .valueCollection()
       .stream()
@@ -44,7 +44,7 @@ public class EgressPaths {
    * <p>
    * This method is static and package local to enable unit-testing.
    */
-  public static EgressPaths create(Collection<RaptorTransfer> paths, RaptorProfile profile) {
+  public static EgressPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
     if (!profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNoneOptimalPathsForStandardRaptor(paths);
     }

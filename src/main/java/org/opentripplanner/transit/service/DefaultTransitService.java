@@ -309,9 +309,16 @@ public class DefaultTransitService implements TransitEditorService {
   public List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
     LocalDate serviceDate,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   ) {
-    return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, arrivalDeparture);
+    return StopTimesHelper.stopTimesForStop(
+      this,
+      stop,
+      serviceDate,
+      arrivalDeparture,
+      includeCancellations
+    );
   }
 
   /**
@@ -336,7 +343,8 @@ public class DefaultTransitService implements TransitEditorService {
     Instant startTime,
     Duration timeRange,
     int numberOfDepartures,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   ) {
     return StopTimesHelper.stopTimesForPatternAtStop(
       this,
@@ -345,7 +353,8 @@ public class DefaultTransitService implements TransitEditorService {
       startTime,
       timeRange,
       numberOfDepartures,
-      arrivalDeparture
+      arrivalDeparture,
+      includeCancellations
     );
   }
 

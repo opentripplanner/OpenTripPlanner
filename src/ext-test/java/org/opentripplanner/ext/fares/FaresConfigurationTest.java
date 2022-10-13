@@ -1,11 +1,14 @@
 package org.opentripplanner.ext.fares;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareService;
-import org.opentripplanner.standalone.config.JsonSupport;
+import org.opentripplanner.standalone.config.framework.JsonSupport;
 
 class FaresConfigurationTest extends JsonSupport {
 

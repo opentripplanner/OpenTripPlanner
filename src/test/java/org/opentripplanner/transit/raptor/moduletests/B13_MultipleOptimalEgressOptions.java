@@ -3,9 +3,8 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
@@ -17,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -82,9 +83,9 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
     // We will test board- and alight-slack in a separate test
     requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
 
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_A, D0s));
+    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 
-    data.withTransfer(STOP_B, walk(STOP_C, D2m));
+    data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m));
 
     // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -133,11 +134,15 @@ public class B13_MultipleOptimalEgressOptions implements RaptorTestConstants {
   }
 
   private void withFlexEgressAsBestDestinationArrivalTime() {
-    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m));
+    requestBuilder
+      .searchParams()
+      .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D7m));
   }
 
   private void withWalkingAsBestDestinationArrivalTime() {
-    requestBuilder.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m));
+    requestBuilder
+      .searchParams()
+      .addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), TestAccessEgress.walk(STOP_C, D5m));
   }
 
   private String runSearch() {

@@ -22,7 +22,7 @@ import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.alerts.TransitAlertProvider;
+import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
