@@ -100,23 +100,16 @@ public class UpdatersConfig implements UpdatersParameters {
           .asObject()
       );
 
-    List<NodeAdapter> updaters = rootAdapter
+    rootAdapter
       .of("updaters")
       .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
-      .asObject()
-      .asList();
-
-    for (NodeAdapter conf : updaters) {
-      Type type = conf
-        .of("type")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnum(Type.class);
-
-      configList.put(type, type.parseConfig(conf));
-    }
+      .asObjects(it -> {
+        Type type = it.of("type").withDoc(NA, /*TODO DOC*/"TODO").asEnum(Type.class);
+        configList.put(type, type.parseConfig(it));
+        return "OK";
+      });
   }
 
   /**
@@ -263,4 +256,6 @@ public class UpdatersConfig implements UpdatersParameters {
       return factory.apply(this.name(), nodeAdapter);
     }
   }
+
+  private record ConfigParameterEntry(Type type, Object parameters) {}
 }
