@@ -57,7 +57,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
         point.setUserData(parkingAndGroup);
         return point;
       })
-      .collect(Collectors.toList());
+      .toList();
   }
 
   enum MapperType {
