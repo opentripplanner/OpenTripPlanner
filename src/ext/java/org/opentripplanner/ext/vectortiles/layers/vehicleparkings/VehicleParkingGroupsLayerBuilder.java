@@ -55,7 +55,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
         var parking = vehicleParkingGroupEntry.getValue();
         var parkingAndGroup = new VehicleParkingAndGroup(group, parking);
         point.setUserData(parkingAndGroup);
-        return point;
+        return (Geometry) point;
       })
       .toList();
   }
