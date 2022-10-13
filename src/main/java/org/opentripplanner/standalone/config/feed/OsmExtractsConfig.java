@@ -1,8 +1,8 @@
 package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Configure the list of OpenStreetMap extracts.
@@ -11,13 +11,8 @@ public class OsmExtractsConfig {
 
   public final List<OsmExtractConfig> osmExtractConfigs;
 
-  public OsmExtractsConfig(NodeAdapter config) {
-    osmExtractConfigs =
-      config
-        .asList()
-        .stream()
-        .map(osmConfig -> OsmExtractConfigBuilder.of(osmConfig).build())
-        .toList();
+  public OsmExtractsConfig(Collection<OsmExtractConfig> extracts) {
+    osmExtractConfigs = List.copyOf(extracts);
   }
 
   public List<URI> osmFiles() {
