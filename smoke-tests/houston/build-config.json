@@ -1,6 +1,6 @@
 {
   "fares": {
-    "type": "highestFareInFreeTransferWindow",
+    "type": "highest-fare-in-free-transfer-window",
     "analyzeInterlinedTransfers": "true"
   },
   "osmDefaults": {
