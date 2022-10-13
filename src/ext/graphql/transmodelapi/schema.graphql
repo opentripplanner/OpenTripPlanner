@@ -616,8 +616,8 @@ type RoutingParameters {
     "DEPRECATED - NOT IN USE IN OTP2."
     compactLegsByReversedSearch: Boolean
     debugItineraryFilter: Boolean
-    "Option to disable the default filtering of GTFS-RT alerts by time."
-    disableAlertFiltering: Boolean
+    "Option to disable the default filtering of GTFS-RT alerts by time. Deprecated, not supported in OTP 2."
+    disableAlertFiltering: Boolean @deprecated(reason: "Deprecated, not supported in OTP 2.")
     "If true, the remaining weight heuristic is disabled."
     disableRemainingWeightHeuristic: Boolean
     "What is the cost of boarding a elevator?"
@@ -662,8 +662,8 @@ type RoutingParameters {
     transferSlack: Int
     "Multiplicative factor on expected turning time."
     turnReluctance: Float
-    "How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)."
-    waitAtBeginningFactor: Float
+    "How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding). Deprecated, not used, the timetable-view replaces this functionality."
+    waitAtBeginningFactor: Float @deprecated(reason: "Deprecated, not used, the timetable-view replaces this functionality.")
     "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
     waitReluctance: Float
     "This prevents unnecessary transfers by adding a cost for boarding a vehicle."

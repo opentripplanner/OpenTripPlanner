@@ -1,9 +1,11 @@
 package org.opentripplanner.standalone.config.feed;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.net.URI;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TransitFeedsConfig {
 
@@ -22,14 +24,30 @@ public class TransitFeedsConfig {
     gtfsFeedConfigs =
       feedConfigs
         .stream()
-        .filter(feedConfig -> FEED_TYPE_GTFS.equalsIgnoreCase(feedConfig.asText("type")))
+        .filter(feedConfig ->
+          FEED_TYPE_GTFS.equalsIgnoreCase(
+            feedConfig
+              .of("type")
+              .withDoc(NA, /*TODO DOC*/"TODO")
+              .withExample(/*TODO DOC*/"TODO")
+              .asString()
+          )
+        )
         .map(feedConfig -> GtfsFeedConfigBuilder.of(feedConfig).build())
         .toList();
 
     netexFeedConfigs =
       feedConfigs
         .stream()
-        .filter(feedConfig -> FEED_TYPE_NETEX.equalsIgnoreCase(feedConfig.asText("type")))
+        .filter(feedConfig ->
+          FEED_TYPE_NETEX.equalsIgnoreCase(
+            feedConfig
+              .of("type")
+              .withDoc(NA, /*TODO DOC*/"TODO")
+              .withExample(/*TODO DOC*/"TODO")
+              .asString()
+          )
+        )
         .map(feedConfig -> NetexFeedConfigBuilder.of(feedConfig).build())
         .toList();
   }

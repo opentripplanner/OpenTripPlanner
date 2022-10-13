@@ -33,10 +33,14 @@ class ElevatorHopEdgeTest {
   public void shouldNotTraverse(Accessibility wheelchair) {
     var req = AStarRequest.of();
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
-    req.withWheelchair(true);
     req
-      .preferences()
-      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
+      .withWheelchair(true)
+      .withPreferences(preferences ->
+        preferences.withWheelchair(
+          new WheelchairPreferences(feature, feature, feature, 25, 0.5, 10, 25)
+        )
+      );
+
     State result = traverse(wheelchair, req.build());
     assertNull(result);
   }

@@ -727,11 +727,10 @@ public class TimetableHelper {
       return Result.failure(new UpdateError(tripId, INVALID_INPUT_STRUCTURE));
     }
 
-    VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
 
-    Duration delay = null;
     if (monitoredVehicleJourney != null) {
-      delay = monitoredVehicleJourney.getDelay();
+      Duration delay = monitoredVehicleJourney.getDelay();
       int updatedDelay = 0;
       if (delay != null) {
         updatedDelay =

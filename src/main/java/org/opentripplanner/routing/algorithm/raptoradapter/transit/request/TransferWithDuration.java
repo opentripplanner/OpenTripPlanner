@@ -17,11 +17,6 @@ public class TransferWithDuration extends AbstractRaptorTransfer {
   }
 
   @Override
-  public boolean hasOpeningHours() {
-    return false;
-  }
-
-  @Override
   public String toString() {
     return asString();
   }

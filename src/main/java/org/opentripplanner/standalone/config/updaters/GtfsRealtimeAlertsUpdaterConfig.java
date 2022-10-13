@@ -1,18 +1,20 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 
 public class GtfsRealtimeAlertsUpdaterConfig {
 
   public static GtfsRealtimeAlertsUpdaterParameters create(String configRef, NodeAdapter c) {
     return new GtfsRealtimeAlertsUpdaterParameters(
       configRef,
-      c.asText("feedId", null),
-      c.asText("url"),
-      c.asInt("earlyStartSec", 0),
-      c.asBoolean("fuzzyTripMatching", false),
-      c.asInt("frequencySec", 60)
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
+      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
+      c.of("earlyStartSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(0),
+      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60)
     );
   }
 }

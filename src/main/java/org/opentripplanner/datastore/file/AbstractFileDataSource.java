@@ -25,7 +25,7 @@ public abstract class AbstractFileDataSource implements DataSource {
   }
 
   @Override
-  public final String name() {
+  public String name() {
     return file.getName();
   }
 

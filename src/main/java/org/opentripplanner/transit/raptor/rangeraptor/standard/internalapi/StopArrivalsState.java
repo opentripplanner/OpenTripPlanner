@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
@@ -24,9 +25,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTim
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public interface StopArrivalsState<T extends RaptorTripSchedule> extends BestNumberOfTransfers {
-  void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime);
+  void setAccessTime(int arrivalTime, RaptorAccessEgress access, boolean bestTime);
 
-  default void rejectAccessTime(int arrivalTime, RaptorTransfer access) {}
+  default void rejectAccessTime(int arrivalTime, RaptorAccessEgress access) {}
 
   int bestTimePreviousRound(int stop);
 

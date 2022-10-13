@@ -52,7 +52,7 @@ public class OTPMain {
       OtpStartupInfo.logInfo();
       startOTPServer(params);
     } catch (OtpAppException ae) {
-      LOG.error(ae.getMessage());
+      LOG.error(ae.getMessage(), ae);
       System.exit(100);
     } catch (Exception e) {
       LOG.error("An uncaught error occurred inside OTP: {}", e.getLocalizedMessage(), e);

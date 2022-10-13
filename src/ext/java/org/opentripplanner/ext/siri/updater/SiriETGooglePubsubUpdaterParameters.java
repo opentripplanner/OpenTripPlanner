@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 public record SiriETGooglePubsubUpdaterParameters(
@@ -15,8 +16,10 @@ public record SiriETGooglePubsubUpdaterParameters(
   @Nullable String dataInitializationUrl,
   Duration reconnectPeriod,
   Duration initialGetDataTimeout,
-  boolean purgeExpiredData
-) {
+  boolean purgeExpiredData,
+  boolean fuzzyTripMatching
+)
+  implements UrlUpdaterParameters {
   public static Duration RECONNECT_PERIOD = Duration.ofSeconds(30);
   public static Duration INITIAL_GET_DATA_TIMEOUT = Duration.ofSeconds(30);
 
@@ -41,7 +44,23 @@ public record SiriETGooglePubsubUpdaterParameters(
       .addDuration("reconnectPeriod", reconnectPeriod, RECONNECT_PERIOD)
       .addDuration("initialGetDataTimeout", initialGetDataTimeout, INITIAL_GET_DATA_TIMEOUT)
       .addBoolIfTrue("purgeExpiredData", purgeExpiredData)
+      .addBoolIfTrue("fuzzyTripMatching", fuzzyTripMatching)
       .addObj("dataInitializationUrl", dataInitializationUrl, null)
       .toString();
+  }
+
+  @Override
+  public String getUrl() {
+    return dataInitializationUrl;
+  }
+
+  @Override
+  public String getConfigRef() {
+    return configRef;
+  }
+
+  @Override
+  public String getFeedId() {
+    return feedId;
   }
 }

@@ -61,5 +61,5 @@ public interface CostCalculator<T extends RaptorTripSchedule> {
    * @return the {@link RaptorTransfer#generalizedCost()} plus any additional board or transfer
    * cost.
    */
-  int costEgress(RaptorTransfer egress);
+  int costEgress(RaptorAccessEgress egress);
 }

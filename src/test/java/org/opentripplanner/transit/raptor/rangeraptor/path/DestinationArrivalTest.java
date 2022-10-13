@@ -2,10 +2,9 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
@@ -16,7 +15,10 @@ public class DestinationArrivalTest {
   private static final int ACCESS_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 72;
-  private static final TestTransfer ACCESS_WALK = walk(ACCESS_STOP, ACCESS_DURATION);
+  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walk(
+    ACCESS_STOP,
+    ACCESS_DURATION
+  );
   private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
 
   private static final int TRANSIT_STOP = 101;
@@ -48,7 +50,7 @@ public class DestinationArrivalTest {
   );
 
   private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
-    walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
+    TestAccessEgress.walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
     TRANSIT_ARRIVAL,
     TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
     DESTINATION_COST

@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.feed;
 
 import java.net.URI;
 import java.util.List;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class DemExtractsConfig {
 

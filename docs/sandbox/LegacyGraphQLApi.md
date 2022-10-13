@@ -27,6 +27,8 @@
 - Implement allowedBikeRentalNetworks while deprecating it and add allowedVehicleRentalNetworks and bannedVehicleRentalNetworks. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4279)
 - Filters place types in legacy GraphQL API so that a bike park type is not returned if a vehicle parking has no bicycle spaces and car park type is not returned if a parking has no car spaces. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4296)
 - Include departures with skipped stops in the Stop type's stopTimesForPattern query. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4299)
+- Add built-in GraphQL client. (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4499)
+- Implement support for omitCanceled parameter in some stop's stoptime queries (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4504)
 
 ## Documentation
 
@@ -47,6 +49,10 @@ curl --request POST \
   --header 'OTPTimeout: 180000' \
   --data '{"query":"query stops {\n  stops {\n    gtfsId\n    name\n  }\n}\n","operationName":"stops"}'
 ```
+
+## Built-in API client
+
+A browser based GraphQL API client is available at `http://localhost:8080/legacygraphql/graphiql` 
 
 ### OTP2 Official GraphQL API (Not available)
 

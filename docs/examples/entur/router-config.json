@@ -50,7 +50,6 @@
     "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
     "disableRemainingWeightHeuristic": false,
-    "disableAlertFiltering": false,
     "geoidElevation": false,
     "maxJourneyDuration": "36h",
     "transferOptimization": {

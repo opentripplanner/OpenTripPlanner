@@ -70,7 +70,7 @@ public class AStarRequest {
 
   AStarRequest(AStarRequestBuilder builder) {
     this.startTime = builder.startTime;
-    this.preferences = builder.preferences();
+    this.preferences = builder.preferences;
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;
     this.wheelchair = builder.wheelchair;
@@ -133,8 +133,8 @@ public class AStarRequest {
     return to;
   }
 
-  public AStarRequest copyOfReversed(Instant time) {
-    return copyOf(this).withStartTime(time).withArriveBy(!arriveBy).build();
+  public AStarRequestBuilder copyOfReversed(Instant time) {
+    return copyOf(this).withStartTime(time).withArriveBy(!arriveBy);
   }
 
   public void setIntersectionTraversalCalculator(

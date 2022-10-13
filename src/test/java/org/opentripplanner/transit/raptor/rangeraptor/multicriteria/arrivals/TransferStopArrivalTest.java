@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
@@ -17,7 +17,10 @@ public class TransferStopArrivalTest {
   private static final int ACCESS_TO_STOP = 100;
   private static final int ACCESS_DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 300;
-  private static final TestTransfer ACCESS_WALK = walk(ACCESS_TO_STOP, ACCESS_DURATION);
+  private static final TestAccessEgress ACCESS_WALK = TestAccessEgress.walk(
+    ACCESS_TO_STOP,
+    ACCESS_DURATION
+  );
   private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
 
   private static final int TRANSIT_TO_STOP = 101;
@@ -31,7 +34,10 @@ public class TransferStopArrivalTest {
   private static final int TRANSFER_TO_STOP = 102;
   private static final int TRANSFER_LEG_DURATION = 360;
   private static final int TRANSFER_ALIGHT_TIME = TRANSIT_ALIGHT_TIME + TRANSFER_LEG_DURATION;
-  private static final TestTransfer TRANSFER_WALK = walk(TRANSFER_TO_STOP, TRANSFER_LEG_DURATION);
+  private static final TestTransfer TRANSFER_WALK = TestTransfer.transfer(
+    TRANSFER_TO_STOP,
+    TRANSFER_LEG_DURATION
+  );
   private static final int TRANSFER_COST = TRANSFER_WALK.generalizedCost();
 
   private static final int EXPECTED_COST = ACCESS_COST + TRANSIT_COST + TRANSFER_COST;

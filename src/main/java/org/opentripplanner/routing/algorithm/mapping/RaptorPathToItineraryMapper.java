@@ -12,7 +12,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.AccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -73,7 +73,7 @@ public class RaptorPathToItineraryMapper {
     this.transferMode = request.journey().transfer().mode();
     this.request =
       AStarRequestMapper
-        .map(Transfer.prepareTransferRoutingRequest(request))
+        .map(request.copyAndPrepareForTransferRouting())
         .withArriveBy(false)
         .withMode(transferMode)
         .build();
@@ -138,7 +138,7 @@ public class RaptorPathToItineraryMapper {
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<TripSchedule> accessPathLeg) {
-    AccessEgress accessPath = (AccessEgress) accessPathLeg.access();
+    DefaultAccessEgress accessPath = (DefaultAccessEgress) accessPathLeg.access();
 
     if (accessPath.durationInSeconds() == 0) {
       return List.of();
@@ -220,7 +220,7 @@ public class RaptorPathToItineraryMapper {
   }
 
   private Itinerary mapEgressLeg(EgressPathLeg<TripSchedule> egressPathLeg) {
-    AccessEgress egressPath = (AccessEgress) egressPathLeg.egress();
+    DefaultAccessEgress egressPath = (DefaultAccessEgress) egressPathLeg.egress();
 
     if (egressPath.durationInSeconds() == 0) {
       return null;

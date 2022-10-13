@@ -89,9 +89,9 @@ class StreetTransitEntityLinkTest {
       feature = AccessibilityPreferences.ofCost(100, 100);
     }
     req.withWheelchair(true);
-    req
-      .preferences()
-      .setWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 8, 10, 25));
+    req.withPreferences(p ->
+      p.withWheelchair(new WheelchairPreferences(feature, feature, feature, 25, 0.045, 10, 25))
+    );
 
     var edge = new StreetTransitStopLink(from, to);
     return edge.traverse(new State(from, req.build()));

@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import java.util.HashMap;
@@ -8,7 +10,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -52,9 +54,16 @@ public class HighestFareInFreeTransferWindowFareServiceFactory extends DefaultFa
   @Override
   public void configure(JsonNode config) {
     var adapter = new NodeAdapter(config, null);
-    freeTransferWindow = adapter.asDuration("freeTransferWindow", freeTransferWindow);
+    freeTransferWindow =
+      adapter
+        .of("freeTransferWindow")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDuration(freeTransferWindow);
 
     analyzeInterlinedTransfers =
-      adapter.asBoolean("analyzeInterlinedTransfers", analyzeInterlinedTransfers);
+      adapter
+        .of("analyzeInterlinedTransfers")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asBoolean(analyzeInterlinedTransfers);
   }
 }

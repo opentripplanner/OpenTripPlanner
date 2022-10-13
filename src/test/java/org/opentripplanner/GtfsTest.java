@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
-import static org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -28,7 +28,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,8 +40,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.updater.alert.AlertsUpdateHandler;
+import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {
@@ -70,8 +69,13 @@ public abstract class GtfsTest {
     String excludedStop,
     int legCount
   ) {
+    // Preconditions
+    if (excludedStop != null && !excludedStop.isEmpty()) {
+      throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
+    }
+
+    // Init request
     RouteRequest routingRequest = new RouteRequest();
-    RoutingPreferences preferences = routingRequest.preferences();
 
     routingRequest.setNumItineraries(1);
 
@@ -92,7 +96,7 @@ public abstract class GtfsTest {
       //routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
     }
     routingRequest.setWheelchair(wheelchairAccessible);
-    preferences.transfer().setCost(preferLeastTransfers ? 300 : 0);
+
     RequestModesBuilder requestModesBuilder = RequestModes
       .of()
       .withDirectMode(NOT_SET)
@@ -113,20 +117,27 @@ public abstract class GtfsTest {
           RouteMatcher.idMatcher(List.of(new FeedScopedId(feedId.getId(), excludedRoute)))
         );
     }
-    if (excludedStop != null && !excludedStop.isEmpty()) {
-      throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
-    }
-    preferences.transit().setOtherThanPreferredRoutesPenalty(0);
 
-    // The walk board cost is set low because it interferes with test 2c1.
-    // As long as boarding has a very low cost, waiting should not be "better" than riding
-    // since this makes interlining _worse_ than alighting and re-boarding the same line.
-    // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
-    preferences.transfer().setWaitReluctance(1);
-    preferences.withWalk(w -> w.setBoardCost(30));
-    preferences.transfer().setSlack(0);
+    // Init preferences
+    routingRequest.withPreferences(preferences -> {
+      preferences.withTransfer(tx -> {
+        tx.withSlack(0);
+        tx.withWaitReluctance(1);
+        tx.withCost(preferLeastTransfers ? 300 : 0);
+      });
 
+      // The walk board cost is set low because it interferes with test 2c1.
+      // As long as boarding has a very low cost, waiting should not be "better" than riding
+      // since this makes interlining _worse_ than alighting and re-boarding the same line.
+      // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
+      preferences.withWalk(w -> w.withBoardCost(30));
+      preferences.withTransit(tr -> tr.setOtherThanPreferredRoutesPenalty(0));
+    });
+
+    // Route
     RoutingResponse res = serverContext.routingService().route(routingRequest);
+
+    // Assert itineraries
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
     // Stored in instance field for use in individual tests
     Itinerary itinerary = itineraries.get(0);

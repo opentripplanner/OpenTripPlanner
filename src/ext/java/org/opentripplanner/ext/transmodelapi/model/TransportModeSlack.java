@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.api.request.framework.DurationForEnumBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransportModeSlack {
@@ -125,7 +124,7 @@ public class TransportModeSlack {
   }
 
   @SuppressWarnings("unchecked")
-  public static void mapIntoDomain(DurationForEnumBuilder<TransitMode> builder, Object value) {
+  public static void mapIntoDomain(DurationForEnum.Builder<TransitMode> builder, Object value) {
     if (value instanceof List) {
       List<Map<String, Object>> list = (List<Map<String, Object>>) value;
       for (Map<String, Object> map : list) {

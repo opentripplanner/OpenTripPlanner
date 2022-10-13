@@ -9,6 +9,13 @@ import org.junit.jupiter.api.Test;
 class DoubleUtilsTest {
 
   @Test
+  void roundToZeroDecimals() {
+    assertEquals(3, DoubleUtils.roundToZeroDecimals(3.4999999999));
+    assertEquals(4, DoubleUtils.roundToZeroDecimals(3.50));
+    assertEquals(5, DoubleUtils.roundToZeroDecimals(4.5));
+  }
+
+  @Test
   void roundTo1Decimal() {
     assertEquals(0.3, DoubleUtils.roundTo1Decimal(0.34999999999));
     assertEquals(0.4, DoubleUtils.roundTo1Decimal(0.35));

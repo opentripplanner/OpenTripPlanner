@@ -19,6 +19,8 @@ public enum OTPFeature {
   APIGraphInspectorTile(true),
   APIUpdaterStatus(true),
   ConsiderPatternsForDirectTransfers(true),
+  DebugClient(true),
+  FloatingBike(true),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
@@ -29,7 +31,6 @@ public enum OTPFeature {
   OptimizeTransfers(true),
   ParallelRouting(false),
   TransferConstraints(true),
-  FloatingBike(true),
 
   // Sandbox extension features - Must be turned OFF by default
   ActuatorAPI(false),
@@ -41,9 +42,9 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false),
   SandboxAPILegacyGraphQLApi(false),
   SandboxAPIMapboxVectorTilesApi(false),
+  SandboxAPIParkAndRideApi(false),
   SandboxAPITransmodelApi(false),
   SandboxAPITravelTime(false),
-  SandboxAPIParkAndRideApi(false),
   TransferAnalyzer(false),
   VehicleToStopHeuristics(false);
 

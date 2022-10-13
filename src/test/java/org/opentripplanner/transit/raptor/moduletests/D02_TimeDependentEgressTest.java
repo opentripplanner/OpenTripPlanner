@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToStringDetailed;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.SECONDS_IN_DAY;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.SECONDS_IN_DAY;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -51,7 +51,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
           schedule("24:20 24:30")
         )
     );
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_A, D0s));
+    requestBuilder.searchParams().addAccessPaths(TestAccessEgress.walk(STOP_A, D0s));
 
     requestBuilder
       .searchParams()
@@ -70,7 +70,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m));
 
     // Note the last result is outside the search window
     assertEquals(
@@ -89,7 +89,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m, T00_00, T01_00));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T01_00));
 
     assertEquals(
       join(
@@ -108,7 +108,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m, T00_00, T01_00));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T01_00));
 
     assertEquals(
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",
@@ -125,7 +125,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m, T00_35, T01_00));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_35, T01_00));
 
     assertEquals(
       join(
@@ -143,7 +143,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m, T00_35, T01_00));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_35, T01_00));
 
     // First and last path have time-shifted egress (wait 5 minutes to board)
     assertEquals(
@@ -162,7 +162,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m, T00_25, T01_00));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_25, T01_00));
 
     assertEquals(
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",
@@ -175,7 +175,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m, T00_00, T00_25));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T00_25));
 
     assertEquals(
       join(
@@ -192,7 +192,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m, T00_00, T00_25));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T00_25));
 
     assertEquals(
       join(
@@ -210,7 +210,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m, T00_00, T00_25));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_00, T00_25));
 
     assertEquals(
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:02+2d 23h42m 0tx $86040]",
@@ -227,7 +227,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
     requestBuilder
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
-      .addEgressPaths(walk(STOP_B, D2m, T00_25, T00_35));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_25, T00_35));
 
     assertEquals(
       join(
@@ -245,7 +245,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .searchWindow(D25h)
-      .addEgressPaths(walk(STOP_B, D2m, T00_25, T00_35));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_25, T00_35));
 
     assertEquals(
       join(
@@ -264,7 +264,7 @@ public class D02_TimeDependentEgressTest implements RaptorTestConstants {
       .profile(RaptorProfile.MULTI_CRITERIA)
       .searchParams()
       .earliestDepartureTime(SECONDS_IN_DAY + T00_10)
-      .addEgressPaths(walk(STOP_B, D2m, T00_25, T00_35));
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D2m, T00_25, T00_35));
 
     assertEquals(
       "A ~ BUS R1 0:20+1d 0:30+1d ~ B ~ Walk 2m [0:20+1d 0:32+1d 12m 0tx $1440]",

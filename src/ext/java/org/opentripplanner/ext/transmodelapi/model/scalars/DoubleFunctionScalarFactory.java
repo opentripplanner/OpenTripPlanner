@@ -5,8 +5,8 @@ import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
-import java.util.function.DoubleFunction;
-import org.opentripplanner.routing.api.request.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class DoubleFunctionScalarFactory {
 
@@ -23,14 +23,14 @@ public class DoubleFunctionScalarFactory {
       .name("DoubleFunction")
       .description(DOCUMENTATION)
       .coercing(
-        new Coercing<DoubleFunction<Double>, String>() {
+        new Coercing<DoubleAlgorithmFunction, String>() {
           @Override
           public String serialize(Object dataFetcherResult) {
             return RequestFunctions.serialize(dataFetcherResult);
           }
 
           @Override
-          public DoubleFunction<Double> parseValue(Object input)
+          public DoubleAlgorithmFunction parseValue(Object input)
             throws CoercingParseValueException {
             try {
               return RequestFunctions.parse((String) input);
@@ -40,7 +40,7 @@ public class DoubleFunctionScalarFactory {
           }
 
           @Override
-          public DoubleFunction<Double> parseLiteral(Object input)
+          public DoubleAlgorithmFunction parseLiteral(Object input)
             throws CoercingParseLiteralException {
             if (input instanceof StringValue) {
               return parseValue(((StringValue) input).getValue());

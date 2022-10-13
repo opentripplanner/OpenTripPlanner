@@ -1,6 +1,7 @@
 package org.opentripplanner.common.model;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 

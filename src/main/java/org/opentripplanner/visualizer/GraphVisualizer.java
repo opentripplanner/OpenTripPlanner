@@ -469,26 +469,28 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     RouteRequest options = new RouteRequest();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
     options.journey().setModes(qualifiedModeSet.getRequestModes());
-    var preferences = options.preferences();
 
     options.setArriveBy(arriveByCheckBox.isSelected());
-    preferences.withWalk(walk -> {
-      walk.setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-      walk.setSpeed(Float.parseFloat(walkSpeed.getText()));
-    });
-    preferences.withBike(bike ->
-      bike
-        .setSpeed(Float.parseFloat(bikeSpeed.getText()))
-        // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-        .setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
-        // there should be a ui element for walk distance and optimize type
-        .setOptimizeType(getSelectedOptimizeType())
-    );
-
     options.setDateTime(when);
     options.setFrom(LocationStringParser.fromOldStyleString(from));
     options.setTo(LocationStringParser.fromOldStyleString(to));
     options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
+
+    options.withPreferences(preferences -> {
+      preferences.withWalk(walk -> {
+        walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+        walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
+      });
+      preferences.withBike(bike ->
+        bike
+          .withSpeed(Float.parseFloat(bikeSpeed.getText()))
+          // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
+          .withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
+          // there should be a ui element for walk distance and optimize type
+          .withOptimizeType(getSelectedOptimizeType())
+      );
+    });
+
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);
     System.out.println("\tModes: " + qualifiedModeSet);

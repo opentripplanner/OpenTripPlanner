@@ -44,7 +44,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
     var req = AStarRequest.of();
-    req.preferences().withWalk(w -> w.setReluctance(walkReluctance));
+    req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
     State result = traverse(edge, req.withMode(StreetMode.WALK).build());
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
@@ -66,7 +66,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
     var req = AStarRequest.of();
-    req.preferences().withBike(bike -> bike.setReluctance(bikeReluctance));
+    req.withPreferences(p -> p.withBike(b -> b.withReluctance(bikeReluctance)));
 
     State result = traverse(edge, req.withMode(StreetMode.BIKE).build());
     assertNotNull(result);
@@ -89,7 +89,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
 
     var req = AStarRequest.of();
-    req.preferences().car().setReluctance(carReluctance);
+    req.withPreferences(p -> p.withCar(c -> c.withReluctance(carReluctance)));
 
     State result = traverse(edge, req.withMode(StreetMode.CAR).build());
     assertNotNull(result);
@@ -112,7 +112,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     edge.setStairs(true);
 
     var req = AStarRequest.of();
-    req.preferences().withWalk(w -> w.setStairsReluctance(stairsReluctance));
+    req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
     req.withMode(StreetMode.WALK);
     var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
@@ -146,7 +146,7 @@ class StreetEdgeCostTest extends GraphRoutingTest {
     edge.setWalkSafetyFactor(2);
 
     var req = AStarRequest.of();
-    req.preferences().withWalk(w -> w.setSafetyFactor(walkSafetyFactor));
+    req.withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(walkSafetyFactor)));
     req.withMode(StreetMode.WALK);
     var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
