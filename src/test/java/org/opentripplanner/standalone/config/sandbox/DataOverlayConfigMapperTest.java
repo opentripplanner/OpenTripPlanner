@@ -15,7 +15,7 @@ class DataOverlayConfigMapperTest {
     // Setup so we get access to the NodeAdapter
     var a = new NodeAdapter(node, DataOverlayConfigMapperTest.class.getSimpleName());
 
-    DataOverlayConfigMapper.map(a.of("dataOverlay").asObject());
+    DataOverlayConfigMapper.map(a, "dataOverlay");
 
     // Test for unused parameters
     var buf = new StringBuilder();

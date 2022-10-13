@@ -641,15 +641,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
-    dataOverlay =
-      DataOverlayConfigMapper.map(
-        root
-          .of("dataOverlay")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
