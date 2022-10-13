@@ -20,6 +20,7 @@ public class HslHubsDownloader {
   private final String jsonParsePath;
   private final Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser;
   private String url;
+  private static final ObjectMapper mapper = new ObjectMapper();
 
   public HslHubsDownloader(
     String url,
@@ -65,7 +66,6 @@ public class HslHubsDownloader {
 
     String hubsString = convertStreamToString(dataStream);
 
-    ObjectMapper mapper = new ObjectMapper();
     JsonNode rootNode = mapper.readTree(hubsString);
 
     if (!jsonParsePath.equals("")) {

@@ -23,6 +23,8 @@ public class HslFacilitiesDownloader {
   private final BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser;
   private String url;
 
+  private static final ObjectMapper mapper = new ObjectMapper();
+
   public HslFacilitiesDownloader(
     String url,
     String jsonParsePath,
@@ -71,7 +73,6 @@ public class HslFacilitiesDownloader {
 
     String facilitiesString = convertStreamToString(dataStream);
 
-    ObjectMapper mapper = new ObjectMapper();
     JsonNode rootNode = mapper.readTree(facilitiesString);
 
     if (!jsonParsePath.equals("")) {
