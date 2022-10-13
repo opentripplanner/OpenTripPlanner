@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -33,9 +34,10 @@ public class VehicleParking implements Serializable {
   private final I18NString name;
 
   /**
-   * Note: x = Longitude, y = Latitude
+   * The coordinate of the vehicle parking. It can be different than the coordinates for its
+   * entrances.
    */
-  private final double x, y;
+  private final WgsCoordinate coordinate;
 
   /**
    * URL which contains details of this vehicle parking.
@@ -105,8 +107,7 @@ public class VehicleParking implements Serializable {
   VehicleParking(
     FeedScopedId id,
     I18NString name,
-    double x,
-    double y,
+    WgsCoordinate coordinate,
     String detailsUrl,
     String imageUrl,
     Set<String> tags,
@@ -122,8 +123,7 @@ public class VehicleParking implements Serializable {
   ) {
     this.id = id;
     this.name = name;
-    this.x = x;
-    this.y = y;
+    this.coordinate = coordinate;
     this.detailsUrl = detailsUrl;
     this.imageUrl = imageUrl;
     this.tags = tags;
@@ -151,12 +151,8 @@ public class VehicleParking implements Serializable {
     return name;
   }
 
-  public double getX() {
-    return x;
-  }
-
-  public double getY() {
-    return y;
+  public WgsCoordinate getCoordinate() {
+    return coordinate;
   }
 
   public String getDetailsUrl() {
@@ -281,8 +277,7 @@ public class VehicleParking implements Serializable {
     return Objects.hash(
       id,
       name,
-      x,
-      y,
+      coordinate,
       detailsUrl,
       imageUrl,
       tags,
@@ -308,8 +303,7 @@ public class VehicleParking implements Serializable {
     }
     final VehicleParking that = (VehicleParking) o;
     return (
-      Double.compare(that.x, x) == 0 &&
-      Double.compare(that.y, y) == 0 &&
+      Objects.equals(coordinate, that.coordinate) &&
       bicyclePlaces == that.bicyclePlaces &&
       carPlaces == that.carPlaces &&
       wheelchairAccessibleCarPlaces == that.wheelchairAccessibleCarPlaces &&
@@ -328,7 +322,13 @@ public class VehicleParking implements Serializable {
   }
 
   public String toString() {
-    return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
+    return String.format(
+      Locale.ROOT,
+      "VehicleParking(%s at %.6f, %.6f)",
+      name,
+      coordinate.latitude(),
+      coordinate.longitude()
+    );
   }
 
   private void addEntrance(VehicleParkingEntranceCreator creator) {
@@ -354,8 +354,7 @@ public class VehicleParking implements Serializable {
     private OHCalendar openingHoursCalendar;
     private FeedScopedId id;
     private I18NString name;
-    private double x;
-    private double y;
+    private WgsCoordinate coordinate;
     private String detailsUrl;
     private String imageUrl;
     private I18NString note;
@@ -400,13 +399,8 @@ public class VehicleParking implements Serializable {
       return this;
     }
 
-    public VehicleParkingBuilder x(double x) {
-      this.x = x;
-      return this;
-    }
-
-    public VehicleParkingBuilder y(double y) {
-      this.y = y;
+    public VehicleParkingBuilder coordinate(WgsCoordinate coordinate) {
+      this.coordinate = coordinate;
       return this;
     }
 
@@ -472,8 +466,7 @@ public class VehicleParking implements Serializable {
       var vehicleParking = new VehicleParking(
         id,
         name,
-        x,
-        y,
+        coordinate,
         detailsUrl,
         imageUrl,
         tags,

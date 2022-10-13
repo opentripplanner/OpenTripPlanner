@@ -27,6 +27,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -43,8 +44,7 @@ public class VehicleParkingsLayerTest {
         .builder()
         .id(ID)
         .name(TranslatedString.getI18NString(Map.of("", "name", "de", "DE"), false, false))
-        .x(1)
-        .y(2)
+        .coordinate(new WgsCoordinate(2, 1))
         .bicyclePlaces(true)
         .carPlaces(true)
         .wheelchairAccessibleCarPlaces(false)

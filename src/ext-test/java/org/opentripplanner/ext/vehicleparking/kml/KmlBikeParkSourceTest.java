@@ -30,10 +30,20 @@ public class KmlBikeParkSourceTest {
     VehicleParking zwolle = bikeParks.get(4);
     assertEquals("Station Alkmaar", alkmaar.getName().toString());
     assertEquals("Station Zwolle", zwolle.getName().toString());
-    assertTrue(alkmaar.getX() >= 4.739850 && alkmaar.getX() <= 4.739851);
-    assertTrue(alkmaar.getY() >= 52.637531 && alkmaar.getY() <= 52.637532);
-    assertTrue(zwolle.getX() >= 6.091060 && zwolle.getX() <= 6.091061);
-    assertTrue(zwolle.getY() >= 52.504990 && zwolle.getY() <= 52.504991);
+    var alkmaarCoordinate = alkmaar.getCoordinate();
+    assertTrue(
+      alkmaarCoordinate.longitude() >= 4.739850 && alkmaarCoordinate.longitude() <= 4.739851
+    );
+    assertTrue(
+      alkmaarCoordinate.latitude() >= 52.637531 && alkmaarCoordinate.latitude() <= 52.637532
+    );
+    var zwolleCoordinate = zwolle.getCoordinate();
+    assertTrue(
+      zwolleCoordinate.longitude() >= 6.091060 && zwolleCoordinate.longitude() <= 6.091061
+    );
+    assertTrue(
+      zwolleCoordinate.latitude() >= 52.504990 && zwolleCoordinate.latitude() <= 52.504991
+    );
   }
 
   @Test
@@ -55,9 +65,17 @@ public class KmlBikeParkSourceTest {
     VehicleParking almere = bikeParks.get(4);
     assertEquals("Station Alkmaar", alkmaar.getName().toString());
     assertEquals("Station Almere Centrum", almere.getName().toString());
-    assertTrue(alkmaar.getX() >= 4.739850 && alkmaar.getX() <= 4.739851);
-    assertTrue(alkmaar.getY() >= 52.637531 && alkmaar.getY() <= 52.637532);
-    assertTrue(almere.getX() >= 5.21780 && almere.getX() <= 5.21782);
-    assertTrue(almere.getY() >= 52.3746190 && almere.getY() <= 52.3746191);
+    var alkmaarCoordinate = alkmaar.getCoordinate();
+    assertTrue(
+      alkmaarCoordinate.longitude() >= 4.739850 && alkmaarCoordinate.longitude() <= 4.739851
+    );
+    assertTrue(
+      alkmaarCoordinate.latitude() >= 52.637531 && alkmaarCoordinate.latitude() <= 52.637532
+    );
+    var almereCoordinate = almere.getCoordinate();
+    assertTrue(almereCoordinate.longitude() >= 5.21780 && almereCoordinate.longitude() <= 5.21782);
+    assertTrue(
+      almereCoordinate.latitude() >= 52.3746190 && almereCoordinate.latitude() <= 52.3746191
+    );
   }
 }

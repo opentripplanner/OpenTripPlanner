@@ -50,8 +50,8 @@ public class HslParkUpdaterTest {
     var first = parkingLots.get(0);
     assertEquals("Tapiola Park", first.getName().toString());
     assertEquals("hslpark:990", first.getId().toString());
-    assertEquals(24.804713028552346, first.getX());
-    assertEquals(60.176018858575354, first.getY());
+    assertEquals(24.804713, first.getCoordinate().longitude());
+    assertEquals(60.1760189, first.getCoordinate().latitude());
     var entrance = first.getEntrances().get(0);
     assertEquals(24.804713028552346, entrance.getX());
     assertEquals(60.176018858575354, entrance.getY());
@@ -173,8 +173,8 @@ public class HslParkUpdaterTest {
     var first = parkingLots.get(0);
     assertEquals("Tapiola Park", first.getName().toString());
     assertEquals("hslpark:990", first.getId().toString());
-    assertEquals(24.804713028552346, first.getX());
-    assertEquals(60.176018858575354, first.getY());
+    assertEquals(24.804713, first.getCoordinate().longitude());
+    assertEquals(60.1760189, first.getCoordinate().latitude());
     assertNull(first.getOpeningHours());
   }
 }

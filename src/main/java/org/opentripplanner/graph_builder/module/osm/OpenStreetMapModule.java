@@ -77,6 +77,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -752,8 +753,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         .builder()
         .id(id)
         .name(creativeName)
-        .x(lon)
-        .y(lat)
+        .coordinate(new WgsCoordinate(lat, lon))
         .tags(tags)
         .detailsUrl(entity.getTag("website"))
         .openingHoursCalendar(openingHours)
