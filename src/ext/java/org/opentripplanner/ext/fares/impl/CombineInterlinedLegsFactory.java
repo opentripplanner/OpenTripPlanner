@@ -3,7 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class CombineInterlinedLegsFactory extends DefaultFareServiceFactory {
 
@@ -17,6 +17,6 @@ public class CombineInterlinedLegsFactory extends DefaultFareServiceFactory {
   @Override
   public void configure(JsonNode config) {
     var adapter = new NodeAdapter(config, null);
-    mode = adapter.asEnum("mode", CombinationMode.ALWAYS);
+    mode = adapter.of("mode").asEnum(CombinationMode.ALWAYS);
   }
 }
