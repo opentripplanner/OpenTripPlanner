@@ -185,7 +185,6 @@ public class VehicleRentalStation implements VehicleRentalPlace {
     );
   }
 
-  @Override
   public Set<FormFactor> formFactors() {
     return SetUtils.combine(
       getAvailableDropoffFormFactors(false),

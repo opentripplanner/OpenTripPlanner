@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
+package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.BICYCLE;
@@ -17,10 +17,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class VehicleRentalLayerTest {
 
   public static final String NAME = "a rental";
-  DigitransitVehicleRentalPropertyMapper mapper = new DigitransitVehicleRentalPropertyMapper();
 
   @Test
   public void floatingVehicle() {
+    var mapper = new DigitransitRentalVehiclePropertyMapper();
     var vehicle = new VehicleRentalVehicle();
     vehicle.id = new FeedScopedId("A", "B");
     vehicle.latitude = 1;
@@ -31,28 +31,27 @@ public class VehicleRentalLayerTest {
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicle).forEach(o -> map.put(o.first, o.second));
 
-    assertEquals("bicycle", map.get("formFactors"));
+    assertEquals("bicycle", map.get("formFactor"));
     assertEquals(NAME, map.get("name"));
-    assertEquals("floatingVehicle", map.get("type"));
-    assertEquals("A", map.get("networks"));
+    assertEquals("A", map.get("network"));
   }
 
   @Test
   public void station() {
-    var vehicle = new VehicleRentalStation();
-    vehicle.id = new FeedScopedId("A", "B");
-    vehicle.latitude = 1;
-    vehicle.longitude = 2;
-    vehicle.name = new NonLocalizedString(NAME);
-    vehicle.vehicleTypesAvailable = Map.of(vehicleType(BICYCLE), 5, vehicleType(SCOOTER), 10);
+    var mapper = new DigitransitVehicleRentalStationPropertyMapper();
+    var station = new VehicleRentalStation();
+    station.id = new FeedScopedId("A", "B");
+    station.latitude = 1;
+    station.longitude = 2;
+    station.name = new NonLocalizedString(NAME);
+    station.vehicleTypesAvailable = Map.of(vehicleType(BICYCLE), 5, vehicleType(SCOOTER), 10);
 
     Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicle).forEach(o -> map.put(o.first, o.second));
+    mapper.map(station).forEach(o -> map.put(o.first, o.second));
 
     assertEquals("bicycle,scooter", map.get("formFactors"));
     assertEquals(NAME, map.get("name"));
-    assertEquals("station", map.get("type"));
-    assertEquals("A", map.get("networks"));
+    assertEquals("A", map.get("network"));
   }
 
   @Nonnull

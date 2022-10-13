@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
+package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,27 +24,7 @@ public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<Vehic
       // to the response somehow.
       new T2<>("name", place.getName().toString()),
       // this is plural since once upon a time OSM-added rental stations could have multiple stations
-      new T2<>("networks", place.getNetwork()),
-      // a station can potentially have multiple form factors that's why this is plural
-      new T2<>(
-        "formFactors",
-        place
-          .formFactors()
-          .stream()
-          .map(ff -> ff.name().toLowerCase())
-          .sorted()
-          .collect(Collectors.joining(","))
-      ),
-      new T2<>("type", mapToType(place))
+      new T2<>("networks", place.getNetwork())
     );
-  }
-
-  private static String mapToType(VehicleRentalPlace place) {
-    if (place instanceof VehicleRentalVehicle) {
-      return "floatingVehicle";
-    } else if (place instanceof VehicleRentalStation) {
-      return "station";
-    }
-    return "unknown";
   }
 }

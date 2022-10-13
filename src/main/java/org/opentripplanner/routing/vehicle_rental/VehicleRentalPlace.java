@@ -98,9 +98,4 @@ public interface VehicleRentalPlace {
 
     return !request.allowedNetworks().contains(getNetwork());
   }
-
-  /**
-   * The form factors this place has - some types of places can have multiple.
-   */
-  Set<FormFactor> formFactors();
 }
