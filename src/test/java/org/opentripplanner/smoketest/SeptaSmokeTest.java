@@ -25,7 +25,7 @@ public class SeptaSmokeTest {
       airport,
       stPetersCemetary,
       Set.of("TRANSIT", "WALK"),
-      List.of("WALK", "RAIL", "RAIL", "WALK", "SUBWAY", "WALK", "BUS", "WALK")
+      List.of("WALK", "RAIL", "RAIL", "WALK", "SUBWAY", "WALK")
     );
   }
 
