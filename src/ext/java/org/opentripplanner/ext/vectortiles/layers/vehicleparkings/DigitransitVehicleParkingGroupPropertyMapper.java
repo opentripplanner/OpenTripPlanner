@@ -34,9 +34,9 @@ public class DigitransitVehicleParkingGroupPropertyMapper
     );
     // TODO translate name
     return List.of(
-        new T2<>("id", group.id().toString()),
-        new T2<>("name", group.name().toString()),
-        new T2<>("vehicleParking", parking)
+      new T2<>("id", group.id().toString()),
+      new T2<>("name", group.name().toString()),
+      new T2<>("vehicleParking", parking)
     );
   }
 }
