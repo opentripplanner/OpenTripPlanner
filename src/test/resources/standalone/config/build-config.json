@@ -4,7 +4,9 @@
   "osmCacheDataInMem" : true,
   "localFileNamePatterns" : {
     "osm" : "(i?)\\.osm\\.pbf$",
-    "dem" : "(i?)\\.dem\\.tiff?$"
+    "dem" : "(i?)\\.dem\\.tiff?$",
+    "gtfs" : "(?i)gtfs",
+    "netex" : "(?i)netex"
   },
 
   "osmDefaults": {
@@ -21,15 +23,28 @@
     "elevationUnitMultiplier" : 2.5
   }],
   "netexDefaults" : {
+    "netexFeedId" : "EN",
     "sharedFilePattern" : "_stops.xml",
     "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
-    "groupFilePattern" : "(\\w{3})_.*\\.xml"
+    "groupFilePattern" : "(\\w{3})_.*\\.xml",
+    "ignoreFilePattern" : "(temp|tmp)",
+    "ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
   },
   "transitFeeds" : [
     {
+      "type" : "gtfs",
+      "feedId" : "SE",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
+    },
+    {
       "type" : "netex",
-      "feedId" : "EN",
-      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/graph-EN0001234.obj"
+      "feedId" : "NO",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/norway-netex.obj",
+      "sharedFilePattern" : "_stops.xml",
+      "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
+      "groupFilePattern" : "(\\w{3})_.*\\.xml",
+      "ignoreFilePattern" : "(temp|tmp)"
+      //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
     }
   ],
   "transferRequests": [ { "modes": "WALK" }, { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }} ]
