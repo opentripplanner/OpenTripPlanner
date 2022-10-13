@@ -8,7 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -27,8 +27,8 @@ public class OsmConfig {
     return new OsmDefaultParameters(mapTagMapping(osmDefaults), mapTimeZone(osmDefaults));
   }
 
-  public static OsmExtractsConfig mapOsmConfig(NodeAdapter root, String parameterName) {
-    return new OsmExtractsConfig(
+  public static OsmExtractParametersList mapOsmConfig(NodeAdapter root, String parameterName) {
+    return new OsmExtractParametersList(
       root
         .of(parameterName)
         .withDoc(NA, /*TODO DOC*/"TODO")

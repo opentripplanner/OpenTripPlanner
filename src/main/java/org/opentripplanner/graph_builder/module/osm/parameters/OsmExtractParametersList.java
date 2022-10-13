@@ -7,11 +7,11 @@ import java.util.List;
 /**
  * Configure the list of OpenStreetMap extracts.
  */
-public class OsmExtractsConfig {
+public class OsmExtractParametersList {
 
   public final List<OsmExtractParameters> parameters;
 
-  public OsmExtractsConfig(Collection<OsmExtractParameters> extracts) {
+  public OsmExtractParametersList(Collection<OsmExtractParameters> extracts) {
     parameters = List.copyOf(extracts);
   }
 
