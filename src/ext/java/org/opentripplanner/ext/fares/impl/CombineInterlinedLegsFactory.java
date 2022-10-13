@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -11,7 +12,9 @@ public class CombineInterlinedLegsFactory extends DefaultFareServiceFactory {
 
   @Override
   public FareService makeFareService() {
-    return new CombinedInterlinedLegsFareService(mode);
+    var service = new CombinedInterlinedLegsFareService(mode);
+    service.addFareRules(FareType.regular, regularFareRules.values());
+    return service;
   }
 
   @Override
