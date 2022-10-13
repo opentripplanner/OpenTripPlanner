@@ -25,6 +25,8 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  * @param defaultValue The default value used if this parameter is not present in the documentation.
  * @param required The config parameter is required. OTP will not start unless this parameter is
  *                 set.
+ * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
+ *                  node.
  * @param deprecated This parameter is no longer in use in OTP, we keep it here to be able to
  *                   generate documentation.
  *
@@ -65,20 +67,14 @@ public record NodeInfo(
    *           the child, but that requires a bit of refactoring.
    */
   static NodeInfo ofSkipChild(String name) {
-    return new NodeInfo(
-      name,
-      "No doc, parent contains doc.",
-      null,
-      OBJECT,
-      null,
-      null,
-      OtpVersion.NA,
-      null,
-      null,
-      false,
-      true,
-      null
-    );
+    return of()
+      .withName(name)
+      .withSummary("No doc, parent contains doc.")
+      .withType(OBJECT)
+      .withSince(OtpVersion.NA)
+      .withOptional()
+      .withSkipChild()
+      .build();
   }
 
   /**

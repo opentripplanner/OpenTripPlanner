@@ -21,6 +21,8 @@ class NodeInfoBuilder {
   private String defaultValue = null;
   private Object exampleValue = null;
   private boolean required = true;
+
+  private boolean skipChildren = false;
   private DeprecatedInfo deprecated = null;
 
   public String name() {
@@ -114,6 +116,11 @@ class NodeInfoBuilder {
     return this;
   }
 
+  NodeInfoBuilder withSkipChild() {
+    this.skipChildren = true;
+    return this;
+  }
+
   NodeInfo build() {
     // Use the first enum as an example value, if not set
     if (exampleValue == null && enumType != null) {
@@ -131,7 +138,7 @@ class NodeInfoBuilder {
       defaultValue,
       exampleValue,
       required,
-      false,
+      skipChildren,
       deprecated
     );
   }
