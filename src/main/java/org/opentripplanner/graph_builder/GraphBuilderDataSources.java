@@ -17,8 +17,8 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
@@ -108,7 +108,7 @@ public class GraphBuilderDataSources {
     return inputData.get(type);
   }
 
-  public Iterable<ConfiguredDataSource<OsmExtractConfig>> getOsmConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
     return inputData
       .get(OSM)
       .stream()
@@ -116,12 +116,12 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
-    return buildConfig.osm.osmExtractConfigs
+  private OsmExtractParameters getOsmExtractConfig(DataSource dataSource) {
+    return buildConfig.osm.parameters
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
+      .orElse(new OsmExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<DemExtractConfig>> getDemConfiguredDatasource() {

@@ -5,9 +5,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import java.net.URI;
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfig;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractConfigBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -16,7 +16,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class OsmConfig {
 
-  public static OsmDefaultsConfig mapOsmDefaults(NodeAdapter root, String parameterName) {
+  public static OsmDefaultParameters mapOsmDefaults(NodeAdapter root, String parameterName) {
     var osmDefaults = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
@@ -24,10 +24,7 @@ public class OsmConfig {
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
 
-    return new OsmDefaultsConfig(
-      mapTagMapping(osmDefaults),
-      mapTimeZone(osmDefaults)
-    );
+    return new OsmDefaultParameters(mapTagMapping(osmDefaults), mapTimeZone(osmDefaults));
   }
 
   public static OsmExtractsConfig mapOsmConfig(NodeAdapter root, String parameterName) {
@@ -41,8 +38,8 @@ public class OsmConfig {
     );
   }
 
-  private static OsmExtractConfig mapOsmExtractConfig(NodeAdapter config) {
-    var builder = new OsmExtractConfigBuilder();
+  private static OsmExtractParameters mapOsmExtractConfig(NodeAdapter config) {
+    var builder = new OsmExtractParametersBuilder();
     builder.withSource(mapSource(config));
     builder.withTimeZone(mapTimeZone(config));
     builder.withOsmWayPropertySet(mapTagMapping(config));

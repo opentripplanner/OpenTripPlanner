@@ -18,7 +18,7 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultsConfig;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractsConfig;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -310,7 +310,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * OpenStreetMap specific build parameters.
    */
-  public final OsmDefaultsConfig osmDefaults;
+  public final OsmDefaultParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
 

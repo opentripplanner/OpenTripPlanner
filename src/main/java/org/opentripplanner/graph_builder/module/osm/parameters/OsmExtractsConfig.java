@@ -9,13 +9,13 @@ import java.util.List;
  */
 public class OsmExtractsConfig {
 
-  public final List<OsmExtractConfig> osmExtractConfigs;
+  public final List<OsmExtractParameters> parameters;
 
-  public OsmExtractsConfig(Collection<OsmExtractConfig> extracts) {
-    osmExtractConfigs = List.copyOf(extracts);
+  public OsmExtractsConfig(Collection<OsmExtractParameters> extracts) {
+    parameters = List.copyOf(extracts);
   }
 
   public List<URI> osmFiles() {
-    return osmExtractConfigs.stream().map(OsmExtractConfig::source).toList();
+    return parameters.stream().map(OsmExtractParameters::source).toList();
   }
 }

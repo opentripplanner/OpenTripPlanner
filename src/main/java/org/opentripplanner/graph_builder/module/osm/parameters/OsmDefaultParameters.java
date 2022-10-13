@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 /**
  * Default configuration for OpenStreetMap feeds.
  */
-public class OsmDefaultsConfig {
+public class OsmDefaultParameters {
 
   /**
    * The default set of rules for mapping OSM tags.
@@ -18,11 +18,11 @@ public class OsmDefaultsConfig {
    */
   public final ZoneId timeZone;
 
-  public OsmDefaultsConfig() {
+  public OsmDefaultParameters() {
     this(null, null);
   }
 
-  public OsmDefaultsConfig(WayPropertySetSource osmWayPropertySetSource, ZoneId timeZone) {
+  public OsmDefaultParameters(WayPropertySetSource osmWayPropertySetSource, ZoneId timeZone) {
     this.osmWayPropertySetSource =
       osmWayPropertySetSource != null
         ? osmWayPropertySetSource

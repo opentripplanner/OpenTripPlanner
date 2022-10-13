@@ -7,7 +7,7 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 /**
  * Configure an OpenStreetMap extract.
  */
-public class OsmExtractConfigBuilder {
+public class OsmExtractParametersBuilder {
 
   /**
    * URI to the source file.
@@ -24,17 +24,17 @@ public class OsmExtractConfigBuilder {
    */
   private ZoneId timeZone;
 
-  public OsmExtractConfigBuilder withSource(URI source) {
+  public OsmExtractParametersBuilder withSource(URI source) {
     this.source = source;
     return this;
   }
 
-  public OsmExtractConfigBuilder withOsmWayPropertySet(WayPropertySetSource osmWayPropertySet) {
+  public OsmExtractParametersBuilder withOsmWayPropertySet(WayPropertySetSource osmWayPropertySet) {
     this.osmWayPropertySet = osmWayPropertySet;
     return this;
   }
 
-  public OsmExtractConfigBuilder withTimeZone(ZoneId timeZone) {
+  public OsmExtractParametersBuilder withTimeZone(ZoneId timeZone) {
     this.timeZone = timeZone;
     return this;
   }
@@ -51,7 +51,7 @@ public class OsmExtractConfigBuilder {
     return timeZone;
   }
 
-  public OsmExtractConfig build() {
-    return new OsmExtractConfig(this);
+  public OsmExtractParameters build() {
+    return new OsmExtractParameters(this);
   }
 }
