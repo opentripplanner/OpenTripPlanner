@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.EnvironmentVariableReplacer.insertEnvironmentVariables;
-import static org.opentripplanner.standalone.config.IncludeFileDirective.includeFileDirective;
+import static org.opentripplanner.standalone.config.framework.file.IncludeFileDirective.includeFileDirective;
+import static org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;

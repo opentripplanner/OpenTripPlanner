@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
-import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRoutingRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

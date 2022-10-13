@@ -33,7 +33,7 @@ public class OtpConfig {
    */
   public final String configVersion;
 
-  OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
+  public OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
     this.root = new NodeAdapter(otpConfig, source);
 
     this.configVersion =
