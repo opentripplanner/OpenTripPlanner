@@ -467,8 +467,14 @@ public class BuildConfig implements OtpDataStoreConfig {
    * that class is more type safe, it seems simpler to just list out the parameters by name here.
    */
   public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
-    this.root = new NodeAdapter(node, source);
+    this(new NodeAdapter(node, source), logUnusedParams);
+  }
 
+  /**
+   * @see #BuildConfig(JsonNode, String, boolean)
+   */
+  public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
+    this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
     areaVisibility = root.of("areaVisibility").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     banDiscouragedWalking =
