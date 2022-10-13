@@ -15,15 +15,15 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.util.OTPFeature;
 
 public class RaptorRequestMapper {
 
   private final RouteRequest request;
-  private final Collection<? extends RaptorTransfer> accessPaths;
-  private final Collection<? extends RaptorTransfer> egressPaths;
+  private final Collection<? extends RaptorAccessEgress> accessPaths;
+  private final Collection<? extends RaptorAccessEgress> egressPaths;
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
@@ -31,8 +31,8 @@ public class RaptorRequestMapper {
   private RaptorRequestMapper(
     RouteRequest request,
     boolean isMultiThreaded,
-    Collection<? extends RaptorTransfer> accessPaths,
-    Collection<? extends RaptorTransfer> egressPaths,
+    Collection<? extends RaptorAccessEgress> accessPaths,
+    Collection<? extends RaptorAccessEgress> egressPaths,
     long transitSearchTimeZeroEpocSecond,
     MeterRegistry meterRegistry
   ) {
@@ -48,8 +48,8 @@ public class RaptorRequestMapper {
     RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,
-    Collection<? extends RaptorTransfer> accessPaths,
-    Collection<? extends RaptorTransfer> egressPaths,
+    Collection<? extends RaptorAccessEgress> accessPaths,
+    Collection<? extends RaptorAccessEgress> egressPaths,
     MeterRegistry meterRegistry
   ) {
     return new RaptorRequestMapper(

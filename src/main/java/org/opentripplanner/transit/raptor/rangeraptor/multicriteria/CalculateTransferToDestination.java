@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import java.util.List;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -16,11 +16,11 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 public class CalculateTransferToDestination<T extends RaptorTripSchedule>
   implements ParetoSetEventListener<ArrivalView<T>> {
 
-  private final List<RaptorTransfer> egressPaths;
+  private final List<RaptorAccessEgress> egressPaths;
   private final DestinationArrivalPaths<T> destinationArrivals;
 
   CalculateTransferToDestination(
-    List<RaptorTransfer> egressPaths,
+    List<RaptorAccessEgress> egressPaths,
     DestinationArrivalPaths<T> destinationArrivals
   ) {
     this.egressPaths = egressPaths;
@@ -37,11 +37,11 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
   @Override
   public void notifyElementAccepted(ArrivalView<T> newElement) {
     if (newElement.arrivedByTransit()) {
-      for (RaptorTransfer egress : egressPaths) {
+      for (RaptorAccessEgress egress : egressPaths) {
         destinationArrivals.add(newElement, egress);
       }
     } else if (newElement.arrivedByTransfer()) {
-      for (RaptorTransfer egress : egressPaths) {
+      for (RaptorAccessEgress egress : egressPaths) {
         if (egress.stopReachedOnBoard()) {
           destinationArrivals.add(newElement, egress);
         }

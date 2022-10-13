@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class AccessStopArrivalTest {
@@ -18,7 +18,7 @@ public class AccessStopArrivalTest {
   private static final int DEPARTURE_TIME = 8 * 60 * 60;
   private static final int ACCESS_DURATION = 10 * 60;
   private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
-  private static final TestTransfer WALK = walk(ALIGHT_STOP, ACCESS_DURATION);
+  private static final TestAccessEgress WALK = TestAccessEgress.walk(ALIGHT_STOP, ACCESS_DURATION);
   private static final int COST = WALK.generalizedCost();
 
   private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
@@ -97,7 +97,7 @@ public class AccessStopArrivalTest {
   @Test
   public void timeShiftNotAllowed() {
     AbstractStopArrival<RaptorTripSchedule> original, result;
-    RaptorTransfer access = transfer(-1);
+    RaptorAccessEgress access = access(-1);
 
     original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
@@ -113,7 +113,7 @@ public class AccessStopArrivalTest {
     AbstractStopArrival<RaptorTripSchedule> original, result;
 
     // Allow time-shift, but only by dTime
-    RaptorTransfer access = transfer(ALIGHT_TIME + dTime);
+    RaptorAccessEgress access = access(ALIGHT_TIME + dTime);
 
     original = new AccessStopArrival<>(DEPARTURE_TIME, access);
 
@@ -122,11 +122,16 @@ public class AccessStopArrivalTest {
     assertEquals(ALIGHT_TIME + dTime, result.arrivalTime());
   }
 
-  private static RaptorTransfer transfer(final int latestArrivalTime) {
-    return new RaptorTransfer() {
+  private static RaptorAccessEgress access(final int latestArrivalTime) {
+    return new RaptorAccessEgress() {
       @Override
       public int stop() {
         return 0;
+      }
+
+      @Override
+      public boolean stopReachedOnBoard() {
+        throw new NotImplementedException();
       }
 
       @Override

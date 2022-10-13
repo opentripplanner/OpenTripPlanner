@@ -15,7 +15,8 @@ class RouterConfigTest {
 
   @Test
   void completeConfigTest() {
-    var node = jsonNodeForTest("""
+    var node = jsonNodeForTest(
+      """
       {
         "updaters" : [ {
           "type" : "vehicle-positions",
@@ -30,7 +31,8 @@ class RouterConfigTest {
           "url" : "https://gbfs.bcycle.com/bcycle_indego/gbfs.json"
         } ]
       }
-      """);
+      """
+    );
 
     // Setup so we get access to the NodeAdapter, it is used later in the test
     var a = new NodeAdapter(node, SOURCE);
@@ -39,7 +41,7 @@ class RouterConfigTest {
     // Test for unused parameters
     var buf = new StringBuilder();
     a.logAllUnusedParameters(m -> buf.append(m).append("\n"));
-    if(buf.length() > 10) {
+    if (buf.length() > 10) {
       System.out.println(buf);
     }
     assertEquals("", buf.toString());

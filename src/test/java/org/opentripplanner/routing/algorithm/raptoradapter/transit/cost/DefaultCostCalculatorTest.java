@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 
 public class DefaultCostCalculatorTest {
@@ -102,10 +102,10 @@ public class DefaultCostCalculatorTest {
     var GENERALIZED_COST = 100;
 
     // transfer cost on stop index 0 is 0 - do not subtract anything
-    var t1 = TestTransfer.walk(0, 15, GENERALIZED_COST);
+    var t1 = TestAccessEgress.walk(0, 15, GENERALIZED_COST);
     assertEquals(GENERALIZED_COST, subject.costEgress(t1));
     // transfer cost on stop index 1 is 25 - subtract 25 from generalized cost
-    var t2 = TestTransfer.walk(1, 15, 100);
+    var t2 = TestAccessEgress.walk(1, 15, 100);
     assertEquals(GENERALIZED_COST - 25, subject.costEgress(t2));
   }
 
@@ -117,9 +117,9 @@ public class DefaultCostCalculatorTest {
     var DESIRED_COST = GENERALIZED_COST + TRANSFER_COST_SEC * 100;
 
     // Should be the same on all stop indexes
-    var t1 = TestTransfer.flex(0, 15, 1, GENERALIZED_COST);
+    var t1 = TestAccessEgress.flex(0, 15, 1, GENERALIZED_COST);
     assertEquals(DESIRED_COST, subject.costEgress(t1));
-    var t2 = TestTransfer.flex(1, 15, 1, GENERALIZED_COST);
+    var t2 = TestAccessEgress.flex(1, 15, 1, GENERALIZED_COST);
     assertEquals(DESIRED_COST, subject.costEgress(t2));
   }
 }

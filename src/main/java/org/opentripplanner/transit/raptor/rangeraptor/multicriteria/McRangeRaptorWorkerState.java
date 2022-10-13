@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -88,7 +89,7 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
     addStopArrival(new AccessStopArrival<>(departureTime, accessPath));
   }
 

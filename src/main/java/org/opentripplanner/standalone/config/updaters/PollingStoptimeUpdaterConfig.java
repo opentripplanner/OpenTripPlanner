@@ -4,8 +4,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.stoptime.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 public class PollingStoptimeUpdaterConfig {
@@ -18,8 +18,6 @@ public class PollingStoptimeUpdaterConfig {
       .withDoc(NA, /*TODO DOC*/"TODO")
       .withExample(/*TODO DOC*/"TODO")
       .asEnum(DataSourceType.class);
-
-
 
     if (sourceType == DataSourceType.GTFS_RT_FILE) {
       file =

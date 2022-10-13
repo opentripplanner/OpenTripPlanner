@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 
 public class GtfsRealtimeAlertsUpdaterConfig {
 

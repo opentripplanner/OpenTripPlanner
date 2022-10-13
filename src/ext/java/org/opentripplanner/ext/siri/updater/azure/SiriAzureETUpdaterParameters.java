@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
 import java.time.LocalDate;
-import org.opentripplanner.updater.stoptime.UrlUpdaterParameters;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public class SiriAzureETUpdaterParameters
   extends SiriAzureUpdaterParameters

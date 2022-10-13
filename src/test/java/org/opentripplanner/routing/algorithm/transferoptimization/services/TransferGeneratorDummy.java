@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
-
 import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -75,7 +74,7 @@ public class TransferGeneratorDummy {
     int toStop,
     TestTripSchedule toTrip
   ) {
-    var pathTransfer = fromStop == toStop ? null : walk(toStop, walkDuration);
+    var pathTransfer = fromStop == toStop ? null : TestTransfer.transfer(toStop, walkDuration);
 
     return new TripToTripTransfer<>(
       departure(fromTrip, fromStop),
@@ -91,7 +90,7 @@ public class TransferGeneratorDummy {
   ) {
     int fromStop = builder.getFromStopIndex();
     int toStop = builder.getToStopIndex();
-    var pathTransfer = fromStop == toStop ? null : walk(toStop, walkDuration);
+    var pathTransfer = fromStop == toStop ? null : TestTransfer.transfer(toStop, walkDuration);
 
     return new TripToTripTransfer<>(
       departure(builder.getFromTrip(), builder.getFromStopIndex()),

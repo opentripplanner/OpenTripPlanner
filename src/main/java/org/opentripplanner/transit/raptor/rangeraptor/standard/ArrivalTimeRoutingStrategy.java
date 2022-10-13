@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
@@ -40,7 +40,7 @@ public final class ArrivalTimeRoutingStrategy<T extends RaptorTripSchedule>
 
   @Override
   public void setAccessToStop(
-    RaptorTransfer accessPath,
+    RaptorAccessEgress accessPath,
     int iterationDepartureTime,
     int timeDependentDepartureTime
   ) {

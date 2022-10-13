@@ -87,7 +87,8 @@ public class StopTimesHelper {
     TransitService transitService,
     StopLocation stop,
     LocalDate serviceDate,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
@@ -106,7 +107,13 @@ public class StopTimesHelper {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, i)) {
             continue;
           }
+          if (skipByStopCancellation(pattern, includeCancellations, i)) {
+            continue;
+          }
           for (TripTimes t : tt.getTripTimes()) {
+            if (skipByTripCancellation(t, includeCancellations)) {
+              continue;
+            }
             if (servicesRunning.contains(t.getServiceCode())) {
               stopTimes.times.add(new TripTimeOnDate(t, i, pattern, serviceDate, midnight));
             }
@@ -140,7 +147,8 @@ public class StopTimesHelper {
     Instant startTime,
     Duration timeRange,
     int numberOfDepartures,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   ) {
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
       transitService,
@@ -150,7 +158,7 @@ public class StopTimesHelper {
       timeRange,
       numberOfDepartures,
       arrivalDeparture,
-      false,
+      includeCancellations,
       true
     );
 

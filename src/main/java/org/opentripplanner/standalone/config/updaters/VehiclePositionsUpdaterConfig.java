@@ -4,7 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.vehicle_positions.VehiclePositionsUpdaterParameters;
+import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 public class VehiclePositionsUpdaterConfig {
