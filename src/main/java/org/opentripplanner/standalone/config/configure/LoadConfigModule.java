@@ -8,8 +8,8 @@ import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
 import org.opentripplanner.standalone.config.api.TransitServicePeriod;
 
@@ -29,13 +29,13 @@ import org.opentripplanner.standalone.config.api.TransitServicePeriod;
 public class LoadConfigModule {
 
   @Provides
-  static ConfigLoader providesConfigLoader(@OtpBaseDirectory File configDirectory) {
-    return new ConfigLoader(configDirectory);
+  static OtpConfigLoader providesConfigLoader(@OtpBaseDirectory File configDirectory) {
+    return new OtpConfigLoader(configDirectory);
   }
 
   @Provides
   @Singleton
-  static ConfigModel providesModel(ConfigLoader loader) {
+  static ConfigModel providesModel(OtpConfigLoader loader) {
     return new ConfigModel(loader);
   }
 

@@ -9,7 +9,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class SpeedTestConfig {
   }
 
   public static SpeedTestConfig config(File dir) {
-    var json = new ConfigLoader(dir).loadJsonByFilename(FILE_NAME);
+    var json = ConfigFileLoader.of().withConfigDir(dir).loadFromFile(FILE_NAME);
     SpeedTestConfig config = new SpeedTestConfig(json);
     LOG.info("SpeedTest config loaded: {}", config);
     return config;

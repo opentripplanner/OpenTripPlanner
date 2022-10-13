@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.projectinfo.MavenProjectVersion;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.model.projectinfo.VersionControlInfo;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.util.OtpAppException;
 
 public class EnvironmentVariableReplacerTest {
@@ -123,7 +124,7 @@ public class EnvironmentVariableReplacerTest {
     assertThrows(
       OtpAppException.class,
       () ->
-        ConfigLoader.nodeFromString(
+        ConfigFileLoader.nodeFromString(
           "None existing env.var: '${none_existing_env_variable}'.",
           "test"
         )

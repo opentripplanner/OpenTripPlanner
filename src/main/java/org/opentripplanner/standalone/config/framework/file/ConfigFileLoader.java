@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config;
+package org.opentripplanner.standalone.config.framework.file;
 
 import static org.opentripplanner.standalone.config.framework.file.IncludeFileDirective.includeFileDirective;
 import static org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer.insertEnvironmentVariables;
@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  * This class is also provide logging when a config file is loaded. We load and parse config files
  * early to reveal syntax errors without waiting for graph build.
  */
-public class ConfigLoader {
+public class ConfigFileLoader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ConfigLoader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigFileLoader.class);
 
   private static final String OTP_CONFIG_FILENAME = "otp-config.json";
   private static final String BUILD_CONFIG_FILENAME = "build-config.json";
@@ -40,33 +40,29 @@ public class ConfigLoader {
   private final ObjectMapper mapper = new ObjectMapper();
 
   @Nullable
-  private final File configDir;
+  private File configDir = null;
 
-  private final String jsonFallback;
+  @Nullable
+  private String jsonFallback = null;
 
-  private ConfigLoader(File configDir, String jsonFallback) {
-    this.configDir = configDir;
-    this.jsonFallback = jsonFallback;
-    assertConfigDirIsADirectory();
+  private ConfigFileLoader() {
     // Configure mapper
     mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
     mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
   }
 
-  /**
-   * Create a config loader that load config from the given directory.
-   */
-  public ConfigLoader(File configDir) {
-    this(configDir, null);
+  public static ConfigFileLoader of() {
+    return new ConfigFileLoader();
   }
 
-  /**
-   * Create a config loader that load config from the given input json document. Use it with {@link
-   * #loadBuildConfig()} or one of the other load methods to return a configuration for the given
-   * input json string.
-   */
-  public static ConfigLoader fromString(String json) {
-    return new ConfigLoader(null, json);
+  public ConfigFileLoader withConfigDir(File configDir) {
+    this.configDir = assertConfigDirExist(configDir);
+    return this;
+  }
+
+  public ConfigFileLoader withJsonFallback(String jsonFallback) {
+    this.jsonFallback = jsonFallback;
+    return this;
   }
 
   /**
@@ -74,89 +70,18 @@ public class ConfigLoader {
    * to generate a proper error message in case the string is not a proper JSON document.
    */
   public static JsonNode nodeFromString(String json, String source) {
-    return new ConfigLoader(null, null).stringToJsonNode(json, source);
+    return of().stringToJsonNode(json, source);
   }
 
   /**
-   * Check if a file is a config file using the configuration file name. This method returns {@code
-   * true} if the file match {@code (otp|build|router)-config.json}.
-   */
-  public static boolean isConfigFile(String filename) {
-    return (
-      OTP_CONFIG_FILENAME.equals(filename) ||
-      BUILD_CONFIG_FILENAME.equals(filename) ||
-      ROUTER_CONFIG_FILENAME.equals(filename)
-    );
-  }
-
-  /**
-   * Log the config-version for each configuration file. The logging is only performed if the
-   * config-version is set.
-   */
-  public static void logConfigVersion(
-    String otpConfigVersion,
-    String buildConfigVersion,
-    String routerConfigVersion
-  ) {
-    logConfigVersion(otpConfigVersion, OTP_CONFIG_FILENAME);
-    logConfigVersion(buildConfigVersion, BUILD_CONFIG_FILENAME);
-    logConfigVersion(routerConfigVersion, ROUTER_CONFIG_FILENAME);
-  }
-
-  /**
-   * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
-   * given {@code configDir}  is {@code null} or config file is NOT found.
-   * <p>
-   * This method also log all loaded parameters to the console.
-   * <p>
-   *
-   * @see #loadJsonFile for more details.
-   */
-  public OtpConfig loadOtpConfig() {
-    return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME, true);
-  }
-
-  /**
-   * Load the graph build configuration file as a JsonNode three. An empty node is returned if the
-   * given {@code configDir}  is {@code null} or config file is NOT found.
-   * <p>
-   * This method also log all loaded parameters to the console.
-   * <p>
-   *
-   * @see #loadJsonFile for more details.
-   */
-  public BuildConfig loadBuildConfig() {
-    JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
-    if (node.isMissingNode()) {
-      return BuildConfig.DEFAULT;
-    }
-    return new BuildConfig(node, BUILD_CONFIG_FILENAME, true);
-  }
-
-  /**
-   * Load the router configuration file as a JsonNode three. An empty node is returned if the given
-   * {@code configDir}  is {@code null} or config file is NOT found.
-   * <p>
-   *
-   * @see #loadJsonFile for more details.
-   */
-  public RouterConfig loadRouterConfig() {
-    JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
-    if (node.isMissingNode()) {
-      return RouterConfig.DEFAULT;
-    }
-    return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
-  }
-
-  /**
-   * Load the router configuration file as a JsonNode three. An empty node is returned if the given
+   * Load the configuration file as a JsonNode three. An empty node is returned if the given
    * {@code configDir}  is {@code null} or config file is NOT found.
    * <p>
    * This is public to allow loading configuration files from tests like the SpeedTest.
    *
    * @see #loadJsonFile for more details.
    */
-  public JsonNode loadJsonByFilename(String filename) {
+  public JsonNode loadFromFile(String filename) {
     // Use default parameters if no configDir is available.
     if (configDir == null) {
       if (jsonFallback != null) {
@@ -194,12 +119,6 @@ public class ConfigLoader {
             entry.setValue(new TextNode("********"));
           }
         });
-    }
-  }
-
-  private static void logConfigVersion(String configVersion, String filename) {
-    if (configVersion != null) {
-      LOG.info("{} config-version is {}.", filename, configVersion);
     }
   }
 
@@ -251,13 +170,14 @@ public class ConfigLoader {
     }
   }
 
-  private void assertConfigDirIsADirectory() {
+  public static File assertConfigDirExist(File configDir) {
     // Config dir not set, using defaults
     if (configDir == null) {
-      return;
+      return null;
     }
     if (!configDir.isDirectory()) {
       throw new IllegalArgumentException(configDir + " is not a readable configuration directory.");
     }
+    return configDir;
   }
 }

@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -16,9 +15,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 
-public class ConfigLoaderTest {
+public class OtpConfigLoaderTest {
 
   private static final String OTP_CONFIG_FILENAME = "otp-config.json";
   private static final String BUILD_CONFIG_FILENAME = "build-config.json";
@@ -39,10 +38,10 @@ public class ConfigLoaderTest {
 
   @Test
   public void isConfigFile() {
-    assertTrue(ConfigLoader.isConfigFile(OTP_CONFIG_FILENAME));
-    assertTrue(ConfigLoader.isConfigFile(BUILD_CONFIG_FILENAME));
-    assertTrue(ConfigLoader.isConfigFile(ROUTER_CONFIG_FILENAME));
-    assertFalse(ConfigLoader.isConfigFile("not-config.json"));
+    assertTrue(OtpConfigLoader.isConfigFile(OTP_CONFIG_FILENAME));
+    assertTrue(OtpConfigLoader.isConfigFile(BUILD_CONFIG_FILENAME));
+    assertTrue(OtpConfigLoader.isConfigFile(ROUTER_CONFIG_FILENAME));
+    assertFalse(OtpConfigLoader.isConfigFile("not-config.json"));
   }
 
   @Test
@@ -54,7 +53,7 @@ public class ConfigLoaderTest {
     FileUtils.write(file, json, UTF_8);
 
     // when:
-    BuildConfig parameters = new ConfigLoader(tempDir).loadBuildConfig();
+    BuildConfig parameters = new OtpConfigLoader(tempDir).loadBuildConfig();
 
     // then:
     assertTrue(parameters.areaVisibility);
@@ -67,7 +66,7 @@ public class ConfigLoaderTest {
     FileUtils.write(file, "{requestLogFile : \"aFile.txt\"}", UTF_8);
 
     // when:
-    RouterConfig params = new ConfigLoader(tempDir).loadRouterConfig();
+    RouterConfig params = new OtpConfigLoader(tempDir).loadRouterConfig();
 
     // then:
     assertEquals("aFile.txt", params.requestLogFile());
@@ -76,28 +75,19 @@ public class ConfigLoaderTest {
   @Test
   public void whenFileDoNotExistExpectMissingNode() {
     // when: ruter-config.json do not exist
-    RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig();
+    RouterConfig res = new OtpConfigLoader(tempDir).loadRouterConfig();
 
     // then: expect missing node
     assertNull(res.requestLogFile(), "Expect deafult value(null)");
   }
 
-  @Test
-  public void parseJsonString() {
-    // when:
-    JsonNode node = ConfigLoader.nodeFromString("{key:\"value\"}", "JSON-STRING");
-
-    // then:
-    assertEquals("value", node.path("key").asText());
-  }
-
   /**
-   * Test replacing environment variables in JSON config. The {@link ConfigLoader} should replace
+   * Test replacing environment variables in JSON config. The {@link OtpConfigLoader} should replace
    * placeholders like '${ENV_NAME}' when converting a JSON string to a node tree.
    * <p>
    * This test pick a random system environment variable and insert it into the JSON string to be
    * able to test the replace functionality. This is necessary to avoid changing the system
-   * environment variables and to apply this test on the {@link ConfigLoader} level.
+   * environment variables and to apply this test on the {@link OtpConfigLoader} level.
    */
   @Test
   public void testReplacementOfEnvironmentVariables() {
@@ -124,38 +114,12 @@ public class ConfigLoaderTest {
     String json = json("{  'key': '${" + eName + "}', 'key2':'${" + eName + "}' }");
 
     // When: parse JSON
-    JsonNode node = ConfigLoader.nodeFromString(json, "test");
+    JsonNode node = ConfigFileLoader.nodeFromString(json, "test");
 
     // Then: verify that the JSON node have the expected value
     String actualValue = node.path("key").asText(null);
 
     assertEquals(expectedValue, actualValue);
-  }
-
-  /**
-   * Test replacing environment variables in config fails on a unknown environment variable.
-   */
-  @Test
-  public void testMissingEnvironmentVariable() {
-    assertThrows(
-      OtpAppException.class,
-      () -> ConfigLoader.nodeFromString(json("{ key: '${none_existing_env_variable}' }"), "test")
-    );
-  }
-
-  @Test
-  public void configFailsIfBaseDirectoryDoesNotExist() {
-    File cfgDir = new File(tempDir, "cfg");
-
-    assertThrows(Exception.class, () -> new ConfigLoader(cfgDir), "" + cfgDir.getName());
-  }
-
-  @Test
-  public void configFailsIfConfigDirIsAFile() throws IOException {
-    File file = new File(tempDir, "AFile.txt");
-    FileUtils.write(file, "{}", UTF_8);
-
-    assertThrows(Exception.class, () -> new ConfigLoader(file), "" + file.getName());
   }
 
   private static String json(String text) {

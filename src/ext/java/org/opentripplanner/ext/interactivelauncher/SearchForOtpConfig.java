@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.interactivelauncher;
 
-import static org.opentripplanner.standalone.config.ConfigLoader.isConfigFile;
+import static org.opentripplanner.standalone.config.OtpConfigLoader.isConfigFile;
 
 import java.io.File;
 import java.util.Arrays;

@@ -33,7 +33,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 
 public class OtpDataStoreTest {
 
@@ -169,7 +169,7 @@ public class OtpDataStoreTest {
 
     // Open data store using the base-dir
 
-    var confLoader = new ConfigLoader(baseDir);
+    var confLoader = new OtpConfigLoader(baseDir);
     var buildConfig = confLoader.loadBuildConfig();
 
     OtpDataStore store = DataStoreModule.provideDataStore(baseDir, buildConfig, null);
@@ -270,7 +270,7 @@ public class OtpDataStoreTest {
   }
 
   private OtpDataStoreConfig config() {
-    var confLoader = new ConfigLoader(baseDir);
+    var confLoader = new OtpConfigLoader(baseDir);
     return confLoader.loadBuildConfig();
   }
 }
