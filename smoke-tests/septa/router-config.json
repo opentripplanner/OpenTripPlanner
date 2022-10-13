@@ -2,7 +2,7 @@
   "updaters": [
     {
       "type": "vehicle-positions",
-      "sourceType": "gtfs-http",
+      "sourceType": "gtfs-rt-http",
       "url": "https://www3.septa.org/gtfsrt/septarail-pa-us/Vehicle/rtVehiclePosition.pb",
       "feedId": "septa-rail",
       "frequencySec": 60

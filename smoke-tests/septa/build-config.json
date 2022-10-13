@@ -10,5 +10,6 @@
       "source": "bus.gtfs.zip",
       "feedId": "septa-bus"
     }
-  ]
+  ],
+  "fares": "combine-interlined-legs"
 }
