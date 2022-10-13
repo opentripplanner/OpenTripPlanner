@@ -1,11 +1,10 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.function.Function;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * Builder for {@link WayProperties}. Default value for bicycle and walk safety is set when
- * {@link WayProperties} is built.
+ * Builder for {@link WayProperties}. Bicycle and walk safety features are nullable, but they should
+ * be set before building the final {@link WayProperties} for a way.
  */
 public class WayPropertiesBuilder {
 
@@ -75,16 +74,7 @@ public class WayPropertiesBuilder {
     return walkSafetyFeatures;
   }
 
-  public WayProperties build(
-    Function<StreetTraversalPermission, Double> defaultBicycleSafetyForPermission,
-    Function<StreetTraversalPermission, Double> defaultWalkSafetyForPermission
-  ) {
-    if (bicycleSafetyFeatures == null) {
-      bicycleSafety(defaultBicycleSafetyForPermission.apply(permission));
-    }
-    if (walkSafetyFeatures == null) {
-      walkSafety(defaultWalkSafetyForPermission.apply(permission));
-    }
+  public WayProperties build() {
     return new WayProperties(this);
   }
 

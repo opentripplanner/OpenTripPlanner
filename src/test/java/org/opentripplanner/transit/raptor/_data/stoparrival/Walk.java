@@ -21,7 +21,7 @@ public class Walk extends AbstractStopArrival {
     super(round, stop, arrivalTime, extraCost, previous);
     // In a reverse search we the arrival is before the departure
     int durationInSeconds = Math.abs(arrivalTime - departureTime);
-    this.transfer = TestTransfer.walk(stop, durationInSeconds, extraCost);
+    this.transfer = TestTransfer.transfer(stop, durationInSeconds, extraCost);
   }
 
   public Walk(

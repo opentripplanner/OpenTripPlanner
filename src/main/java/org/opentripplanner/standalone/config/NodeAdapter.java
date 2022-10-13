@@ -23,14 +23,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
@@ -459,9 +459,9 @@ public class NodeAdapter {
     return uriFromString(paramName, asText(paramName, defaultValue));
   }
 
-  public DoubleFunction<Double> asLinearFunction(
+  public DoubleAlgorithmFunction asLinearFunction(
     String paramName,
-    DoubleFunction<Double> defaultValue
+    DoubleAlgorithmFunction defaultValue
   ) {
     String text = param(paramName).asText();
     if (text == null || text.isBlank()) {

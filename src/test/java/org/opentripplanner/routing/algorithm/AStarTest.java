@@ -13,7 +13,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
@@ -87,12 +86,14 @@ public class AStarTest {
   public void testForward() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(to);
@@ -114,13 +115,15 @@ public class AStarTest {
   public void testBack() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     request.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(from);
@@ -152,7 +155,7 @@ public class AStarTest {
   public void testForwardExtraEdges() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
       "near_shilshole_22nd",
@@ -172,7 +175,9 @@ public class AStarTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(to);
@@ -196,7 +201,7 @@ public class AStarTest {
   public void testBackExtraEdges() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     request.setArriveBy(true);
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
@@ -217,7 +222,9 @@ public class AStarTest {
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, from, to))
+      .setRequest(request)
+      .setFrom(from)
+      .setTo(to)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(from);
@@ -241,7 +248,7 @@ public class AStarTest {
   public void testMultipleTargets() {
     var request = new RouteRequest();
 
-    request.preferences().withWalk(w -> w.setSpeed(1.0));
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     Set<Vertex> targets = new HashSet<>();
     targets.add(graph.getVertex("shilshole_22nd"));
@@ -256,7 +263,9 @@ public class AStarTest {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setTerminationStrategy(strategy)
-      .setContext(new RoutingContext(request, graph, v1, v2))
+      .setRequest(request)
+      .setFrom(v1)
+      .setTo(v2)
       .getShortestPathTree();
 
     for (Vertex v : targets) {

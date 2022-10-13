@@ -130,7 +130,8 @@ public interface TransitService {
   List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
     LocalDate serviceDate,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   );
 
   List<TripTimeOnDate> stopTimesForPatternAtStop(
@@ -139,7 +140,8 @@ public interface TransitService {
     Instant startTime,
     Duration timeRange,
     int numberOfDepartures,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   );
 
   Collection<GroupOfRoutes> getGroupsOfRoutes();

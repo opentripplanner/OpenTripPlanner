@@ -9,6 +9,13 @@ public class DoubleUtils {
   /**
    * Round to a decimal number with 1 digits precision
    */
+  public static double roundToZeroDecimals(double value) {
+    return roundToNDecimals(value, 0);
+  }
+
+  /**
+   * Round to a decimal number with 1 digits precision
+   */
   public static double roundTo1Decimal(double value) {
     return roundToNDecimals(value, 1);
   }
@@ -48,13 +55,6 @@ public class DoubleUtils {
     return roundToNDecimals(value, 7);
   }
 
-  public static double roundToNDecimals(double value, int places) {
-    if (Double.isNaN(value) || Double.isInfinite(value)) {
-      return value;
-    }
-    return BigDecimal.valueOf(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
-  }
-
   /**
    * Compare two doubles for equality - this is equivalent of
    * <pre>
@@ -63,5 +63,14 @@ public class DoubleUtils {
    */
   public static boolean doubleEquals(double a, double b) {
     return Double.compare(a, b) == 0;
+  }
+
+  /* private methods */
+
+  private static double roundToNDecimals(double value, int decimals) {
+    if (Double.isNaN(value) || Double.isInfinite(value)) {
+      return value;
+    }
+    return BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_UP).doubleValue();
   }
 }

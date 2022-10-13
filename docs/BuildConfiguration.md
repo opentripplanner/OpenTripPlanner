@@ -125,8 +125,9 @@ different locations around the local filesystem.
 
 As a general rule, references to data files are specified as absolute URIs and must start with the protocol name.   
 Example:   
-Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`   
-Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`
+Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`  
+HTTPS resources: `"https://download.geofabrik.de/europe/norway-latest.osm.pbf"`  
+Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`  
 
 Alternatively if a relative URI can be provided, it is interpreted as a path relative to the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
 Example:   
@@ -537,6 +538,7 @@ The current list of custom fare type is:
     - `analyzeInterlinedTransfers` If true, will treat interlined transfers as actual transfers.
       This is merely a work-around for transit agencies that choose to code their fares in a
       route-based fashion instead of a zone-based fashion. Default: `false`
+- `atlanta` (no parameters)
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:

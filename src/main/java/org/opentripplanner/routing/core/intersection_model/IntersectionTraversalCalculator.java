@@ -13,6 +13,11 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
  * @author avi
  */
 public interface IntersectionTraversalCalculator {
+  IntersectionTraversalCalculator DEFAULT = create(
+    IntersectionTraversalModel.SIMPLE,
+    DrivingDirection.RIGHT
+  );
+
   /**
    * Compute the duration of turning onto "to" from "from".
    *

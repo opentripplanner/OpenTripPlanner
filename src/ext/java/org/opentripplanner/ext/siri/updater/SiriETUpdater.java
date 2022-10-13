@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import java.util.List;
+import java.util.function.Consumer;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
@@ -8,6 +9,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -52,6 +55,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
 
+  private final Consumer<UpdateResult> recordMetrics;
+
   public SiriETUpdater(
     SiriETUpdaterParameters config,
     TransitModel transitModel,
@@ -66,13 +71,17 @@ public class SiriETUpdater extends PollingGraphUpdater {
     this.snapshotSource = timetableSnapshot;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
+    this.fuzzyTripMatcher =
+      config.isFuzzyTripMatching()
+        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+        : null;
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
       pollingPeriodSeconds(),
       updateSource
     );
+    recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
   @Override
@@ -99,13 +108,14 @@ public class SiriETUpdater extends PollingGraphUpdater {
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
-            snapshotSource.applyEstimatedTimetable(
+            var result = snapshotSource.applyEstimatedTimetable(
               transitModel,
               fuzzyTripMatcher,
               feedId,
               fullDataset,
               etds
             );
+            recordMetrics.accept(result);
             if (markPrimed) primed = true;
           });
         }

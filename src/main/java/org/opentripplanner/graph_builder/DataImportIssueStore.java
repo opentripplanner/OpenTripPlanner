@@ -33,10 +33,6 @@ public class DataImportIssueStore {
     return NOOP;
   }
 
-  public static DataImportIssueStore noop() {
-    return DataImportIssueStore.noopIssueStore();
-  }
-
   public void add(DataImportIssue issue) {
     ISSUE_LOG.debug("{} - {}", issue.getType(), issue.getMessage());
     if (storeIssues) {

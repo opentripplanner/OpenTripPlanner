@@ -1,12 +1,8 @@
 package org.opentripplanner.routing.core;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 
 /**
@@ -15,9 +11,6 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
  * time and space use during searches.
  */
 public class StateData implements Cloneable {
-
-  // the time at which the search started
-  public Instant startTime;
 
   // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
 
@@ -28,16 +21,6 @@ public class StateData implements Cloneable {
   protected boolean mayKeepRentedVehicleAtDestination;
 
   protected CarPickupState carPickupState;
-
-  protected RouteRequest opt;
-
-  protected RoutingContext rctx;
-
-  // TODO VIA - this will be folded into an AStarRequest in the future
-  public IntersectionTraversalCalculator intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
-    IntersectionTraversalModel.SIMPLE,
-    DrivingDirection.RIGHT
-  );
 
   /**
    * The preferred mode, which may differ from backMode when for example walking with a bike. It may
@@ -61,14 +44,12 @@ public class StateData implements Cloneable {
   protected boolean enteredNoThroughTrafficArea;
 
   /** Private constructor, use static methods to get a set of initial states. */
-  private StateData(RouteRequest options) {
-    this.opt = options;
-    TraverseModeSet modes = options.streetSubRequestModes;
-    if (modes.getCar()) {
+  private StateData(StreetMode requestMode) {
+    if (requestMode.includesDriving()) {
       currentMode = TraverseMode.CAR;
-    } else if (modes.getWalk()) {
+    } else if (requestMode.includesWalking()) {
       currentMode = TraverseMode.WALK;
-    } else if (modes.getBicycle()) {
+    } else if (requestMode.includesBiking()) {
       currentMode = TraverseMode.BICYCLE;
     } else {
       currentMode = null;
@@ -78,16 +59,26 @@ public class StateData implements Cloneable {
   /**
    * Returns a set of initial StateDatas based on the options from the RoutingRequest
    */
-  public static List<StateData> getInitialStateDatas(RouteRequest options) {
-    return getInitialStateDatas(options, false);
+  public static List<StateData> getInitialStateDatas(AStarRequest request) {
+    return getInitialStateDatas(
+      request.mode(),
+      request.arriveBy(),
+      request.rental().allowArrivingInRentedVehicleAtDestination(),
+      false
+    );
   }
 
   /**
    * Returns an initial StateData based on the options from the RoutingRequest. This returns always
    * only a single state, which is considered the "base case"
    */
-  public static StateData getInitialStateData(RouteRequest options) {
-    var stateDatas = getInitialStateDatas(options, true);
+  public static StateData getInitialStateData(AStarRequest request) {
+    var stateDatas = getInitialStateDatas(
+      request.mode(),
+      request.arriveBy(),
+      request.rental().allowArrivingInRentedVehicleAtDestination(),
+      true
+    );
     if (stateDatas.size() != 1) {
       throw new IllegalStateException("Unable to create only a single state");
     }
@@ -99,17 +90,19 @@ public class StateData implements Cloneable {
    *                         mostly in tests, which test a single State
    */
   private static List<StateData> getInitialStateDatas(
-    RouteRequest options,
+    StreetMode requestMode,
+    boolean arriveBy,
+    boolean allowArrivingInRentedVehicleAtDestination,
     boolean forceSingleState
   ) {
     List<StateData> res = new ArrayList<>();
-    var proto = new StateData(options);
+    var proto = new StateData(requestMode);
 
     // carPickup searches may start and end in two distinct states:
     //   - CAR / IN_CAR where pickup happens directly at the bus stop
     //   - WALK / WALK_FROM_DROP_OFF or WALK_TO_PICKUP for cases with an initial walk
     // For forward/reverse searches to be symmetric both initial states need to be created.
-    if (options.carPickup) {
+    if (requestMode.includesPickup()) {
       if (!forceSingleState) {
         var inCarPickupStateData = proto.clone();
         inCarPickupStateData.carPickupState = CarPickupState.IN_CAR;
@@ -118,7 +111,7 @@ public class StateData implements Cloneable {
       }
       var walkingPickupStateData = proto.clone();
       walkingPickupStateData.carPickupState =
-        options.arriveBy() ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
+        arriveBy ? CarPickupState.WALK_FROM_DROP_OFF : CarPickupState.WALK_TO_PICKUP;
       walkingPickupStateData.currentMode = TraverseMode.WALK;
       res.add(walkingPickupStateData);
     }
@@ -129,10 +122,10 @@ public class StateData implements Cloneable {
     //   - HAVE_RENTED
     // When searching backwards:
     //   - BEFORE_RENTING
-    else if (options.vehicleRental) {
-      if (options.arriveBy()) {
+    else if (requestMode.includesRenting()) {
+      if (arriveBy) {
         if (!forceSingleState) {
-          if (options.journey().rental().allowArrivingInRentedVehicleAtDestination()) {
+          if (allowArrivingInRentedVehicleAtDestination) {
             var keptVehicleStateData = proto.clone();
             keptVehicleStateData.vehicleRentalState = VehicleRentalState.RENTING_FROM_STATION;
             keptVehicleStateData.currentMode = TraverseMode.BICYCLE;
@@ -157,13 +150,13 @@ public class StateData implements Cloneable {
     // If the itinerary is to begin with a car that is parked for transit the initial state is
     //   - In arriveBy searches is with the car already "parked" and in WALK mode
     //   - In departAt searches, we are in CAR mode and "unparked".
-    else if (options.parkAndRide) {
+    else if (requestMode.includesParking()) {
       var parkAndRideStateData = proto.clone();
-      parkAndRideStateData.vehicleParked = options.arriveBy();
+      parkAndRideStateData.vehicleParked = arriveBy;
       parkAndRideStateData.currentMode =
         parkAndRideStateData.vehicleParked
           ? TraverseMode.WALK
-          : options.streetSubRequestModes.getBicycle() ? TraverseMode.BICYCLE : TraverseMode.CAR;
+          : requestMode.includesBiking() ? TraverseMode.BICYCLE : TraverseMode.CAR;
       res.add(parkAndRideStateData);
     } else {
       res.add(proto.clone());

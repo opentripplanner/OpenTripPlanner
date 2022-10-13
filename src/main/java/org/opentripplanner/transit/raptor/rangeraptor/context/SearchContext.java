@@ -16,9 +16,9 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -207,7 +207,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
    * <p>
    * This method is static and package local to enable unit-testing.
    */
-  static Collection<RaptorTransfer> accessOrEgressPaths(
+  static Collection<RaptorAccessEgress> accessOrEgressPaths(
     boolean getAccess,
     RaptorProfile profile,
     SearchParams searchParams
@@ -220,9 +220,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     // For none MC-search we only want the fastest transfer for each stop,
     // no duplicates are accepted
-    Map<Integer, RaptorTransfer> bestTimePaths = new HashMap<>();
-    for (RaptorTransfer it : paths) {
-      RaptorTransfer existing = bestTimePaths.get(it.stop());
+    Map<Integer, RaptorAccessEgress> bestTimePaths = new HashMap<>();
+    for (RaptorAccessEgress it : paths) {
+      RaptorAccessEgress existing = bestTimePaths.get(it.stop());
       if (existing == null || it.durationInSeconds() < existing.durationInSeconds()) {
         bestTimePaths.put(it.stop(), it);
       }

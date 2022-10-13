@@ -3,10 +3,9 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -53,7 +53,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
       // All access paths are all pareto-optimal (McRaptor).
       .addAccessPaths(
         // lowest num-of-transfers (0)
-        walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
+        TestAccessEgress.walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
         // lowest cost
         flexAndWalk(STOP_C, D2m, TWO_RIDES, 2 * COST_ONE_STOP - COST_ONE_SEC),
         // latest departure time
@@ -61,7 +61,7 @@ public class B10_FlexAccessTest implements RaptorTestConstants {
         // best on combination of transfers and time
         flexAndWalk(STOP_E, D7m, ONE_RIDE, 4 * COST_ONE_STOP)
       )
-      .addEgressPaths(walk(STOP_F, D1m));
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D1m));
 
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 

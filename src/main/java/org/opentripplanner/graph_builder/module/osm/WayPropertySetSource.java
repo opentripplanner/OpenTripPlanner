@@ -20,21 +20,18 @@ public interface WayPropertySetSource {
   static WayPropertySetSource fromConfig(String type) {
     // type is set to "default" by GraphBuilderParameters if not provided in
     // build-config.json
-    if ("default".equals(type)) {
-      return new DefaultWayPropertySetSource();
-    } else if ("norway".equals(type)) {
-      return new NorwayWayPropertySetSource();
-    } else if ("uk".equals(type)) {
-      return new UKWayPropertySetSource();
-    } else if ("finland".equals(type)) {
-      return new FinlandWayPropertySetSource();
-    } else if ("germany".equals(type)) {
-      return new GermanyWayPropertySetSource();
-    } else if ("atlanta".equals(type)) {
-      return new AtlantaWayPropertySetSource();
-    } else {
-      throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'", type));
-    }
+    return switch (type) {
+      case "default" -> new DefaultWayPropertySetSource();
+      case "norway" -> new NorwayWayPropertySetSource();
+      case "uk" -> new UKWayPropertySetSource();
+      case "finland" -> new FinlandWayPropertySetSource();
+      case "germany" -> new GermanyWayPropertySetSource();
+      case "atlanta" -> new AtlantaWayPropertySetSource();
+      case "houston" -> new HoustonWayPropertySetSource();
+      default -> throw new IllegalArgumentException(
+        "Unknown osmWayPropertySet: '%s'".formatted(type)
+      );
+    };
   }
 
   void populateProperties(WayPropertySet wayPropertySet);

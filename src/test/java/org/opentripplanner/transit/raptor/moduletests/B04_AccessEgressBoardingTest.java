@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_TRAVEL_DURATION;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.api.PathUtils;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -76,14 +76,14 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
     requestBuilder
       .searchParams()
       .addAccessPaths(
-        walk(STOP_A, D1s),
-        walk(STOP_B, D10s), // Best option
-        walk(STOP_C, D5m)
+        TestAccessEgress.walk(STOP_A, D1s),
+        TestAccessEgress.walk(STOP_B, D10s), // Best option
+        TestAccessEgress.walk(STOP_C, D5m)
       )
       .addEgressPaths(
-        walk(STOP_D, D5m),
-        walk(STOP_E, D10s), // Best option
-        walk(STOP_F, D1s)
+        TestAccessEgress.walk(STOP_D, D5m),
+        TestAccessEgress.walk(STOP_E, D10s), // Best option
+        TestAccessEgress.walk(STOP_F, D1s)
       )
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)

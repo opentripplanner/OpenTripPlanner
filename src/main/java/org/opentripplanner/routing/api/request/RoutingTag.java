@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.api.request;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -27,9 +26,6 @@ public class RoutingTag implements Serializable {
      */
     public final boolean micrometerTiming;
   }
-
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   /** Tags are categorized in groups, this allow  */
   private final Category category;

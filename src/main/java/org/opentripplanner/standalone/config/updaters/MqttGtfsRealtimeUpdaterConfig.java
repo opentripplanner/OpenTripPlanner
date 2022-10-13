@@ -1,8 +1,8 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 
 public class MqttGtfsRealtimeUpdaterConfig {
 

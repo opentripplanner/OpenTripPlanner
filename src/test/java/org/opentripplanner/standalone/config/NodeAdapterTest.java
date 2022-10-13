@@ -366,7 +366,7 @@ public class NodeAdapterTest {
   @Test
   public void linearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '4+8x' }");
-    assertEquals("f(x) = 4.0 + 8.0 x", subject.asLinearFunction("key", null).toString());
+    assertEquals("f(x) = 4 + 8.0 x", subject.asLinearFunction("key", null).toString());
     assertNull(subject.asLinearFunction("no-key", null));
   }
 

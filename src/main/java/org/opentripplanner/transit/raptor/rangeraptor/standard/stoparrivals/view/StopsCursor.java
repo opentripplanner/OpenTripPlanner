@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.vie
 
 import java.util.function.ToIntFunction;
 import javax.annotation.Nonnull;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -51,7 +52,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   }
 
   /** Return a fictive access stop arrival. */
-  public Access<T> fictiveAccess(int round, RaptorTransfer accessPath, int arrivalTime) {
+  public Access<T> fictiveAccess(int round, RaptorAccessEgress accessPath, int arrivalTime) {
     return new Access<>(round, arrivalTime, accessPath);
   }
 
@@ -94,7 +95,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
    * Return the stop-arrival for the given round, stop and given access. There is no check that the
    * access exist.
    */
-  public ArrivalView<T> access(int round, int stop, RaptorTransfer access) {
+  public ArrivalView<T> access(int round, int stop, RaptorAccessEgress access) {
     var arrival = arrivals.get(round, stop);
     int time = access.stopReachedOnBoard() ? arrival.onBoardArrivalTime() : arrival.time();
     return new Access<>(round, time, access);
@@ -156,7 +157,11 @@ public class StopsCursor<T extends RaptorTripSchedule> {
    * If given transit is {@code null}, then use the iteration departure time without any
    * time-shifted departure. This is used for logging and debugging, not for returned paths.
    */
-  private ArrivalView<T> newAccessView(int round, RaptorTransfer accessPath, Transit<T> transit) {
+  private ArrivalView<T> newAccessView(
+    int round,
+    RaptorAccessEgress accessPath,
+    Transit<T> transit
+  ) {
     int transitDepartureTime = transit.boardTime();
     int boardSlack = boardSlackProvider.applyAsInt(transit.trip().pattern());
 
@@ -176,7 +181,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
   private ArrivalView<T> newAccessView(
     int round,
     int preferredDepartureTime,
-    RaptorTransfer accessPath
+    RaptorAccessEgress accessPath
   ) {
     // Get the real 'departureTime' honoring the time-shift restriction in the access
     int departureTime = transitCalculator.departureTime(accessPath, preferredDepartureTime);

@@ -1,8 +1,11 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
 import java.time.LocalDate;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
-public class SiriAzureETUpdaterParameters extends SiriAzureUpdaterParameters {
+public class SiriAzureETUpdaterParameters
+  extends SiriAzureUpdaterParameters
+  implements UrlUpdaterParameters {
 
   private LocalDate fromDateTime;
 
@@ -16,5 +19,10 @@ public class SiriAzureETUpdaterParameters extends SiriAzureUpdaterParameters {
 
   public void setFromDateTime(LocalDate fromDateTime) {
     this.fromDateTime = fromDateTime;
+  }
+
+  @Override
+  public String getUrl() {
+    return getDataInitializationUrl();
   }
 }

@@ -60,6 +60,19 @@ public class ToStringBuilderTest {
   }
 
   @Test
+  public void addCost() {
+    assertEquals(
+      "ToStringBuilderTest{a: $30, c: $33.33}",
+      subject()
+        .addCost("a", 30, 0)
+        .addCost("b", 7, 7)
+        .addCostCenti("c", 3333, 0)
+        .addCostCenti("d", 7, 7)
+        .toString()
+    );
+  }
+
+  @Test
   public void addBool() {
     assertEquals(
       "ToStringBuilderTest{a: true, b: false}",
@@ -136,6 +149,16 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{c: [1, 3.0, true]}",
       subject().addCol("c", List.of(1, 3d, true)).toString()
     );
+  }
+
+  @Test
+  public void addCollectionIgnoreDefault() {
+    var dftValue = List.of("A", "B");
+    var list = List.of("A", "B");
+    var other = List.of("A");
+    assertEquals("ToStringBuilderTest{c: null}", subject().addCol("c", null, dftValue).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addCol("c", list, dftValue).toString());
+    assertEquals("ToStringBuilderTest{c: [A]}", subject().addCol("c", other, dftValue).toString());
   }
 
   @Test
@@ -216,6 +239,7 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{t: 2012-01-28T22:45:12Z}",
       subject().addDateTime("t", time).toString()
     );
+    assertEquals("ToStringBuilderTest{}", subject().addDateTime("t", null).toString());
   }
 
   @Test
@@ -269,16 +293,18 @@ public class ToStringBuilderTest {
 
   @Test
   public void addDuration() {
+    var D2m5s = Duration.ofSeconds(125);
+    var D1d2h50m45s = Duration.parse("P1dT2h50m45s");
+
     assertEquals("ToStringBuilderTest{d: 35s}", subject().addDurationSec("d", 35).toString());
     assertEquals(
       "ToStringBuilderTest{d: 1d2h50m45s}",
-      subject().addDurationSec("d", (26 * 60 + 50) * 60 + 45).toString()
+      subject().addDurationSec("d", (int) D1d2h50m45s.toSeconds()).toString()
     );
-    assertEquals(
-      "ToStringBuilderTest{d: 2m5s}",
-      subject().addDuration("d", Duration.ofSeconds(125)).toString()
-    );
+    assertEquals("ToStringBuilderTest{d: 2m5s}", subject().addDuration("d", D2m5s).toString());
     assertEquals("ToStringBuilderTest{}", subject().addDurationSec("d", 12, 12).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addDuration("d", null, null).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addDuration("d", D2m5s, D2m5s).toString());
   }
 
   @Test

@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
-import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
