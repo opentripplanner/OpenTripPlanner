@@ -2,7 +2,9 @@ package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeForTest;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
@@ -13,38 +15,23 @@ class RouterConfigTest {
 
   private static final String SOURCE = "RouterConfigTest";
 
+  /**
+   * Test that the build-config.json example used in documentation is valid.
+   */
   @Test
-  void completeConfigTest() {
-    var node = jsonNodeForTest(
-      """
-      {
-        "updaters" : [ {
-          "type" : "vehicle-positions",
-          "sourceType" : "gtfs-rt-http",
-          "url" : "https://www3.septa.org/gtfsrt/septarail-pa-us/Vehicle/rtVehiclePosition.pb",
-          "feedId" : "septa-rail",
-          "frequencySec" : 60
-        }, {
-          "type" : "vehicle-rental",
-          "sourceType" : "gbfs",
-          "frequencySec" : 60,
-          "url" : "https://gbfs.bcycle.com/bcycle_indego/gbfs.json"
-        } ]
-      }
-      """
-    );
+  void validateBuildConfigExample() {
+    var node = jsonNodeFromResource("standalone/config/build-config.json");
 
-    // Setup so we get access to the NodeAdapter, it is used later in the test
+    // Setup so we get access to the NodeAdapter
     var a = new NodeAdapter(node, SOURCE);
     var c = new RouterConfig(a, SOURCE, false);
 
     // Test for unused parameters
     var buf = new StringBuilder();
-    a.logAllUnusedParameters(m -> buf.append(m).append("\n"));
-    if (buf.length() > 10) {
-      System.out.println(buf);
+    a.logAllUnusedParameters(m -> buf.append(" | ").append(m));
+    if (!buf.isEmpty()) {
+      fail(buf.substring(3));
     }
-    assertEquals("", buf.toString());
   }
 
   @Test
