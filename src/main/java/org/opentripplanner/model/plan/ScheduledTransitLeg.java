@@ -372,7 +372,7 @@ public class ScheduledTransitLeg implements TransitLeg {
    */
   @Override
   public String toString() {
-    String headsign = getHeadsign() != null ? getHeadsign().toString() : null;
+    String headsign = I18NString.hasValue(getHeadsign()) ? getHeadsign().toString() : null;
     return ToStringBuilder
       .of(ScheduledTransitLeg.class)
       .addObj("from", getFrom())

@@ -17,11 +17,6 @@ class TripMapper {
 
   private final Map<org.onebusaway.gtfs.model.Trip, Trip> mappedTrips = new HashMap<>();
 
-  TripMapper(RouteMapper routeMapper, DirectionMapper directionMapper) {
-    this.routeMapper = routeMapper;
-    this.directionMapper = directionMapper;
-  }
-
   TripMapper(
     RouteMapper routeMapper,
     DirectionMapper directionMapper,

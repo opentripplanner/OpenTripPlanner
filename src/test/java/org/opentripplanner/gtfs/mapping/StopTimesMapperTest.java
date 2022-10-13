@@ -62,13 +62,15 @@ public class StopTimesMapperTest {
     stopMapper,
     locationMapper
   );
+  private final TranslationHelper translationHelper = new TranslationHelper();
   private final StopTimeMapper subject = new StopTimeMapper(
     stopMapper,
     locationMapper,
     locationGroupMapper,
     new TripMapper(
-      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
-      new DirectionMapper(ISSUE_STORE)
+      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, translationHelper),
+      new DirectionMapper(ISSUE_STORE),
+      translationHelper
     ),
     bookingRuleMapper,
     new TranslationHelper()

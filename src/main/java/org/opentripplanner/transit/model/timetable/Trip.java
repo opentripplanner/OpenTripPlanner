@@ -186,7 +186,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     if (StringUtils.hasValue(route.getName())) {
       return route.getName();
     }
-    if (headsign != null && StringUtils.hasValue(headsign.toString())) {
+    if (I18NString.hasValue(headsign)) {
       return headsign.toString();
     }
     return mode.name();

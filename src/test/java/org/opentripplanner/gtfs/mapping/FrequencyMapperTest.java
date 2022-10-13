@@ -31,9 +31,11 @@ public class FrequencyMapperTest {
 
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
 
+  private static final TranslationHelper translationHelper = new TranslationHelper();
   private static final TripMapper TRIP_MAPPER = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
-    new DirectionMapper(ISSUE_STORE)
+    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, translationHelper),
+    new DirectionMapper(ISSUE_STORE),
+    translationHelper
   );
 
   private static final Frequency FREQUENCY = new Frequency();
