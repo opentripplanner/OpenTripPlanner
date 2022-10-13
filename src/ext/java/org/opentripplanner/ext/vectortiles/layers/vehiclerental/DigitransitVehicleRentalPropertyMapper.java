@@ -32,6 +32,7 @@ public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<Vehic
           .formFactors()
           .stream()
           .map(ff -> ff.name().toLowerCase())
+          .sorted()
           .collect(Collectors.joining(","))
       ),
       new T2<>("type", mapToType(place))
