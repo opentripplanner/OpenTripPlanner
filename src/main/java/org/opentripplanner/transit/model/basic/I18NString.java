@@ -10,7 +10,6 @@ import java.util.Locale;
  */
 public interface I18NString {
   /** true if the given value is not {@code null} or has at least one none white-space character. */
-
   public static boolean hasValue(I18NString value) {
     return value != null && !value.toString().isBlank();
   }
