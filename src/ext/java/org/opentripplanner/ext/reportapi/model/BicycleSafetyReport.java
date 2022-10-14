@@ -6,19 +6,18 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 public class BicycleSafetyReport {
 
   public static void main(String[] args) {
-    System.out.println(makeCsv("norway"));
+    System.out.println(makeCsv(WayPropertySetSource.Source.NORWAY));
   }
 
-  public static String makeCsv(String configName) {
+  public static String makeCsv(WayPropertySetSource.Source source) {
     var wayPropertySet = new WayPropertySet();
 
-    var source = WayPropertySetSource.fromConfig(configName);
-    source.populateProperties(wayPropertySet);
+    source.getInstance().populateProperties(wayPropertySet);
 
     var buf = new CsvReportBuilder(",");
 
     buf.addHeader(
-      "OSM tags for osmWayPropertySet " + configName,
+      "OSM tags for osmWayPropertySet " + source,
       "mixin",
       "permissions",
       "safety penalty there",

@@ -50,11 +50,11 @@ public class RouterConfig implements Serializable {
   private final FlexConfig flexConfig;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
-    this(new NodeAdapter(node, source), source, logUnusedParams);
+    this(new NodeAdapter(node, source), logUnusedParams);
   }
 
   /** protected to give unit-test access */
-  RouterConfig(NodeAdapter root, String source, boolean logUnusedParams) {
+  RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
     this.configVersion =
       root
