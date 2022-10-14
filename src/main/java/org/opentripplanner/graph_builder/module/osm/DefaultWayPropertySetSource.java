@@ -8,6 +8,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -36,7 +38,6 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  *
  * @author bdferris, novalis
  * @see WayPropertySetSource
- * @see OpenStreetMapModule
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
@@ -498,7 +499,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.7));
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      withModes(ALL).bicycleSafety(0.7)
+    );
 
     /*
      * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
@@ -615,9 +619,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     populateNotesAndNames(props);
 
     // slope overrides
-    props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
   }
 
   public void populateNotesAndNames(WayPropertySet props) {
