@@ -97,6 +97,7 @@ For each layer, the configuration includes:
   - `VehicleRentalVehicle`: free-floating rental vehicles
   - `VehicleRentalStation`: rental stations
   - `VehicleParking`
+  - `VehicleParkingGroup`
 - `mapper` which describes the mapper converting the properties from the OTP model entities to the
   vector tile properties. Currently `Digitransit` is supported for all layer types.
 - `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
