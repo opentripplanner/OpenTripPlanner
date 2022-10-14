@@ -7,6 +7,8 @@ import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.util.MapUtils;
 
 /**
@@ -25,18 +27,22 @@ class StopTimeMapper {
 
   private final Map<org.onebusaway.gtfs.model.StopTime, StopTime> mappedStopTimes = new HashMap<>();
 
+  private final TranslationHelper translationHelper;
+
   StopTimeMapper(
     StopMapper stopMapper,
     LocationMapper locationMapper,
     LocationGroupMapper locationGroupMapper,
     TripMapper tripMapper,
-    BookingRuleMapper bookingRuleMapper
+    BookingRuleMapper bookingRuleMapper,
+    TranslationHelper translationHelper
   ) {
     this.stopMapper = stopMapper;
     this.locationMapper = locationMapper;
     this.locationGroupMapper = locationGroupMapper;
     this.tripMapper = tripMapper;
     this.bookingRuleMapper = bookingRuleMapper;
+    this.translationHelper = translationHelper;
   }
 
   Collection<StopTime> map(Collection<org.onebusaway.gtfs.model.StopTime> times) {
@@ -59,11 +65,24 @@ class StopTimeMapper {
     } else if (rhs.getStop() instanceof LocationGroup) {
       lhs.setStop(locationGroupMapper.map((LocationGroup) rhs.getStop()));
     }
+
+    I18NString stopHeadsign = null;
+    if (rhs.getStopHeadsign() != null) {
+      stopHeadsign =
+        translationHelper.getTranslation(
+          org.onebusaway.gtfs.model.StopTime.class,
+          "stopHeadsign",
+          rhs.getTrip().getId().toString(),
+          Integer.toString(rhs.getStopSequence()),
+          rhs.getStopHeadsign()
+        );
+    }
+
     lhs.setArrivalTime(rhs.getArrivalTime());
     lhs.setDepartureTime(rhs.getDepartureTime());
     lhs.setTimepoint(rhs.getTimepoint());
     lhs.setStopSequence(rhs.getStopSequence());
-    lhs.setStopHeadsign(rhs.getStopHeadsign());
+    lhs.setStopHeadsign(stopHeadsign);
     lhs.setRouteShortName(rhs.getRouteShortName());
     lhs.setPickupType(PickDropMapper.map(rhs.getPickupType()));
     lhs.setDropOffType(PickDropMapper.map(rhs.getDropOffType()));

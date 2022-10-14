@@ -3,6 +3,7 @@ package org.opentripplanner.routing.vehicle_rental;
 import static java.util.Locale.ROOT;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.SetUtils;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
@@ -180,6 +182,13 @@ public class VehicleRentalStation implements VehicleRentalPlace {
       name,
       latitude,
       longitude
+    );
+  }
+
+  public Set<FormFactor> formFactors() {
+    return SetUtils.combine(
+      getAvailableDropoffFormFactors(false),
+      getAvailablePickupFormFactors(false)
     );
   }
 }

@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
@@ -36,7 +37,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.feed.DemExtractConfig;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -54,7 +54,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<OpenStreetMapProvider> providers = new ArrayList<>();
-    for (ConfiguredDataSource<OsmExtractConfig> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+    for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
       providers.add(
         new OpenStreetMapProvider(
           osmConfiguredDataSource,

@@ -18,14 +18,15 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemExtractsConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
+import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
@@ -309,7 +310,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * OpenStreetMap specific build parameters.
    */
-  public final OsmDefaultsConfig osmDefaults;
+  public final OsmDefaultParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
 
@@ -452,7 +453,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
    * auto-detection based on the directory provided on the command line..
    */
-  public final OsmExtractsConfig osm;
+  public final OsmExtractParametersList osm;
 
   /**
    * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
@@ -467,8 +468,14 @@ public class BuildConfig implements OtpDataStoreConfig {
    * that class is more type safe, it seems simpler to just list out the parameters by name here.
    */
   public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
-    this.root = new NodeAdapter(node, source);
+    this(new NodeAdapter(node, source), logUnusedParams);
+  }
 
+  /**
+   * @see #BuildConfig(JsonNode, String, boolean)
+   */
+  public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
+    this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
     areaVisibility = root.of("areaVisibility").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     banDiscouragedWalking =
@@ -620,15 +627,8 @@ public class BuildConfig implements OtpDataStoreConfig {
         .withExample(/*TODO DOC*/"TODO")
         .asUri(null);
 
-    osm =
-      new OsmExtractsConfig(
-        root
-          .of("osm")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
+    osm = OsmConfig.mapOsmConfig(root, "osm");
     dem =
       new DemExtractsConfig(
         (
@@ -657,15 +657,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       new NetexDefaultsConfig(
         root
           .of("netexDefaults")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
-    osmDefaults =
-      new OsmDefaultsConfig(
-        root
-          .of("osmDefaults")
           .withDoc(NA, /*TODO DOC*/"TODO")
           .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")

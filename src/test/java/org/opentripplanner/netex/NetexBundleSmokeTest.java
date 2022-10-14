@@ -157,7 +157,7 @@ public class NetexBundleSmokeTest {
       .stream()
       .collect(Collectors.toMap(TripPattern::getId, s -> s));
     TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
-    assertEquals("Jernbanetorget", p.getTripHeadsign());
+    assertEquals("Jernbanetorget", p.getTripHeadsign().toString());
     assertEquals("RB", p.getFeedId());
     assertEquals(
       "[RegularStop{RB:NSR:Quay:7203 N/A}, RegularStop{RB:NSR:Quay:8027 N/A}]",
@@ -175,7 +175,7 @@ public class NetexBundleSmokeTest {
     Map<FeedScopedId, Trip> map = trips.stream().collect(Collectors.toMap(Trip::getId, t -> t));
     Trip t = map.get(fId("RUT:ServiceJourney:12-101375-1001"));
 
-    assertEquals("Jernbanetorget", t.getHeadsign());
+    assertEquals("Jernbanetorget", t.getHeadsign().toString());
     assertNull(t.getShortName());
     assertNotNull(t.getServiceId());
     assertEquals("Ruter", t.getOperator().getName());

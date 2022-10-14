@@ -1,17 +1,18 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
 import java.time.ZoneId;
 import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.standalone.config.feed.DataSourceConfig;
 
 /**
  * Configure an OpenStreetMap extract.
  * Example: {@code "osm" : [ {source: "file:///path/to/otp/norway.pbf"} ] }
  *
  */
-public class OsmExtractConfig implements DataSourceConfig {
+public class OsmExtractParameters implements DataSourceConfig {
 
   private final URI source;
 
@@ -19,10 +20,10 @@ public class OsmExtractConfig implements DataSourceConfig {
 
   private final ZoneId timeZone;
 
-  OsmExtractConfig(OsmExtractConfigBuilder osmExtractConfigBuilder) {
-    this.source = Objects.requireNonNull(osmExtractConfigBuilder.getSource());
-    this.osmWayPropertySet = osmExtractConfigBuilder.getOsmWayPropertySet();
-    this.timeZone = osmExtractConfigBuilder.getTimeZone();
+  OsmExtractParameters(OsmExtractParametersBuilder builder) {
+    this.source = Objects.requireNonNull(builder.getSource());
+    this.osmWayPropertySet = builder.getOsmWayPropertySet();
+    this.timeZone = builder.getTimeZone();
   }
 
   @Override
@@ -32,7 +33,7 @@ public class OsmExtractConfig implements DataSourceConfig {
 
   /**
    *
-   * @return the custom OSM way properties for this OSM extract. Overrides {@link OsmDefaultsConfig#osmWayPropertySetSource}.
+   * @return the custom OSM way properties for this OSM extract. Overrides {@link OsmDefaultParameters#osmWayPropertySetSource}.
    */
   public Optional<WayPropertySetSource> osmWayPropertySet() {
     return Optional.ofNullable(osmWayPropertySet);
@@ -40,7 +41,7 @@ public class OsmExtractConfig implements DataSourceConfig {
 
   /**
    *
-   * @return the timezone to use to resolve opening hours in this extract. Overrides {@link OsmDefaultsConfig#timeZone}
+   * @return the timezone to use to resolve opening hours in this extract. Overrides {@link OsmDefaultParameters#timeZone}
    */
   public Optional<ZoneId> timeZone() {
     return Optional.ofNullable(timeZone);
