@@ -13,7 +13,6 @@ public class TransferRequestConfig {
     return root
       .of(transferRequestsName)
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObjects(List.of(new RouteRequest()), RoutingRequestMapper::mapRoutingRequest);
   }

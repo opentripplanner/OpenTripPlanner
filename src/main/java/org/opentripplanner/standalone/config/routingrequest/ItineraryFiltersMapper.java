@@ -47,7 +47,6 @@ public class ItineraryFiltersMapper {
           c
             .of("transitGeneralizedCostLimit")
             .withDoc(NA, /*TODO DOC*/"TODO")
-            .withExample(/*TODO DOC*/"TODO")
             .withDescription(/*TODO DOC*/"TODO")
             .asObject(),
           dft.transitGeneralizedCostLimit()

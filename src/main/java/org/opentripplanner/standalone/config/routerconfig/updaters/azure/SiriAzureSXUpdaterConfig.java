@@ -12,23 +12,23 @@ public class SiriAzureSXUpdaterConfig extends SiriAzureUpdaterConfig {
     populateConfig(parameters, configRef, c);
 
     if (c.exist("history")) {
+      /*TODO DOC*/
+      /*TODO DOC*/
       NodeAdapter history = c
         .of("history")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObject();
 
+      /*TODO DOC*/
+      /*TODO DOC*/
       String fromDateTime = history
         .of("fromDateTime")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .asString("-P1D");
-      String toDateTime = history
-        .of("toDateTime")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString("P1D");
+      /*TODO DOC*/
+      /*TODO DOC*/
+      String toDateTime = history.of("toDateTime").withDoc(NA, /*TODO DOC*/"TODO").asString("P1D");
       int customMidnight = c.of("customMidnight").withDoc(NA, /*TODO DOC*/"TODO").asInt(0);
 
       parameters.setFromDateTime(asDateOrRelativePeriod(fromDateTime, customMidnight));

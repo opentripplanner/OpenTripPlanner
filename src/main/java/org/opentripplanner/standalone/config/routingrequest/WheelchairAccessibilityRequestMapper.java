@@ -12,28 +12,17 @@ public class WheelchairAccessibilityRequestMapper {
   static WheelchairPreferences mapAccessibilityRequest(NodeAdapter a) {
     return new WheelchairPreferences(
       mapAccessibilityFeature(
-        a
-          .of("trip")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject(),
+        a.of("trip").withDoc(NA, /*TODO DOC*/"TODO").withDescription(/*TODO DOC*/"TODO").asObject(),
         DEFAULT.trip()
       ),
       mapAccessibilityFeature(
-        a
-          .of("stop")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject(),
+        a.of("stop").withDoc(NA, /*TODO DOC*/"TODO").withDescription(/*TODO DOC*/"TODO").asObject(),
         DEFAULT.stop()
       ),
       mapAccessibilityFeature(
         a
           .of("elevator")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject(),
         DEFAULT.elevator()

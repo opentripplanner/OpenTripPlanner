@@ -87,7 +87,6 @@ public class RoutingRequestMapper {
         c
           .of("modes")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .asCustomStringType(
             RequestModes.defaultRequestModes(),
             s -> new QualifiedModeSet(s).getRequestModes()
@@ -111,7 +110,6 @@ public class RoutingRequestMapper {
       c
         .of("wheelchairAccessibility")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObject()
         .of("enabled")
@@ -122,7 +120,6 @@ public class RoutingRequestMapper {
     NodeAdapter unpreferred = c
       .of("unpreferred")
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
     request
@@ -166,17 +163,17 @@ public class RoutingRequestMapper {
         c
           .of("wheelchairAccessibility")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       )
     );
     preferences.withItineraryFilter(it -> {
+      /*TODO DOC*/
+      /*TODO DOC*/
       mapItineraryFilterParams(
         c
           .of("itineraryFilters")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject(),
         it
@@ -214,7 +211,6 @@ public class RoutingRequestMapper {
             c
               .of("boardSlackForMode")
               .withDoc(NA, /*TODO DOC*/"TODO")
-              .withExample(/*TODO DOC*/"TODO")
               .asEnumMap(TransitMode.class, Duration.class)
           )
       )
@@ -234,7 +230,6 @@ public class RoutingRequestMapper {
         c
           .of("transitReluctanceForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .asEnumMap(TransitMode.class, Double.class)
       )
       .setUnpreferredCost(
@@ -350,7 +345,6 @@ public class RoutingRequestMapper {
         c
           .of("maxAccessEgressDurationForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withMaxDirectDuration(
@@ -361,7 +355,6 @@ public class RoutingRequestMapper {
         c
           .of("maxDirectStreetDurationForMode")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withIntersectionTraversalModel(
@@ -413,12 +406,13 @@ public class RoutingRequestMapper {
           .asDuration(dft.maxJourneyDuration())
       );
     if (OTPFeature.DataOverlay.isOn()) {
+      /*TODO DOC*/
+      /*TODO DOC*/
       builder.withDataOverlay(
         DataOverlayParametersMapper.map(
           c
             .of("dataOverlay")
             .withDoc(NA, /*TODO DOC*/"TODO")
-            .withExample(/*TODO DOC*/"TODO")
             .withDescription(/*TODO DOC*/"TODO")
             .asObject()
         )
@@ -445,7 +439,6 @@ public class RoutingRequestMapper {
           c
             .of("transferOptimization")
             .withDoc(NA, /*TODO DOC*/"TODO")
-            .withExample(/*TODO DOC*/"TODO")
             .withDescription(/*TODO DOC*/"TODO")
             .asObject()
         )

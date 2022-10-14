@@ -43,24 +43,13 @@ public class SpeedTestConfig {
         .of("testDate")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
-    graph =
-      adapter
-        .of("graph")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri(null);
-    feedId =
-      adapter
-        .of("feedId")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString();
+    graph = adapter.of("graph").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
+    feedId = adapter.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString();
     transitRoutingParams =
       new TransitRoutingConfig(
         adapter
           .of("tuningParameters")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );
@@ -69,7 +58,6 @@ public class SpeedTestConfig {
         adapter
           .of("routingDefaults")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );

@@ -59,24 +59,13 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion =
-      root
-        .of("configVersion")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
-    this.requestLogFile =
-      root
-        .of("requestLogFile")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
+    this.configVersion = root.of("configVersion").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
+    this.requestLogFile = root.of("requestLogFile").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
     this.transmodelApi =
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );
@@ -86,7 +75,6 @@ public class RouterConfig implements Serializable {
         root
           .of("transit")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );
@@ -95,7 +83,6 @@ public class RouterConfig implements Serializable {
         root
           .of("routingDefaults")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );
@@ -106,7 +93,6 @@ public class RouterConfig implements Serializable {
         root
           .of("flex")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );

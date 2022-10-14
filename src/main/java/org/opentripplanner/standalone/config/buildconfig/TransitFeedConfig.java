@@ -20,7 +20,6 @@ public class TransitFeedConfig {
     List<DataSourceConfig> list = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
 
@@ -46,16 +45,8 @@ public class TransitFeedConfig {
 
   private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
     return new GtfsFeedParametersBuilder()
-      .withFeedId(
-        node
-          .of("feedId")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asString(null)
-      )
-      .withSource(
-        node.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri()
-      )
+      .withFeedId(node.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null))
+      .withSource(node.of("source").withDoc(NA, /*TODO DOC*/"TODO").asUri())
       .build();
   }
 

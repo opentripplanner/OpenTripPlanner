@@ -32,7 +32,6 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
       root
         .of(vectorTileLayers)
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObjects(VectorTileConfig::mapLayer)
     );

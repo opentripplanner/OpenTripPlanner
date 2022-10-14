@@ -15,10 +15,9 @@ public class PollingStoptimeUpdaterConfig {
     String url = null;
 
     if (c.exist("file")) {
-      file =
-        c.of("file").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
+      file = c.of("file").withDoc(NA, /*TODO DOC*/"TODO").asString();
     } else if (c.exist("url")) {
-      url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
+      url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString();
     } else {
       throw new OtpAppException(
         "Need either 'url' or 'file' properties to configure " +
@@ -40,7 +39,7 @@ public class PollingStoptimeUpdaterConfig {
         .of("backwardsDelayPropagationType")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null),
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
       url,
       file
     );

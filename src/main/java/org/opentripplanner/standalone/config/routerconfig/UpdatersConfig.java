@@ -79,13 +79,11 @@ public class UpdatersConfig implements UpdatersParameters {
           ? rootAdapter
             .of("vehicleRentalServiceDirectory")
             .withDoc(NA, /*TODO DOC*/"TODO")
-            .withExample(/*TODO DOC*/"TODO")
             .withDescription(/*TODO DOC*/"TODO")
             .asObject()
           : rootAdapter
             .of("bikeRentalServiceDirectory")
             .withDoc(NA, /*TODO DOC*/"TODO")
-            .withExample(/*TODO DOC*/"TODO")
             .withDescription(/*TODO DOC*/"TODO")
             .asObject() // TODO: deprecated, remove in next major version
       );
@@ -95,7 +93,6 @@ public class UpdatersConfig implements UpdatersParameters {
         rootAdapter
           .of("timetableUpdates")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );
@@ -103,7 +100,6 @@ public class UpdatersConfig implements UpdatersParameters {
     rootAdapter
       .of("updaters")
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObjects(it -> {
         Type type = it.of("type").withDoc(NA, /*TODO DOC*/"TODO").asEnum(Type.class);
