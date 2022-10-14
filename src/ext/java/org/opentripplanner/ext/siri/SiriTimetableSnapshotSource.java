@@ -1027,6 +1027,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 .ifFailure(errors::add);
             }
           } else {
+            removePreviousRealtimeUpdate(trip, serviceDate);
             buffer.update(pattern, tripTimes, serviceDate).ifFailure(errors::add);
           }
 
