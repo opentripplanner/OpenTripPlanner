@@ -81,13 +81,13 @@ The feature must be configured in `router-config.json` as follows
 For each layer, the configuration includes:
 
 - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
-- `type` which tells the type of the layer. Currently supported
-  - `Stop`
-  - `Station`
-  - `VehicleRental`: all rental places: stations and free-floating vehicles
-  - `VehicleRentalVehicle`: free-floating rental vehicles
-  - `VehicleRentalStation`: rental stations
-  - `VehicleParking`
+- `type` which tells the type of the layer. Currently supported:
+    - `Stop`
+    - `Station`
+    - `VehicleRental`: all rental places: stations and free-floating vehicles
+    - `VehicleRentalVehicle`: free-floating rental vehicles
+    - `VehicleRentalStation`: rental stations
+    - `VehicleParking`
 - `mapper` which describes the mapper converting the properties from the OTP model entities to the
   vector tile properties. Currently `Digitransit` is supported for all layer types.
 - `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
