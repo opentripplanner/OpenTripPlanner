@@ -13,7 +13,7 @@ public class DigitransitVehicleRentalStationPropertyMapper
   @Override
   protected Collection<T2<String, Object>> map(VehicleRentalStation station) {
     return List.of(
-      new T2<>("id", station.getStationId()),
+      new T2<>("id", station.getId().toString()),
       // getName() returns an instance of I18NString which the vector tiles code cannot easily convert.
       // https://github.com/wdtinc/mapbox-vector-tile-java/blob/81d2ea92fe255eab5c1005ec86c8a9160fdf44dd/src/main/java/com/wdtinc/mapbox_vector_tile/encoding/MvtValue.java#L83-L91
       // in order to prevent it being silently dropped we convert to string here.
@@ -24,12 +24,7 @@ public class DigitransitVehicleRentalStationPropertyMapper
       // a station can potentially have multiple form factors that's why this is plural
       new T2<>(
         "formFactors",
-        station
-          .formFactors()
-          .stream()
-          .map(ff -> ff.name().toLowerCase())
-          .sorted()
-          .collect(Collectors.joining(","))
+        station.formFactors().stream().map(Enum::name).sorted().collect(Collectors.joining(","))
       )
     );
   }

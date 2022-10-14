@@ -11,15 +11,9 @@ public class DigitransitRentalVehiclePropertyMapper extends PropertyMapper<Vehic
   @Override
   protected Collection<T2<String, Object>> map(VehicleRentalVehicle place) {
     return List.of(
-      new T2<>("id", place.getStationId()),
-      // getName() returns an instance of I18NString which the vector tiles code cannot easily convert.
-      // https://github.com/wdtinc/mapbox-vector-tile-java/blob/81d2ea92fe255eab5c1005ec86c8a9160fdf44dd/src/main/java/com/wdtinc/mapbox_vector_tile/encoding/MvtValue.java#L83-L91
-      // in order to prevent it being silently dropped we convert to string here.
-      // not sure if we should take the possibility of translated names into account and add them
-      // to the response somehow.
-      new T2<>("name", place.getName().toString()),
+      new T2<>("id", place.getId().toString()),
       new T2<>("network", place.getNetwork()),
-      new T2<>("formFactor", place.vehicleType.formFactor.toString().toLowerCase())
+      new T2<>("formFactor", place.vehicleType.formFactor.toString())
     );
   }
 }

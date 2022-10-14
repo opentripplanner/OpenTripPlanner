@@ -2,14 +2,9 @@ package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
-import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 
 public class DigitransitVehicleRentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.BICYCLE;
 import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.SCOOTER;
 
@@ -31,9 +32,10 @@ public class VehicleRentalLayerTest {
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicle).forEach(o -> map.put(o.first, o.second));
 
-    assertEquals("bicycle", map.get("formFactor"));
-    assertEquals(NAME, map.get("name"));
+    assertEquals("A:B", map.get("id"));
+    assertEquals("BICYCLE", map.get("formFactor"));
     assertEquals("A", map.get("network"));
+    assertNull(map.get("name"));
   }
 
   @Test
@@ -49,7 +51,8 @@ public class VehicleRentalLayerTest {
     Map<String, Object> map = new HashMap<>();
     mapper.map(station).forEach(o -> map.put(o.first, o.second));
 
-    assertEquals("bicycle,scooter", map.get("formFactors"));
+    assertEquals("A:B", map.get("id"));
+    assertEquals("BICYCLE,SCOOTER", map.get("formFactors"));
     assertEquals(NAME, map.get("name"));
     assertEquals("A", map.get("network"));
   }
