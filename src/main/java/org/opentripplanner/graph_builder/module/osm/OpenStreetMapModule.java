@@ -478,6 +478,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       int n = 0;
       VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
+      List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
+
       for (OSMNode node : nodes) {
         n++;
 
@@ -506,7 +508,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
           List.of(entrance)
         );
 
-        vehicleParkingService.addVehicleParking(vehicleParking);
+        vehicleParkingToAdd.add(vehicleParking);
 
         VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(
           graph,
@@ -515,80 +517,55 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         new VehicleParkingEdge(parkVertex);
       }
 
+      if (!vehicleParkingToAdd.isEmpty()) {
+        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
+      }
+
       LOG.info("Created {} {} P+R nodes.", n, isCarParkAndRide ? "car" : "bike");
     }
 
     private void buildBikeParkAndRideAreas() {
       LOG.info("Building bike P+R areas");
       List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
-      int n = 0;
-      for (AreaGroup group : areaGroups) {
-        if (buildParkAndRideAreasForGroup(group, false)) n++;
-      }
-      if (n > 0) {
+      List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, false);
+      if (!vehicleParkingToAdd.isEmpty()) {
         graph.hasBikeRide = true;
+        VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
+        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
       }
-      LOG.info("Created {} bike P+R areas.", n);
-    }
-
-    private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
-      if (skipVisibility) {
-        LOG.info(
-          "Skipping visibility graph construction for walkable areas and using just area rings for edges."
-        );
-      } else {
-        LOG.info("Building visibility graphs for walkable areas.");
-      }
-      List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
-      WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
-        graph,
-        osmdb,
-        this,
-        issueStore,
-        maxAreaNodes,
-        platformEntriesLinking,
-        boardingAreaRefTags
-      );
-      if (skipVisibility) {
-        for (AreaGroup group : areaGroups) {
-          walkableAreaBuilder.buildWithoutVisibility(group);
-        }
-      } else {
-        ProgressTracker progress = ProgressTracker.track(
-          "Build visibility graph for areas",
-          50,
-          areaGroups.size()
-        );
-        for (AreaGroup group : areaGroups) {
-          walkableAreaBuilder.buildWithVisibility(group);
-          //Keep lambda! A method-ref would log incorrect class and line number
-          //noinspection Convert2MethodRef
-          progress.step(m -> LOG.info(m));
-        }
-        LOG.info(progress.completeMessage());
-      }
-
-      if (skipVisibility) {
-        LOG.info("Done building rings for walkable areas.");
-      } else {
-        LOG.info("Done building visibility graphs for walkable areas.");
-      }
+      LOG.info("Created {} bike P+R areas.", vehicleParkingToAdd.size());
     }
 
     private void buildParkAndRideAreas() {
       LOG.info("Building car P+R areas");
       List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
-      int n = 0;
-      for (AreaGroup group : areaGroups) {
-        if (buildParkAndRideAreasForGroup(group, true)) n++;
-      }
-      if (n > 0) {
+      List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, true);
+      if (!vehicleParkingToAdd.isEmpty()) {
         graph.hasParkRide = true;
+        VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
+        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
       }
-      LOG.info("Created {} car P+R areas.", n);
+      LOG.info("Created {} car P+R areas.", vehicleParkingToAdd.size());
     }
 
-    private boolean buildParkAndRideAreasForGroup(AreaGroup group, boolean isCarParkAndRide) {
+    private List<VehicleParking> buildParkAndRideAreasForGroups(
+      List<AreaGroup> areaGroups,
+      boolean isCarParkAndRide
+    ) {
+      List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
+      for (AreaGroup group : areaGroups) {
+        var vehicleParking = buildParkAndRideAreasForGroup(group, isCarParkAndRide);
+        if (vehicleParking != null) {
+          vehicleParkingToAdd.add(vehicleParking);
+        }
+      }
+      return vehicleParkingToAdd;
+    }
+
+    private VehicleParking buildParkAndRideAreasForGroup(
+      AreaGroup group,
+      boolean isCarParkAndRide
+    ) {
       Envelope envelope = new Envelope();
       Set<VertexAndName> accessVertices = new HashSet<>();
 
@@ -604,7 +581,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
 
       if (entity == null) {
-        return false;
+        return null;
       }
 
       var creativeName = nameParkAndRideEntity(entity);
@@ -648,13 +625,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
           // This will prevent the P+R to be useful.
           issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-          return false;
+          return null;
         }
       } else {
         if (!walkAccessibleOut || !walkAccessibleIn) {
           // This will prevent the P+R to be useful.
           issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-          return false;
+          return null;
         }
       }
 
@@ -673,12 +650,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         entrances
       );
 
-      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-      vehicleParkingService.addVehicleParking(vehicleParking);
-
       VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
-      return true;
+      return vehicleParking;
     }
 
     private VehicleParking createVehicleParkingObjectFromOsmEntity(
@@ -896,6 +870,50 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         areasLevels.put(area, osmdb.getLevelForWay(area.parent));
       }
       return AreaGroup.groupAreas(areasLevels);
+    }
+
+    private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
+      if (skipVisibility) {
+        LOG.info(
+          "Skipping visibility graph construction for walkable areas and using just area rings for edges."
+        );
+      } else {
+        LOG.info("Building visibility graphs for walkable areas.");
+      }
+      List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
+      WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
+        graph,
+        osmdb,
+        this,
+        issueStore,
+        maxAreaNodes,
+        platformEntriesLinking,
+        boardingAreaRefTags
+      );
+      if (skipVisibility) {
+        for (AreaGroup group : areaGroups) {
+          walkableAreaBuilder.buildWithoutVisibility(group);
+        }
+      } else {
+        ProgressTracker progress = ProgressTracker.track(
+          "Build visibility graph for areas",
+          50,
+          areaGroups.size()
+        );
+        for (AreaGroup group : areaGroups) {
+          walkableAreaBuilder.buildWithVisibility(group);
+          //Keep lambda! A method-ref would log incorrect class and line number
+          //noinspection Convert2MethodRef
+          progress.step(m -> LOG.info(m));
+        }
+        LOG.info(progress.completeMessage());
+      }
+
+      if (skipVisibility) {
+        LOG.info("Done building rings for walkable areas.");
+      } else {
+        LOG.info("Done building visibility graphs for walkable areas.");
+      }
     }
 
     private void buildBasicGraph() {

@@ -1,59 +1,64 @@
 package org.opentripplanner.routing.vehicle_parking;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
  * Service that holds all the {@link VehicleParking} instances and an index for fetching parking
- * locations within a {@link VehicleParkingGroup}.
+ * locations within a {@link VehicleParkingGroup}. This class is thread-safe because the collections
+ * held here are immutable and only updated in atomic operations that replace the existing
+ * collection with a new copy.
  */
 public class VehicleParkingService implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final Set<VehicleParking> vehicleParkings = new HashSet<>();
-  private final Map<VehicleParkingGroup, Set<VehicleParking>> vehicleParkingGroups = new ConcurrentHashMap<>();
+  /**
+   * To ensure that his is thread-safe, the set stored here should always be immutable.
+   */
+  private Set<VehicleParking> vehicleParkings = Set.of();
 
   /**
-   * Adds {@link VehicleParking} to this service and attaches it to an index for
-   * {@link VehicleParkingGroup} if the parking is part of a group.
+   * To ensure that his is thread-safe, {@link ImmutableListMultimap} is used.
    */
-  public void addVehicleParking(VehicleParking vehicleParking) {
-    var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
-    if (vehicleParkingGroup != null) {
-      var parkingForGroup = vehicleParkingGroups.get(vehicleParkingGroup);
-      if (parkingForGroup != null) {
-        parkingForGroup.add(vehicleParking);
-      } else {
-        HashSet<VehicleParking> newParkingForGroup = new HashSet<>();
-        newParkingForGroup.add(vehicleParking);
-        vehicleParkingGroups.put(vehicleParkingGroup, newParkingForGroup);
-      }
-    }
-    vehicleParkings.add(vehicleParking);
-  }
+  private ImmutableListMultimap<VehicleParkingGroup, VehicleParking> vehicleParkingGroups = ImmutableListMultimap.of();
 
   /**
-   * Removes {@link VehicleParking} to this service and from an index for
-   * {@link VehicleParkingGroup} if the parking is part of a group.
+   * Does atomic update of {@link VehicleParking} and index of {@link VehicleParkingGroup} in this
+   * service by replacing the existing with a new copy that includes old ones that were not removed
+   * in the update and the new ones that were added in the update.
    */
-  public void removeVehicleParking(VehicleParking vehicleParking) {
-    var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
-    if (vehicleParkingGroup != null) {
-      var parkingForGroup = vehicleParkingGroups.get(vehicleParkingGroup);
-      if (parkingForGroup != null) {
-        if (parkingForGroup.size() == 1) {
-          vehicleParkingGroups.remove(vehicleParkingGroup);
-        } else {
-          parkingForGroup.remove(vehicleParking);
-        }
+  public void updateVehicleParking(
+    Collection<VehicleParking> parkingToAdd,
+    Collection<VehicleParking> parkingToRemove
+  ) {
+    Multimap<VehicleParkingGroup, VehicleParking> updatedVehicleParkingGroups = ArrayListMultimap.create(
+      vehicleParkingGroups
+    );
+    parkingToRemove.forEach(vehicleParking -> {
+      var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
+      if (vehicleParkingGroup != null) {
+        updatedVehicleParkingGroups.remove(vehicleParking.getVehicleParkingGroup(), vehicleParking);
       }
-    }
-    vehicleParkings.remove(vehicleParking);
+    });
+    parkingToAdd.forEach(vehicleParking -> {
+      var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
+      if (vehicleParkingGroup != null) {
+        updatedVehicleParkingGroups.put(vehicleParking.getVehicleParkingGroup(), vehicleParking);
+      }
+    });
+    vehicleParkingGroups = ImmutableListMultimap.copyOf(updatedVehicleParkingGroups);
+
+    Set<VehicleParking> updatedVehicleParkings = new HashSet<>(vehicleParkings);
+    updatedVehicleParkings.removeAll(parkingToRemove);
+    updatedVehicleParkings.addAll(parkingToAdd);
+    vehicleParkings = Set.copyOf(updatedVehicleParkings);
   }
 
   public Stream<VehicleParking> getBikeParks() {
@@ -68,7 +73,7 @@ public class VehicleParkingService implements Serializable {
     return vehicleParkings.stream();
   }
 
-  public Map<VehicleParkingGroup, Set<VehicleParking>> getVehicleParkingGroups() {
+  public ImmutableListMultimap<VehicleParkingGroup, VehicleParking> getVehicleParkingGroups() {
     return vehicleParkingGroups;
   }
 }

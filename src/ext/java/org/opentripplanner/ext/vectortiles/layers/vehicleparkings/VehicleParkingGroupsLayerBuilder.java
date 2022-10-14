@@ -45,6 +45,7 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
     }
     return service
       .getVehicleParkingGroups()
+      .asMap()
       .entrySet()
       .stream()
       .map(vehicleParkingGroupEntry -> {

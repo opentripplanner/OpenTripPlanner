@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableListMultimap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +95,7 @@ public class VehicleParkingGroupsLayerTest {
   public void vehicleParkingGeometryTest() {
     VehicleParkingService service = mock(VehicleParkingService.class);
     when(service.getVehicleParkingGroups())
-      .thenReturn(Map.of(vehicleParkingGroup, Set.of(vehicleParking)));
+      .thenReturn(ImmutableListMultimap.of(vehicleParkingGroup, vehicleParking));
 
     Graph graph = mock(Graph.class);
     TransitService transitService = mock(TransitService.class);

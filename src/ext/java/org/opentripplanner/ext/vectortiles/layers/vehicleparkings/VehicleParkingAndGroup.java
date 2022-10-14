@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
-import java.util.Set;
+import java.util.Collection;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 
@@ -10,5 +10,5 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
  */
 public record VehicleParkingAndGroup(
   VehicleParkingGroup vehicleParkingGroup,
-  Set<VehicleParking> vehicleParking
+  Collection<VehicleParking> vehicleParking
 ) {}

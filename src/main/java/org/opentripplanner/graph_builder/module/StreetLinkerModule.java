@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitStopLink;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -203,6 +205,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       return;
     }
     LOG.info("Linking vehicle parks to graph...");
+    List<VehicleParking> vehicleParkingToRemove = new ArrayList<>();
     for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
       VehicleParkingEntranceVertex.class
     )) {
@@ -223,7 +226,17 @@ public class StreetLinkerModule implements GraphBuilderModule {
       issueStore.add(
         new ParkAndRideEntranceRemoved(vehicleParkingEntranceVertex.getParkingEntrance())
       );
-      removeVehicleParkingEntranceVertexFromGraph(vehicleParkingEntranceVertex, graph);
+      var vehicleParking = removeVehicleParkingEntranceVertexFromGraph(
+        vehicleParkingEntranceVertex,
+        graph
+      );
+      if (vehicleParking != null) {
+        vehicleParkingToRemove.add(vehicleParking);
+      }
+    }
+    if (!vehicleParkingToRemove.isEmpty()) {
+      var vehicleParkingService = graph.getVehicleParkingService();
+      vehicleParkingService.updateVehicleParking(List.of(), vehicleParkingToRemove);
     }
     graph.hasLinkedBikeParks = true;
   }
@@ -243,7 +256,12 @@ public class StreetLinkerModule implements GraphBuilderModule {
     );
   }
 
-  private void removeVehicleParkingEntranceVertexFromGraph(
+  /**
+   * Removes vehicle parking entrace vertex from graph.
+   *
+   * @return vehicle parking for removal if the removed entrance was its only entrance.
+   */
+  private VehicleParking removeVehicleParkingEntranceVertexFromGraph(
     VehicleParkingEntranceVertex vehicleParkingEntranceVertex,
     Graph graph
   ) {
@@ -272,10 +290,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.remove(vehicleParkingEntranceVertex);
 
     if (removeVehicleParking) {
-      var vehicleParkingService = graph.getVehicleParkingService();
-      vehicleParkingService.removeVehicleParking(vehicleParking);
+      return vehicleParking;
     } else {
       vehicleParking.getEntrances().remove(entrance);
+      return null;
     }
   }
 }

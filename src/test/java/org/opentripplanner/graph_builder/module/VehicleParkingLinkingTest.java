@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -132,7 +133,7 @@ public class VehicleParkingLinkingTest {
       .build();
 
     var vehicleParkingService = graph.getVehicleParkingService();
-    vehicleParkingService.addVehicleParking(vehicleParking);
+    vehicleParkingService.updateVehicleParking(List.of(vehicleParking), List.of());
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
     graph.remove(A);
