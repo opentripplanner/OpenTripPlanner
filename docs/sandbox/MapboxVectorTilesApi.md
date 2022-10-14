@@ -55,7 +55,7 @@ The feature must be configured in `router-config.json` as follows
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
-      "cacheMaxSeconds": 60,
+      "cacheMaxSeconds": 60
     },
     {
       "name": "rentalStation",
@@ -63,7 +63,7 @@ The feature must be configured in `router-config.json` as follows
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
-      "cacheMaxSeconds": 600,
+      "cacheMaxSeconds": 600
     },
     {
       "name": "vehicleParking",
@@ -136,4 +136,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
 - 2022-01-03: Add support for VehicleParking entities
 - 2022-04-27: Read the headsign for frequency-only patterns correctly [#4122](https://github.com/opentripplanner/OpenTripPlanner/pull/4122)
 - 2022-08-23: Remove patterns and add route gtfsTypes to stop layer [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
-- 2022-10-14: Add separate layers for vehicle rental place types [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
+- 2022-10-14: Add separate layers for vehicle rental place types [#4516](https://github.com/opentripplanner/OpenTripPlanner/pull/4516)
