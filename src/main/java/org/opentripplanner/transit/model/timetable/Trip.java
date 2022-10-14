@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -27,7 +28,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   private final String shortName;
   private final TransitMode mode;
   private final SubMode netexSubmode;
-  private final String headsign;
+  private final I18NString headsign;
   private final FeedScopedId shapeId;
 
   private final Direction direction;
@@ -116,7 +117,7 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
   }
 
   @Nullable
-  public String getHeadsign() {
+  public I18NString getHeadsign() {
     return headsign;
   }
 
@@ -185,8 +186,8 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     if (StringUtils.hasValue(route.getName())) {
       return route.getName();
     }
-    if (StringUtils.hasValue(headsign)) {
-      return headsign;
+    if (I18NString.hasValue(headsign)) {
+      return headsign.toString();
     }
     return mode.name();
   }
