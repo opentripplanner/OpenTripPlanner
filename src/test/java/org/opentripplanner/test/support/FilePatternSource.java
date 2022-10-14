@@ -11,9 +11,9 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @ArgumentsSource(FilePatternArgumentsProvider.class)
-public @interface VariableSource {
+public @interface FilePatternSource {
   /**
-   * The name of the static variable
+   * The glob pattern to search for
    */
-  String value();
+  String pattern();
 }
