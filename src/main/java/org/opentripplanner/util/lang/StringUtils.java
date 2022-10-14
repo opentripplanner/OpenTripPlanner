@@ -1,7 +1,5 @@
 package org.opentripplanner.util.lang;
 
-import org.opentripplanner.transit.model.basic.I18NString;
-
 /**
  * OTP String utils extending the Java lang String...
  */

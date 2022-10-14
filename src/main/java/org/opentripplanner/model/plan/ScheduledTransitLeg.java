@@ -372,7 +372,6 @@ public class ScheduledTransitLeg implements TransitLeg {
    */
   @Override
   public String toString() {
-    String headsign = I18NString.hasValue(getHeadsign()) ? getHeadsign().toString() : null;
     return ToStringBuilder
       .of(ScheduledTransitLeg.class)
       .addObj("from", getFrom())
@@ -386,7 +385,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObjOp("agencyId", getAgency(), AbstractTransitEntity::getId)
       .addObjOp("routeId", getRoute(), AbstractTransitEntity::getId)
       .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
-      .addStr("headsign", headsign)
+      .addObj("headsign", getHeadsign())
       .addObj("serviceDate", serviceDate)
       .addObj("legGeometry", legGeometry)
       .addCol("transitAlerts", transitAlerts)
