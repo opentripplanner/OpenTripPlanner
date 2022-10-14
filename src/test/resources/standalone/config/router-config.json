@@ -101,6 +101,58 @@
   "transmodelApi": {
     "hideFeedId" : true
   },
+  "vectorTileLayers": [
+    {
+      "name": "stops",
+      "type": "Stop",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 600
+    },
+    {
+      "name": "stations",
+      "type": "Station",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 12,
+      "cacheMaxSeconds": 600
+    },
+    {
+      "name": "rentalPlaces",
+      "type": "VehicleRental", // all rental places: stations and free-floating vehicles
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60,
+      "expansionFactor": 0.25
+    },
+    {
+      "name": "rentalVehicle",
+      "type": "VehicleRentalVehicle", // just free-floating vehicles
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60
+    },
+    {
+      "name": "rentalStation",
+      "type": "VehicleRentalStation", // just rental stations
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 600
+    },
+    {
+      "name": "vehicleParking",
+      "type": "VehicleParking",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60,
+      "expansionFactor": 0.25
+    }
+  ],
   "updaters": [
     // GTFS-RT service alerts (frequent polling)
     {
