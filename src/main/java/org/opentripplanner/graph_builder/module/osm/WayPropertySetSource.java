@@ -17,6 +17,7 @@ public interface WayPropertySetSource {
 
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
     return (
+      "no".equals(tagValue) ||
       "destination".equals(tagValue) ||
       "private".equals(tagValue) ||
       "customers".equals(tagValue) ||
@@ -31,7 +32,11 @@ public interface WayPropertySetSource {
 
   default boolean isVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String vehicle = way.getTag("vehicle");
-    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(vehicle);
+    if (vehicle != null) {
+      return doesTagValueDisallowThroughTraffic(vehicle);
+    } else {
+      return isGeneralNoThroughTraffic(way);
+    }
   }
 
   /**
@@ -39,10 +44,11 @@ public interface WayPropertySetSource {
    */
   default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String motorVehicle = way.getTag("motor_vehicle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(motorVehicle)
-    );
+    if (motorVehicle != null) {
+      return doesTagValueDisallowThroughTraffic(motorVehicle);
+    } else {
+      return isVehicleThroughTrafficExplicitlyDisallowed(way);
+    }
   }
 
   /**
@@ -50,10 +56,11 @@ public interface WayPropertySetSource {
    */
   default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String bicycle = way.getTag("bicycle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(bicycle)
-    );
+    if (bicycle != null) {
+      return doesTagValueDisallowThroughTraffic(bicycle);
+    } else {
+      return isVehicleThroughTrafficExplicitlyDisallowed(way);
+    }
   }
 
   /**
@@ -61,7 +68,11 @@ public interface WayPropertySetSource {
    */
   default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String foot = way.getTag("foot");
-    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
+    if (foot != null) {
+      return doesTagValueDisallowThroughTraffic(foot);
+    } else {
+      return isGeneralNoThroughTraffic(way);
+    }
   }
 
   /**
