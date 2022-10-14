@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -16,12 +17,12 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class AccessStopArrivalState<T extends RaptorTripSchedule> implements StopArrivalState<T> {
 
   private final DefaultStopArrivalState<T> delegate;
-  private RaptorTransfer accessArriveOnStreet;
-  private RaptorTransfer accessArriveOnBoard;
+  private RaptorAccessEgress accessArriveOnStreet;
+  private RaptorAccessEgress accessArriveOnBoard;
 
   public AccessStopArrivalState(
     int time,
-    RaptorTransfer accessPath,
+    RaptorAccessEgress accessPath,
     boolean isOverallBestTime,
     DefaultStopArrivalState<T> other
   ) {
@@ -57,7 +58,7 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
   }
 
   @Override
-  public RaptorTransfer accessPathOnStreet() {
+  public RaptorAccessEgress accessPathOnStreet() {
     return accessArriveOnStreet;
   }
 
@@ -67,7 +68,7 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
   }
 
   @Override
-  public RaptorTransfer accessPathOnBoard() {
+  public RaptorAccessEgress accessPathOnBoard() {
     return accessArriveOnBoard;
   }
 
@@ -141,7 +142,7 @@ public class AccessStopArrivalState<T extends RaptorTripSchedule> implements Sto
 
   /* package local methods */
 
-  void setAccessTime(int time, RaptorTransfer access, boolean isOverallBestTime) {
+  void setAccessTime(int time, RaptorAccessEgress access, boolean isOverallBestTime) {
     this.delegate.setAccessTime(time, isOverallBestTime, access.stopReachedOnBoard());
 
     if (access.stopReachedOnBoard()) {

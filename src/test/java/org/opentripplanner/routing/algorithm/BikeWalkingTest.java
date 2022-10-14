@@ -368,12 +368,14 @@ public class BikeWalkingTest extends GraphRoutingTest {
     boolean arriveBy
   ) {
     var request = new RouteRequest();
-    var preferences = request.preferences();
 
-    preferences.withBike(it ->
-      it.setSpeed(20d).setWalkingSpeed(5d).setSwitchTime(100).setSwitchCost(1000)
+    request.withPreferences(preferences ->
+      preferences
+        .withWalk(w -> w.withSpeed(10))
+        .withBike(it ->
+          it.withSpeed(20d).withWalkingSpeed(5d).withSwitchTime(100).withSwitchCost(1000)
+        )
     );
-    preferences.withWalk(w -> w.setSpeed(10));
     request.setArriveBy(arriveBy);
 
     var tree = AStarBuilder

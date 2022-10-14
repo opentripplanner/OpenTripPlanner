@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
@@ -16,16 +18,19 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.feed.DemExtractsConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractsConfig;
+import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
+import org.opentripplanner.util.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +84,9 @@ public class BuildConfig implements OtpDataStoreConfig {
   private static final String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
 
   /**
-   * The raw JsonNode three kept for reference and (de)serialization.
+   * The root adaptor kept for reference and (de)serialization.
    */
-  private final JsonNode rawJson;
+  private final NodeAdapter root;
 
   /**
    * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
@@ -305,7 +310,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * OpenStreetMap specific build parameters.
    */
-  public final OsmDefaultsConfig osmDefaults;
+  public final OsmDefaultParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
 
@@ -448,7 +453,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
    * auto-detection based on the directory provided on the command line..
    */
-  public final OsmExtractsConfig osm;
+  public final OsmExtractParametersList osm;
 
   /**
    * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
@@ -463,78 +468,226 @@ public class BuildConfig implements OtpDataStoreConfig {
    * that class is more type safe, it seems simpler to just list out the parameters by name here.
    */
   public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
-    NodeAdapter c = new NodeAdapter(node, source);
-    rawJson = node;
+    this(new NodeAdapter(node, source), logUnusedParams);
+  }
 
+  /**
+   * @see #BuildConfig(JsonNode, String, boolean)
+   */
+  public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
+    this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    areaVisibility = c.asBoolean("areaVisibility", false);
-    banDiscouragedWalking = c.asBoolean("banDiscouragedWalking", false);
-    banDiscouragedBiking = c.asBoolean("banDiscouragedBiking", false);
-    configVersion = c.asText("configVersion", null);
-    dataImportReport = c.asBoolean("dataImportReport", false);
+    areaVisibility = root.of("areaVisibility").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    banDiscouragedWalking =
+      root.of("banDiscouragedWalking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    banDiscouragedBiking =
+      root.of("banDiscouragedBiking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    configVersion =
+      root.of("configVersion").withDoc(NA, "TODO DOC").withExample("2.2.12_12").asString(null);
+    dataImportReport = root.of("dataImportReport").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     distanceBetweenElevationSamples =
-      c.asDouble(
-        "distanceBetweenElevationSamples",
-        CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
+      root
+        .of("distanceBetweenElevationSamples")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
+    elevationBucket =
+      S3BucketConfig.fromConfig(
+        root
+          .of("elevationBucket")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
       );
-    elevationBucket = S3BucketConfig.fromConfig(c.path("elevationBucket"));
-    elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
-    embedRouterConfig = c.asBoolean("embedRouterConfig", true);
-    extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
-    includeEllipsoidToGeoidDifference = c.asBoolean("includeEllipsoidToGeoidDifference", false);
-    pruningThresholdIslandWithStops = c.asInt("islandWithStopsMaxSize", 5);
-    pruningThresholdIslandWithoutStops = c.asInt("islandWithoutStopsMaxSize", 40);
-    matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
-    maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
-    maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
-    blockBasedInterlining = c.asBoolean("blockBasedInterlining", true);
+    elevationUnitMultiplier =
+      root.of("elevationUnitMultiplier").withDoc(NA, /*TODO DOC*/"TODO").asDouble(1);
+    embedRouterConfig =
+      root.of("embedRouterConfig").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    extraEdgesStopPlatformLink =
+      root.of("extraEdgesStopPlatformLink").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    includeEllipsoidToGeoidDifference =
+      root.of("includeEllipsoidToGeoidDifference").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    pruningThresholdIslandWithStops =
+      root.of("islandWithStopsMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(5);
+    pruningThresholdIslandWithoutStops =
+      root.of("islandWithoutStopsMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(40);
+    matchBusRoutesToStreets =
+      root.of("matchBusRoutesToStreets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    maxDataImportIssuesPerFile =
+      root.of("maxDataImportIssuesPerFile").withDoc(NA, /*TODO DOC*/"TODO").asInt(1000);
+    maxInterlineDistance =
+      root.of("maxInterlineDistance").withDoc(NA, /*TODO DOC*/"TODO").asInt(200);
+    blockBasedInterlining =
+      root.of("blockBasedInterlining").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
     maxTransferDurationSeconds =
-      c.asDouble("maxTransferDurationSeconds", Duration.ofMinutes(30).toSeconds());
-    maxStopToShapeSnapDistance = c.asDouble("maxStopToShapeSnapDistance", 150);
-    multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
-    osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
-    platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
-    readCachedElevations = c.asBoolean("readCachedElevations", true);
-    staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-    staticParkAndRide = c.asBoolean("staticParkAndRide", true);
-    streets = c.asBoolean("streets", true);
-    subwayAccessTime = c.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    transit = c.asBoolean("transit", true);
-    transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
-    transitServiceEnd = c.asDateOrRelativePeriod("transitServiceEnd", "P3Y");
-    writeCachedElevations = c.asBoolean("writeCachedElevations", false);
-    maxAreaNodes = c.asInt("maxAreaNodes", 500);
-    maxElevationPropagationMeters = c.asInt("maxElevationPropagationMeters", 2000);
-    boardingLocationTags = c.asTextSet("boardingLocationTags", Set.of("ref"));
-    discardMinTransferTimes = c.asBoolean("discardMinTransferTimes", false);
-    transitModelTimeZone = c.asZoneId("transitModelTimeZone", null);
+      root
+        .of("maxTransferDurationSeconds")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble((double) Duration.ofMinutes(30).toSeconds());
+    maxStopToShapeSnapDistance =
+      root.of("maxStopToShapeSnapDistance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(150);
+    multiThreadElevationCalculations =
+      root.of("multiThreadElevationCalculations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    osmCacheDataInMem =
+      root.of("osmCacheDataInMem").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    platformEntriesLinking =
+      root.of("platformEntriesLinking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    readCachedElevations =
+      root.of("readCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    staticBikeParkAndRide =
+      root.of("staticBikeParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    staticParkAndRide =
+      root.of("staticParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    streets = root.of("streets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    subwayAccessTime =
+      root
+        .of("subwayAccessTime")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+    transit = root.of("transit").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
 
-    var localFileNamePatternsConfig = c.path("localFileNamePatterns");
-    gtfsLocalFilePattern = localFileNamePatternsConfig.asPattern("gtfs", DEFAULT_GTFS_PATTERN);
-    netexLocalFilePattern = localFileNamePatternsConfig.asPattern("netex", DEFAULT_NETEX_PATTERN);
-    osmLocalFilePattern = localFileNamePatternsConfig.asPattern("osm", DEFAULT_OSM_PATTERN);
-    demLocalFilePattern = localFileNamePatternsConfig.asPattern("dem", DEFAULT_DEM_PATTERN);
+    // Time Zone dependent config
+    {
+      // We need a time zone for setting transit service start and end. Getting the wrong time-zone
+      // will just shift the period with one day, so the consequences is limited.
+      transitModelTimeZone =
+        root.of("transitModelTimeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
+      var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
+      transitServiceStart =
+        root
+          .of("transitServiceStart")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDateOrRelativePeriod("-P1Y", confZone);
+      transitServiceEnd =
+        root
+          .of("transitServiceEnd")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDateOrRelativePeriod("P3Y", confZone);
+    }
 
-    gsCredentials = c.asText("gsCredentials", null);
-    graph = c.asUri("graph", null);
-    streetGraph = c.asUri("streetGraph", null);
-    buildReportDir = c.asUri("buildReportDir", null);
+    writeCachedElevations =
+      root.of("writeCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    maxAreaNodes = root.of("maxAreaNodes").withDoc(NA, /*TODO DOC*/"TODO").asInt(500);
+    maxElevationPropagationMeters =
+      root.of("maxElevationPropagationMeters").withDoc(NA, /*TODO DOC*/"TODO").asInt(2000);
+    boardingLocationTags =
+      root
+        .of("boardingLocationTags")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asStringSet(List.copyOf(Set.of("ref")));
+    discardMinTransferTimes =
+      root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
 
-    osm = new OsmExtractsConfig(c.path("osm"));
-    dem = new DemExtractsConfig((c.path("dem")));
-    transitFeeds = new TransitFeedsConfig(c.path("transitFeeds"));
+    var localFileNamePatternsConfig = root
+      .of("localFileNamePatterns")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObject();
+    gtfsLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("gtfs")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_GTFS_PATTERN);
+    netexLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("netex")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_NETEX_PATTERN);
+    osmLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("osm")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_OSM_PATTERN);
+    demLocalFilePattern =
+      localFileNamePatternsConfig
+        .of("dem")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asPattern(DEFAULT_DEM_PATTERN);
+
+    gsCredentials =
+      root
+        .of("gsCredentials")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
+    graph =
+      root.of("graph").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(null);
+    streetGraph =
+      root
+        .of("streetGraph")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null);
+    buildReportDir =
+      root
+        .of("buildReportDir")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asUri(null);
+
+    osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
+    osm = OsmConfig.mapOsmConfig(root, "osm");
+    dem =
+      new DemExtractsConfig(
+        (
+          root
+            .of("dem")
+            .withDoc(NA, /*TODO DOC*/"TODO")
+            .withExample(/*TODO DOC*/"TODO")
+            .withDescription(/*TODO DOC*/"TODO")
+            .asObject()
+        )
+      );
+    transitFeeds =
+      new TransitFeedsConfig(
+        root
+          .of("transitFeeds")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
     // List of complex parameters
-    fareServiceFactory = FaresConfiguration.fromConfig(c.asRawNode("fares"));
-    customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
-    netexDefaults = new NetexDefaultsConfig(c.path("netexDefaults"));
-    osmDefaults = new OsmDefaultsConfig(c.path("osmDefaults"));
-    dataOverlay = DataOverlayConfigMapper.map(c.path("dataOverlay"));
+    fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
+    customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
+    netexDefaults =
+      new NetexDefaultsConfig(
+        root
+          .of("netexDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    dataOverlay =
+      DataOverlayConfigMapper.map(
+        root
+          .of("dataOverlay")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
-    if (c.path("transferRequests").isNonEmptyArray()) {
+    if (
+      root
+        .of("transferRequests")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject()
+        .isNonEmptyArray()
+    ) {
       transferRequests =
-        c
-          .path("transferRequests")
+        root
+          .of("transferRequests")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
           .asList()
           .stream()
           .map(RoutingRequestMapper::mapRoutingRequest)
@@ -544,7 +697,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     }
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      c.logAllUnusedParameters(LOG::warn);
+      root.logAllUnusedParameters(LOG::warn);
     }
   }
 
@@ -614,11 +767,11 @@ public class BuildConfig implements OtpDataStoreConfig {
    * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
    */
   public boolean isDefault() {
-    return rawJson.isMissingNode();
+    return root.isEmpty();
   }
 
   public String toJson() {
-    return rawJson.isMissingNode() ? "" : rawJson.toString();
+    return root.isEmpty() ? "" : root.toJson();
   }
 
   public ServiceDateInterval getTransitServicePeriod() {
@@ -628,5 +781,9 @@ public class BuildConfig implements OtpDataStoreConfig {
   public int getSubwayAccessTimeSeconds() {
     // Convert access time in minutes to seconds
     return (int) (subwayAccessTime * 60.0);
+  }
+
+  public NodeAdapter asNodeAdapter() {
+    return root;
   }
 }

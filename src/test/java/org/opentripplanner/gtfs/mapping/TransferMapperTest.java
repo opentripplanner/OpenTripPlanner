@@ -24,7 +24,8 @@ public class TransferMapperTest {
 
   private static final TripMapper TRIP_MAPPER = new TripMapper(
     ROUTE_MAPPER,
-    new DirectionMapper(ISSUE_STORE)
+    new DirectionMapper(ISSUE_STORE),
+    TRANSLATION_HELPER
   );
 
   private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);

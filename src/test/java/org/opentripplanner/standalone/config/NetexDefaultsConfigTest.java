@@ -2,12 +2,13 @@ package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 class NetexDefaultsConfigTest {
 

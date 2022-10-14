@@ -13,6 +13,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -396,5 +397,10 @@ public class OSMWithTags {
   private boolean isTagDeniedAccess(String tagName) {
     String tagValue = getTag(tagName);
     return "no".equals(tagValue) || "license".equals(tagValue);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("tags", tags).toString();
   }
 }

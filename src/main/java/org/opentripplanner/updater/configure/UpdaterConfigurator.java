@@ -17,15 +17,15 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
-import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.street_note.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
+import org.opentripplanner.updater.trip.PollingTripUpdater;
+import org.opentripplanner.updater.trip.TimetableSnapshotSource;
+import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
-import org.opentripplanner.updater.vehicle_positions.PollingVehiclePositionUpdater;
+import org.opentripplanner.updater.vehicle_position.PollingVehiclePositionUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
 import org.slf4j.Logger;
@@ -141,7 +141,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
       updaters.add(
-        new PollingStoptimeUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
+        new PollingTripUpdater(configItem, transitModel, provideGtfsTimetableSnapshot())
       );
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {

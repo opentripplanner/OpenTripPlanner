@@ -1,17 +1,19 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -34,9 +36,9 @@ public class RouterConfig implements Serializable {
   );
 
   /**
-   * The raw JsonNode three kept for reference and (de)serialization.
+   * The node adaptor kept for reference and (de)serialization.
    */
-  private final JsonNode rawJson;
+  private final NodeAdapter root;
   private final String configVersion;
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
@@ -48,20 +50,75 @@ public class RouterConfig implements Serializable {
   private final FlexConfig flexConfig;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
-    NodeAdapter adapter = new NodeAdapter(node, source);
-    this.rawJson = node;
-    this.configVersion = adapter.asText("configVersion", null);
-    this.requestLogFile = adapter.asText("requestLogFile", null);
-    this.transmodelApi = new TransmodelAPIConfig(adapter.path("transmodelApi"));
-    this.streetRoutingTimeout = parseStreetRoutingTimeout(adapter);
-    this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
-    this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-    this.updatersParameters = new UpdatersConfig(adapter);
-    this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
-    this.flexConfig = new FlexConfig(adapter.path("flex"));
+    this(new NodeAdapter(node, source), logUnusedParams);
+  }
+
+  /** protected to give unit-test access */
+  RouterConfig(NodeAdapter root, boolean logUnusedParams) {
+    this.root = root;
+    this.configVersion =
+      root
+        .of("configVersion")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
+    this.requestLogFile =
+      root
+        .of("requestLogFile")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
+    this.transmodelApi =
+      new TransmodelAPIConfig(
+        root
+          .of("transmodelApi")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
+    this.transitConfig =
+      new TransitRoutingConfig(
+        root
+          .of("transit")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    this.routingRequestDefaults =
+      mapRoutingRequest(
+        root
+          .of("routingDefaults")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
+    this.updatersParameters = new UpdatersConfig(root);
+    this.vectorTileLayers =
+      new VectorTileConfig(
+        root
+          .of("vectorTileLayers")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+          .asList()
+      );
+    this.flexConfig =
+      new FlexConfig(
+        root
+          .of("flex")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      adapter.logAllUnusedParameters(LOG::warn);
+      root.logAllUnusedParameters(LOG::warn);
     }
   }
 
@@ -127,16 +184,16 @@ public class RouterConfig implements Serializable {
    * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
    */
   public boolean isDefault() {
-    return this.rawJson.isMissingNode();
+    return root.isEmpty();
   }
 
   public String toJson() {
-    return rawJson.isMissingNode() ? "" : rawJson.toString();
+    return root.isEmpty() ? "" : root.toJson();
   }
 
   public String toString() {
-    // Print ONLY the values set, not deafult values
-    return rawJson.toPrettyString();
+    // Print ONLY the values set, not default values
+    return root.toPrettyString();
   }
 
   /**
@@ -145,25 +202,9 @@ public class RouterConfig implements Serializable {
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
-    try {
-      return adapter.asDuration("streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT);
-    } catch (DateTimeParseException ex) {
-      LOG.warn(
-        "The `streetRoutingTimeout` parameter input format changed from a real number to a " +
-        "Duration. Update you config, the support for the old format will be removed in the " +
-        "next version after v2.2. Details: " +
-        ex.getMessage()
-      );
-      // This is safe, because the asDouble, will fall back to the default value on parse error
-      return Duration.ofMillis(
-        (long) (
-          1000L *
-          adapter.asDouble(
-            "streetRoutingTimeout",
-            (double) DEFAULT_STREET_ROUTING_TIMEOUT.toSeconds()
-          )
-        )
-      );
-    }
+    return adapter
+      .of("streetRoutingTimeout")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asDuration2(DEFAULT_STREET_ROUTING_TIMEOUT, ChronoUnit.SECONDS);
   }
 }

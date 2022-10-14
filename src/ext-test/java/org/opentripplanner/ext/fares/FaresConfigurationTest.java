@@ -1,11 +1,15 @@
 package org.opentripplanner.ext.fares;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareService;
-import org.opentripplanner.standalone.config.JsonSupport;
+import org.opentripplanner.standalone.config.framework.JsonSupport;
 
 class FaresConfigurationTest extends JsonSupport {
 
@@ -13,7 +17,7 @@ class FaresConfigurationTest extends JsonSupport {
   void houston() {
     var node = jsonNodeForTest("\"highestFareInFreeTransferWindow\"");
     var service = FaresConfiguration.fromConfig(node).makeFareService();
-    assertSame(HighestFareInFreeTransferWindowFareService.class, service.getClass());
+    assertInstanceOf(HighestFareInFreeTransferWindowFareService.class, service);
   }
 
   @Test
@@ -33,5 +37,29 @@ class FaresConfigurationTest extends JsonSupport {
     var houston = (HighestFareInFreeTransferWindowFareService) service;
     assertEquals(Duration.ofMinutes(30), houston.freeTransferWindow());
     assertTrue(houston.analyzeInterlinedTransfers());
+  }
+
+  @Test
+  void combineInterlinedLegs() {
+    var node = jsonNodeForTest("\"combine-interlined-legs\"");
+    var service = FaresConfiguration.fromConfig(node).makeFareService();
+    assertInstanceOf(CombinedInterlinedLegsFareService.class, service);
+  }
+
+  @Test
+  void combineInterlinedLegsWithParams() {
+    var node = jsonNodeForTest(
+      """
+        {
+          "type": "combine-interlined-legs",
+          "mode": "SAME_ROUTE"
+        }
+      """
+    );
+    var service = FaresConfiguration.fromConfig(node).makeFareService();
+    assertInstanceOf(CombinedInterlinedLegsFareService.class, service);
+
+    var s = (CombinedInterlinedLegsFareService) service;
+    assertEquals(SAME_ROUTE, s.mode());
   }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.view;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 /**
  * Provide access path information to debugger and path mapping.
@@ -11,5 +11,5 @@ public interface AccessPathView {
    * <p>
    * This is a reference to a transit-layer object passed into Raptor.
    */
-  RaptorTransfer access();
+  RaptorAccessEgress access();
 }

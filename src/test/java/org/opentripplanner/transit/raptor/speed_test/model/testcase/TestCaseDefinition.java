@@ -42,4 +42,11 @@ public record TestCaseDefinition(
   public String idAndDescription() {
     return id + " " + description;
   }
+
+  public boolean departureTimeSet() {
+    return departureTime != TestCase.NOT_SET;
+  }
+  public boolean arrivalTimeSet() {
+    return arrivalTime != TestCase.NOT_SET;
+  }
 }

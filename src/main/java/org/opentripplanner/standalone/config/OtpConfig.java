@@ -1,7 +1,10 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +16,7 @@ public class OtpConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
 
-  public final JsonNode rawConfig;
+  public final NodeAdapter root;
 
   public final Map<OTPFeature, Boolean> otpFeatures;
 
@@ -31,13 +34,23 @@ public class OtpConfig {
   public final String configVersion;
 
   OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
-    this.rawConfig = otpConfig;
-    NodeAdapter adapter = new NodeAdapter(otpConfig, source);
+    this.root = new NodeAdapter(otpConfig, source);
 
-    this.configVersion = adapter.asText("configVersion", null);
-    this.otpFeatures = adapter.asEnumMap("otpFeatures", OTPFeature.class, NodeAdapter::asBoolean);
+    this.configVersion =
+      root
+        .of("configVersion")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null);
+    this.otpFeatures =
+      root
+        .of("otpFeatures")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMap(OTPFeature.class, Boolean.class);
+
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      adapter.logAllUnusedParameters(LOG::warn);
+      root.logAllUnusedParameters(LOG::warn);
     }
   }
 }

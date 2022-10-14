@@ -9,6 +9,7 @@
 - Initial move into sandbox [#4241](https://github.com/opentripplanner/OpenTripPlanner/pull/4241)
 - Add HighestFareInFreeTransferWindowFareService [#4267](https://github.com/opentripplanner/OpenTripPlanner/pull/4267)
 - Add Fares V2 [#4338](https://github.com/opentripplanner/OpenTripPlanner/pull/4338)
+- Add CombineInterlinedLegsFareService [#4509](https://github.com/opentripplanner/OpenTripPlanner/pull/4509)
 
 ## Documentation
 
@@ -50,6 +51,7 @@ The classes and their maintainers are as follows:
 |--------------------------------------------|------------------------------------------------------------|
 | HighestFareInFreeTransferWindowFareService | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | AtlantaFareService                         | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
+| CombinedInterlinedLegsFareService          | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | HSLFareServiceImpl                         | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com))  |
 | NycFareServiceImpl                         | unmaintained                                               |
 | SFBayFareServiceImpl                       | unmaintained                                               |

@@ -15,6 +15,7 @@ import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -109,15 +110,17 @@ public class GrizzlyServer {
     httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp/");
 
     /* 2. A static content handler to serve the client JS apps etc. from the classpath. */
-    CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(
-      GrizzlyServer.class.getClassLoader(),
-      "/client/"
-    );
-    if (params.disableFileCache) {
-      LOG.info("Disabling HTTP server static file cache.");
-      staticHandler.setFileCacheEnabled(false);
+    if (OTPFeature.DebugClient.isOn()) {
+      CLStaticHttpHandler staticHandler = new CLStaticHttpHandler(
+        GrizzlyServer.class.getClassLoader(),
+        "/client/"
+      );
+      if (params.disableFileCache) {
+        LOG.info("Disabling HTTP server static file cache.");
+        staticHandler.setFileCacheEnabled(false);
+      }
+      httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
     }
-    httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
 
     /* 3. A static content handler to serve local files from the filesystem, under the "local" path. */
     if (params.clientDirectory != null) {

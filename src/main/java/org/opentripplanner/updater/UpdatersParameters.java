@@ -8,13 +8,13 @@ import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
+import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.street_note.WFSNotePollingGraphUpdaterParameters;
+import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
-import org.opentripplanner.updater.vehicle_positions.VehiclePositionsUpdaterParameters;
+import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 
 public interface UpdatersParameters {
@@ -26,7 +26,7 @@ public interface UpdatersParameters {
 
   List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters();
 
-  List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters();
+  List<PollingTripUpdaterParameters> getPollingStoptimeUpdaterParameters();
 
   List<VehiclePositionsUpdaterParameters> getVehiclePositionsUpdaterParameters();
 

@@ -10,31 +10,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  */
 public interface WayPropertySetSource {
   static WayPropertySetSource defaultWayPropertySetSource() {
-    return fromConfig("default");
-  }
-
-  /**
-   * Return the given WayPropertySetSource or throws IllegalArgumentException if an unknown type is
-   * specified
-   */
-  static WayPropertySetSource fromConfig(String type) {
-    // type is set to "default" by GraphBuilderParameters if not provided in
-    // build-config.json
-    if ("default".equals(type)) {
-      return new DefaultWayPropertySetSource();
-    } else if ("norway".equals(type)) {
-      return new NorwayWayPropertySetSource();
-    } else if ("uk".equals(type)) {
-      return new UKWayPropertySetSource();
-    } else if ("finland".equals(type)) {
-      return new FinlandWayPropertySetSource();
-    } else if ("germany".equals(type)) {
-      return new GermanyWayPropertySetSource();
-    } else if ("atlanta".equals(type)) {
-      return new AtlantaWayPropertySetSource();
-    } else {
-      throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'", type));
-    }
+    return Source.DEFAULT.getInstance();
   }
 
   void populateProperties(WayPropertySet wayPropertySet);
@@ -86,5 +62,31 @@ public interface WayPropertySetSource {
   default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
+  }
+
+  /**
+   * This is the list of WayPropertySetSource sources. The enum provide a mapping between the
+   * enum name and the actual implementation.
+   */
+  enum Source {
+    DEFAULT,
+    NORWAY,
+    UK,
+    FINLAND,
+    GERMANY,
+    ATLANTA,
+    HOUSTON;
+
+    public WayPropertySetSource getInstance() {
+      return switch (this) {
+        case DEFAULT -> new DefaultWayPropertySetSource();
+        case NORWAY -> new NorwayWayPropertySetSource();
+        case UK -> new UKWayPropertySetSource();
+        case FINLAND -> new FinlandWayPropertySetSource();
+        case GERMANY -> new GermanyWayPropertySetSource();
+        case ATLANTA -> new AtlantaWayPropertySetSource();
+        case HOUSTON -> new HoustonWayPropertySetSource();
+      };
+    }
   }
 }

@@ -17,6 +17,8 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
@@ -26,8 +28,6 @@ import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +108,7 @@ public class GraphBuilderDataSources {
     return inputData.get(type);
   }
 
-  public Iterable<ConfiguredDataSource<OsmExtractConfig>> getOsmConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
     return inputData
       .get(OSM)
       .stream()
@@ -116,12 +116,12 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
-    return buildConfig.osm.osmExtractConfigs
+  private OsmExtractParameters getOsmExtractConfig(DataSource dataSource) {
+    return buildConfig.osm.parameters
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
+      .orElse(new OsmExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<DemExtractConfig>> getDemConfiguredDatasource() {

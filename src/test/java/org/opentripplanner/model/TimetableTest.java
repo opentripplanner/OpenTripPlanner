@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -27,7 +26,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.stoptime.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.util.TestUtils;
 
 public class TimetableTest {

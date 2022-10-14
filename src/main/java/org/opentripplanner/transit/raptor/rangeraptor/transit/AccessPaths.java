@@ -9,16 +9,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 public class AccessPaths {
 
-  private final TIntObjectMap<List<RaptorTransfer>> arrivedOnStreetByNumOfRides;
-  private final TIntObjectMap<List<RaptorTransfer>> arrivedOnBoardByNumOfRides;
+  private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides;
+  private final TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides;
 
   private AccessPaths(
-    TIntObjectMap<List<RaptorTransfer>> arrivedOnStreetByNumOfRides,
-    TIntObjectMap<List<RaptorTransfer>> arrivedOnBoardByNumOfRides
+    TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides,
+    TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides
   ) {
     this.arrivedOnStreetByNumOfRides = arrivedOnStreetByNumOfRides;
     this.arrivedOnBoardByNumOfRides = arrivedOnBoardByNumOfRides;
@@ -28,7 +28,7 @@ public class AccessPaths {
    * Return the transfer arriving at the stop on-street(walking) grouped by Raptor round. The Raptor
    * round is calculated from the number of rides in the transfer.
    */
-  public TIntObjectMap<List<RaptorTransfer>> arrivedOnStreetByNumOfRides() {
+  public TIntObjectMap<List<RaptorAccessEgress>> arrivedOnStreetByNumOfRides() {
     return arrivedOnStreetByNumOfRides;
   }
 
@@ -36,7 +36,7 @@ public class AccessPaths {
    * Return the transfer arriving at the stop on-board a transit(flex) service grouped by Raptor
    * round. The Raptor round is calculated from the number of rides in the transfer.
    */
-  public TIntObjectMap<List<RaptorTransfer>> arrivedOnBoardByNumOfRides() {
+  public TIntObjectMap<List<RaptorAccessEgress>> arrivedOnBoardByNumOfRides() {
     return arrivedOnBoardByNumOfRides;
   }
 
@@ -57,13 +57,13 @@ public class AccessPaths {
    * <p>
    * This method is static and package local to enable unit-testing.
    */
-  public static AccessPaths create(Collection<RaptorTransfer> paths, RaptorProfile profile) {
+  public static AccessPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
     if (!profile.is(RaptorProfile.MULTI_CRITERIA)) {
       paths = removeNoneOptimalPathsForStandardRaptor(paths);
     }
     return new AccessPaths(
-      groupByRound(paths, Predicate.not(RaptorTransfer::hasRides)),
-      groupByRound(paths, RaptorTransfer::hasRides)
+      groupByRound(paths, Predicate.not(RaptorAccessEgress::hasRides)),
+      groupByRound(paths, RaptorAccessEgress::hasRides)
     );
   }
 }

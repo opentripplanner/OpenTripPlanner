@@ -6,19 +6,18 @@ import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 public class BicycleSafetyReport {
 
   public static void main(String[] args) {
-    System.out.println(makeCsv("norway"));
+    System.out.println(makeCsv(WayPropertySetSource.Source.NORWAY));
   }
 
-  public static String makeCsv(String configName) {
+  public static String makeCsv(WayPropertySetSource.Source source) {
     var wayPropertySet = new WayPropertySet();
 
-    var source = WayPropertySetSource.fromConfig(configName);
-    source.populateProperties(wayPropertySet);
+    source.getInstance().populateProperties(wayPropertySet);
 
     var buf = new CsvReportBuilder(",");
 
     buf.addHeader(
-      "OSM tags for osmWayPropertySet " + configName,
+      "OSM tags for osmWayPropertySet " + source,
       "mixin",
       "permissions",
       "safety penalty there",
@@ -28,11 +27,11 @@ public class BicycleSafetyReport {
     wayPropertySet
       .getWayProperties()
       .forEach(p -> {
-        buf.addText(p.getSpecifier().toString());
-        buf.addBoolean(p.isSafetyMixin());
-        buf.addText(p.getProperties().getPermission().toString());
+        buf.addText(p.specifier().toString());
+        buf.addBoolean(p.safetyMixin());
+        buf.addText(p.properties().getPermission().toString());
 
-        var safetyProps = p.getProperties().getBicycleSafetyFeatures();
+        var safetyProps = p.properties().getBicycleSafetyFeatures();
         buf.addNumber(safetyProps.forward());
         buf.addNumber(safetyProps.back());
         buf.newLine();

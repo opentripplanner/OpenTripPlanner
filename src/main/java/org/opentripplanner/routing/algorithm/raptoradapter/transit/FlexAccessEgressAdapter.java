@@ -3,9 +3,9 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 
 /**
- * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg AccessEgress.
+ * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.
  */
-public class FlexAccessEgressAdapter extends AccessEgress {
+public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   private final FlexAccessEgress flexAccessEgress;
 

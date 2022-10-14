@@ -126,10 +126,10 @@ public class RaptorRequestTransferCache {
       this.stairsTimeFactor = preferences.walk().stairsTimeFactor();
       this.turnReluctance = preferences.street().turnReluctance();
 
-      this.elevatorBoardCost = preferences.street().elevatorBoardCost();
-      this.elevatorBoardTime = preferences.street().elevatorBoardTime();
-      this.elevatorHopCost = preferences.street().elevatorHopCost();
-      this.elevatorHopTime = preferences.street().elevatorHopTime();
+      this.elevatorBoardCost = preferences.street().elevator().boardCost();
+      this.elevatorBoardTime = preferences.street().elevator().boardTime();
+      this.elevatorHopCost = preferences.street().elevator().hopCost();
+      this.elevatorHopTime = preferences.street().elevator().hopTime();
     }
 
     @Override

@@ -1,8 +1,10 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
-public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
+public class SiriETUpdaterParameters
+  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
 
   private final String configRef;
   private final String feedId;
@@ -18,6 +20,7 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String requestorRef;
   private final int timeoutSec;
   private final int previewIntervalMinutes;
+  private final boolean fuzzyTripMatching;
 
   public SiriETUpdaterParameters(
     String configRef,
@@ -30,7 +33,8 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
     int frequencySec,
     String requestorRef,
     int timeoutSec,
-    int previewIntervalMinutes
+    int previewIntervalMinutes,
+    boolean fuzzyTripMatching
   ) {
     this.configRef = configRef;
     this.feedId = feedId;
@@ -43,6 +47,7 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
     this.requestorRef = requestorRef;
     this.timeoutSec = timeoutSec;
     this.previewIntervalMinutes = previewIntervalMinutes;
+    this.fuzzyTripMatching = fuzzyTripMatching;
   }
 
   public String getFeedId() {
@@ -71,8 +76,17 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
   }
 
   @Override
+  public String getUrl() {
+    return sourceParameters().getUrl();
+  }
+
+  @Override
   public String getConfigRef() {
     return configRef;
+  }
+
+  public boolean isFuzzyTripMatching() {
+    return fuzzyTripMatching;
   }
 
   public SiriETHttpTripUpdateSource.Parameters sourceParameters() {

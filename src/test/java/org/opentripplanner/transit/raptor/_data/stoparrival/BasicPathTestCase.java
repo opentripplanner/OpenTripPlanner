@@ -3,8 +3,7 @@ package org.opentripplanner.transit.raptor._data.stoparrival;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexWithOnBoard;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flexWithOnBoard;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 import static org.opentripplanner.util.time.TimeUtils.time;
@@ -14,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
@@ -24,6 +24,7 @@ import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
@@ -97,7 +98,10 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int ACCESS_START = time("10:00");
   public static final int ACCESS_END = time("10:03:15");
   public static final int ACCESS_DURATION = ACCESS_END - ACCESS_START;
-  public static final RaptorTransfer ACCESS_TRANSFER = TestTransfer.walk(STOP_A, ACCESS_DURATION);
+  public static final RaptorAccessEgress ACCESS_TRANSFER = TestAccessEgress.walk(
+    STOP_A,
+    ACCESS_DURATION
+  );
   public static final int ACCESS_COST = ACCESS_TRANSFER.generalizedCost();
 
   // Trip 1 (A ~ BUS L11 10:04 10:35 ~ B)
@@ -114,7 +118,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final int TX_START = time("10:35:15");
   private static final int TX_END = time("10:39:00");
   public static final int TX_DURATION = TX_END - TX_START;
-  public static final RaptorTransfer TX_TRANSFER = TestTransfer.walk(STOP_C, TX_DURATION);
+  public static final RaptorTransfer TX_TRANSFER = TestTransfer.transfer(STOP_C, TX_DURATION);
   public static final int TX_COST = TX_TRANSFER.generalizedCost();
 
   // Trip 2 (C ~ BUS L21 11:00 11:23 ~ D)
@@ -145,15 +149,30 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final int EGRESS_START = time("11:52:15");
   public static final int EGRESS_END = time("12:00");
   public static final int EGRESS_DURATION = EGRESS_END - EGRESS_START;
-  public static final RaptorTransfer EGRESS_TRANSFER = TestTransfer.walk(STOP_E, EGRESS_DURATION);
+  public static final RaptorAccessEgress EGRESS_TRANSFER = TestAccessEgress.walk(
+    STOP_E,
+    EGRESS_DURATION
+  );
   public static final int EGRESS_COST = EGRESS_TRANSFER.generalizedCost();
 
   public static final int TRIP_DURATION = EGRESS_END - ACCESS_START;
 
-  private static final RaptorTransfer ACCESS = walk(STOP_A, ACCESS_DURATION, ACCESS_COST);
-  private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
+  private static final RaptorAccessEgress ACCESS = TestAccessEgress.walk(
+    STOP_A,
+    ACCESS_DURATION,
+    ACCESS_COST
+  );
+  private static final RaptorAccessEgress EGRESS = TestAccessEgress.walk(
+    STOP_E,
+    EGRESS_DURATION,
+    EGRESS_COST
+  );
   // this is of course not a real flex egress
-  private static final RaptorTransfer FLEX = flexWithOnBoard(STOP_E, EGRESS_DURATION, EGRESS_COST);
+  private static final RaptorAccessEgress FLEX = flexWithOnBoard(
+    STOP_E,
+    EGRESS_DURATION,
+    EGRESS_COST
+  );
 
   public static final String LINE_11 = "L11";
   public static final String LINE_21 = "L21";
@@ -215,7 +234,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     prevArrival = new Bus(3, STOP_E, L31_END, LINE_31_COST, TRIP_3, prevArrival);
     Egress egress = new Egress(EGRESS_START, EGRESS_END, EGRESS_COST, prevArrival);
     return new DestinationArrival<>(
-      walk(egress.previous().stop(), egress.durationInSeconds()),
+      TestAccessEgress.walk(egress.previous().stop(), egress.durationInSeconds()),
       egress.previous(),
       egress.arrivalTime(),
       egress.additionalCost()
@@ -236,7 +255,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     nextArrival = new Bus(3, STOP_A, L11_START, LINE_11_COST, TRIP_1, nextArrival);
     Egress egress = new Egress(ACCESS_END, ACCESS_START, ACCESS_COST, nextArrival);
     return new DestinationArrival<>(
-      walk(egress.previous().stop(), egress.durationInSeconds()),
+      TestAccessEgress.walk(egress.previous().stop(), egress.durationInSeconds()),
       egress.previous(),
       egress.arrivalTime(),
       egress.additionalCost()
@@ -270,7 +289,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       LINE_21_COST,
       leg5
     );
-    var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
+    var transfer = TestTransfer.transfer(STOP_C, TX_END - TX_START);
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
@@ -298,7 +317,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       EGRESS_END,
       EGRESS_COST
     );
-    var transfer = TestTransfer.walk(STOP_E, TX_END - TX_START);
+    var transfer = TestTransfer.transfer(STOP_E, TX_END - TX_START);
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
