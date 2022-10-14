@@ -77,8 +77,6 @@ public class NodeAdapterTest {
     assertEquals("B Summary", infos.get(0).summary());
     assertEquals("Ddd", infos.get(0).description());
     assertEquals(BOOLEAN, infos.get(0).type());
-    assertEquals("{NANOS : \"A String\"}", infos.get(1).exampleValueJson());
-    assertEquals(DECADES, infos.get(2).exampleValue());
   }
 
   @Test

@@ -6,8 +6,6 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.EN
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
@@ -42,7 +40,6 @@ public record NodeInfo(
   @Nullable ConfigType elementType,
   OtpVersion since,
   @Nullable String defaultValue,
-  @Nullable Object exampleValue,
   boolean required,
   boolean skipChild,
   @Nullable DeprecatedInfo deprecated
@@ -88,28 +85,6 @@ public record NodeInfo(
 
   public boolean isDeprecated() {
     return deprecated != null;
-  }
-
-  public String exampleValueJson() {
-    return exampleValueJson(type);
-  }
-
-  public Object exampleOrFallback(Object fallback) {
-    if (exampleValue != null) {
-      if (type.isComplex()) {
-        try {
-          new ObjectMapper().writeValueAsString(exampleValue);
-        } catch (JsonProcessingException e) {
-          throw new IllegalStateException(
-            "JSON serialization of exampleValue failed!: " + e.getMessage(),
-            e
-          );
-        }
-      } else {
-        return exampleValue;
-      }
-    }
-    return fallback;
   }
 
   static NodeInfoBuilder of() {
@@ -164,28 +139,26 @@ public record NodeInfo(
   private String exampleValueJson(ConfigType type) {
     return type.quote(
       switch (type) {
-        case BOOLEAN -> exampleOrFallback("true").toString().toLowerCase();
-        case DOUBLE -> exampleOrFallback(3.15);
-        case INTEGER -> exampleOrFallback(123);
-        case LONG -> exampleOrFallback(1000);
-        case ENUM -> exampleOrFallback(firstEnumValue());
-        case STRING -> exampleOrFallback("A String");
-        case LOCALE -> exampleOrFallback("en_US");
-        case DATE -> exampleOrFallback("20022-05-31");
-        case DATE_OR_PERIOD -> exampleOrFallback("P1Y5D");
-        case DURATION -> exampleOrFallback("45s");
-        case REGEXP -> exampleOrFallback("-?[\\d+=*/ =]+");
-        case URI -> exampleOrFallback("https://www.opentripplanner.org/");
-        case ZONE_ID -> exampleOrFallback("UTC");
-        case FEED_SCOPED_ID -> exampleOrFallback("FID:Trip0001");
-        case LINEAR_FUNCTION -> exampleOrFallback("600 + 3.0 x");
-        case OBJECT -> exampleOrFallback("{a:1}");
-        case MAP -> exampleOrFallback("{a:" + exampleValueJson(elementType) + "}");
-        case ENUM_MAP -> exampleOrFallback(
-          "{" + firstEnumValue() + " : " + exampleValueJson(elementType) + "}"
-        );
-        case ENUM_SET -> exampleOrFallback("[" + firstEnumValue() + "]");
-        case ARRAY -> exampleOrFallback("[{n:1},{n:2}]");
+        case BOOLEAN -> "true";
+        case DOUBLE -> "3.15";
+        case INTEGER -> "123";
+        case LONG -> "1000";
+        case ENUM -> firstEnumValue();
+        case STRING -> "A String";
+        case LOCALE -> "en_US";
+        case DATE -> "20022-05-31";
+        case DATE_OR_PERIOD -> "P1Y5D";
+        case DURATION -> "45s";
+        case REGEXP -> "-?[\\d+=*/ =]+";
+        case URI -> "https://www.opentripplanner.org/";
+        case ZONE_ID -> "Europe/Paris";
+        case FEED_SCOPED_ID -> "FID:Trip0001";
+        case LINEAR_FUNCTION -> "600 + 3.0 x";
+        case OBJECT -> "{a:1}";
+        case MAP -> "{a:" + exampleValueJson(elementType) + "}";
+        case ENUM_MAP -> "{" + firstEnumValue() + " : " + exampleValueJson(elementType) + "}";
+        case ENUM_SET -> "[" + firstEnumValue() + "]";
+        case ARRAY -> "[{n:1},{n:2}]";
       }
     );
   }

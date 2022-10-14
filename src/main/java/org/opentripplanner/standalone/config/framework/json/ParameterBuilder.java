@@ -77,7 +77,6 @@ public class ParameterBuilder {
 
   /** Add documentation detail description to a parameter. */
   public ParameterBuilder withExample(Object example) {
-    this.info.withExample(example);
     return this;
   }
 
