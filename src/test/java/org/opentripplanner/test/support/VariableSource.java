@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@ArgumentsSource(FilePatternArgumentsProvider.class)
+@ArgumentsSource(VariableArgumentsProvider.class)
 public @interface VariableSource {
   /**
    * The name of the static variable
