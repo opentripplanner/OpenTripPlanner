@@ -50,7 +50,7 @@ The feature must be configured in `router-config.json` as follows
       "expansionFactor": 0.25
     },
     {
-      "name": "rentalVehicle",
+      "name": "rentalVehicles",
       "type": "VehicleRentalVehicle", // just free-floating vehicles
       "mapper": "Digitransit",
       "maxZoom": 20,
@@ -58,7 +58,7 @@ The feature must be configured in `router-config.json` as follows
       "cacheMaxSeconds": 60
     },
     {
-      "name": "rentalStation",
+      "name": "rentalStations",
       "type": "VehicleRentalStation", // just rental stations
       "mapper": "Digitransit",
       "maxZoom": 20,
