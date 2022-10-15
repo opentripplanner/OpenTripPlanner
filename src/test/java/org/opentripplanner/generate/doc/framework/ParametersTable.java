@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework.doc;
+package org.opentripplanner.generate.doc.framework;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -22,7 +22,7 @@ public class ParametersTable extends AbstractTable {
 
   @Override
   List<String> headers() {
-    return List.of("Parameter", "Type", "Required / Optional Default Value", "Since", "Summary");
+    return List.of("Config Parameter", "Type", "Req./Opt.", "Default Value", "Since", "Summary");
   }
 
   @Override
@@ -34,7 +34,8 @@ public class ParametersTable extends AbstractTable {
       List.of(
         parameterNameIndented(node, info),
         writer().code(info.type().docName()),
-        requieredOptonalInfo(info),
+        requiredOrOptional(info),
+        defaultValue(info),
         info.since(),
         info.summary()
       )

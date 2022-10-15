@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework.doc;
+package org.opentripplanner.generate.doc.framework;
 
 import java.io.PrintStream;
 import java.util.List;

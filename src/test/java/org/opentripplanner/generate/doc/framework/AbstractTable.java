@@ -1,6 +1,6 @@
-package org.opentripplanner.standalone.config.framework.doc;
+package org.opentripplanner.generate.doc.framework;
 
-import static org.opentripplanner.standalone.config.framework.doc.MarkDownDocWriter.contextIndented;
+import static org.opentripplanner.generate.doc.framework.MarkDownDocWriter.contextIndented;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,14 +61,12 @@ abstract class AbstractTable {
     return contextIndented(node.contextPath()) + parameter;
   }
 
-  String requieredOptonalInfo(NodeInfo info) {
-    StringBuilder buf = new StringBuilder();
-    buf.append(writer().em(info.required() ? "Required" : "Optional"));
-    if (info.defaultValue() != null) {
-      buf
-        .append(" ")
-        .append(writer.code(info.type().quote(writer.escapeInTable(info.defaultValue()))));
-    }
-    return buf.toString();
+  String requiredOrOptional(NodeInfo info) {
+    return writer().em(info.required() ? "Required" : "Optional");
+  }
+
+  String defaultValue(NodeInfo info) {
+    return info.defaultValue() == null ? "" :
+      writer.code(info.type().quote(writer.escapeInTable(info.defaultValue())));
   }
 }

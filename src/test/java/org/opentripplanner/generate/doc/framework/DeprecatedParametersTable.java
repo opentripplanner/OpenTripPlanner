@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework.doc;
+package org.opentripplanner.generate.doc.framework;
 
 import java.util.List;
 import java.util.function.Predicate;

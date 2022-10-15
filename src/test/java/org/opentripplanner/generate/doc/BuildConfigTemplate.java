@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.framework;
+package org.opentripplanner.generate.doc;
 
 public class BuildConfigTemplate {
 
