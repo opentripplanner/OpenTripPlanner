@@ -14,7 +14,6 @@ public class PollingTripUpdaterParameters
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
   // Source
-  private final DataSourceType sourceType;
   private final String feedId;
   private final String httpSourceUrl;
   private final String fileSource;
@@ -26,7 +25,6 @@ public class PollingTripUpdaterParameters
     boolean purgeExpiredData,
     boolean fuzzyTripMatching,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
-    DataSourceType sourceType,
     String feedId,
     String httpSourceUrl,
     String fileSource
@@ -37,7 +35,6 @@ public class PollingTripUpdaterParameters
     this.purgeExpiredData = purgeExpiredData;
     this.fuzzyTripMatching = fuzzyTripMatching;
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
-    this.sourceType = sourceType;
     this.feedId = feedId;
     this.httpSourceUrl = httpSourceUrl;
     this.fileSource = fileSource;
@@ -58,16 +55,8 @@ public class PollingTripUpdaterParameters
     return configRef;
   }
 
-  public DataSourceType getSourceType() {
-    return sourceType;
-  }
-
   public String getFeedId() {
     return feedId;
-  }
-
-  boolean purgeExpiredData() {
-    return purgeExpiredData;
   }
 
   boolean fuzzyTripMatching() {
