@@ -10,11 +10,11 @@ public class GtfsRealtimeAlertsUpdaterConfig {
   public static GtfsRealtimeAlertsUpdaterParameters create(String configRef, NodeAdapter c) {
     return new GtfsRealtimeAlertsUpdaterParameters(
       configRef,
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("earlyStartSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(0),
-      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60)
+      c.of("feedId").since(NA).summary("TODO").asString(null),
+      c.of("url").since(NA).summary("TODO").asString(),
+      c.of("earlyStartSec").since(NA).summary("TODO").asInt(0),
+      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false),
+      c.of("frequencySec").since(NA).summary("TODO").asInt(60)
     );
   }
 }

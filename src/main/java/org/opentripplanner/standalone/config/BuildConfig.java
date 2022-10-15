@@ -482,135 +482,143 @@ public class BuildConfig implements OtpDataStoreConfig {
   public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    areaVisibility = root.of("areaVisibility").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    areaVisibility = root.of("areaVisibility").since(NA).summary("TODO").asBoolean(false);
     banDiscouragedWalking =
-      root.of("banDiscouragedWalking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("banDiscouragedWalking").since(NA).summary("TODO").asBoolean(false);
     banDiscouragedBiking =
-      root.of("banDiscouragedBiking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    configVersion = root.of("configVersion").withDoc(NA, "TODO DOC").asString(null);
-    dataImportReport = root.of("dataImportReport").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("banDiscouragedBiking").since(NA).summary("TODO").asBoolean(false);
+    configVersion = root.of("configVersion").since(NA).summary("TODO DOC").asString(null);
+    dataImportReport = root.of("dataImportReport").since(NA).summary("TODO").asBoolean(false);
     distanceBetweenElevationSamples =
       root
         .of("distanceBetweenElevationSamples")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket =
       S3BucketConfig.fromConfig(
         root
           .of("elevationBucket")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
     elevationUnitMultiplier =
-      root.of("elevationUnitMultiplier").withDoc(NA, /*TODO DOC*/"TODO").asDouble(1);
-    embedRouterConfig =
-      root.of("embedRouterConfig").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+      root.of("elevationUnitMultiplier").since(NA).summary("TODO").asDouble(1);
+    embedRouterConfig = root.of("embedRouterConfig").since(NA).summary("TODO").asBoolean(true);
     extraEdgesStopPlatformLink =
-      root.of("extraEdgesStopPlatformLink").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("extraEdgesStopPlatformLink").since(NA).summary("TODO").asBoolean(false);
     includeEllipsoidToGeoidDifference =
-      root.of("includeEllipsoidToGeoidDifference").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("includeEllipsoidToGeoidDifference").since(NA).summary("TODO").asBoolean(false);
     pruningThresholdIslandWithStops =
-      root.of("islandWithStopsMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(5);
+      root.of("islandWithStopsMaxSize").since(NA).summary("TODO").asInt(5);
     pruningThresholdIslandWithoutStops =
-      root.of("islandWithoutStopsMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(40);
+      root.of("islandWithoutStopsMaxSize").since(NA).summary("TODO").asInt(40);
     matchBusRoutesToStreets =
-      root.of("matchBusRoutesToStreets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("matchBusRoutesToStreets").since(NA).summary("TODO").asBoolean(false);
     maxDataImportIssuesPerFile =
-      root.of("maxDataImportIssuesPerFile").withDoc(NA, /*TODO DOC*/"TODO").asInt(1000);
-    maxInterlineDistance =
-      root.of("maxInterlineDistance").withDoc(NA, /*TODO DOC*/"TODO").asInt(200);
+      root.of("maxDataImportIssuesPerFile").since(NA).summary("TODO").asInt(1000);
+    maxInterlineDistance = root.of("maxInterlineDistance").since(NA).summary("TODO").asInt(200);
     blockBasedInterlining =
-      root.of("blockBasedInterlining").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+      root.of("blockBasedInterlining").since(NA).summary("TODO").asBoolean(true);
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDouble((double) Duration.ofMinutes(30).toSeconds());
     maxStopToShapeSnapDistance =
-      root.of("maxStopToShapeSnapDistance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(150);
+      root.of("maxStopToShapeSnapDistance").since(NA).summary("TODO").asDouble(150);
     multiThreadElevationCalculations =
-      root.of("multiThreadElevationCalculations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    osmCacheDataInMem =
-      root.of("osmCacheDataInMem").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("multiThreadElevationCalculations").since(NA).summary("TODO").asBoolean(false);
+    osmCacheDataInMem = root.of("osmCacheDataInMem").since(NA).summary("TODO").asBoolean(false);
     platformEntriesLinking =
-      root.of("platformEntriesLinking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("platformEntriesLinking").since(NA).summary("TODO").asBoolean(false);
     readCachedElevations =
-      root.of("readCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+      root.of("readCachedElevations").since(NA).summary("TODO").asBoolean(true);
     staticBikeParkAndRide =
-      root.of("staticBikeParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    staticParkAndRide =
-      root.of("staticParkAndRide").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
-    streets = root.of("streets").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+      root.of("staticBikeParkAndRide").since(NA).summary("TODO").asBoolean(false);
+    staticParkAndRide = root.of("staticParkAndRide").since(NA).summary("TODO").asBoolean(true);
+    streets = root.of("streets").since(NA).summary("TODO").asBoolean(true);
     subwayAccessTime =
       root
         .of("subwayAccessTime")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    transit = root.of("transit").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(true);
+    transit = root.of("transit").since(NA).summary("TODO").asBoolean(true);
 
     // Time Zone dependent config
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone
       // will just shift the period with one day, so the consequences is limited.
       transitModelTimeZone =
-        root.of("transitModelTimeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
+        root.of("transitModelTimeZone").since(NA).summary("TODO").asZoneId(null);
       var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
       transitServiceStart =
         root
           .of("transitServiceStart")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDateOrRelativePeriod("-P1Y", confZone);
       transitServiceEnd =
         root
           .of("transitServiceEnd")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDateOrRelativePeriod("P3Y", confZone);
     }
 
     writeCachedElevations =
-      root.of("writeCachedElevations").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    maxAreaNodes = root.of("maxAreaNodes").withDoc(NA, /*TODO DOC*/"TODO").asInt(500);
+      root.of("writeCachedElevations").since(NA).summary("TODO").asBoolean(false);
+    maxAreaNodes = root.of("maxAreaNodes").since(NA).summary("TODO").asInt(500);
     maxElevationPropagationMeters =
-      root.of("maxElevationPropagationMeters").withDoc(NA, /*TODO DOC*/"TODO").asInt(2000);
+      root.of("maxElevationPropagationMeters").since(NA).summary("TODO").asInt(2000);
     boardingLocationTags =
       root
         .of("boardingLocationTags")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asStringSet(List.copyOf(Set.of("ref")));
     discardMinTransferTimes =
-      root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+      root.of("discardMinTransferTimes").since(NA).summary("TODO").asBoolean(false);
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
+      .description(/*TODO DOC*/"TODO")
       .asObject();
     gtfsLocalFilePattern =
       localFileNamePatternsConfig
         .of("gtfs")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asPattern(DEFAULT_GTFS_PATTERN);
     netexLocalFilePattern =
       localFileNamePatternsConfig
         .of("netex")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asPattern(DEFAULT_NETEX_PATTERN);
     osmLocalFilePattern =
       localFileNamePatternsConfig
         .of("osm")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asPattern(DEFAULT_OSM_PATTERN);
     demLocalFilePattern =
       localFileNamePatternsConfig
         .of("dem")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asPattern(DEFAULT_DEM_PATTERN);
 
-    gsCredentials = root.of("gsCredentials").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
-    graph = root.of("graph").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
-    streetGraph = root.of("streetGraph").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
-    buildReportDir = root.of("buildReportDir").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
+    gsCredentials = root.of("gsCredentials").since(NA).summary("TODO").asString(null);
+    graph = root.of("graph").since(NA).summary("TODO").asUri(null);
+    streetGraph = root.of("streetGraph").since(NA).summary("TODO").asUri(null);
+    buildReportDir = root.of("buildReportDir").since(NA).summary("TODO").asUri(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");

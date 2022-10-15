@@ -30,46 +30,44 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
     this.maxNumberOfTransfers =
-      c
-        .of("maxNumberOfTransfers")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asInt(dft.maxNumberOfTransfers());
+      c.of("maxNumberOfTransfers").since(NA).summary("TODO").asInt(dft.maxNumberOfTransfers());
     this.scheduledTripBinarySearchThreshold =
       c
         .of("scheduledTripBinarySearchThreshold")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asInt(dft.scheduledTripBinarySearchThreshold());
     this.iterationDepartureStepInSeconds =
       c
         .of("iterationDepartureStepInSeconds")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asInt(dft.iterationDepartureStepInSeconds());
     this.searchThreadPoolSize =
-      c
-        .of("searchThreadPoolSize")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asInt(dft.searchThreadPoolSize());
+      c.of("searchThreadPoolSize").since(NA).summary("TODO").asInt(dft.searchThreadPoolSize());
     // Dynamic Search Window
     this.stopTransferCost =
       c
         .of("stopTransferCost")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asEnumMapAllKeysRequired(StopTransferPriority.class, Integer.class);
-    this.transferCacheMaxSize =
-      c.of("transferCacheMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(25);
+    this.transferCacheMaxSize = c.of("transferCacheMaxSize").since(NA).summary("TODO").asInt(25);
 
     this.pagingSearchWindowAdjustments =
       c
         .of("pagingSearchWindowAdjustments")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
     this.dynamicSearchWindowCoefficients =
       new DynamicSearchWindowConfig(
         c
           .of("dynamicSearchWindow")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
   }
@@ -132,25 +130,21 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       this.minTransitTimeCoefficient =
         dsWin
           .of("minTransitTimeCoefficient")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dsWinDft.minTransitTimeCoefficient());
       this.minWaitTimeCoefficient =
         dsWin
           .of("minWaitTimeCoefficient")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dsWinDft.minWaitTimeCoefficient());
       this.minWinTimeMinutes =
-        dsWin
-          .of("minWinTimeMinutes")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asInt(dsWinDft.minWinTimeMinutes());
+        dsWin.of("minWinTimeMinutes").since(NA).summary("TODO").asInt(dsWinDft.minWinTimeMinutes());
       this.maxWinTimeMinutes =
-        dsWin
-          .of("maxWinTimeMinutes")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asInt(dsWinDft.maxWinTimeMinutes());
+        dsWin.of("maxWinTimeMinutes").since(NA).summary("TODO").asInt(dsWinDft.maxWinTimeMinutes());
       this.stepMinutes =
-        dsWin.of("stepMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(dsWinDft.stepMinutes());
+        dsWin.of("stepMinutes").since(NA).summary("TODO").asInt(dsWinDft.stepMinutes());
     }
 
     @Override

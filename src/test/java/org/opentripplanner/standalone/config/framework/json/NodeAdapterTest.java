@@ -58,9 +58,9 @@ public class NodeAdapterTest {
   @Test
   public void docInfo() {
     NodeAdapter subject = newNodeAdapterForTest("{ bool: false }");
-    subject.of("bool").withDoc(V2_0, "B Summary").withDescription("Ddd").asBoolean();
-    subject.of("en").withDoc(V2_1, "EN Summary").asEnum(SECONDS);
-    subject.of("em").withDoc(V2_1, "EM Summary").asEnumMap(ChronoUnit.class, String.class);
+    subject.of("bool").since(V2_0).summary("B Summary").description("Ddd").asBoolean();
+    subject.of("en").since(V2_1).summary("EN Summary").asEnum(SECONDS);
+    subject.of("em").since(V2_1).summary("EM Summary").asEnumMap(ChronoUnit.class, String.class);
 
     List<NodeInfo> infos = subject.parametersSorted();
     assertEquals(
@@ -417,10 +417,11 @@ public class NodeAdapterTest {
 
     List<ARecord> result = subject
       .of("key")
-      .withDoc(V2_0, "Summary Array")
+      .since(V2_0)
+      .summary("Summary Array")
       .asObjects(
         List.of(),
-        n -> new ARecord(n.of("a").withDoc(V2_1, "Summary Element").asString())
+        n -> new ARecord(n.of("a").since(V2_1).summary("Summary Element").asString())
       );
 
     assertEquals("[ARecord[a=I], ARecord[a=2]]", result.toString());

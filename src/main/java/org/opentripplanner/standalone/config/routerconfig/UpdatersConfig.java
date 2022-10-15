@@ -78,13 +78,15 @@ public class UpdatersConfig implements UpdatersParameters {
         rootAdapter.exist("vehicleRentalServiceDirectory")
           ? rootAdapter
             .of("vehicleRentalServiceDirectory")
-            .withDoc(NA, /*TODO DOC*/"TODO")
-            .withDescription(/*TODO DOC*/"TODO")
+            .since(NA)
+            .summary("TODO")
+            .description(/*TODO DOC*/"TODO")
             .asObject()
           : rootAdapter
             .of("bikeRentalServiceDirectory")
-            .withDoc(NA, /*TODO DOC*/"TODO")
-            .withDescription(/*TODO DOC*/"TODO")
+            .since(NA)
+            .summary("TODO")
+            .description(/*TODO DOC*/"TODO")
             .asObject() // TODO: deprecated, remove in next major version
       );
 
@@ -92,17 +94,19 @@ public class UpdatersConfig implements UpdatersParameters {
       timetableUpdates(
         rootAdapter
           .of("timetableUpdates")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
 
     rootAdapter
       .of("updaters")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
+      .description(/*TODO DOC*/"TODO")
       .asObjects(it -> {
-        Type type = it.of("type").withDoc(NA, /*TODO DOC*/"TODO").asEnum(Type.class);
+        Type type = it.of("type").since(NA).summary("TODO").asEnum(Type.class);
         var config = type.parseConfig(it);
         configList.put(type, config);
         // We do not care what we return here
@@ -123,11 +127,8 @@ public class UpdatersConfig implements UpdatersParameters {
     // TODO DOC - Deprecate c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(dflt.logFrequency())
 
     return new TimetableSnapshotSourceParameters(
-      c
-        .of("maxSnapshotFrequency")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asInt(dflt.maxSnapshotFrequencyMs()),
-      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dflt.purgeExpiredData())
+      c.of("maxSnapshotFrequency").since(NA).summary("TODO").asInt(dflt.maxSnapshotFrequencyMs()),
+      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(dflt.purgeExpiredData())
     );
   }
 

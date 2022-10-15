@@ -52,20 +52,23 @@ public class RoutingRequestMapper {
     vehicleRental.setAllowedNetworks(
       c
         .of("allowedVehicleRentalNetworks")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asStringSet(vehicleRental.allowedNetworks())
     );
-    request.setArriveBy(c.of("arriveBy").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.arriveBy()));
+    request.setArriveBy(c.of("arriveBy").since(NA).summary("TODO").asBoolean(dft.arriveBy()));
     vehicleParking.setBannedTags(
       c
         .of("bannedVehicleParkingTags")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asStringSet(vehicleParking.bannedTags())
     );
     vehicleRental.setBannedNetworks(
       c
         .of("bannedVehicleRentalNetworks")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asStringSet(vehicleRental.bannedNetworks())
     );
 
@@ -75,18 +78,20 @@ public class RoutingRequestMapper {
       .setAllowArrivingInRentedVehicleAtDestination(
         c
           .of("allowKeepingRentedBicycleAtDestination")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asBoolean(request.journey().rental().allowArrivingInRentedVehicleAtDestination())
       );
 
-    request.setLocale(c.of("locale").withDoc(NA, /*TODO DOC*/"TODO").asLocale(dft.locale()));
+    request.setLocale(c.of("locale").since(NA).summary("TODO").asLocale(dft.locale()));
 
     request
       .journey()
       .setModes(
         c
           .of("modes")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asCustomStringType(
             RequestModes.defaultRequestModes(),
             s -> new QualifiedModeSet(s).getRequestModes()
@@ -94,33 +99,37 @@ public class RoutingRequestMapper {
       );
 
     request.setNumItineraries(
-      c.of("numItineraries").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.numItineraries())
+      c.of("numItineraries").since(NA).summary("TODO").asInt(dft.numItineraries())
     );
     request.setSearchWindow(
-      c.of("searchWindow").withDoc(NA, /*TODO DOC*/"TODO").asDuration(dft.searchWindow())
+      c.of("searchWindow").since(NA).summary("TODO").asDuration(dft.searchWindow())
     );
     vehicleParking.setRequiredTags(
       c
         .of("requiredVehicleParkingTags")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asStringSet(vehicleParking.requiredTags())
     );
 
     request.setWheelchair(
       c
         .of("wheelchairAccessibility")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withDescription(/*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
+        .description(/*TODO DOC*/"TODO")
         .asObject()
         .of("enabled")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asBoolean(false)
     );
 
     NodeAdapter unpreferred = c
       .of("unpreferred")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
+      .description(/*TODO DOC*/"TODO")
       .asObject();
     request
       .journey()
@@ -128,7 +137,8 @@ public class RoutingRequestMapper {
       .setUnpreferredRoutes(
         unpreferred
           .of("routes")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
@@ -138,7 +148,8 @@ public class RoutingRequestMapper {
       .setUnpreferredAgencies(
         unpreferred
           .of("routes")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
 
@@ -162,19 +173,19 @@ public class RoutingRequestMapper {
       mapAccessibilityRequest(
         c
           .of("wheelchairAccessibility")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       )
     );
     preferences.withItineraryFilter(it -> {
-      /*TODO DOC*/
-      /*TODO DOC*/
       mapItineraryFilterParams(
         c
           .of("itineraryFilters")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject(),
         it
       );
@@ -189,13 +200,15 @@ public class RoutingRequestMapper {
           .withDefault(
             c
               .of("alightSlack")
-              .withDoc(NA, /*TODO DOC*/"TODO")
+              .since(NA)
+              .summary("TODO")
               .asDuration2(dft.alightSlack().defaultValue(), SECONDS)
           )
           .withValues(
             c
               .of("alightSlackForMode")
-              .withDoc(NA, /*TODO DOC*/"TODO")
+              .since(NA)
+              .summary("TODO")
               .asEnumMap(TransitMode.class, Duration.class)
           )
       )
@@ -204,38 +217,44 @@ public class RoutingRequestMapper {
           .withDefault(
             c
               .of("boardSlack")
-              .withDoc(NA, /*TODO DOC*/"TODO")
+              .since(NA)
+              .summary("TODO")
               .asDuration2(dft.boardSlack().defaultValue(), SECONDS)
           )
           .withValues(
             c
               .of("boardSlackForMode")
-              .withDoc(NA, /*TODO DOC*/"TODO")
+              .since(NA)
+              .summary("TODO")
               .asEnumMap(TransitMode.class, Duration.class)
           )
       )
       .setIgnoreRealtimeUpdates(
         c
           .of("ignoreRealtimeUpdates")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asBoolean(dft.ignoreRealtimeUpdates())
       )
       .setOtherThanPreferredRoutesPenalty(
         c
           .of("otherThanPreferredRoutesPenalty")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asInt(dft.otherThanPreferredRoutesPenalty())
       )
       .setReluctanceForMode(
         c
           .of("transitReluctanceForMode")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asEnumMap(TransitMode.class, Double.class)
       )
       .setUnpreferredCost(
         c
           .of("unpreferredRouteCost")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asLinearFunction(dft.unpreferredCost())
       );
   }
@@ -243,39 +262,26 @@ public class RoutingRequestMapper {
   private static void mapBikePreferences(NodeAdapter c, BikePreferences.Builder builder) {
     var dft = builder.original();
     builder
-      .withSpeed(c.of("bikeSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.speed()))
-      .withReluctance(
-        c.of("bikeReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.reluctance())
-      )
-      .withBoardCost(c.of("bikeBoardCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.boardCost()))
-      .withParkTime(c.of("bikeParkTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.parkTime()))
-      .withParkCost(c.of("bikeParkCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.parkCost()))
+      .withSpeed(c.of("bikeSpeed").since(NA).summary("TODO").asDouble(dft.speed()))
+      .withReluctance(c.of("bikeReluctance").since(NA).summary("TODO").asDouble(dft.reluctance()))
+      .withBoardCost(c.of("bikeBoardCost").since(NA).summary("TODO").asInt(dft.boardCost()))
+      .withParkTime(c.of("bikeParkTime").since(NA).summary("TODO").asInt(dft.parkTime()))
+      .withParkCost(c.of("bikeParkCost").since(NA).summary("TODO").asInt(dft.parkCost()))
       .withWalkingSpeed(
-        c.of("bikeWalkingSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.walkingSpeed())
+        c.of("bikeWalkingSpeed").since(NA).summary("TODO").asDouble(dft.walkingSpeed())
       )
       .withWalkingReluctance(
-        c
-          .of("bikeWalkingReluctance")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asDouble(dft.walkingReluctance())
+        c.of("bikeWalkingReluctance").since(NA).summary("TODO").asDouble(dft.walkingReluctance())
       )
-      .withSwitchTime(
-        c.of("bikeSwitchTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.switchTime())
-      )
-      .withSwitchCost(
-        c.of("bikeSwitchCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.switchCost())
-      )
-      .withOptimizeType(c.of("optimize").withDoc(NA, /*TODO DOC*/"TODO").asEnum(dft.optimizeType()))
+      .withSwitchTime(c.of("bikeSwitchTime").since(NA).summary("TODO").asInt(dft.switchTime()))
+      .withSwitchCost(c.of("bikeSwitchCost").since(NA).summary("TODO").asInt(dft.switchCost()))
+      .withOptimizeType(c.of("optimize").since(NA).summary("TODO").asEnum(dft.optimizeType()))
       .withOptimizeTriangle(it ->
         it
-          .withTime(
-            c.of("bikeTriangleTimeFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(it.time())
-          )
-          .withSlope(
-            c.of("bikeTriangleSlopeFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(it.slope())
-          )
+          .withTime(c.of("bikeTriangleTimeFactor").since(NA).summary("TODO").asDouble(it.time()))
+          .withSlope(c.of("bikeTriangleSlopeFactor").since(NA).summary("TODO").asDouble(it.slope()))
           .withSafety(
-            c.of("bikeTriangleSafetyFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(it.safety())
+            c.of("bikeTriangleSafetyFactor").since(NA).summary("TODO").asDouble(it.safety())
           )
       );
   }
@@ -287,27 +293,29 @@ public class RoutingRequestMapper {
     var dft = builder.original();
     builder
       .withDropoffCost(
-        c.of("bikeRentalDropoffCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.dropoffCost())
+        c.of("bikeRentalDropoffCost").since(NA).summary("TODO").asInt(dft.dropoffCost())
       )
       .withDropoffTime(
-        c.of("bikeRentalDropoffTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.dropoffTime())
+        c.of("bikeRentalDropoffTime").since(NA).summary("TODO").asInt(dft.dropoffTime())
       )
       .withPickupCost(
-        c.of("bikeRentalPickupCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.pickupCost())
+        c.of("bikeRentalPickupCost").since(NA).summary("TODO").asInt(dft.pickupCost())
       )
       .withPickupTime(
-        c.of("bikeRentalPickupTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.pickupTime())
+        c.of("bikeRentalPickupTime").since(NA).summary("TODO").asInt(dft.pickupTime())
       )
       .withUseAvailabilityInformation(
         c
           .of("useBikeRentalAvailabilityInformation")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asBoolean(dft.useAvailabilityInformation())
       )
       .withArrivingInRentalVehicleAtDestinationCost(
         c
           .of("keepingRentedBicycleAtDestinationCost")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.arrivingInRentalVehicleAtDestinationCost())
       );
   }
@@ -316,51 +324,56 @@ public class RoutingRequestMapper {
     var dft = builder.original();
     builder
       .withTurnReluctance(
-        c.of("turnReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.turnReluctance())
+        c.of("turnReluctance").since(NA).summary("TODO").asDouble(dft.turnReluctance())
       )
       .withDrivingDirection(
-        c.of("drivingDirection").withDoc(NA, /*TODO DOC*/"TODO").asEnum(dft.drivingDirection())
+        c.of("drivingDirection").since(NA).summary("TODO").asEnum(dft.drivingDirection())
       )
       .withElevator(elevator -> {
         var dftElevator = dft.elevator();
         elevator
           .withBoardCost(
-            c.of("elevatorBoardCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dftElevator.boardCost())
+            c.of("elevatorBoardCost").since(NA).summary("TODO").asInt(dftElevator.boardCost())
           )
           .withBoardTime(
-            c.of("elevatorBoardTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dftElevator.boardTime())
+            c.of("elevatorBoardTime").since(NA).summary("TODO").asInt(dftElevator.boardTime())
           )
           .withHopCost(
-            c.of("elevatorHopCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dftElevator.hopCost())
+            c.of("elevatorHopCost").since(NA).summary("TODO").asInt(dftElevator.hopCost())
           )
           .withHopTime(
-            c.of("elevatorHopTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dftElevator.hopTime())
+            c.of("elevatorHopTime").since(NA).summary("TODO").asInt(dftElevator.hopTime())
           );
       })
       .withMaxAccessEgressDuration(
         c
           .of("maxAccessEgressDuration")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDuration(dft.maxAccessEgressDuration().defaultValue()),
         c
           .of("maxAccessEgressDurationForMode")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withMaxDirectDuration(
         c
           .of("maxDirectStreetDuration")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDuration(dft.maxDirectDuration().defaultValue()),
         c
           .of("maxDirectStreetDurationForMode")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withIntersectionTraversalModel(
         c
           .of("intersectionTraversalModel")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asEnum(dft.intersectionTraversalModel())
       );
   }
@@ -368,28 +381,18 @@ public class RoutingRequestMapper {
   private static void mapCarPreferences(NodeAdapter c, CarPreferences.Builder builder) {
     var dft = builder.original();
     builder
-      .withSpeed(c.of("carSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.speed()))
-      .withReluctance(
-        c.of("carReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.reluctance())
-      )
-      .withDropoffTime(
-        c.of("carDropoffTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.dropoffTime())
-      )
-      .withParkCost(c.of("carParkCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.parkCost()))
-      .withParkTime(c.of("carParkTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.parkTime()))
-      .withPickupCost(c.of("carPickupCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.pickupCost()))
-      .withPickupTime(c.of("carPickupTime").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.pickupTime()))
+      .withSpeed(c.of("carSpeed").since(NA).summary("TODO").asDouble(dft.speed()))
+      .withReluctance(c.of("carReluctance").since(NA).summary("TODO").asDouble(dft.reluctance()))
+      .withDropoffTime(c.of("carDropoffTime").since(NA).summary("TODO").asInt(dft.dropoffTime()))
+      .withParkCost(c.of("carParkCost").since(NA).summary("TODO").asInt(dft.parkCost()))
+      .withParkTime(c.of("carParkTime").since(NA).summary("TODO").asInt(dft.parkTime()))
+      .withPickupCost(c.of("carPickupCost").since(NA).summary("TODO").asInt(dft.pickupCost()))
+      .withPickupTime(c.of("carPickupTime").since(NA).summary("TODO").asInt(dft.pickupTime()))
       .withAccelerationSpeed(
-        c
-          .of("carAccelerationSpeed")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asDouble(dft.accelerationSpeed())
+        c.of("carAccelerationSpeed").since(NA).summary("TODO").asDouble(dft.accelerationSpeed())
       )
       .withDecelerationSpeed(
-        c
-          .of("carDecelerationSpeed")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asDouble(dft.decelerationSpeed())
+        c.of("carDecelerationSpeed").since(NA).summary("TODO").asDouble(dft.decelerationSpeed())
       );
   }
 
@@ -397,24 +400,15 @@ public class RoutingRequestMapper {
     var dft = builder.original();
     builder
       .withGeoidElevation(
-        c.of("geoidElevation").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.geoidElevation())
+        c.of("geoidElevation").since(NA).summary("TODO").asBoolean(dft.geoidElevation())
       )
       .withMaxJourneyDuration(
-        c
-          .of("maxJourneyDuration")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asDuration(dft.maxJourneyDuration())
+        c.of("maxJourneyDuration").since(NA).summary("TODO").asDuration(dft.maxJourneyDuration())
       );
     if (OTPFeature.DataOverlay.isOn()) {
-      /*TODO DOC*/
-      /*TODO DOC*/
       builder.withDataOverlay(
         DataOverlayParametersMapper.map(
-          c
-            .of("dataOverlay")
-            .withDoc(NA, /*TODO DOC*/"TODO")
-            .withDescription(/*TODO DOC*/"TODO")
-            .asObject()
+          c.of("dataOverlay").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
         )
       );
     }
@@ -424,22 +418,20 @@ public class RoutingRequestMapper {
     var dft = tx.original();
     tx
       .withNonpreferredCost(
-        c
-          .of("nonpreferredTransferPenalty")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asInt(dft.nonpreferredCost())
+        c.of("nonpreferredTransferPenalty").since(NA).summary("TODO").asInt(dft.nonpreferredCost())
       )
-      .withCost(c.of("transferPenalty").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.cost()))
-      .withSlack(c.of("transferSlack").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.slack()))
+      .withCost(c.of("transferPenalty").since(NA).summary("TODO").asInt(dft.cost()))
+      .withSlack(c.of("transferSlack").since(NA).summary("TODO").asInt(dft.slack()))
       .withWaitReluctance(
-        c.of("waitReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.waitReluctance())
+        c.of("waitReluctance").since(NA).summary("TODO").asDouble(dft.waitReluctance())
       )
       .withOptimization(
         mapTransferOptimization(
           c
             .of("transferOptimization")
-            .withDoc(NA, /*TODO DOC*/"TODO")
-            .withDescription(/*TODO DOC*/"TODO")
+            .since(NA)
+            .summary("TODO")
+            .description(/*TODO DOC*/"TODO")
             .asObject()
         )
       );
@@ -459,19 +451,17 @@ public class RoutingRequestMapper {
   private static void mapWalkPreferences(NodeAdapter c, WalkPreferences.Builder walk) {
     var dft = walk.original();
     walk
-      .withSpeed(c.of("walkSpeed").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.speed()))
-      .withReluctance(
-        c.of("walkReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.reluctance())
-      )
-      .withBoardCost(c.of("walkBoardCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(dft.boardCost()))
+      .withSpeed(c.of("walkSpeed").since(NA).summary("TODO").asDouble(dft.speed()))
+      .withReluctance(c.of("walkReluctance").since(NA).summary("TODO").asDouble(dft.reluctance()))
+      .withBoardCost(c.of("walkBoardCost").since(NA).summary("TODO").asInt(dft.boardCost()))
       .withStairsReluctance(
-        c.of("stairsReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.stairsReluctance())
+        c.of("stairsReluctance").since(NA).summary("TODO").asDouble(dft.stairsReluctance())
       )
       .withStairsTimeFactor(
-        c.of("stairsTimeFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.stairsTimeFactor())
+        c.of("stairsTimeFactor").since(NA).summary("TODO").asDouble(dft.stairsTimeFactor())
       )
       .withSafetyFactor(
-        c.of("walkSafetyFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(dft.safetyFactor())
+        c.of("walkSafetyFactor").since(NA).summary("TODO").asDouble(dft.safetyFactor())
       );
   }
 
@@ -482,25 +472,29 @@ public class RoutingRequestMapper {
       .withOptimizeTransferWaitTime(
         c
           .of("optimizeTransferWaitTime")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asBoolean(dft.optimizeTransferWaitTime())
       )
       .withMinSafeWaitTimeFactor(
         c
           .of("minSafeWaitTimeFactor")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.minSafeWaitTimeFactor())
       )
       .withBackTravelWaitTimeFactor(
         c
           .of("backTravelWaitTimeFactor")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.backTravelWaitTimeFactor())
       )
       .withExtraStopBoardAlightCostsFactor(
         c
           .of("extraStopBoardAlightCostsFactor")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.extraStopBoardAlightCostsFactor())
       )
       .build();

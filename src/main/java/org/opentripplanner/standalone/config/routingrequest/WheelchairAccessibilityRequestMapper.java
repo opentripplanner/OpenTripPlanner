@@ -12,31 +12,29 @@ public class WheelchairAccessibilityRequestMapper {
   static WheelchairPreferences mapAccessibilityRequest(NodeAdapter a) {
     return new WheelchairPreferences(
       mapAccessibilityFeature(
-        a.of("trip").withDoc(NA, /*TODO DOC*/"TODO").withDescription(/*TODO DOC*/"TODO").asObject(),
+        a.of("trip").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject(),
         DEFAULT.trip()
       ),
       mapAccessibilityFeature(
-        a.of("stop").withDoc(NA, /*TODO DOC*/"TODO").withDescription(/*TODO DOC*/"TODO").asObject(),
+        a.of("stop").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject(),
         DEFAULT.stop()
       ),
       mapAccessibilityFeature(
-        a
-          .of("elevator")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject(),
+        a.of("elevator").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject(),
         DEFAULT.elevator()
       ),
       a
         .of("inaccessibleStreetReluctance")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDouble(DEFAULT.inaccessibleStreetReluctance()),
-      a.of("maxSlope").withDoc(NA, /*TODO DOC*/"TODO").asDouble(DEFAULT.maxSlope()),
+      a.of("maxSlope").since(NA).summary("TODO").asDouble(DEFAULT.maxSlope()),
       a
         .of("slopeExceededReluctance")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDouble(DEFAULT.slopeExceededReluctance()),
-      a.of("stairsReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(DEFAULT.stairsReluctance())
+      a.of("stairsReluctance").since(NA).summary("TODO").asDouble(DEFAULT.stairsReluctance())
     );
   }
 
@@ -46,14 +44,12 @@ public class WheelchairAccessibilityRequestMapper {
   ) {
     var onlyAccessible = adapter
       .of("onlyConsiderAccessible")
-      .withDoc(NA, /*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
       .asBoolean(defaultValue.onlyConsiderAccessible());
 
-    var unknownCost = adapter.of("unknownCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(60 * 10);
-    var inaccessibleCost = adapter
-      .of("inaccessibleCost")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .asInt(60 * 60);
+    var unknownCost = adapter.of("unknownCost").since(NA).summary("TODO").asInt(60 * 10);
+    var inaccessibleCost = adapter.of("inaccessibleCost").since(NA).summary("TODO").asInt(60 * 60);
     if (onlyAccessible) {
       return AccessibilityPreferences.ofOnlyAccessible();
     } else {

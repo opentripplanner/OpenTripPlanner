@@ -66,29 +66,30 @@ public class VehicleRentalSourceFactory {
   }
 
   private String language() {
-    return c.of("language").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
+    return c.of("language").since(NA).summary("TODO").asString(null);
   }
 
   private Map<String, String> headers() {
-    return c.of("headers").withDoc(NA, /*TODO DOC*/"TODO").asStringMap();
+    return c.of("headers").since(NA).summary("TODO").asStringMap();
   }
 
   private String url() {
-    return c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString();
+    return c.of("url").since(NA).summary("TODO").asString();
   }
 
   private String network() {
-    return c.of("network").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
+    return c.of("network").since(NA).summary("TODO").asString(null);
   }
 
   private boolean allowKeepingRentedVehicleAtDestination() {
     return c
       .of("allowKeepingRentedBicycleAtDestination")
-      .withDoc(NA, /*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
       .asBoolean(false);
   }
 
   private boolean allowOverloading() {
-    return c.of("allowOverloading").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    return c.of("allowOverloading").since(NA).summary("TODO").asBoolean(false);
   }
 }

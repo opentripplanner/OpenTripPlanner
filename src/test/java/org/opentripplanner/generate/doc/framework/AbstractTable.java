@@ -66,7 +66,8 @@ abstract class AbstractTable {
   }
 
   String defaultValue(NodeInfo info) {
-    return info.defaultValue() == null ? "" :
-      writer.code(info.type().quote(writer.escapeInTable(info.defaultValue())));
+    return info.defaultValue() == null
+      ? ""
+      : writer.code(info.type().quote(writer.escapeInTable(info.defaultValue())));
   }
 }

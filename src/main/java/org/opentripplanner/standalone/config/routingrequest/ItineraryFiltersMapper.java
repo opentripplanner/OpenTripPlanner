@@ -23,31 +23,35 @@ public class ItineraryFiltersMapper {
     var dft = builder.original();
 
     builder
-      .withDebug(c.of("debug").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(dft.debug()))
+      .withDebug(c.of("debug").since(NA).summary("TODO").asBoolean(dft.debug()))
       .withGroupSimilarityKeepOne(
         c
           .of("groupSimilarityKeepOne")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.groupSimilarityKeepOne())
       )
       .withGroupSimilarityKeepThree(
         c
           .of("groupSimilarityKeepThree")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.groupSimilarityKeepThree())
       )
       .withGroupedOtherThanSameLegsMaxCostMultiplier(
         c
           .of("groupedOtherThanSameLegsMaxCostMultiplier")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.groupedOtherThanSameLegsMaxCostMultiplier())
       )
       .withTransitGeneralizedCostLimit(
         parseTransitGeneralizedCostLimit(
           c
             .of("transitGeneralizedCostLimit")
-            .withDoc(NA, /*TODO DOC*/"TODO")
-            .withDescription(/*TODO DOC*/"TODO")
+            .since(NA)
+            .summary("TODO")
+            .description(/*TODO DOC*/"TODO")
             .asObject(),
           dft.transitGeneralizedCostLimit()
         )
@@ -55,37 +59,39 @@ public class ItineraryFiltersMapper {
       .withNonTransitGeneralizedCostLimit(
         c
           .of("nonTransitGeneralizedCostLimit")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
       .withBikeRentalDistanceRatio(
         c
           .of("bikeRentalDistanceRatio")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.bikeRentalDistanceRatio())
       )
       .withParkAndRideDurationRatio(
         c
           .of("parkAndRideDurationRatio")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(dft.parkAndRideDurationRatio())
       )
       .withFilterItinerariesWithSameFirstOrLastTrip(
         c
           .of("filterItinerariesWithSameFirstOrLastTrip")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip())
       )
       .withAccessibilityScore(
-        c
-          .of("accessibilityScore")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .asBoolean(dft.useAccessibilityScore())
+        c.of("accessibilityScore").since(NA).summary("TODO").asBoolean(dft.useAccessibilityScore())
       )
       .withRemoveItinerariesWithSameRoutesAndStops(
         c
           .of("removeItinerariesWithSameRoutesAndStops")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asBoolean(dft.removeItinerariesWithSameRoutesAndStops())
       )
       .build();
@@ -103,11 +109,13 @@ public class ItineraryFiltersMapper {
       return new TransitGeneralizedCostFilterParams(
         node
           .of("costLimitFunction")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
         node
           .of("intervalRelaxFactor")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
       );
     }

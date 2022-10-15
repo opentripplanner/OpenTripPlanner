@@ -16,19 +16,21 @@ public class DemConfig {
     return new DemExtractParametersList(
       root
         .of(parameterName)
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withDescription(/*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
+        .description(/*TODO DOC*/"TODO")
         .asObjects(DemConfig::mapDemExtract)
     );
   }
 
   private static DemExtractParameters mapDemExtract(NodeAdapter config) {
     return new DemExtractParametersBuilder()
-      .withSource(config.of("source").withDoc(NA, /*TODO DOC*/"TODO").asUri())
+      .withSource(config.of("source").since(NA).summary("TODO").asUri())
       .withElevationUnitMultiplier(
         config
           .of("elevationUnitMultiplier")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asDoubleOptional()
           .orElse(null)
       )

@@ -18,29 +18,24 @@ public abstract class SiriAzureUpdaterConfig {
     NodeAdapter c
   ) {
     parameters.setConfigRef(configRef);
-    parameters.setServiceBusUrl(
-      c.of("servicebus-url").withDoc(NA, /*TODO DOC*/"TODO").asString(null)
-    );
-    parameters.setTopicName(c.of("topic").withDoc(NA, /*TODO DOC*/"TODO").asString(null));
-    parameters.setFeedId(c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null));
+    parameters.setServiceBusUrl(c.of("servicebus-url").since(NA).summary("TODO").asString(null));
+    parameters.setTopicName(c.of("topic").since(NA).summary("TODO").asString(null));
+    parameters.setFeedId(c.of("feedId").since(NA).summary("TODO").asString(null));
     parameters.setFuzzyTripMatching(
-      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
+      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false)
     );
 
     if (c.exist("history")) {
-      /*TODO DOC*/
-      /*TODO DOC*/
       NodeAdapter history = c
         .of("history")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withDescription(/*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
+        .description(/*TODO DOC*/"TODO")
         .asObject();
-      /*TODO DOC*/
-      /*TODO DOC*/
       parameters.setDataInitializationUrl(
-        history.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(null)
+        history.of("url").since(NA).summary("TODO").asString(null)
       );
-      parameters.setTimeout(history.of("timeout").withDoc(NA, /*TODO DOC*/"TODO").asInt(300000));
+      parameters.setTimeout(history.of("timeout").since(NA).summary("TODO").asInt(300000));
     }
   }
 

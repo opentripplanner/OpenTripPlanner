@@ -11,14 +11,15 @@ public class MqttGtfsRealtimeUpdaterConfig {
   public static MqttGtfsRealtimeUpdaterParameters create(String configRef, NodeAdapter c) {
     return new MqttGtfsRealtimeUpdaterParameters(
       configRef,
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("topic").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("qos").withDoc(NA, /*TODO DOC*/"TODO").asInt(0),
-      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+      c.of("feedId").since(NA).summary("TODO").asString(null),
+      c.of("url").since(NA).summary("TODO").asString(),
+      c.of("topic").since(NA).summary("TODO").asString(),
+      c.of("qos").since(NA).summary("TODO").asInt(0),
+      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false),
       c
         .of("backwardsDelayPropagationType")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA)
     );
   }
