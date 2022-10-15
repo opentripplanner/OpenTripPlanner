@@ -482,28 +482,60 @@ public class BuildConfig implements OtpDataStoreConfig {
   public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    areaVisibility = root.of("areaVisibility").since(NA).summary("TODO").asBoolean(false);
+    areaVisibility =
+      root
+        .of("areaVisibility")
+        .since(NA)
+        .summary("Perform visibility calculations.")
+        .description(
+          "If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming)."
+        )
+        .asBoolean(false);
     banDiscouragedWalking =
-      root.of("banDiscouragedWalking").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("banDiscouragedWalking")
+        .since(NA)
+        .summary("Should walking be allowed on OSM ways tagged with `foot=discouraged`")
+        .asBoolean(false);
     banDiscouragedBiking =
-      root.of("banDiscouragedBiking").since(NA).summary("TODO").asBoolean(false);
-    configVersion = root.of("configVersion").since(NA).summary("TODO DOC").asString(null);
-    dataImportReport = root.of("dataImportReport").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("banDiscouragedBiking")
+        .since(NA)
+        .summary("Should biking be allowed on OSM ways tagged with `bicycle=discouraged`")
+        .asBoolean(false);
+    configVersion =
+      root
+        .of("configVersion")
+        .since(NA)
+        .summary("Deployment version of the *build-config.json*.")
+        .description(
+          """
+          The config-version is a parameter which each OTP deployment may set to be able to query
+          the OTP server and verify that it uses the correct version of the config. The version
+          must be injected into the config in the operation deployment pipeline. How this is done
+          is up to the deployment.
+          <p>
+          The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+          or format check on the version and it can be any string.
+          <p>
+          Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+          """
+        )
+        .asString(null);
+    dataImportReport =
+      root
+        .of("dataImportReport")
+        .since(NA)
+        .summary("Generate nice HTML report of Graph errors/warnings")
+        .description("The reports are stored in the same location as the graph.")
+        .asBoolean(false);
     distanceBetweenElevationSamples =
       root
         .of("distanceBetweenElevationSamples")
         .since(NA)
         .summary("TODO")
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
-    elevationBucket =
-      S3BucketConfig.fromConfig(
-        root
-          .of("elevationBucket")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
     elevationUnitMultiplier =
       root.of("elevationUnitMultiplier").since(NA).summary("TODO").asDouble(1);
     embedRouterConfig = root.of("embedRouterConfig").since(NA).summary("TODO").asBoolean(true);
