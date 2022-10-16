@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip;
 
-import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
 public class PollingTripUpdaterParameters
@@ -13,7 +12,6 @@ public class PollingTripUpdaterParameters
   private final boolean fuzzyTripMatching;
   private final BackwardsDelayPropagationType backwardsDelayPropagationType;
 
-  // Source
   private final String feedId;
   private final String httpSourceUrl;
   private final String fileSource;
