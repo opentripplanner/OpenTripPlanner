@@ -1,68 +1,56 @@
 package org.opentripplanner.generate.doc;
 
-import static org.opentripplanner.generate.doc.framework.DeprecatedParametersTable.createDeprecatedParametersTable;
 import static org.opentripplanner.generate.doc.framework.ParameterDetailsList.listParametersWithDetails;
-import static org.opentripplanner.generate.doc.framework.ParametersTable.createParametersTable;
+import static org.opentripplanner.generate.doc.framework.ParameterSummaryTable.createParametersTable;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Set;
 import org.opentripplanner.generate.doc.framework.MarkDownDocWriter;
+import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
 public class BuildConfigUserGuideDocPrinter {
 
-  private static final Set<String> SKIP_OBJECTS = Set.of("dataOverlay");
+  private static final File OUT_FILE = new File("docs", "BuildConfiguration-generated.md");
+  private static final String BUILD_CONFIG_FILENAME = "standalone/config/build-config.json";
+  private static final SkipNodes SKIP_NODES = SkipNodes.of(
+    "dataOverlay",
+    "/docs/sandbox/DataOverlay.md",
+    "transferRequests",
+    "/docs/RoutingRequest.md"
+  );
 
-  private final MarkDownDocWriter out;
-  private final BuildConfigTemplate template;
-
-  public BuildConfigUserGuideDocPrinter(BuildConfigTemplate template, MarkDownDocWriter out) {
-    this.template = template;
-    this.out = out;
-  }
+  private final MarkDownDocWriter out = MarkDownDocWriter.create(OUT_FILE);
 
   public static void main(String[] args) throws FileNotFoundException {
-    var out = new PrintStream(
-      new FileOutputStream(new File("docs", "BuildConfiguration-generated.md"))
-    );
-    var printer = new BuildConfigUserGuideDocPrinter(
-      new BuildConfigTemplate(),
-      new MarkDownDocWriter(out)
-    );
-
-    String source = "standalone/config/build-config.json";
-    var json = jsonNodeFromResource(source);
-    var conf = new BuildConfig(json, source, false);
-    printer.write(conf.asNodeAdapter());
+    var printer = new BuildConfigUserGuideDocPrinter();
+    var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
+    var conf = new BuildConfig(json, BUILD_CONFIG_FILENAME, false);
+    var node = conf.asNodeAdapter();
+    printer.write(node);
   }
 
   public void write(NodeAdapter node) {
-    out.printDocTitle(template.title());
-    out.printSection(template.introduction());
+    out.printDocTitle(BuildConfigTemplate.TITLE);
+    out.printSection(BuildConfigTemplate.INTRODUCTION);
 
     out.printHeader1("Overview");
-    out.printSection(template.overview());
+    out.printSection(BuildConfigTemplate.OVERVIEW);
 
-    out.printHeader2("Parameters");
-    out.printSection(template.parameters());
-    createParametersTable(node, out, this::skipObject);
+    out.printHeader2("Parameters", null);
+    out.printSection(BuildConfigTemplate.PARAMETERS);
+    createParametersTable(node, out, SKIP_NODES);
 
-    out.printHeader2("Deprecated Parameters");
+    /* Add support for listing deprecated parameters (old, not in use parameters)
+    out.printHeader2("Deprecated Parameters", null);
     out.printSection(template.parametersDeprecated());
     createDeprecatedParametersTable(node, out, this::skipObject);
+    */
 
     out.printHeader1("Parameter Details");
-    out.printSection(template.parameterDetails());
-    listParametersWithDetails(node, out, this::skipObject);
-  }
-
-  private boolean skipObject(NodeInfo it) {
-    return SKIP_OBJECTS.contains(it.name());
+    out.printSection(BuildConfigTemplate.PARAMETER_DETAILS);
+    listParametersWithDetails(node, out, SKIP_NODES);
   }
 }

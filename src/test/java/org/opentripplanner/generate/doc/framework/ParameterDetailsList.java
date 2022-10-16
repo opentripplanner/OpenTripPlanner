@@ -1,6 +1,5 @@
 package org.opentripplanner.generate.doc.framework;
 
-import java.util.function.Predicate;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -10,27 +9,27 @@ public class ParameterDetailsList {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParameterDetailsList.class);
 
-  private final Predicate<NodeInfo> skipObjectOp;
+  private final SkipFunction skipNodeOp;
   private final MarkDownDocWriter writer;
 
-  public ParameterDetailsList(MarkDownDocWriter writer, Predicate<NodeInfo> skipObjectOp) {
+  public ParameterDetailsList(MarkDownDocWriter writer, SkipFunction skipNodeOp) {
     this.writer = writer;
-    this.skipObjectOp = skipObjectOp;
+    this.skipNodeOp = skipNodeOp;
   }
 
   public static void listParametersWithDetails(
     NodeAdapter root,
     MarkDownDocWriter out,
-    Predicate<NodeInfo> skipObjectOp
+    SkipFunction skipNodeOp
   ) {
-    new ParameterDetailsList(out, skipObjectOp).addParametersList(root);
+    new ParameterDetailsList(out, skipNodeOp).addParametersList(root);
   }
 
   private void addParametersList(NodeAdapter node) {
     for (NodeInfo it : node.parametersSorted()) {
       printNode(node, it);
 
-      if (it.type().isComplex() && !skipObjectOp.test(it)) {
+      if (it.type().isComplex() && !skipNodeOp.skip(it)) {
         var child = node.child(it.name());
         if (child != null && !child.isEmpty()) {
           addParametersList(child);
@@ -46,33 +45,36 @@ public class ParameterDetailsList {
     if (!it.printDetails()) {
       return;
     }
-    writer.printHeader3(node.fullPath(it.name()));
-    writer.printSection(writer.em(parameterSummaryLine(it)));
+    writer.printHeader2(it.name(), node.fullPath(it.name()));
+    writer.printSection(DocFormatter.em(parameterSummaryLine(it, node.contextPath())));
     writer.printSection(it.summary());
     //noinspection ConstantConditions
     writer.printSection(it.description());
   }
 
-  String parameterSummaryLine(NodeInfo info) {
+  String parameterSummaryLine(NodeInfo info, String path) {
     var buf = new StringBuilder();
     var delimiter = " ∙ ";
     buf
-      .append("Since version ")
-      .append(info.since())
+      .append("Since version: ")
+      .append(DocFormatter.code(info.since()))
       .append(delimiter)
       .append("Type: ")
-      .append(writer.code(info.type().docName()))
+      .append(DocFormatter.code(info.type().docName()))
       .append(delimiter)
-      .append(info.required() ? "Required" : "Optional")
-      .append(' ');
+      .append(DocFormatter.code(info.required() ? "Required" : "Optional"))
+      .append(delimiter);
 
-    if (info.defaultValue() != null) {
-      buf.append(delimiter).append("Default vaule: ").append(defaultValue(info));
+    if (info.type().isSimple() && info.defaultValue() != null) {
+      buf.append("Default value: ").append(defaultValue(info)).append(delimiter);
     }
+    buf.append("Path: ").append(DocFormatter.code(path == null ? "Root" : path));
+
     return buf.toString();
   }
 
   String defaultValue(NodeInfo info) {
-    return writer.code(info.type().quote(info.defaultValue()));
+    var defautlValue = info.defaultValue();
+    return defautlValue == null ? "" : DocFormatter.code(info.type().quote(defautlValue));
   }
 }

@@ -1,5 +1,7 @@
 package org.opentripplanner.util.lang;
 
+import java.util.Arrays;
+
 /**
  * OTP String utils extending the Java lang String...
  */
@@ -45,10 +47,20 @@ public class StringUtils {
    *
    * @return the given buffer input for convenient chaining.
    */
-  public static StringBuilder pad(StringBuilder buffer, char ch, int newLenght) {
-    while (buffer.length() < newLenght) {
+  public static StringBuilder pad(StringBuilder buffer, char ch, int newLength) {
+    while (buffer.length() < newLength) {
       buffer.append(ch);
     }
     return buffer;
+  }
+
+  /**
+   * Create a new String with the given {@code length} and all characters set to the given {@code ch}
+   * character.
+   */
+  public static String fill(char ch, int length) {
+    char[] array = new char[length];
+    Arrays.fill(array, ch);
+    return new String(array);
   }
 }

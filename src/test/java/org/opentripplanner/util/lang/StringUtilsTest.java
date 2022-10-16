@@ -44,4 +44,9 @@ class StringUtilsTest {
     assertEquals("ABC", StringUtils.pad(new StringBuilder("ABC"), '+', 3).toString());
     assertEquals("ABC", StringUtils.pad(new StringBuilder("ABC"), '+', 0).toString());
   }
+
+  @Test
+  void fill() {
+    assertEquals("$$$", StringUtils.fill('$', 3));
+  }
 }

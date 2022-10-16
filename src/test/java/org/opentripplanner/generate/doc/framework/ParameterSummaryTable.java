@@ -1,28 +1,27 @@
 package org.opentripplanner.generate.doc.framework;
 
 import java.util.List;
-import java.util.function.Predicate;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
-public class ParametersTable extends AbstractTable {
+public class ParameterSummaryTable extends AbstractTable {
 
-  public ParametersTable(MarkDownDocWriter writer, Predicate<NodeInfo> skipObjectOp) {
-    super(writer, skipObjectOp);
+  public ParameterSummaryTable(SkipFunction skipFunction) {
+    super(skipFunction);
   }
 
   public static void createParametersTable(
     NodeAdapter root,
     MarkDownDocWriter out,
-    Predicate<NodeInfo> skipObjectOp
+    SkipFunction skipFunction
   ) {
-    var table = new ParametersTable(out, skipObjectOp).createTable(root);
+    var table = new ParameterSummaryTable(skipFunction).createTable(root);
     out.printTable(table);
   }
 
   @Override
   List<String> headers() {
-    return List.of("Config Parameter", "Type", "Req./Opt.", "Default Value", "Since", "Summary");
+    return List.of("Config Parameter", "Type", "Summary", "Req./Opt.", "Default Value", "Since");
   }
 
   @Override
@@ -33,11 +32,11 @@ public class ParametersTable extends AbstractTable {
     table.add(
       List.of(
         parameterNameIndented(node, info),
-        writer().code(info.type().docName()),
+        DocFormatter.code(info.type().docName()),
+        info.summary(),
         requiredOrOptional(info),
-        defaultValue(info),
-        info.since(),
-        info.summary()
+        info.type().isSimple() ? defaultValue(info) : "",
+        info.since()
       )
     );
   }

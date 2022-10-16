@@ -43,7 +43,8 @@ public record NodeInfo(
   boolean required,
   boolean skipChild,
   @Nullable DeprecatedInfo deprecated
-) {
+)
+  implements Comparable<NodeInfo> {
   public NodeInfo {
     Objects.requireNonNull(name);
     Objects.requireNonNull(type);
@@ -80,7 +81,7 @@ public record NodeInfo(
    * the case where there is more info than the info listed in the summary section.
    */
   public boolean printDetails() {
-    return description != null;
+    return description != null || type.isMapOrArray();
   }
 
   public boolean isDeprecated() {
@@ -133,6 +134,21 @@ public record NodeInfo(
     builder.addText(" Since ").addText(since.toString());
 
     return builder.toString();
+  }
+
+  /**
+   * NodeInfo's are sorted by:
+   * <ol>
+   *   <li>simple before complex types</li>
+   *   <li>alphabetical on name</li>
+   * </ol>
+   */
+  @Override
+  public int compareTo(NodeInfo other) {
+    if (type.isSimple() != other.type.isSimple()) {
+      return type.isSimple() ? -1 : 1;
+    }
+    return name.compareTo(other.name);
   }
 
   @SuppressWarnings("ConstantConditions")
