@@ -2,7 +2,6 @@
   "updaters": [
     {
       "type": "vehicle-positions",
-      "sourceType": "gtfs-rt-http",
       "url": "https://www.rtd-denver.com/files/gtfs-rt/VehiclePosition.pb",
       "feedId": "1",
       "frequencySec": 60
