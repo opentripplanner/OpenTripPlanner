@@ -199,7 +199,7 @@ public class StopTimesHelper {
     List<LocalDate> serviceDates = startDate.datesUntil(endDate.plusDays(1)).toList();
 
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
-    // relay on the trip times to be in order because of real-time updates. This code can
+    // rely on the trip times to be in order because of real-time updates. This code can
     // probably be optimized, and the trip search in the Raptor search does almost the same
     // thing. This is no part of a routing request, but is a used frequently in some
     // operation like Entur for "departure boards" (apps, widgets, screens on platforms, and
