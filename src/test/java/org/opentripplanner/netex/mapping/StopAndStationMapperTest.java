@@ -218,9 +218,7 @@ public class StopAndStationMapperTest {
         VehicleModeEnumeration.TRAM
       );
 
-    if (isolated) {
-      stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
-    }
+    stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
 
     stopPlaces.add(stopPlace);
     StopAndStationMapper stopMapper = new StopAndStationMapper(
