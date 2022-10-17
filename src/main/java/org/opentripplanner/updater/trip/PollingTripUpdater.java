@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * rt.type = stop-time-updater
  * rt.frequencySec = 60
- * rt.sourceType = gtfs-http
  * rt.url = http://host.tld/path
  * rt.feedId = TA
  * </pre>
@@ -120,14 +119,15 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   }
 
   private static TripUpdateSource createSource(PollingTripUpdaterParameters parameters) {
-    switch (parameters.getSourceType()) {
-      case GTFS_RT_HTTP:
-        return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());
-      case GTFS_RT_FILE:
-        return new GtfsRealtimeFileTripUpdateSource(parameters.fileSourceParameters());
+    if (parameters.httpSourceParameters().getUrl() != null) {
+      return new GtfsRealtimeHttpTripUpdateSource(parameters.httpSourceParameters());
+    } else if (parameters.fileSourceParameters().getFile() != null) {
+      return new GtfsRealtimeFileTripUpdateSource(parameters.fileSourceParameters());
+    } else {
+      throw new IllegalArgumentException(
+        "Need either a url or file argument to construct a" +
+        PollingTripUpdater.class.getSimpleName()
+      );
     }
-    throw new IllegalArgumentException(
-      "Unknown update streamer source type: " + parameters.getSourceType()
-    );
   }
 }

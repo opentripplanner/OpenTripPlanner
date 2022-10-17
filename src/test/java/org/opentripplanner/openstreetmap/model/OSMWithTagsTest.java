@@ -113,6 +113,22 @@ public class OSMWithTagsTest {
   }
 
   @Test
+  public void testBicycleDenied() {
+    OSMWithTags tags = new OSMWithTags();
+    assertFalse(tags.isBicycleExplicitlyDenied());
+
+    for (var allowedValue : List.of("yes", "unknown", "somevalue")) {
+      tags.addTag("bicycle", allowedValue);
+      assertFalse(tags.isBicycleExplicitlyDenied(), "bicycle=" + allowedValue);
+    }
+
+    for (var deniedValue : List.of("no", "dismount", "license", "use_sidepath")) {
+      tags.addTag("bicycle", deniedValue);
+      assertTrue(tags.isBicycleExplicitlyDenied(), "bicycle=" + deniedValue);
+    }
+  }
+
+  @Test
   public void getReferenceTags() {
     var osm = new OSMWithTags();
     osm.addTag("ref", "A");

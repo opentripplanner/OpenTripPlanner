@@ -25,7 +25,6 @@ import uk.org.siri.siri20.Siri;
  * <pre>
  * rt.type = stop-time-updater
  * rt.frequencySec = 60
- * rt.sourceType = gtfs-http
  * rt.url = http://host.tld/path
  * rt.feedId = TA
  * </pre>

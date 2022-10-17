@@ -82,6 +82,119 @@ public class WayPropertySetSourceTest {
     assertEquals(1, wps.getDataForWay(withFoo).getBicycleSafetyFeatures().back());
   }
 
+  public void testAccessNo() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("access", "no");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testAccessPrivate() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("access", "private");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testFootModifier() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("access", "private");
+    tags.addTag("foot", "yes");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testVehicleDenied() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("vehicle", "destination");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testVehicleDeniedMotorVehiclePermissive() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("vehicle", "destination");
+    tags.addTag("motor_vehicle", "designated");
+
+    assertFalse(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testVehicleDeniedBicyclePermissive() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("vehicle", "destination");
+    tags.addTag("bicycle", "designated");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testMotorcycleModifier() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("access", "private");
+    tags.addTag("motor_vehicle", "yes");
+
+    assertFalse(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testBicycleModifier() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("access", "private");
+    tags.addTag("bicycle", "yes");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
+  @Test
+  public void testBicyclePermissive() {
+    OSMWithTags tags = new OSMWithTags();
+    WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+
+    tags.addTag("access", "private");
+    tags.addTag("bicycle", "permissive");
+
+    assertTrue(wayPropertySetSource.isMotorVehicleThroughTrafficExplicitlyDisallowed(tags));
+    assertFalse(wayPropertySetSource.isBicycleNoThroughTrafficExplicitlyDisallowed(tags));
+    assertTrue(wayPropertySetSource.isWalkNoThroughTrafficExplicitlyDisallowed(tags));
+  }
+
   public OSMWithTags way(String key, String value) {
     var way = new OSMWithTags();
     way.addTag(key, value);

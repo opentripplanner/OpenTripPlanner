@@ -1,5 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+
 /**
  * Describes how unnamed OSM ways are to be named based on the tags they possess. The CreativeNamer
  * will be applied to ways that match the OSMSpecifier.
@@ -8,7 +10,7 @@ package org.opentripplanner.graph_builder.module.osm;
  */
 public class CreativeNamerPicker {
 
-  public OSMSpecifier specifier;
+  public OsmSpecifier specifier;
   public CreativeNamer namer;
 
   public CreativeNamerPicker() {
@@ -16,7 +18,7 @@ public class CreativeNamerPicker {
     namer = null;
   }
 
-  public CreativeNamerPicker(OSMSpecifier specifier, CreativeNamer namer) {
+  public CreativeNamerPicker(OsmSpecifier specifier, CreativeNamer namer) {
     this.specifier = specifier;
     this.namer = namer;
   }
