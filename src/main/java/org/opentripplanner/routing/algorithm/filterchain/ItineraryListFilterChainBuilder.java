@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
@@ -33,6 +32,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilt
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -57,7 +57,7 @@ public class ItineraryListFilterChainBuilder {
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
-  private DoubleFunction<Double> nonTransitGeneralizedCostLimit;
+  private DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
@@ -147,7 +147,7 @@ public class ItineraryListFilterChainBuilder {
    * non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
    */
   public ItineraryListFilterChainBuilder withNonTransitGeneralizedCostLimit(
-    DoubleFunction<Double> value
+    DoubleAlgorithmFunction value
   ) {
     this.nonTransitGeneralizedCostLimit = value;
     return this;

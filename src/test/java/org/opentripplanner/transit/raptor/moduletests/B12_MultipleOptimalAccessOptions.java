@@ -3,9 +3,8 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.STANDARD;
@@ -17,6 +16,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
@@ -79,9 +80,13 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
     // We will test board- and alight-slack in a separate test
     requestBuilder.slackProvider(defaultSlackProvider(D1m, D0s, D0s));
 
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_A, D0s), flex(STOP_C, D11m));
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D0s), flex(STOP_C, D11m));
 
-    data.withTransfer(STOP_B, walk(STOP_C, D2m)).withTransfer(STOP_C, walk(STOP_D, D2m));
+    data
+      .withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D2m))
+      .withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D2m));
 
     // Set ModuleTestDebugLogging.DEBUG=true to enable debugging output
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
@@ -106,7 +111,7 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
   @Test
   public void standardReverseExpectFlex() {
     requestBuilder.profile(STANDARD).searchDirection(REVERSE);
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s));
+    requestBuilder.searchParams().addEgressPaths(TestAccessEgress.walk(STOP_F, D0s));
 
     assertEquals(EXPECTED_FLEX_STD, runSearch());
   }
@@ -121,7 +126,9 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
     requestBuilder.profile(MULTI_CRITERIA);
     requestBuilder.searchParams().searchWindowInSeconds(D5m);
     requestBuilder.searchParams().earliestDepartureTime(T00_00);
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_E, D3m), walk(STOP_F, D0s));
+    requestBuilder
+      .searchParams()
+      .addEgressPaths(TestAccessEgress.walk(STOP_E, D3m), TestAccessEgress.walk(STOP_F, D0s));
 
     String actual = runSearch();
 
@@ -133,7 +140,9 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
    * is set to 3 minutes.
    */
   private void withFlexAccessAsBestOption() {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D3m));
+    requestBuilder
+      .searchParams()
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D0s), TestAccessEgress.walk(STOP_E, D3m));
   }
 
   /**
@@ -141,7 +150,9 @@ public class B12_MultipleOptimalAccessOptions implements RaptorTestConstants {
    * Stop E to Stop F is set to 1 minute.
    */
   private void withTripL1AsBestStartOption() {
-    requestBuilder.searchParams().addEgressPaths(walk(STOP_F, D0s), walk(STOP_E, D1m));
+    requestBuilder
+      .searchParams()
+      .addEgressPaths(TestAccessEgress.walk(STOP_F, D0s), TestAccessEgress.walk(STOP_E, D1m));
   }
 
   private String runSearch() {

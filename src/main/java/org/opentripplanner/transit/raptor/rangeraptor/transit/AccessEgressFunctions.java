@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
@@ -44,7 +44,7 @@ public final class AccessEgressFunctions {
    *     </li>
    * </ol>
    */
-  private static final ParetoComparator<RaptorTransfer> STANDARD_COMPARATOR = (l, r) ->
+  private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
     (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
     (!l.hasOpeningHours() && r.hasOpeningHours()) ||
     l.numberOfRides() < r.numberOfRides() ||
@@ -59,7 +59,7 @@ public final class AccessEgressFunctions {
    */
   public static int calculateEgressDepartureTime(
     int arrivalTime,
-    RaptorTransfer egressPath,
+    RaptorAccessEgress egressPath,
     SlackProvider slackProvider,
     TimeCalculator timeCalculator
   ) {
@@ -75,8 +75,8 @@ public final class AccessEgressFunctions {
     }
   }
 
-  static Collection<RaptorTransfer> removeNoneOptimalPathsForStandardRaptor(
-    Collection<RaptorTransfer> paths
+  static Collection<RaptorAccessEgress> removeNoneOptimalPathsForStandardRaptor(
+    Collection<RaptorAccessEgress> paths
   ) {
     // To avoid too many items in the pareto set we first group the paths by stop,
     // for each stop we filter it down to the optimal pareto set. We could do this
@@ -85,7 +85,7 @@ public final class AccessEgressFunctions {
     // contain to many non-optimal paths.
     var mapByStop = groupByStop(paths);
     var set = new ParetoSet<>(STANDARD_COMPARATOR);
-    Collection<RaptorTransfer> result = new ArrayList<>();
+    Collection<RaptorAccessEgress> result = new ArrayList<>();
 
     mapByStop.forEachValue(list -> {
       set.clear();
@@ -100,25 +100,25 @@ public final class AccessEgressFunctions {
    * Filter the given input keeping all elements satisfying the given include predicate. If the
    * {@code keepOne} flag is set only one raptor transfer is kept for each group of numOfRides.
    */
-  static TIntObjectMap<List<RaptorTransfer>> groupByRound(
-    Collection<RaptorTransfer> input,
-    Predicate<RaptorTransfer> include
+  static TIntObjectMap<List<RaptorAccessEgress>> groupByRound(
+    Collection<RaptorAccessEgress> input,
+    Predicate<RaptorAccessEgress> include
   ) {
     return groupBy(
       input.stream().filter(include).collect(Collectors.toList()),
-      RaptorTransfer::numberOfRides
+      RaptorAccessEgress::numberOfRides
     );
   }
 
-  static TIntObjectMap<List<RaptorTransfer>> groupByStop(Collection<RaptorTransfer> input) {
-    return groupBy(input, RaptorTransfer::stop);
+  static TIntObjectMap<List<RaptorAccessEgress>> groupByStop(Collection<RaptorAccessEgress> input) {
+    return groupBy(input, RaptorAccessEgress::stop);
   }
 
   /* private methods */
 
-  private static List<RaptorTransfer> getOrCreate(
+  private static List<RaptorAccessEgress> getOrCreate(
     int key,
-    TIntObjectMap<List<RaptorTransfer>> map
+    TIntObjectMap<List<RaptorAccessEgress>> map
   ) {
     if (!map.containsKey(key)) {
       map.put(key, new ArrayList<>());
@@ -126,13 +126,13 @@ public final class AccessEgressFunctions {
     return map.get(key);
   }
 
-  private static TIntObjectMap<List<RaptorTransfer>> groupBy(
-    Collection<RaptorTransfer> input,
-    ToIntFunction<RaptorTransfer> groupBy
+  private static TIntObjectMap<List<RaptorAccessEgress>> groupBy(
+    Collection<RaptorAccessEgress> input,
+    ToIntFunction<RaptorAccessEgress> groupBy
   ) {
-    var mapByRound = new TIntObjectHashMap<List<RaptorTransfer>>();
+    var mapByRound = new TIntObjectHashMap<List<RaptorAccessEgress>>();
 
-    for (RaptorTransfer it : input) {
+    for (RaptorAccessEgress it : input) {
       getOrCreate(groupBy.applyAsInt(it), mapByRound).add(it);
     }
     return mapByRound;

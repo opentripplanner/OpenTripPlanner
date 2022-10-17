@@ -365,7 +365,8 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> tripHeadsign() {
-    return environment -> getSource(environment).getHeadsign();
+    return environment ->
+      LegacyGraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
   }
 
   @Override

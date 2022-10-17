@@ -10,7 +10,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.alerts.TransitAlertProvider;
+import org.opentripplanner.updater.alert.TransitAlertProvider;
 
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 

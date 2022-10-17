@@ -76,7 +76,8 @@ public class PatternAtStop {
       startTime,
       timeRange,
       numberOfDepartures,
-      arrivalDeparture
+      arrivalDeparture,
+      true
     );
   }
 

@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
@@ -70,7 +70,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
   }
 
   @Override
-  public int costEgress(RaptorTransfer egress) {
+  public int costEgress(RaptorAccessEgress egress) {
     return delegate.costEgress(egress);
   }
 

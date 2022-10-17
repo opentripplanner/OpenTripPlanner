@@ -2,9 +2,10 @@ package org.opentripplanner.routing.api.request.framework;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
-import org.opentripplanner.util.lang.ObjectUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
@@ -13,33 +14,30 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
-
-public class DurationForEnum<E extends Enum<?>> implements Serializable {
+public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
   private final Class<E> type;
   private final Duration defaultValue;
-  private final Duration[] valueForEnum;
+  private final Map<E, Duration> valueForEnum;
 
-  DurationForEnum(DurationForEnumBuilder<E> builder) {
-    this.type = builder.type();
-    this.defaultValue = ObjectUtils.ifNotNull(builder.defaultValue(), Duration.ZERO);
-    this.valueForEnum = builder.valueForEnum();
-    // Set default values to avoid null checks later
-    for (int i = 0; i < valueForEnum.length; i++) {
-      if (valueForEnum[i] == null) {
-        valueForEnum[i] = defaultValue;
-      }
-    }
+  public DurationForEnum(Class<E> type) {
+    this.type = Objects.requireNonNull(type);
+    this.defaultValue = Duration.ZERO;
+    this.valueForEnum = Map.of();
   }
 
-  public static <S extends Enum<?>> DurationForEnumBuilder<S> of(Class<S> type) {
-    return new DurationForEnumBuilder<>(type);
+  DurationForEnum(Builder<E> builder) {
+    this.type = Objects.requireNonNull(builder.type());
+    this.defaultValue = Objects.requireNonNull(builder.defaultValue());
+    this.valueForEnum = builder.copyValueForEnum();
   }
 
-  public DurationForEnum<E> copyOf(Consumer<DurationForEnumBuilder<E>> body) {
-    var builder = new DurationForEnumBuilder<>(this);
-    body.accept(builder);
-    return builder.build();
+  public static <S extends Enum<S>> Builder<S> of(Class<S> type) {
+    return new DurationForEnum<S>(type).copyOf();
+  }
+
+  public Builder<E> copyOf() {
+    return new Builder<>(this);
   }
 
   Class<E> type() {
@@ -60,11 +58,11 @@ public class DurationForEnum<E extends Enum<?>> implements Serializable {
   }
 
   public Duration valueOf(E type) {
-    return valueForEnum[type.ordinal()];
+    return valueForEnum.getOrDefault(type, defaultValue);
   }
 
   public boolean isSet(E key) {
-    return valueOf(key) != defaultValue;
+    return !defaultValue.equals(valueOf(key));
   }
 
   @Override
@@ -75,10 +73,9 @@ public class DurationForEnum<E extends Enum<?>> implements Serializable {
       .addText("default:")
       .addDuration(defaultValue);
 
-    for (int i = 0; i < valueForEnum.length; ++i) {
-      if (!defaultValue.equals(valueForEnum[i])) {
-        E e = type.getEnumConstants()[i];
-        builder.addText(", ").addText(e.name()).addText(":").addDuration(valueForEnum[i]);
+    for (Map.Entry<E, Duration> e : valueForEnum.entrySet()) {
+      if (!defaultValue.equals(e.getValue())) {
+        builder.addText(", ").addText(e.getKey().name()).addText(":").addDuration(e.getValue());
       }
     }
     return builder.addText("}").toString();
@@ -91,11 +88,102 @@ public class DurationForEnum<E extends Enum<?>> implements Serializable {
 
     DurationForEnum<?> that = (DurationForEnum<?>) o;
 
-    return type.equals(that.type) && Arrays.equals(valueForEnum, that.valueForEnum);
+    return (
+      type.equals(that.type) &&
+      defaultValue.equals(that.defaultValue) &&
+      valueForEnum.equals(that.valueForEnum)
+    );
   }
 
   @Override
   public int hashCode() {
-    return 31 * type.hashCode() + Arrays.hashCode(valueForEnum);
+    return Objects.hash(type, defaultValue, valueForEnum);
+  }
+
+  @SuppressWarnings("UnusedReturnValue")
+  public static class Builder<E extends Enum<E>> {
+
+    private final DurationForEnum<E> original;
+    private Duration defaultValue;
+    private EnumMap<E, Duration> valueForEnum = null;
+
+    Builder(DurationForEnum<E> original) {
+      this.original = original;
+      this.defaultValue = original.defaultValue();
+    }
+
+    Class<E> type() {
+      return original.type();
+    }
+
+    Duration defaultValue() {
+      return defaultValue;
+    }
+
+    public Builder<E> withDefault(Duration defaultValue) {
+      this.defaultValue = defaultValue;
+      return this;
+    }
+
+    public Builder<E> withDefaultSec(int defaultValue) {
+      return withDefault(Duration.ofSeconds(defaultValue));
+    }
+
+    public Builder<E> with(E key, Duration value) {
+      // Lazy initialize the valueForEnum map
+      if (valueForEnum == null) {
+        valueForEnum = new EnumMap<>(original.type);
+        for (E it : original.type.getEnumConstants()) {
+          if (original.isSet(it)) {
+            valueForEnum.put(it, original.valueOf(it));
+          }
+        }
+      }
+      valueForEnum.put(key, value);
+      return this;
+    }
+
+    /**
+     * Build a copy of the current values, excluding the defaultValue from the map. This
+     * ensures equality and make a defencive copy of the builder values. Hence, the builder
+     * can be used to generate new values if desired.
+     * */
+    Map<E, Duration> copyValueForEnum() {
+      if (valueForEnum == null) {
+        // The valueForEnum is protected and should never be mutated, so we can reuse it
+        return original.valueForEnum;
+      }
+
+      var copy = new EnumMap<E, Duration>(original.type);
+      for (Map.Entry<E, Duration> it : valueForEnum.entrySet()) {
+        if (!defaultValue.equals(it.getValue())) {
+          copy.put(it.getKey(), it.getValue());
+        }
+      }
+      return copy;
+    }
+
+    public Builder<E> withValues(Map<E, Duration> values) {
+      for (Map.Entry<E, Duration> e : values.entrySet()) {
+        with(e.getKey(), e.getValue());
+      }
+      return this;
+    }
+
+    public Builder<E> apply(Consumer<Builder<E>> body) {
+      body.accept(this);
+      return this;
+    }
+
+    public DurationForEnum<E> build() {
+      var it = new DurationForEnum<>(this);
+
+      // Return original if not change, subscriber is not notified
+      if (original != null && original.equals(it)) {
+        return original;
+      }
+
+      return it;
+    }
   }
 }

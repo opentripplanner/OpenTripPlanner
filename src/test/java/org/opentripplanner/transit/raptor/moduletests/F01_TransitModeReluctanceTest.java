@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -47,8 +47,8 @@ public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
-      .addEgressPaths(walk(STOP_B, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D20s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_10)
       .timetableEnabled(true);

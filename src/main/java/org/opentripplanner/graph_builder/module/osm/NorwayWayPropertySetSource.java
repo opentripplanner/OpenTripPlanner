@@ -9,6 +9,9 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
+
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
  * is that most of the highway=trunk roads also allows walking and biking, where as some does not.
@@ -617,7 +620,10 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
 
     //relation properties are copied over to ways
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.8));
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      withModes(ALL).bicycleSafety(0.7)
+    );
 
     props.setProperties(
       "highway=busway",
@@ -724,10 +730,10 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     new DefaultWayPropertySetSource().populateNotesAndNames(props);
 
-    props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("embankment=*"), false);
-    props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("location=underground"), true);
-    props.setSlopeOverride(new OSMSpecifier("indoor=yes"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), false);
+    props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("location=underground"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
   }
 }

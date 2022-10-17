@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class is responsible for creating a pretty table that can be printed to a terminal window.
@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
  * </pre>
  */
 public class TableFormatter {
+
+  private static final char SPACE = ' ';
 
   private final List<Align> aligns = new ArrayList<>();
   private final List<String> headers = new ArrayList<>();
@@ -39,7 +41,7 @@ public class TableFormatter {
   }
 
   /**
-   * Use this constructor to create a table with headers and fixed width columns. This is usful if
+   * Use this constructor to create a table with headers and fixed width columns. This is useful if
    * you want to print header and row during computation and can not hold the entire table in memory
    * until all values are added.
    * <p>
@@ -55,6 +57,55 @@ public class TableFormatter {
       int width = Math.max(this.headers.get(i).length(), widths[i]);
       this.widths.add(width);
     }
+  }
+
+  /**
+   * Static method witch format a given table as valid Markdown table like:
+   * <pre>
+   * | A | B |
+   * |---|---|
+   * | 1 | 2 |
+   * </pre>
+   * <ul>
+   *   <li>Any 'null' values are converted to empty strings.</li>
+   *   <li>Any '|' are escaped with '\'</li>
+   * </ul>
+   */
+  public static List<String> asMarkdownTable(List<List<?>> table) {
+    final int nColumns = table.get(0).size();
+    // Ad an extra row to make room for the horizontal divider: | -- | -- |
+    final int nRows = table.size() + 1;
+    var buf = new ArrayList<StringBuilder>();
+    for (int i = 0; i < nRows; ++i) {
+      buf.add(new StringBuilder("|"));
+    }
+
+    for (int colIndex = 0; colIndex < nColumns; ++colIndex) {
+      // Use Array list to allow for 'null' values
+      var col = extractColumn(table, colIndex)
+        .map(TableFormatter::escapeMarkdownTableCell)
+        .toList();
+
+      var width = findMaxWidth(col);
+
+      for (int rowIndex = 0; rowIndex < nRows; ++rowIndex) {
+        var row = buf.get(rowIndex);
+        // Allow for an extra space on each side; Hence: 'width + 2'
+        int newLength = row.length() + width + 2;
+
+        if (rowIndex == 1) {
+          // Build horizontal ruler like '| --- | --- | ------ |'
+          StringUtils.pad(row, '-', newLength);
+        } else {
+          // Get row 0, skip horizontal ruler for rowIndex > 1
+          int i = rowIndex - (rowIndex == 0 ? 0 : 1);
+          var text = col.get(i);
+          StringUtils.pad(row.append(SPACE).append(text), SPACE, newLength);
+        }
+        row.append("|");
+      }
+    }
+    return buf.stream().map(Objects::toString).toList();
   }
 
   /**
@@ -78,7 +129,6 @@ public class TableFormatter {
    * All columns are left or right justified, depending on the given {@code leftJustify} input
    * variable.
    */
-  @SuppressWarnings("OptionalGetWithoutIsPresent")
   public static List<String> formatTableAsTextLines(
     List<List<?>> table,
     String colSep,
@@ -87,17 +137,16 @@ public class TableFormatter {
     final int nColumns = table.get(0).size();
     var buf = table.stream().map(i -> new StringBuilder()).toList();
 
-    for (int i = 0; i < nColumns; ++i) {
-      final int columnIndex = i;
-      var col = table.stream().map(r -> r.get(columnIndex)).map(Object::toString).toList();
-      var width = col.stream().mapToInt(String::length).max().getAsInt();
+    for (int colIndex = 0; colIndex < nColumns; ++colIndex) {
+      var col = extractColumn(table, colIndex).toList();
+      int width = findMaxWidth(col);
       var f = (leftJustify ? "%-" : "%") + width + "s";
 
-      for (int j = 0; j < buf.size(); ++j) {
-        if (i > 0) {
-          buf.get(j).append(colSep);
+      for (int rowIndex = 0; rowIndex < buf.size(); ++rowIndex) {
+        if (colIndex > 0) {
+          buf.get(rowIndex).append(colSep);
         }
-        buf.get(j).append(f.formatted(col.get(j)));
+        buf.get(rowIndex).append(f.formatted(col.get(rowIndex)));
       }
     }
     return buf.stream().map(Objects::toString).toList();
@@ -142,33 +191,6 @@ public class TableFormatter {
       .stream(row)
       .map(it -> it == null ? "" : it.toString())
       .collect(Collectors.toList());
-  }
-
-  private static String padLeft(String value, int width) {
-    return pad(value, width, b -> false);
-  }
-
-  private static String padRight(String value, int width) {
-    return pad(value, width, b -> true);
-  }
-
-  private static String padCenter(String value, int width) {
-    return pad(value, width, b -> !b);
-  }
-
-  private static String pad(String value, int width, Function<Boolean, Boolean> toRight) {
-    boolean toggle = toRight.apply(false);
-    StringBuilder buf = new StringBuilder(value);
-    while (buf.length() < width) {
-      if (toggle) {
-        buf.insert(0, ' ');
-      } else {
-        buf.append(' ');
-      }
-      toggle = toRight.apply(toggle);
-    }
-    value = buf.toString();
-    return value;
   }
 
   private void addRow(Collection<?> row) {
@@ -218,6 +240,30 @@ public class TableFormatter {
     }
   }
 
+  /**
+   * Extract a column from a table of rows. This method will also transform each cell to
+   * a string using {@code toString}, any 'null' values are converted to an empty string.
+   */
+  private static Stream<String> extractColumn(List<List<?>> table, final int columnIndex) {
+    return table.stream().map(r -> r.get(columnIndex)).map(o -> o == null ? "" : o.toString());
+  }
+
+  /**
+   * Find the maximum width for the given set of cells. Returns zero(0) if the given list of cells
+   * are empty.
+   */
+  private static int findMaxWidth(List<String> cells) {
+    return cells.stream().mapToInt(String::length).max().orElse(0);
+  }
+
+  /**
+   * Pipes '|' in the text cell in a Markdown table will cause the table to be rendered wrong,
+   * so we must escape '|' in the text.
+   */
+  private static String escapeMarkdownTableCell(String text) {
+    return text == null ? null : text.replace("|", "\\|");
+  }
+
   private void assertRowIsLessThanOrSameSizeAsHeader(Collection<?> row) {
     if (row.size() > headers.size()) {
       throw new IllegalArgumentException(
@@ -231,18 +277,36 @@ public class TableFormatter {
   }
 
   public enum Align {
-    Left(TableFormatter::padLeft),
-    Center(TableFormatter::padCenter),
-    Right(TableFormatter::padRight);
+    Left {
+      String pad(String value, char ch, int width) {
+        return StringUtils.pad(new StringBuilder(value), ch, width).toString();
+      }
+    },
+    Center {
+      String pad(String value, char ch, int width) {
+        if (value.length() >= width) {
+          return value;
+        }
+        var buf = new StringBuilder();
+        StringUtils.pad(buf, ch, (width + 1 - value.length()) / 2);
+        buf.append(value);
+        StringUtils.pad(buf, ch, width);
+        return buf.toString();
+      }
+    },
+    Right {
+      String pad(String value, char ch, int width) {
+        return StringUtils
+          .pad(new StringBuilder(), ch, width - value.length())
+          .append(value)
+          .toString();
+      }
+    };
 
-    private final BiFunction<String, Integer, String> padFunction;
-
-    Align(BiFunction<String, Integer, String> padFunction) {
-      this.padFunction = padFunction;
-    }
+    abstract String pad(String value, char ch, int width);
 
     String pad(String value, int width) {
-      return padFunction.apply(value, width);
+      return pad(value, SPACE, width);
     }
   }
 }

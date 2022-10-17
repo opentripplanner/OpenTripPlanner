@@ -10,7 +10,6 @@ import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTest
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.RAPTOR_ITERATION_START_TIME;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
 import static org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.TimeUtils.time;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
@@ -22,9 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.BasicPathTestCase;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 public class PathTest implements RaptorTestConstants {
 
@@ -148,7 +148,7 @@ public class PathTest implements RaptorTestConstants {
   public void testCountTransfersWithStaySeated() {
     int egressStart = time("09:30");
     int egressEnd = time("09:40");
-    RaptorTransfer egress = walk(STOP_C, egressEnd - egressStart);
+    RaptorAccessEgress egress = TestAccessEgress.walk(STOP_C, egressEnd - egressStart);
     PathLeg<TestTripSchedule> leg4 = new EgressPathLeg<>(
       egress,
       egressStart,
@@ -180,7 +180,7 @@ public class PathTest implements RaptorTestConstants {
 
     int accessStart = time("09:00");
     int accessEnd = time("09:10");
-    RaptorTransfer access = walk(STOP_A, accessEnd - accessStart);
+    RaptorAccessEgress access = TestAccessEgress.walk(STOP_A, accessEnd - accessStart);
     AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
       access,
       accessStart,
@@ -196,7 +196,7 @@ public class PathTest implements RaptorTestConstants {
   public void testCountTransfersWithTransfer() {
     int egressStart = time("09:30");
     int egressEnd = time("09:40");
-    RaptorTransfer egress = walk(STOP_C, egressEnd - egressStart);
+    RaptorAccessEgress egress = TestAccessEgress.walk(STOP_C, egressEnd - egressStart);
     PathLeg<TestTripSchedule> leg4 = new EgressPathLeg<>(
       egress,
       egressStart,
@@ -222,7 +222,7 @@ public class PathTest implements RaptorTestConstants {
 
     int accessStart = time("09:00");
     int accessEnd = time("09:10");
-    RaptorTransfer access = walk(STOP_A, accessEnd - accessStart);
+    RaptorAccessEgress access = TestAccessEgress.walk(STOP_A, accessEnd - accessStart);
     AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(
       access,
       accessStart,

@@ -11,6 +11,7 @@ import java.util.OptionalInt;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * set the headsigns array to null to save space. Field is private to force use of the getter
    * method which does the necessary fallbacks.
    */
-  private final String[] headsigns;
+  private final I18NString[] headsigns;
   /**
    * Contains a list of via names for each stop. This field provides info about intermediate stops
    * between current stop and final trip destination. This is 2D array since there can be more than
@@ -142,7 +143,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
     this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
     this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
-    this.headsigns = deduplicator.deduplicateStringArray(makeHeadsignsArray(stopTimes));
+    this.headsigns =
+      deduplicator.deduplicateObjectArray(I18NString.class, makeHeadsignsArray(stopTimes));
     this.headsignVias = deduplicator.deduplicateString2DArray(makeHeadsignViasArray(stopTimes));
 
     this.dropOffBookingInfos =
@@ -185,7 +187,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * StopPatterns unique human readable route variant names, but a TripTimes currently does not have
    * a pointer to its enclosing timetable or pattern.
    */
-  public String getHeadsign(final int stop) {
+  public I18NString getHeadsign(final int stop) {
     if (headsigns == null) {
       return getTrip().getHeadsign();
     } else {
@@ -530,8 +532,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * @return either an array of headsigns (one for each stop on this trip) or null if the headsign
    * is the same at all stops (including null) and can be found in the Trip object.
    */
-  private String[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
-    final String tripHeadsign = trip.getHeadsign();
+  private I18NString[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
+    final I18NString tripHeadsign = trip.getHeadsign();
     boolean useStopHeadsigns = false;
     if (tripHeadsign == null) {
       useStopHeadsigns = true;
@@ -548,9 +550,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
     boolean allNull = true;
     int i = 0;
-    final String[] hs = new String[stopTimes.size()];
+    final I18NString[] hs = new I18NString[stopTimes.size()];
     for (final StopTime st : stopTimes) {
-      final String headsign = st.getStopHeadsign();
+      final I18NString headsign = st.getStopHeadsign();
       hs[i++] = headsign;
       if (headsign != null) allNull = false;
     }

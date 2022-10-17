@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -17,8 +17,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   private final RaptorRequestBuilder<T> parent;
-  private final Collection<RaptorTransfer> accessPaths = new ArrayList<>();
-  private final Collection<RaptorTransfer> egressPaths = new ArrayList<>();
+  private final Collection<RaptorAccessEgress> accessPaths = new ArrayList<>();
+  private final Collection<RaptorAccessEgress> egressPaths = new ArrayList<>();
   // Search
   private int earliestDepartureTime;
   private int latestArrivalTime;
@@ -142,29 +142,33 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     return this;
   }
 
-  public Collection<RaptorTransfer> accessPaths() {
+  public Collection<RaptorAccessEgress> accessPaths() {
     return accessPaths;
   }
 
-  public SearchParamsBuilder<T> addAccessPaths(Collection<? extends RaptorTransfer> accessPaths) {
+  public SearchParamsBuilder<T> addAccessPaths(
+    Collection<? extends RaptorAccessEgress> accessPaths
+  ) {
     this.accessPaths.addAll(accessPaths);
     return this;
   }
 
-  public SearchParamsBuilder<T> addAccessPaths(RaptorTransfer... accessPaths) {
+  public SearchParamsBuilder<T> addAccessPaths(RaptorAccessEgress... accessPaths) {
     return addAccessPaths(Arrays.asList(accessPaths));
   }
 
-  public Collection<RaptorTransfer> egressPaths() {
+  public Collection<RaptorAccessEgress> egressPaths() {
     return egressPaths;
   }
 
-  public SearchParamsBuilder<T> addEgressPaths(Collection<? extends RaptorTransfer> egressPaths) {
+  public SearchParamsBuilder<T> addEgressPaths(
+    Collection<? extends RaptorAccessEgress> egressPaths
+  ) {
     this.egressPaths.addAll(egressPaths);
     return this;
   }
 
-  public SearchParamsBuilder<T> addEgressPaths(RaptorTransfer... egressPaths) {
+  public SearchParamsBuilder<T> addEgressPaths(RaptorAccessEgress... egressPaths) {
     return addEgressPaths(Arrays.asList(egressPaths));
   }
 

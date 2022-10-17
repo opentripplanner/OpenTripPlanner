@@ -1,12 +1,14 @@
 package org.opentripplanner.standalone.config.updaters.azure;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdaterParameters;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public abstract class SiriAzureUpdaterConfig {
 
@@ -16,15 +18,38 @@ public abstract class SiriAzureUpdaterConfig {
     NodeAdapter c
   ) {
     parameters.setConfigRef(configRef);
-    parameters.setServiceBusUrl(c.asText("servicebus-url", null));
-    parameters.setTopicName(c.asText("topic", null));
-    parameters.setFeedId(c.asText("feedId", null));
-    parameters.setFuzzyTripMatching(c.asBoolean("fuzzyTripMatching", false));
+    parameters.setServiceBusUrl(
+      c
+        .of("servicebus-url")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(null)
+    );
+    parameters.setTopicName(
+      c.of("topic").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null)
+    );
+    parameters.setFeedId(
+      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(null)
+    );
+    parameters.setFuzzyTripMatching(
+      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
+    );
 
     if (c.exist("history")) {
-      NodeAdapter history = c.path("history");
-      parameters.setDataInitializationUrl(history.asText("url", null));
-      parameters.setTimeout(history.asInt("timeout", 300000));
+      NodeAdapter history = c
+        .of("history")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObject();
+      parameters.setDataInitializationUrl(
+        history
+          .of("url")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString(null)
+      );
+      parameters.setTimeout(history.of("timeout").withDoc(NA, /*TODO DOC*/"TODO").asInt(300000));
     }
   }
 

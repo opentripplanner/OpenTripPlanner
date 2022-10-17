@@ -48,14 +48,17 @@ public class StreetEdgeTest {
     v1 = vertex("maple_1st", 2.0, 2.0);
     v2 = vertex("maple_2nd", 1.0, 2.0);
 
-    var req = AStarRequest.of();
-    var pref = req.preferences();
-    pref.street().setTurnReluctance(1.0);
-    pref.withWalk(it -> it.setSpeed(1.0).setReluctance(1.0).setStairsReluctance(1.0));
-    pref.withBike(it -> it.setSpeed(5.0f).setReluctance(1.0).setWalkingSpeed(0.8));
-    pref.car().setSpeed(15.0f);
-    pref.car().setReluctance(1.0);
-    this.proto = req.build();
+    this.proto =
+      AStarRequest
+        .of()
+        .withPreferences(references ->
+          references
+            .withStreet(s -> s.withTurnReluctance(1.0))
+            .withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0))
+            .withBike(it -> it.withSpeed(5.0f).withReluctance(1.0).withWalkingSpeed(0.8))
+            .withCar(c -> c.withSpeed(15.0f).withReluctance(1.0))
+        )
+        .build();
   }
 
   @Test
@@ -84,9 +87,9 @@ public class StreetEdgeTest {
     StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
     e1.setCarSpeed(10.0f);
 
-    AStarRequestBuilder options = AStarRequest.copyOf(proto);
+    AStarRequest options = AStarRequest.copyOf(proto).withMode(StreetMode.WALK).build();
 
-    State s0 = new State(v1, options.withMode(StreetMode.WALK).build());
+    State s0 = new State(v1, options);
     State s1 = e1.traverse(s0);
 
     // Should use the speed on the edge.
@@ -143,7 +146,7 @@ public class StreetEdgeTest {
     v1.trafficLight = true;
 
     AStarRequestBuilder forward = AStarRequest.copyOf(proto);
-    forward.preferences().withBike(it -> it.setSpeed(3.0f));
+    forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
 
     State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0);
@@ -151,7 +154,7 @@ public class StreetEdgeTest {
 
     AStarRequestBuilder reverse = AStarRequest.copyOf(proto);
     reverse.withArriveBy(true);
-    reverse.preferences().withBike(it -> it.setSpeed(3.0f));
+    reverse.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
 
     State s3 = new State(v2, reverse.withMode(StreetMode.BIKE).build());
     State s4 = e1.traverse(s3);
@@ -202,7 +205,7 @@ public class StreetEdgeTest {
     StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     AStarRequestBuilder noPenalty = AStarRequest.copyOf(proto);
-    noPenalty.preferences().withBike(it -> it.setSwitchTime(0).setSwitchCost(0));
+    noPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(0).withSwitchCost(0)));
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0);
@@ -210,7 +213,7 @@ public class StreetEdgeTest {
     State s3 = e2.traverse(s2);
 
     AStarRequestBuilder withPenalty = AStarRequest.copyOf(proto);
-    withPenalty.preferences().withBike(it -> it.setSwitchTime(42).setSwitchCost(23));
+    withPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(42).withSwitchCost(23)));
 
     State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
     State s5 = e0.traverse(s4);
@@ -366,15 +369,18 @@ public class StreetEdgeTest {
 
     var request = AStarRequest.of().withMode(StreetMode.BIKE);
 
-    request
-      .preferences()
-      .withBike(bike ->
-        bike
-          .setSpeed(SPEED)
-          .setOptimizeType(BicycleOptimizeType.TRIANGLE)
-          .withOptimizeTriangle(it -> it.withTime(1))
-      );
-    request.preferences().setAllStreetReluctance(1);
+    request.withPreferences(pref ->
+      pref
+        .withBike(bike ->
+          bike
+            .withSpeed(SPEED)
+            .withOptimizeType(BicycleOptimizeType.TRIANGLE)
+            .withOptimizeTriangle(it -> it.withTime(1))
+            .withReluctance(1)
+        )
+        .withWalk(walk -> walk.withReluctance(1))
+        .withCar(car -> car.withReluctance(1))
+    );
 
     State startState = new State(v1, request.build());
     State result = testStreet.traverse(startState);
@@ -382,7 +388,9 @@ public class StreetEdgeTest {
     double expectedTimeWeight = slopeSpeedLength / SPEED;
     assertEquals(expectedTimeWeight, result.getWeight(), DELTA);
 
-    request.preferences().withBike(bike -> bike.withOptimizeTriangle(it -> it.withSlope(1)));
+    request.withPreferences(p ->
+      p.withBike(bike -> bike.withOptimizeTriangle(it -> it.withSlope(1)))
+    );
     startState = new State(v1, request.build());
     result = testStreet.traverse(startState);
     double slopeWeight = result.getWeight();
@@ -391,7 +399,9 @@ public class StreetEdgeTest {
     assertTrue(length * 1.5 / SPEED < slopeWeight);
     assertTrue(length * 1.5 * 10 / SPEED > slopeWeight);
 
-    request.preferences().withBike(bike -> bike.withOptimizeTriangle(it -> it.withSafety(1)));
+    request.withPreferences(p ->
+      p.withBike(bike -> bike.withOptimizeTriangle(it -> it.withSafety(1)))
+    );
     startState = new State(v1, request.build());
     result = testStreet.traverse(startState);
     double slopeSafety = costs.slopeSafetyCost;
@@ -399,9 +409,9 @@ public class StreetEdgeTest {
     double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / SPEED;
     assertEquals(expectedSafetyWeight, safetyWeight, DELTA);
 
-    request
-      .preferences()
-      .withBike(bike -> bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1)));
+    request.withPreferences(p ->
+      p.withBike(bike -> bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1)))
+    );
     startState = new State(v1, request.build());
     result = testStreet.traverse(startState);
     double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;

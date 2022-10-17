@@ -34,15 +34,15 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
-  private List<FareLegRule> fareLegRules = new ArrayList<>();
-  private List<FareTransferRule> fareTransferRules = new ArrayList<>();
+  private final List<FareLegRule> fareLegRules = new ArrayList<>();
+  private final List<FareTransferRule> fareTransferRules = new ArrayList<>();
 
   // mapping the stop ids to area ids. one stop can be in several areas.
   private final Multimap<FeedScopedId, String> stopAreas = ArrayListMultimap.create();
 
   @Override
   public FareService makeFareService() {
-    DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+    DefaultFareService fareService = new DefaultFareService();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
 
     var faresV2Service = new GtfsFaresV2Service(fareLegRules, fareTransferRules, stopAreas);

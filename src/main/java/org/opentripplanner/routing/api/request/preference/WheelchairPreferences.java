@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
-import org.opentripplanner.util.lang.DoubleUtils;
+import java.util.Objects;
+import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * @param slopeExceededReluctance What factor should be given to street edges, which are over the
@@ -11,6 +12,9 @@ import org.opentripplanner.util.lang.DoubleUtils;
  *                                severely punished. This value determines how much they are
  *                                punished. This should be a very high value as you want to only
  *                                include stairs as a last result.
+ * @param maxSlope                TODO, unit?
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public record WheelchairPreferences(
   AccessibilityPreferences trip,
@@ -65,12 +69,12 @@ public record WheelchairPreferences(
     double slopeExceededReluctance,
     double stairsReluctance
   ) {
-    this.trip = trip;
-    this.stop = stop;
-    this.elevator = elevator;
-    this.inaccessibleStreetReluctance = DoubleUtils.roundTo2Decimals(inaccessibleStreetReluctance);
-    this.maxSlope = DoubleUtils.roundTo3Decimals(maxSlope);
-    this.slopeExceededReluctance = DoubleUtils.roundTo2Decimals(slopeExceededReluctance);
-    this.stairsReluctance = DoubleUtils.roundTo2Decimals(stairsReluctance);
+    this.trip = Objects.requireNonNull(trip);
+    this.stop = Objects.requireNonNull(stop);
+    this.elevator = Objects.requireNonNull(elevator);
+    this.inaccessibleStreetReluctance = Units.reluctance(inaccessibleStreetReluctance);
+    this.maxSlope = Units.ratio(maxSlope);
+    this.slopeExceededReluctance = Units.reluctance(slopeExceededReluctance);
+    this.stairsReluctance = Units.reluctance(stairsReluctance);
   }
 }

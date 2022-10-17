@@ -196,9 +196,8 @@ class PathwayEdgeTest {
   private State assertThatEdgeIsTraversable(PathwayEdge edge, boolean wheelchair) {
     var req = AStarRequest.of().withWheelchair(wheelchair).withMode(StreetMode.WALK);
 
-    req
-      .preferences()
-      .setWheelchair(
+    req.withPreferences(preferences ->
+      preferences.withWheelchair(
         new WheelchairPreferences(
           ofOnlyAccessible(),
           ofOnlyAccessible(),
@@ -208,7 +207,8 @@ class PathwayEdgeTest {
           1,
           25
         )
-      );
+      )
+    );
 
     var afterTraversal = edge.traverse(new State(from, req.build()));
     assertNotNull(afterTraversal);

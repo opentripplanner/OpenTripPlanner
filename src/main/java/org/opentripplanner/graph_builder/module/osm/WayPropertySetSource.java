@@ -10,34 +10,14 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  */
 public interface WayPropertySetSource {
   static WayPropertySetSource defaultWayPropertySetSource() {
-    return fromConfig("default");
-  }
-
-  /**
-   * Return the given WayPropertySetSource or throws IllegalArgumentException if an unknown type is
-   * specified
-   */
-  static WayPropertySetSource fromConfig(String type) {
-    // type is set to "default" by GraphBuilderParameters if not provided in
-    // build-config.json
-    return switch (type) {
-      case "default" -> new DefaultWayPropertySetSource();
-      case "norway" -> new NorwayWayPropertySetSource();
-      case "uk" -> new UKWayPropertySetSource();
-      case "finland" -> new FinlandWayPropertySetSource();
-      case "germany" -> new GermanyWayPropertySetSource();
-      case "atlanta" -> new AtlantaWayPropertySetSource();
-      case "houston" -> new HoustonWayPropertySetSource();
-      default -> throw new IllegalArgumentException(
-        "Unknown osmWayPropertySet: '%s'".formatted(type)
-      );
-    };
+    return Source.DEFAULT.getInstance();
   }
 
   void populateProperties(WayPropertySet wayPropertySet);
 
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
     return (
+      "no".equals(tagValue) ||
       "destination".equals(tagValue) ||
       "private".equals(tagValue) ||
       "customers".equals(tagValue) ||
@@ -52,7 +32,11 @@ public interface WayPropertySetSource {
 
   default boolean isVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String vehicle = way.getTag("vehicle");
-    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(vehicle);
+    if (vehicle != null) {
+      return doesTagValueDisallowThroughTraffic(vehicle);
+    } else {
+      return isGeneralNoThroughTraffic(way);
+    }
   }
 
   /**
@@ -60,10 +44,11 @@ public interface WayPropertySetSource {
    */
   default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String motorVehicle = way.getTag("motor_vehicle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(motorVehicle)
-    );
+    if (motorVehicle != null) {
+      return doesTagValueDisallowThroughTraffic(motorVehicle);
+    } else {
+      return isVehicleThroughTrafficExplicitlyDisallowed(way);
+    }
   }
 
   /**
@@ -71,10 +56,11 @@ public interface WayPropertySetSource {
    */
   default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String bicycle = way.getTag("bicycle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(bicycle)
-    );
+    if (bicycle != null) {
+      return doesTagValueDisallowThroughTraffic(bicycle);
+    } else {
+      return isVehicleThroughTrafficExplicitlyDisallowed(way);
+    }
   }
 
   /**
@@ -82,6 +68,36 @@ public interface WayPropertySetSource {
    */
   default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String foot = way.getTag("foot");
-    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
+    if (foot != null) {
+      return doesTagValueDisallowThroughTraffic(foot);
+    } else {
+      return isGeneralNoThroughTraffic(way);
+    }
+  }
+
+  /**
+   * This is the list of WayPropertySetSource sources. The enum provide a mapping between the
+   * enum name and the actual implementation.
+   */
+  enum Source {
+    DEFAULT,
+    NORWAY,
+    UK,
+    FINLAND,
+    GERMANY,
+    ATLANTA,
+    HOUSTON;
+
+    public WayPropertySetSource getInstance() {
+      return switch (this) {
+        case DEFAULT -> new DefaultWayPropertySetSource();
+        case NORWAY -> new NorwayWayPropertySetSource();
+        case UK -> new UKWayPropertySetSource();
+        case FINLAND -> new FinlandWayPropertySetSource();
+        case GERMANY -> new GermanyWayPropertySetSource();
+        case ATLANTA -> new AtlantaWayPropertySetSource();
+        case HOUSTON -> new HoustonWayPropertySetSource();
+      };
+    }
   }
 }

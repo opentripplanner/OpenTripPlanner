@@ -22,6 +22,8 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -39,6 +41,8 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
   private long startTime;
 
+  private final Consumer<UpdateResult> recordMetrics;
+
   public SiriAzureETUpdater(
     SiriAzureETUpdaterParameters config,
     TransitModel transitModel,
@@ -47,6 +51,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
     super(config, transitModel);
     this.fromDateTime = config.getFromDateTime();
     this.snapshotSource = snapshotSource;
+    this.recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
   @Override
@@ -119,8 +124,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
           fuzzyTripMatcher(),
           feedId,
           false,
-          updates,
-          fuzzyTripMatching
+          updates
         )
       );
     } catch (JAXBException | XMLStreamException e) {
@@ -139,14 +143,14 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
       super.saveResultOnGraph.execute((graph, transitModel) -> {
         long t1 = System.currentTimeMillis();
-        snapshotSource.applyEstimatedTimetable(
+        var result = snapshotSource.applyEstimatedTimetable(
           transitModel,
           fuzzyTripMatcher(),
           feedId,
           false,
-          updates,
-          fuzzyTripMatching
+          updates
         );
+        recordMetrics.accept(result);
 
         setPrimed(true);
         LOG.info(

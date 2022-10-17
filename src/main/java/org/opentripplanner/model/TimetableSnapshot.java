@@ -11,10 +11,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -178,7 +178,7 @@ public class TimetableSnapshot {
    * @param serviceDate      service day for which this update is valid
    * @return whether the update was actually applied
    */
-  public Optional<UpdateError> update(
+  public Result<?, UpdateError> update(
     TripPattern pattern,
     TripTimes updatedTripTimes,
     LocalDate serviceDate
@@ -235,7 +235,7 @@ public class TimetableSnapshot {
 
     // The time tables are finished during the commit
 
-    return UpdateError.noError();
+    return Result.success();
   }
 
   /**
