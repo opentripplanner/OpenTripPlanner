@@ -3,7 +3,8 @@
   "transitServiceEnd":  "P1Y",
   "osmCacheDataInMem" : true,
   "localFileNamePatterns" : {
-    "osm" : ".*\\.osm\\.pbf"
+    "osm" : "(i?)\\.osm\\.pbf$",
+    "dem" : "(i?)\\.dem\\.tiff?$"
   },
 
   "osmDefaults": {
@@ -14,6 +15,10 @@
     "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
     "timeZone" : "Europe/Oslo",
     "osmTagMapping" : "norway"
+  }],
+  "dem": [{
+    "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
+    "elevationUnitMultiplier" : 2.5
   }],
   "netexDefaults" : {
     "sharedFilePattern" : "_stops.xml",

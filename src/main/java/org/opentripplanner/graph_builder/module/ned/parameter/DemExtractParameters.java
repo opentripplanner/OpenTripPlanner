@@ -1,14 +1,15 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.graph_builder.module.ned.parameter;
 
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
+import org.opentripplanner.standalone.config.feed.DataSourceConfig;
 
 /**
  * Configuration of a DEM extract. Example:
  * {@code "dem" : [ {source: "file:///path/to/otp/norway-dem.tif"} ] }
  */
-public class DemExtractConfig implements DataSourceConfig {
+public class DemExtractParameters implements DataSourceConfig {
 
   private final URI source;
 
@@ -19,9 +20,9 @@ public class DemExtractConfig implements DataSourceConfig {
    */
   private final Double elevationUnitMultiplier;
 
-  DemExtractConfig(DemExtractConfigBuilder demExtractConfigBuilder) {
-    source = Objects.requireNonNull(demExtractConfigBuilder.getSource());
-    elevationUnitMultiplier = demExtractConfigBuilder.getElevationUnitMultiplier();
+  DemExtractParameters(DemExtractParametersBuilder builder) {
+    source = Objects.requireNonNull(builder.source());
+    elevationUnitMultiplier = builder.elevationUnitMultiplier();
   }
 
   @Override

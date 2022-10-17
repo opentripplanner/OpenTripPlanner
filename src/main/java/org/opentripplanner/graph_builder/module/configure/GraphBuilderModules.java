@@ -26,6 +26,7 @@ import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -35,7 +36,6 @@ import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.feed.DemExtractConfig;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -265,11 +265,11 @@ public class GraphBuilderModules {
   }
 
   private static List<ElevationGridCoverageFactory> createDemGeotiffGridCoverageFactories(
-    Iterable<ConfiguredDataSource<DemExtractConfig>> dataSources,
+    Iterable<ConfiguredDataSource<DemExtractParameters>> dataSources,
     double defaultElevationUnitMultiplier
   ) {
     List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
-    for (ConfiguredDataSource<DemExtractConfig> demSource : dataSources) {
+    for (ConfiguredDataSource<DemExtractParameters> demSource : dataSources) {
       double elevationUnitMultiplier = demSource
         .config()
         .elevationUnitMultiplier()

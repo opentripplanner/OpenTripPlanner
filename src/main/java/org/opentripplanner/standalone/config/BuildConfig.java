@@ -18,13 +18,14 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.standalone.config.feed.DemExtractsConfig;
+import org.opentripplanner.standalone.config.feed.DemConfig;
 import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
 import org.opentripplanner.standalone.config.feed.OsmConfig;
 import org.opentripplanner.standalone.config.feed.TransitFeedsConfig;
@@ -447,7 +448,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Specify parameters for DEM extracts. If not specified OTP will fall back to auto-detection
    * based on the directory provided on the command line.
    */
-  public final DemExtractsConfig dem;
+  public final DemExtractParametersList dem;
 
   /**
    * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
@@ -629,17 +630,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");
-    dem =
-      new DemExtractsConfig(
-        (
-          root
-            .of("dem")
-            .withDoc(NA, /*TODO DOC*/"TODO")
-            .withExample(/*TODO DOC*/"TODO")
-            .withDescription(/*TODO DOC*/"TODO")
-            .asObject()
-        )
-      );
+    dem = DemConfig.mapDemConfig(root, "dem");
     transitFeeds =
       new TransitFeedsConfig(
         root
