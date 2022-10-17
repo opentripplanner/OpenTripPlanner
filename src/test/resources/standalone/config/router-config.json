@@ -179,8 +179,6 @@
     {
       "type": "stop-time-updater",
       "frequencySec": 60,
-      // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
-      "sourceType": "gtfs-rt-http",
       // Optional parameter for defining behaviour for propagating delays to previous stops.
       // Default value is "REQUIRED_NO_DATA" which only propagates delays backwards when it is required
       // to ensure that the times are increasing and it sets the NO_DATA flag on the stops so these
@@ -197,7 +195,6 @@
     // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL APIss
     {
       "type": "vehicle-positions",
-      "sourceType": "gtfs-rt-http",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId": "1",
       "frequencySec": 60
