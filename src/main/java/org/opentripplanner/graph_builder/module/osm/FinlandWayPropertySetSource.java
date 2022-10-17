@@ -8,6 +8,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PED
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.function.BiFunction;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -129,5 +130,20 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
 
     // Read the rest from the default set
     new DefaultWayPropertySetSource().populateProperties(props);
+  }
+
+  @Override
+  public boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+    String bicycle = way.getTag("bicycle");
+    return (
+      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
+      doesTagValueDisallowThroughTraffic(bicycle)
+    );
+  }
+
+  @Override
+  public boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
+    String foot = way.getTag("foot");
+    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
   }
 }
