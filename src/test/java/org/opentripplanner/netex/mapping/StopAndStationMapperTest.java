@@ -227,7 +227,7 @@ public class StopAndStationMapperTest {
       null,
       DEFAULT_TIME_ZONE,
       DataImportIssueStore.noopIssueStore(),
-      false
+      isolated
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);
