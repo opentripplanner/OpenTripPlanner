@@ -63,7 +63,6 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -470,20 +469,28 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     RouteRequest options = new RouteRequest();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
     options.journey().setModes(qualifiedModeSet.getRequestModes());
-    var preferences = options.preferences();
 
     options.setArriveBy(arriveByCheckBox.isSelected());
-    preferences.walk().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-    // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-    preferences.bike().setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
-    // there should be a ui element for walk distance and optimize type
-    preferences.bike().setOptimizeType(getSelectedOptimizeType());
     options.setDateTime(when);
     options.setFrom(LocationStringParser.fromOldStyleString(from));
     options.setTo(LocationStringParser.fromOldStyleString(to));
-    preferences.walk().setSpeed(Float.parseFloat(walkSpeed.getText()));
-    preferences.bike().setSpeed(Float.parseFloat(bikeSpeed.getText()));
     options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
+
+    options.withPreferences(preferences -> {
+      preferences.withWalk(walk -> {
+        walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+        walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
+      });
+      preferences.withBike(bike ->
+        bike
+          .withSpeed(Float.parseFloat(bikeSpeed.getText()))
+          // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
+          .withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
+          // there should be a ui element for walk distance and optimize type
+          .withOptimizeType(getSelectedOptimizeType())
+      );
+    });
+
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);
     System.out.println("\tModes: " + qualifiedModeSet);
@@ -497,9 +504,15 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, options)) {
-      var routingContext = new RoutingContext(options, graph, temporaryVertices);
-      List<GraphPath> paths = finder.graphPathFinderEntryPoint(routingContext);
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        options,
+        options.journey().direct().mode(),
+        options.journey().direct().mode()
+      )
+    ) {
+      List<GraphPath> paths = finder.graphPathFinderEntryPoint(options, temporaryVertices);
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");
 

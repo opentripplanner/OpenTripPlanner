@@ -8,7 +8,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * Render important information for debugging wheelchair access (street slopes and transit stop
@@ -25,11 +25,7 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
 
   public WheelchairEdgeRenderer(RoutingPreferences routingPreferences) {
     this.slopePalette =
-      new DefaultScalarColorPalette(
-        0.0,
-        routingPreferences.wheelchairAccessibility().maxSlope(),
-        1.0
-      );
+      new DefaultScalarColorPalette(0.0, routingPreferences.wheelchair().maxSlope(), 1.0);
   }
 
   @Override
@@ -61,15 +57,13 @@ public class WheelchairEdgeRenderer implements EdgeVertexRenderer {
     if (v instanceof TransitStopVertex) {
       if (
         ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
-        WheelchairAccessibility.NO_INFORMATION
+        Accessibility.NO_INFORMATION
       ) attrs.color = NO_WHEELCHAIR_INFORMATION_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
-        WheelchairAccessibility.POSSIBLE
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() == Accessibility.POSSIBLE
       ) attrs.color = YES_WHEELCHAIR_COLOR;
       if (
-        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() ==
-        WheelchairAccessibility.NOT_POSSIBLE
+        ((TransitStopVertex) v).getStop().getWheelchairAccessibility() == Accessibility.NOT_POSSIBLE
       ) attrs.color = NO_WHEELCHAIR_COLOR;
       attrs.label = v.getDefaultName();
     } else {

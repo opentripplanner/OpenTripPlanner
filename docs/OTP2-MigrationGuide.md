@@ -50,6 +50,8 @@ of this type:
   Default: `-P1Y`. Since v2.0
 - `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*.
   Default: `P3Y`. Since v2.0
+- Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` 
+  nodes.
 
 #### Parameters whose names were changed
 
@@ -68,7 +70,10 @@ of this type:
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
 
-Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` nodes.
+
+Since v2.2, `osmWayPropertySet` was renamed `osmTagMapping` and is part of the individual osm 
+source. The driving direction and intersection cost model were decoupled for the tag mapping and can
+be configured using `drivingDirection` and `intersectionTraversalModel` inside `routingDefaults`.
 
 OTP2 records the "parentStation" relationship between stops and stations in its internal transit
 model, based on the GTFS and/or NeTEx input. This enables OTP to search from all stop in a station
@@ -108,6 +113,7 @@ routing parameters.
 - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`. Since v2.0
 - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`. Since
   v2.0
+- `disableAlertFiltering` Not implemented in OTP2. Since v2.0
 
 ## REST API
 
@@ -152,7 +158,7 @@ permanently from OTP2, but may require some development to support valid importa
 - `waitAtBeginningFactor` - No longer necessary to weight the initial wait differently based on the
   the Range Raptor search algorithm, which no longer prefers a departure at one valid time over
   another. Filtering could be implemented on top of Raptor to show certain departure times before
-  others.
+  others. Removed in v2.2.
 - `pathComparator` - The ability to set a sort order based on departure or arrival should be the
   domain of the API rather than the search.
 - `startingTransitStopId` - this is redundant, as the same thing can be achieved with fromPlace
@@ -203,6 +209,7 @@ permanently from OTP2, but may require some development to support valid importa
 - `maxWeight` Since 2.1
 - `driveOnRight` You can specify the driving direction in your way property set. Since 2.1
 - `bannedTrips` Not supported in 2.0 and 2.1
+- `waitAtBeginningFactor` Since 2.2 
 
 #### Paging
 

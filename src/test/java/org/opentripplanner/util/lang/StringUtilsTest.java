@@ -1,5 +1,6 @@
 package org.opentripplanner.util.lang;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +29,19 @@ class StringUtilsTest {
 
     for (var it : illegalValues) {
       assertThrows(IllegalArgumentException.class, () -> StringUtils.assertHasValue(it));
+
+      Throwable thrown = assertThrows(
+        IllegalArgumentException.class,
+        () -> StringUtils.assertHasValue(it, "Illegal value %s", it)
+      );
+      assertTrue(thrown.getMessage().startsWith("Illegal value " + it));
     }
+  }
+
+  @Test
+  void pad() {
+    assertEquals("ABC?????", StringUtils.pad(new StringBuilder("ABC"), '?', 8).toString());
+    assertEquals("ABC", StringUtils.pad(new StringBuilder("ABC"), '+', 3).toString());
+    assertEquals("ABC", StringUtils.pad(new StringBuilder("ABC"), '+', 0).toString());
   }
 }

@@ -86,7 +86,7 @@ public class DefaultRoutingRequestType {
           .name("maxSlope")
           .description("The maximum slope of streets for wheelchair trips.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.wheelchairAccessibility().maxSlope())
+          .dataFetcher(env -> preferences.wheelchair().maxSlope())
           .build()
       )
       .field(
@@ -148,7 +148,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorBoardTime")
           .description("How long does it take to get on an elevator, on average.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorBoardTime())
+          .dataFetcher(env -> preferences.street().elevator().boardTime())
           .build()
       )
       .field(
@@ -157,7 +157,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorBoardCost")
           .description("What is the cost of boarding a elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorBoardCost())
+          .dataFetcher(env -> preferences.street().elevator().boardCost())
           .build()
       )
       .field(
@@ -166,7 +166,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorHopTime")
           .description("How long does it take to advance one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorHopTime())
+          .dataFetcher(env -> preferences.street().elevator().hopTime())
           .build()
       )
       .field(
@@ -175,7 +175,7 @@ public class DefaultRoutingRequestType {
           .name("elevatorHopCost")
           .description("What is the cost of travelling one floor on an elevator?")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.street().elevatorHopCost())
+          .dataFetcher(env -> preferences.street().elevator().hopCost())
           .build()
       )
       .field(
@@ -252,17 +252,6 @@ public class DefaultRoutingRequestType {
           )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> preferences.transfer().waitReluctance())
-          .build()
-      )
-      .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
-          .name("waitAtBeginningFactor")
-          .description(
-            "How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)."
-          )
-          .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> preferences.transfer().waitAtBeginningFactor())
           .build()
       )
       .field(
@@ -426,7 +415,7 @@ public class DefaultRoutingRequestType {
           .description("")
           .type(Scalars.GraphQLBoolean)
           .deprecate("Rental is specified by modes")
-          .dataFetcher(env -> request.vehicleRental)
+          .dataFetcher(env -> false)
           .build()
       )
       .field(
@@ -434,7 +423,8 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("parkAndRide")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.parkAndRide)
+          .deprecate("Parking is specified by modes")
+          .dataFetcher(env -> false)
           .build()
       )
       .field(
@@ -442,7 +432,8 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("kissAndRide")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> request.carPickup)
+          .deprecate("Parking is specified by modes")
+          .dataFetcher(env -> false)
           .build()
       )
       .field(
@@ -450,7 +441,7 @@ public class DefaultRoutingRequestType {
           .newFieldDefinition()
           .name("debugItineraryFilter")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.system().itineraryFilters().debug)
+          .dataFetcher(env -> preferences.itineraryFilter().debug())
           .build()
       )
       /*
@@ -482,7 +473,8 @@ public class DefaultRoutingRequestType {
           .name("disableAlertFiltering")
           .description("Option to disable the default filtering of GTFS-RT alerts by time.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.system().disableAlertFiltering())
+          .deprecate("This is not supported!")
+          .dataFetcher(env -> false)
           .build()
       )
       .field(

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 /**
@@ -43,13 +43,13 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
     this.transitFactors =
       transitReluctanceFactors == null
-        ? new SingleValueFactorStrategy(McCostParams.DEFAULT_TRANSIT_RELUCTANCE)
+        ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
         : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
     this.stopTransferCost = stopTransferCost;
   }
 
-  public DefaultCostCalculator(McCostParams params, int[] stopTransferCost) {
+  public DefaultCostCalculator(GeneralizedCostParameters params, int[] stopTransferCost) {
     this(
       params.boardCost(),
       params.transferCost(),
@@ -132,7 +132,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   }
 
   @Override
-  public int costEgress(RaptorTransfer egress) {
+  public int costEgress(RaptorAccessEgress egress) {
     if (egress.hasRides()) {
       return egress.generalizedCost() + transferCostOnly;
     } else if (stopTransferCost != null) {

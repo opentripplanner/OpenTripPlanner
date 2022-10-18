@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
@@ -38,7 +37,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   protected final int offset;
   protected final int headway;
   protected final LocalDate serviceDate;
-  private final WheelchairAccessibility wheelChairBoarding;
+  private final Accessibility wheelChairBoarding;
 
   public FrequencyBoardOrAlightEvent(
     TripPatternForDates raptorTripPattern,
@@ -137,7 +136,7 @@ abstract class FrequencyBoardOrAlightEvent<T extends DefaultTripSchedule>
   }
 
   @Override
-  public WheelchairAccessibility wheelchairBoarding() {
+  public Accessibility wheelchairBoarding() {
     return wheelChairBoarding;
   }
 }

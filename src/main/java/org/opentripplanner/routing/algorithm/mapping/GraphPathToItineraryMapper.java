@@ -341,10 +341,7 @@ public class GraphPathToItineraryMapper {
     } else if (vertex instanceof VehicleRentalPlaceVertex) {
       return Place.forVehicleRentalPlace((VehicleRentalPlaceVertex) vertex);
     } else if (vertex instanceof VehicleParkingEntranceVertex) {
-      return Place.forVehicleParkingEntrance(
-        (VehicleParkingEntranceVertex) vertex,
-        state.getOptions()
-      );
+      return Place.forVehicleParkingEntrance((VehicleParkingEntranceVertex) vertex, state);
     } else {
       return Place.normal(vertex, name);
     }

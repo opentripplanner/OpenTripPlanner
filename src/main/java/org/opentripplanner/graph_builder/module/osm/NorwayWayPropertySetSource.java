@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -10,8 +9,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTraversalCostModel;
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 
 /**
  * OSM way properties for Norwegian roads. The main difference compared to the default property set
@@ -23,8 +22,6 @@ import org.opentripplanner.routing.core.intersection_model.NorwayIntersectionTra
  * @see DefaultWayPropertySetSource
  */
 public class NorwayWayPropertySetSource implements WayPropertySetSource {
-
-  private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -623,7 +620,10 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
     );
 
     //relation properties are copied over to ways
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.8));
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      withModes(ALL).bicycleSafety(0.7)
+    );
 
     props.setProperties(
       "highway=busway",
@@ -730,20 +730,10 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     new DefaultWayPropertySetSource().populateNotesAndNames(props);
 
-    props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("embankment=*"), false);
-    props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("location=underground"), true);
-    props.setSlopeOverride(new OSMSpecifier("indoor=yes"), true);
-  }
-
-  @Override
-  public DrivingDirection drivingDirection() {
-    return drivingDirection;
-  }
-
-  @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new NorwayIntersectionTraversalCostModel(drivingDirection);
+    props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), false);
+    props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("location=underground"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
   }
 }

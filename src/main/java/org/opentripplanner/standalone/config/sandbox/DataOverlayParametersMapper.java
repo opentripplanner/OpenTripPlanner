@@ -1,16 +1,23 @@
 package org.opentripplanner.standalone.config.sandbox;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.ext.dataoverlay.api.DataOverlayParametersBuilder;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class DataOverlayParametersMapper {
 
   public static DataOverlayParameters map(NodeAdapter c) {
-    var dataOverlay = new DataOverlayParameters();
+    var builder = new DataOverlayParametersBuilder();
 
     for (String param : DataOverlayParameters.parametersAsString()) {
-      c.asDoubleOptional(param).ifPresent(it -> dataOverlay.put(param, it));
+      c
+        .of(param)
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDoubleOptional()
+        .ifPresent(it -> builder.add(param, it));
     }
-    return dataOverlay;
+    return builder.build();
   }
 }

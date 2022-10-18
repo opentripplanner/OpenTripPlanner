@@ -1,0 +1,37 @@
+{
+  "transitServiceStart": "-P3M",
+  "transitServiceEnd":  "P1Y",
+  "osmCacheDataInMem" : true,
+  "localFileNamePatterns" : {
+    "osm" : "(i?)\\.osm\\.pbf$",
+    "dem" : "(i?)\\.dem\\.tiff?$"
+  },
+
+  "osmDefaults": {
+    "timeZone": "Europe/Rome",
+    "osmTagMapping": "atlanta"
+  },
+  "osm": [{
+    "source" : "gs://my-bucket/otp-work-dir/norway.osm.pbf",
+    "timeZone" : "Europe/Oslo",
+    "osmTagMapping" : "norway"
+  }],
+  "dem": [{
+    "source" : "gs://my-bucket/otp-work-dir/norway.dem.tiff",
+    "elevationUnitMultiplier" : 2.5
+  }],
+  "netexDefaults" : {
+    "sharedFilePattern" : "_stops.xml",
+    "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
+    "groupFilePattern" : "(\\w{3})_.*\\.xml"
+  },
+  "transitFeeds" : [
+    {
+      "type" : "netex",
+      "feedId" : "EN",
+      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/graph-EN0001234.obj"
+    }
+  ],
+  "transferRequests": [ { "modes": "WALK" }, { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }} ]
+
+}

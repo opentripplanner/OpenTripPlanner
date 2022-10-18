@@ -5,6 +5,7 @@ import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
 import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
 import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -13,10 +14,11 @@ public class TableFormatterTest {
   @Test
   public void buildAndPrintTable() {
     String expect =
-      "" +
-      "LEFT |   CENTER   | RIGHT\n" +
-      "AAA  | Long-value |     2\n" +
-      "BB   |    Short   |    12\n";
+      """
+      LEFT |   CENTER   | RIGHT
+      AAA  | Long-value |     2
+      BB   |    Short   |    12
+      """;
 
     TableFormatter table = new TableFormatter(
       List.of(Left, Center, Right),
@@ -46,6 +48,26 @@ public class TableFormatterTest {
     List<List<?>> input = List.of(List.of("A", "B", "Total"), List.of(100, 2, 102));
 
     var table = TableFormatter.formatTableAsTextLines(input, " | ", false);
-    assertEquals(List.of("  A | B | Total", "100 | 2 |   102"), table);
+    assertEquals("  A | B | Total", table.get(0));
+    assertEquals("100 | 2 |   102", table.get(1));
+    assertEquals(2, table.size());
+  }
+
+  @Test
+  public void tableAsMarkdown() {
+    // Use a regular ArrayList to be able to insert null
+    var lastRow = new ArrayList<String>();
+    lastRow.add("(A|B)");
+    lastRow.add(null);
+    lastRow.add("X");
+
+    List<List<?>> input = List.of(List.of("A", "B", "Total"), List.of(100, 2, 102), lastRow);
+
+    var table = TableFormatter.asMarkdownTable(input);
+    assertEquals("| A      | B | Total |", table.get(0));
+    assertEquals("|--------|---|-------|", table.get(1));
+    assertEquals("| 100    | 2 | 102   |", table.get(2));
+    assertEquals("| (A\\|B) |   | X     |", table.get(3));
+    assertEquals(4, table.size());
   }
 }

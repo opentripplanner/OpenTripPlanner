@@ -1,32 +1,57 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentripplanner.util.lang.DoubleUtils.doubleEquals;
+
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
+import org.opentripplanner.routing.api.request.framework.Units;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
-// TODO VIA: Javadoc
-public class TransferPreferences implements Cloneable, Serializable {
+/**
+ * Parameters for doing transfers between transit legs.
+ *
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
+ */
+public final class TransferPreferences implements Serializable {
 
-  private int cost = 0;
-  private int slack = 120;
-  private int nonpreferredCost = 180;
-  private double waitReluctance = 1.0;
+  public static final TransferPreferences DEFAULT = new TransferPreferences();
+  private static final int MAX_NUMBER_OF_TRANSFERS = 30;
 
-  @Deprecated
-  private double waitAtBeginningFactor = 0.4;
+  private final int cost;
+  private final int slack;
+  private final double waitReluctance;
+  private final int maxTransfers;
+  private final TransferOptimizationParameters optimization;
+  private final int nonpreferredCost;
 
-  private TransferOptimizationParameters optimization = TransferOptimizationPreferences.DEFAULT;
-  private Integer maxTransfers = 12;
+  private TransferPreferences() {
+    this.cost = 0;
+    this.slack = 120;
+    this.waitReluctance = 1.0;
+    this.maxTransfers = 12;
+    this.optimization = TransferOptimizationPreferences.DEFAULT;
+    this.nonpreferredCost = 180;
+  }
 
-  public TransferPreferences() {}
+  private TransferPreferences(Builder builder) {
+    this.cost = Units.cost(builder.cost);
+    this.slack = Units.duration(builder.slack);
+    this.waitReluctance = Units.reluctance(builder.waitReluctance);
+    this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
+    this.optimization = requireNonNull(builder.optimization);
+    this.nonpreferredCost = Units.cost(builder.nonpreferredCost);
+  }
 
-  public TransferPreferences(TransferPreferences other) {
-    this.cost = other.cost;
-    this.slack = other.slack;
-    this.nonpreferredCost = other.nonpreferredCost;
-    this.waitReluctance = other.waitReluctance;
-    this.waitAtBeginningFactor = other.waitAtBeginningFactor;
-    this.optimization = other.optimization;
-    this.maxTransfers = other.maxTransfers;
+  public static Builder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public Builder copyOf() {
+    return new Builder(this);
   }
 
   /**
@@ -47,10 +72,6 @@ public class TransferPreferences implements Cloneable, Serializable {
     return cost;
   }
 
-  public void setCost(int cost) {
-    this.cost = cost;
-  }
-
   /**
    * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must
    * pass between exiting one transit vehicle and boarding another. This time is in addition to time
@@ -65,25 +86,6 @@ public class TransferPreferences implements Cloneable, Serializable {
    */
   public int slack() {
     return slack;
-  }
-
-  public void setSlack(int slack) {
-    this.slack = slack;
-  }
-
-  /**
-   * Penalty for using a non-preferred transfer
-   *
-   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
-   * old functionality the same way, but we will try to map this parameter
-   * so it does work similar as before.
-   */
-  public int nonpreferredCost() {
-    return nonpreferredCost;
-  }
-
-  public void setNonpreferredCost(int nonpreferredCost) {
-    this.nonpreferredCost = nonpreferredCost;
   }
 
   /**
@@ -102,34 +104,6 @@ public class TransferPreferences implements Cloneable, Serializable {
     return waitReluctance;
   }
 
-  public void setWaitReluctance(double waitReluctance) {
-    this.waitReluctance = waitReluctance;
-  }
-
-  public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
-    this.waitAtBeginningFactor = waitAtBeginningFactor;
-  }
-
-  /**
-   * How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first
-   * boarding)
-   *
-   * @deprecated TODO OTP2 Probably a regression, but I'm not sure it worked correctly in OTP 1.X
-   * either. It could be a part of itinerary-filtering after a Raptor search.
-   */
-  public double waitAtBeginningFactor() {
-    return waitAtBeginningFactor;
-  }
-
-  /** Configure the transfer optimization */
-  public TransferOptimizationParameters optimization() {
-    return optimization;
-  }
-
-  public void setOptimization(TransferOptimizationParameters optimization) {
-    this.optimization = optimization;
-  }
-
   /**
    * Ideally maxTransfers should be set in the router config, not here. Instead the client should be
    * able to pass in a parameter for the max number of additional/extra transfers relative to the
@@ -145,20 +119,118 @@ public class TransferPreferences implements Cloneable, Serializable {
     return maxTransfers;
   }
 
-  public void setMaxTransfers(Integer maxTransfers) {
-    this.maxTransfers = maxTransfers;
+  /** Configure the transfer optimization */
+  public TransferOptimizationParameters optimization() {
+    return optimization;
   }
 
-  public TransferPreferences clone() {
-    try {
-      // TODO VIA (Thomas): 2022-08-26 not cloning TransferOptimizationParameters (that's how it was before)
+  /**
+   * Penalty for using a non-preferred transfer
+   *
+   * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+   * old functionality the same way, but we will try to map this parameter
+   * so it does work similar as before.
+   */
+  public int nonpreferredCost() {
+    return nonpreferredCost;
+  }
 
-      var clone = (TransferPreferences) super.clone();
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    TransferPreferences that = (TransferPreferences) o;
+    return (
+      cost == that.cost &&
+      slack == that.slack &&
+      doubleEquals(that.waitReluctance, waitReluctance) &&
+      maxTransfers == that.maxTransfers &&
+      optimization.equals(that.optimization) &&
+      nonpreferredCost == that.nonpreferredCost
+    );
+  }
 
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
+  @Override
+  public int hashCode() {
+    return Objects.hash(cost, slack, waitReluctance, maxTransfers, optimization, nonpreferredCost);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TransferPreferences.class)
+      .addNum("cost", cost, DEFAULT.cost)
+      .addNum("slack", slack, DEFAULT.slack)
+      .addNum("waitReluctance", waitReluctance, DEFAULT.waitReluctance)
+      .addNum("maxTransfers", maxTransfers, DEFAULT.maxTransfers)
+      .addObj("optimization", optimization, DEFAULT.optimization)
+      .addNum("nonpreferredCost", nonpreferredCost, DEFAULT.nonpreferredCost)
+      .toString();
+  }
+
+  public static class Builder {
+
+    private final TransferPreferences original;
+    private int cost = 0;
+    private int slack = 120;
+    private int nonpreferredCost = 180;
+    private double waitReluctance = 1.0;
+
+    private TransferOptimizationParameters optimization = TransferOptimizationPreferences.DEFAULT;
+    private Integer maxTransfers = 12;
+
+    public Builder(TransferPreferences original) {
+      this.original = original;
+      this.cost = original.cost;
+      this.slack = original.slack;
+      this.maxTransfers = original.maxTransfers;
+      this.waitReluctance = original.waitReluctance;
+      this.optimization = original.optimization;
+      this.nonpreferredCost = original.nonpreferredCost;
+    }
+
+    public TransferPreferences original() {
+      return original;
+    }
+
+    public Builder withCost(int cost) {
+      this.cost = cost;
+      return this;
+    }
+
+    public Builder withSlack(int slack) {
+      this.slack = slack;
+      return this;
+    }
+
+    public Builder withNonpreferredCost(int nonpreferredCost) {
+      this.nonpreferredCost = nonpreferredCost;
+      return this;
+    }
+
+    public Builder withWaitReluctance(double waitReluctance) {
+      this.waitReluctance = waitReluctance;
+      return this;
+    }
+
+    public Builder withOptimization(TransferOptimizationParameters optimization) {
+      this.optimization = optimization;
+      return this;
+    }
+
+    public Builder withMaxTransfers(Integer maxTransfers) {
+      this.maxTransfers = maxTransfers;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
+      return this;
+    }
+
+    TransferPreferences build() {
+      var value = new TransferPreferences(this);
+      return original.equals(value) ? original : value;
     }
   }
 }

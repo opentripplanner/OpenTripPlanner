@@ -1,15 +1,14 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -21,7 +20,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   private final StreetTraversalPermission permission;
 
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
   private double levels = 1;
   private int travelTime = 0;
@@ -30,7 +29,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairAccessibility,
+    Accessibility wheelchairAccessibility,
     double levels,
     int travelTime
   ) {
@@ -43,7 +42,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairAccessibility
+    Accessibility wheelchairAccessibility
   ) {
     super(from, to);
     this.permission = permission;
@@ -54,7 +53,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairBoarding,
+    Accessibility wheelchairBoarding,
     int levels,
     int travelTime
   ) {
@@ -66,7 +65,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
-    WheelchairAccessibility wheelchairBoarding
+    Accessibility wheelchairBoarding
   ) {
     new ElevatorHopEdge(from, to, permission, wheelchairBoarding);
     new ElevatorHopEdge(to, from, permission, wheelchairBoarding);
@@ -84,20 +83,19 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   @Override
   public State traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
-    RouteRequest request = s0.getOptions();
 
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
 
-    if (request.wheelchair()) {
+    if (s0.getRequest().wheelchair()) {
       if (
-        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE &&
-        preferences.wheelchairAccessibility().elevator().onlyConsiderAccessible()
+        wheelchairAccessibility != Accessibility.POSSIBLE &&
+        preferences.wheelchair().elevator().onlyConsiderAccessible()
       ) {
         return null;
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().unknownCost());
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(preferences.wheelchairAccessibility().elevator().inaccessibleCost());
+      } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
+        s1.incrementWeight(preferences.wheelchair().elevator().unknownCost());
+      } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
+        s1.incrementWeight(preferences.wheelchair().elevator().inaccessibleCost());
       }
     }
 
@@ -116,12 +114,14 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     }
 
     s1.incrementWeight(
-      this.travelTime > 0 ? this.travelTime : (preferences.street().elevatorHopCost() * this.levels)
+      this.travelTime > 0
+        ? this.travelTime
+        : (preferences.street().elevator().hopCost() * this.levels)
     );
     s1.incrementTimeInSeconds(
       this.travelTime > 0
         ? this.travelTime
-        : (int) (preferences.street().elevatorHopTime() * this.levels)
+        : (int) (preferences.street().elevator().hopTime() * this.levels)
     );
     return s1.makeState();
   }
@@ -143,6 +143,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public boolean isWheelchairAccessible() {
-    return wheelchairAccessibility == WheelchairAccessibility.POSSIBLE;
+    return wheelchairAccessibility == Accessibility.POSSIBLE;
   }
 }

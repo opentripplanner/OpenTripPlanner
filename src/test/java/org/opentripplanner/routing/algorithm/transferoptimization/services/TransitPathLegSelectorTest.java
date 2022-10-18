@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
 import java.util.Collection;
@@ -15,7 +14,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
@@ -124,7 +123,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   }
 
   private TransitPathLeg<TestTripSchedule> transitLeg(int egressStop) {
-    TestTransfer walk = walk(egressStop, EGRESS_END - EGRESS_START);
+    TestAccessEgress walk = TestAccessEgress.walk(egressStop, EGRESS_END - EGRESS_START);
     var egress = new EgressPathLeg<TestTripSchedule>(
       walk,
       EGRESS_START,

@@ -1,19 +1,25 @@
 package org.opentripplanner.datastore.base;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.io.IOUtils;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.TemporaryFileDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This decorator help unzip the content of any underling data source(the delegate). This make it
@@ -23,7 +29,15 @@ import org.opentripplanner.datastore.api.FileType;
  */
 public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
+  /**
+   * Maximum size of an uncompressed zip entry in memory. Larger entries are stored on disk.
+   */
+  private static final int DEFAULT_MAX_ZIP_ENTRY_SIZE_IN_MEMORY = 2_000_000_000;
+
+  private static final Logger LOG = LoggerFactory.getLogger(ZipStreamDataSourceDecorator.class);
+
   private final DataSource delegate;
+  private final int maxZipEntrySizeInMemory;
 
   /**
    * This store load the zip file into memory; hence we should load the content only once, even at
@@ -43,7 +57,12 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
    * content.
    */
   public ZipStreamDataSourceDecorator(DataSource delegate) {
+    this(delegate, DEFAULT_MAX_ZIP_ENTRY_SIZE_IN_MEMORY);
+  }
+
+  ZipStreamDataSourceDecorator(DataSource delegate, int maxZipEntrySizeInMemory) {
     this.delegate = delegate;
+    this.maxZipEntrySizeInMemory = maxZipEntrySizeInMemory;
   }
 
   @Override
@@ -119,6 +138,12 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
 
   @Override
   public void close() {
+    if (content != null) {
+      content
+        .stream()
+        .filter(TemporaryFileDataSource.class::isInstance)
+        .forEach(dataSource -> ((TemporaryFileDataSource) dataSource).deleteFile());
+    }
     // Make the content available for GC.
     content = null;
   }
@@ -147,22 +172,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
         if (entry.isDirectory()) {
           continue;
         }
-
-        ByteArrayOutputStream buf = new ByteArrayOutputStream(4048);
-        zis.transferTo(buf);
-        byte[] bArray = buf.toByteArray();
-
-        content.add(
-          new ByteArrayDataSource(
-            entry.getName() + " (" + path() + ")",
-            entry.getName(),
-            type(),
-            bArray.length,
-            entry.getLastModifiedTime().toMillis(),
-            false
-          )
-            .withBytes(bArray)
-        );
+        uncompressEntry(zis, entry);
       }
     } catch (ZipException ex) {
       throw new RuntimeException(
@@ -171,6 +181,37 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
       );
     } catch (IOException ie) {
       throw new RuntimeException("Failed to load " + path() + ": " + ie.getLocalizedMessage(), ie);
+    }
+  }
+
+  private void uncompressEntry(ZipInputStream zis, ZipEntry entry) throws IOException {
+    ByteArrayOutputStream buf = new ByteArrayOutputStream(4048);
+    long nbCopiedBytes = IOUtils.copyLarge(zis, buf, 0, maxZipEntrySizeInMemory + 1L);
+    byte[] byteArray = buf.toByteArray();
+    if (nbCopiedBytes <= maxZipEntrySizeInMemory) {
+      content.add(
+        new ByteArrayDataSource(
+          entry.getName() + " (" + path() + ")",
+          entry.getName(),
+          type(),
+          byteArray.length,
+          entry.getLastModifiedTime().toMillis(),
+          false
+        )
+          .withBytes(byteArray)
+      );
+    } else {
+      LOG.info(
+        "The entry {} in the zip datasource {} is larger than 2GB. It will be stored on disk",
+        entry.getName(),
+        name()
+      );
+      File tmpFile = Files.createTempFile(null, null).toFile();
+      try (OutputStream outputStream = Files.newOutputStream(tmpFile.toPath())) {
+        outputStream.write(byteArray);
+        zis.transferTo(outputStream);
+      }
+      content.add(new TemporaryFileDataSource(entry.getName(), tmpFile, type()));
     }
   }
 }

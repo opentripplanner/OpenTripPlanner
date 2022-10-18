@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.fares;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.ext.fares.impl.AtlantaFareServiceFactory;
+import org.opentripplanner.ext.fares.impl.CombineInterlinedLegsFactory;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HSLFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
@@ -10,12 +12,8 @@ import org.opentripplanner.ext.fares.impl.NycFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.SFBayFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.TimeBasedVehicleRentalFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FaresConfiguration {
-
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
   /**
    * Build a specific FareServiceFactory given the config node, or fallback to the default if none
@@ -85,8 +83,11 @@ public class FaresConfiguration {
         "bike-rental-time-based" -> new TimeBasedVehicleRentalFareServiceFactory(); //TODO: deprecated, remove in next major version
       case "san-francisco" -> new SFBayFareServiceFactory();
       case "new-york" -> new NycFareServiceFactory();
-      case "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
+      case "highest-fare-in-free-transfer-window",
+        "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
       case "hsl" -> new HSLFareServiceFactory();
+      case "atlanta" -> new AtlantaFareServiceFactory();
+      case "combine-interlined-legs" -> new CombineInterlinedLegsFactory();
       default -> throw new IllegalArgumentException(String.format("Unknown fare type: '%s'", type));
     };
   }

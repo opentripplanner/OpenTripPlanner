@@ -11,9 +11,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
-import org.opentripplanner.routing.core.RoutingContext;
 
 public class RaptorRequestTransferCache {
 
@@ -27,12 +26,9 @@ public class RaptorRequestTransferCache {
     return transferCache;
   }
 
-  public RaptorTransferIndex get(
-    List<List<Transfer>> transfersByStopIndex,
-    RoutingContext routingContext
-  ) {
+  public RaptorTransferIndex get(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
     try {
-      return transferCache.get(new CacheKey(transfersByStopIndex, routingContext));
+      return transferCache.get(new CacheKey(transfersByStopIndex, request));
     } catch (ExecutionException e) {
       throw new RuntimeException("Failed to get item from transfer cache", e);
     }
@@ -42,7 +38,7 @@ public class RaptorRequestTransferCache {
     return new CacheLoader<>() {
       @Override
       public RaptorTransferIndex load(@javax.annotation.Nonnull CacheKey cacheKey) {
-        return RaptorTransferIndex.create(cacheKey.transfersByStopIndex, cacheKey.routingContext);
+        return RaptorTransferIndex.create(cacheKey.transfersByStopIndex, cacheKey.request);
       }
     };
   }
@@ -50,13 +46,13 @@ public class RaptorRequestTransferCache {
   private static class CacheKey {
 
     private final List<List<Transfer>> transfersByStopIndex;
-    private final RoutingContext routingContext;
+    private final RouteRequest request;
     private final StreetRelevantOptions options;
 
-    private CacheKey(List<List<Transfer>> transfersByStopIndex, RoutingContext routingContext) {
+    private CacheKey(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
       this.transfersByStopIndex = transfersByStopIndex;
-      this.routingContext = routingContext;
-      this.options = new StreetRelevantOptions(routingContext.opt);
+      this.request = request;
+      this.options = new StreetRelevantOptions(request);
     }
 
     @Override
@@ -85,7 +81,7 @@ public class RaptorRequestTransferCache {
 
   /**
    * This contains an extract of the parameters which may influence transfers. The possible values
-   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RoutingRequest, RoutingPreferences)}.
+   * are somewhat limited by rounding in {@link Transfer#prepareTransferRoutingRequest(RouteRequest)}.
    * <p>
    * TODO VIA: the bikeWalking options are not used.
    * TODO VIA: Should we use StreetPreferences instead?
@@ -95,7 +91,8 @@ public class RaptorRequestTransferCache {
     private final StreetMode transferMode;
     private final BicycleOptimizeType optimize;
     private final TimeSlopeSafetyTriangle bikeOptimizeTimeSlopeSafety;
-    private final WheelchairAccessibilityPreferences wheelchairAccessibility;
+    private final boolean wheelchair;
+    private final WheelchairPreferences wheelchairPreferences;
     private final double walkSpeed;
     private final double bikeSpeed;
     private final double walkReluctance;
@@ -118,7 +115,8 @@ public class RaptorRequestTransferCache {
       this.bikeOptimizeTimeSlopeSafety = preferences.bike().optimizeTriangle();
       this.bikeSwitchCost = preferences.bike().switchCost();
       this.bikeSwitchTime = preferences.bike().switchTime();
-      this.wheelchairAccessibility = preferences.wheelchairAccessibility().round();
+      this.wheelchair = routingRequest.wheelchair();
+      this.wheelchairPreferences = preferences.wheelchair();
 
       this.walkSpeed = preferences.walk().speed();
       this.bikeSpeed = preferences.bike().speed();
@@ -128,10 +126,10 @@ public class RaptorRequestTransferCache {
       this.stairsTimeFactor = preferences.walk().stairsTimeFactor();
       this.turnReluctance = preferences.street().turnReluctance();
 
-      this.elevatorBoardCost = preferences.street().elevatorBoardCost();
-      this.elevatorBoardTime = preferences.street().elevatorBoardTime();
-      this.elevatorHopCost = preferences.street().elevatorHopCost();
-      this.elevatorHopTime = preferences.street().elevatorHopTime();
+      this.elevatorBoardCost = preferences.street().elevator().boardCost();
+      this.elevatorBoardTime = preferences.street().elevator().boardTime();
+      this.elevatorHopCost = preferences.street().elevator().hopCost();
+      this.elevatorHopTime = preferences.street().elevator().hopTime();
     }
 
     @Override
@@ -140,7 +138,8 @@ public class RaptorRequestTransferCache {
         transferMode,
         optimize,
         bikeOptimizeTimeSlopeSafety,
-        wheelchairAccessibility,
+        wheelchair,
+        wheelchairPreferences,
         walkSpeed,
         bikeSpeed,
         walkReluctance,
@@ -173,7 +172,8 @@ public class RaptorRequestTransferCache {
         Double.compare(that.stairsTimeFactor, stairsTimeFactor) == 0 &&
         Double.compare(that.turnReluctance, turnReluctance) == 0 &&
         Objects.equals(that.bikeOptimizeTimeSlopeSafety, bikeOptimizeTimeSlopeSafety) &&
-        wheelchairAccessibility.equals(that.wheelchairAccessibility) &&
+        wheelchair == that.wheelchair &&
+        wheelchairPreferences.equals(that.wheelchairPreferences) &&
         elevatorBoardCost == that.elevatorBoardCost &&
         elevatorBoardTime == that.elevatorBoardTime &&
         elevatorHopCost == that.elevatorHopCost &&

@@ -184,7 +184,7 @@ public class GtfsModule implements GraphBuilderModule {
             maxInterlineDistance,
             issueStore
           )
-            .run(transitModel.getAllTripPatterns());
+            .run(otpTransitService.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
@@ -281,10 +281,10 @@ public class GtfsModule implements GraphBuilderModule {
 
     for (Class<?> entityClass : reader.getEntityClasses()) {
       if (skipEntityClass(entityClass)) {
-        LOG.info("Skipping entity: " + entityClass.getName());
+        LOG.info("Skipping entity: {}", entityClass.getName());
         continue;
       }
-      LOG.info("Reading entity: " + entityClass.getName());
+      LOG.info("Reading entity: {}", entityClass.getName());
       reader.readEntities(entityClass);
       store.flush();
       // NOTE that agencies are first in the list and read before all other entity types, so it is effective to
@@ -343,6 +343,11 @@ public class GtfsModule implements GraphBuilderModule {
     }
     for (var fareProduct : store.getAllEntitiesForType(FareProduct.class)) {
       fareProduct.getId().setAgencyId(reader.getDefaultAgencyId());
+    }
+    for (var transferRule : store.getAllEntitiesForType(FareTransferRule.class)) {
+      transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
+      transferRule.getFromLegGroupId().setAgencyId(reader.getDefaultAgencyId());
+      transferRule.getToLegGroupId().setAgencyId(reader.getDefaultAgencyId());
     }
     for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
       pathway.getId().setAgencyId(reader.getDefaultAgencyId());
@@ -470,7 +475,7 @@ public class GtfsModule implements GraphBuilderModule {
         String name = bean.getClass().getName();
         int index = name.lastIndexOf('.');
         if (index != -1) name = name.substring(index + 1);
-        LOG.debug("loading " + name + ": " + count);
+        LOG.debug("loading {}: {}", name, count);
       }
     }
 

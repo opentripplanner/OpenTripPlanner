@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
-import static org.opentripplanner.graph_builder.module.osm.WayPropertySetSource.DrivingDirection.RIGHT_HAND_TRAFFIC;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BICYCLE_AND_CAR;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.CAR;
@@ -9,8 +8,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.intersection_model.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 
 /**
@@ -39,19 +38,15 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  *
  * @author bdferris, novalis
  * @see WayPropertySetSource
- * @see OpenStreetMapModule
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
-  private final WayProperties allWayProperties = withModes(ALL).build();
-  private final WayProperties noneWayProperties = withModes(NONE).build();
-  private final WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
-  private final WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE)
-    .build();
-  private final DrivingDirection drivingDirection = RIGHT_HAND_TRAFFIC;
-
   /* Populate properties on existing WayPropertySet */
   public void populateProperties(WayPropertySet props) {
+    WayProperties allWayProperties = withModes(ALL).build();
+    WayProperties noneWayProperties = withModes(NONE).build();
+    WayProperties pedestrianWayProperties = withModes(PEDESTRIAN).build();
+    WayProperties pedestrianAndBicycleWayProperties = withModes(PEDESTRIAN_AND_BICYCLE).build();
     /* no bicycle tags */
 
     /* NONE */
@@ -504,7 +499,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     // We assume highway/cycleway of a cycle network to be safer (for bicycle network relations, their network is copied to way in postLoad)
     // this uses a OR since you don't want to apply the safety multiplier more than once.
-    props.setMixinProperties("lcn=yes|rcn=yes|ncn=yes", withModes(ALL).bicycleSafety(0.7));
+    props.setMixinProperties(
+      new LogicalOrSpecifier("lcn=yes", "rcn=yes", "ncn=yes"),
+      withModes(ALL).bicycleSafety(0.7)
+    );
 
     /*
      * Automobile speeds in the United States: Based on my (mattwigway) personal experience, primarily in California
@@ -621,19 +619,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     populateNotesAndNames(props);
 
     // slope overrides
-    props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("embankment=*"), true);
-    props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
-  }
-
-  @Override
-  public DrivingDirection drivingDirection() {
-    return drivingDirection;
-  }
-
-  @Override
-  public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-    return new SimpleIntersectionTraversalCostModel(drivingDirection);
+    props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), true);
+    props.setSlopeOverride(new BestMatchSpecifier("tunnel=*"), true);
   }
 
   public void populateNotesAndNames(WayPropertySet props) {

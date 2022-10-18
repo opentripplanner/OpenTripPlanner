@@ -69,15 +69,11 @@ public class ItineraryFares {
   }
 
   public List<FareComponent> getDetails(FareType type) {
-    return details.get(type);
+    return details.getOrDefault(type, List.of());
   }
 
   public Set<FareType> getTypes() {
     return fare.keySet();
-  }
-
-  public void addLegProducts(Collection<LegProducts> legProducts) {
-    legProducts.forEach(lp -> this.legProducts.putAll(lp.leg(), lp.products()));
   }
 
   @Override
@@ -100,5 +96,14 @@ public class ItineraryFares {
   @Override
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("details", details).toString();
+  }
+
+  public void addLegProducts(Collection<LegProducts> legProducts) {
+    legProducts.forEach(lp ->
+      this.legProducts.putAll(
+          lp.leg(),
+          lp.products().stream().map(LegProducts.ProductWithTransfer::product).toList()
+        )
+    );
   }
 }

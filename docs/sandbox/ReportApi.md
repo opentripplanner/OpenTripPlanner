@@ -22,6 +22,8 @@ Feel free to add more reports and to add your organization to the contact info l
 This module mounts an endpoint for generating reports under `otp/report`. Available reports:
 
 - [/otp/report/transfers.csv](http://localhost:8080/otp/report/transfers.csv)
+- [/otp/report/graph.json](http://localhost:8080/otp/report/graph.json)
+  Detailed numbers of transit and street entities in the graph
 - [/otp/report/bicycle-safety.html](http://localhost:8080/otp/report/bicycle-safety.html):
   Interactive viewer of the rules that determine how bicycle safety factors are calculated.
 - [/otp/report/bicycle-safety.csv](http://localhost:8080/otp/report/bicycle-safety.csv): Raw CSV

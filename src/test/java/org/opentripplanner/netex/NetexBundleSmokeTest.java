@@ -21,8 +21,8 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Notice;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -157,7 +157,7 @@ public class NetexBundleSmokeTest {
       .stream()
       .collect(Collectors.toMap(TripPattern::getId, s -> s));
     TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
-    assertEquals("Jernbanetorget", p.getTripHeadsign());
+    assertEquals("Jernbanetorget", p.getTripHeadsign().toString());
     assertEquals("RB", p.getFeedId());
     assertEquals(
       "[RegularStop{RB:NSR:Quay:7203 N/A}, RegularStop{RB:NSR:Quay:8027 N/A}]",
@@ -175,12 +175,12 @@ public class NetexBundleSmokeTest {
     Map<FeedScopedId, Trip> map = trips.stream().collect(Collectors.toMap(Trip::getId, t -> t));
     Trip t = map.get(fId("RUT:ServiceJourney:12-101375-1001"));
 
-    assertEquals("Jernbanetorget", t.getHeadsign());
+    assertEquals("Jernbanetorget", t.getHeadsign().toString());
     assertNull(t.getShortName());
     assertNotNull(t.getServiceId());
     assertEquals("Ruter", t.getOperator().getName());
     assertEquals(BikeAccess.UNKNOWN, t.getBikesAllowed());
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, t.getWheelchairBoarding());
+    assertEquals(Accessibility.NO_INFORMATION, t.getWheelchairBoarding());
     assertEquals(4, trips.size());
   }
 

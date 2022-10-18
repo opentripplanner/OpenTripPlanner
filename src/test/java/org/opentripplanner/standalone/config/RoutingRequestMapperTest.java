@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.framework.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class RoutingRequestMapperTest {
             "inaccessibleCost": 6
           },
           "stairsReluctance": 7,
-          "maxSlope": 8,
+          "maxSlope": 0.085,
           "slopeExceededReluctance": 9,
           "inaccessibleStreetReluctance": 10
         }
@@ -42,7 +42,7 @@ class RoutingRequestMapperTest {
 
     var subject = RoutingRequestMapper.mapRoutingRequest(nodeAdapter);
 
-    var accessibility = subject.preferences().wheelchairAccessibility();
+    var accessibility = subject.preferences().wheelchair();
     assertTrue(subject.wheelchair());
 
     assertFalse(accessibility.trip().onlyConsiderAccessible());
@@ -62,7 +62,7 @@ class RoutingRequestMapperTest {
     assertEquals(6, accessibility.elevator().inaccessibleCost());
 
     assertEquals(7.0, accessibility.stairsReluctance());
-    assertEquals(8.0, accessibility.maxSlope());
+    assertEquals(.085, accessibility.maxSlope());
     assertEquals(9.0, accessibility.slopeExceededReluctance());
     assertEquals(10.0, accessibility.inaccessibleStreetReluctance());
   }

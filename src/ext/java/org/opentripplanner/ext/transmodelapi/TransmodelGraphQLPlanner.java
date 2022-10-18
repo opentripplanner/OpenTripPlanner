@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
@@ -90,7 +91,6 @@ public class TransmodelGraphQLPlanner {
     TransmodelRequestContext context = environment.getContext();
     OtpServerRequestContext serverContext = context.getServerContext();
     RouteRequest request = serverContext.defaultRouteRequest();
-    RoutingPreferences preferences = request.preferences();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
@@ -114,41 +114,10 @@ public class TransmodelGraphQLPlanner {
     //        callWith.argument("maxTransferWalkDistance", request::setMaxTransferWalkDistance);
     //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
     //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
-    callWith.argument("walkBoardCost", preferences.walk()::setBoardCost);
-    callWith.argument("walkReluctance", preferences::setNonTransitReluctance);
-    callWith.argument("waitReluctance", preferences.transfer()::setWaitReluctance);
-    callWith.argument("waitAtBeginningFactor", preferences.transfer()::setWaitAtBeginningFactor);
-    callWith.argument("walkSpeed", preferences.walk()::setSpeed);
-    callWith.argument("bikeSpeed", preferences.bike()::setSpeed);
-    callWith.argument("bikeSwitchTime", preferences.bike()::setSwitchTime);
-    callWith.argument("bikeSwitchCost", preferences.bike()::setSwitchCost);
+
     //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
-    BicycleOptimizeType bicycleOptimizeType = environment.getArgument("bicycleOptimisationMethod");
-
-    if (bicycleOptimizeType == BicycleOptimizeType.TRIANGLE) {
-      // Arguments: [ time, slope, safety ]
-      final double[] args = new double[3];
-
-      callWith.argument("triangleFactors.time", (Double v) -> args[0] = v);
-      callWith.argument("triangleFactors.slope", (Double v) -> args[1] = v);
-      callWith.argument("triangleFactors.safety", (Double v) -> args[2] = v);
-
-      preferences.bike().initOptimizeTriangle(args[0], args[1], args[2]);
-    }
-
-    if (bicycleOptimizeType != null) {
-      preferences.bike().setOptimizeType(bicycleOptimizeType);
-    }
-
     callWith.argument("arriveBy", request::setArriveBy);
-    // TODO VIA (Skånetrafiken): 2022-08-24 refactor
-    //    callWith.argument(
-    //      "vias",
-    //      (List<Map<String, Object>> v) ->
-    //        request.intermediatePlaces =
-    //          v.stream().map(this::toGenericLocation).collect(Collectors.toList())
-    //    );
 
     callWith.argument(
       "preferred.authorities",
@@ -171,10 +140,6 @@ public class TransmodelGraphQLPlanner {
         request.journey().transit().setBannedAgencies(mapIDsToDomain(authorities))
     );
 
-    callWith.argument(
-      "preferred.otherThanPreferredLinesPenalty",
-      preferences.transit()::setOtherThanPreferredRoutesPenalty
-    );
     callWith.argument(
       "preferred.lines",
       (List<String> lines) -> request.journey().transit().setPreferredRoutes(mapIDsToDomain(lines))
@@ -206,15 +171,19 @@ public class TransmodelGraphQLPlanner {
     // callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
     // callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
 
+    callWith.argument(
+      "whiteListed.rentalNetworks",
+      (List<String> networks) -> request.journey().rental().setAllowedNetworks(Set.copyOf(networks))
+    );
+
+    callWith.argument(
+      "banned.rentalNetworks",
+      (List<String> networks) -> request.journey().rental().setBannedNetworks(Set.copyOf(networks))
+    );
+
     // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
     // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
     // callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-    callWith.argument(
-      "debugItineraryFilter",
-      (Boolean v) -> preferences.system().itineraryFilters().debug = v
-    );
-
-    callWith.argument("transferPenalty", (Integer v) -> preferences.transfer().setCost(v));
 
     // callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
     // callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
@@ -223,11 +192,10 @@ public class TransmodelGraphQLPlanner {
     if (modes != null) {
       request.journey().setModes(modes);
     }
-    ItineraryFiltersInputType.mapToRequest(
-      environment,
-      callWith,
-      preferences.system().itineraryFilters()
-    );
+
+    request.withPreferences(preferences -> {
+      mapPreferences(environment, callWith, preferences);
+    });
 
     /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
@@ -242,46 +210,81 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-    if (request.vehicleRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
-      //slower bike speed for bike sharing, based on empirical evidence from DC.
-      preferences.bike().setSpeed(4.3);
-    }
+    return request;
+  }
 
-    // One of those arguments has been deprecated. That's why we are mapping same thing twice.
-    callWith.argument("minimumTransferTime", preferences.transfer()::setSlack);
-    callWith.argument("transferSlack", preferences.transfer()::setSlack);
+  private void mapPreferences(
+    DataFetchingEnvironment environment,
+    DataFetcherDecorator callWith,
+    RoutingPreferences.Builder preferences
+  ) {
+    preferences.withWalk(b -> {
+      callWith.argument("walkBoardCost", b::withBoardCost);
+      callWith.argument("walkSpeed", b::withSpeed);
+    });
+    callWith.argument(
+      "walkReluctance",
+      (Double streetReluctance) -> {
+        setStreetReluctance(preferences, streetReluctance);
+      }
+    );
+    preferences.withBike(bike -> {
+      callWith.argument("bikeSpeed", bike::withSpeed);
+      callWith.argument("bikeSwitchTime", bike::withSwitchTime);
+      callWith.argument("bikeSwitchCost", bike::withSwitchCost);
+      callWith.argument("bicycleOptimisationMethod", bike::withOptimizeType);
 
-    preferences
-      .transit()
-      .withBoardSlack(builder -> {
+      if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+        bike.withOptimizeTriangle(triangle -> {
+          callWith.argument("triangle.timeFactor", triangle::withTime);
+          callWith.argument("triangle.slopeFactor", triangle::withSlope);
+          callWith.argument("triangle.safetyFactor", triangle::withSafety);
+        });
+      }
+    });
+
+    preferences.withTransfer(transfer -> {
+      callWith.argument("transferPenalty", transfer::withCost);
+
+      // 'minimumTransferTime' is deprecated, that's why we are mapping 'slack' twice.
+      callWith.argument("minimumTransferTime", transfer::withSlack);
+      callWith.argument("transferSlack", transfer::withSlack);
+
+      callWith.argument("waitReluctance", transfer::withWaitReluctance);
+      callWith.argument("maximumTransfers", transfer::withMaxTransfers);
+    });
+    preferences.withTransit(tr -> {
+      callWith.argument(
+        "preferred.otherThanPreferredLinesPenalty",
+        tr::setOtherThanPreferredRoutesPenalty
+      );
+      tr.withBoardSlack(builder -> {
         callWith.argument("boardSlackDefault", builder::withDefaultSec);
         callWith.argument(
           "boardSlackList",
           (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
         );
       });
-    preferences
-      .transit()
-      .withAlightSlack(builder -> {
+      tr.withAlightSlack(builder -> {
         callWith.argument("alightSlackDefault", builder::withDefaultSec);
         callWith.argument(
           "alightSlackList",
           (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
         );
       });
-    callWith.argument("maximumTransfers", preferences.transfer()::setMaxTransfers);
-    callWith.argument(
-      "useBikeRentalAvailabilityInformation",
-      preferences.rental()::setUseAvailabilityInformation
+      callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
+      callWith.argument("includePlannedCancellations", tr::setIncludePlannedCancellations);
+    });
+    preferences.withItineraryFilter(itineraryFilter -> {
+      callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);
+      ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
+    });
+    preferences.withRental(rental ->
+      callWith.argument(
+        "useBikeRentalAvailabilityInformation",
+        rental::withUseAvailabilityInformation
+      )
     );
-    callWith.argument("ignoreRealtimeUpdates", preferences.transit()::setIgnoreRealtimeUpdates);
-    callWith.argument(
-      "includePlannedCancellations",
-      preferences.transit()::setIncludePlannedCancellations
-    );
-    //callWith.argument("ignoreInterchanges", (Boolean v) -> request.ignoreInterchanges = v);
-
-    return request;
   }
 
   @SuppressWarnings("unchecked")
@@ -332,6 +335,23 @@ public class TransmodelGraphQLPlanner {
       return mBuilder.build();
     }
     return null;
+  }
+
+  /**
+   * This set the reluctance for bike, walk, car and bikeWalking (x2.7) - all in one go. These
+   * parameters can be set individually.
+   */
+  private void setStreetReluctance(
+    RoutingPreferences.Builder preferences,
+    Double streetReluctance
+  ) {
+    if (streetReluctance > 0) {
+      preferences.withWalk(walk -> walk.withReluctance(streetReluctance));
+      preferences.withBike(bike ->
+        bike.withReluctance(streetReluctance).withWalkingReluctance(streetReluctance * 2.7)
+      );
+      preferences.withCar(car -> car.withReluctance(streetReluctance));
+    }
   }
 
   /**

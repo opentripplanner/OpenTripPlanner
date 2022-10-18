@@ -4,13 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
@@ -71,12 +72,12 @@ public class G01_HeuristicTest implements RaptorTestConstants {
 
     data.withRoute(route(pattern("R1", STOP_C, STOP_D)).withTimetable(schedule("00:05, 00:08")));
 
-    data.withTransfer(STOP_B, walk(STOP_C, D30s));
+    data.withTransfer(STOP_B, TestTransfer.transfer(STOP_C, D30s));
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_A, D30s))
-      .addEgressPaths(walk(STOP_D, D20s))
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D20s))
       .earliestDepartureTime(T00_00)
       .timetableEnabled(true);
 

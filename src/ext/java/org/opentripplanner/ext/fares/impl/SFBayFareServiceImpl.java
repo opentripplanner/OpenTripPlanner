@@ -16,7 +16,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
+public class SFBayFareServiceImpl extends DefaultFareService {
 
   @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(SFBayFareServiceImpl.class);

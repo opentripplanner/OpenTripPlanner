@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * This fare service module handles single feed HSL ticket pricing logic.
  */
 
-public class HSLFareServiceImpl extends DefaultFareServiceImpl {
+public class HSLFareServiceImpl extends DefaultFareService {
 
   @Serial
   private static final long serialVersionUID = 20131259L;

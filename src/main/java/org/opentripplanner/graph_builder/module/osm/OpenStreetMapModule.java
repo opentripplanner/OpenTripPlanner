@@ -73,10 +73,10 @@ import org.opentripplanner.routing.vertextype.OsmBoardingLocationVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -187,19 +187,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     OSMDatabase osmdb = new OSMDatabase(issueStore, boardingAreaRefTags);
     Handler handler = new Handler(graph, osmdb);
     for (OpenStreetMapProvider provider : providers) {
-      LOG.info("Gathering OSM from provider: " + provider);
+      LOG.info("Gathering OSM from provider: {}", provider);
       provider.readOSM(osmdb);
     }
     osmdb.postLoad();
 
     LOG.info(
-      "Using OSM way configuration from {}. Setting driving direction of the graph to {}.",
-      wayPropertySetSource.getClass().getSimpleName(),
-      wayPropertySetSource.drivingDirection()
-    );
-    graph.setDrivingDirection(wayPropertySetSource.drivingDirection());
-    graph.setIntersectionTraversalCostModel(
-      wayPropertySetSource.getIntersectionTraversalCostModel()
+      "Using OSM way configuration from {}.",
+      wayPropertySetSource.getClass().getSimpleName()
     );
 
     LOG.info("Building street graph from OSM");
@@ -321,12 +316,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       );
 
       if (street != null) {
-        double bicycleSafety = wayData.getBicycleSafetyFeatures().first;
+        double bicycleSafety = wayData.getBicycleSafetyFeatures().forward();
         street.setBicycleSafetyFactor((float) bicycleSafety);
         if (bicycleSafety < bestBikeSafety) {
           bestBikeSafety = (float) bicycleSafety;
         }
-        double walkSafety = wayData.getWalkSafetyFeatures().first;
+        double walkSafety = wayData.getWalkSafetyFeatures().forward();
         street.setWalkSafetyFactor((float) walkSafety);
         if (walkSafety < bestWalkSafety) {
           bestWalkSafety = (float) walkSafety;
@@ -344,12 +339,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
 
       if (backStreet != null) {
-        double bicycleSafety = wayData.getBicycleSafetyFeatures().second;
+        double bicycleSafety = wayData.getBicycleSafetyFeatures().back();
         if (bicycleSafety < bestBikeSafety) {
           bestBikeSafety = (float) bicycleSafety;
         }
         backStreet.setBicycleSafetyFactor((float) bicycleSafety);
-        double walkSafety = wayData.getWalkSafetyFeatures().second;
+        double walkSafety = wayData.getWalkSafetyFeatures().back();
         if (walkSafety < bestWalkSafety) {
           bestWalkSafety = (float) walkSafety;
         }
@@ -1227,7 +1222,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private void createElevatorHopEdges(
       ArrayList<Vertex> onboardVertices,
-      WheelchairAccessibility wheelchair,
+      Accessibility wheelchair,
       boolean bicycleAllowed,
       int levels,
       int travelTime

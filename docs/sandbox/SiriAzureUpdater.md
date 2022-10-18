@@ -8,7 +8,7 @@ IT also OTP to download historical data from en HTTP endpoint on startup.
 Skånetrafiken, Sweden
 
 ## Changelog
-
+- Added configuration for turning off stop arrival time match feature. 
 - Initial version (April 2022)
 
 ## Documentation

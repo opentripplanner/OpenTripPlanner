@@ -137,9 +137,9 @@ public class RoutingResponseMapper {
     PageCursor nextPageCursor,
     Set<RoutingError> errors
   ) {
-    LOG.debug("PageCursor current  : " + currentPageCursor);
-    LOG.debug("PageCursor previous : " + prevPageCursor);
-    LOG.debug("PageCursor next ... : " + nextPageCursor);
-    LOG.debug("Errors ............ : " + errors);
+    LOG.debug("PageCursor current  : {}", currentPageCursor);
+    LOG.debug("PageCursor previous : {}", prevPageCursor);
+    LOG.debug("PageCursor next ... : {}", nextPageCursor);
+    LOG.debug("Errors ............ : {}", errors);
   }
 }

@@ -85,7 +85,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
       }
     } catch (IOException | JAXBException | XMLStreamException e) {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
-      LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
+      LOG.warn("Failed to parse SIRI-VM feed from {}", url, e);
 
       final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
 

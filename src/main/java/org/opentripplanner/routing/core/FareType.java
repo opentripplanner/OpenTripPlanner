@@ -9,4 +9,8 @@ public enum FareType implements Serializable {
   tram,
   special,
   youth,
+  electronicRegular,
+  electronicSenior,
+  electronicSpecial,
+  electronicYouth,
 }

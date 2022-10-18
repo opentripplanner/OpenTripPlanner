@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.entur.protobuf.mapper.SiriMapper;
@@ -31,6 +32,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.trip.UpdateResult;
+import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +80,14 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   /**
    * The number of seconds to wait before reconnecting after a failed connection.
    */
-  private final int reconnectPeriodSec;
+  private final java.time.Duration reconnectPeriod;
+
+  /**
+   * For larger deployments it sometimes takes more than the default 30 seconds to fetch
+   * data, if so this parameter can be increased.
+   */
+  private final java.time.Duration initialGetDataTimeout;
+
   private final SubscriptionAdminClient subscriptionAdminClient;
   private final ProjectSubscriptionName subscriptionName;
   private final ProjectTopicName topic;
@@ -94,19 +104,22 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private transient long startTime;
   private boolean primed;
 
+  private final Consumer<UpdateResult> recordMetrics;
+
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
     TransitModel transitModel,
     SiriTimetableSnapshotSource timetableSnapshot
   ) {
-    this.configRef = config.getConfigRef();
+    this.configRef = config.configRef();
     /*
            URL that responds to HTTP GET which returns all initial data in protobuf-format.
            Will be called once to initialize realtime-data. All updates will be received from Google Cloud Pubsub
           */
-    this.dataInitializationUrl = URI.create(config.getDataInitializationUrl());
-    this.feedId = config.getFeedId();
-    this.reconnectPeriodSec = config.getReconnectPeriodSec();
+    this.dataInitializationUrl = URI.create(config.dataInitializationUrl());
+    this.feedId = config.feedId();
+    this.reconnectPeriod = config.reconnectPeriod();
+    this.initialGetDataTimeout = config.initialGetDataTimeout();
     this.snapshotSource = timetableSnapshot;
 
     // set subscriber
@@ -115,13 +128,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       subscriptionId = "otp-" + UUID.randomUUID().toString();
     }
 
-    String projectName = config.getProjectName();
-    String topicName = config.getTopicName();
+    String projectName = config.projectName();
+    String topicName = config.topicName();
 
     this.subscriptionName = ProjectSubscriptionName.of(projectName, subscriptionId);
     this.topic = ProjectTopicName.of(projectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
-    this.fuzzyTripMatcher = SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel));
+    this.fuzzyTripMatcher =
+      config.fuzzyTripMatching()
+        ? SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel))
+        : null;
 
     try {
       if (
@@ -143,6 +159,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+    recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
   @Override
@@ -223,7 +240,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         }
       }
       try {
-        Thread.sleep(reconnectPeriodSec * 1000);
+        Thread.sleep(reconnectPeriod.toMillis());
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
@@ -278,12 +295,12 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     EstimatedTimetableMessageReceiver receiver
   ) throws IOException {
     if (dataInitializationUrl != null) {
-      LOG.info("Fetching initial data from " + dataInitializationUrl);
+      LOG.info("Fetching initial data from {}", dataInitializationUrl);
       final long t1 = System.currentTimeMillis();
 
       final InputStream data = HttpUtils.getData(
         dataInitializationUrl,
-        java.time.Duration.ofSeconds(30),
+        initialGetDataTimeout,
         Map.of("Content-Type", "application/x-protobuf")
       );
       ByteString value = ByteString.readFrom(data);
@@ -368,15 +385,17 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
           );
         }
 
-        var f = saveResultOnGraph.execute((graph, transitModel) ->
-          snapshotSource.applyEstimatedTimetable(
+        var f = saveResultOnGraph.execute((graph, transitModel) -> {
+          var results = snapshotSource.applyEstimatedTimetable(
             transitModel,
             fuzzyTripMatcher,
             feedId,
             false,
             estimatedTimetableDeliveries
-          )
-        );
+          );
+
+          recordMetrics.accept(results);
+        });
 
         if (!isPrimed()) {
           try {

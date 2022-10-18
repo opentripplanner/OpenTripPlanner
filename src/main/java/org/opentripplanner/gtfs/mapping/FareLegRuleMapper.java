@@ -25,7 +25,7 @@ public final class FareLegRuleMapper {
         FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
         if (productForRule != null) {
           return new FareLegRule(
-            productForRule.id().getFeedId(),
+            r.getLegGroupId(),
             r.getNetworkId(),
             r.getFromAreaId(),
             r.getToAreaId(),

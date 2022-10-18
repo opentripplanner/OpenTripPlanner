@@ -187,7 +187,7 @@ public class StopTimesMapperTest {
   ) {
     assertEquals(stopId, stopTime.getStop().getId().getId());
     assertEquals(departureTime, stopTime.getDepartureTime());
-    assertEquals(headsign, stopTime.getStopHeadsign());
+    assertEquals(headsign, stopTime.getStopHeadsign().toString());
 
     List<String> stopTimeVia = stopTime.getHeadsignVias();
     assertEquals(via, stopTimeVia);

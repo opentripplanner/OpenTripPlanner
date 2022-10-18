@@ -213,11 +213,17 @@ public class GraphBuilder implements Runnable {
     var f = new OtpNumberFormat();
     var nStops = f.formatNumber(transitModel.getStopModel().stopIndexSize());
     var nPatterns = f.formatNumber(transitModel.getAllTripPatterns().size());
+    var nTransfers = f.formatNumber(transitModel.getTransferService().listAll().size());
     var nVertices = f.formatNumber(graph.countVertices());
     var nEdges = f.formatNumber(graph.countEdges());
 
     LOG.info("Graph building took {}.", time);
     LOG.info("Graph built.   |V|={} |E|={}", nVertices, nEdges);
-    LOG.info("Transit built. |Stops|={} |Patterns|={}", nStops, nPatterns);
+    LOG.info(
+      "Transit built. |Stops|={} |Patterns|={} |ConstrainedTransfers|={}",
+      nStops,
+      nPatterns,
+      nTransfers
+    );
   }
 }

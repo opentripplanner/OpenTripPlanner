@@ -1,9 +1,12 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -26,26 +29,51 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   public TransitRoutingConfig(NodeAdapter c) {
     RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
-    this.maxNumberOfTransfers = c.asInt("maxNumberOfTransfers", dft.maxNumberOfTransfers());
+    this.maxNumberOfTransfers =
+      c
+        .of("maxNumberOfTransfers")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.maxNumberOfTransfers());
     this.scheduledTripBinarySearchThreshold =
-      c.asInt("scheduledTripBinarySearchThreshold", dft.scheduledTripBinarySearchThreshold());
+      c
+        .of("scheduledTripBinarySearchThreshold")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.scheduledTripBinarySearchThreshold());
     this.iterationDepartureStepInSeconds =
-      c.asInt("iterationDepartureStepInSeconds", dft.iterationDepartureStepInSeconds());
-    this.searchThreadPoolSize = c.asInt("searchThreadPoolSize", dft.searchThreadPoolSize());
+      c
+        .of("iterationDepartureStepInSeconds")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.iterationDepartureStepInSeconds());
+    this.searchThreadPoolSize =
+      c
+        .of("searchThreadPoolSize")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(dft.searchThreadPoolSize());
     // Dynamic Search Window
     this.stopTransferCost =
-      c.asEnumMapAllKeysRequired(
-        "stopTransferCost",
-        StopTransferPriority.class,
-        NodeAdapter::asInt
-      );
-    this.transferCacheMaxSize = c.asInt("transferCacheMaxSize", 25);
+      c
+        .of("stopTransferCost")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asEnumMapAllKeysRequired(StopTransferPriority.class, Integer.class);
+    this.transferCacheMaxSize =
+      c.of("transferCacheMaxSize").withDoc(NA, /*TODO DOC*/"TODO").asInt(25);
 
     this.pagingSearchWindowAdjustments =
-      c.asDurations("pagingSearchWindowAdjustments", PAGING_SEARCH_WINDOW_ADJUSTMENTS);
+      c
+        .of("pagingSearchWindowAdjustments")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
     this.dynamicSearchWindowCoefficients =
-      new DynamicSearchWindowConfig(c.path("dynamicSearchWindow"));
+      new DynamicSearchWindowConfig(
+        c
+          .of("dynamicSearchWindow")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject()
+      );
   }
 
   @Override
@@ -104,12 +132,27 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     public DynamicSearchWindowConfig(NodeAdapter dsWin) {
       DynamicSearchWindowCoefficients dsWinDft = new DynamicSearchWindowCoefficients() {};
       this.minTransitTimeCoefficient =
-        dsWin.asDouble("minTransitTimeCoefficient", dsWinDft.minTransitTimeCoefficient());
+        dsWin
+          .of("minTransitTimeCoefficient")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dsWinDft.minTransitTimeCoefficient());
       this.minWaitTimeCoefficient =
-        dsWin.asDouble("minWaitTimeCoefficient", dsWinDft.minWaitTimeCoefficient());
-      this.minWinTimeMinutes = dsWin.asInt("minWinTimeMinutes", dsWinDft.minWinTimeMinutes());
-      this.maxWinTimeMinutes = dsWin.asInt("maxWinTimeMinutes", dsWinDft.maxWinTimeMinutes());
-      this.stepMinutes = dsWin.asInt("stepMinutes", dsWinDft.stepMinutes());
+        dsWin
+          .of("minWaitTimeCoefficient")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asDouble(dsWinDft.minWaitTimeCoefficient());
+      this.minWinTimeMinutes =
+        dsWin
+          .of("minWinTimeMinutes")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(dsWinDft.minWinTimeMinutes());
+      this.maxWinTimeMinutes =
+        dsWin
+          .of("maxWinTimeMinutes")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .asInt(dsWinDft.maxWinTimeMinutes());
+      this.stepMinutes =
+        dsWin.of("stepMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(dsWinDft.stepMinutes());
     }
 
     @Override

@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import java.util.function.DoubleFunction;
 import javax.annotation.Nonnull;
+import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransferConstraint;
 
 public class PatternCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
@@ -14,12 +14,12 @@ public class PatternCostCalculator<T extends DefaultTripSchedule> implements Cos
 
   private final CostCalculator<T> delegate;
   private final BitSet unpreferredPatterns;
-  private final DoubleFunction<Double> unpreferredCost;
+  private final DoubleAlgorithmFunction unpreferredCost;
 
   public PatternCostCalculator(
     @Nonnull CostCalculator<T> delegate,
     @Nonnull BitSet unpreferredPatterns,
-    @Nonnull DoubleFunction<Double> unpreferredCost
+    @Nonnull DoubleAlgorithmFunction unpreferredCost
   ) {
     this.unpreferredPatterns = unpreferredPatterns;
     this.delegate = delegate;
@@ -61,7 +61,7 @@ public class PatternCostCalculator<T extends DefaultTripSchedule> implements Cos
     int unpreferCost = 0;
     if (unpreferredPatterns.get(trip.pattern().patternIndex())) {
       // calculate cost with linear function: fixed + reluctance * transitTime
-      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredCost.apply(transitTime));
+      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredCost.calculate(transitTime));
     }
     int defaultCost = delegate.transitArrivalCost(
       boardCost,
@@ -84,7 +84,7 @@ public class PatternCostCalculator<T extends DefaultTripSchedule> implements Cos
   }
 
   @Override
-  public int costEgress(RaptorTransfer egress) {
+  public int costEgress(RaptorAccessEgress egress) {
     return delegate.costEgress(egress);
   }
 }

@@ -42,17 +42,13 @@ public class SpeedTestRequest {
 
   RouteRequest toRoutingRequest() {
     var request = config.request.clone();
-    var pref = request.preferences();
 
     var input = testCase.definition();
 
-    if (input.departureTime() != TestCase.NOT_SET) {
+    if (input.departureTimeSet()) {
       request.setDateTime(time(input.departureTime()));
       request.setArriveBy(false);
-      if (input.arrivalTime() != TestCase.NOT_SET) {
-        pref.transit().raptorOptions().withTimeLimit(time(input.arrivalTime()));
-      }
-    } else if (input.arrivalTime() != TestCase.NOT_SET) {
+    } else if (input.arrivalTimeSet()) {
       request.setDateTime(time(input.arrivalTime()));
       request.setArriveBy(true);
     }
@@ -66,13 +62,6 @@ public class SpeedTestRequest {
     request.setNumItineraries(opts.numOfItineraries());
     request.journey().setModes(input.modes());
 
-    pref
-      .transit()
-      .raptorOptions()
-      .withProfile(profile.raptorProfile())
-      .withOptimizations(profile.optimizations())
-      .withSearchDirection(profile.direction());
-
     if (profile.raptorProfile().isOneOf(MIN_TRAVEL_DURATION, MIN_TRAVEL_DURATION_BEST_TIME)) {
       request.setSearchWindow(Duration.ZERO);
     }
@@ -84,15 +73,30 @@ public class SpeedTestRequest {
       .withStops(opts.debugStops())
       .withPath(opts.debugPath());
 
-    pref
-      .system()
-      .tags()
-      .addAll(
-        List.of(
-          RoutingTag.testCaseSample(input.idAndDescription()),
-          RoutingTag.testCaseCategory(input.category())
+    request.withPreferences(pref -> {
+      if (input.departureTimeSet() && input.arrivalTimeSet()) {
+        pref.withTransit(transit ->
+          transit.withRaptor(r -> r.withTimeLimit(time(input.arrivalTime())))
+        );
+      }
+      pref.withTransit(transit ->
+        transit.withRaptor(raptor ->
+          raptor
+            .withProfile(profile.raptorProfile())
+            .withOptimizations(profile.optimizations())
+            .withSearchDirection(profile.direction())
         )
       );
+      pref.withSystem(it ->
+        it.addTags(
+          List.of(
+            RoutingTag.testCaseSample(input.idAndDescription()),
+            RoutingTag.testCaseCategory(input.category())
+          )
+        )
+      );
+    });
+
     return request;
   }
 

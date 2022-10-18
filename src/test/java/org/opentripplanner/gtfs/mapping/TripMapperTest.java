@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.timetable.Direction;
 
@@ -35,7 +35,8 @@ public class TripMapperTest {
 
   private final TripMapper subject = new TripMapper(
     new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
-    new DirectionMapper(ISSUE_STORE)
+    new DirectionMapper(ISSUE_STORE),
+    new TranslationHelper()
   );
 
   static {
@@ -72,9 +73,9 @@ public class TripMapperTest {
     assertNotNull(result.getRoute());
     assertEquals("A:1", result.getServiceId().toString());
     assertEquals("A:1", result.getShapeId().toString());
-    assertEquals(TRIP_HEADSIGN, result.getHeadsign());
+    assertEquals(TRIP_HEADSIGN, result.getHeadsign().toString());
     assertEquals(TRIP_SHORT_NAME, result.getShortName());
-    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(Accessibility.POSSIBLE, result.getWheelchairBoarding());
     assertEquals(BikeAccess.ALLOWED, result.getBikesAllowed());
   }
 
@@ -96,7 +97,7 @@ public class TripMapperTest {
     assertNull(result.getHeadsign());
     assertNull(result.getShortName());
     assertEquals(Direction.UNKNOWN, result.getDirection());
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(Accessibility.NO_INFORMATION, result.getWheelchairBoarding());
     assertEquals(BikeAccess.UNKNOWN, result.getBikesAllowed());
   }
 

@@ -50,7 +50,7 @@ public enum Message {
     try {
       return config.get(name(), l);
     } catch (Exception e) {
-      LOG.warn("No entry in Message.properties file could be found for string " + name());
+      LOG.warn("No entry in Message.properties file could be found for string {}", name());
       return "";
     }
   }

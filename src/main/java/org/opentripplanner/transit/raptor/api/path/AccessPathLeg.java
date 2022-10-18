@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.api.path;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -13,14 +13,14 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
 
-  private final RaptorTransfer access;
+  private final RaptorAccessEgress access;
   private final int fromTime;
   private final int toTime;
   private final int generalizedCost;
   private final PathLeg<T> next;
 
   public AccessPathLeg(
-    @Nonnull RaptorTransfer access,
+    @Nonnull RaptorAccessEgress access,
     int fromTime,
     int toTime,
     int generalizedCost,
@@ -66,7 +66,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     return next;
   }
 
-  public RaptorTransfer access() {
+  public RaptorAccessEgress access() {
     return access;
   }
 

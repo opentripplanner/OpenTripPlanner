@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCostModel;
 
 /**
  * Interface for populating a {@link WayPropertySet} that determine how OSM streets can be traversed
@@ -11,41 +10,14 @@ import org.opentripplanner.routing.core.intersection_model.IntersectionTraversal
  */
 public interface WayPropertySetSource {
   static WayPropertySetSource defaultWayPropertySetSource() {
-    return fromConfig("default");
-  }
-
-  /**
-   * Return the given WayPropertySetSource or throws IllegalArgumentException if an unknown type is
-   * specified
-   */
-  static WayPropertySetSource fromConfig(String type) {
-    // type is set to "default" by GraphBuilderParameters if not provided in
-    // build-config.json
-    if ("default".equals(type)) {
-      return new DefaultWayPropertySetSource();
-    } else if ("norway".equals(type)) {
-      return new NorwayWayPropertySetSource();
-    } else if ("uk".equals(type)) {
-      return new UKWayPropertySetSource();
-    } else if ("finland".equals(type)) {
-      return new FinlandWayPropertySetSource();
-    } else if ("germany".equals(type)) {
-      return new GermanyWayPropertySetSource();
-    } else if ("atlanta".equals(type)) {
-      return new AtlantaWayPropertySetSource();
-    } else {
-      throw new IllegalArgumentException(String.format("Unknown osmWayPropertySet: '%s'", type));
-    }
+    return Source.DEFAULT.getInstance();
   }
 
   void populateProperties(WayPropertySet wayPropertySet);
 
-  DrivingDirection drivingDirection();
-
-  IntersectionTraversalCostModel getIntersectionTraversalCostModel();
-
   default boolean doesTagValueDisallowThroughTraffic(String tagValue) {
     return (
+      "no".equals(tagValue) ||
       "destination".equals(tagValue) ||
       "private".equals(tagValue) ||
       "customers".equals(tagValue) ||
@@ -60,7 +32,11 @@ public interface WayPropertySetSource {
 
   default boolean isVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String vehicle = way.getTag("vehicle");
-    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(vehicle);
+    if (vehicle != null) {
+      return doesTagValueDisallowThroughTraffic(vehicle);
+    } else {
+      return isGeneralNoThroughTraffic(way);
+    }
   }
 
   /**
@@ -68,10 +44,11 @@ public interface WayPropertySetSource {
    */
   default boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String motorVehicle = way.getTag("motor_vehicle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(motorVehicle)
-    );
+    if (motorVehicle != null) {
+      return doesTagValueDisallowThroughTraffic(motorVehicle);
+    } else {
+      return isVehicleThroughTrafficExplicitlyDisallowed(way);
+    }
   }
 
   /**
@@ -79,10 +56,11 @@ public interface WayPropertySetSource {
    */
   default boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String bicycle = way.getTag("bicycle");
-    return (
-      isVehicleThroughTrafficExplicitlyDisallowed(way) ||
-      doesTagValueDisallowThroughTraffic(bicycle)
-    );
+    if (bicycle != null) {
+      return doesTagValueDisallowThroughTraffic(bicycle);
+    } else {
+      return isVehicleThroughTrafficExplicitlyDisallowed(way);
+    }
   }
 
   /**
@@ -90,19 +68,36 @@ public interface WayPropertySetSource {
    */
   default boolean isWalkNoThroughTrafficExplicitlyDisallowed(OSMWithTags way) {
     String foot = way.getTag("foot");
-    return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
+    if (foot != null) {
+      return doesTagValueDisallowThroughTraffic(foot);
+    } else {
+      return isGeneralNoThroughTraffic(way);
+    }
   }
 
-  enum DrivingDirection {
-    /**
-     * Specifies that cars go on the right hand side of the road. This is true for the US mainland
-     * Europe.
-     */
-    RIGHT_HAND_TRAFFIC,
-    /**
-     * Specifies that cars go on the left hand side of the road. This is true for the UK, Japan and
-     * Australia.
-     */
-    LEFT_HAND_TRAFFIC,
+  /**
+   * This is the list of WayPropertySetSource sources. The enum provide a mapping between the
+   * enum name and the actual implementation.
+   */
+  enum Source {
+    DEFAULT,
+    NORWAY,
+    UK,
+    FINLAND,
+    GERMANY,
+    ATLANTA,
+    HOUSTON;
+
+    public WayPropertySetSource getInstance() {
+      return switch (this) {
+        case DEFAULT -> new DefaultWayPropertySetSource();
+        case NORWAY -> new NorwayWayPropertySetSource();
+        case UK -> new UKWayPropertySetSource();
+        case FINLAND -> new FinlandWayPropertySetSource();
+        case GERMANY -> new GermanyWayPropertySetSource();
+        case ATLANTA -> new AtlantaWayPropertySetSource();
+        case HOUSTON -> new HoustonWayPropertySetSource();
+      };
+    }
   }
 }

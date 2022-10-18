@@ -151,7 +151,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         stop(),
         DurationUtils.durationToStr(accessPath().access().durationInSeconds()),
         TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCost(cost())
+        OtpNumberFormat.formatCostCenti(cost())
       );
     }
     if (arrivedByTransit()) {
@@ -161,7 +161,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         stop(),
         transitPath().trip().pattern().debugInfo(),
         TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCost(cost())
+        OtpNumberFormat.formatCostCenti(cost())
       );
     }
     if (arrivedByTransfer()) {
@@ -170,7 +170,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         round(),
         stop(),
         TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCost(cost())
+        OtpNumberFormat.formatCostCenti(cost())
       );
     }
     if (arrivedAtDestination()) {
@@ -180,7 +180,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
         previous().stop(),
         DurationUtils.durationToStr(egressPath().egress().durationInSeconds()),
         TimeUtils.timeToStrCompact(arrivalTime()),
-        OtpNumberFormat.formatCost(cost())
+        OtpNumberFormat.formatCostCenti(cost())
       );
     }
     throw new IllegalStateException("Unknown type of stop-arrival: " + getClass());

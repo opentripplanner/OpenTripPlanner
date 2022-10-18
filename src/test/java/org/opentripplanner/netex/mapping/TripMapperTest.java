@@ -13,7 +13,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.AccessibilityAssessment;
@@ -47,7 +47,7 @@ public class TripMapperTest {
     var limitations = new AccessibilityLimitations_RelStructure();
     var access = new AccessibilityAssessment();
 
-    var transitBuilder = new OtpTransitServiceBuilder();
+    var transitBuilder = new OtpTransitServiceBuilder(issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -69,14 +69,14 @@ public class TripMapperTest {
     assertNotNull(trip, "trip must not be null");
     assertEquals(
       trip.getWheelchairBoarding(),
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       "Wheelchair accessibility not possible on trip"
     );
   }
 
   @Test
   public void mapTrip() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     TripMapper tripMapper = new TripMapper(
@@ -100,7 +100,7 @@ public class TripMapperTest {
 
   @Test
   public void mapTripWithRouteRefViaJourneyPattern() {
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
+    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
     transitBuilder.getRoutes().add(TransitModelForTest.route(ROUTE_ID).build());
 
     JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);

@@ -223,7 +223,6 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("whiteListed")
-          .description("Whitelisted")
           .description(
             "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
           )
@@ -430,7 +429,7 @@ public class TripQuery {
             "instead of removing them. This is very convenient when tuning the filters."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(preferences.system().itineraryFilters().debug)
+          .defaultValue(preferences.itineraryFilter().debug())
           .build()
       )
       .argument(
@@ -441,7 +440,7 @@ public class TripQuery {
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
-          .type(ItineraryFiltersInputType.create(gqlUtil, preferences.system().itineraryFilters()))
+          .type(ItineraryFiltersInputType.create(gqlUtil, preferences.itineraryFilter()))
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

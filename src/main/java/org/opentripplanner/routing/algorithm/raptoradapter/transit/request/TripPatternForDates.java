@@ -9,7 +9,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternFo
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyAlightSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency.TripFrequencyBoardSearch;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -55,7 +55,7 @@ public class TripPatternForDates
    */
   private final int[] departureTimes;
 
-  private final WheelchairAccessibility[] wheelchairBoardings;
+  private final Accessibility[] wheelchairBoardings;
 
   // bit arrays with boarding/alighting information for all stops on trip pattern,
   // potentially filtered by wheelchair accessibility
@@ -86,7 +86,7 @@ public class TripPatternForDates
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
-    wheelchairBoardings = new WheelchairAccessibility[numberOfTripSchedules];
+    wheelchairBoardings = new Accessibility[numberOfTripSchedules];
 
     final int nStops = tripPattern.numberOfStopsInPattern();
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
@@ -264,7 +264,7 @@ public class TripPatternForDates
       .toString();
   }
 
-  public WheelchairAccessibility wheelchairBoardingForTrip(int index) {
+  public Accessibility wheelchairBoardingForTrip(int index) {
     return wheelchairBoardings[index];
   }
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
@@ -68,7 +68,7 @@ public final class TripScheduleWithOffset implements TripSchedule {
   }
 
   @Override
-  public WheelchairAccessibility wheelchairBoarding() {
+  public Accessibility wheelchairBoarding() {
     return pattern.wheelchairBoardingForTrip(tripIndexForDates);
   }
 

@@ -41,9 +41,9 @@ import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -185,8 +185,8 @@ public abstract class GraphRoutingTest {
         var from = onboardVertices.get(i - 1);
         var to = onboardVertices.get(i);
 
-        edges.add(new ElevatorHopEdge(from, to, permission, WheelchairAccessibility.POSSIBLE));
-        edges.add(new ElevatorHopEdge(to, from, permission, WheelchairAccessibility.POSSIBLE));
+        edges.add(new ElevatorHopEdge(from, to, permission, Accessibility.POSSIBLE));
+        edges.add(new ElevatorHopEdge(to, from, permission, Accessibility.POSSIBLE));
       }
 
       return edges;

@@ -125,8 +125,9 @@ different locations around the local filesystem.
 
 As a general rule, references to data files are specified as absolute URIs and must start with the protocol name.   
 Example:   
-Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`   
-Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`
+Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`  
+HTTPS resources: `"https://download.geofabrik.de/europe/norway-latest.osm.pbf"`  
+Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`  
 
 Alternatively if a relative URI can be provided, it is interpreted as a path relative to the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
 Example:   
@@ -529,7 +530,7 @@ The current list of custom fare type is:
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
-- `highestFareInFreeTransferWindow` Will apply the highest observed transit fare (across all
+- `highest-fare-in-free-transfer-window` Will apply the highest observed transit fare (across all
   operators) within a free transfer window, adding to the cost if a trip is boarded outside the free
   transfer window. It accepts the following parameters:
     - `freeTransferWindow` the duration (in ISO8601-ish notation) that free transfers are
@@ -537,6 +538,12 @@ The current list of custom fare type is:
     - `analyzeInterlinedTransfers` If true, will treat interlined transfers as actual transfers.
       This is merely a work-around for transit agencies that choose to code their fares in a
       route-based fashion instead of a zone-based fashion. Default: `false`
+- `atlanta` (no parameters)
+- `combine-interlined-legs` Will treat two interlined legs (those with a stay-seated transfer in 
+   between them) as a single leg for the purpose of fare calculation.
+   It has a single parameter `mode` which controls when exactly the combination should happen:
+    - `ALWAYS`: All interlined legs are combined. (default)
+    - `SAME_ROUTE`: Only interlined legs whose route ID are identical are encountered.
 - `off` (no parameters)
 
 The current list of `combinationStrategy` is:
@@ -565,6 +572,7 @@ There are currently following OSM tag mapping defined;
 - `uk` which is adjusted to rules and speed in the UK
 - `germany` which is adjusted to rules and speed in Germany
 - `atlanta` which is adjusted to rules in Atlanta
+- `houston` which is adjusted to rules in Houston
 
 To add your own OSM tag mapping have a look
 at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
@@ -580,7 +588,7 @@ The mechanism is that for any two identical tags, OTP will use the first one.
       "source": "gs://marduk-dev/osm/oslo_norway.osm-160816.pbf",
       "osmTagMapping": "norway"
     }
-    ]
+  ]
 }
 ```
 

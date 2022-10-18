@@ -115,7 +115,7 @@ public abstract class SnapshotTestBase {
       )
     );
 
-    request.preferences().transfer().setMaxTransfers(6);
+    request.withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)));
     request.setNumItineraries(6);
     request.setSearchWindow(Duration.ofHours(5));
 
@@ -302,7 +302,7 @@ public abstract class SnapshotTestBase {
       dateTime.toLocalTime().format(apiTimeFormatter),
       modes,
       request.arriveBy(),
-      request.preferences().wheelchairAccessibility()
+      request.preferences().wheelchair()
     );
   }
 

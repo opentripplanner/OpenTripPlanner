@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model.basic.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
@@ -62,7 +62,7 @@ public class TransitModelForTest {
 
   public static RegularStop stopForTest(
     String idAndName,
-    WheelchairAccessibility wheelchair,
+    Accessibility wheelchair,
     double lat,
     double lon
   ) {
@@ -105,7 +105,7 @@ public class TransitModelForTest {
     double lat,
     double lon,
     Station parent,
-    WheelchairAccessibility wheelchair
+    Accessibility wheelchair
   ) {
     return RegularStop
       .of(id(idAndName))

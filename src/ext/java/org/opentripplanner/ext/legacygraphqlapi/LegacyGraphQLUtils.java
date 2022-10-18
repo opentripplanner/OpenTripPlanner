@@ -13,8 +13,8 @@ import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 
 public class LegacyGraphQLUtils {
 
@@ -42,7 +42,7 @@ public class LegacyGraphQLUtils {
     return input.toString(getLocale(environment));
   }
 
-  public static LegacyGraphQLWheelchairBoarding toGraphQL(WheelchairAccessibility boarding) {
+  public static LegacyGraphQLWheelchairBoarding toGraphQL(Accessibility boarding) {
     if (boarding == null) return null;
     return switch (boarding) {
       case NO_INFORMATION -> LegacyGraphQLWheelchairBoarding.NO_INFORMATION;

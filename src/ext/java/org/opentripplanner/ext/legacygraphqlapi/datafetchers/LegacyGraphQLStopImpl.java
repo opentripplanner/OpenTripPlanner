@@ -253,8 +253,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             );
           }
 
-          // TODO: use args.getLegacyGraphQLOmitCanceled()
-
           return transitService.stopTimesForPatternAtStop(
             stop,
             pattern,
@@ -263,7 +261,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
               ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH
+              : ArrivalDeparture.BOTH,
+            !args.getLegacyGraphQLOmitCanceled()
           );
         },
         station -> null
@@ -288,8 +287,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         environment.getArguments()
       );
 
-      // TODO: use args.getLegacyGraphQLOmitCanceled()
-
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
         transitService.stopTimesForStop(
           stop,
@@ -299,7 +296,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
           args.getLegacyGraphQLOmitNonPickups()
             ? ArrivalDeparture.DEPARTURES
             : ArrivalDeparture.BOTH,
-          false
+          !args.getLegacyGraphQLOmitCanceled()
         );
 
       return getValue(
@@ -330,15 +327,14 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         return null;
       }
 
-      // TODO: use args.getLegacyGraphQLOmitCanceled()
-
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
         transitService.getStopTimesForStop(
           stop,
           date,
           args.getLegacyGraphQLOmitNonPickups()
             ? ArrivalDeparture.DEPARTURES
-            : ArrivalDeparture.BOTH
+            : ArrivalDeparture.BOTH,
+          !args.getLegacyGraphQLOmitCanceled()
         );
 
       return getValue(
@@ -363,8 +359,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         environment.getArguments()
       );
 
-      // TODO: use args.getLegacyGraphQLOmitCanceled()
-
       Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
         transitService
           .stopTimesForStop(
@@ -375,7 +369,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             args.getLegacyGraphQLOmitNonPickups()
               ? ArrivalDeparture.DEPARTURES
               : ArrivalDeparture.BOTH,
-            false
+            !args.getLegacyGraphQLOmitCanceled()
           )
           .stream();
 
@@ -543,7 +537,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
             args.getLegacyGraphQLNumberOfDepartures(),
             args.getLegacyGraphQLOmitNonPickups()
               ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH
+              : ArrivalDeparture.BOTH,
+            false
           )
           .stream()
       )

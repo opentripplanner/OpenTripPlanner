@@ -14,7 +14,8 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -97,13 +98,16 @@ public class TurnRestrictionTest {
   @Test
   public void testForwardDefault() {
     var request = new RouteRequest();
-    var preferences = request.preferences();
-    preferences.car().setSpeed(1.0);
-    preferences.walk().setSpeed(1.0);
+
+    request.withPreferences(preferences ->
+      preferences.withCar(it -> it.withSpeed(1.0)).withWalk(w -> w.withSpeed(1.0))
+    );
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, topRight, bottomLeft))
+      .setRequest(request)
+      .setFrom(topRight)
+      .setTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);
@@ -125,12 +129,14 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsPedestrian() {
-    var request = new RouteRequest(TraverseMode.WALK);
-    request.preferences().walk().setSpeed(1.0);
+    var request = new RouteRequest();
+    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, topRight, bottomLeft))
+      .setRequest(request)
+      .setFrom(topRight)
+      .setTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);
@@ -152,12 +158,15 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsCar() {
-    var request = new RouteRequest(TraverseMode.CAR);
-    request.preferences().car().setSpeed(1.0);
+    var request = new RouteRequest();
+    request.withPreferences(p -> p.withCar(it -> it.withSpeed(1.0)));
 
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(request, graph, topRight, bottomLeft))
+      .setRequest(request)
+      .setStreetRequest(new StreetRequest(StreetMode.CAR))
+      .setFrom(topRight)
+      .setTo(bottomLeft)
       .getShortestPathTree();
 
     GraphPath path = tree.getPath(bottomLeft);

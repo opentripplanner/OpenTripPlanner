@@ -20,8 +20,9 @@ import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -153,7 +154,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public WheelchairAccessibility getTripWheelchairAccessibility() {
+  public Accessibility getTripWheelchairAccessibility() {
     return tripTimes.getWheelchairAccessibility();
   }
 
@@ -220,7 +221,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public String getHeadsign() {
+  public I18NString getHeadsign() {
     return tripTimes.getHeadsign(boardStopPosInPattern);
   }
 
@@ -384,7 +385,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObjOp("agencyId", getAgency(), AbstractTransitEntity::getId)
       .addObjOp("routeId", getRoute(), AbstractTransitEntity::getId)
       .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
-      .addStr("headsign", getHeadsign())
+      .addObj("headsign", getHeadsign())
       .addObj("serviceDate", serviceDate)
       .addObj("legGeometry", legGeometry)
       .addCol("transitAlerts", transitAlerts)

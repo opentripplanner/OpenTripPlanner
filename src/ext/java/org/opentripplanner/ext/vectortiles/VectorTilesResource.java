@@ -25,7 +25,9 @@ import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
-import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPlacesLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVehiclesLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.VectorTileConfig;
@@ -42,7 +44,27 @@ public class VectorTilesResource {
   static {
     layers.put(LayerType.Stop, StopsLayerBuilder::new);
     layers.put(LayerType.Station, StationsLayerBuilder::new);
-    layers.put(LayerType.VehicleRental, VehicleRentalLayerBuilder::new);
+    layers.put(
+      LayerType.VehicleRental,
+      (graph, transitService, layerParameters) ->
+        new VehicleRentalPlacesLayerBuilder(graph.getVehicleRentalStationService(), layerParameters)
+    );
+    layers.put(
+      LayerType.VehicleRentalStation,
+      (graph, transitService, layerParameters) ->
+        new VehicleRentalStationsLayerBuilder(
+          graph.getVehicleRentalStationService(),
+          layerParameters
+        )
+    );
+    layers.put(
+      LayerType.VehicleRentalVehicle,
+      (graph, transitService, layerParameters) ->
+        new VehicleRentalVehiclesLayerBuilder(
+          graph.getVehicleRentalStationService(),
+          layerParameters
+        )
+    );
     layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
   }
 
@@ -148,6 +170,8 @@ public class VectorTilesResource {
     Stop,
     Station,
     VehicleRental,
+    VehicleRentalVehicle,
+    VehicleRentalStation,
     VehicleParking,
   }
 

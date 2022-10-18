@@ -805,7 +805,7 @@ public class OSMDatabase {
         } else if (role.equals("outer")) {
           outerWays.add(way);
         } else {
-          LOG.warn("Unexpected role " + role + " in multipolygon");
+          LOG.warn("Unexpected role {} in multipolygon", role);
         }
       }
       processedAreas.add(relation);
@@ -1031,7 +1031,7 @@ public class OSMDatabase {
             relation.getOsmProvider()::getZoneId
           );
       } catch (NumberFormatException e) {
-        LOG.info("Unparseable turn restriction: " + relation.getId());
+        LOG.info("Unparseable turn restriction: {}", relation.getId());
       }
     }
 
@@ -1060,7 +1060,7 @@ public class OSMDatabase {
             if (levels.containsKey(role)) {
               wayLevels.put(way, levels.get(role));
             } else {
-              LOG.warn(member.getRef() + " has undefined level " + role);
+              LOG.warn("{} has undefined level {}", member.getRef(), role);
             }
           }
         }

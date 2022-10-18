@@ -1,54 +1,74 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences.DEFAULT;
+import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityFeature;
-import org.opentripplanner.routing.api.request.preference.WheelchairAccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class WheelchairAccessibilityRequestMapper {
 
-  static WheelchairAccessibilityPreferences mapAccessibilityRequest(NodeAdapter a) {
-    var trips = mapAccessibilityFeature(a.path("trip"), DEFAULT.trip());
-    var stops = mapAccessibilityFeature(a.path("stop"), DEFAULT.stop());
-    var elevators = mapAccessibilityFeature(a.path("elevator"), DEFAULT.elevator());
-    var inaccessibleStreetReluctance = (float) a.asDouble(
-      "inaccessibleStreetReluctance",
-      DEFAULT.inaccessibleStreetReluctance()
-    );
-    var maxSlope = a.asDouble("maxSlope", DEFAULT.maxSlope());
-    var slopeExceededReluctance = a.asDouble(
-      "slopeExceededReluctance",
-      DEFAULT.slopeExceededReluctance()
-    );
-    var stairsReluctance = a.asDouble("stairsReluctance", DEFAULT.stairsReluctance());
-
-    return new WheelchairAccessibilityPreferences(
-      trips,
-      stops,
-      elevators,
-      inaccessibleStreetReluctance,
-      maxSlope,
-      slopeExceededReluctance,
-      stairsReluctance
+  static WheelchairPreferences mapAccessibilityRequest(NodeAdapter a) {
+    return new WheelchairPreferences(
+      mapAccessibilityFeature(
+        a
+          .of("trip")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject(),
+        DEFAULT.trip()
+      ),
+      mapAccessibilityFeature(
+        a
+          .of("stop")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject(),
+        DEFAULT.stop()
+      ),
+      mapAccessibilityFeature(
+        a
+          .of("elevator")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .withDescription(/*TODO DOC*/"TODO")
+          .asObject(),
+        DEFAULT.elevator()
+      ),
+      a
+        .of("inaccessibleStreetReluctance")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(DEFAULT.inaccessibleStreetReluctance()),
+      a.of("maxSlope").withDoc(NA, /*TODO DOC*/"TODO").asDouble(DEFAULT.maxSlope()),
+      a
+        .of("slopeExceededReluctance")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asDouble(DEFAULT.slopeExceededReluctance()),
+      a.of("stairsReluctance").withDoc(NA, /*TODO DOC*/"TODO").asDouble(DEFAULT.stairsReluctance())
     );
   }
 
-  private static WheelchairAccessibilityFeature mapAccessibilityFeature(
+  private static AccessibilityPreferences mapAccessibilityFeature(
     NodeAdapter adapter,
-    WheelchairAccessibilityFeature deflt
+    AccessibilityPreferences defaultValue
   ) {
-    var onlyAccessible = adapter.asBoolean(
-      "onlyConsiderAccessible",
-      deflt.onlyConsiderAccessible()
-    );
+    var onlyAccessible = adapter
+      .of("onlyConsiderAccessible")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asBoolean(defaultValue.onlyConsiderAccessible());
 
-    var unknownCost = adapter.asInt("unknownCost", 60 * 10);
-    var inaccessibleCost = adapter.asInt("inaccessibleCost", 60 * 60);
+    var unknownCost = adapter.of("unknownCost").withDoc(NA, /*TODO DOC*/"TODO").asInt(60 * 10);
+    var inaccessibleCost = adapter
+      .of("inaccessibleCost")
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .asInt(60 * 60);
     if (onlyAccessible) {
-      return WheelchairAccessibilityFeature.ofOnlyAccessible();
+      return AccessibilityPreferences.ofOnlyAccessible();
     } else {
-      return WheelchairAccessibilityFeature.ofCost(unknownCost, inaccessibleCost);
+      return AccessibilityPreferences.ofCost(unknownCost, inaccessibleCost);
     }
   }
 }

@@ -17,17 +17,17 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
+import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.api.OtpBaseDirectory;
-import org.opentripplanner.standalone.config.feed.DemExtractConfig;
-import org.opentripplanner.standalone.config.feed.DemExtractConfigBuilder;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
 import org.opentripplanner.standalone.config.feed.GtfsFeedConfigBuilder;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfig;
 import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +108,7 @@ public class GraphBuilderDataSources {
     return inputData.get(type);
   }
 
-  public Iterable<ConfiguredDataSource<OsmExtractConfig>> getOsmConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
     return inputData
       .get(OSM)
       .stream()
@@ -116,15 +116,15 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private OsmExtractConfig getOsmExtractConfig(DataSource dataSource) {
-    return buildConfig.osm.osmExtractConfigs
+  private OsmExtractParameters getOsmExtractConfig(DataSource dataSource) {
+    return buildConfig.osm.parameters
       .stream()
       .filter(osmExtractConfig -> uriMatch(osmExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new OsmExtractConfigBuilder().withSource(dataSource.uri()).build());
+      .orElse(new OsmExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
-  public Iterable<ConfiguredDataSource<DemExtractConfig>> getDemConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDatasource() {
     return inputData
       .get(DEM)
       .stream()
@@ -132,12 +132,13 @@ public class GraphBuilderDataSources {
       .toList();
   }
 
-  private DemExtractConfig getDemExtractConfig(DataSource dataSource) {
-    return buildConfig.dem.demExtractConfigs
+  private DemExtractParameters getDemExtractConfig(DataSource dataSource) {
+    return buildConfig.dem
+      .demExtracts()
       .stream()
       .filter(demExtractConfig -> uriMatch(demExtractConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(new DemExtractConfigBuilder().withSource(dataSource.uri()).build());
+      .orElse(new DemExtractParametersBuilder().withSource(dataSource.uri()).build());
   }
 
   public Iterable<ConfiguredDataSource<GtfsFeedConfig>> getGtfsConfiguredDatasource() {
@@ -215,7 +216,7 @@ public class GraphBuilderDataSources {
     LOG.info("Existing files expected to be read or written:");
     for (FileType type : FileType.values()) {
       for (DataSource source : inputData.get(type)) {
-        LOG.info(BULLET_POINT + source.detailedInfo());
+        LOG.info(BULLET_POINT + "{}", source.detailedInfo());
       }
     }
 
@@ -223,7 +224,7 @@ public class GraphBuilderDataSources {
       LOG.info("Files excluded due to command line switches or unknown type:");
       for (FileType type : FileType.values()) {
         for (DataSource source : skipData.get(type)) {
-          LOG.info(BULLET_POINT + source.detailedInfo());
+          LOG.info(BULLET_POINT + "{}", source.detailedInfo());
         }
       }
     }

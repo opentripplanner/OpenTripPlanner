@@ -1,8 +1,10 @@
 package org.opentripplanner.standalone.config.sandbox;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class FlexConfig {
 
@@ -10,7 +12,11 @@ public class FlexConfig {
   public final int maxTransferSeconds;
 
   public FlexConfig(NodeAdapter json) {
-    maxTransferSeconds = json.asInt("maxTransferDurationSeconds", DEFAULT_MAX_TRANSFER_SECONDS);
+    maxTransferSeconds =
+      json
+        .of("maxTransferDurationSeconds")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .asInt(DEFAULT_MAX_TRANSFER_SECONDS);
   }
 
   public FlexParameters toFlexParameters(RoutingPreferences preferences) {

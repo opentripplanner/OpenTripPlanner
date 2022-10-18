@@ -9,10 +9,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.module.osm.TemplateLibrary;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
-import org.opentripplanner.transit.model.basic.WheelchairAccessibility;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -101,13 +102,13 @@ public class OSMWithTags {
   /**
    * Returns the level of wheelchair access of the element.
    */
-  public WheelchairAccessibility getWheelchairAccessibility() {
+  public Accessibility getWheelchairAccessibility() {
     if (isTagTrue("wheelchair")) {
-      return WheelchairAccessibility.POSSIBLE;
+      return Accessibility.POSSIBLE;
     } else if (isTagFalse("wheelchair")) {
-      return WheelchairAccessibility.NOT_POSSIBLE;
+      return Accessibility.NOT_POSSIBLE;
     } else {
-      return WheelchairAccessibility.NO_INFORMATION;
+      return Accessibility.NO_INFORMATION;
     }
   }
 
@@ -283,10 +284,14 @@ public class OSMWithTags {
   /**
    * Returns true if bikes are explicitly denied access.
    * <p>
-   * bicycle is denied if bicycle:no, bicycle:license or bicycle:use_sidepath
+   * bicycle is denied if bicycle:no, bicycle:dismount, bicycle:license or bicycle:use_sidepath
    */
   public boolean isBicycleExplicitlyDenied() {
-    return isTagDeniedAccess("bicycle") || "use_sidepath".equals(getTag("bicycle"));
+    return (
+      isTagDeniedAccess("bicycle") ||
+      "dismount".equals(getTag("bicycle")) ||
+      "use_sidepath".equals(getTag("bicycle"))
+    );
   }
 
   /**
@@ -396,5 +401,10 @@ public class OSMWithTags {
   private boolean isTagDeniedAccess(String tagName) {
     String tagValue = getTag(tagName);
     return "no".equals(tagValue) || "license".equals(tagValue);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("tags", tags).toString();
   }
 }

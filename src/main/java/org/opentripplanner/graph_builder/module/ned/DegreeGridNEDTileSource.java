@@ -101,7 +101,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
           "Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set"
         );
       }
-      log.info("Downloading NED degree tile " + path);
+      log.info("Downloading NED degree tile {}", path);
       // download the file from S3.
       AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
       String key = formatLatLon(x, y) + ".tiff";

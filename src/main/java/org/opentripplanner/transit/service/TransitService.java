@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -130,7 +129,8 @@ public interface TransitService {
   List<StopTimesInPattern> getStopTimesForStop(
     StopLocation stop,
     LocalDate serviceDate,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   );
 
   List<TripTimeOnDate> stopTimesForPatternAtStop(
@@ -139,7 +139,8 @@ public interface TransitService {
     Instant startTime,
     Duration timeRange,
     int numberOfDepartures,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   );
 
   Collection<GroupOfRoutes> getGroupsOfRoutes();
