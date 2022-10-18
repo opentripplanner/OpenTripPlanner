@@ -6,6 +6,7 @@ import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormF
 import static org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor.SCOOTER;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ public class VehicleRentalLayerTest {
 
   @Test
   public void station() {
-    var mapper = new DigitransitVehicleRentalStationPropertyMapper();
+    var mapper = new DigitransitVehicleRentalStationPropertyMapper(new Locale("en-US"));
     var station = new VehicleRentalStation();
     station.id = new FeedScopedId("A", "B");
     station.latitude = 1;

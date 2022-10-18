@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,7 +124,8 @@ public class VehicleParkingGroupsLayerTest {
       assertEquals(1, tiles.layers().size());
       VehicleParkingGroupsLayerBuilderWithPublicGeometry builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
         graph,
-        tiles.layers().get(0)
+        tiles.layers().get(0),
+        new Locale("en-US")
       );
 
       List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
@@ -140,7 +142,9 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void digitransitVehicleParkingGroupPropertyMapperTest() {
-    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap();
+    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
+      new Locale("en-US")
+    );
     Map<String, Object> map = new HashMap<>();
     mapper
       .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
@@ -160,9 +164,10 @@ public class VehicleParkingGroupsLayerTest {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       Graph graph,
-      VectorTilesResource.LayerParameters layerParameters
+      VectorTilesResource.LayerParameters layerParameters,
+      Locale locale
     ) {
-      super(graph, null, layerParameters);
+      super(graph, layerParameters, locale);
     }
 
     @Override
@@ -174,8 +179,8 @@ public class VehicleParkingGroupsLayerTest {
   private static class VehicleParkingGroupPropertyMapperWithPublicMap
     extends DigitransitVehicleParkingGroupPropertyMapper {
 
-    public VehicleParkingGroupPropertyMapperWithPublicMap() {
-      super();
+    public VehicleParkingGroupPropertyMapperWithPublicMap(Locale locale) {
+      super(locale);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.vectortiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,10 @@ public class StopsLayerTest {
     transitModel.index();
     var transitService = new DefaultTransitService(transitModel);
 
-    DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(transitService);
+    DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
+      transitService,
+      new Locale("en-US")
+    );
 
     Map<String, Object> map = new HashMap<>();
     mapper.map(stop).forEach(o -> map.put(o.first, o.second));

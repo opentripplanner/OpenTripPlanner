@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,7 +98,8 @@ public class VehicleParkingsLayerTest {
       assertEquals(1, tiles.layers().size());
       VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
         graph,
-        tiles.layers().get(0)
+        tiles.layers().get(0),
+        new Locale("en-US")
       );
 
       List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
@@ -114,13 +116,14 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
-    VehicleParkingPropertyMapperWithPublicMap mapper = new VehicleParkingPropertyMapperWithPublicMap();
+    VehicleParkingPropertyMapperWithPublicMap mapper = new VehicleParkingPropertyMapperWithPublicMap(
+      new Locale("en-US")
+    );
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("name", map.get("name").toString());
-    assertEquals("DE", map.get("name.de").toString());
     assertEquals("details", map.get("detailsUrl").toString());
     assertEquals("image", map.get("imageUrl").toString());
     assertEquals("note", map.get("note").toString());
@@ -158,9 +161,10 @@ public class VehicleParkingsLayerTest {
 
     public VehicleParkingsLayerBuilderWithPublicGeometry(
       Graph graph,
-      VectorTilesResource.LayerParameters layerParameters
+      VectorTilesResource.LayerParameters layerParameters,
+      Locale locale
     ) {
-      super(graph, null, layerParameters);
+      super(graph, layerParameters, locale);
     }
 
     @Override
@@ -172,8 +176,8 @@ public class VehicleParkingsLayerTest {
   private static class VehicleParkingPropertyMapperWithPublicMap
     extends DigitransitVehicleParkingPropertyMapper {
 
-    public VehicleParkingPropertyMapperWithPublicMap() {
-      super();
+    public VehicleParkingPropertyMapperWithPublicMap(Locale locale) {
+      super(locale);
     }
 
     @Override
