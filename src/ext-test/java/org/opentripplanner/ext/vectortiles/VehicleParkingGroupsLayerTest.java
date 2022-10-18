@@ -92,7 +92,7 @@ public class VehicleParkingGroupsLayerTest {
   }
 
   @Test
-  public void vehicleParkingGeometryTest() {
+  public void vehicleParkingGroupGeometryTest() {
     VehicleParkingService service = mock(VehicleParkingService.class);
     when(service.getVehicleParkingGroups())
       .thenReturn(ImmutableListMultimap.of(vehicleParkingGroup, vehicleParking));
@@ -152,7 +152,7 @@ public class VehicleParkingGroupsLayerTest {
   }
 
   @Test
-  public void digitransitVehicleParkingPropertyMapperTest() {
+  public void digitransitVehicleParkingGroupPropertyMapperTest() {
     VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap();
     Map<String, Object> map = new HashMap<>();
     mapper
