@@ -161,8 +161,17 @@ public class GraphBuilderDataSources {
     return inputData
       .get(NETEX)
       .stream()
-      .map(it -> new ConfiguredDataSource<>(it, (NetexFeedParameters) it))
+      .map(it -> new ConfiguredDataSource<>(it, getNetexConfig(it)))
       .toList();
+  }
+
+  public NetexFeedParameters getNetexConfig(DataSource dataSource) {
+    return buildConfig.transitFeeds
+      .netexFeeds()
+      .stream()
+      .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
+      .findFirst()
+      .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
   /**

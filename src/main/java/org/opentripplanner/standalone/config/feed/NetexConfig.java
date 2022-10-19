@@ -28,7 +28,6 @@ public class NetexConfig {
 
   static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode, NetexFeedParameters original) {
     return mapFilePatternParameters(feedNode, original)
-      // feedId is required for specific feeds; Hence 'asString()'
       .withFeedId(readFeedId(feedNode).asString())
       .withSource(
         feedNode
