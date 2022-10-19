@@ -14,6 +14,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleRentalLayerTest {
@@ -56,6 +57,33 @@ public class VehicleRentalLayerTest {
     assertEquals("BICYCLE,SCOOTER", map.get("formFactors"));
     assertEquals(NAME, map.get("name"));
     assertEquals("A", map.get("network"));
+  }
+
+  @Test
+  public void stationWithTranslations() {
+    var mapper = new DigitransitVehicleRentalStationPropertyMapper(new Locale("de"));
+    var station = new VehicleRentalStation();
+    station.id = new FeedScopedId("A", "B");
+    station.latitude = 1;
+    station.longitude = 2;
+    var germanName = "nameDE";
+    station.name =
+      TranslatedString.getI18NString(
+        new HashMap<>() {
+          {
+            put(null, NAME);
+            put("de", germanName);
+          }
+        },
+        false,
+        false
+      );
+    station.vehicleTypesAvailable = Map.of(vehicleType(BICYCLE), 5, vehicleType(SCOOTER), 10);
+
+    Map<String, Object> map = new HashMap<>();
+    mapper.map(station).forEach(o -> map.put(o.first, o.second));
+
+    assertEquals(germanName, map.get("name"));
   }
 
   @Nonnull

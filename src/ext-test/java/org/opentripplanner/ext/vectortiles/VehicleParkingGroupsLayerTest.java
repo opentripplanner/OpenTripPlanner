@@ -159,6 +159,24 @@ public class VehicleParkingGroupsLayerTest {
     );
   }
 
+  @Test
+  public void digitransitVehicleParkingGroupPropertyMapperTranslationTest() {
+    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
+      new Locale("de")
+    );
+    Map<String, Object> map = new HashMap<>();
+    mapper
+      .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
+      .forEach(o -> map.put(o.first, o.second));
+
+    assertEquals("groupDE", map.get("name").toString());
+
+    assertEquals(
+      "[{\"bicyclePlaces\":false,\"carPlaces\":true,\"name\":\"DE\",\"id\":\"F:id\"}]",
+      map.get("vehicleParking")
+    );
+  }
+
   private static class VehicleParkingGroupsLayerBuilderWithPublicGeometry
     extends VehicleParkingGroupsLayerBuilder {
 

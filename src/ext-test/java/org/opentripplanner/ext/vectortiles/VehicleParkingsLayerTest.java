@@ -156,6 +156,17 @@ public class VehicleParkingsLayerTest {
     );
   }
 
+  @Test
+  public void digitransitVehicleParkingPropertyMapperTranslationTest() {
+    VehicleParkingPropertyMapperWithPublicMap mapper = new VehicleParkingPropertyMapperWithPublicMap(
+      new Locale("de")
+    );
+    Map<String, Object> map = new HashMap<>();
+    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+
+    assertEquals("DE", map.get("name").toString());
+  }
+
   private static class VehicleParkingsLayerBuilderWithPublicGeometry
     extends VehicleParkingsLayerBuilder {
 
