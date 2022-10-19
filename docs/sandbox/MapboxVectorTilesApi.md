@@ -15,6 +15,9 @@ public transit entities on the map.
 The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`,
 where `layers` is a comma separated list of layer names from the configuration.
 
+Translatable fields in the tiles are translated based on the `accept-language` header in requests.
+Currently, only the language with the highest priority from the header is used.
+
 ### Configuration
 
 To enable this you need to add the feature `SandboxAPIMapboxVectorTilesApi` in `otp-config.json`.
