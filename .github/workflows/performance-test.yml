@@ -52,6 +52,7 @@ jobs:
 
       - name: Build graph
         run: |
+          mkdir graph
           cp test/performance/${{ matrix.location }}/build-config.json graph/build-config.json
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save graph
