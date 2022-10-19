@@ -46,4 +46,4 @@ If the link above do not work you should be able to find it on the ENTUR web:
  
 #### Germany
 
-- [Tidied GTFS data](https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip)
+- [Tidied GTFS data](https://otp-performance.leonard.io/data/germany/germany-2022-08-23.tidy.gtfs.zip)
