@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
-public class BoarAndAlightTimeTest {
+public class BoardAndAlightTimeTest {
 
   @Test
   public void testToString() {
