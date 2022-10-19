@@ -46,7 +46,6 @@ public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<Vehicl
     // items.addAll(mapI18NString("feeHours", vehicleParking.getFeeHours()));
     items.addAll(mapPlaces("capacity", vehicleParking.getCapacity()));
     items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
-    items.addAll(mapPlaces("availability", vehicleParking.getAvailability()));
     return items;
   }
 
