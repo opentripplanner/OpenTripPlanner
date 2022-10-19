@@ -14,8 +14,6 @@ jobs:
         include:
 
           - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
-            transit-url: https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip
-            transit-filename: germany.gtfs.zip
             iterations: 1
             jfr-delay: "50s"
 
@@ -74,7 +72,12 @@ jobs:
           else
             wget ${{ matrix.osm-url }} -O graph/osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
           fi
-          wget ${{ matrix.transit-url }} -O graph/${{ matrix.transit-filename }} --no-clobber -q --show-progress --progress=bar:force || true
+          if [ "${{ matrix.transit-url }}" = "" ];
+          then
+            echo "No transit download specified. Skipping..."
+          else
+            wget ${{ matrix.transit-url }} -O graph/${{ matrix.transit-filename }} --no-clobber -q --show-progress --progress=bar:force || true
+          fi
 
       - name: Build graph
         run: |
