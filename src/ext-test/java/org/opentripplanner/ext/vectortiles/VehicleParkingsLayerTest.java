@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.DigitransitVehicleParkingPropertyMapper;
+import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.StadtnaviVehicleParkingPropertyMapper;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -79,7 +79,7 @@ public class VehicleParkingsLayerTest {
           {
             "name": "vehicleParking",
             "type": "VehicleParking",
-            "mapper": "Digitransit",
+            "mapper": "Stadtnavi",
             "maxZoom": 20,
             "minZoom": 14,
             "cacheMaxSeconds": 60,
@@ -115,10 +115,8 @@ public class VehicleParkingsLayerTest {
   }
 
   @Test
-  public void digitransitVehicleParkingPropertyMapperTest() {
-    VehicleParkingPropertyMapperWithPublicMap mapper = new VehicleParkingPropertyMapperWithPublicMap(
-      new Locale("en-US")
-    );
+  public void stadtnaviVehicleParkingPropertyMapperTest() {
+    StadtnaviVehicleParkingPropertyMapperWithPublicMap mapper = new StadtnaviVehicleParkingPropertyMapperWithPublicMap();
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
 
@@ -156,17 +154,6 @@ public class VehicleParkingsLayerTest {
     );
   }
 
-  @Test
-  public void digitransitVehicleParkingPropertyMapperTranslationTest() {
-    VehicleParkingPropertyMapperWithPublicMap mapper = new VehicleParkingPropertyMapperWithPublicMap(
-      new Locale("de")
-    );
-    Map<String, Object> map = new HashMap<>();
-    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
-
-    assertEquals("DE", map.get("name").toString());
-  }
-
   private static class VehicleParkingsLayerBuilderWithPublicGeometry
     extends VehicleParkingsLayerBuilder {
 
@@ -184,11 +171,11 @@ public class VehicleParkingsLayerTest {
     }
   }
 
-  private static class VehicleParkingPropertyMapperWithPublicMap
-    extends DigitransitVehicleParkingPropertyMapper {
+  private static class StadtnaviVehicleParkingPropertyMapperWithPublicMap
+    extends StadtnaviVehicleParkingPropertyMapper {
 
-    public VehicleParkingPropertyMapperWithPublicMap(Locale locale) {
-      super(locale);
+    public StadtnaviVehicleParkingPropertyMapperWithPublicMap() {
+      super();
     }
 
     @Override

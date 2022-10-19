@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
+import static java.util.Map.entry;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -19,9 +21,12 @@ import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
-  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParking>>> mappers = Map.of(
-    VehicleParkingsLayerBuilder.MapperType.Digitransit,
-    DigitransitVehicleParkingPropertyMapper::create
+  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParking>>> mappers = Map.ofEntries(
+    entry(
+      VehicleParkingsLayerBuilder.MapperType.Stadtnavi,
+      StadtnaviVehicleParkingPropertyMapper::create
+    ),
+    entry(MapperType.Digitransit, DigitransitVehicleParkingPropertyMapper::create)
   );
   private final Graph graph;
 
@@ -58,5 +63,6 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
   enum MapperType {
     Digitransit,
+    Stadtnavi,
   }
 }
