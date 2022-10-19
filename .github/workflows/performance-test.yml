@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev-2.x
-      - optional-transit-url
 
 jobs:
   perf-test:
