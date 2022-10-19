@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class ToStringBuilderTest {
@@ -83,6 +81,8 @@ public class ToStringBuilderTest {
   @Test
   public void addStr() {
     assertEquals("{a: 'text'}", ToStringBuilder.of().addStr("a", "text").toString());
+    assertEquals("{}", ToStringBuilder.of().addStr("a", null).toString());
+    assertEquals("{}", ToStringBuilder.of().addStr("a", "text", "text").toString());
   }
 
   @Test
@@ -107,16 +107,18 @@ public class ToStringBuilderTest {
 
   @Test
   public void addObjOp() {
-    var trip = TransitModelForTest.trip("1").build();
+    var duration = Duration.ofMinutes(1);
     assertEquals(
-      "ToStringBuilderTest{tripId: F:1}",
-      subject().addObjOp("tripId", trip, AbstractTransitEntity::getId).toString()
+      "ToStringBuilderTest{p: 60}",
+      subject().addObjOp("p", duration, Duration::toSeconds).toString()
     );
     assertEquals(
       "ToStringBuilderTest{}",
-      subject()
-        .addObjOp("tripId", (AbstractTransitEntity<?, ?>) null, AbstractTransitEntity::getId)
-        .toString()
+      subject().addObjOp("p", null, Duration::toSeconds).toString()
+    );
+    assertEquals(
+      "ToStringBuilderTest{}",
+      subject().addObjOp("p", duration, Duration.ofSeconds(60), Duration::toSeconds).toString()
     );
   }
 

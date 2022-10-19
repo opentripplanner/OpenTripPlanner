@@ -44,7 +44,7 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
     "groupFilePattern": "(\\w{3})_.*\\.xml",
-    "netexFeedId": "EN",
+    "feedId": "EN",
     "ferryIdsNotAllowedForBicycle": [
       "NYC:Line:1",
       "NYC:Line:012fc5c4-131b-4dfc-8160-4e49136e531a",

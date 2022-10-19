@@ -17,9 +17,7 @@ import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.DataImportIssuesToHTML;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneNoThruIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
@@ -30,13 +28,15 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
-import org.opentripplanner.netex.configure.NetexConfig;
+import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.feed.GtfsFeedConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -84,7 +84,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (ConfiguredDataSource<GtfsFeedConfig> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+    for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
       GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
 
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
@@ -113,7 +113,7 @@ public class GraphBuilderModules {
     TransitModel transitModel,
     DataImportIssueStore issueStore
   ) {
-    return new NetexConfig(config)
+    return new NetexConfigure(config)
       .createNetexModule(
         dataSources.getNetexConfiguredDatasource(),
         transitModel,

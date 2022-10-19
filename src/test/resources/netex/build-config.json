@@ -6,6 +6,6 @@
     "sharedFilePattern" : "_stops.xml",
     "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
     "groupFilePattern" : "(\\w{3})_.*\\.xml",
-    "netexFeedId": "RB"
+    "feedId": "EN"
   }
 }

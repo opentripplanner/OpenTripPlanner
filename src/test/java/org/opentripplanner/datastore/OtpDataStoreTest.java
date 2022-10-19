@@ -131,28 +131,26 @@ public class OtpDataStoreTest {
     }
 
     // Insert a URI for osm, gtfs, graph and report data sources
-    String buildConfigJson = String
-      .format(
-        "{" +
-        "%n  osm: [{" +
-        "%n    source: '%s'" +
-        "%n  }]," +
-        "%n  transitFeeds: [" +
-        "%n      {" +
-        "%n         type: 'GTFS'," +
-        "%n         feedId: 'NO'," +
-        "%n         source: '%s'" +
-        "%n      }" +
-        "%n  ]," +
-        "%n  graph: '%s'," +
-        "%n  buildReportDir: '%s'" +
-        "%n}",
-        uri + OSM_FILENAME,
-        uri + GTFS_FILENAME,
-        uri + GRAPH_FILENAME,
-        uri + REPORT_FILENAME
-      )
-      .replace('\'', '\"');
+    String buildConfigJson =
+      """
+      {
+        osm: [{
+          source: '%s'
+        }],
+        transitFeeds: [{
+          type: 'GTFS',
+          feedId: 'NO',
+          source: '%s'
+        }],
+        graph: '%s',
+        buildReportDir: '%s'
+        }""".formatted(
+          uri + OSM_FILENAME,
+          uri + GTFS_FILENAME,
+          uri + GRAPH_FILENAME,
+          uri + REPORT_FILENAME
+        )
+        .replace('\'', '\"');
 
     // Create build-config  and a unknown file in the 'baseDir'
     write(baseDir, BUILD_CONFIG_FILENAME, buildConfigJson);

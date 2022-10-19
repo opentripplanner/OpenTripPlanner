@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.ned.parameter;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentripplanner.standalone.config.feed.DataSourceConfig;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
 
 /**
  * Configuration of a DEM extract. Example:

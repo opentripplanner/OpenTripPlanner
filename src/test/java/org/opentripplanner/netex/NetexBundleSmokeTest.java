@@ -91,7 +91,7 @@ public class NetexBundleSmokeTest {
   }
 
   private static FeedScopedId fId(String id) {
-    return new FeedScopedId("RB", id);
+    return new FeedScopedId("EN", id);
   }
 
   private void assertAgencies(Collection<Agency> agencies) {
@@ -136,7 +136,7 @@ public class NetexBundleSmokeTest {
     assertEquals("N/A", quay.getName().toString());
     assertEquals(59.909803, quay.getLat(), 0.000001);
     assertEquals(10.748062, quay.getLon(), 0.000001);
-    assertEquals("RB:NSR:StopPlace:3995", quay.getParentStation().getId().toString());
+    assertEquals("EN:NSR:StopPlace:3995", quay.getParentStation().getId().toString());
     assertEquals("L", quay.getPlatformCode());
     assertEquals(16, stops.size());
   }
@@ -158,13 +158,13 @@ public class NetexBundleSmokeTest {
       .collect(Collectors.toMap(TripPattern::getId, s -> s));
     TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
     assertEquals("Jernbanetorget", p.getTripHeadsign().toString());
-    assertEquals("RB", p.getFeedId());
+    assertEquals("EN", p.getFeedId());
     assertEquals(
-      "[RegularStop{RB:NSR:Quay:7203 N/A}, RegularStop{RB:NSR:Quay:8027 N/A}]",
+      "[RegularStop{EN:NSR:Quay:7203 N/A}, RegularStop{EN:NSR:Quay:8027 N/A}]",
       p.getStops().toString()
     );
     assertEquals(
-      "[Trip{RB:RUT:ServiceJourney:12-101375-1000 12}]",
+      "[Trip{EN:RUT:ServiceJourney:12-101375-1000 12}]",
       p.scheduledTripsAsStream().toList().toString()
     );
 
@@ -222,7 +222,7 @@ public class NetexBundleSmokeTest {
       "Notice not found: " + key + " -> <Notice " + code + ", " + text + ">\n\t" + map
     );
     Notice n = list.get(0);
-    assertTrue(n.getId().toString().startsWith("RB:RUT:Notice:"));
+    assertTrue(n.getId().toString().startsWith("EN:RUT:Notice:"));
     assertEquals(code, n.publicCode());
     assertEquals(text, n.text());
     assertEquals(1, list.size());
