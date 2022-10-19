@@ -148,3 +148,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
 - 2022-08-23: Remove patterns and add route gtfsTypes to stop layer [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
 - 2022-10-11: Added layer for VehicleParkingGroups [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510)
 - 2022-10-14: Add separate layers for vehicle rental place types [#4516](https://github.com/opentripplanner/OpenTripPlanner/pull/4516)
+- 2022-10-19: Translatable fields are now translated based on accept-language header [#4529](https://github.com/opentripplanner/OpenTripPlanner/pull/4529)
