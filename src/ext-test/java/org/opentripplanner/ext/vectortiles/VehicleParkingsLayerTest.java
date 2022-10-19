@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.DigitransitVehicleParkingPropertyMapper;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.StadtnaviVehicleParkingPropertyMapper;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -122,6 +123,7 @@ public class VehicleParkingsLayerTest {
 
     assertEquals(ID.toString(), map.get("id").toString());
     assertEquals("name", map.get("name").toString());
+    assertEquals("DE", map.get("name.de").toString());
     assertEquals("details", map.get("detailsUrl").toString());
     assertEquals("image", map.get("imageUrl").toString());
     assertEquals("note", map.get("note").toString());
@@ -154,6 +156,34 @@ public class VehicleParkingsLayerTest {
     );
   }
 
+  @Test
+  public void digitransitVehicleParkingPropertyMapperTest() {
+    DigitransitVehicleParkingPropertyMapperWithPublicMap mapper = new DigitransitVehicleParkingPropertyMapperWithPublicMap(
+      new Locale("en-US")
+    );
+    Map<String, Object> map = new HashMap<>();
+    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+
+    assertEquals(ID.toString(), map.get("id").toString());
+    assertEquals("name", map.get("name").toString());
+
+    assertTrue((Boolean) map.get("bicyclePlaces"));
+    assertTrue((Boolean) map.get("anyCarPlaces"));
+    assertTrue((Boolean) map.get("carPlaces"));
+    assertFalse((Boolean) map.get("wheelchairAccessibleCarPlaces"));
+  }
+
+  @Test
+  public void digitransitVehicleParkingPropertyMapperTranslationTest() {
+    DigitransitVehicleParkingPropertyMapperWithPublicMap mapper = new DigitransitVehicleParkingPropertyMapperWithPublicMap(
+      new Locale("de")
+    );
+    Map<String, Object> map = new HashMap<>();
+    mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
+
+    assertEquals("DE", map.get("name").toString());
+  }
+
   private static class VehicleParkingsLayerBuilderWithPublicGeometry
     extends VehicleParkingsLayerBuilder {
 
@@ -176,6 +206,19 @@ public class VehicleParkingsLayerTest {
 
     public StadtnaviVehicleParkingPropertyMapperWithPublicMap() {
       super();
+    }
+
+    @Override
+    public Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
+      return super.map(vehicleParking);
+    }
+  }
+
+  private static class DigitransitVehicleParkingPropertyMapperWithPublicMap
+    extends DigitransitVehicleParkingPropertyMapper {
+
+    public DigitransitVehicleParkingPropertyMapperWithPublicMap(Locale locale) {
+      super(locale);
     }
 
     @Override
