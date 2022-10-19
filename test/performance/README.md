@@ -32,8 +32,8 @@ that shows bottlenecks in the code.
 
 #### Norway
 
-- [Norwegian NeTEx data](https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip)
-- [Norway OSM data](https://download.geofabrik.de/europe/norway-210101.osm.pbf)
+- [Norwegian NeTEx data](https://otp-performance.leonard.io/data/norway/rb_norway-aggregated-netex-2021-12-11.zip)
+- [Norway OSM data](https://otp-performance.leonard.io/data/norway/norway-210101.osm.pbf)
 
 If the link above do not work you should be able to find it on the ENTUR web:
 
