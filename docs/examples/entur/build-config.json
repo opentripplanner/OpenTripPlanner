@@ -27,8 +27,7 @@
   "netexDefaults": {
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
-    "groupFilePattern": "(\\w{3})_.*\\.xml",
-    "feedId": "EN"
+    "groupFilePattern": "(\\w{3})_.*\\.xml"
   },
   "osmDefaults": {
     "osmTagMapping": "norway",
@@ -37,7 +36,8 @@
   "transitFeeds": [
     {
       "type": "netex",
-      "source": "gs://bucket/outbound/netex/rb_norway-aggregated-netex-otp2.zip"
+      "source": "gs://bucket/outbound/netex/rb_norway-aggregated-netex-otp2.zip",
+      "feedId": "EN"
     }
   ],
   "osm": [
