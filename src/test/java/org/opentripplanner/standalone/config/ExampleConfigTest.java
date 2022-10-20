@@ -17,7 +17,9 @@ public class ExampleConfigTest {
     testConfig(filename, a -> new RouterConfig(a, true));
   }
 
-  @FilePatternSource(pattern = "docs/examples/**/build-config.json")
+  @FilePatternSource(
+    pattern = { "docs/examples/**/build-config.json", "test/performance/**/build-config.json" }
+  )
   @ParameterizedTest(name = "Check validity of {0}")
   void buildConfig(Path filename) {
     testConfig(filename, a -> new BuildConfig(a, true));

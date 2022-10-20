@@ -15,5 +15,5 @@ public @interface FilePatternSource {
   /**
    * The glob pattern to search for
    */
-  String pattern();
+  String[] pattern();
 }

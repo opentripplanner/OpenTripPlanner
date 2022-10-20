@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,35 +27,43 @@ import org.junit.jupiter.params.support.AnnotationConsumer;
 class FilePatternArgumentsProvider
   implements ArgumentsProvider, AnnotationConsumer<FilePatternSource> {
 
-  private String pattern;
+  private List<String> patterns;
 
   @Override
-  public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws IOException {
+  public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+    return patterns.stream().flatMap(FilePatternArgumentsProvider::resolvePaths).map(Arguments::of);
+  }
+
+  private static Stream<Path> resolvePaths(String pattern) {
     var pathMatcher = FileSystems.getDefault().getPathMatcher("glob:./" + pattern);
 
     var pathsFound = new ArrayList<Path>();
-    Files.walkFileTree(
-      Paths.get("."),
-      new SimpleFileVisitor<>() {
-        @Override
-        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-          if (pathMatcher.matches(path)) {
-            pathsFound.add(path);
+    try {
+      Files.walkFileTree(
+        Paths.get("."),
+        new SimpleFileVisitor<>() {
+          @Override
+          public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+            if (pathMatcher.matches(path)) {
+              pathsFound.add(path);
+            }
+            return FileVisitResult.CONTINUE;
           }
-          return FileVisitResult.CONTINUE;
-        }
 
-        @Override
-        public FileVisitResult visitFileFailed(Path file, IOException exc) {
-          return FileVisitResult.CONTINUE;
+          @Override
+          public FileVisitResult visitFileFailed(Path file, IOException exc) {
+            return FileVisitResult.CONTINUE;
+          }
         }
-      }
-    );
-    return pathsFound.stream().map(Arguments::of);
+      );
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return pathsFound.stream();
   }
 
   @Override
   public void accept(FilePatternSource variableSource) {
-    pattern = variableSource.pattern();
+    patterns = Arrays.stream(variableSource.pattern()).toList();
   }
 }
