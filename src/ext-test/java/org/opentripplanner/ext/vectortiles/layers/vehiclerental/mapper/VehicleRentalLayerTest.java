@@ -86,6 +86,30 @@ public class VehicleRentalLayerTest {
     assertEquals(germanName, map.get("name"));
   }
 
+  @Test
+  public void realtimeStation() {
+    var mapper = new DigitransitRealtimeVehicleRentalStationPropertyMapper(new Locale("en-US"));
+    var station = new VehicleRentalStation();
+    station.id = new FeedScopedId("A", "B");
+    station.latitude = 1;
+    station.longitude = 2;
+    station.name = new NonLocalizedString(NAME);
+    station.vehicleTypesAvailable = Map.of(vehicleType(BICYCLE), 5, vehicleType(SCOOTER), 10);
+    station.isRenting = false;
+    station.isReturning = false;
+    station.vehiclesAvailable = 8;
+
+    Map<String, Object> map = new HashMap<>();
+    mapper.map(station).forEach(o -> map.put(o.first, o.second));
+
+    assertEquals("A:B", map.get("id"));
+    assertEquals("BICYCLE,SCOOTER", map.get("formFactors"));
+    assertEquals(NAME, map.get("name"));
+    assertEquals("A", map.get("network"));
+    assertEquals(false, map.get("operative"));
+    assertEquals(8, map.get("vehiclesAvailable"));
+  }
+
   @Nonnull
   private static RentalVehicleType vehicleType(RentalVehicleType.FormFactor formFactor) {
     return new RentalVehicleType(
