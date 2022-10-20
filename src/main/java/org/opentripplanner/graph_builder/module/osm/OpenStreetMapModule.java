@@ -158,7 +158,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    this(List.copyOf(providers), boardingAreaRefTags, graph, issueStore, config.osmDefaults.osmOsmTagMapper);
+    this(
+      List.copyOf(providers),
+      boardingAreaRefTags,
+      graph,
+      issueStore,
+      config.osmDefaults.osmOsmTagMapper
+    );
     this.customNamer = config.customNamer;
     this.skipVisibility = !config.areaVisibility;
     this.platformEntriesLinking = config.platformEntriesLinking;
@@ -182,10 +188,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
     osmdb.postLoad();
 
-    LOG.info(
-      "Using OSM way configuration from {}.",
-      osmTagMapper.getClass().getSimpleName()
-    );
+    LOG.info("Using OSM way configuration from {}.", osmTagMapper.getClass().getSimpleName());
 
     LOG.info("Building street graph from OSM");
     handler.buildGraph();
@@ -287,9 +290,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       WayProperties wayData,
       OSMWithTags way
     ) {
-      OsmTagMapper tagMapperForWay = way
-        .getOsmProvider()
-        .getOsmTagMapper();
+      OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
       Set<T2<StreetNote, NoteMatcher>> notes = way
         .getOsmProvider()
@@ -298,12 +299,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
         way
       );
-      boolean bicycleNoThrough = tagMapperForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(
-        way
-      );
-      boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(
-        way
-      );
+      boolean bicycleNoThrough = tagMapperForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
+      boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(way);
 
       if (street != null) {
         double bicycleSafety = wayData.getBicycleSafetyFeatures().forward();

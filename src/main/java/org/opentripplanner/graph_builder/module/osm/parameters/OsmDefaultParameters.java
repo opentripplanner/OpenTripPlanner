@@ -23,10 +23,7 @@ public class OsmDefaultParameters {
   }
 
   public OsmDefaultParameters(OsmTagMapper osmOsmTagMapper, ZoneId timeZone) {
-    this.osmOsmTagMapper =
-      osmOsmTagMapper != null
-        ? osmOsmTagMapper
-        : OsmTagMapper.defaultMapper();
+    this.osmOsmTagMapper = osmOsmTagMapper != null ? osmOsmTagMapper : OsmTagMapper.defaultMapper();
     this.timeZone = timeZone;
   }
 }

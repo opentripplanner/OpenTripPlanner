@@ -7,9 +7,9 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.WayTestData;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 class WayPropertySetTest {

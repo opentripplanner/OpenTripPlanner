@@ -163,7 +163,7 @@ public class UnconnectedAreasTest {
       Set.of(),
       graph,
       issueStore,
-     new DefaultMapper()
+      new DefaultMapper()
     );
     loader.staticParkAndRide = true;
     loader.staticBikeParkAndRide = true;

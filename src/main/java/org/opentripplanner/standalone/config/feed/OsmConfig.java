@@ -4,11 +4,11 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import java.net.URI;
 import java.time.ZoneId;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**

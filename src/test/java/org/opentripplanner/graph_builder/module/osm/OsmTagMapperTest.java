@@ -41,23 +41,17 @@ public class OsmTagMapperTest {
   public void isBicycleNoThroughTrafficExplicitlyDisallowed() {
     OsmTagMapper osmTagMapper = new DefaultMapper();
     assertTrue(
-      osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(
-        way("bicycle", "destination")
-      )
+      osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(way("bicycle", "destination"))
     );
     assertTrue(
-      osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(
-        way("access", "destination")
-      )
+      osmTagMapper.isBicycleNoThroughTrafficExplicitlyDisallowed(way("access", "destination"))
     );
   }
 
   @Test
   public void isWalkNoThroughTrafficExplicitlyDisallowed() {
     OsmTagMapper osmTagMapper = new DefaultMapper();
-    assertTrue(
-      osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(way("foot", "destination"))
-    );
+    assertTrue(osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(way("foot", "destination")));
     assertTrue(
       osmTagMapper.isWalkNoThroughTrafficExplicitlyDisallowed(way("access", "destination"))
     );
