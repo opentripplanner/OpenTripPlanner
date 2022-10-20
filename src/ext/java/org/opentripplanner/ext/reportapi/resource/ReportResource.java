@@ -16,7 +16,7 @@ import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder.GraphStats;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitService;
@@ -64,7 +64,7 @@ public class ReportResource {
   public Response getBicycleSafetyAsCsv(
     @DefaultValue("default") @QueryParam("osmWayPropertySet") String osmWayPropertySet
   ) {
-    var source = WayPropertySetSource.Source.valueOf(osmWayPropertySet);
+    var source = OsmTagMapper.Source.valueOf(osmWayPropertySet);
     return Response
       .ok(BicycleSafetyReport.makeCsv(source))
       .header(

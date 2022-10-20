@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
@@ -8,22 +8,23 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PED
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
 import java.util.function.BiFunction;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * OSM way properties for Finnish roads. FinlandWayPropertySetSource is derived from
- * NorwayPropertySetSource by seime
+ * OSM way properties for Finnish roads. {@link FinlandMapper} is derived from
+ * {@link NorwayMapper} by seime
  * <p>
  * The main difference compared to the default property set is that most of the highway=trunk roads
  * also allows walking and biking, where as some does not. http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk
  * http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
  *
  * @author juusokor
- * @see WayPropertySetSource
- * @see DefaultWayPropertySetSource
+ * @see OsmTagMapper
+ * @see DefaultMapper
  */
-public class FinlandWayPropertySetSource implements WayPropertySetSource {
+public class FinlandMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -129,7 +130,7 @@ public class FinlandWayPropertySetSource implements WayPropertySetSource {
     props.setCarSpeed("highway=track", 4.5f);
 
     // Read the rest from the default set
-    new DefaultWayPropertySetSource().populateProperties(props);
+    new DefaultMapper().populateProperties(props);
   }
 
   @Override

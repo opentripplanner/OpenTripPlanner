@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -21,8 +22,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Verify that OSM ways that represent proposed or as yet unbuilt roads are not used for routing.
@@ -38,9 +37,7 @@ public class UnroutableTest {
   @BeforeEach
   public void setUp() throws Exception {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
     graph = new Graph(deduplicator);
-    TransitModel transitModel = new TransitModel(stopModel, deduplicator);
 
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
@@ -49,10 +46,9 @@ public class UnroutableTest {
       List.of(provider),
       Set.of(),
       graph,
-      transitModel.getTimeZone(),
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
-    osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     osmBuilder.buildGraph();
   }
 

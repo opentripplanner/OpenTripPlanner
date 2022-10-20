@@ -21,7 +21,7 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -140,8 +140,8 @@ public class ConstantsForTests {
           Set.of(),
           // Need to use a mutable set here, since it is used
           graph,
-          transitModel.getTimeZone(),
-          noopIssueStore()
+          noopIssueStore(),
+          new DefaultMapper()
         );
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
@@ -190,10 +190,9 @@ public class ConstantsForTests {
         List.of(osmProvider),
         Set.of(),
         graph,
-        transitModel.getTimeZone(),
-        noopIssueStore()
+        noopIssueStore(),
+        new DefaultMapper()
       );
-      osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
       osmModule.skipVisibility = true;
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
@@ -250,8 +249,8 @@ public class ConstantsForTests {
           List.of(osmProvider),
           Set.of(),
           graph,
-          transitModel.getTimeZone(),
-          noopIssueStore()
+          noopIssueStore(),
+          new DefaultMapper()
         );
         osmModule.skipVisibility = true;
         osmModule.buildGraph();

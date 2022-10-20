@@ -1,13 +1,16 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.SpeedPicker;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
-public class DefaultWayPropertySetSourceTest {
+public class DefaultMapperTest {
 
   WayPropertySet wps = new WayPropertySet();
   float epsilon = 0.01f;
@@ -17,7 +20,7 @@ public class DefaultWayPropertySetSourceTest {
    */
   @Test
   public void testCarSpeeds() {
-    DefaultWayPropertySetSource source = new DefaultWayPropertySetSource();
+    DefaultMapper source = new DefaultMapper();
     source.populateProperties(wps);
 
     OSMWithTags way;

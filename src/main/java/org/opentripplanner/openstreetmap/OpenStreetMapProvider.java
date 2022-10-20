@@ -12,7 +12,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
@@ -37,7 +37,7 @@ public class OpenStreetMapProvider implements OSMProvider {
 
   private boolean hasWarnedAboutMissingTimeZone = false;
 
-  private final WayPropertySetSource wayPropertySetSource;
+  private final OsmTagMapper osmTagMapper;
 
   private final WayPropertySet wayPropertySet;
   private byte[] cachedBytes = null;
@@ -66,13 +66,13 @@ public class OpenStreetMapProvider implements OSMProvider {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
     this.zoneId =
       osmExtractConfigConfiguredDataSource.config().timeZone().orElse(defaultParameters.timeZone);
-    this.wayPropertySetSource =
+    this.osmTagMapper =
       osmExtractConfigConfiguredDataSource
         .config()
-        .osmWayPropertySet()
-        .orElse(defaultParameters.osmWayPropertySetSource);
+        .osmTagMapper()
+        .orElse(defaultParameters.osmOsmTagMapper);
     this.wayPropertySet = new WayPropertySet();
-    wayPropertySetSource.populateProperties(wayPropertySet);
+    osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
   }
 
@@ -158,8 +158,8 @@ public class OpenStreetMapProvider implements OSMProvider {
   }
 
   @Override
-  public WayPropertySetSource getWayPropertySetSource() {
-    return wayPropertySetSource;
+  public OsmTagMapper getOsmTagMapper() {
+    return osmTagMapper;
   }
 
   @Override
