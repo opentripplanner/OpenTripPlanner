@@ -11,7 +11,7 @@ import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class BuildConfigUserGuideDocPrinter {
+public class BuildConfigDocGenerator {
 
   private static final File OUT_FILE = new File("docs", "BuildConfiguration-generated.md");
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/build-config.json";
@@ -25,7 +25,7 @@ public class BuildConfigUserGuideDocPrinter {
   private final MarkDownDocWriter out = MarkDownDocWriter.create(OUT_FILE);
 
   public static void main(String[] args) throws FileNotFoundException {
-    var printer = new BuildConfigUserGuideDocPrinter();
+    var printer = new BuildConfigDocGenerator();
     var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
     var conf = new BuildConfig(json, BUILD_CONFIG_FILENAME, false);
     var node = conf.asNodeAdapter();
