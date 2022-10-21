@@ -56,7 +56,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.ignoreFilePattern = Pattern.compile(IGNORE_FILE_PATTERN).pattern();
     }
     this.ferryIdsNotAllowedForBicycle = FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE;
-    this.noTransfersOnIsolatedStops = false;
+    this.noTransfersOnIsolatedStops = NO_TRANSFERS_ON_ISOLATED_STOPS;
   }
 
   private NetexFeedParameters(Builder builder) {
