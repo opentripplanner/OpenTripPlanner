@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.BoardingLocationToStopLink;
@@ -92,8 +93,8 @@ class OsmBoardingLocationsModuleTest {
       List.of(provider),
       Set.of("ref", "ref:IFOPT"),
       graph,
-      transitModel.getTimeZone(),
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
     osmModule.skipVisibility = skipVisibility;
 

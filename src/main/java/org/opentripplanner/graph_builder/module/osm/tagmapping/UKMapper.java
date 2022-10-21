@@ -1,7 +1,9 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 
 /**
  * OSM way properties for UK roads. The main differences compared to the default property set are:
@@ -16,10 +18,10 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL
  * https://wiki.openstreetmap.org/wiki/United_Kingdom_Tagging_Guidelines
  *
  * @author marcusyoung
- * @see WayPropertySetSource
- * @see DefaultWayPropertySetSource
+ * @see OsmTagMapper
+ * @see DefaultMapper
  */
-public class UKWayPropertySetSource implements WayPropertySetSource {
+public class UKMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -70,6 +72,6 @@ public class UKWayPropertySetSource implements WayPropertySetSource {
     props.setCarSpeed("highway=tertiary", 15.7f); // ~= 35mph
 
     // Read the rest from the default set
-    new DefaultWayPropertySetSource().populateProperties(props);
+    new DefaultMapper().populateProperties(props);
   }
 }

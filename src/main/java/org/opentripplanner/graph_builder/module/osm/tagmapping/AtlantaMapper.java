@@ -1,7 +1,9 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 
 /**
  * OSM way properties for the Atlanta, Georgia, USA area.
@@ -10,11 +12,11 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL
  * these roads typically still allow pedestrian traffic and often include bus service / stops.
  *
  * @author demory
- * @see WayPropertySetSource
- * @see DefaultWayPropertySetSource
+ * @see OsmTagMapper
+ * @see DefaultMapper
  */
 
-public class AtlantaWayPropertySetSource implements WayPropertySetSource {
+public class AtlantaMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -23,6 +25,6 @@ public class AtlantaWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=trunk", withModes(ALL).bicycleSafety(2.5));
 
     // Read the rest from the default set
-    new DefaultWayPropertySetSource().populateProperties(props);
+    new DefaultMapper().populateProperties(props);
   }
 }

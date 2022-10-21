@@ -216,7 +216,7 @@ public class WayPropertySet {
     Float bestSpeed = null;
     int score;
 
-    // SpeedPickers are constructed in DefaultWayPropertySetSource with an OSM specifier
+    // SpeedPickers are constructed in DefaultOsmTagMapper with an OSM specifier
     // (e.g. highway=motorway) and a default speed for that segment.
     for (SpeedPicker picker : speedPickers) {
       OsmSpecifier specifier = picker.specifier;

@@ -1,8 +1,9 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NONE;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
 
 /**
@@ -13,7 +14,7 @@ import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifie
  * 1. In Houston we want to disallow usage of downtown pedestrian tunnel system.
  */
 
-public class HoustonWayPropertySetSource implements WayPropertySetSource {
+public class HoustonMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -26,6 +27,6 @@ public class HoustonWayPropertySetSource implements WayPropertySetSource {
       withModes(NONE)
     );
     // Read the rest from the default set
-    new DefaultWayPropertySetSource().populateProperties(props);
+    new DefaultMapper().populateProperties(props);
   }
 }

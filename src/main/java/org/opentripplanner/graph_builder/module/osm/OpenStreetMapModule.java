@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -34,6 +33,7 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
@@ -133,7 +133,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   public boolean banDiscouragedWalking = false;
   public boolean banDiscouragedBiking = false;
   private final DataImportIssueStore issueStore;
-  private WayPropertySetSource wayPropertySetSource = new DefaultWayPropertySetSource();
+  private final OsmTagMapper osmTagMapper;
 
   private final Graph graph;
 
@@ -141,13 +141,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Collection<OpenStreetMapProvider> providers,
     Set<String> boardingAreaRefTags,
     Graph graph,
-    @Nullable ZoneId timeZoneId,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    OsmTagMapper osmTagMapper
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
+    this.osmTagMapper = osmTagMapper;
   }
 
   public OpenStreetMapModule(
@@ -155,12 +156,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Collection<OpenStreetMapProvider> providers,
     Set<String> boardingAreaRefTags,
     Graph graph,
-    ZoneId timeZoneId,
     DataImportIssueStore issueStore
   ) {
-    this(List.copyOf(providers), boardingAreaRefTags, graph, timeZoneId, issueStore);
+    this(
+      List.copyOf(providers),
+      boardingAreaRefTags,
+      graph,
+      issueStore,
+      config.osmDefaults.osmOsmTagMapper
+    );
     this.customNamer = config.customNamer;
-    this.setDefaultWayPropertySetSource(config.osmDefaults.osmWayPropertySetSource);
     this.skipVisibility = !config.areaVisibility;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
@@ -168,15 +173,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     this.banDiscouragedWalking = config.banDiscouragedWalking;
     this.banDiscouragedBiking = config.banDiscouragedBiking;
     this.maxAreaNodes = config.maxAreaNodes;
-  }
-
-  /**
-   * Set the way properties from a {@link WayPropertySetSource} source.
-   *
-   * @param source the way properties source
-   */
-  public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
-    wayPropertySetSource = source;
   }
 
   @Override
@@ -192,10 +188,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
     osmdb.postLoad();
 
-    LOG.info(
-      "Using OSM way configuration from {}.",
-      wayPropertySetSource.getClass().getSimpleName()
-    );
+    LOG.info("Using OSM way configuration from {}.", osmTagMapper.getClass().getSimpleName());
 
     LOG.info("Building street graph from OSM");
     handler.buildGraph();
@@ -297,23 +290,17 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       WayProperties wayData,
       OSMWithTags way
     ) {
-      WayPropertySetSource wayPropertySetSourceForWay = way
-        .getOsmProvider()
-        .getWayPropertySetSource();
+      OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
 
       Set<T2<StreetNote, NoteMatcher>> notes = way
         .getOsmProvider()
         .getWayPropertySet()
         .getNoteForWay(way);
-      boolean motorVehicleNoThrough = wayPropertySetSourceForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
+      boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
         way
       );
-      boolean bicycleNoThrough = wayPropertySetSourceForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(
-        way
-      );
-      boolean walkNoThrough = wayPropertySetSourceForWay.isWalkNoThroughTrafficExplicitlyDisallowed(
-        way
-      );
+      boolean bicycleNoThrough = tagMapperForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
+      boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(way);
 
       if (street != null) {
         double bicycleSafety = wayData.getBicycleSafetyFeatures().forward();

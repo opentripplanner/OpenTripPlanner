@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -36,17 +37,13 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
 
 public class OpenStreetMapModuleTest {
 
   @Test
   public void testGraphBuilder() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
     var gg = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
@@ -58,10 +55,9 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       gg,
-      transitModel.getTimeZone(),
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
-    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     osmModule.buildGraph();
 
@@ -111,11 +107,9 @@ public class OpenStreetMapModuleTest {
    * Detailed testing of OSM graph building using a very small chunk of NYC (SOHO-ish).
    */
   @Test
-  public void testBuildGraphDetailed() throws Exception {
+  public void testBuildGraphDetailed() {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
     var gg = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -128,10 +122,9 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       gg,
-      transitModel.getTimeZone(),
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
-    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     osmModule.buildGraph();
 
@@ -304,9 +297,7 @@ public class OpenStreetMapModuleTest {
    */
   private void testBuildingAreas(boolean skipVisibility) {
     var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -320,11 +311,10 @@ public class OpenStreetMapModuleTest {
       List.of(provider),
       Set.of(),
       graph,
-      transitModel.getTimeZone(),
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
     loader.skipVisibility = skipVisibility;
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     loader.buildGraph();
 

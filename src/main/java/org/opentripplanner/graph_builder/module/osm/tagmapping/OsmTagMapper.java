@@ -1,5 +1,6 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -8,8 +9,8 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  *
  * @author bdferris, novalis, seime
  */
-public interface WayPropertySetSource {
-  static WayPropertySetSource defaultWayPropertySetSource() {
+public interface OsmTagMapper {
+  static OsmTagMapper defaultMapper() {
     return Source.DEFAULT.getInstance();
   }
 
@@ -76,7 +77,7 @@ public interface WayPropertySetSource {
   }
 
   /**
-   * This is the list of WayPropertySetSource sources. The enum provide a mapping between the
+   * This is the list of {@link OsmTagMapper} sources. The enum provide a mapping between the
    * enum name and the actual implementation.
    */
   enum Source {
@@ -88,15 +89,15 @@ public interface WayPropertySetSource {
     ATLANTA,
     HOUSTON;
 
-    public WayPropertySetSource getInstance() {
+    public OsmTagMapper getInstance() {
       return switch (this) {
-        case DEFAULT -> new DefaultWayPropertySetSource();
-        case NORWAY -> new NorwayWayPropertySetSource();
-        case UK -> new UKWayPropertySetSource();
-        case FINLAND -> new FinlandWayPropertySetSource();
-        case GERMANY -> new GermanyWayPropertySetSource();
-        case ATLANTA -> new AtlantaWayPropertySetSource();
-        case HOUSTON -> new HoustonWayPropertySetSource();
+        case DEFAULT -> new DefaultMapper();
+        case NORWAY -> new NorwayMapper();
+        case UK -> new UKMapper();
+        case FINLAND -> new FinlandMapper();
+        case GERMANY -> new GermanyMapper();
+        case ATLANTA -> new AtlantaMapper();
+        case HOUSTON -> new HoustonMapper();
       };
     }
   }

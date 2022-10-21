@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.net.URI;
 import java.time.ZoneId;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 
 /**
  * Configure an OpenStreetMap extract.
@@ -17,7 +17,7 @@ public class OsmExtractParametersBuilder {
   /**
    * Custom OSM way properties for this extract.
    */
-  private WayPropertySetSource osmWayPropertySet;
+  private OsmTagMapper osmTagMapper;
 
   /**
    * The timezone to use to resolve opening hours in this extract.
@@ -29,8 +29,8 @@ public class OsmExtractParametersBuilder {
     return this;
   }
 
-  public OsmExtractParametersBuilder withOsmWayPropertySet(WayPropertySetSource osmWayPropertySet) {
-    this.osmWayPropertySet = osmWayPropertySet;
+  public OsmExtractParametersBuilder withOsmTagMapper(OsmTagMapper mapper) {
+    this.osmTagMapper = mapper;
     return this;
   }
 
@@ -43,8 +43,8 @@ public class OsmExtractParametersBuilder {
     return source;
   }
 
-  public WayPropertySetSource getOsmWayPropertySet() {
-    return osmWayPropertySet;
+  public OsmTagMapper getOsmTagMapper() {
+    return osmTagMapper;
   }
 
   public ZoneId getTimeZone() {

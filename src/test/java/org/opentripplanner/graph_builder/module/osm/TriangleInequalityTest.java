@@ -22,6 +22,7 @@ import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -72,10 +73,9 @@ public class TriangleInequalityTest {
       List.of(provider),
       Set.of(),
       graph,
-      null,
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
-    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     osmModule.buildGraph();
   }
 
