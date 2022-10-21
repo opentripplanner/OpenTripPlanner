@@ -150,36 +150,4 @@ public record NodeInfo(
     }
     return name.compareTo(other.name);
   }
-
-  @SuppressWarnings("ConstantConditions")
-  private String exampleValueJson(ConfigType type) {
-    return type.quote(
-      switch (type) {
-        case BOOLEAN -> "true";
-        case DOUBLE -> "3.15";
-        case INTEGER -> "123";
-        case LONG -> "1000";
-        case ENUM -> firstEnumValue();
-        case STRING -> "A String";
-        case LOCALE -> "en_US";
-        case DATE -> "20022-05-31";
-        case DATE_OR_PERIOD -> "P1Y5D";
-        case DURATION -> "45s";
-        case REGEXP -> "-?[\\d+=*/ =]+";
-        case URI -> "https://www.opentripplanner.org/";
-        case ZONE_ID -> "Europe/Paris";
-        case FEED_SCOPED_ID -> "FID:Trip0001";
-        case LINEAR_FUNCTION -> "600 + 3.0 x";
-        case OBJECT -> "{a:1}";
-        case MAP -> "{a:" + exampleValueJson(elementType) + "}";
-        case ENUM_MAP -> "{" + firstEnumValue() + " : " + exampleValueJson(elementType) + "}";
-        case ENUM_SET -> "[" + firstEnumValue() + "]";
-        case ARRAY -> "[{n:1},{n:2}]";
-      }
-    );
-  }
-  private String firstEnumValue() {
-    //noinspection ConstantConditions
-    return enumType.getEnumConstants()[0].name();
-  }
 }
