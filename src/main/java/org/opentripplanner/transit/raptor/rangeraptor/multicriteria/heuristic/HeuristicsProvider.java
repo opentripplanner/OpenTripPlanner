@@ -103,21 +103,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
 
   private HeuristicAtStop get(int stop) {
     if (stops[stop] == null && heuristics.reached(stop)) {
-      stops[stop] =
-        createHeuristicAtStop(
-          heuristics.bestTravelDuration(stop),
-          heuristics.bestNumOfTransfers(stop),
-          heuristics.bestGeneralizedCost(stop)
-        );
+      stops[stop] = heuristics.createHeuristicAtStop(stop);
     }
     return stops[stop];
-  }
-
-  private HeuristicAtStop createHeuristicAtStop(
-    int bestTravelDuration,
-    int bestNumOfTransfers,
-    int bestCost
-  ) {
-    return new HeuristicAtStop(bestTravelDuration, bestNumOfTransfers, bestCost);
   }
 }

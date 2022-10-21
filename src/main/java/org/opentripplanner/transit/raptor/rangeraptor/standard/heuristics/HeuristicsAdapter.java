@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
@@ -91,6 +93,18 @@ public class HeuristicsAdapter implements Heuristics {
   @Override
   public int[] bestGeneralizedCostToIntArray(int unreached) {
     return toIntArray(size(), unreached, this::bestGeneralizedCost);
+  }
+
+  @Override
+  @Nullable
+  public HeuristicAtStop createHeuristicAtStop(int stop) {
+    return reached(stop)
+      ? new HeuristicAtStop(
+        bestTravelDuration(stop),
+        bestNumOfTransfers(stop),
+        bestGeneralizedCost(stop)
+      )
+      : null;
   }
 
   @Override
