@@ -4,6 +4,7 @@ import static org.opentripplanner.generate.doc.framework.MarkDownDocWriter.conte
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.framework.doc.DocFormatter;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;

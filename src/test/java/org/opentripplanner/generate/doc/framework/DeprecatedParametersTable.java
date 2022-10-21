@@ -1,6 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
 import java.util.List;
+import org.opentripplanner.framework.doc.DocFormatter;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 

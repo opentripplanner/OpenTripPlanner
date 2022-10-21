@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.doc.DocFormatter;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.util.lang.TableFormatter;
 

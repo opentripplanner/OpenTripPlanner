@@ -1,4 +1,4 @@
-package org.opentripplanner.generate.doc.framework;
+package org.opentripplanner.framework.doc;
 
 public class DocFormatter {
 
