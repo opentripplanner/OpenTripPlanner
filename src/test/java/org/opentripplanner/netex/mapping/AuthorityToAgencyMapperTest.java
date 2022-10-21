@@ -1,10 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.ContactStructure;
@@ -16,7 +16,7 @@ public class AuthorityToAgencyMapperTest {
   private static final String NAME = "Olsen";
   private static final String URL = "http://olsen.no/help";
   private static final String PHONE = "+47 88882222";
-  private static final String TIME_ZONE = "CEST";
+  private static final String TIME_ZONE = "CET";
   private static final String N_A = "N/A";
 
   private final AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(ID_FACTORY, TIME_ZONE);
@@ -32,7 +32,7 @@ public class AuthorityToAgencyMapperTest {
     // Then expect
     assertEquals(ID, a.getId().getId());
     assertEquals(NAME, a.getName());
-    assertEquals(TIME_ZONE, a.getTimezone());
+    assertEquals(TIME_ZONE, a.getTimezone().getId());
     assertEquals(URL, a.getUrl());
     assertEquals(PHONE, a.getPhone());
   }
@@ -56,9 +56,9 @@ public class AuthorityToAgencyMapperTest {
     Agency a = mapper.createDummyAgency();
 
     // Then expect
-    assertEquals("Dummy-" + a.getTimezone(), a.getId().getId());
+    assertEquals("Dummy-" + a.getTimezone().getId(), a.getId().getId());
     assertEquals(N_A, a.getName());
-    assertEquals(TIME_ZONE, a.getTimezone());
+    assertEquals(TIME_ZONE, a.getTimezone().getId());
     assertEquals(N_A, a.getUrl());
     assertEquals(N_A, a.getPhone());
   }

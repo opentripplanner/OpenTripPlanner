@@ -2,31 +2,31 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
 import java.util.function.BiFunction;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.api.view.Worker;
-import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
+import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicSearch;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Worker;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivalTimeRoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.MinTravelDurationRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StdRangeRaptorWorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StdWorkerState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimesOnlyStopArrivalsState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.SimpleArrivedAtDestinationCheck;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.SimpleBestNumberOfTransfers;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.debug.DebugStopArrivalsState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicsAdapter;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.BestNumberOfTransfers;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.StopArrivalsState;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StdStopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StdStopArrivalsState;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivals;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path.EgressArrivalToPathAdapter;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 
 /**
  * The responsibility of this class is to wire different standard range raptor worker configurations
@@ -41,7 +41,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   private final PathConfig<T> pathConfig;
 
   private BestTimes bestTimes = null;
-  private StopArrivals<T> arrivals = null;
+  private StdStopArrivals<T> arrivals = null;
   private ArrivedAtDestinationCheck destinationCheck = null;
   private BestNumberOfTransfers bestNumberOfTransfers = null;
 
@@ -161,9 +161,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     }
   }
 
-  private StopArrivals<T> stopArrivals() {
+  private StdStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
-      arrivals = new StopArrivals<>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider());
+      arrivals = new StdStopArrivals<>(ctx.nRounds(), ctx.nStops(), ctx.roundProvider());
       setBestNumberOfTransfers(arrivals);
     }
     return arrivals;

@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.State;
@@ -17,8 +14,11 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A TraverseVisitor used in finding various types of places while walking the street graph.
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.network.TransitMode;
 public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   public final List<PlaceAtDistance> placesFound = new ArrayList<>();
-  private final RoutingService routingService;
+  private final TransitService transitService;
   private final Set<TransitMode> filterByModes;
   private final Set<FeedScopedId> filterByStops;
   private final Set<FeedScopedId> filterByRoutes;
@@ -44,7 +44,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final double radiusMeters;
 
   /**
-   * @param routingService             A RoutingService used in finding information about the
+   * @param transitService             A TransitService used in finding information about the
    *                                   various places.
    * @param filterByModes              A list of TransitModes for which to find Stops and
    *                                   PatternAtStops. Use null to disable the filtering.
@@ -60,7 +60,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
    * @param maxResults                 Maximum number of results to return.
    */
   public PlaceFinderTraverseVisitor(
-    RoutingService routingService,
+    TransitService transitService,
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
     List<FeedScopedId> filterByStops,
@@ -69,7 +69,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     int maxResults,
     double radiusMeters
   ) {
-    this.routingService = routingService;
+    this.transitService = transitService;
     this.filterByModes = toSet(filterByModes);
     this.filterByStops = toSet(filterByStops);
     this.filterByRoutes = toSet(filterByRoutes);
@@ -92,7 +92,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     Vertex vertex = state.getVertex();
     double distance = state.getWalkDistance();
     if (vertex instanceof TransitStopVertex transitVertex) {
-      Stop stop = transitVertex.getStop();
+      RegularStop stop = transitVertex.getStop();
       handleStop(stop, distance);
       handlePatternsAtStop(stop, distance);
     } else if (vertex instanceof VehicleRentalPlaceVertex rentalVertex) {
@@ -159,15 +159,15 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     return filterByPlaceTypes == null || filterByPlaceTypes.contains(type);
   }
 
-  private boolean stopHasRoutesWithMode(Stop stop, Set<TransitMode> modes) {
-    return routingService
+  private boolean stopHasRoutesWithMode(RegularStop stop, Set<TransitMode> modes) {
+    return transitService
       .getPatternsForStop(stop)
       .stream()
       .map(TripPattern::getMode)
       .anyMatch(modes::contains);
   }
 
-  private void handleStop(Stop stop, double distance) {
+  private void handleStop(RegularStop stop, double distance) {
     if (filterByStops != null && !filterByStops.contains(stop.getId())) {
       return;
     }
@@ -181,9 +181,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handlePatternsAtStop(Stop stop, double distance) {
+  private void handlePatternsAtStop(RegularStop stop, double distance) {
     if (includePatternAtStops) {
-      List<TripPattern> patterns = routingService
+      List<TripPattern> patterns = transitService
         .getPatternsForStop(stop)
         .stream()
         .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))

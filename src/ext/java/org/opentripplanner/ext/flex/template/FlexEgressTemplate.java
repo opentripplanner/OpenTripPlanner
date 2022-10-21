@@ -9,13 +9,13 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
 
@@ -36,12 +36,12 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
     return Lists.reverse(transfer.getEdges());
   }
 
-  protected Stop getFinalStop(PathTransfer transfer) {
-    return transfer.from instanceof Stop ? (Stop) transfer.from : null;
+  protected RegularStop getFinalStop(PathTransfer transfer) {
+    return transfer.from instanceof RegularStop ? (RegularStop) transfer.from : null;
   }
 
-  protected Collection<PathTransfer> getTransfersFromTransferStop(Graph graph) {
-    return graph.index.getFlexIndex().transfersToStop.get(transferStop);
+  protected Collection<PathTransfer> getTransfersFromTransferStop(TransitService transitService) {
+    return transitService.getFlexIndex().getTransfersToStop(transferStop);
   }
 
   protected Vertex getFlexVertex(Edge edge) {

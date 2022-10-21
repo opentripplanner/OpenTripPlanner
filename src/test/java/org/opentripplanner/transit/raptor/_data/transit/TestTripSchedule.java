@@ -1,9 +1,11 @@
 package org.opentripplanner.transit.raptor._data.transit;
 
-import static org.opentripplanner.model.WheelchairAccessibility.NO_INFORMATION;
+import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import java.util.Arrays;
+import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
@@ -11,23 +13,23 @@ import org.opentripplanner.util.time.TimeUtils;
 /**
  * An implementation of the {@link RaptorTripSchedule} for unit-testing.
  * <p>
- * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
+ * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
-public class TestTripSchedule implements RaptorTripSchedule {
+public class TestTripSchedule implements DefaultTripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
-  private final RaptorTripPattern pattern;
+  private final DefaultTripPattern pattern;
   private final int[] arrivalTimes;
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final Accessibility wheelchairBoarding;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
     int transitReluctanceIndex,
-    WheelchairAccessibility wheelchairBoarding
+    Accessibility wheelchairBoarding
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
@@ -65,7 +67,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
   }
 
   @Override
-  public RaptorTripPattern pattern() {
+  public DefaultTripPattern pattern() {
     return pattern;
   }
 
@@ -75,7 +77,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
   }
 
   @Override
-  public WheelchairAccessibility wheelchairBoarding() {
+  public Accessibility wheelchairBoarding() {
     return wheelchairBoarding;
   }
 
@@ -85,7 +87,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
 
   @Override
   public String toString() {
-    if (arrivalTimes == departureTimes) {
+    if (Arrays.equals(arrivalTimes, departureTimes)) {
       return ToStringBuilder
         .of(TestTripSchedule.class)
         .addServiceTimeSchedule("times", arrivalTimes)
@@ -106,7 +108,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
     private int[] departureTimes;
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
-    private WheelchairAccessibility wheelchairBoarding = NO_INFORMATION;
+    private Accessibility wheelchairBoarding = NO_INFORMATION;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
@@ -172,7 +174,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
       return this;
     }
 
-    public TestTripSchedule.Builder wheelchairBoarding(WheelchairAccessibility wcb) {
+    public TestTripSchedule.Builder wheelchairBoarding(Accessibility wcb) {
       this.wheelchairBoarding = wcb;
       return this;
     }
@@ -204,6 +206,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
           pattern.numberOfStopsInPattern()
         );
       }
+
       return new TestTripSchedule(
         pattern,
         arrivalTimes,

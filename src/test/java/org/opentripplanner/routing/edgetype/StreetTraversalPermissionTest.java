@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
@@ -42,20 +42,15 @@ public class StreetTraversalPermissionTest {
     StreetTraversalPermission perm1 = StreetTraversalPermission.ALL;
     assertTrue(perm1.allows(TraverseMode.CAR));
     assertTrue(perm1.allows(TraverseMode.WALK));
-
-    // StreetTraversalPermission is not used for public transit.
-    assertFalse(perm1.allows(TraverseMode.TRANSIT));
   }
 
   @Test
   public void testAllowsTraverseModeSet() {
-    StreetTraversalPermission perm1 = StreetTraversalPermission.BICYCLE_AND_CAR;
-    assertTrue(perm1.allows(TraverseModeSet.allModes()));
-    assertTrue(perm1.allows(new TraverseModeSet(TraverseMode.CAR, TraverseMode.BICYCLE)));
-    assertTrue(
-      perm1.allows(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.RAIL, TraverseMode.FERRY))
-    );
-    assertFalse(perm1.allows(new TraverseModeSet(TraverseMode.WALK)));
+    StreetTraversalPermission perm = StreetTraversalPermission.BICYCLE_AND_CAR;
+    assertTrue(perm.allows(TraverseModeSet.allModes()));
+    assertTrue(perm.allows(new TraverseModeSet(TraverseMode.CAR, TraverseMode.BICYCLE)));
+    assertTrue(perm.allows(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertFalse(perm.allows(new TraverseModeSet(TraverseMode.WALK)));
   }
 
   @Test

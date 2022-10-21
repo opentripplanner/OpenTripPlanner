@@ -1,12 +1,14 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
+
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTransitEntranceLink;
@@ -15,17 +17,20 @@ import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links various
+ * {@link GraphBuilderModule} plugin that links various
  * objects in the graph to the street network. It should be run after both the transit network and
  * street network are loaded. It links four things: transit stops, transit entrances, bike rental
  * stations, and bike parks. Therefore it should be run even when there's no GTFS data present to
@@ -34,32 +39,36 @@ import org.slf4j.LoggerFactory;
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
-  private Boolean addExtraEdgesToAreas = true;
+  private final Graph graph;
+  private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
+  private final Boolean addExtraEdgesToAreas;
 
-  public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
+  public StreetLinkerModule(
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
+    boolean addExtraEdgesToAreas
+  ) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
 
-  public List<String> provides() {
-    return Arrays.asList("street to transit", "linking");
-  }
-
-  public List<String> getPrerequisites() {
-    return List.of("streets"); // don't include transit, because we also link P+Rs and bike rental stations,
-    // which you could have without transit. However, if you have transit, this module should be run after it
-    // is loaded.
+  /** For test only */
+  public static void linkStreetsForTestOnly(Graph graph, TransitModel model) {
+    new StreetLinkerModule(graph, model, noopIssueStore(), false).buildGraph();
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
     graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
 
     if (graph.hasStreets) {
-      linkTransitStops(graph);
+      linkTransitStops(graph, transitModel);
       linkTransitEntrances(graph);
       linkVehicleParks(graph, issueStore);
     }
@@ -73,10 +82,30 @@ public class StreetLinkerModule implements GraphBuilderModule {
     //no inputs
   }
 
-  public void linkTransitStops(Graph graph) {
+  public void linkTransitStops(Graph graph, TransitModel transitModel) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
     LOG.info(progress.startMessage());
+
+    Set<StopLocation> stopLocationsUsedForFlexTrips = Set.of();
+
+    if (OTPFeature.FlexRouting.isOn()) {
+      stopLocationsUsedForFlexTrips =
+        transitModel
+          .getAllFlexTrips()
+          .stream()
+          .flatMap(t -> t.getStops().stream())
+          .collect(Collectors.toSet());
+
+      stopLocationsUsedForFlexTrips.addAll(
+        stopLocationsUsedForFlexTrips
+          .stream()
+          .filter(GroupStop.class::isInstance)
+          .map(GroupStop.class::cast)
+          .flatMap(g -> g.getLocations().stream().filter(RegularStop.class::isInstance))
+          .toList()
+      );
+    }
 
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
@@ -92,7 +121,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       if (OTPFeature.FlexRouting.isOn()) {
         // If regular stops are used for flex trips, they also need to be connected to car routable
         // street edges.
-        if (graph.getAllFlexStopsFlat().contains(tStop.getStop())) {
+        if (stopLocationsUsedForFlexTrips.contains(tStop.getStop())) {
           modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
         }
       }
@@ -243,7 +272,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.remove(vehicleParkingEntranceVertex);
 
     if (removeVehicleParking) {
-      var vehicleParkingService = graph.getService(VehicleParkingService.class);
+      var vehicleParkingService = graph.getVehicleParkingService();
       vehicleParkingService.removeVehicleParking(vehicleParking);
     } else {
       vehicleParking.getEntrances().remove(entrance);

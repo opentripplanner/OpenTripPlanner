@@ -1,23 +1,25 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 
@@ -83,10 +85,10 @@ public class NodeAdapterTest {
     assertEquals(-1, subject.asLong("missingField", -1));
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void requiredAsLong() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    subject.asLong("missingField");
+    assertThrows(OtpAppException.class, () -> subject.asLong("missingField"));
   }
 
   @Test
@@ -99,10 +101,16 @@ public class NodeAdapterTest {
     assertEquals("TEXT", subject.asText("aText"));
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void requiredAsText() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    subject.asText("missingField");
+    assertThrows(OtpAppException.class, () -> subject.asText("missingField"));
+  }
+
+  @Test
+  public void rawAsText() {
+    NodeAdapter subject = newNodeAdapterForTest("{ aText : 'TEXT' }");
+    assertEquals("TEXT", subject.path("aText").asText());
   }
 
   @Test
@@ -111,19 +119,19 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'A' }");
 
     // Then
-    assertEquals("Get existing property", AnEnum.A, subject.asEnum("key", AnEnum.B));
-    assertEquals("Get default value", AnEnum.B, subject.asEnum("missing-key", AnEnum.B));
-    assertEquals("Get existing property", AnEnum.A, subject.asEnum("key", AnEnum.class));
+    assertEquals(AnEnum.A, subject.asEnum("key", AnEnum.B), "Get existing property");
+    assertEquals(AnEnum.B, subject.asEnum("missing-key", AnEnum.B), "Get default value");
+    assertEquals(AnEnum.A, subject.asEnum("key", AnEnum.class), "Get existing property");
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void asEnumWithIllegalPropertySet() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ key : 'NONE_EXISTING_ENUM_VALUE' }");
 
     // Then expect an error when value 'NONE_EXISTING_ENUM_VALUE' is not in the set of legal
     // values: ['A', 'B', 'C']
-    subject.asEnum("key", AnEnum.B);
+    assertThrows(OtpAppException.class, () -> subject.asEnum("key", AnEnum.B));
   }
 
   @Test
@@ -165,11 +173,15 @@ public class NodeAdapterTest {
     assertNull(subject.asEnumMapAllKeysRequired("missing-key", AnEnum.class, NodeAdapter::asText));
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void asEnumMapWithRequiredMissingValue() {
     // A value for C is missing in map
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
-    subject.asEnumMapAllKeysRequired("key", AnEnum.class, NodeAdapter::asBoolean);
+
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.asEnumMapAllKeysRequired("key", AnEnum.class, NodeAdapter::asBoolean)
+    );
   }
 
   @Test
@@ -197,6 +209,30 @@ public class NodeAdapterTest {
   }
 
   @Test
+  public void asFeedScopedIds() {
+    NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12']}");
+    assertEquals("[A:23, B:12]", subject.asFeedScopedIds("routes", List.of()).toString());
+    assertEquals("[]", subject.asFeedScopedIds("missing-key", List.of()).toString());
+    assertEquals(
+      "[C:12]",
+      subject.asFeedScopedIds("missing-key", List.of(new FeedScopedId("C", "12"))).toString()
+    );
+  }
+
+  @Test
+  public void asFeedScopedIdSet() {
+    NodeAdapter subject = newNodeAdapterForTest("{ routes: ['A:23', 'B:12', 'A:23']}");
+    assertEquals(
+      List.of(
+        new FeedScopedId("A", "23"),
+        new FeedScopedId("B", "12"),
+        new FeedScopedId("A", "23")
+      ),
+      subject.asFeedScopedIdList("routes", List.of())
+    );
+  }
+
+  @Test
   public void asDateOrRelativePeriod() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ 'a' : '2020-02-28', 'b' : '-P3Y' }");
@@ -212,27 +248,41 @@ public class NodeAdapterTest {
     assertNull(subject.asDateOrRelativePeriod("do-no-exist", null));
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void testParsePeriodDateThrowsException() {
     // Given
     NodeAdapter subject = newNodeAdapterForTest("{ 'foo' : 'bar' }");
 
     // Then
-    subject.asDateOrRelativePeriod("foo", null);
+    assertThrows(OtpAppException.class, () -> subject.asDateOrRelativePeriod("foo", null));
   }
 
   @Test
   public void asDuration() {
-    NodeAdapter subject = newNodeAdapterForTest("{ key1 : 'PT1s', key2 : '4d3h2m1s' }");
-    assertEquals("PT1S", subject.asDuration("key1", null).toString());
-    assertEquals("PT99H2M1S", subject.asDuration("key2", null).toString());
+    NodeAdapter subject = newNodeAdapterForTest("{ k1:'PT1s', k2:'3h2m1s', k3:7 }");
+
+    // as required duration
+    assertEquals("PT1S", subject.asDuration("k1").toString());
+    assertEquals("PT3H2M1S", subject.asDuration("k2").toString());
+
+    // as optional duration
+    assertEquals("PT1S", subject.asDuration("k1", null).toString());
     assertEquals("PT3H", subject.asDuration("missing-key", D3h).toString());
+
+    // as required duration v2 (with unit)
+    assertEquals("PT1S", subject.asDuration("k1").toString());
+    assertEquals("PT7S", subject.asDuration2("k3", ChronoUnit.SECONDS).toString());
+
+    // as optional duration v2 (with unit)
+    assertEquals("PT1S", subject.asDuration2("k1", null, ChronoUnit.SECONDS).toString());
+    assertEquals("PT7S", subject.asDuration2("k3", null, ChronoUnit.SECONDS).toString());
+    assertEquals("PT3H", subject.asDuration2("missing-key", D3h, ChronoUnit.SECONDS).toString());
   }
 
-  @Test(expected = OtpAppException.class)
+  @Test
   public void requiredAsDuration() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    subject.asDuration("missingField");
+    assertThrows(OtpAppException.class, () -> subject.asDuration("missingField"));
   }
 
   @Test
@@ -274,26 +324,19 @@ public class NodeAdapterTest {
   @Test
   public void uriSyntaxException() {
     NodeAdapter subject = newNodeAdapterForTest("{ aUri : 'error$%uri' }");
-    try {
-      subject.asUri("aUri", null);
-      fail("Expected an exception");
-    } catch (OtpAppException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("error$%uri"));
-    }
+
+    assertThrows(OtpAppException.class, () -> subject.asUri("aUri", null), "error$%uri");
   }
 
   @Test
   public void uriRequiredValueMissing() {
     NodeAdapter subject = newNodeAdapterForTest("{ }");
-    try {
-      subject.asUri("aUri");
-      fail("Expected an exception");
-    } catch (OtpAppException e) {
-      assertTrue(
-        e.getMessage(),
-        e.getMessage().contains("Required parameter 'aUri' not found in 'Test'")
-      );
-    }
+
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.asUri("aUri"),
+      "Required parameter 'aUri' not found in 'Test'"
+    );
   }
 
   @Test
@@ -308,13 +351,12 @@ public class NodeAdapterTest {
   @Test
   public void urisNotAnArrayException() {
     NodeAdapter subject = newNodeAdapterForTest("{ 'uris': 'no array' }");
-    try {
-      subject.asUris("uris");
-      fail("Expected an exception");
-    } catch (OtpAppException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("'uris': 'no array'"));
-      assertTrue(e.getMessage(), e.getMessage().contains("Source: Test"));
-    }
+
+    assertThrows(
+      OtpAppException.class,
+      () -> subject.asUris("uris"),
+      "'uris': 'no array'" + "Source: Test"
+    );
   }
 
   @Test
@@ -333,6 +375,20 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '4+8x' }");
     assertEquals("f(x) = 4.0 + 8.0 x", subject.asLinearFunction("key", null).toString());
     assertNull(subject.asLinearFunction("no-key", null));
+  }
+
+  @Test
+  public void asZoneId() {
+    NodeAdapter subject = newNodeAdapterForTest(
+      "{ key1 : 'UTC', key2 : 'Europe/Oslo', key3 : '+02:00', key4: 'invalid' }"
+    );
+    assertEquals("UTC", subject.asZoneId("key1", null).getId());
+    assertEquals("Europe/Oslo", subject.asZoneId("key2", null).getId());
+    assertEquals("+02:00", subject.asZoneId("key3", null).getId());
+
+    assertThrows(OtpAppException.class, () -> subject.asZoneId("key4", null));
+
+    assertEquals(ZoneId.of("UTC"), subject.asZoneId("missing-key", ZoneId.of("UTC")));
   }
 
   @Test

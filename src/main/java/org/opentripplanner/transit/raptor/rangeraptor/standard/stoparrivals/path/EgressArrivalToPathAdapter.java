@@ -5,10 +5,10 @@ import java.util.List;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.ArrivedAtDestinationCheck;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.DestinationArrivalListener;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.ArrivedAtDestinationCheck;
+import org.opentripplanner.transit.raptor.rangeraptor.standard.internalapi.DestinationArrivalListener;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopsCursor;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -117,7 +117,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
     }
   }
 
-  /** Used internally in this class to cash a destination arrival */
+  /** Used internally in this class to cache a destination arrival */
   private static class DestinationArrivalEvent {
 
     final int round;

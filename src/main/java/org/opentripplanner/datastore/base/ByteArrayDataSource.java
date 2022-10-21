@@ -4,8 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import java.net.URI;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * This data source keep its data in memory as a byte array. You may insert data using {@link
@@ -50,6 +51,11 @@ public class ByteArrayDataSource implements DataSource {
   @Override
   public String path() {
     return path;
+  }
+
+  @Override
+  public URI uri() {
+    return URI.create(path());
   }
 
   @Override

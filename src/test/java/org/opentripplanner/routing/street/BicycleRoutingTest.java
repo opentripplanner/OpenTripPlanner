@@ -1,17 +1,20 @@
 package org.opentripplanner.routing.street;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
+import java.time.Duration;
 import java.time.Instant;
-import org.junit.jupiter.api.Assertions;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
+import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
@@ -19,14 +22,20 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class BicycleRoutingTest {
 
   static final Instant dateTime = Instant.now();
-  Graph herrenbergGraph = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+  private final Graph herrenbergGraph;
+
+  {
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    herrenbergGraph = model.graph();
+
+    model.transitModel().index();
+    herrenbergGraph.index(model.transitModel().getStopModel());
+  }
 
   /**
    * https://www.openstreetmap.org/way/22392895 is access=destination which means that both bicycles
@@ -61,22 +70,21 @@ public class BicycleRoutingTest {
   }
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
-    request.bicycleOptimizeType = BicycleOptimizeType.QUICK;
+    request.setFrom(from);
+    request.setTo(to);
+    request.preferences().withBike(it -> it.setOptimizeType(BicycleOptimizeType.QUICK));
 
     request.streetSubRequestModes = new TraverseModeSet(TraverseMode.BICYCLE);
     var temporaryVertices = new TemporaryVerticesContainer(graph, request);
     RoutingContext routingContext = new RoutingContext(request, graph, temporaryVertices);
 
-    var gpf = new GraphPathFinder(new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry));
+    var gpf = new GraphPathFinder(null, Duration.ofSeconds(5));
     var paths = gpf.graphPathFinderEntryPoint(routingContext);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-      graph.getTimeZone(),
-      new AlertToLegMapper(graph.getTransitAlertService()),
+      ZoneId.of("Europe/Berlin"),
       graph.streetNotesService,
       graph.ellipsoidToGeoidDifference
     );
@@ -84,11 +92,19 @@ public class BicycleRoutingTest {
     var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
     temporaryVertices.close();
 
-    // make sure that we only get BICYLE legs
+    // make sure that we only get BICYCLE legs
     itineraries.forEach(i ->
-      i.legs.forEach(l -> Assertions.assertEquals(l.getMode(), TraverseMode.BICYCLE))
+      i
+        .getLegs()
+        .forEach(l -> {
+          if (l instanceof StreetLeg stLeg) {
+            assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
+          } else {
+            fail("Expected StreetLeg (BICYCLE): " + l);
+          }
+        })
     );
-    Geometry legGeometry = itineraries.get(0).legs.get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
     return PolylineEncoder.encodeGeometry(legGeometry).points();
   }
 }

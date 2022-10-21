@@ -6,8 +6,8 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import java.io.OutputStream;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 
@@ -33,6 +33,6 @@ class GsOutFileDataSource extends AbstractGsDataSource implements DataSource {
   @Override
   public OutputStream asOutputStream() {
     BlobInfo blobInfo = BlobInfo.newBuilder(blobId()).build();
-    return newOutputStream(storage.writer(blobInfo));
+    return newOutputStream(storage.writer(blobInfo, Storage.BlobWriteOption.doesNotExist()));
   }
 }

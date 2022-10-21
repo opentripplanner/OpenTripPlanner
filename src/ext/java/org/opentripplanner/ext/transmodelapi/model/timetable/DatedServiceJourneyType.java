@@ -2,17 +2,26 @@ package org.opentripplanner.ext.transmodelapi.model.timetable;
 
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.SERVICE_ALTERATION;
 
+import graphql.AssertException;
+import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.TripTimesShortHelper;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A DatedServiceJourney GraphQL Type for use in endpoints fetching DatedServiceJourney data
@@ -22,7 +31,13 @@ public class DatedServiceJourneyType {
   private static final String NAME = "DatedServiceJourney";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
-  public static GraphQLObjectType create(GraphQLOutputType serviceJourneyType, GqlUtil gqlUtil) {
+  public static GraphQLObjectType create(
+    GraphQLOutputType serviceJourneyType,
+    GraphQLOutputType journeyPatternType,
+    GraphQLType estimatedCallType,
+    GraphQLType quayType,
+    GqlUtil gqlUtil
+  ) {
     return GraphQLObjectType
       .newObject()
       .name(NAME)
@@ -40,7 +55,6 @@ public class DatedServiceJourneyType {
             Optional
               .of(tripOnServiceDate(environment))
               .map(TripOnServiceDate::getServiceDate)
-              .map(ServiceDate::toLocalDate)
               .orElse(null)
           )
       )
@@ -68,7 +82,88 @@ public class DatedServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(REF))))
           .dataFetcher(environment -> tripOnServiceDate(environment).getReplacementFor())
       )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("journeyPattern")
+          .description("JourneyPattern for the dated service journey.")
+          .type(journeyPatternType)
+          .dataFetcher(DatedServiceJourneyType::tripPattern)
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("quays")
+          .description("Quays visited by the dated service journey.")
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("first")
+              .description("Only fetch the first n quays on the service journey")
+              .type(Scalars.GraphQLInt)
+              .build()
+          )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("last")
+              .description("Only fetch the last n quays on the service journey")
+              .type(Scalars.GraphQLInt)
+              .build()
+          )
+          .dataFetcher(environment -> {
+            Integer first = environment.getArgument("first");
+            Integer last = environment.getArgument("last");
+            TripPattern tripPattern = tripPattern(environment);
+            List<StopLocation> stops = tripPattern.getStops();
+
+            if (first != null && last != null) {
+              throw new AssertException("Both first and last can't be defined simultaneously.");
+            } else if (first != null) {
+              if (first > stops.size()) {
+                return stops.subList(0, first);
+              }
+            } else if (last != null) {
+              if (last > stops.size()) {
+                return stops.subList(stops.size() - last, stops.size());
+              }
+            }
+            return stops;
+          })
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("estimatedCalls")
+          .type(new GraphQLList(estimatedCallType))
+          .withDirective(gqlUtil.timingData)
+          .description(
+            "Returns scheduled passingTimes for this dated service journey, " +
+            "updated with realtime-updates (if available). "
+          )
+          .dataFetcher(environment -> {
+            TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
+            return TripTimesShortHelper.getTripTimesShort(
+              GqlUtil.getTransitService(environment),
+              tripOnServiceDate.getTrip(),
+              tripOnServiceDate.getServiceDate()
+            );
+          })
+          .build()
+      )
       .build();
+  }
+
+  private static TripPattern tripPattern(DataFetchingEnvironment env) {
+    TransitService transitService = GqlUtil.getTransitService(env);
+    TripOnServiceDate tripOnServiceDate = tripOnServiceDate(env);
+    return transitService.getPatternForTrip(
+      tripOnServiceDate.getTrip(),
+      tripOnServiceDate.getServiceDate()
+    );
   }
 
   private static TripOnServiceDate tripOnServiceDate(DataFetchingEnvironment environment) {

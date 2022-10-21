@@ -8,8 +8,8 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationUris;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalSystem;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,7 @@ public class GbfsStationInformationMapper {
           )
         : null;
 
-    rentalStation.isKeepingVehicleRentalAtDestinationAllowed =
+    rentalStation.isArrivingInRentalVehicleAtDestinationAllowed =
       allowKeepingRentedVehicleAtDestination;
 
     GBFSRentalUris rentalUris = station.getRentalUris();

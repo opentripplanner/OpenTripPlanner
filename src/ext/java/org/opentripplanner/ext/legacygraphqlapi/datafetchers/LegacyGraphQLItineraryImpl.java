@@ -9,29 +9,29 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.ItineraryFares;
 
 public class LegacyGraphQLItineraryImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {
-    return environment -> getSource(environment).arrivedAtDestinationWithRentedVehicle;
+    return environment -> getSource(environment).isArrivedAtDestinationWithRentedVehicle();
   }
 
   @Override
   public DataFetcher<Long> duration() {
-    return environment -> (long) getSource(environment).durationSeconds;
+    return environment -> (long) getSource(environment).getDuration().toSeconds();
   }
 
   @Override
   public DataFetcher<Double> elevationGained() {
-    return environment -> getSource(environment).elevationGained;
+    return environment -> getSource(environment).getElevationGained();
   }
 
   @Override
   public DataFetcher<Double> elevationLost() {
-    return environment -> getSource(environment).elevationLost;
+    return environment -> getSource(environment).getElevationLost();
   }
 
   @Override
@@ -42,16 +42,16 @@ public class LegacyGraphQLItineraryImpl
   @Override
   public DataFetcher<Iterable<Map<String, Object>>> fares() {
     return environment -> {
-      Fare fare = getSource(environment).fare;
+      ItineraryFares fare = getSource(environment).getFares();
       if (fare == null) {
         return null;
       }
-      return fare.fare
-        .keySet()
+      return fare
+        .getTypes()
         .stream()
         .map(fareKey -> {
           Map<String, Object> result = new HashMap<>();
-          result.put("name", fareKey.name());
+          result.put("name", fareKey);
           result.put("fare", fare.getFare(fareKey));
           result.put("details", fare.getDetails(fareKey));
           return result;
@@ -62,12 +62,12 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Integer> generalizedCost() {
-    return environment -> getSource(environment).generalizedCost;
+    return environment -> getSource(environment).getGeneralizedCost();
   }
 
   @Override
   public DataFetcher<Iterable<Leg>> legs() {
-    return environment -> getSource(environment).legs;
+    return environment -> getSource(environment).getLegs();
   }
 
   @Override
@@ -77,22 +77,22 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Iterable<SystemNotice>> systemNotices() {
-    return environment -> getSource(environment).systemNotices;
+    return environment -> getSource(environment).getSystemNotices();
   }
 
   @Override
   public DataFetcher<Long> waitingTime() {
-    return environment -> (long) getSource(environment).waitingTimeSeconds;
+    return environment -> (long) getSource(environment).getWaitingDuration().toSeconds();
   }
 
   @Override
   public DataFetcher<Double> walkDistance() {
-    return environment -> getSource(environment).nonTransitDistanceMeters;
+    return environment -> getSource(environment).getNonTransitDistanceMeters();
   }
 
   @Override
   public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).nonTransitTimeSeconds;
+    return environment -> (long) getSource(environment).getNonTransitDuration().toSeconds();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

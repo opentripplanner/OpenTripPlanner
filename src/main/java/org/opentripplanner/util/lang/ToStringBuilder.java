@@ -4,6 +4,7 @@ import static java.lang.Boolean.TRUE;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -143,8 +144,12 @@ public class ToStringBuilder {
     return addIfNotNull(name, c == null || c.isEmpty() ? null : c);
   }
 
-  public ToStringBuilder addColSize(String name, Collection<?> c) {
-    return addIfNotNull(name, c, x -> String.format("%d items", x.size()));
+  /**
+   * Add collection if not null or not empty, all elements are added using the given custom
+   * {@code toStingOp}.
+   */
+  public <T> ToStringBuilder addCol(String name, Collection<T> c, Function<T, String> toStingOp) {
+    return addIfNotNull(name, c == null || c.isEmpty() ? null : c.stream().map(toStingOp).toList());
   }
 
   /** Add the collection, truncate the number of elements at given maxLimit. */
@@ -161,6 +166,10 @@ public class ToStringBuilder {
       return addIt(name + "(" + maxLimit + "/" + c.size() + ")", "[" + value + ", ..]");
     }
     return addIfNotNull(name, c);
+  }
+
+  public ToStringBuilder addColSize(String name, Collection<?> c) {
+    return addIfNotNull(name, c, x -> String.format("%d items", x.size()));
   }
 
   /** Add the collection, truncate the number of elements at given maxLimit. */
@@ -186,12 +195,16 @@ public class ToStringBuilder {
     return addIfNotNull(name, num, numFormat::formatCoordinate);
   }
 
+  public ToStringBuilder addDateTime(String name, Instant time) {
+    return addIfNotNull(name, time, Instant::toString);
+  }
+
   /**
    * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
    * DATE is not printed. {@code null} value is ignored.
    */
-  public ToStringBuilder addTimeCal(String name, ZonedDateTime time) {
-    return addIfNotNull(name, time, this::formatTime);
+  public ToStringBuilder addTime(String name, ZonedDateTime time) {
+    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_TIME::format);
   }
 
   /**
@@ -228,8 +241,12 @@ public class ToStringBuilder {
     );
   }
 
-  public ToStringBuilder addTime(String name, Instant time) {
-    return addIfNotNull(name, time, Instant::toString);
+  /**
+   * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
+   * DATE is not printed. {@code null} value is ignored.
+   */
+  public ToStringBuilder addDate(String name, LocalDate time) {
+    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_DATE::format);
   }
 
   /**
@@ -320,9 +337,5 @@ public class ToStringBuilder {
       return NULL_VALUE;
     }
     return object.toString();
-  }
-
-  private String formatTime(ZonedDateTime time) {
-    return time.format(DateTimeFormatter.ISO_LOCAL_TIME);
   }
 }

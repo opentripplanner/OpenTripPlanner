@@ -2,6 +2,8 @@
 package org.opentripplanner.model;
 
 import java.util.List;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -48,10 +50,10 @@ public final class StopTime implements Comparable<StopTime> {
   private int flexWindowEnd = MISSING_VALUE;
 
   // Disabled by default
-  private int flexContinuousPickup = MISSING_VALUE;
+  private PickDrop flexContinuousPickup = PickDrop.NONE;
 
   // Disabled by default
-  private int flexContinuousDropOff = MISSING_VALUE;
+  private PickDrop flexContinuousDropOff = PickDrop.NONE;
 
   private BookingInfo dropOffBookingInfo;
 
@@ -91,7 +93,7 @@ public final class StopTime implements Comparable<StopTime> {
    * is ok.
    */
   public StopTimeKey getId() {
-    return new StopTimeKey(trip.getId(), stopSequence);
+    return StopTimeKey.of(trip.getId(), stopSequence).build();
   }
 
   public Trip getTrip() {
@@ -247,19 +249,19 @@ public final class StopTime implements Comparable<StopTime> {
     this.flexWindowEnd = flexWindowEnd;
   }
 
-  public int getFlexContinuousPickup() {
-    return flexContinuousPickup == MISSING_VALUE ? 1 : flexContinuousPickup;
+  public PickDrop getFlexContinuousPickup() {
+    return flexContinuousPickup;
   }
 
-  public void setFlexContinuousPickup(int flexContinuousPickup) {
+  public void setFlexContinuousPickup(PickDrop flexContinuousPickup) {
     this.flexContinuousPickup = flexContinuousPickup;
   }
 
-  public int getFlexContinuousDropOff() {
-    return flexContinuousDropOff == MISSING_VALUE ? 1 : flexContinuousDropOff;
+  public PickDrop getFlexContinuousDropOff() {
+    return flexContinuousDropOff;
   }
 
-  public void setFlexContinuousDropOff(int flexContinuousDropOff) {
+  public void setFlexContinuousDropOff(PickDrop flexContinuousDropOff) {
     this.flexContinuousDropOff = flexContinuousDropOff;
   }
 

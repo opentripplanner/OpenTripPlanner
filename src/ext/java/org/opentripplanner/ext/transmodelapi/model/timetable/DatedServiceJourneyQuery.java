@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripAlteration;
-import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
  * A GraphQL query for retrieving data on DatedServiceJourneys
@@ -34,7 +33,7 @@ public class DatedServiceJourneyQuery {
       .dataFetcher(environment -> {
         FeedScopedId id = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
 
-        return GqlUtil.getRoutingService(environment).getTripOnServiceDateById(id);
+        return GqlUtil.getTransitService(environment).getTripOnServiceDateById(id);
       })
       .build();
   }
@@ -84,11 +83,19 @@ public class DatedServiceJourneyQuery {
           .name("authorities")
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("replacementFor")
+          .description(
+            "Get all DatedServiceJourneys, which are replacing any of the given DatedServiceJourneys ids"
+          )
+          .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
+      )
       .dataFetcher(environment -> {
         Stream<TripOnServiceDate> stream = GqlUtil
-          .getRoutingService(environment)
-          .getTripOnServiceDateById()
-          .values()
+          .getTransitService(environment)
+          .getAllTripOnServiceDates()
           .stream();
 
         var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
@@ -97,6 +104,7 @@ public class DatedServiceJourneyQuery {
         var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
         var alterations = environment.<List<TripAlteration>>getArgument("alterations");
         var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
+        var replacementFor = mapIDsToDomainNullSafe(environment.getArgument("replacementFor"));
 
         if (!lines.isEmpty()) {
           stream =
@@ -120,7 +128,7 @@ public class DatedServiceJourneyQuery {
         }
 
         // At least one operationg day is required
-        var days = operatingDays.stream().map(ServiceDate::new).toList();
+        var days = operatingDays.stream().toList();
 
         stream =
           stream.filter(tripOnServiceDate -> days.contains(tripOnServiceDate.getServiceDate()));
@@ -136,6 +144,17 @@ public class DatedServiceJourneyQuery {
           stream =
             stream.filter(tripOnServiceDate ->
               authorities.contains(tripOnServiceDate.getTrip().getRoute().getAgency().getId())
+            );
+        }
+
+        if (!replacementFor.isEmpty()) {
+          stream =
+            stream.filter(tripOnServiceDate ->
+              !tripOnServiceDate.getReplacementFor().isEmpty() &&
+              tripOnServiceDate
+                .getReplacementFor()
+                .stream()
+                .anyMatch(replacement -> replacementFor.contains(replacement.getId()))
             );
         }
 

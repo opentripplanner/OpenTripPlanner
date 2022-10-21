@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.parkAndRideApi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -13,11 +12,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * Created by demory on 7/26/18.
@@ -26,17 +26,24 @@ import org.opentripplanner.standalone.server.Router;
 @Path("/routers/{ignoreRouterId}/park_and_ride")
 public class ParkAndRideResource {
 
-  private final OTPServer otpServer;
+  private final VehicleParkingService vehicleParkingService;
+  private final GraphFinder graphFinder;
 
   public ParkAndRideResource(
-    @Context OTPServer otpServer,
+    @Context OtpServerRequestContext serverContext,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.otpServer = otpServer;
+    this.vehicleParkingService = serverContext.graph().getVehicleParkingService();
+
+    // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
+    //           - serverContext.graphFinder(). This needs at least a comment!
+    //           - This can be replaced with a search done with the StopModel
+    //           - if we have a radius search there.
+    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStop);
   }
 
   /** Envelopes are in latitude, longitude format */
@@ -59,8 +66,6 @@ public class ParkAndRideResource {
     @QueryParam("upperRight") String upperRight,
     @QueryParam("maxTransitDistance") Double maxTransitDistance
   ) {
-    Router router = otpServer.getRouter();
-
     Envelope envelope;
     if (lowerLeft != null) {
       envelope = getEnvelope(lowerLeft, upperRight);
@@ -68,43 +73,33 @@ public class ParkAndRideResource {
       envelope = new Envelope(-180, 180, -90, 90);
     }
 
-    List<ParkAndRideInfo> prs = new ArrayList<>();
-    for (Vertex v : router.graph.getVertices()) {
-      // Check if vertex is a ParkAndRideVertex
-      if (!(v instanceof VehicleParkingEntranceVertex)) continue;
-
-      // Check if cars are allowed
-      if (!((VehicleParkingEntranceVertex) v).getVehicleParking().hasAnyCarPlaces()) continue;
-
-      // Check if vertex is within envelope
-      if (!envelope.contains(v.getX(), v.getY())) continue;
-
-      // Check if vertex is within maxTransitDistance of a stop (if specified)
-      if (maxTransitDistance != null) {
-        List<TransitStopVertex> stops = router.graph
-          .getStreetIndex()
-          .getNearbyTransitStops(new Coordinate(v.getX(), v.getY()), maxTransitDistance);
-        if (stops.isEmpty()) {
-          continue;
-        }
-      }
-
-      prs.add(new ParkAndRideInfo((VehicleParkingEntranceVertex) v));
-    }
+    var prs = vehicleParkingService
+      .getCarParks()
+      .filter(lot -> envelope.contains(new Coordinate(lot.getX(), lot.getY())))
+      .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))
+      .map(ParkAndRideInfo::ofVehicleParking)
+      .toList();
 
     return Response.status(Status.OK).entity(prs).build();
   }
 
-  public static class ParkAndRideInfo {
+  private boolean hasTransitStopsNearby(Double maxTransitDistance, VehicleParking lot) {
+    if (maxTransitDistance == null) {
+      return true;
+    } else {
+      var stops = graphFinder.findClosestStops(lot.getY(), lot.getX(), maxTransitDistance);
+      return !stops.isEmpty();
+    }
+  }
 
-    public String name;
+  public record ParkAndRideInfo(String name, double x, double y) {
+    public static ParkAndRideInfo ofVehicleParking(VehicleParking parking) {
+      var name = Optional
+        .ofNullable(parking.getName())
+        .map(I18NString::toString)
+        .orElse(parking.getId().getId());
 
-    public Double x, y;
-
-    public ParkAndRideInfo(VehicleParkingEntranceVertex vertex) {
-      this.name = vertex.getDefaultName();
-      this.x = vertex.getX();
-      this.y = vertex.getY();
+      return new ParkAndRideInfo(name, parking.getX(), parking.getY());
     }
   }
 }

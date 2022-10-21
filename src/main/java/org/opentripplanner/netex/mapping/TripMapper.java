@@ -1,18 +1,16 @@
 package org.opentripplanner.netex.mapping;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.netex.mapping.support.MainAndSubMode;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
@@ -38,7 +36,6 @@ class TripMapper {
   private final ReadOnlyHierarchicalMap<String, Route> routeById;
   private final ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
   private final Map<String, FeedScopedId> serviceIds;
-  private final Set<FeedScopedId> shapePointIds;
   private final EntityById<Operator> operatorsById;
   private final TransportModeMapper transportModeMapper = new TransportModeMapper();
   private final EntityById<Trip> mappedTrips = new EntityById<>();
@@ -50,8 +47,7 @@ class TripMapper {
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
     ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
-    Map<String, FeedScopedId> serviceIds,
-    Set<FeedScopedId> shapePointIds
+    Map<String, FeedScopedId> serviceIds
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
@@ -59,7 +55,6 @@ class TripMapper {
     this.routeById = routeById;
     this.journeyPatternsById = journeyPatternsById;
     this.serviceIds = serviceIds;
-    this.shapePointIds = shapePointIds;
     this.operatorsById = operatorsById;
   }
 
@@ -96,13 +91,12 @@ class TripMapper {
 
     var wheelChairBoarding = WheelChairMapper.wheelchairAccessibility(
       serviceJourney.getAccessibilityAssessment(),
-      WheelchairAccessibility.NO_INFORMATION
+      Accessibility.NO_INFORMATION
     );
 
     var builder = Trip.of(id);
     builder.withRoute(route);
     builder.withServiceId(serviceId);
-    builder.withShapeId(getShapeId(serviceJourney));
     builder.withWheelchairBoarding(wheelChairBoarding);
 
     if (serviceJourney.getPrivateCode() != null) {
@@ -113,7 +107,7 @@ class TripMapper {
     builder.withOperator(findOperator(serviceJourney));
 
     if (serviceJourney.getTransportMode() != null) {
-      T2<TransitMode, String> transitMode = null;
+      MainAndSubMode transitMode = null;
       try {
         transitMode =
           transportModeMapper.map(
@@ -129,8 +123,8 @@ class TripMapper {
         );
         return null;
       }
-      builder.withMode(transitMode.first);
-      builder.withNetexSubmode(transitMode.second);
+      builder.withMode(transitMode.mainMode());
+      builder.withNetexSubmode(transitMode.subMode());
     }
 
     builder.withDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));
@@ -154,18 +148,6 @@ class TripMapper {
     } else {
       return null;
     }
-  }
-
-  @Nullable
-  private FeedScopedId getShapeId(ServiceJourney serviceJourney) {
-    JourneyPattern journeyPattern = journeyPatternsById.lookup(
-      serviceJourney.getJourneyPatternRef().getValue().getRef()
-    );
-    FeedScopedId serviceLinkId = journeyPattern != null
-      ? idFactory.createId(journeyPattern.getId().replace("JourneyPattern", "ServiceLink"))
-      : null;
-
-    return shapePointIds.contains(serviceLinkId) ? serviceLinkId : null;
   }
 
   private Route lookUpNetexRoute(ServiceJourney serviceJourney) {

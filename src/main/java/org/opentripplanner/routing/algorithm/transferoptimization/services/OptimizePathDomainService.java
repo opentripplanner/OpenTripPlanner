@@ -67,7 +67,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
   private final TransferGenerator<T> transferGenerator;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final RaptorSlackProvider slackProvider;
   private final MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain;
   private final RaptorStopNameResolver stopNameTranslator;
@@ -82,7 +82,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
   public OptimizePathDomainService(
     TransferGenerator<T> transferGenerator,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorSlackProvider slackProvider,
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,

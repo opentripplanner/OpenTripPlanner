@@ -5,19 +5,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class UnconnectedAreasTest {
 
@@ -31,10 +35,10 @@ public class UnconnectedAreasTest {
    */
   @Test
   public void testUnconnectedCarParkAndRide() {
-    DataImportIssueStore issueStore = new DataImportIssueStore(true);
+    DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
-    assertEquals(2, issueStore.getIssues().size());
+    assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
 
     var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
     int nParkAndRide = vehicleParkingVertices.size();
@@ -48,10 +52,10 @@ public class UnconnectedAreasTest {
 
   @Test
   public void testUnconnectedBikeParkAndRide() {
-    DataImportIssueStore issueStore = new DataImportIssueStore(true);
+    DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
 
-    assertEquals(3, issueStore.getIssues().size());
+    assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
 
     var vehicleParkingVertices = gg.getVerticesOfType(VehicleParkingEntranceVertex.class);
     int nParkAndRideEntrances = vehicleParkingVertices.size();
@@ -140,25 +144,33 @@ public class UnconnectedAreasTest {
   }
 
   private Graph buildOSMGraph(String osmFileName) {
-    return buildOSMGraph(osmFileName, new DataImportIssueStore(false));
+    return buildOSMGraph(osmFileName, DataImportIssueStore.noopIssueStore());
   }
 
   private Graph buildOSMGraph(String osmFileName, DataImportIssueStore issueStore) {
-    Graph graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
     var fileUrl = getClass().getResource(osmFileName);
     Assertions.assertNotNull(fileUrl);
     File file = new File(fileUrl.getFile());
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      graph,
+      transitModel.getTimeZone(),
+      issueStore
+    );
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     loader.staticParkAndRide = true;
     loader.staticBikeParkAndRide = true;
 
-    loader.buildGraph(graph, new HashMap<>(), issueStore);
+    loader.buildGraph();
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, new HashMap<>(), issueStore);
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     return graph;
   }
@@ -206,5 +218,13 @@ public class UnconnectedAreasTest {
       .forEach(e -> assertTrue(connections.contains(e.getFromVertex().getLabel())));
 
     return connections;
+  }
+
+  private int getParkAndRideUnlinkedIssueCount(DataImportIssueStore issueStore) {
+    return (int) issueStore
+      .getIssues()
+      .stream()
+      .filter(dataImportIssue -> dataImportIssue instanceof ParkAndRideUnlinked)
+      .count();
   }
 }

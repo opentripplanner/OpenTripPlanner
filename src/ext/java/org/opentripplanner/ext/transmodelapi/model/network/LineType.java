@@ -18,8 +18,8 @@ import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.OTPFeature;
 
@@ -110,10 +110,11 @@ public class LineType {
           .newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
-          .dataFetcher(environment -> {
-            final String netexSubMode = ((Route) environment.getSource()).getNetexSubmode();
-            return netexSubMode != null ? TransmodelTransportSubmode.fromValue(netexSubMode) : null;
-          })
+          .dataFetcher(environment ->
+            TransmodelTransportSubmode.fromValue(
+              ((Route) environment.getSource()).getNetexSubmode()
+            )
+          )
           .build()
       )
       .field(
@@ -121,7 +122,7 @@ public class LineType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getDesc())
+          .dataFetcher(environment -> ((Route) environment.getSource()).getDescription())
           .build()
       )
       .field(
@@ -147,12 +148,9 @@ public class LineType {
           .newFieldDefinition()
           .name("journeyPatterns")
           .type(new GraphQLList(journeyPatternType))
-          .dataFetcher(environment -> {
-            return GqlUtil
-              .getRoutingService(environment)
-              .getPatternsForRoute()
-              .get(environment.getSource());
-          })
+          .dataFetcher(environment ->
+            GqlUtil.getTransitService(environment).getPatternsForRoute(environment.getSource())
+          )
           .build()
       )
       .field(
@@ -160,17 +158,16 @@ public class LineType {
           .newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
-          .dataFetcher(environment -> {
-            return GqlUtil
-              .getRoutingService(environment)
-              .getPatternsForRoute()
-              .get(environment.getSource())
+          .dataFetcher(environment ->
+            GqlUtil
+              .getTransitService(environment)
+              .getPatternsForRoute(environment.getSource())
               .stream()
               .map(TripPattern::getStops)
               .flatMap(Collection::stream)
               .distinct()
-              .collect(Collectors.toList());
-          })
+              .collect(Collectors.toList())
+          )
           .build()
       )
       .field(
@@ -180,9 +177,8 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment -> {
             List<Trip> result = GqlUtil
-              .getRoutingService(environment)
-              .getPatternsForRoute()
-              .get(environment.getSource())
+              .getTransitService(environment)
+              .getPatternsForRoute(environment.getSource())
               .stream()
               .flatMap(TripPattern::scheduledTripsAsStream)
               .distinct()
@@ -192,9 +188,9 @@ public class LineType {
               // Workaround since flex trips are not part of patterns yet
               result.addAll(
                 GqlUtil
-                  .getRoutingService(environment)
+                  .getTransitService(environment)
                   .getFlexIndex()
-                  .tripById.values()
+                  .getAllFlexTrips()
                   .stream()
                   .map(FlexTrip::getTrip)
                   .filter(t -> t.getRoute().equals((Route) environment.getSource()))
@@ -212,7 +208,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
             Route route = environment.getSource();
-            return GqlUtil.getRoutingService(environment).getNoticesByEntity(route);
+            return GqlUtil.getTransitService(environment).getNoticesByEntity(route);
           })
           .build()
       )
@@ -224,7 +220,7 @@ public class LineType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
             GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getRouteAlerts(((Route) environment.getSource()).getId())
           )

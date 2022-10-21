@@ -5,52 +5,48 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
+import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
+import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 
-import io.micrometer.core.instrument.Metrics;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.LocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class OpenStreetMapModuleTest {
 
-  private HashMap<Class<?>, Object> extra;
-
-  @BeforeEach
-  public void setUp() {
-    extra = new HashMap<>();
-  }
-
   @Test
   public void testGraphBuilder() {
-    Graph gg = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var gg = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
@@ -58,10 +54,16 @@ public class OpenStreetMapModuleTest {
 
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
 
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
+    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(gg, extra);
+    osmModule.buildGraph();
 
     // Kamiennogorska at south end of segment
     Vertex v1 = gg.getVertex("osm:node:280592578");
@@ -110,7 +112,10 @@ public class OpenStreetMapModuleTest {
    */
   @Test
   public void testBuildGraphDetailed() throws Exception {
-    Graph gg = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var gg = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -119,10 +124,16 @@ public class OpenStreetMapModuleTest {
       )
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
-    loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
+    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(gg, extra);
+    osmModule.buildGraph();
 
     // These vertices are labeled in the OSM file as having traffic lights.
     IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm:node:1919595918");
@@ -181,16 +192,14 @@ public class OpenStreetMapModuleTest {
     // add two equal matches: lane only...
     OSMSpecifier lane_only = new OSMSpecifier("cycleway=lane");
 
-    WayProperties lane_is_safer = new WayProperties();
-    lane_is_safer.setSafetyFeatures(new P2<>(1.5, 1.5));
+    WayProperties lane_is_safer = withModes(ALL).bicycleSafety(1.5).build();
 
     wayPropertySet.addProperties(lane_only, lane_is_safer);
 
     // and footway only
     OSMSpecifier footway_only = new OSMSpecifier("highway=footway");
 
-    WayProperties footways_allow_peds = new WayProperties();
-    footways_allow_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    WayProperties footways_allow_peds = new WayPropertiesBuilder(PEDESTRIAN).build();
 
     wayPropertySet.addProperties(footway_only, footways_allow_peds);
 
@@ -201,9 +210,7 @@ public class OpenStreetMapModuleTest {
     // add a better match
     OSMSpecifier lane_and_footway = new OSMSpecifier("cycleway=lane;highway=footway");
 
-    WayProperties safer_and_peds = new WayProperties();
-    safer_and_peds.setSafetyFeatures(new P2<>(0.75, 0.75));
-    safer_and_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    WayProperties safer_and_peds = new WayPropertiesBuilder(PEDESTRIAN).bicycleSafety(0.75).build();
 
     wayPropertySet.addProperties(lane_and_footway, safer_and_peds);
     dataForWay = wayPropertySet.getDataForWay(way);
@@ -211,12 +218,11 @@ public class OpenStreetMapModuleTest {
 
     // add a mixin
     OSMSpecifier gravel = new OSMSpecifier("surface=gravel");
-    WayProperties gravel_is_dangerous = new WayProperties();
-    gravel_is_dangerous.setSafetyFeatures(new P2<>(2.0, 2.0));
+    WayProperties gravel_is_dangerous = new WayPropertiesBuilder(ALL).bicycleSafety(2).build();
     wayPropertySet.addProperties(gravel, gravel_is_dangerous, true);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.getSafetyFeatures().first, 1.5);
+    assertEquals(dataForWay.getBicycleSafetyFeatures().first, 1.5);
 
     // test a left-right distinction
     way = new OSMWay();
@@ -225,14 +231,13 @@ public class OpenStreetMapModuleTest {
     way.addTag("cycleway:right", "track");
 
     OSMSpecifier track_only = new OSMSpecifier("highway=footway;cycleway=track");
-    WayProperties track_is_safest = new WayProperties();
-    track_is_safest.setSafetyFeatures(new P2<>(0.25, 0.25));
+    WayProperties track_is_safest = new WayPropertiesBuilder(ALL).bicycleSafety(0.25).build();
 
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(0.25, dataForWay.getSafetyFeatures().first); // right (with traffic) comes
+    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().first); // right (with traffic) comes
     // from track
-    assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
+    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().second); // left comes from lane
 
     way = new OSMWay();
     way.addTag("highway", "footway");
@@ -287,7 +292,10 @@ public class OpenStreetMapModuleTest {
    * @param skipVisibility if true visibility calculations are skipped
    */
   private void testBuildingAreas(boolean skipVisibility) {
-    Graph graph = new Graph();
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var graph = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = new File(
       URLDecoder.decode(
@@ -297,26 +305,28 @@ public class OpenStreetMapModuleTest {
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-    OpenStreetMapModule loader = new OpenStreetMapModule(provider);
+    OpenStreetMapModule loader = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      graph,
+      transitModel.getTimeZone(),
+      noopIssueStore()
+    );
     loader.skipVisibility = skipVisibility;
     loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
-    loader.buildGraph(graph, extra);
-    graph.getStreetIndex();
+    loader.buildGraph();
 
-    Router router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
-
-    RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
+    RouteRequest request = new RouteRequest(TraverseMode.WALK);
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
     //It tests if it is possible to route over area without visibility calculations
     Vertex bottomV = graph.getVertex("osm:node:580290955");
     Vertex topV = graph.getVertex("osm:node:559271124");
 
-    RoutingContext routingContext = new RoutingContext(request, router.graph, bottomV, topV);
+    RoutingContext routingContext = new RoutingContext(request, graph, bottomV, topV);
 
-    GraphPathFinder graphPathFinder = new GraphPathFinder(router);
+    GraphPathFinder graphPathFinder = new GraphPathFinder(null, Duration.ofSeconds(3));
     List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(routingContext);
 
     assertNotNull(pathList);

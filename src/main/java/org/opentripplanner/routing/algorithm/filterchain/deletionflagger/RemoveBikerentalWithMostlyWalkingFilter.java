@@ -25,13 +25,15 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletio
   }
 
   @Override
-  public Predicate<Itinerary> predicate() {
+  public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return itinerary -> {
-      var containsTransit = itinerary.legs
+      var containsTransit = itinerary
+        .getLegs()
         .stream()
-        .anyMatch(l -> l != null && l.getMode().isTransit());
+        .anyMatch(l -> l != null && l.isTransitLeg());
 
-      double bikeRentalDistance = itinerary.legs
+      double bikeRentalDistance = itinerary
+        .getLegs()
         .stream()
         .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
         .mapToDouble(Leg::getDistanceMeters)

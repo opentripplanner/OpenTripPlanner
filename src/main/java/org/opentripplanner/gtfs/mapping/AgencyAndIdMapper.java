@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /** Responsible for mapping GTFS AgencyAndId into the OTP model. */
 public class AgencyAndIdMapper {

@@ -4,12 +4,13 @@ import static java.nio.channels.Channels.newInputStream;
 import static java.nio.channels.Channels.newOutputStream;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 
@@ -71,6 +72,6 @@ class GsFileDataSource extends AbstractGsDataSource implements DataSource {
 
   @Override
   public OutputStream asOutputStream() {
-    return newOutputStream(blob.writer());
+    return newOutputStream(blob.writer(Storage.BlobWriteOption.generationMatch()));
   }
 }

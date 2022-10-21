@@ -8,7 +8,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 /**
@@ -19,7 +19,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
   private final RaptorSlackProvider slackProvider;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final BoardAndAlightTimeSearch tripSearch;
   private final RaptorStopNameResolver stopNameResolver;
 
@@ -28,7 +28,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
   public ForwardPathMapper(
     RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch,
     RaptorSlackProvider slackProvider,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle,
     boolean useApproximateTripTimesSearch

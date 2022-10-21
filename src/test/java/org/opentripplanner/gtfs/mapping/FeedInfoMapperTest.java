@@ -1,10 +1,10 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -53,8 +53,8 @@ public class FeedInfoMapperTest {
     org.opentripplanner.model.FeedInfo result = subject.map(FEED_INFO);
 
     assertEquals(ID, result.getId());
-    assertEquals("2016-10-05", result.getStartDate().asISO8601());
-    assertEquals("2017-12-07", result.getEndDate().asISO8601());
+    assertEquals("2016-10-05", result.getStartDate().toString());
+    assertEquals("2017-12-07", result.getEndDate().toString());
     assertEquals(LANG, result.getLang());
     assertEquals(PUBLISHER_NAME, result.getPublisherName());
     assertEquals(PUBLISHER_URL, result.getPublisherUrl());

@@ -8,9 +8,9 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSet;
 
@@ -24,7 +24,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   implements RoutingStrategy<T> {
 
   private final McRangeRaptorWorkerState<T> state;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final SlackProvider slackProvider;
   private final ParetoSet<PatternRide<T>> patternRides;
 
@@ -33,7 +33,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
     SlackProvider slackProvider,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.state = state;
@@ -63,7 +63,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
   @Override
   public void alight(final int stopIndex, final int stopPos, int alightSlack) {
     for (PatternRide<T> ride : patternRides) {
-      state.transitToStop(ride, stopIndex, ride.trip.arrival(stopPos), alightSlack);
+      state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
 
@@ -98,11 +98,10 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
 
     final int boardCost = calculateCostAtBoardTime(prevArrival, boarding);
 
-    final int relativeBoardCost =
-      boardCost + calculateOnTripRelativeCost(trip.transitReluctanceFactorIndex(), boardTime);
+    final int relativeBoardCost = boardCost + calculateOnTripRelativeCost(boardTime, trip);
 
     patternRides.add(
-      new PatternRide<>(
+      new PatternRide<T>(
         prevArrival,
         stopIndex,
         boarding.getStopPositionInPattern(),
@@ -146,7 +145,7 @@ public final class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule>
    * point in place or time - as long as it can be used to compare to paths that started at the
    * origin in the same iteration, having used the same number-of-rounds to board the same trip.
    */
-  private int calculateOnTripRelativeCost(int transitReluctanceIndex, int boardTime) {
-    return costCalculator.onTripRelativeRidingCost(boardTime, transitReluctanceIndex);
+  private int calculateOnTripRelativeCost(int boardTime, T tripSchedule) {
+    return costCalculator.onTripRelativeRidingCost(boardTime, tripSchedule);
   }
 }

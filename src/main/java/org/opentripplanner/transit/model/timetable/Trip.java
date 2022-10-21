@@ -1,43 +1,38 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.timetable;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.opentripplanner.util.lang.ObjectUtils.ifNotNull;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity2;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.LogInfo;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.util.lang.StringUtils;
 
-public final class Trip extends TransitEntity2<Trip, TripBuilder> {
+public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> implements LogInfo {
 
   private final Operator operator;
   private final Route route;
   private final FeedScopedId serviceId;
   private final String shortName;
   private final TransitMode mode;
-  private final String netexSubmode;
+  private final SubMode netexSubmode;
   private final String headsign;
-
-  // TODO RT - Fix this after the Transmodel is refactored
-  // The shapeId is mutable to clear the reference in case the shape do not exist.
-  // This happens late in the graph-build process, but we can not create a new object
-  // because there are other objects witch may reference this particular instance.
-  private FeedScopedId shapeId;
+  private final FeedScopedId shapeId;
 
   private final Direction direction;
   private final BikeAccess bikesAllowed;
-  private final WheelchairAccessibility wheelchairBoarding;
+  private final Accessibility wheelchairBoarding;
 
   private final String gtfsBlockId;
   private final String gtfsFareId;
@@ -47,27 +42,33 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
 
   Trip(TripBuilder builder) {
     super(builder.getId());
-    // Route is done first, it is used as fallback in many cases
-    this.route = builder.getRoute();
+    // Required fields
+    // Route is done first, it is used as a fallback for some fields
+    this.route = requireNonNull(builder.getRoute());
+    this.mode = requireNonNullElse(builder.getMode(), route.getMode());
+    this.netexSubmode =
+      builder.getNetexSubmode() != null
+        ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
+        : route.getNetexSubmode();
+    this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
+    this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
+    this.wheelchairBoarding =
+      requireNonNullElse(builder.getWheelchairBoarding(), Accessibility.NO_INFORMATION);
+    this.netexAlteration = requireNonNullElse(builder.getNetexAlteration(), TripAlteration.PLANNED);
+
+    // Optional fields
 
     this.operator = ifNotNull(builder.getOperator(), route.getOperator());
     this.serviceId = builder.getServiceId();
     this.shortName = builder.getShortName();
-    this.mode = requireNonNullElse(builder.getMode(), route.getMode());
-    this.netexSubmode = ifNotNull(builder.getNetexSubmode(), route.getNetexSubmode());
     this.headsign = builder.getHeadsign();
     this.shapeId = builder.getShapeId();
-    this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
-    this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
-    this.wheelchairBoarding =
-      requireNonNullElse(builder.getWheelchairBoarding(), WheelchairAccessibility.NO_INFORMATION);
     this.gtfsBlockId = builder.getGtfsBlockId();
     this.gtfsFareId = builder.getGtfsFareId();
     this.netexInternalPlanningCode = builder.getNetexInternalPlanningCode();
-    this.netexAlteration = requireNonNullElse(builder.getNetexAlteration(), TripAlteration.PLANNED);
   }
 
-  public static TripBuilder of(FeedScopedId id) {
+  public static TripBuilder of(@Nonnull FeedScopedId id) {
     return new TripBuilder(id);
   }
 
@@ -75,7 +76,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
    * Operator running the trip. Returns operator of this trip, if it exist, or else the route
    * operator.
    */
-  @Nonnull
+  @Nullable
   public Operator getOperator() {
     return operator;
   }
@@ -99,6 +100,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
    * Public code or identifier for the journey. Equal to NeTEx PublicCode. GTFS and NeTEx have
    * additional constraints on this fields that are not enforced in OTP.
    */
+  @Nullable
   public String getShortName() {
     return shortName;
   }
@@ -108,54 +110,46 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
     return mode;
   }
 
-  @Nullable
-  public String getNetexSubmode() {
+  @Nonnull
+  public SubMode getNetexSubMode() {
     return netexSubmode;
   }
 
+  @Nullable
   public String getHeadsign() {
     return headsign;
   }
 
+  @Nullable
   public FeedScopedId getShapeId() {
     return shapeId;
   }
 
   /**
-   * Clear the shapeId if the shape is missing from the data. There is no way to set the
-   * shape again, so use this carefully.
-   */
-  public void deleteShapeId() {
-    shapeId = null;
-  }
-
-  /**
    * The direction for this Trip (and all other Trips in this TripPattern).
    */
-  @NotNull
+  @Nonnull
   public Direction getDirection() {
     return direction;
   }
 
-  public String getGtfsDirectionIdAsString(String unknownValue) {
-    return direction.equals(Direction.UNKNOWN)
-      ? unknownValue
-      : Integer.toString(direction.gtfsCode);
-  }
-
+  @Nonnull
   public BikeAccess getBikesAllowed() {
     return bikesAllowed;
   }
 
-  public WheelchairAccessibility getWheelchairBoarding() {
+  @Nonnull
+  public Accessibility getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 
+  @Nullable
   public String getGtfsBlockId() {
     return gtfsBlockId;
   }
 
   /** Custom extension for KCM to specify a fare per-trip */
+  @Nullable
   public String getGtfsFareId() {
     return gtfsFareId;
   }
@@ -165,6 +159,7 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
    * planners' tool). This is kept to ensure compatibility with legacy planning systems. In NeTEx
    * this maps to privateCode, there is no GTFS equivalent.
    */
+  @Nullable
   public String getNetexInternalPlanningCode() {
     return netexInternalPlanningCode;
   }
@@ -174,29 +169,30 @@ public final class Trip extends TransitEntity2<Trip, TripBuilder> {
    * <p>
    * This is planned, by default (e.g. GTFS and if not set explicit).
    */
+  @Nonnull
   public TripAlteration getNetexAlteration() {
     return netexAlteration;
   }
 
   /**
-   * Return human friendly short info to identify the trip when mode, from/to stop and times are
+   * Return human friendly name to identify the trip when mode, from/to stop and times are
    * known. This method is meant for debug/logging, and should not be exposed in any API.
    */
-  public String logInfo() {
+  public String logName() {
     if (StringUtils.hasValue(shortName)) {
       return shortName;
     }
-    if (route != null && StringUtils.hasValue(route.getName())) {
+    if (StringUtils.hasValue(route.getName())) {
       return route.getName();
     }
     if (StringUtils.hasValue(headsign)) {
       return headsign;
     }
-    return getId().getId();
+    return mode.name();
   }
 
   @Override
-  public boolean sameValue(@Nonnull Trip other) {
+  public boolean sameAs(@Nonnull Trip other) {
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.operator, other.operator) &&

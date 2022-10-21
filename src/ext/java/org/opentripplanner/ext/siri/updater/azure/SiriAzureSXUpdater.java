@@ -19,11 +19,9 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
-import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alerts.TransitAlertProvider;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
@@ -34,30 +32,22 @@ import uk.org.siri.siri20.Siri;
 public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements TransitAlertProvider {
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
-  private SiriAlertsUpdateHandler updateHandler;
-  private TransitAlertService transitAlertService;
+  private final SiriAlertsUpdateHandler updateHandler;
+  private final TransitAlertService transitAlertService;
 
   private static final transient AtomicLong messageCounter = new AtomicLong(0);
   private final LocalDate fromDateTime;
   private final LocalDate toDateTime;
   private long startTime;
 
-  public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config) {
-    super(config);
+  public SiriAzureSXUpdater(SiriAzureSXUpdaterParameters config, TransitModel transitModel) {
+    super(config, transitModel);
     this.fromDateTime = config.getFromDateTime();
     this.toDateTime = config.getToDateTime();
-  }
-
-  @Override
-  public void setup(Graph graph) throws Exception {
-    super.setup(graph);
-    this.transitAlertService = new TransitAlertServiceImpl(graph);
-    SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
-    if (updateHandler == null) {
-      updateHandler = new SiriAlertsUpdateHandler(feedId, graph);
-    }
-    updateHandler.setTransitAlertService(transitAlertService);
-    updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
+    this.transitAlertService = new TransitAlertServiceImpl(transitModel);
+    this.updateHandler = new SiriAlertsUpdateHandler(feedId, transitModel);
+    this.updateHandler.setTransitAlertService(transitAlertService);
+    this.updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher());
   }
 
   @Override
@@ -141,7 +131,9 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
         return;
       }
 
-      super.saveResultOnGraph.execute(graph -> updateHandler.update(siri.getServiceDelivery()));
+      super.saveResultOnGraph.execute((graph, transitModel) ->
+        updateHandler.update(siri.getServiceDelivery())
+      );
     } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
@@ -155,7 +147,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
         return;
       }
 
-      super.saveResultOnGraph.execute(graph -> {
+      super.saveResultOnGraph.execute((graph, transitModel) -> {
         long t1 = System.currentTimeMillis();
         updateHandler.update(siri.getServiceDelivery());
 

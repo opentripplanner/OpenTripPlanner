@@ -2,16 +2,17 @@ package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions
@@ -20,12 +21,12 @@ import org.opentripplanner.transit.model.basic.FeedScopedId;
  */
 public class TransitAlertServiceImpl implements TransitAlertService {
 
-  private final Graph graph;
+  private final TransitModel transitModel;
 
   private Multimap<EntitySelector, TransitAlert> alerts = HashMultimap.create();
 
-  public TransitAlertServiceImpl(Graph graph) {
-    this.graph = graph;
+  public TransitAlertServiceImpl(TransitModel transitModel) {
+    this.transitModel = transitModel;
   }
 
   @Override
@@ -65,8 +66,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     );
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
-      if (graph != null && graph.index != null) {
-        var quay = graph.index.getStopForId(stopId);
+      if (transitModel != null) {
+        var quay = transitModel.getStopModel().getRegularStop(stopId);
         if (quay != null) {
           // TODO - SIRI: Add alerts from parent- and multimodal-stops
           /*
@@ -91,7 +92,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, ServiceDate serviceDate) {
+  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
     return alerts.get(new EntitySelector.Trip(trip, serviceDate));
   }
 
@@ -113,7 +114,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   public Collection<TransitAlert> getStopAndTripAlerts(
     FeedScopedId stop,
     FeedScopedId trip,
-    ServiceDate serviceDate
+    LocalDate serviceDate
   ) {
     // TODO StopConditions: Need to take the required StopConditions into account.
     //  These are matched using equals/hashCode, but required StopConditions do not necessarily
@@ -133,7 +134,10 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getDirectionAndRouteAlerts(int directionId, FeedScopedId route) {
-    return alerts.get(new EntitySelector.DirectionAndRoute(directionId, route));
+  public Collection<TransitAlert> getDirectionAndRouteAlerts(
+    Direction direction,
+    FeedScopedId route
+  ) {
+    return alerts.get(new EntitySelector.DirectionAndRoute(direction, route));
   }
 }

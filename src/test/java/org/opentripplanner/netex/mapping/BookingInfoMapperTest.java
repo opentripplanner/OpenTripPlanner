@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
@@ -31,7 +31,9 @@ public class BookingInfoMapperTest {
   private static final LocalTime FIVE_THIRTY = LocalTime.of(5, 30);
   private static final Duration THIRTY_MINUTES = Duration.ofMinutes(30);
 
-  private final BookingInfoMapper subject = new BookingInfoMapper(new DataImportIssueStore(false));
+  private final BookingInfoMapper subject = new BookingInfoMapper(
+    DataImportIssueStore.noopIssueStore()
+  );
 
   @Test
   public void testMapBookingInfoPrecedence() {

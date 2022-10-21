@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.mapping;
 
 import static java.lang.Boolean.TRUE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayType;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignment;
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeRefList;
@@ -17,15 +17,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.opentripplanner.netex.mapping.calendar.CalendarServiceBuilder;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -56,7 +55,7 @@ public class TripCalendarBuilderTest {
   private static final HierarchicalMapById<OperatingPeriod> EMPTY_PERIODS = new HierarchicalMapById<>();
   public static final String OD_1 = "OD-1";
 
-  private final DataImportIssueStore issueStore = new DataImportIssueStore(true);
+  private final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
   private final CalendarServiceBuilder calendarServiceBuilder = new CalendarServiceBuilder(
     new FeedScopedIdFactory(FEED_ID)
   );
@@ -158,7 +157,7 @@ public class TripCalendarBuilderTest {
     return map;
   }
 
-  private String toStr(Map<String, Set<ServiceDate>> result, String key) {
+  private String toStr(Map<String, Set<LocalDate>> result, String key) {
     return result.get(key).stream().sorted().collect(Collectors.toList()).toString();
   }
 }

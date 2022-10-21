@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.conveyal.object_differ.ObjectDiffer;
 import java.io.File;
@@ -11,16 +11,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.JarFile;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Tests that saving a graph and reloading it (round trip through serialization and deserialization)
@@ -38,7 +40,8 @@ public class GraphSerializationTest {
    */
   @Test
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
-    testRoundTrip(ConstantsForTests.buildNewPortlandGraph(true));
+    TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
+    testRoundTrip(model.graph(), model.transitModel());
   }
 
   /**
@@ -46,7 +49,8 @@ public class GraphSerializationTest {
    */
   @Test
   public void testRoundTripSerializationForNetexGraph() throws Exception {
-    testRoundTrip(ConstantsForTests.buildNewMinimalNetexGraph());
+    TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
+    testRoundTrip(model.graph(), model.transitModel());
   }
 
   // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -70,8 +74,13 @@ public class GraphSerializationTest {
    */
   @Test
   public void compareGraphToItself() {
-    Graph originalGraph = ConstantsForTests.getInstance().getCachedPortlandGraph();
-    originalGraph.index();
+    TestOtpModel cachedPortlandGraph = ConstantsForTests
+      .getInstance()
+      .getCachedPortlandGraph()
+      .index();
+    Graph originalGraph = cachedPortlandGraph.graph();
+    TransitModel originalTransitModel = cachedPortlandGraph.transitModel();
+
     // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
     // We do skip edge lists - otherwise we trigger a depth-first search of the graph causing a stack overflow.
     // We also skip some deeply buried weak-value hash maps, which refuse to tell you what their keys are.
@@ -122,7 +131,9 @@ public class GraphSerializationTest {
       "tripPatternForId",
       "transitLayer",
       "realtimeTransitLayer",
-      "dateTime"
+      "dateTime",
+      "notesForEdge",
+      "uniqueMatchers"
     );
     // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
     objectDiffer.setKeyExtractor("turnRestrictions", edge -> edge.toString());
@@ -150,26 +161,36 @@ public class GraphSerializationTest {
    * Tests that saving a Graph to disk and reloading it results in a separate but semantically
    * identical Graph.
    */
-  private void testRoundTrip(Graph originalGraph) throws Exception {
-    // The cached timezone in the graph is transient and lazy-initialized.
-    // Previous tests may have caused a timezone to be cached.
-    originalGraph.clearTimeZone();
+  private void testRoundTrip(Graph originalGraph, TransitModel originalTransitModel)
+    throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
     SerializedGraphObject serializedObj = new SerializedGraphObject(
       originalGraph,
+      originalTransitModel,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
-    Graph copiedGraph1 = SerializedGraphObject.load(tempFile);
+    SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
+    Graph copiedGraph1 = deserializedGraph.graph;
+    TransitModel copiedTransitModel1 = deserializedGraph.transitModel;
     // Index both graph - we do no know if the original is indexed, because it is cached and
     // might be indexed by other tests.
-    originalGraph.index();
-    copiedGraph1.index();
+
+    originalTransitModel.index();
+    originalGraph.index(originalTransitModel.getStopModel());
+
+    copiedTransitModel1.index();
+    copiedGraph1.index(copiedTransitModel1.getStopModel());
+
     assertNoDifferences(originalGraph, copiedGraph1);
-    Graph copiedGraph2 = SerializedGraphObject.load(tempFile);
-    copiedGraph2.index();
+
+    SerializedGraphObject deserializedGraph2 = SerializedGraphObject.load(tempFile);
+    Graph copiedGraph2 = deserializedGraph2.graph;
+    TransitModel copiedTransitModel2 = deserializedGraph2.transitModel;
+    copiedTransitModel2.index();
+    copiedGraph2.index(copiedTransitModel2.getStopModel());
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 }

@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
-import org.junit.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class TraverseResultTest {
 
@@ -20,7 +20,7 @@ public class TraverseResultTest {
         null,
         Instant.ofEpochSecond(i * 1000),
         null,
-        StateData.getInitialStateData(new RoutingRequest())
+        StateData.getInitialStateData(new RouteRequest())
       );
       resultChain = r.addToExistingResultChain(resultChain);
     }

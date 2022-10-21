@@ -1,6 +1,9 @@
 # OTP configuration design
 
-This document explains the configuration design.
+The OTP configuration model is responsible for loading the config from the file system. Other OTP
+modules should not depend on the configuration, but instead define interfaces for the needed config.
+The config model can then implement these interfaces and Dagger can inject them.
+
 
 ## Design Goals
 
@@ -19,17 +22,18 @@ The design goals are:
   type-safety and provides a consistent way to document needed configuration for each module.
 - For Sandbox modules the configuration loading should be put in the
   `org.opentripplanner.standalone.config.sandbox` package. This keeps all the configuration loading
-  in one place, avoiding fragmentation and makes it easier to get an overview. The parameters
-  (interface or POJO) injected into the Sandbox module itself, should be declared in the Sandbox
-  module.
+  in one place, avoiding fragmentation and makes it easier to get an overview. The interface with 
+  the Sandbox parameters should be declared in the Sandbox module.
+
 
 ## Implementation
 
-For historic reasons the configuration loader uses jackson and parses the config into a JSON node
-tree. Java objects are mapped explicit by wrapping each `JsonNode` in a `NodeAdapter`. The
-`NodeAdapter` decorates the `JsonNode` to provide type-safe getters for rich basic types like
-`Enum`, `List`(type-safe), `Map`(type-safe), `LocalDateTime`, `URI` and so on. It also helps with
-validation and providing a list of unused parameters.
+The configuration loader uses jackson and parses the config into a JSON node tree. Java objects are
+mapped explicit by wrapping each `JsonNode` in a `NodeAdapter`. The `NodeAdapter` decorates the 
+`JsonNode` to provide type-safe getters for rich basic types like `Enum`, `List`(type-safe), 
+`Map`(type-safe), `LocalDateTime`, `URI` and so on. It also helps with validation and providing a 
+list of unused parameters.
+
 
 ### Config Injection
 
@@ -84,5 +88,5 @@ This creates cyclic dependencies between the configuration loading and the modul
 is an issue to (Merge otp-config, router-config and
 build-config)[https://github.com/opentripplanner/OpenTripPlanner/issues/3020]. When doing this
 issue, we should move the above classes to the appropriate packages, possibly splitting them by
-their usage. Than parsing and instantiating them should be done in the
+their usage. Then parsing and instantiating them should be done in the
 `org.opentripplanner.standalone.config` package.

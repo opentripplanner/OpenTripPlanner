@@ -1,13 +1,17 @@
 package org.opentripplanner.standalone.config;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.TransferOptimizationRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
+import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,152 +19,288 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static RoutingRequest mapRoutingRequest(NodeAdapter c) {
-    RoutingRequest dft = new RoutingRequest();
+  public static RouteRequest mapRoutingRequest(NodeAdapter c) {
+    RouteRequest dft = new RouteRequest();
 
     if (c.isEmpty()) {
       return dft;
     }
 
     LOG.debug("Loading default routing parameters from JSON.");
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
+    RoutingPreferences preferences = request.preferences();
+    VehicleRentalRequest vehicleRental = request.journey().rental();
+    VehicleParkingRequest vehicleParking = request.journey().parking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
-    request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
-    request.alightSlackForMode =
-      c.asEnumMap("alightSlackForMode", TransitMode.class, NodeAdapter::asInt);
-    request.allowedVehicleRentalNetworks =
-      c.asTextSet("allowedVehicleRentalNetworks", dft.allowedVehicleRentalNetworks);
-    request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
-    request.bannedVehicleParkingTags =
-      c.asTextSet("bannedVehicleParkingTags", dft.bannedVehicleParkingTags);
-    request.bannedVehicleRentalNetworks =
-      c.asTextSet("bannedVehicleRentalNetworks", dft.bannedVehicleRentalNetworks);
-    request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
-    request.bikeParkTime = c.asInt("bikeParkTime", dft.bikeParkTime);
-    request.bikeParkCost = c.asInt("bikeParkCost", dft.bikeParkCost);
-    request.bikeReluctance = c.asDouble("bikeReluctance", dft.bikeReluctance);
-    request.vehicleRentalDropoffCost =
-      c.asInt("bikeRentalDropoffCost", dft.vehicleRentalDropoffCost);
-    request.vehicleRentalDropoffTime =
-      c.asInt("bikeRentalDropoffTime", dft.vehicleRentalDropoffTime);
-    request.vehicleRentalPickupCost = c.asInt("bikeRentalPickupCost", dft.vehicleRentalPickupCost);
-    request.vehicleRentalPickupTime = c.asInt("bikeRentalPickupTime", dft.vehicleRentalPickupTime);
-    request.bikeSpeed = c.asDouble("bikeSpeed", dft.bikeSpeed);
-    request.bikeTriangleSafetyFactor =
-      c.asDouble("bikeTriangleSafetyFactor", dft.bikeTriangleSafetyFactor);
-    request.bikeTriangleSlopeFactor =
-      c.asDouble("bikeTriangleSlopeFactor", dft.bikeTriangleSlopeFactor);
-    request.bikeTriangleTimeFactor =
-      c.asDouble("bikeTriangleTimeFactor", dft.bikeTriangleTimeFactor);
-    request.bikeSwitchTime = c.asInt("bikeSwitchTime", dft.bikeSwitchTime);
-    request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
-    request.bikeWalkingReluctance = c.asDouble("bikeWalkingReluctance", dft.bikeWalkingReluctance);
-    request.bikeWalkingSpeed = c.asDouble("bikeWalkingSpeed", dft.bikeWalkingSpeed);
-    request.allowKeepingRentedVehicleAtDestination =
-      c.asBoolean(
-        "allowKeepingRentedBicycleAtDestination",
-        dft.allowKeepingRentedVehicleAtDestination
+
+    preferences
+      .transit()
+      .initAlightSlack(
+        c.asDuration2("alightSlack", preferences.transit().alightSlack().defaultValue(), SECONDS),
+        c.asEnumMap("alightSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
       );
-    request.keepingRentedVehicleAtDestinationCost =
-      c.asDouble(
-        "keepingRentedBicycleAtDestinationCost",
-        dft.keepingRentedVehicleAtDestinationCost
+    vehicleRental.setAllowedNetworks(
+      c.asTextSet("allowedVehicleRentalNetworks", vehicleRental.allowedNetworks())
+    );
+    request.setArriveBy(c.asBoolean("arriveBy", dft.arriveBy()));
+    vehicleParking.setBannedTags(
+      c.asTextSet("bannedVehicleParkingTags", vehicleParking.bannedTags())
+    );
+    vehicleRental.setBannedNetworks(
+      c.asTextSet("bannedVehicleRentalNetworks", vehicleRental.bannedNetworks())
+    );
+
+    preferences.withBike(bike -> {
+      bike.setSpeed(c.asDouble("bikeSpeed", bike.speed()));
+      bike.setReluctance(c.asDouble("bikeReluctance", bike.reluctance()));
+      bike.setBoardCost(c.asInt("bikeBoardCost", bike.boardCost()));
+      bike.setParkTime(c.asInt("bikeParkTime", bike.parkTime()));
+      bike.setParkCost(c.asInt("bikeParkCost", bike.parkCost()));
+      bike.setWalkingSpeed(c.asDouble("bikeWalkingSpeed", bike.walkingSpeed()));
+      bike.setWalkingReluctance(c.asDouble("bikeWalkingReluctance", bike.walkingReluctance()));
+      bike.setSwitchTime(c.asInt("bikeSwitchTime", bike.switchTime()));
+      bike.setSwitchCost(c.asInt("bikeSwitchCost", bike.switchCost()));
+      bike.setOptimizeType(c.asEnum("optimize", bike.optimizeType()));
+
+      bike.withOptimizeTriangle(it ->
+        it
+          .withTime(c.asDouble("bikeTriangleTimeFactor", it.time()))
+          .withSlope(c.asDouble("bikeTriangleSlopeFactor", it.slope()))
+          .withSafety(c.asDouble("bikeTriangleSafetyFactor", it.safety()))
       );
-    request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
-    request.boardSlackForMode =
-      c.asEnumMap("boardSlackForMode", TransitMode.class, NodeAdapter::asInt);
-    request.maxAccessEgressDurationForMode =
-      c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration);
-    request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
-    request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
-    request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
-    request.carParkCost = c.asInt("carParkCost", dft.carParkCost);
-    request.carParkTime = c.asInt("carParkTime", dft.carParkTime);
-    request.carPickupCost = c.asInt("carPickupCost", dft.carPickupCost);
-    request.carPickupTime = c.asInt("carPickupTime", dft.carPickupTime);
-    request.carReluctance = c.asDouble("carReluctance", dft.carReluctance);
-    request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
-    request.itineraryFilters = ItineraryFiltersMapper.map(c.path("itineraryFilters"));
-    request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
-    request.elevatorBoardCost = c.asInt("elevatorBoardCost", dft.elevatorBoardCost);
-    request.elevatorBoardTime = c.asInt("elevatorBoardTime", dft.elevatorBoardTime);
-    request.elevatorHopCost = c.asInt("elevatorHopCost", dft.elevatorHopCost);
-    request.elevatorHopTime = c.asInt("elevatorHopTime", dft.elevatorHopTime);
-    request.geoidElevation = c.asBoolean("geoidElevation", dft.geoidElevation);
-    request.ignoreRealtimeUpdates = c.asBoolean("ignoreRealtimeUpdates", dft.ignoreRealtimeUpdates);
+    });
+
+    preferences
+      .rental()
+      .setDropoffCost(c.asInt("bikeRentalDropoffCost", preferences.rental().dropoffCost()));
+    preferences
+      .rental()
+      .setDropoffTime(c.asInt("bikeRentalDropoffTime", preferences.rental().dropoffTime()));
+    preferences
+      .rental()
+      .setPickupCost(c.asInt("bikeRentalPickupCost", preferences.rental().pickupCost()));
+    preferences
+      .rental()
+      .setPickupTime(c.asInt("bikeRentalPickupTime", preferences.rental().pickupTime()));
+    request
+      .journey()
+      .rental()
+      .setAllowArrivingInRentedVehicleAtDestination(
+        c.asBoolean(
+          "allowKeepingRentedBicycleAtDestination",
+          request.journey().rental().allowArrivingInRentedVehicleAtDestination()
+        )
+      );
+    preferences
+      .rental()
+      .setArrivingInRentalVehicleAtDestinationCost(
+        c.asDouble(
+          "keepingRentedBicycleAtDestinationCost",
+          preferences.rental().arrivingInRentalVehicleAtDestinationCost()
+        )
+      );
+    preferences
+      .transit()
+      .initBoardSlack(
+        c.asDuration2("boardSlack", preferences.transit().boardSlack().defaultValue(), SECONDS),
+        c.asEnumMap("boardSlackForMode", TransitMode.class, (a, n) -> a.asDuration2(n, SECONDS))
+      );
+
+    preferences
+      .street()
+      .initMaxAccessEgressDuration(
+        c.asDuration(
+          "maxAccessEgressDuration",
+          preferences.street().maxAccessEgressDuration().defaultValue()
+        ),
+        c.asEnumMap("maxAccessEgressDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+      );
+    preferences
+      .car()
+      .setAccelerationSpeed(
+        c.asDouble("carAccelerationSpeed", preferences.car().accelerationSpeed())
+      );
+    preferences
+      .car()
+      .setDecelerationSpeed(
+        c.asDouble("carDecelerationSpeed", preferences.car().decelerationSpeed())
+      );
+    preferences.car().setDropoffTime(c.asInt("carDropoffTime", preferences.car().dropoffTime()));
+    preferences.car().setParkCost(c.asInt("carParkCost", preferences.car().parkCost()));
+    preferences.car().setParkTime(c.asInt("carParkTime", preferences.car().parkTime()));
+    preferences.car().setPickupCost(c.asInt("carPickupCost", preferences.car().pickupCost()));
+    preferences.car().setPickupTime(c.asInt("carPickupTime", preferences.car().pickupTime()));
+    preferences.car().setReluctance(c.asDouble("carReluctance", preferences.car().reluctance()));
+    preferences.car().setSpeed(c.asDouble("carSpeed", preferences.car().speed()));
+
+    preferences
+      .system()
+      .setItineraryFilters(ItineraryFiltersMapper.map(c.path("itineraryFilters")));
+    preferences
+      .system()
+      .setDisableAlertFiltering(
+        c.asBoolean("disableAlertFiltering", preferences.system().disableAlertFiltering())
+      );
+    preferences
+      .street()
+      .setElevatorBoardCost(c.asInt("elevatorBoardCost", preferences.street().elevatorBoardCost()));
+    preferences
+      .street()
+      .setElevatorBoardTime(c.asInt("elevatorBoardTime", preferences.street().elevatorBoardTime()));
+    preferences
+      .street()
+      .setElevatorHopCost(c.asInt("elevatorHopCost", preferences.street().elevatorHopCost()));
+    preferences
+      .street()
+      .setElevatorHopTime(c.asInt("elevatorHopTime", preferences.street().elevatorHopTime()));
+    preferences
+      .system()
+      .setGeoidElevation(c.asBoolean("geoidElevation", preferences.system().geoidElevation()));
+    preferences
+      .transit()
+      .setIgnoreRealtimeUpdates(
+        c.asBoolean("ignoreRealtimeUpdates", preferences.transit().ignoreRealtimeUpdates())
+      );
     request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
-    request.locale = c.asLocale("locale", dft.locale);
+    request.setLocale(c.asLocale("locale", dft.locale()));
     // 'maxTransfers' is configured in the Raptor tuning parameters, not here
-    request.maxDirectStreetDuration =
-      c.asDuration("maxDirectStreetDuration", dft.maxDirectStreetDuration);
-    request.maxDirectStreetDurationForMode =
-      c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration);
-    request.maxJourneyDuration = c.asDuration("maxJourneyDuration", dft.maxJourneyDuration);
-    request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
-    request.wheelchairSlopeTooSteepCostFactor =
-      c.asDouble("wheelchairSlopeTooSteepCostFactor", dft.wheelchairSlopeTooSteepCostFactor);
-    request.modes = c.asRequestModes("modes", RequestModes.defaultRequestModes);
-    request.nonpreferredTransferCost =
-      c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
-    request.numItineraries = c.asInt("numItineraries", dft.numItineraries);
-    request.onlyTransitTrips = c.asBoolean("onlyTransitTrips", dft.onlyTransitTrips);
-    request.bicycleOptimizeType = c.asEnum("optimize", dft.bicycleOptimizeType);
-    request.otherThanPreferredRoutesPenalty =
-      c.asInt("otherThanPreferredRoutesPenalty", dft.otherThanPreferredRoutesPenalty);
+    preferences
+      .street()
+      .initMaxDirectDuration(
+        c.asDuration(
+          "maxDirectStreetDuration",
+          preferences.street().maxDirectDuration().defaultValue()
+        ),
+        c.asEnumMap("maxDirectStreetDurationForMode", StreetMode.class, NodeAdapter::asDuration)
+      );
+
+    preferences
+      .system()
+      .setMaxJourneyDuration(
+        c.asDuration("maxJourneyDuration", preferences.system().maxJourneyDuration())
+      );
+
+    request.journey().setModes(c.asRequestModes("modes", RequestModes.defaultRequestModes()));
+
+    preferences
+      .transfer()
+      .setNonpreferredCost(
+        c.asInt("nonpreferredTransferPenalty", preferences.transfer().nonpreferredCost())
+      );
+    request.setNumItineraries(c.asInt("numItineraries", dft.numItineraries()));
+    preferences
+      .transit()
+      .setOtherThanPreferredRoutesPenalty(
+        c.asInt(
+          "otherThanPreferredRoutesPenalty",
+          preferences.transit().otherThanPreferredRoutesPenalty()
+        )
+      );
     request.parkAndRide = c.asBoolean("parkAndRide", dft.parkAndRide);
-    request.pathComparator = c.asText("pathComparator", dft.pathComparator);
-    request.requiredVehicleParkingTags =
-      c.asTextSet("requiredVehicleParkingTags", dft.requiredVehicleParkingTags);
-    request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
-    request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
-    request.stairsTimeFactor = c.asDouble("stairsTimeFactor", dft.stairsTimeFactor);
-    request.startingTransitTripId =
-      c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
-    request.transferCost = c.asInt("transferPenalty", dft.transferCost);
-    request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
-    request.setTransitReluctanceForMode(
-      c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble)
+    request.setSearchWindow(c.asDuration("searchWindow", dft.searchWindow()));
+    vehicleParking.setRequiredTags(
+      c.asTextSet("requiredVehicleParkingTags", vehicleParking.requiredTags())
     );
-    request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
-    request.useVehicleRentalAvailabilityInformation =
-      c.asBoolean(
-        "useBikeRentalAvailabilityInformation",
-        dft.useVehicleRentalAvailabilityInformation
+
+    preferences.transfer().setCost(c.asInt("transferPenalty", preferences.transfer().cost()));
+    preferences.transfer().setSlack(c.asInt("transferSlack", preferences.transfer().slack()));
+    preferences
+      .transit()
+      .setReluctanceForMode(
+        c.asEnumMap("transitReluctanceForMode", TransitMode.class, NodeAdapter::asDouble)
       );
-    request.useVehicleParkingAvailabilityInformation =
-      c.asBoolean(
-        "useVehicleParkingAvailabilityInformation",
-        dft.useVehicleParkingAvailabilityInformation
+    preferences
+      .street()
+      .setTurnReluctance(c.asDouble("turnReluctance", preferences.street().turnReluctance()));
+    preferences
+      .rental()
+      .setUseAvailabilityInformation(
+        c.asBoolean(
+          "useBikeRentalAvailabilityInformation",
+          preferences.rental().useAvailabilityInformation()
+        )
       );
-    request.useUnpreferredRoutesPenalty =
-      c.asInt("useUnpreferredRoutesPenalty", dft.useUnpreferredRoutesPenalty);
+    preferences
+      .parking()
+      .setUseAvailabilityInformation(
+        c.asBoolean(
+          "useVehicleParkingAvailabilityInformation",
+          preferences.parking().useAvailabilityInformation()
+        )
+      );
+    preferences
+      .transit()
+      .setUnpreferredCost(
+        c.asLinearFunction("unpreferredRouteCost", preferences.transit().unpreferredCost())
+      );
     request.vehicleRental = c.asBoolean("allowBikeRental", dft.vehicleRental);
-    request.waitAtBeginningFactor = c.asDouble("waitAtBeginningFactor", dft.waitAtBeginningFactor);
-    request.waitReluctance = c.asDouble("waitReluctance", dft.waitReluctance);
-    request.walkBoardCost = c.asInt("walkBoardCost", dft.walkBoardCost);
-    request.walkReluctance = c.asDouble("walkReluctance", dft.walkReluctance);
-    request.walkSpeed = c.asDouble("walkSpeed", dft.walkSpeed);
+    preferences
+      .transfer()
+      .setWaitAtBeginningFactor(
+        c.asDouble("waitAtBeginningFactor", preferences.transfer().waitAtBeginningFactor())
+      );
+    preferences
+      .transfer()
+      .setWaitReluctance(
+        c.asDouble("waitReluctance", preferences.transfer().waitAtBeginningFactor())
+      );
+    preferences.withWalk(walk -> {
+      walk.setSpeed(c.asDouble("walkSpeed", walk.speed()));
+      walk.setReluctance(c.asDouble("walkReluctance", walk.reluctance()));
+      walk.setBoardCost(c.asInt("walkBoardCost", walk.boardCost()));
+      walk.setStairsReluctance(c.asDouble("stairsReluctance", walk.stairsReluctance()));
+      walk.setStairsTimeFactor(c.asDouble("stairsTimeFactor", walk.stairsTimeFactor()));
+      walk.setSafetyFactor(c.asDouble("walkSafetyFactor", walk.safetyFactor()));
+    });
 
-    request.wheelchairAccessibility = mapAccessibilityRequest(c.path("wheelchairAccessibility"));
+    preferences.setWheelchair(mapAccessibilityRequest(c.path("wheelchairAccessibility")));
+    request.setWheelchair(c.path("wheelchairAccessibility").asBoolean("enabled", false));
 
-    mapTransferOptimization(
-      (TransferOptimizationRequest) request.transferOptimization,
-      c.path("transferOptimization")
-    );
+    preferences.transfer().setOptimization(mapTransferOptimization(c.path("transferOptimization")));
 
-    request.dataOverlay = DataOverlayParametersMapper.map(c.path("dataOverlay"));
+    preferences.system().setDataOverlay(DataOverlayParametersMapper.map(c.path("dataOverlay")));
+
+    preferences
+      .street()
+      .setDrivingDirection(
+        c.asEnum("drivingDirection", dft.preferences().street().drivingDirection())
+      );
+    preferences
+      .street()
+      .setIntersectionTraversalModel(
+        c.asEnum(
+          "intersectionTraversalModel",
+          dft.preferences().street().intersectionTraversalModel()
+        )
+      );
+
+    NodeAdapter unpreferred = c.path("unpreferred");
+    request
+      .journey()
+      .transit()
+      .setUnpreferredRoutes(
+        unpreferred.asFeedScopedIdList("routes", request.journey().transit().unpreferredRoutes())
+      );
+
+    request
+      .journey()
+      .transit()
+      .setUnpreferredAgencies(
+        unpreferred.asFeedScopedIdList("agencies", request.journey().transit().unpreferredRoutes())
+      );
 
     return request;
   }
 
-  private static void mapTransferOptimization(TransferOptimizationRequest p, NodeAdapter c) {
-    p.optimizeTransferWaitTime =
-      c.asBoolean("optimizeTransferWaitTime", p.optimizeTransferWaitTime);
-    p.minSafeWaitTimeFactor = c.asDouble("minSafeWaitTimeFactor", p.minSafeWaitTimeFactor);
-    p.backTravelWaitTimeFactor = c.asDouble("backTravelWaitTimeFactor", p.backTravelWaitTimeFactor);
-    p.extraStopBoardAlightCostsFactor =
-      c.asDouble("extraStopBoardAlightCostsFactor", p.extraStopBoardAlightCostsFactor);
+  private static TransferOptimizationPreferences mapTransferOptimization(NodeAdapter c) {
+    var dft = TransferOptimizationPreferences.DEFAULT;
+    return new TransferOptimizationPreferences(
+      c.asBoolean("optimizeTransferWaitTime", dft.optimizeTransferWaitTime()),
+      c.asDouble("minSafeWaitTimeFactor", dft.minSafeWaitTimeFactor()),
+      c.asDouble("backTravelWaitTimeFactor", dft.backTravelWaitTimeFactor()),
+      c.asDouble("extraStopBoardAlightCostsFactor", dft.extraStopBoardAlightCostsFactor())
+    );
   }
 }

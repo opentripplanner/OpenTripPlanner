@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.alerts;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -12,34 +12,30 @@ import com.google.transit.realtime.GtfsRealtime.Alert.Effect;
 import com.google.transit.realtime.GtfsRealtime.Alert.SeverityLevel;
 import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 
-@RunWith(MockitoJUnitRunner.class)
 public class AlertsUpdateHandlerTest {
 
   private AlertsUpdateHandler handler;
 
-  @Spy
-  private FakeTransitAlertService service;
+  private final FakeTransitAlertService service = Mockito.spy(FakeTransitAlertService.class);
 
-  @Before
+  @BeforeEach
   public void setUp() {
     handler = new AlertsUpdateHandler();
     handler.setFeedId("1");
@@ -55,8 +51,8 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(new Date(5 * 1000), transitAlert.getEffectiveStartDate());
-    assertEquals(new Date(20 * 1000), transitAlert.getEffectiveEndDate());
+    assertEquals(Instant.ofEpochSecond(5), transitAlert.getEffectiveStartDate());
+    assertEquals(Instant.ofEpochSecond(20), transitAlert.getEffectiveEndDate());
   }
 
   @Test
@@ -67,7 +63,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals(new Date(5 * 1000), transitAlert.getEffectiveStartDate());
+    assertEquals(Instant.ofEpochSecond(5), transitAlert.getEffectiveStartDate());
     assertNull(transitAlert.getEffectiveEndDate());
   }
 
@@ -80,7 +76,7 @@ public class AlertsUpdateHandlerTest {
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
     assertNull(transitAlert.getEffectiveStartDate());
-    assertEquals(new Date(20 * 1000), transitAlert.getEffectiveEndDate());
+    assertEquals(Instant.ofEpochSecond(20), transitAlert.getEffectiveEndDate());
   }
 
   @Test

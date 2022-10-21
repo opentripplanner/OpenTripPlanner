@@ -154,7 +154,7 @@ public class GraphFileHeader implements Serializable {
   /** Example: 41 6C 66 61 2D 31  "Alfa-1" */
   static String prettyBytesToString(byte[] text) {
     if (text == null || text.length == 0) {
-      return "<empty>";
+      return "[empty]";
     }
     StringBuilder buf = new StringBuilder();
     for (int v : text) {

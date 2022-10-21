@@ -4,20 +4,22 @@ import java.time.ZonedDateTime;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.WheelchairCostCalculator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.McCostParamsMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
@@ -25,6 +27,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.time.ServiceDateUtils;
 
 /**
  * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,
@@ -50,18 +53,21 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   /**
    * Transfers by stop index
    */
-  private final RaptorTransferIndex transfers;
+  private final RaptorTransferIndex transferIndex;
+
+  private final List<TransferForPatternByStopPos> forwardConstrainedTransfers;
+
+  private final List<TransferForPatternByStopPos> reverseConstrainedTransfers;
 
   private final ZonedDateTime transitSearchTimeZero;
 
-  private final CostCalculator generalizedCostCalculator;
+  private final CostCalculator<TripSchedule> generalizedCostCalculator;
 
   private final int validTransitDataStartTime;
 
   private final int validTransitDataEndTime;
 
   public RaptorRoutingRequestTransitData(
-    TransferService transferService,
     TransitLayer transitLayer,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
@@ -69,10 +75,9 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     TransitDataProviderFilter filter,
     RoutingContext routingContext
   ) {
-    this.transferService = transferService;
+    this.transferService = transitLayer.getTransferService();
     this.transitLayer = transitLayer;
     this.transitSearchTimeZero = transitSearchTimeZero;
-    var accessibility = routingContext.opt.wheelchairAccessibility;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolate this code to only be available at
@@ -81,31 +86,34 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
       transitLayer,
       transitSearchTimeZero
     );
-    this.patternIndex =
-      transitDataCreator.createTripPatterns(
-        additionalPastSearchDays,
-        additionalFutureSearchDays,
-        filter
-      );
-    this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(patternIndex);
-    this.transfers = transitLayer.getRaptorTransfersForRequest(routingContext);
+    List<TripPatternForDates> tripPatterns = transitDataCreator.createTripPatterns(
+      additionalPastSearchDays,
+      additionalFutureSearchDays,
+      filter
+    );
+    this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
+    this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
+    this.transferIndex = transitLayer.getRaptorTransfersForRequest(routingContext);
 
-    var mcCostParams = McCostParamsMapper.map(routingContext.opt);
+    this.forwardConstrainedTransfers = transitLayer.getForwardConstrainedTransfers();
+    this.reverseConstrainedTransfers = transitLayer.getReverseConstrainedTransfers();
+
+    var mcCostParams = GeneralizedCostParametersMapper.map(routingContext.opt, patternIndex);
 
     this.generalizedCostCalculator =
       CostCalculatorFactory.createCostCalculator(
         mcCostParams,
-        transitLayer.getStopIndex().stopBoardAlightCosts
+        transitLayer.getStopBoardAlightCosts()
       );
 
     this.validTransitDataStartTime =
-      DateMapper.secondsSinceStartOfTime(
+      ServiceDateUtils.secondsSinceStartOfTime(
         this.transitSearchTimeZero,
         this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
       );
     // The +1 is due to the validity being to the end of the day
     this.validTransitDataEndTime =
-      DateMapper.secondsSinceStartOfTime(
+      ServiceDateUtils.secondsSinceStartOfTime(
         this.transitSearchTimeZero,
         this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
       );
@@ -113,17 +121,17 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   @Override
   public Iterator<RaptorTransfer> getTransfersFromStop(int stopIndex) {
-    return transfers.getForwardTransfers().get(stopIndex).iterator();
+    return transferIndex.getForwardTransfers(stopIndex).iterator();
   }
 
   @Override
   public Iterator<? extends RaptorTransfer> getTransfersToStop(int stopIndex) {
-    return transfers.getReversedTransfers().get(stopIndex).iterator();
+    return transferIndex.getReversedTransfers(stopIndex).iterator();
   }
 
   @Override
   public IntIterator routeIndexIterator(IntIterator stops) {
-    BitSet activeTripPatternsForGivenStops = new BitSet(patternIndex.size());
+    BitSet activeTripPatternsForGivenStops = new BitSet(RoutingTripPattern.indexCounter());
 
     while (stops.hasNext()) {
       int[] patterns = activeTripPatternsPerStop.get(stops.next());
@@ -146,7 +154,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   @Override
-  public CostCalculator multiCriteriaCostCalculator() {
+  public CostCalculator<TripSchedule> multiCriteriaCostCalculator() {
     return generalizedCostCalculator;
   }
 
@@ -177,6 +185,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     };
   }
 
+  @Nonnull
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     return (int stopIndex) -> {
@@ -193,5 +202,27 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   @Override
   public int getValidTransitDataEndTime() {
     return validTransitDataEndTime;
+  }
+
+  @Override
+  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsForwardSearch(
+    int routeIndex
+  ) {
+    TransferForPatternByStopPos transfers = forwardConstrainedTransfers.get(routeIndex);
+    if (transfers == null) {
+      return ConstrainedBoardingSearch.NOOP_SEARCH;
+    }
+    return new ConstrainedBoardingSearch(true, transfers);
+  }
+
+  @Override
+  public RaptorConstrainedTripScheduleBoardingSearch<TripSchedule> transferConstraintsReverseSearch(
+    int routeIndex
+  ) {
+    TransferForPatternByStopPos transfers = reverseConstrainedTransfers.get(routeIndex);
+    if (transfers == null) {
+      return ConstrainedBoardingSearch.NOOP_SEARCH;
+    }
+    return new ConstrainedBoardingSearch(false, transfers);
   }
 }

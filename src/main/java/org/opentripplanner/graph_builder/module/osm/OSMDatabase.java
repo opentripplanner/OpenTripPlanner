@@ -25,7 +25,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -48,6 +47,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,11 +83,6 @@ public class OSMDatabase {
 
   /* All bike parking areas */
   private final List<Area> bikeParkingAreas = new ArrayList<>();
-
-  /**
-   * Boarding location ways where passengers wait for transit
-   */
-  private final List<Area> boardingLocationAreas = new ArrayList<>();
 
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
@@ -183,10 +178,6 @@ public class OSMDatabase {
     return Collections.unmodifiableCollection(bikeParkingAreas);
   }
 
-  public Collection<Area> getBoardingLocationAreas() {
-    return List.copyOf(boardingLocationAreas);
-  }
-
   public Collection<Long> getTurnRestrictionWayIds() {
     return Collections.unmodifiableCollection(turnRestrictionsByFromWay.keySet());
   }
@@ -239,12 +230,7 @@ public class OSMDatabase {
     if (nodesById.containsKey(node.getId())) {
       return;
     }
-
     nodesById.put(node.getId(), node);
-
-    if (nodesById.size() % 100000 == 0) {
-      LOG.debug("nodes=" + nodesById.size());
-    }
   }
 
   public void addWay(OSMWay way) {
@@ -278,7 +264,7 @@ public class OSMDatabase {
         way.isTag("area", "yes") ||
         way.isTag("amenity", "parking") ||
         way.isTag("amenity", "bicycle_parking") ||
-        way.isBoardingLocation()
+        way.isBoardingArea()
       ) &&
       way.getNodeRefs().size() > 2
     ) {
@@ -299,10 +285,6 @@ public class OSMDatabase {
     }
 
     waysById.put(wayId, way);
-
-    if (waysById.size() % 10000 == 0) {
-      LOG.debug("ways=" + waysById.size());
-    }
   }
 
   public void addRelation(OSMRelation relation) {
@@ -346,10 +328,6 @@ public class OSMDatabase {
     }
 
     relationsById.put(relation.getId(), relation);
-
-    if (relationsById.size() % 100 == 0) {
-      LOG.debug("relations=" + relationsById.size());
-    }
   }
 
   /**
@@ -528,8 +506,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nA, epsilon)
             ) {
-              LOG.info(
-                "Node {} in way {} is coincident but disconnected with area {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in way %s is coincident but disconnected with area %s",
                 nA.getId(),
                 way.getId(),
                 ringSegment.area.parent.getId()
@@ -547,8 +526,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nA, nB, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nB, epsilon)
             ) {
-              LOG.info(
-                "Node {} in way {} is coincident but disconnected with area {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in way %s is coincident but disconnected with area %s",
                 nB.getId(),
                 way.getId(),
                 ringSegment.area.parent.getId()
@@ -567,8 +547,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nA, nB, epsilon)
             ) {
-              LOG.info(
-                "Node {} in area {} is coincident but disconnected with way {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in area %s is coincident but disconnected with way %s",
                 ringSegment.nA.getId(),
                 ringSegment.area.parent.getId(),
                 way.getId()
@@ -589,8 +570,9 @@ public class OSMDatabase {
               checkDistanceWithin(ringSegment.nB, nA, epsilon) ||
               checkDistanceWithin(ringSegment.nB, nB, epsilon)
             ) {
-              LOG.info(
-                "Node {} in area {} is coincident but disconnected with way {}",
+              issueStore.add(
+                "DisconnectedOsmNode",
+                "Node %s in area %s is coincident but disconnected with way %s",
                 ringSegment.nB.getId(),
                 ringSegment.area.parent.getId(),
                 way.getId()
@@ -823,7 +805,7 @@ public class OSMDatabase {
         } else if (role.equals("outer")) {
           outerWays.add(way);
         } else {
-          LOG.warn("Unexpected role " + role + " in multipolygon");
+          LOG.warn("Unexpected role {} in multipolygon", role);
         }
       }
       processedAreas.add(relation);
@@ -879,12 +861,6 @@ public class OSMDatabase {
     }
     if (area.parent.isBikeParking()) {
       bikeParkingAreas.add(area);
-    }
-    if (
-      area.parent.isBoardingLocation() &&
-      !area.parent.getMultiTagValues(boardingAreaRefTags).isEmpty()
-    ) {
-      boardingLocationAreas.add(area);
     }
   }
 
@@ -1051,10 +1027,11 @@ public class OSMDatabase {
             relation.getTag("day_on"),
             relation.getTag("day_off"),
             relation.getTag("hour_on"),
-            relation.getTag("hour_off")
+            relation.getTag("hour_off"),
+            relation.getOsmProvider()::getZoneId
           );
       } catch (NumberFormatException e) {
-        LOG.info("Unparseable turn restriction: " + relation.getId());
+        LOG.info("Unparseable turn restriction: {}", relation.getId());
       }
     }
 
@@ -1083,7 +1060,7 @@ public class OSMDatabase {
             if (levels.containsKey(role)) {
               wayLevels.put(way, levels.get(role));
             } else {
-              LOG.warn(member.getRef() + " has undefined level " + role);
+              LOG.warn("{} has undefined level {}", member.getRef(), role);
             }
           }
         }

@@ -3,10 +3,10 @@ package org.opentripplanner.routing.spt;
 import java.util.LinkedList;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A shortest path on the graph.
@@ -36,7 +36,7 @@ public class GraphPath {
     /* Put path in chronological order */
     State lastState;
     // needed to track repeat invocations of path-reversing methods
-    if (s.getOptions().arriveBy) {
+    if (s.getOptions().arriveBy()) {
       lastState = s.reverse();
     } else {
       lastState = s;

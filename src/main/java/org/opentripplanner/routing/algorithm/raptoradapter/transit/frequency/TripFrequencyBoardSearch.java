@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
  * Searches for a concrete trip time for a frequency based pattern. The {@link FrequencyEntry}s are
  * scanned to find the latest possible alighting time.
  */
-public final class TripFrequencyBoardSearch<T extends RaptorTripSchedule>
+public final class TripFrequencyBoardSearch<T extends DefaultTripSchedule>
   implements RaptorTripScheduleSearch<T> {
 
   private final TripPatternForDates patternForDates;
@@ -49,7 +49,6 @@ public final class TripFrequencyBoardSearch<T extends RaptorTripSchedule>
           return new FrequencyBoardingEvent<>(
             patternForDates,
             tripTimes,
-            pattern.getTripPattern().getPattern(),
             stopPositionInPattern,
             departureTime - headway,
             headway,

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import io.micrometer.core.instrument.Metrics;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -16,28 +15,32 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.TestOtpModel;
+import org.opentripplanner.TestServerContext;
+import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
-import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TestUtils;
@@ -53,12 +56,13 @@ import org.opentripplanner.util.model.EncodedPolyline;
 public class ScheduledDeviatedTripTest extends FlexTest {
 
   static Graph graph;
+  static TransitModel transitModel;
 
   float delta = 0.01f;
 
   @Test
-  public void parseCobbCountyAsScheduledDeviatedTrip() {
-    var flexTrips = graph.flexTripsById.values();
+  void parseCobbCountyAsScheduledDeviatedTrip() {
+    var flexTrips = transitModel.getAllFlexTrips();
     assertFalse(flexTrips.isEmpty());
     assertEquals(72, flexTrips.size());
 
@@ -73,7 +77,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .stream()
       .filter(s -> s.getId().getId().equals("cujv"))
       .findFirst()
-      .get();
+      .orElseThrow();
     assertEquals(33.85465, stop.getLat(), delta);
     assertEquals(-84.60039, stop.getLon(), delta);
 
@@ -82,19 +86,17 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       .stream()
       .filter(s -> s.getId().getId().equals("zone_3"))
       .findFirst()
-      .get();
+      .orElseThrow();
     assertEquals(33.825846635310214, flexZone.getLat(), delta);
     assertEquals(-84.63430143459385, flexZone.getLon(), delta);
   }
 
   @Test
-  public void calculateAccessTemplate() {
+  void calculateAccessTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
 
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, params)
-      .collect(Collectors.toList());
+    var accesses = trip.getFlexAccessTemplates(nearbyStop, flexDate, calculator, params).toList();
 
     assertEquals(3, accesses.size());
 
@@ -104,12 +106,10 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   }
 
   @Test
-  public void calculateEgressTemplate() {
+  void calculateEgressTemplate() {
     var trip = getFlexTrip();
     var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, params)
-      .collect(Collectors.toList());
+    var egresses = trip.getFlexEgressTemplates(nearbyStop, flexDate, calculator, params).toList();
 
     assertEquals(3, egresses.size());
 
@@ -119,7 +119,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   }
 
   @Test
-  public void calculateDirectFare() {
+  void calculateDirectFare() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     var trip = getFlexTrip();
 
@@ -128,6 +128,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     var router = new FlexRouter(
       graph,
+      new DefaultTransitService(transitModel),
       new FlexParameters(300),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       false,
@@ -137,15 +138,14 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       List.of(to)
     );
 
-    var itineraries = router.createFlexOnlyItineraries();
+    var filter = new FaresFilter(graph.getFareService());
+
+    var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
 
     var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.fare.fare.isEmpty());
+    assertFalse(itinerary.getFares().getTypes().isEmpty());
 
-    assertEquals(
-      new Money(new WrappedCurrency("USD"), 250),
-      itinerary.fare.getFare(FareType.regular)
-    );
+    assertEquals(Money.usDollars(250), itinerary.getFares().getFare(FareType.regular));
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
@@ -157,11 +157,10 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    * cannot board or alight.
    */
   @Test
-  public void flexTripInTransitMode() {
-    var feedId = graph.getFeedIds().iterator().next();
+  void flexTripInTransitMode() {
+    var feedId = transitModel.getFeedIds().iterator().next();
 
-    var router = new Router(graph, RouterConfig.DEFAULT, Metrics.globalRegistry);
-    router.startup();
+    var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId("Transfer Point for Route 30", feedId, "cujv");
@@ -171,12 +170,12 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       "yz85"
     );
 
-    var itineraries = getItineraries(from, to, router);
+    var itineraries = getItineraries(from, to, serverContext);
 
     assertEquals(2, itineraries.size());
 
     var itin = itineraries.get(0);
-    var leg = itin.legs.get(0);
+    var leg = itin.getLegs().get(0);
 
     assertEquals("cujv", leg.getFrom().stop.getId().getId());
     assertEquals("yz85", leg.getTo().stop.getId().getId());
@@ -198,12 +197,12 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    * Normally these trip times are interpolated/repaired during the graph build but for flex this is
    * exactly what we don't want. Here we check that the interpolation process is skipped.
    *
-   * @see org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation#interpolateStopTimes(List)
+   * @see ValidateAndInterpolateStopTimesForEachTrip#interpolateStopTimes(List)
    */
   @Test
-  public void shouldNotInterpolateFlexTimes() {
-    var feedId = graph.getFeedIds().iterator().next();
-    var pattern = graph.tripPatternForId.get(new FeedScopedId(feedId, "090z:0:01"));
+  void shouldNotInterpolateFlexTimes() {
+    var feedId = transitModel.getFeedIds().iterator().next();
+    var pattern = transitModel.getTripPatternForId(new FeedScopedId(feedId, "090z:0:01"));
 
     assertEquals(3, pattern.numberOfStops());
 
@@ -217,33 +216,35 @@ public class ScheduledDeviatedTripTest extends FlexTest {
    * Checks that trips which have continuous pick up/drop off set are parsed correctly.
    */
   @Test
-  public void parseContinuousPickup() {
+  void parseContinuousPickup() {
     var lincolnGraph = FlexTest.buildFlexGraph(LINCOLN_COUNTY_GBFS);
     assertNotNull(lincolnGraph);
   }
 
   @BeforeAll
   static void setup() {
-    graph = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    TestOtpModel model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    graph = model.graph();
+    transitModel = model.transitModel();
   }
 
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
-    Router router
+    OtpServerRequestContext serverContext
   ) {
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
     Instant dateTime = TestUtils.dateInstant("America/New_York", 2021, 12, 16, 12, 0, 0);
     request.setDateTime(dateTime);
-    request.from = from;
-    request.to = to;
+    request.setFrom(from);
+    request.setTo(to);
 
     var time = dateTime.atZone(ZoneId.of("America/New_York"));
     var additionalSearchDays = AdditionalSearchDays.defaults(time);
 
     var result = TransitRouter.route(
       request,
-      router,
+      serverContext,
       time,
       additionalSearchDays,
       new DebugTimingAggregator()
@@ -252,20 +253,20 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     return result.getItineraries();
   }
 
-  private static NearbyStop getNearbyStop(FlexTrip trip) {
+  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip) {
     return getNearbyStop(trip, "nearby-stop");
   }
 
-  private static NearbyStop getNearbyStop(FlexTrip trip, String id) {
+  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip, String id) {
     // getStops() returns a set of stops and the order doesn't correspond to the stop times
     // of the trip
     var stopLocation = trip
       .getStops()
       .stream()
-      .filter(s -> s instanceof FlexStopLocation)
+      .filter(s -> s instanceof AreaStop)
       .findFirst()
-      .get();
-    var r = new RoutingRequest();
+      .orElseThrow();
+    var r = new RouteRequest();
     try (var temporaryVertices = new TemporaryVerticesContainer(graph, r)) {
       RoutingContext routingContext = new RoutingContext(r, graph, temporaryVertices);
 
@@ -273,15 +274,14 @@ public class ScheduledDeviatedTripTest extends FlexTest {
         stopLocation,
         0,
         List.of(),
-        null,
         new State(new StreetLocation(id, new Coordinate(0, 0), id), r, routingContext)
       );
     }
   }
 
-  private static FlexTrip getFlexTrip() {
-    var feedId = graph.getFeedIds().iterator().next();
+  private static FlexTrip<?, ?> getFlexTrip() {
+    var feedId = transitModel.getFeedIds().iterator().next();
     var tripId = new FeedScopedId(feedId, "a326c618-d42c-4bd1-9624-c314fbf8ecd8");
-    return graph.flexTripsById.get(tripId);
+    return transitModel.getFlexTrip(tripId);
   }
 }

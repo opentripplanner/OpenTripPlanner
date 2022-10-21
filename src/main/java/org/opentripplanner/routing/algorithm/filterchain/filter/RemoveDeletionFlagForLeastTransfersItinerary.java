@@ -17,7 +17,7 @@ public class RemoveDeletionFlagForLeastTransfersItinerary implements ItineraryLi
     itineraries
       .stream()
       .min(numberOfTransfersComparator())
-      .ifPresent(itinerary -> itinerary.systemNotices.clear());
+      .ifPresent(Itinerary::removeDeletionFlags);
 
     return itineraries;
   }

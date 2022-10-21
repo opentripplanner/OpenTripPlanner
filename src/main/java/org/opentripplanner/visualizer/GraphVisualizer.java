@@ -16,13 +16,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,14 +56,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.api.parameter.ApiRequestMode;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -71,7 +75,6 @@ import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,8 +114,6 @@ class DisplayVertex {
  */
 class EdgeListModel extends AbstractListModel<Edge> {
 
-  private static final long serialVersionUID = 1L;
-
   private final ArrayList<Edge> edges;
 
   EdgeListModel(Iterable<Edge> edges) {
@@ -135,8 +136,6 @@ class EdgeListModel extends AbstractListModel<Edge> {
  * A list of vertices where the internal container is exposed.
  */
 class VertexList extends AbstractListModel<DisplayVertex> {
-
-  private static final long serialVersionUID = 1L;
 
   public List<Vertex> selected;
 
@@ -161,11 +160,12 @@ class VertexList extends AbstractListModel<DisplayVertex> {
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
-  private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GraphVisualizer.class);
-  private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-  /* The router we are visualizing. */
-  private final Router router;
+  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern(
+    "yyyy-MM-dd HH:mm:ss z"
+  );
+  public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss z");
+
   /* The graph from the router we are visualizing, note that it will not be updated if the router reloads. */
   private final Graph graph;
   private JPanel leftPanel;
@@ -175,6 +175,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   /* The set of callbacks that display search progress on the showGraph Processing applet. */
   public TraverseVisitor traverseVisitor;
+
+  /* Needed by the GraphPathFinder */
+  private final Duration streetRoutingTimeout;
 
   public JList<DisplayVertex> nearbyVertices;
 
@@ -246,13 +249,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   protected State lastStateClicked = null;
   private JCheckBox longDistanceModeCheckbox;
 
-  public GraphVisualizer(Router router) {
+  public GraphVisualizer(Graph graph, Duration streetRoutingTimeout) {
     super();
     LOG.info("Starting up graph visualizer...");
     setTitle("GraphVisualizer");
     setExtendedState(JFrame.MAXIMIZED_BOTH);
-    this.router = router;
-    this.graph = router.graph;
+    this.graph = graph;
+    this.streetRoutingTimeout = streetRoutingTimeout;
     init();
   }
 
@@ -429,54 +432,74 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
   }
 
   protected void route(String from, String to) {
-    Date when;
+    Instant when;
     // Year + 1900
     try {
-      when = dateFormat.parse(searchDate.getText());
-    } catch (ParseException e) {
-      searchDate.setText("Format: " + dateFormat.toPattern());
+      when = ZonedDateTime.parse(searchDate.getText(), DATE_FORMAT).toInstant();
+    } catch (DateTimeParseException e) {
+      searchDate.setText("Format: " + DATE_FORMAT.toString());
       return;
     }
-    TraverseModeSet modeSet = new TraverseModeSet();
-    modeSet.setWalk(walkCheckBox.isSelected());
-    modeSet.setBicycle(bikeCheckBox.isSelected());
-    modeSet.setFerry(ferryCheckBox.isSelected());
-    modeSet.setRail(trainCheckBox.isSelected());
-    modeSet.setTram(trainCheckBox.isSelected());
-    modeSet.setSubway(trainCheckBox.isSelected());
-    modeSet.setFunicular(trainCheckBox.isSelected());
-    modeSet.setGondola(trainCheckBox.isSelected());
-    modeSet.setBus(busCheckBox.isSelected());
-    modeSet.setCableCar(busCheckBox.isSelected());
-    modeSet.setCar(carCheckBox.isSelected());
-    // must set generic transit mode last, and only when it is checked
-    // otherwise 'false' will clear trainish and busish
-    if (transitCheckBox.isSelected()) modeSet.setTransit(true);
-    RoutingRequest options = new RoutingRequest(modeSet);
+    List<String> modes = new ArrayList<>();
+    if (walkCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.WALK.name());
+    }
+    if (bikeCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.BICYCLE.name());
+    }
+    if (carCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.CAR.name());
+    }
+    if (ferryCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.FERRY.name());
+    }
+    if (trainCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.RAIL.name());
+      modes.add(ApiRequestMode.TRAM.name());
+      modes.add(ApiRequestMode.SUBWAY.name());
+      modes.add(ApiRequestMode.FUNICULAR.name());
+      modes.add(ApiRequestMode.GONDOLA.name());
+    }
+    if (busCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.BUS.name());
+      modes.add(ApiRequestMode.CABLE_CAR.name());
+    }
+    if (transitCheckBox.isSelected()) {
+      modes.add(ApiRequestMode.TRANSIT.name());
+    }
+    RouteRequest options = new RouteRequest();
+    QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
+    options.journey().setModes(qualifiedModeSet.getRequestModes());
+    var preferences = options.preferences();
+
     options.setArriveBy(arriveByCheckBox.isSelected());
-    options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-    // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-    options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
-    // there should be a ui element for walk distance and optimize type
-    options.setBicycleOptimizeType(getSelectedOptimizeType());
-    options.setDateTime(when.toInstant());
-    options.setFromString(from);
-    options.setToString(to);
-    options.walkSpeed = Float.parseFloat(walkSpeed.getText());
-    options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
-    options.numItineraries = 1;
+    preferences.withWalk(walk -> {
+      walk.setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+      walk.setSpeed(Float.parseFloat(walkSpeed.getText()));
+    });
+    preferences.withBike(bike ->
+      bike
+        .setSpeed(Float.parseFloat(bikeSpeed.getText()))
+        // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
+        .setBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2)
+        // there should be a ui element for walk distance and optimize type
+        .setOptimizeType(getSelectedOptimizeType())
+    );
+
+    options.setDateTime(when);
+    options.setFrom(LocationStringParser.fromOldStyleString(from));
+    options.setTo(LocationStringParser.fromOldStyleString(to));
+    options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);
-    System.out.println("\tModes: " + modeSet);
+    System.out.println("\tModes: " + qualifiedModeSet);
     System.out.println("\tOptions: " + options);
-
-    options.numItineraries = (Integer.parseInt(this.nPaths.getText()));
 
     // apply callback if the options call for it
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
     // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
     // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
-    GraphPathFinder finder = new GraphPathFinder(router);
+    GraphPathFinder finder = new GraphPathFinder(traverseVisitor, streetRoutingTimeout);
 
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
@@ -1283,13 +1306,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     resetSearchDateButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          searchDate.setText(dateFormat.format(new Date()));
+          searchDate.setText(DATE_FORMAT.format(Instant.now()));
         }
       }
     );
     routingPanel.add(resetSearchDateButton);
     searchDate = new JTextField();
-    searchDate.setText(dateFormat.format(new Date()));
+    searchDate.setText(DATE_FORMAT.format(Instant.now()));
     routingPanel.add(searchDate);
 
     // row: launch, continue, and clear path search
@@ -1352,9 +1375,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
 
     public String toString() {
-      SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
-      String startTime = shortDateFormat.format(new Date(gp.getStartTime() * 1000));
-      String endTime = shortDateFormat.format(new Date(gp.getEndTime() * 1000));
+      String startTime = TIME_FORMAT.format(Instant.ofEpochSecond(gp.getStartTime()));
+      String endTime = TIME_FORMAT.format(Instant.ofEpochSecond(gp.getEndTime()));
       return (
         "Path (" +
         startTime +

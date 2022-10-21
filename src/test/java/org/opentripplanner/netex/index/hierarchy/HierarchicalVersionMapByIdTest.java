@@ -1,10 +1,10 @@
 package org.opentripplanner.netex.index.hierarchy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.index.hierarchy.E.EASTWOOD;
 import static org.opentripplanner.netex.index.hierarchy.E.REAGAN;
 import static org.opentripplanner.netex.index.hierarchy.E.REAGAN_2;
@@ -17,7 +17,8 @@ import com.google.common.collect.Multimap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HierarchicalVersionMapByIdTest {
 
@@ -59,21 +60,19 @@ public class HierarchicalVersionMapByIdTest {
     assertTrue(child.lookup(SCHWARZENEGGER.getId()).isEmpty());
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void addEntityWithIllegalKeyArgument() {
     // Prevent using add method with (key, value) -> the key is given: the ID.
-    child.add("Illegal key", EASTWOOD);
-    fail("Expected an exception, but did not get one.");
+    assertThrows(IllegalArgumentException.class, () -> child.add("Illegal key", EASTWOOD));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void addEntitiesWithIllegalKeyArgument() {
     Multimap<String, E> input = ArrayListMultimap.create();
     input.put("Illegal key", EASTWOOD);
 
     // Prevent using add method with (key, value) -> the key is given: the ID.
-    child.addAll(input);
-    fail("Expected an exception, but did not get one.");
+    assertThrows(IllegalArgumentException.class, () -> child.addAll(input));
   }
 
   @Test

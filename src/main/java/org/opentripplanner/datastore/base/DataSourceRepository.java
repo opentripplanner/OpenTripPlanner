@@ -1,10 +1,10 @@
 package org.opentripplanner.datastore.base;
 
 import java.net.URI;
-import javax.validation.constraints.NotNull;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import javax.annotation.Nonnull;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * It is an abstraction to reading of and writing to files whenever the file is located on the local
@@ -43,7 +43,7 @@ public interface DataSourceRepository {
    * @param type the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
    */
-  DataSource findSource(@NotNull URI uri, @NotNull FileType type);
+  DataSource findSource(@Nonnull URI uri, @Nonnull FileType type);
 
   /**
    * Get the a composite data source (zip/directory) for the given uri and type.
@@ -54,5 +54,5 @@ public interface DataSourceRepository {
    * @param type the file type to load.
    * @return the datasource wrapper that can be used to access the data source.
    */
-  CompositeDataSource findCompositeSource(@NotNull URI uri, @NotNull FileType type);
+  CompositeDataSource findCompositeSource(@Nonnull URI uri, @Nonnull FileType type);
 }

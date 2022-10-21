@@ -7,8 +7,32 @@ on:
 
 jobs:
   perf-test:
-    if: github.repository_owner == 'opentripplanner'
+    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for')
     runs-on: performance-test
+    strategy:
+      matrix:
+        include:
+
+          - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
+            transit-url: https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip
+            transit-filename: germany.gtfs.zip
+            iterations: 1
+            jfr-delay: "50s"
+
+          - location: norway
+            osm-url: https://download.geofabrik.de/europe/norway-210101.osm.pbf
+            transit-url: https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip
+            transit-filename: rb_norway-aggregated-netex.zip
+            iterations: 4
+            jfr-delay: "35s"
+
+          - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
+            osm-url: https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf
+            transit-url: https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip
+            transit-filename: baden-wuerttemberg.gtfs.zip
+            iterations: 4
+            jfr-delay: "50s"
+
     steps:
       - uses: actions/checkout@v2.3.2
         with:
@@ -29,16 +53,14 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
 
       - name: Cache graph input files
         uses: actions/cache@v2
         with:
           path: |
-            graph/*.osm.pbf
+            graph/*.pbf
             graph/*.zip
-          key: graph
+          key: graph-${{ matrix.transit-url}}-${{ matrix.osm-url}}
 
       - name: Build jar
         run: mvn -DskipTests --batch-mode package -P prettierSkip
@@ -46,12 +68,17 @@ jobs:
       - name: Download OSM & Netex data
         run: |
           mkdir -p graph
-          wget https://download.geofabrik.de/europe/norway-210101.osm.pbf -O graph/norway.osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
-          wget https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip -O graph/rb_norway-aggregated-netex.zip --no-clobber -q --show-progress --progress=bar:force || true
+          if [ "${{ matrix.osm-url }}" = "" ];
+          then
+            echo "No OSM download specified. Skipping..."
+          else
+            wget ${{ matrix.osm-url }} -O graph/osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
+          fi
+          wget ${{ matrix.transit-url }} -O graph/${{ matrix.transit-filename }} --no-clobber -q --show-progress --progress=bar:force || true
 
-      - name: Build Norway graph
+      - name: Build graph
         run: |
-          cp test/ci-performance-test/build-config.json graph/build-config.json
+          cp test/performance/${{ matrix.location }}/build-config.json graph/build-config.json
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save graph
 
@@ -59,14 +86,19 @@ jobs:
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
           MEASUREMENT_ENVIRONMENT: CI
+          SPEEDTEST_LOCATION: ${{ matrix.location }}
+          MAVEN_OPTS: "-Xmx50g -XX:StartFlightRecording=delay=${{ matrix.jfr-delay }},duration=30m,filename=${{ matrix.location}}-speed-test.jfr"
         run: |
-          mv graph/graph.obj test/ci-performance-test/
-          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/ci-performance-test/ -p md -n 4 -i 3 -0"
-
+          mv graph/graph.obj test/performance/${{ matrix.location }}
+          mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.SpeedTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }} -p md -n ${{ matrix.iterations }} -i 3 -0" -P prettierSkip
       - name: Archive travel results file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: travelSearch-results.csv
-          path: |
-            test/ci-performance-test/travelSearch-results.csv
+          name: ${{ matrix.location }}-travelSearch-results.csv
+          path: test/performance/${{ matrix.location }}/travelSearch-results.csv
 
+      - name: Archive Flight Recorder instrumentation file
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.location }}-flight-recorder
+          path: ${{ matrix.location}}-speed-test.jfr

@@ -6,9 +6,8 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.LocalizedString;
-import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
 
 //Currently unused since notes are disabled in DefaultWayPropertySetSource
 public class NoteProperties {
@@ -32,7 +31,7 @@ public class NoteProperties {
       Map<String, String> noteText = TemplateLibrary.generateI18N(notePattern, way);
       text = TranslatedString.getI18NString(noteText, true, false);
     } else {
-      text = new LocalizedString(notePattern, way);
+      text = LocalizedStringMapper.getInstance().map(notePattern, way);
     }
     StreetNote note = new StreetNote(text);
 

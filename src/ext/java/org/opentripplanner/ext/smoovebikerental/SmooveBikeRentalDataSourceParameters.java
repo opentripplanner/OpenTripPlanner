@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.smoovebikerental;
 
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
@@ -18,7 +18,7 @@ public class SmooveBikeRentalDataSourceParameters extends VehicleRentalDataSourc
     String url,
     String network,
     boolean allowOverloading,
-    @NotNull Map<String, String> httpHeaders
+    @Nonnull Map<String, String> httpHeaders
   ) {
     super(DataSourceType.SMOOVE, url, httpHeaders);
     this.network = network;

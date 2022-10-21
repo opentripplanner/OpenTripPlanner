@@ -4,18 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
+import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -36,23 +36,23 @@ public class RoutingServiceTest extends GtfsTest {
     /* Graph vertices */
     for (Vertex vertex : graph.getVertices()) {
       if (vertex instanceof TransitStopVertex) {
-        Stop stop = ((TransitStopVertex) vertex).getStop();
-        Vertex index_vertex = graph.index.getStopVertexForStop().get(stop);
+        RegularStop stop = ((TransitStopVertex) vertex).getStop();
+        Vertex index_vertex = graph.getStopVertexForStopId(stop.getId());
         assertEquals(index_vertex, vertex);
       }
     }
 
     /* Agencies */
-    String feedId = graph.getFeedIds().iterator().next();
+    String feedId = transitModel.getFeedIds().iterator().next();
     Agency agency;
-    agency = graph.index.getAgencyForId(new FeedScopedId(feedId, "azerty"));
+    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "azerty"));
     assertNull(agency);
-    agency = graph.index.getAgencyForId(new FeedScopedId(feedId, "agency"));
-    assertEquals(agency.getId().toString(), feedId + ":" + "agency");
-    assertEquals(agency.getName(), "Fake Agency");
+    agency = transitModel.getTransitModelIndex().getAgencyForId(new FeedScopedId(feedId, "agency"));
+    assertEquals(feedId + ":" + "agency", agency.getId().toString());
+    assertEquals("Fake Agency", agency.getName());
 
     /* Stops */
-    graph.index.getStopForId(new FeedScopedId("X", "Y"));
+    transitModel.getStopModel().getRegularStop(new FeedScopedId("X", "Y"));
     /* Trips */
     //        graph.index.tripForId;
     //        graph.index.routeForId;
@@ -66,18 +66,21 @@ public class RoutingServiceTest extends GtfsTest {
    */
   @Test
   public void testPatternsCoherent() {
-    for (Trip trip : graph.index.getTripForId().values()) {
-      TripPattern pattern = graph.index.getPatternForTrip().get(trip);
+    for (Trip trip : transitModel.getTransitModelIndex().getTripForId().values()) {
+      TripPattern pattern = transitModel.getTransitModelIndex().getPatternForTrip().get(trip);
       assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
     }
     /* This one depends on a feed where each TripPattern appears on only one route. */
-    for (Route route : graph.index.getAllRoutes()) {
-      for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
+    for (Route route : transitModel.getTransitModelIndex().getAllRoutes()) {
+      for (TripPattern pattern : transitModel
+        .getTransitModelIndex()
+        .getPatternsForRoute()
+        .get(route)) {
         assertEquals(pattern.getRoute(), route);
       }
     }
-    for (var stop : graph.index.getAllStops()) {
-      for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
+    for (var stop : transitModel.getStopModel().listStopLocations()) {
+      for (TripPattern pattern : transitModel.getTransitModelIndex().getPatternsForStop(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");
       }
@@ -86,23 +89,26 @@ public class RoutingServiceTest extends GtfsTest {
 
   @Test
   public void testSpatialIndex() {
-    String feedId = graph.getFeedIds().iterator().next();
-    var stopJ = graph.index.getStopForId(new FeedScopedId(feedId, "J"));
-    var stopL = graph.index.getStopForId(new FeedScopedId(feedId, "L"));
-    var stopM = graph.index.getStopForId(new FeedScopedId(feedId, "M"));
-    TransitStopVertex stopvJ = graph.index.getStopVertexForStop().get(stopJ);
-    TransitStopVertex stopvL = graph.index.getStopVertexForStop().get(stopL);
-    TransitStopVertex stopvM = graph.index.getStopVertexForStop().get(stopM);
+    String feedId = transitModel.getFeedIds().iterator().next();
+    FeedScopedId idJ = new FeedScopedId(feedId, "J");
+    var stopJ = transitModel.getStopModel().getRegularStop(idJ);
+    FeedScopedId idL = new FeedScopedId(feedId, "L");
+    var stopL = transitModel.getStopModel().getRegularStop(idL);
+    FeedScopedId idM = new FeedScopedId(feedId, "M");
+    var stopM = transitModel.getStopModel().getRegularStop(idM);
+    TransitStopVertex stopvJ = graph.getStopVertexForStopId(idJ);
+    TransitStopVertex stopvL = graph.getStopVertexForStopId(idL);
+    TransitStopVertex stopvM = graph.getStopVertexForStopId(idM);
     // There are a two other stops within 100 meters of stop J.
     Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
     env.expandBy(
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    List<TransitStopVertex> stops = graph.index.getStopSpatialIndex().query(env);
-    assertTrue(stops.contains(stopvJ));
-    assertTrue(stops.contains(stopvL));
-    assertTrue(stops.contains(stopvM));
+    Collection<RegularStop> stops = transitModel.getStopModel().findRegularStops(env);
+    assertTrue(stops.contains(stopJ));
+    assertTrue(stops.contains(stopL));
+    assertTrue(stops.contains(stopM));
     assertTrue(stops.size() >= 3); // Query can overselect
   }
 

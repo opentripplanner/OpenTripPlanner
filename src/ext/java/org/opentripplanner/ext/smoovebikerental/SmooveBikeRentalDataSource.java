@@ -5,9 +5,9 @@ import java.util.Map;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
-import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonDataSource<VehicleRen
       station.longitude = Double.parseDouble(coordinates[1].trim());
     } catch (NumberFormatException e) {
       // E.g. coordinates is empty
-      log.warn("Error parsing bike rental station " + station.id, e);
+      log.warn("Error parsing bike rental station {}", station.id, e);
       return null;
     }
     if (!node.path("operative").asText().equals("true")) {

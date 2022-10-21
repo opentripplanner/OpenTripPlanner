@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.ServiceDateMapper;
+import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.transit.model.network.Route;
@@ -58,7 +60,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Double> duration() {
-    return environment -> (double) getSource(environment).getDuration();
+    return environment -> (double) getSource(environment).getDuration().toSeconds();
   }
 
   @Override
@@ -123,7 +125,16 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<String> mode() {
-    return environment -> getSource(environment).getMode().name();
+    return environment -> {
+      Leg leg = getSource(environment);
+      if (leg instanceof StreetLeg s) {
+        return s.getMode().name();
+      }
+      if (leg instanceof TransitLeg s) {
+        return s.getMode().name();
+      }
+      throw new IllegalStateException("Unhandled leg type: " + leg);
+    };
   }
 
   @Override
@@ -164,7 +175,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<String> serviceDate() {
-    return environment -> ServiceDateMapper.mapToApi(getSource(environment).getServiceDate());
+    return environment -> LocalDateMapper.mapToApi(getSource(environment).getServiceDate());
   }
 
   @Override

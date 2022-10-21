@@ -1,17 +1,18 @@
 package org.opentripplanner.datastore.base;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 public class ByteArrayDataSourceTest {
 
@@ -57,12 +58,12 @@ public class ByteArrayDataSourceTest {
     assertEquals(DATA, IOUtils.toString(subject.asInputStream(), UTF_8));
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void verifyAReadOnlyInstanceIsNotWritable() {
     DataSource subject = new ByteArrayDataSource(PATH, NAME, TYPE, SIZE, LAST_MODIFIED, false)
       .withBytes(BYTES);
 
     assertFalse(subject.isWritable());
-    subject.asOutputStream();
+    assertThrows(UnsupportedOperationException.class, subject::asOutputStream);
   }
 }

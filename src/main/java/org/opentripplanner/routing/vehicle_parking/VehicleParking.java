@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
@@ -50,6 +52,12 @@ public class VehicleParking implements Serializable {
    * park_and_ride, bike_lockers, or static_osm_data.
    */
   private final Set<String> tags;
+
+  /**
+   * The opening hours of this vehicle parking, when it is possible to drop off / pickup a vehicle.
+   * May be {@code null}.
+   */
+  private final OHCalendar openingHoursCalendar;
 
   /**
    * A short translatable note containing details of this vehicle parking.
@@ -98,6 +106,7 @@ public class VehicleParking implements Serializable {
     String detailsUrl,
     String imageUrl,
     Set<String> tags,
+    OHCalendar openingHoursCalendar,
     I18NString note,
     VehicleParkingState state,
     boolean bicyclePlaces,
@@ -113,6 +122,7 @@ public class VehicleParking implements Serializable {
     this.detailsUrl = detailsUrl;
     this.imageUrl = imageUrl;
     this.tags = tags;
+    this.openingHoursCalendar = openingHoursCalendar;
     this.note = note;
     this.state = state;
     this.bicyclePlaces = bicyclePlaces;
@@ -130,6 +140,7 @@ public class VehicleParking implements Serializable {
     return id;
   }
 
+  @Nullable
   public I18NString getName() {
     return name;
   }
@@ -152,6 +163,10 @@ public class VehicleParking implements Serializable {
 
   public Set<String> getTags() {
     return tags;
+  }
+
+  public OHCalendar getOpeningHours() {
+    return openingHoursCalendar;
   }
 
   public I18NString getNote() {
@@ -260,6 +275,7 @@ public class VehicleParking implements Serializable {
       detailsUrl,
       imageUrl,
       tags,
+      openingHoursCalendar,
       note,
       state,
       bicyclePlaces,
@@ -291,6 +307,7 @@ public class VehicleParking implements Serializable {
       Objects.equals(detailsUrl, that.detailsUrl) &&
       Objects.equals(imageUrl, that.imageUrl) &&
       Objects.equals(tags, that.tags) &&
+      Objects.equals(openingHoursCalendar, that.openingHoursCalendar) &&
       Objects.equals(note, that.note) &&
       Objects.equals(capacity, that.capacity) &&
       Objects.equals(entrances, that.entrances)
@@ -321,6 +338,7 @@ public class VehicleParking implements Serializable {
 
     private final List<VehicleParkingEntranceCreator> entranceCreators = new ArrayList<>();
     private Set<String> tags = Set.of();
+    private OHCalendar openingHoursCalendar;
     private FeedScopedId id;
     private I18NString name;
     private double x;
@@ -340,6 +358,11 @@ public class VehicleParking implements Serializable {
 
     public VehicleParkingBuilder tags(Collection<String> tags) {
       this.tags = new HashSet<>(tags);
+      return this;
+    }
+
+    public VehicleParkingBuilder openingHoursCalendar(OHCalendar openingHoursCalendar) {
+      this.openingHoursCalendar = openingHoursCalendar;
       return this;
     }
 
@@ -435,6 +458,7 @@ public class VehicleParking implements Serializable {
         detailsUrl,
         imageUrl,
         tags,
+        openingHoursCalendar,
         note,
         state$value,
         bicyclePlaces,

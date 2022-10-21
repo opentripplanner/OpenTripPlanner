@@ -63,7 +63,7 @@ public class AgencyMapperTest {
     assertEquals(NAME, result.getName());
     assertEquals(LANG, result.getLang());
     assertEquals(PHONE, result.getPhone());
-    assertEquals(TIMEZONE, result.getTimezone());
+    assertEquals(TIMEZONE, result.getTimezone().getId());
     assertEquals(URL, result.getUrl());
     assertEquals(FARE_URL, result.getFareUrl());
     assertEquals(BRANDING_URL, result.getBrandingUrl());
@@ -75,14 +75,18 @@ public class AgencyMapperTest {
     Agency orginal = new Agency();
     orginal.setId(ID);
     orginal.setName(NAME);
+    orginal.setTimezone(TIMEZONE);
     result = subject.map(orginal);
 
+    // Required
     assertNotNull(result.getId());
     assertNotNull(result.getName());
+    assertNotNull(result.getTimezone());
+
+    // Optional - nullable
+    assertNull(result.getUrl());
     assertNull(result.getLang());
     assertNull(result.getPhone());
-    assertNull(result.getTimezone());
-    assertNull(result.getUrl());
     assertNull(result.getFareUrl());
     assertNull(result.getBrandingUrl());
   }

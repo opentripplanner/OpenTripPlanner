@@ -1,23 +1,22 @@
 package org.opentripplanner.graph_builder.module.linking;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.FakeGraph.addExtraStops;
 import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
 import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
 import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 
-import com.google.common.collect.Iterables;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -29,6 +28,9 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class LinkingTest {
 
@@ -75,16 +77,17 @@ public class LinkingTest {
         null,
         "split",
         x + delta * splitVal,
-        y + delta * splitVal
+        y + delta * splitVal,
+        new NonLocalizedString("split")
       );
       SplitterVertex sv1 = new SplitterVertex(
         null,
         "split",
         x + delta * splitVal,
-        y + delta * splitVal
+        y + delta * splitVal,
+        new NonLocalizedString("split")
       );
 
-      var graph = new Graph();
       P2<StreetEdge> sp0 = s0.splitDestructively(sv0);
       P2<StreetEdge> sp1 = s1.splitDestructively(sv1);
 
@@ -108,24 +111,28 @@ public class LinkingTest {
   @Test
   public void testStopsLinkedIdentically() throws URISyntaxException {
     // build the graph without the added stops
-    Graph g1 = buildGraphNoTransit();
-    addRegularStopGrid(g1);
-    link(g1);
+    TestOtpModel model = buildGraphNoTransit();
+    Graph g1 = model.graph();
+    TransitModel transitModel1 = model.transitModel();
+    addRegularStopGrid(g1, transitModel1);
+    link(g1, transitModel1);
 
-    Graph g2 = buildGraphNoTransit();
-    addExtraStops(g2);
-    addRegularStopGrid(g2);
-    link(g2);
+    TestOtpModel model2 = buildGraphNoTransit();
+    Graph g2 = model2.graph();
+    TransitModel transitModel2 = model2.transitModel();
+    addExtraStops(g2, transitModel2);
+    addRegularStopGrid(g2, transitModel2);
+    link(g2, transitModel2);
 
     // compare the linkages
-    for (TransitStopVertex ts : Iterables.filter(g1.getVertices(), TransitStopVertex.class)) {
+    for (TransitStopVertex ts : g1.getVerticesOfType(TransitStopVertex.class)) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
       assertTrue(stls1.size() >= 1);
 
       TransitStopVertex other = (TransitStopVertex) g2.getVertex(ts.getLabel());
       List<StreetTransitStopLink> stls2 = outgoingStls(other);
 
-      assertEquals("Unequal number of links from stop " + ts, stls1.size(), stls2.size());
+      assertEquals(stls1.size(), stls2.size(), "Unequal number of links from stop " + ts);
 
       for (int i = 0; i < stls1.size(); i++) {
         Vertex v1 = stls1.get(i).getToVertex();

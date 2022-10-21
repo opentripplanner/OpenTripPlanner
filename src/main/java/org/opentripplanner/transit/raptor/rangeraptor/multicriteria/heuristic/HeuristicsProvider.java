@@ -2,14 +2,14 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 
 /**
- * A wrapper around {@link Heuristics} to cash elements to avoid recalculation of heuristic
+ * A wrapper around {@link Heuristics} to cache elements to avoid recalculation of heuristic
  * properties.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -19,7 +19,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   private final Heuristics heuristics;
   private final RoundProvider roundProvider;
   private final DestinationArrivalPaths<T> paths;
-  private final CostCalculator costCalculator;
+  private final CostCalculator<T> costCalculator;
   private final HeuristicAtStop[] stops;
   private final DebugHandlerFactory<T> debugHandlerFactory;
 
@@ -31,7 +31,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     Heuristics heuristics,
     RoundProvider roundProvider,
     DestinationArrivalPaths<T> paths,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.heuristics = heuristics;

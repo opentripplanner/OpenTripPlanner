@@ -20,11 +20,11 @@ public class FlexTripsMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
 
-  public static List<FlexTrip> createFlexTrips(
+  public static List<FlexTrip<?, ?>> createFlexTrips(
     OtpTransitServiceBuilder builder,
     DataImportIssueStore store
   ) {
-    List<FlexTrip> result = new ArrayList<>();
+    List<FlexTrip<?, ?>> result = new ArrayList<>();
     TripStopTimes stopTimesByTrip = builder.getStopTimesSortedByTrip();
 
     final int tripSize = stopTimesByTrip.size();
@@ -36,9 +36,13 @@ public class FlexTripsMapper {
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
-        result.add(new UnscheduledTrip(trip, stopTimes));
+        result.add(
+          UnscheduledTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
+        );
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
-        result.add(new ScheduledDeviatedTrip(trip, stopTimes));
+        result.add(
+          ScheduledDeviatedTrip.of(trip.getId()).withTrip(trip).withStopTimes(stopTimes).build()
+        );
       } else if (hasContinuousStops(stopTimes) && FlexTrip.containsFlexStops(stopTimes)) {
         store.add(
           "ContinuousFlexTrip",
@@ -60,9 +64,7 @@ public class FlexTripsMapper {
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
     return stopTimes
       .stream()
-      .anyMatch(st ->
-        st.getFlexContinuousPickup() != NONE.getGtfsCode() ||
-        st.getFlexContinuousDropOff() != NONE.getGtfsCode()
+      .anyMatch(st -> st.getFlexContinuousPickup() != NONE || st.getFlexContinuousDropOff() != NONE
       );
   }
 }

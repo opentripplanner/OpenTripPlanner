@@ -5,17 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
-import java.util.Collections;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
@@ -33,7 +32,7 @@ public class TripMapperTest {
   private static final String SERVICE_JOURNEY_ID = NetexTestDataSample.SERVICE_JOURNEY_ID;
   private static final String JOURNEY_PATTERN_ID = "RUT:JourneyPattern:1";
   private static final FeedScopedId SERVICE_ID = TransitModelForTest.id("S001");
-  private static final DataImportIssueStore issueStore = new DataImportIssueStore(false);
+  private static final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
 
   private static final JAXBElement<LineRefStructure> LINE_REF = MappingSupport.createWrappedRef(
     ROUTE_ID,
@@ -58,8 +57,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       new HierarchicalMapById<>(),
       new HierarchicalMap<>(),
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     limitation.withWheelchairAccess(wheelchairLimitation);
@@ -71,7 +69,7 @@ public class TripMapperTest {
     assertNotNull(trip, "trip must not be null");
     assertEquals(
       trip.getWheelchairBoarding(),
-      WheelchairAccessibility.POSSIBLE,
+      Accessibility.POSSIBLE,
       "Wheelchair accessibility not possible on trip"
     );
   }
@@ -88,8 +86,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       new HierarchicalMapById<>(),
       new HierarchicalMap<>(),
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     ServiceJourney serviceJourney = createExampleServiceJourney();
@@ -130,8 +127,7 @@ public class TripMapperTest {
       transitBuilder.getRoutes(),
       routeById,
       journeyPatternById,
-      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID),
-      Collections.emptySet()
+      Map.of(SERVICE_JOURNEY_ID, SERVICE_ID)
     );
 
     Trip trip = tripMapper.mapServiceJourney(serviceJourney, this::headsign);

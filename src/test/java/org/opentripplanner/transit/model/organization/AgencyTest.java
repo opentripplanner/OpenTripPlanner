@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.model.organization;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -31,7 +33,7 @@ class AgencyTest {
 
   @Test
   void copy() {
-    assertEquals(subject.getId().getId(), ID);
+    assertEquals(ID, subject.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
     var copy = subject.copy().withName(NAME).build();
@@ -41,14 +43,14 @@ class AgencyTest {
     // Copy and change name
     copy = subject.copy().withName("v2").build();
 
-    // The two objects are not he same instance, but is equal(sae id)
-    assertNotSame(copy, subject);
-    assertEquals(copy, subject);
+    // The two objects are not the same instance, but is equal(same id)
+    assertNotSame(subject, copy);
+    assertEquals(subject, copy);
 
-    assertEquals(copy.getId().getId(), ID);
+    assertEquals(ID, copy.getId().getId());
     assertEquals("v2", copy.getName());
     assertEquals(URL, copy.getUrl());
-    assertEquals(TIMEZONE, copy.getTimezone());
+    assertEquals(TIMEZONE, copy.getTimezone().getId());
     assertEquals(PHONE, copy.getPhone());
     assertEquals(BRANDING_URL, copy.getBrandingUrl());
     assertEquals(FARE_URL, copy.getFareUrl());
@@ -56,7 +58,15 @@ class AgencyTest {
   }
 
   @Test
-  void testToString() {
-    assertEquals(subject.toString(), "<Agency F:1>");
+  void sameAs() {
+    assertTrue(subject.sameAs(subject.copy().build()));
+    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withUrl("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withTimezone("CET").build()));
+    assertFalse(subject.sameAs(subject.copy().withPhone("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withBrandingUrl("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withFareUrl("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withLang("X").build()));
   }
 }

@@ -6,31 +6,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.BoardingArea;
-import org.opentripplanner.model.Entrance;
-import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.FareRule;
-import org.opentripplanner.model.FareZone;
+import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FlexLocationGroup;
-import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TripOnServiceDate;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -39,14 +21,32 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntity;
+import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.BoardingArea;
+import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.GroupOfStations;
+import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Pathway;
+import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,19 +65,13 @@ public class OtpTransitServiceBuilder {
 
   private final List<ServiceCalendar> calendars = new ArrayList<>();
 
-  private final List<FareAttribute> fareAttributes = new ArrayList<>();
-
-  private final List<FareRule> fareRules = new ArrayList<>();
-
   private final List<FeedInfo> feedInfos = new ArrayList<>();
 
   private final List<Frequency> frequencies = new ArrayList<>();
 
-  private final EntityById<GroupOfStations> groupsOfStationsById = new EntityById<>();
+  private final StopModelBuilder stopModelBuilder;
 
-  private final EntityById<MultiModalStation> multiModalStationsById = new EntityById<>();
-
-  private final Multimap<TransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
 
   private final EntityById<Operator> operatorsById = new EntityById<>();
 
@@ -87,19 +81,11 @@ public class OtpTransitServiceBuilder {
 
   private final Multimap<FeedScopedId, ShapePoint> shapePoints = ArrayListMultimap.create();
 
-  private final EntityById<Station> stationsById = new EntityById<>();
-
-  private final EntityById<Stop> stopsById = new EntityById<>();
-
   private final EntityById<Entrance> entrancesById = new EntityById<>();
 
   private final EntityById<PathwayNode> pathwayNodesById = new EntityById<>();
 
   private final EntityById<BoardingArea> boardingAreasById = new EntityById<>();
-
-  private final EntityById<FlexStopLocation> locationsById = new EntityById<>();
-
-  private final EntityById<FlexLocationGroup> locationGroupsById = new EntityById<>();
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
@@ -107,11 +93,13 @@ public class OtpTransitServiceBuilder {
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
+  private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
+
   private final EntityById<Trip> tripsById = new EntityById<>();
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-  private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
+  private final EntityById<FlexTrip<?, ?>> flexTripsById = new EntityById<>();
 
   private final EntityById<Branding> brandingsById = new EntityById<>();
 
@@ -121,7 +109,9 @@ public class OtpTransitServiceBuilder {
 
   private final EntityById<GroupOfRoutes> groupOfRouteById = new EntityById<>();
 
-  public OtpTransitServiceBuilder() {}
+  public OtpTransitServiceBuilder() {
+    this.stopModelBuilder = StopModel.of();
+  }
 
   /* Accessors */
 
@@ -137,14 +127,6 @@ public class OtpTransitServiceBuilder {
     return calendars;
   }
 
-  public List<FareAttribute> getFareAttributes() {
-    return fareAttributes;
-  }
-
-  public List<FareRule> getFareRules() {
-    return fareRules;
-  }
-
   public List<FeedInfo> getFeedInfos() {
     return feedInfos;
   }
@@ -153,19 +135,23 @@ public class OtpTransitServiceBuilder {
     return frequencies;
   }
 
+  public StopModelBuilder stopModelBuilder() {
+    return stopModelBuilder;
+  }
+
   public EntityById<GroupOfStations> getGroupsOfStationsById() {
-    return groupsOfStationsById;
+    return stopModelBuilder().groupOfStationById();
   }
 
   public EntityById<MultiModalStation> getMultiModalStationsById() {
-    return multiModalStationsById;
+    return stopModelBuilder().multiModalStationById();
   }
 
   /**
    * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable).
    * Entities that might have Notices are Routes, Trips, Stops and StopTimes.
    */
-  public Multimap<TransitEntity, Notice> getNoticeAssignments() {
+  public Multimap<AbstractTransitEntity, Notice> getNoticeAssignments() {
     return noticeAssignments;
   }
 
@@ -186,11 +172,11 @@ public class OtpTransitServiceBuilder {
   }
 
   public EntityById<Station> getStations() {
-    return stationsById;
+    return stopModelBuilder().stationById();
   }
 
-  public EntityById<Stop> getStops() {
-    return stopsById;
+  public EntityById<RegularStop> getStops() {
+    return stopModelBuilder().regularStopsById();
   }
 
   public EntityById<Entrance> getEntrances() {
@@ -205,12 +191,12 @@ public class OtpTransitServiceBuilder {
     return boardingAreasById;
   }
 
-  public EntityById<FlexStopLocation> getLocations() {
-    return locationsById;
+  public EntityById<AreaStop> getAreaStops() {
+    return stopModelBuilder().areaStopById();
   }
 
-  public EntityById<FlexLocationGroup> getLocationGroups() {
-    return locationGroupsById;
+  public EntityById<GroupStop> getGroupStops() {
+    return stopModelBuilder().groupStopById();
   }
 
   public TripStopTimes getStopTimesSortedByTrip() {
@@ -225,6 +211,10 @@ public class OtpTransitServiceBuilder {
     return transfers;
   }
 
+  public List<StaySeatedNotAllowed> getStaySeatedNotAllowed() {
+    return staySeatedNotAllowed;
+  }
+
   public EntityById<Trip> getTripsById() {
     return tripsById;
   }
@@ -233,7 +223,7 @@ public class OtpTransitServiceBuilder {
     return tripPatterns;
   }
 
-  public EntityById<FlexTrip> getFlexTripsById() {
+  public EntityById<FlexTrip<?, ?>> getFlexTripsById() {
     return flexTripsById;
   }
 
@@ -255,7 +245,6 @@ public class OtpTransitServiceBuilder {
 
   public CalendarServiceData buildCalendarServiceData() {
     return CalendarServiceDataFactoryImpl.createCalendarServiceData(
-      getAgenciesById().values(),
       getCalendarDates(),
       getCalendars()
     );
@@ -270,7 +259,7 @@ public class OtpTransitServiceBuilder {
    * period. If a service is start before and/or ends after the period then the service is modified
    * to match the period.
    */
-  public void limitServiceDays(ServiceDateInterval periodLimit, DataImportIssueStore issues) {
+  public void limitServiceDays(ServiceDateInterval periodLimit) {
     if (periodLimit.isUnbounded()) {
       LOG.info("Limiting transit service is skipped, the period is unbounded.");
       return;
@@ -296,7 +285,7 @@ public class OtpTransitServiceBuilder {
       calendars.addAll(keepCal);
       logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
     }
-    removeEntitiesWithInvalidReferences(issues);
+    removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
   }
 
@@ -325,31 +314,12 @@ public class OtpTransitServiceBuilder {
    * Check all relations and remove entities which reference none existing entries. This may happen
    * as a result of inconsistent data or by deliberate removal of elements in the builder.
    */
-  private void removeEntitiesWithInvalidReferences(DataImportIssueStore issues) {
+  private void removeEntitiesWithInvalidReferences() {
     removeTripsWithNoneExistingServiceIds();
-    removeInvalidShapeIds(issues);
     removeStopTimesForNoneExistingTrips();
     fixOrRemovePatternsWhichReferenceNoneExistingTrips();
     removeTransfersForNoneExistingTrips();
     removeTripOnServiceDateForNonExistingTrip();
-  }
-
-  private void removeInvalidShapeIds(DataImportIssueStore issues) {
-    tripsById
-      .values()
-      .forEach(t -> {
-        var shapeId = t.getShapeId();
-        boolean shapeMissing = Objects.nonNull(shapeId) && !shapePoints.containsKey(shapeId);
-        if (shapeMissing) {
-          issues.add(
-            "InvalidShapeReference",
-            "Trip %s contains invalid reference to shape %s",
-            t.getId(),
-            shapeId
-          );
-          t.deleteShapeId();
-        }
-      });
   }
 
   /** Remove all trips which reference none existing service ids */

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.graph.Vertex;
@@ -20,7 +20,7 @@ public class DominanceFunctionTest {
     DominanceFunction minimumWeightDominanceFunction = new DominanceFunction.MinimumWeight();
     Vertex fromVertex = mock(TransitStopVertex.class);
     Vertex toVertex = mock(TransitStopVertex.class);
-    RoutingRequest request = new RoutingRequest();
+    RouteRequest request = new RouteRequest();
 
     // Test if domination works in the general case
 

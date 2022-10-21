@@ -22,7 +22,7 @@ public class OpenStreetMapParserTest {
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
     );
     OpenStreetMapProvider pr = new OpenStreetMapProvider(osmFile, true);
-    OSMDatabase osmdb = new OSMDatabase(new DataImportIssueStore(false), Set.of());
+    OSMDatabase osmdb = new OSMDatabase(DataImportIssueStore.noopIssueStore(), Set.of());
 
     pr.readOSM(osmdb);
 
@@ -35,7 +35,7 @@ public class OpenStreetMapParserTest {
     assertTrue(nodeA.hasTag("railway"));
     assertEquals("level_crossing", nodeA.getTag("railway"));
 
-    assertEquals(544, osmdb.wayCount());
+    assertEquals(545, osmdb.wayCount());
 
     OSMWay wayA = osmdb.getWay(13490353L);
     assertEquals(13490353, wayA.getId());

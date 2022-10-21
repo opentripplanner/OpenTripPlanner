@@ -1,11 +1,11 @@
 package org.opentripplanner.util.time;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
@@ -22,6 +22,7 @@ public class TimeUtils {
   public static final int NOT_SET = -1_000_000;
 
   private static final Pattern DAYS_SUFFIX = Pattern.compile("([-+])(\\d+)d");
+  public static final Integer ONE_DAY_SECONDS = 24 * 60 * 60;
 
   /** This is a utility class. Do not instantiate this class. It should have only static methods. */
   private TimeUtils() {}
@@ -86,7 +87,7 @@ public class TimeUtils {
     }
     int mm = tokens.length > 1 ? Integer.parseInt(tokens[1]) : 0;
     int ss = tokens.length == 3 ? Integer.parseInt(tokens[2]) : 0;
-    int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * DateConstants.ONE_DAY_SECONDS;
+    int seconds = LocalTime.of(hh, mm, ss).toSecondOfDay() + days * ONE_DAY_SECONDS;
     return negative ? -seconds : seconds;
   }
 
@@ -110,26 +111,36 @@ public class TimeUtils {
     return Arrays.stream(input.split("[ ,;]+")).mapToInt(TimeUtils::time).toArray();
   }
 
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
   public static String timeToStrCompact(int time) {
     return RelativeTime.ofSeconds(time).toCompactStr();
   }
 
+  public static String durationToStrCompact(Duration duration) {
+    return timeToStrCompact((int) duration.toSeconds());
+  }
+
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
   public static String timeToStrCompact(int time, int notSetValue) {
     return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toCompactStr();
   }
 
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
   public static String timeToStrCompact(ZonedDateTime time) {
     return time == null ? "" : RelativeTime.from(time).toCompactStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrLong(int time) {
     return RelativeTime.ofSeconds(time).toLongStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrLong(int time, int notSetValue) {
     return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toLongStr();
   }
 
+  /** Format string on format HH:MM:SS */
   public static String timeToStrLong(ZonedDateTime time) {
     return RelativeTime.from(time).toLongStr();
   }
@@ -145,9 +156,6 @@ public class TimeUtils {
    * of the service day (effectively midnight except for days on which daylight savings time changes
    * occur." See https://developers.google.com/transit/gtfs/reference#field_types
    * <p>
-   * Note! The itinerary uses the old Java Calendar, but we would like to migrate to the new
-   * java.time library; Hence this method is already changed. To convert into the legacy Calendar
-   * use {@link GregorianCalendar#from(ZonedDateTime)} method.
    *
    * @param date    the "service" date
    * @param seconds number of seconds since noon minus 12 hours (midnight).

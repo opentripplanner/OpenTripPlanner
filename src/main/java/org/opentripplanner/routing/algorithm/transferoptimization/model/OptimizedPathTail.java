@@ -7,11 +7,12 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.transit.raptor.api.path.PathBuilder;
 import org.opentripplanner.transit.raptor.api.path.PathBuilderLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 /**
@@ -38,7 +39,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
   public OptimizedPathTail(
     RaptorSlackProvider slackProvider,
-    CostCalculator costCalculator,
+    CostCalculator<T> costCalculator,
     TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,
     double extraStopBoardAlightCostsFactor,
@@ -71,12 +72,17 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   /** Start by adding the last transit leg with the egress leg attached. */
   public OptimizedPathTail<T> addTransitTail(TransitPathLeg<T> leg) {
     var next = leg.nextLeg();
+    RaptorTransfer transfer = null;
     // this can also be a transfer leg to a flex trip
     if (next.isTransferLeg()) {
+      transfer = next.asTransferLeg().transfer();
       next = next.nextLeg();
     }
     if (next.isEgressLeg()) {
       egress(next.asEgressLeg().egress());
+      if (transfer != null) {
+        transfer(transfer, transfer.stop());
+      }
       var times = new BoardAndAlightTime(
         leg.trip(),
         leg.getFromStopPosition(),

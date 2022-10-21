@@ -1,242 +1,425 @@
 package org.opentripplanner.routing.edgetype;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.TurnRestrictionType;
-import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
-import org.opentripplanner.graph_builder.linking.LinkingDirection;
-import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.SlopeCosts;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
-class StreetEdgeTest extends GraphRoutingTest {
+public class StreetEdgeTest {
 
-  private final Graph graph;
-  private StreetVertex V1, V2;
-  private StreetEdge streetEdge1, streetEdge2;
-  private TurnRestriction originalTurnRestriction;
+  private static final double DELTA = 0.00001;
+  private static final double SPEED = 6.0;
 
-  public StreetEdgeTest() {
-    graph = graph();
+  private Graph graph;
+  private IntersectionVertex v0, v1, v2;
+  private RouteRequest proto;
+
+  @BeforeEach
+  public void before() {
+    graph = new Graph();
+
+    v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
+    v1 = vertex("maple_1st", 2.0, 2.0);
+    v2 = vertex("maple_2nd", 1.0, 2.0);
+
+    proto = new RouteRequest();
+    var pref = proto.preferences();
+    pref.street().setTurnReluctance(1.0);
+    pref.withWalk(it -> it.setSpeed(1.0).setReluctance(1.0).setStairsReluctance(1.0));
+    pref.withBike(it -> it.setSpeed(5.0f).setReluctance(1.0).setWalkingSpeed(0.8));
+    pref.car().setSpeed(15.0f);
+    pref.car().setReluctance(1.0);
+
+    proto.setStreetSubRequestModes(TraverseModeSet.allModes());
   }
 
   @Test
-  public void turnRestrictionFromEdgeSplit() {
-    var splitVtx = new SplitterVertex(graph, "Split_Vertex", 1.0, 0.0);
+  public void testInAndOutAngles() {
+    // An edge heading straight West
+    StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
-    var splitResult = streetEdge1.splitDestructively(splitVtx);
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
-    // The turn restriction is removed when the edge is removed
-    assertOriginalRestrictionExists();
+    // Edge has same first and last angle.
+    assertEquals(90, e1.getInAngle());
+    assertEquals(90, e1.getOutAngle());
 
-    graph.removeEdge(streetEdge1);
-    assertOriginalRestrictionMissing();
+    // 2 new ones
+    StreetVertex u = vertex("test1", 2.0, 1.0);
+    StreetVertex v = vertex("test2", 2.0, 2.0);
 
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
+    // Second edge, heading straight North
+    StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
+
+    // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
+    assertEquals(180, Math.abs(e2.getInAngle()));
+    assertEquals(180, Math.abs(e2.getOutAngle()));
   }
 
   @Test
-  public void turnRestrictionToEdgeSplit() {
-    var splitVtx = new SplitterVertex(graph, "Split_Vertex", 1.0, 1.0);
+  public void testTraverseAsPedestrian() {
+    StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+    e1.setCarSpeed(10.0f);
 
-    var splitResult = streetEdge2.splitDestructively(splitVtx);
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
-    // The turn restriction is removed when the edge is removed
-    assertOriginalRestrictionExists();
+    RouteRequest options = proto.clone();
+    options.setMode(TraverseMode.WALK);
 
-    graph.removeEdge(streetEdge2);
-    assertOriginalRestrictionMissing();
+    State s0 = new State(new RoutingContext(options, graph, v1, v2));
+    State s1 = e1.traverse(s0);
 
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
+    // Should use the speed on the edge.
+    double expectedWeight = e1.getDistanceMeters() / options.preferences().walk().speed();
+    long expectedDuration = (long) Math.ceil(expectedWeight);
+    assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+    assertEquals(expectedWeight, s1.getWeight(), 0.0);
   }
 
   @Test
-  public void turnRestrictionFromEdgeSplitWithTemporary() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, true);
-    var disposableEdgeCollection = new DisposableEdgeCollection(graph);
+  public void testTraverseAsCar() {
+    StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+    e1.setCarSpeed(10.0f);
 
-    var splitResult = streetEdge1.splitNonDestructively(
-      splitVtx,
-      disposableEdgeCollection,
-      LinkingDirection.BOTH_WAYS
-    );
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertFalse(splitResult.second.getTurnRestrictions().isEmpty());
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
-    assertOriginalRestrictionExists();
+    RouteRequest options = proto.clone();
+    options.setMode(TraverseMode.CAR);
 
-    disposableEdgeCollection.disposeEdges();
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
-    assertOnlyOriginalRestrictionExists();
+    State s0 = new State(new RoutingContext(options, graph, v1, v2));
+    State s1 = e1.traverse(s0);
+
+    // Should use the speed on the edge.
+    double expectedWeight = e1.getDistanceMeters() / e1.getCarSpeed();
+    long expectedDuration = (long) Math.ceil(expectedWeight);
+    assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+    assertEquals(expectedWeight, s1.getWeight(), 0.0);
   }
 
   @Test
-  public void turnRestrictionToEdgeSplitTemporary() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, false);
-    var disposableEdgeCollection = new DisposableEdgeCollection(graph);
+  public void testModeSetCanTraverse() {
+    StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
-    var splitResult = streetEdge2.splitNonDestructively(
-      splitVtx,
-      disposableEdgeCollection,
-      LinkingDirection.BOTH_WAYS
-    );
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
-    assertOriginalRestrictionExists();
+    TraverseModeSet modes = TraverseModeSet.allModes();
+    assertTrue(e.canTraverse(modes));
 
-    disposableEdgeCollection.disposeEdges();
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
-    assertOnlyOriginalRestrictionExists();
+    modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
+    assertTrue(e.canTraverse(modes));
+
+    e = edge(v1, v2, 1.0, StreetTraversalPermission.CAR);
+    assertFalse(e.canTraverse(modes));
+
+    modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
+    assertTrue(e.canTraverse(modes));
+  }
+
+  /**
+   * Test the traversal of two edges with different traverse modes, with a focus on cycling. This
+   * test will fail unless the following three conditions are met: 1. Turn costs are computed based
+   * on the back edge's traverse mode during reverse traversal. 2. Turn costs are computed such that
+   * bike walking is taken into account correctly. 3. User-specified bike speeds are applied
+   * correctly during turn cost computation.
+   */
+  @Test
+  public void testTraverseModeSwitchBike() {
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+
+    v1.trafficLight = true;
+
+    RouteRequest forward = proto.clone();
+    forward.preferences().withBike(it -> it.setSpeed(3.0f));
+    forward.setMode(TraverseMode.BICYCLE);
+
+    State s0 = new State(new RoutingContext(forward, graph, v0, v2));
+    State s1 = e0.traverse(s0);
+    State s2 = e1.traverse(s1);
+
+    RouteRequest reverse = proto.clone();
+    reverse.setArriveBy(true);
+    reverse.preferences().withBike(it -> it.setSpeed(3.0f));
+    reverse.setMode(TraverseMode.BICYCLE);
+
+    State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
+    State s4 = e1.traverse(s3);
+    State s5 = e0.traverse(s4);
+
+    assertEquals(104, s2.getElapsedTimeSeconds());
+    assertEquals(104, s5.getElapsedTimeSeconds());
+  }
+
+  /**
+   * Test the traversal of two edges with different traverse modes, with a focus on walking. This
+   * test will fail unless the following three conditions are met: 1. Turn costs are computed based
+   * on the back edge's traverse mode during reverse traversal. 2. Turn costs are computed such that
+   * bike walking is taken into account correctly. 3. Enabling bike mode on a routing request bases
+   * the bike walking speed on the walking speed.
+   */
+  @Test
+  public void testTraverseModeSwitchWalk() {
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
+
+    v1.trafficLight = true;
+
+    RouteRequest forward = proto.clone();
+    forward.setMode(TraverseMode.BICYCLE);
+
+    State s0 = new State(new RoutingContext(forward, graph, v0, v2));
+    State s1 = e0.traverse(s0);
+    State s2 = e1.traverse(s1);
+
+    RouteRequest reverse = proto.clone();
+    reverse.setMode(TraverseMode.BICYCLE);
+    reverse.setArriveBy(true);
+
+    State s3 = new State(new RoutingContext(reverse, graph, v0, v2));
+    State s4 = e1.traverse(s3);
+    State s5 = e0.traverse(s4);
+
+    assertEquals(42, s2.getElapsedTimeSeconds());
+    assertEquals(42, s5.getElapsedTimeSeconds());
+  }
+
+  /**
+   * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
+   */
+  @Test
+  public void testBikeSwitch() {
+    StreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
+    StreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+
+    RouteRequest noPenalty = proto.clone();
+    noPenalty.preferences().withBike(it -> it.setSwitchTime(0).setSwitchCost(0));
+    noPenalty.setMode(TraverseMode.BICYCLE);
+
+    State s0 = new State(new RoutingContext(noPenalty, graph, v0, v0));
+    State s1 = e0.traverse(s0);
+    State s2 = e1.traverse(s1);
+    State s3 = e2.traverse(s2);
+
+    RouteRequest withPenalty = proto.clone();
+    withPenalty.preferences().withBike(it -> it.setSwitchTime(42).setSwitchCost(23));
+    withPenalty.setMode(TraverseMode.BICYCLE);
+
+    State s4 = new State(new RoutingContext(withPenalty, graph, v0, v0));
+    State s5 = e0.traverse(s4);
+    State s6 = e1.traverse(s5);
+    State s7 = e2.traverse(s6);
+
+    assertNull(s0.getBackMode());
+    assertEquals(TraverseMode.WALK, s1.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s2.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s3.getBackMode());
+
+    assertNull(s4.getBackMode());
+    assertEquals(TraverseMode.WALK, s5.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s6.getBackMode());
+    assertEquals(TraverseMode.BICYCLE, s7.getBackMode());
+
+    assertEquals(0, s0.getElapsedTimeSeconds());
+    assertEquals(0, s1.getElapsedTimeSeconds());
+    assertEquals(0, s2.getElapsedTimeSeconds());
+    assertEquals(0, s3.getElapsedTimeSeconds());
+
+    assertEquals(0.0, s0.getWeight(), 0.0);
+    assertEquals(0.0, s1.getWeight(), 0.0);
+    assertEquals(0.0, s2.getWeight(), 0.0);
+    assertEquals(0.0, s3.getWeight(), 0.0);
+
+    assertEquals(0.0, s4.getWeight(), 0.0);
+    assertEquals(0.0, s5.getWeight(), 0.0);
+    assertEquals(23.0, s6.getWeight(), 0.0);
+    assertEquals(23.0, s7.getWeight(), 0.0);
+
+    assertEquals(0, s4.getElapsedTimeSeconds());
+    assertEquals(0, s5.getElapsedTimeSeconds());
+    assertEquals(42, s6.getElapsedTimeSeconds());
+    assertEquals(42, s7.getElapsedTimeSeconds());
   }
 
   @Test
-  public void turnRestrictionFromEdgeSplitWithToVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, true);
-    var disposableEdgeCollection = new DisposableEdgeCollection(graph);
-
-    var splitResult = streetEdge1.splitNonDestructively(
-      splitVtx,
-      disposableEdgeCollection,
-      LinkingDirection.OUTGOING
+  public void testTurnRestriction() {
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
+    RouteRequest routingRequest = proto.clone();
+    RoutingContext routingContext = new RoutingContext(routingRequest, graph, v0, v2);
+    State state = new State(
+      v2,
+      Instant.EPOCH,
+      routingContext,
+      StateData.getInitialStateData(routingRequest)
     );
 
-    assertOnlyOriginalRestrictionExists();
-    assertTrue(splitResult.first.getTurnRestrictions().isEmpty());
-    assertNull(splitResult.second);
+    state.getOptions().setArriveBy(true);
+    e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
 
-    disposableEdgeCollection.disposeEdges();
-    assertOnlyOriginalRestrictionExists();
+    assertNotNull(e0.traverse(e1.traverse(state)));
   }
 
   @Test
-  public void turnRestrictionToEdgeSplitWithToVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, true);
-    var disposableEdgeCollection = new DisposableEdgeCollection(graph);
-
-    var splitResult = streetEdge2.splitNonDestructively(
-      splitVtx,
-      disposableEdgeCollection,
-      LinkingDirection.OUTGOING
+  public void testElevationProfile() {
+    var elevationProfile = new PackedCoordinateSequence.Double(
+      new double[] { 0, 10, 50, 12 },
+      2,
+      0
     );
+    StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL, elevationProfile);
 
-    var turnRestrictions = streetEdge1.getTurnRestrictions();
-    assertEquals(2, turnRestrictions.size());
+    assertArrayEquals(
+      elevationProfile.toCoordinateArray(),
+      e0.getElevationProfile().toCoordinateArray()
+    );
+  }
 
-    assertOriginalRestrictionExists();
-    assertEquals(splitResult.first, addedRestriction(streetEdge1).to);
+  /****
+   * Private Methods
+   ****/
 
-    disposableEdgeCollection.disposeEdges();
-    assertOnlyOriginalRestrictionExists();
+  private IntersectionVertex vertex(String label, double x, double y) {
+    return new IntersectionVertex(graph, label, x, y);
+  }
+
+  /**
+   * Create an edge. If twoWay, create two edges (back and forth).
+   */
+  private StreetEdge edge(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    StreetTraversalPermission perm
+  ) {
+    String labelA = vA.getLabel();
+    String labelB = vB.getLabel();
+    String name = String.format("%s_%s", labelA, labelB);
+    Coordinate[] coords = new Coordinate[2];
+    coords[0] = vA.getCoordinate();
+    coords[1] = vB.getCoordinate();
+    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+    return new StreetEdge(vA, vB, geom, name, length, perm, false);
+  }
+
+  private StreetEdge edge(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    StreetTraversalPermission perm,
+    PackedCoordinateSequence elevationProfile
+  ) {
+    String labelA = vA.getLabel();
+    String labelB = vB.getLabel();
+    String name = String.format("%s_%s", labelA, labelB);
+    Coordinate[] coords = new Coordinate[2];
+    coords[0] = vA.getCoordinate();
+    coords[1] = vB.getCoordinate();
+    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+    var edge = new StreetEdge(vA, vB, geom, name, length, perm, false);
+    StreetElevationExtension.addToEdge(edge, elevationProfile, false);
+    return edge;
   }
 
   @Test
-  public void turnRestrictionFromEdgeSplitWithFromVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 0.0, streetEdge1, false);
-    var disposableEdgeCollection = new DisposableEdgeCollection(graph);
+  public void testBikeOptimizeTriangle() {
+    // This test does not depend on the setup method - and can probably be simplified
 
-    var splitResult = streetEdge1.splitNonDestructively(
-      splitVtx,
-      disposableEdgeCollection,
-      LinkingDirection.INCOMING
+    Coordinate c1 = new Coordinate(-122.575033, 45.456773);
+    Coordinate c2 = new Coordinate(-122.576668, 45.451426);
+
+    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, (NonLocalizedString) null);
+    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, (NonLocalizedString) null);
+
+    GeometryFactory factory = new GeometryFactory();
+    LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+
+    double length = 650.0;
+
+    StreetEdge testStreet = new StreetEdge(
+      v1,
+      v2,
+      geometry,
+      "Test Lane",
+      length,
+      StreetTraversalPermission.ALL,
+      false
     );
+    testStreet.setBicycleSafetyFactor(0.74f); // a safe street
 
-    assertOnlyOriginalRestrictionExists();
+    Coordinate[] profile = new Coordinate[] {
+      new Coordinate(0, 0), // slope = 0.1
+      new Coordinate(length / 2, length / 20.0),
+      new Coordinate(length, 0), // slope = -0.1
+    };
+    PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
+    StreetElevationExtension.addToEdge(testStreet, elev, false);
 
-    assertEquals(streetEdge2, addedRestriction(splitResult.second).to);
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
+    double trueLength = costs.lengthMultiplier * length;
+    double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
+    double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
-    disposableEdgeCollection.disposeEdges();
+    var request = new RouteRequest(TraverseMode.BICYCLE);
 
-    assertOnlyOriginalRestrictionExists();
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
-  }
+    request
+      .preferences()
+      .withBike(bike ->
+        bike
+          .setSpeed(SPEED)
+          .setOptimizeType(BicycleOptimizeType.TRIANGLE)
+          .withOptimizeTriangle(it -> it.withTime(1))
+      );
+    request.preferences().setAllStreetReluctance(1);
 
-  @Test
-  public void turnRestrictionToEdgeSplitWithFromVertex() {
-    var splitVtx = new TemporarySplitterVertex("Split_Vertex", 1.0, 1.0, streetEdge2, false);
-    var disposableEdgeCollection = new DisposableEdgeCollection(graph);
+    State startState = new State(v1, request, null);
+    State result = testStreet.traverse(startState);
+    double timeWeight = result.getWeight();
+    double expectedTimeWeight = slopeSpeedLength / SPEED;
+    assertEquals(expectedTimeWeight, result.getWeight(), DELTA);
 
-    var splitResult = streetEdge2.splitNonDestructively(
-      splitVtx,
-      disposableEdgeCollection,
-      LinkingDirection.INCOMING
-    );
+    request.preferences().withBike(bike -> bike.withOptimizeTriangle(it -> it.withSlope(1)));
+    startState = new State(v1, request, null);
+    result = testStreet.traverse(startState);
+    double slopeWeight = result.getWeight();
+    double expectedSlopeWeight = slopeWorkLength / SPEED;
+    assertEquals(expectedSlopeWeight, slopeWeight, DELTA);
+    assertTrue(length * 1.5 / SPEED < slopeWeight);
+    assertTrue(length * 1.5 * 10 / SPEED > slopeWeight);
 
-    assertOnlyOriginalRestrictionExists();
-    assertTrue(splitResult.second.getTurnRestrictions().isEmpty());
+    request.preferences().withBike(bike -> bike.withOptimizeTriangle(it -> it.withSafety(1)));
+    startState = new State(v1, request, null);
+    result = testStreet.traverse(startState);
+    double slopeSafety = costs.slopeSafetyCost;
+    double safetyWeight = result.getWeight();
+    double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / SPEED;
+    assertEquals(expectedSafetyWeight, safetyWeight, DELTA);
 
-    disposableEdgeCollection.disposeEdges();
-    assertOnlyOriginalRestrictionExists();
-  }
-
-  private Graph graph() {
-    return graphOf(
-      new Builder() {
-        @Override
-        public void build() {
-          V1 = intersection("V1", 0.0, 0.0);
-          V2 = intersection("V2", 2.0, 0.0);
-
-          streetEdge1 = street(V2, V1, 100, StreetTraversalPermission.ALL);
-          streetEdge2 = street(V1, V2, 100, StreetTraversalPermission.ALL);
-
-          originalTurnRestriction = disallowTurn(streetEdge1, streetEdge2);
-        }
-      }
-    );
-  }
-
-  private void assertOriginalRestrictionExists() {
-    var turnRestrictions = streetEdge1.getTurnRestrictions();
-    assertTrue(turnRestrictions.contains(originalTurnRestriction));
-  }
-
-  private void assertOnlyOriginalRestrictionExists() {
-    var turnRestrictions = streetEdge1.getTurnRestrictions();
-    assertEquals(1, turnRestrictions.size());
-    assertEquals(originalTurnRestriction, turnRestrictions.get(0));
-  }
-
-  private void assertOriginalRestrictionMissing() {
-    var turnRestrictions = streetEdge1.getTurnRestrictions();
-    assertFalse(turnRestrictions.contains(originalTurnRestriction));
-  }
-
-  private TurnRestriction addedRestriction(StreetEdge streetEdge) {
-    return streetEdge
-      .getTurnRestrictions()
-      .stream()
-      .filter(tr -> tr != originalTurnRestriction)
-      .findFirst()
-      .orElseThrow();
-  }
-
-  private TurnRestriction disallowTurn(StreetEdge from, StreetEdge to) {
-    TurnRestrictionType restrictionType = TurnRestrictionType.NO_TURN;
-    TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-    TurnRestriction restrict = new TurnRestriction(
-      from,
-      to,
-      restrictionType,
-      restrictedModes,
-      null
-    );
-    from.addTurnRestriction(restrict);
-    return restrict;
+    request
+      .preferences()
+      .withBike(bike -> bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1)));
+    startState = new State(v1, request, null);
+    result = testStreet.traverse(startState);
+    double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;
+    assertEquals(expectedWeight, result.getWeight(), DELTA);
   }
 }

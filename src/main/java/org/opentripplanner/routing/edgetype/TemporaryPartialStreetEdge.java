@@ -4,11 +4,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 public final class TemporaryPartialStreetEdge extends StreetEdge implements TemporaryEdge {
-
-  private static final long serialVersionUID = 1L;
 
   /**
    * The edge on which this lies.
@@ -53,14 +51,6 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
     super(v1, v2, geometry, name, parentEdge.getPermission(), back);
     this.parentEdge = parentEdge;
     this.geometry = super.getGeometry();
-  }
-
-  /**
-   * Partial edges are always partial.
-   */
-  @Override
-  public boolean isPartial() {
-    return true;
   }
 
   /**

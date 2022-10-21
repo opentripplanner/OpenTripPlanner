@@ -2,16 +2,17 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
 import graphql.scalars.ExtendedScalars;
+import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
+import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.util.ResourceBundleSingleton;
 
 public class TripType {
 
@@ -32,7 +33,7 @@ public class TripType {
           .name("dateTime")
           .description("The time and date of travel")
           .type(gqlUtil.dateTimeScalar)
-          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.getTime())
+          .dataFetcher(env -> ((PlanResponse) env.getSource()).plan.date.toEpochMilli())
           .build()
       )
       .field(
@@ -93,12 +94,13 @@ public class TripType {
           .deprecate("Use routingErrors instead")
           .description("A list of possible error messages in cleartext")
           .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
+          .argument(
+            GraphQLArgument.newArgument().name("language").type(Scalars.GraphQLString).build()
+          )
           .dataFetcher(env ->
             ((PlanResponse) env.getSource()).messages.stream()
               .map(routingError -> PlannerErrorMapper.mapMessage(routingError).message)
-              .map(message ->
-                message.get(ResourceBundleSingleton.INSTANCE.getLocale(env.getArgument("locale")))
-              )
+              .map(message -> message.get(TransmodelGraphQLUtils.getLocale(env)))
               .collect(Collectors.toList())
           )
           .build()

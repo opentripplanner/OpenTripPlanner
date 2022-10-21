@@ -6,9 +6,9 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.PatternRide;
-import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
+import org.opentripplanner.transit.raptor.api.view.PatternRideView;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.DebugHandler;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
 /**
@@ -25,7 +25,7 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
 
   private final DebugHandler<ArrivalView<?>> stopHandler;
   private final DebugHandler<Path<?>> pathHandler;
-  private final DebugHandler<PatternRide<?>> patternRideHandler;
+  private final DebugHandler<PatternRideView<?>> patternRideHandler;
   private final DebugLogger logger;
 
   public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
@@ -70,7 +70,7 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   /* PatternRide */
 
   @Nullable
-  public ParetoSetEventListener<PatternRide<?>> paretoSetPatternRideListener() {
+  public ParetoSetEventListener<PatternRideView<?>> paretoSetPatternRideListener() {
     return patternRideHandler == null
       ? null
       : new ParetoSetDebugHandlerAdapter<>(patternRideHandler);

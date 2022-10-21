@@ -4,25 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVehicleParkingLink;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class VehicleParkingLinkingTest {
 
   private Graph graph;
+  private TransitModel transitModel;
   private IntersectionVertex A;
   private IntersectionVertex B;
 
@@ -31,6 +30,7 @@ public class VehicleParkingLinkingTest {
     VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
     graphData.initGraph();
     graph = graphData.getGraph();
+    transitModel = graphData.getTransitModel();
     A = graphData.getAVertex();
     B = graphData.getBVertex();
   }
@@ -43,8 +43,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     assertEquals(1, parkingVertex.getOutgoing().size());
     parkingVertex.getOutgoing().forEach(e -> assertEquals(e.getToVertex(), A));
@@ -63,8 +62,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(2, streetLinks.size());
@@ -90,8 +88,7 @@ public class VehicleParkingLinkingTest {
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     var streetLinks = graph.getEdgesOfType(StreetVehicleParkingLink.class);
     assertEquals(4, streetLinks.size());
@@ -115,8 +112,7 @@ public class VehicleParkingLinkingTest {
 
     graph.remove(A);
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     assertEquals(1, vehicleParking.getEntrances().size());
 
@@ -135,14 +131,13 @@ public class VehicleParkingLinkingTest {
       .entrance(builder -> builder.entranceId(id("Entrance-1")).vertex(A).walkAccessible(true))
       .build();
 
-    var vehicleParkingService = graph.getService(VehicleParkingService.class, true);
+    var vehicleParkingService = graph.getVehicleParkingService();
     vehicleParkingService.addVehicleParking(vehicleParking);
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
     graph.remove(A);
 
-    StreetLinkerModule streetLinkerModule = new StreetLinkerModule();
-    streetLinkerModule.buildGraph(graph, new HashMap<>(), new DataImportIssueStore(false));
+    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 

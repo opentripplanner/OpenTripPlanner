@@ -47,6 +47,14 @@
   [#4128](https://github.com/opentripplanner/OpenTripPlanner/pull/4128)
 - Expose stop-to-stop journey pattern geometries
   [#4161](https://github.com/opentripplanner/OpenTripPlanner/pull/4161)
+- Add possibility to filter dated service journeys by replacementFor
+  [#4198](https://github.com/opentripplanner/OpenTripPlanner/pull/4198)
+- Add support for groupOfLines in top level query
+  [#4232](https://github.com/opentripplanner/OpenTripPlanner/pull/4232)
+- Fix issue when ServiceJourney is created by an updater and expose necessary information via DSJ
+  [#4365](https://github.com/opentripplanner/OpenTripPlanner/pull/4365)
+- Allow specifying allowed/banned rental networks in trip query
+  [#4459](https://github.com/opentripplanner/OpenTripPlanner/pull/4459)
 
 ## Documentation
 

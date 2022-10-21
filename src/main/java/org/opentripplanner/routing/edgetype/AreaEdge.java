@@ -2,11 +2,10 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 public class AreaEdge extends StreetEdge {
 
-  private static final long serialVersionUID = 6761687673982054612L;
   private final AreaEdgeList area;
 
   public AreaEdge(

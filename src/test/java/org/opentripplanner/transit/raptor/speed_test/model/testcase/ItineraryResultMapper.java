@@ -3,19 +3,20 @@ package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.raptor.util.PathStringBuilder;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 
 /**
  * Map an Itinerary to a result instance. We do this to normalize the Itinerary for the purpose of
@@ -28,7 +29,6 @@ class ItineraryResultMapper {
 
   private static final Map<String, String> AGENCY_NAMES_SHORT = new HashMap<>();
 
-  private final boolean skipCost;
   private final String testCaseId;
 
   static {
@@ -66,25 +66,24 @@ class ItineraryResultMapper {
     AGENCY_NAMES_SHORT.put("Østfold kollektivtrafikk", "ØstKol");
   }
 
-  private ItineraryResultMapper(boolean skipCost, String testCaseId) {
-    this.skipCost = skipCost;
+  private ItineraryResultMapper(String testCaseId) {
     this.testCaseId = testCaseId;
   }
 
   public static String details(Itinerary itin) {
     PathStringBuilder buf = new PathStringBuilder(Integer::toString, true);
 
-    for (Leg leg : itin.legs) {
+    for (Leg leg : itin.getLegs()) {
       Optional
         .ofNullable(leg.getFrom().stop)
         .map(ItineraryResultMapper::formatStop)
         .map(id -> buf.sep().stop(id).sep());
 
       if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration());
-      } else if (leg.isTransitLeg()) {
+        buf.walk((int) leg.getDuration().toSeconds());
+      } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
-          leg.getMode().name() + " " + leg.getRoute().getShortName(),
+          transitLeg.getMode().name() + " " + leg.getRoute().getShortName(),
           leg.getStartTime().get(ChronoField.SECOND_OF_DAY),
           leg.getEndTime().get(ChronoField.SECOND_OF_DAY)
         );
@@ -95,10 +94,9 @@ class ItineraryResultMapper {
 
   static Collection<Result> map(
     final String testCaseId,
-    Collection<org.opentripplanner.model.plan.Itinerary> itineraries,
-    boolean skipCost
+    Collection<org.opentripplanner.model.plan.Itinerary> itineraries
   ) {
-    var mapper = new ItineraryResultMapper(skipCost, testCaseId);
+    var mapper = new ItineraryResultMapper(testCaseId);
     return itineraries.stream().map(mapper::map).collect(Collectors.toList());
   }
 
@@ -113,14 +111,16 @@ class ItineraryResultMapper {
   private Result map(Itinerary itinerary) {
     List<String> agencies = new ArrayList<>();
     List<String> routes = new ArrayList<>();
-    Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
+    Set<Enum<?>> modes = new HashSet<>();
     List<String> stops = new ArrayList<>();
 
-    for (Leg it : itinerary.legs) {
-      if (it.isTransitLeg()) {
+    for (Leg it : itinerary.getLegs()) {
+      if (it instanceof TransitLeg trLeg) {
         agencies.add(agencyShortName(it.getAgency()));
         routes.add(it.getRoute().getName());
-        modes.add(it.getMode());
+        modes.add(trLeg.getMode());
+      } else if (it instanceof StreetLeg streetLeg) {
+        modes.add(streetLeg.getMode());
       }
       if (it.getTo().stop != null) {
         stops.add(it.getTo().stop.getId().toString());
@@ -129,10 +129,11 @@ class ItineraryResultMapper {
 
     return new Result(
       testCaseId,
-      itinerary.nTransfers,
-      itinerary.durationSeconds,
-      itinerary.generalizedCost,
-      itinerary.legs
+      itinerary.getNumberOfTransfers(),
+      itinerary.getDuration(),
+      itinerary.getGeneralizedCost(),
+      itinerary
+        .getLegs()
         .stream()
         .filter(Leg::isWalkingLeg)
         .mapToInt(l -> (int) Math.round(l.getDistanceMeters()))

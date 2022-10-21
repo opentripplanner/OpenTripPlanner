@@ -1,16 +1,16 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class TripTimeShortHelper {
 
@@ -85,7 +85,7 @@ public class TripTimeShortHelper {
     TripTimes tripTimes = transitLeg.getTripTimes();
     TripPattern tripPattern = transitLeg.getTripPattern();
     Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
-    ServiceDate serviceDate = transitLeg.getServiceDate();
+    LocalDate serviceDate = transitLeg.getServiceDate();
     return IntStream
       .range(0, tripPattern.numberOfStops())
       .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
@@ -104,7 +104,7 @@ public class TripTimeShortHelper {
     TripTimes tripTimes = transitLeg.getTripTimes();
     TripPattern tripPattern = transitLeg.getTripPattern();
     Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
-    ServiceDate serviceDate = transitLeg.getServiceDate();
+    LocalDate serviceDate = transitLeg.getServiceDate();
     return IntStream
       .range(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern())
       .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)

@@ -34,21 +34,21 @@ public class WalkStepMapper {
     }
     ApiWalkStep api = new ApiWalkStep();
 
-    api.distance = domain.distance;
-    api.relativeDirection = mapRelativeDirection(domain.relativeDirection);
-    api.streetName = domain.streetName.toString(locale);
-    api.absoluteDirection = mapAbsoluteDirection(domain.absoluteDirection);
-    api.exit = domain.exit;
-    api.stayOn = domain.stayOn;
-    api.area = domain.area;
-    api.bogusName = domain.bogusName;
-    if (domain.startLocation != null) {
-      api.lon = domain.startLocation.longitude();
-      api.lat = domain.startLocation.latitude();
+    api.distance = domain.getDistance();
+    api.relativeDirection = mapRelativeDirection(domain.getRelativeDirection());
+    api.streetName = domain.getStreetName().toString(locale);
+    api.absoluteDirection = mapAbsoluteDirection(domain.getAbsoluteDirection());
+    api.exit = domain.getExit();
+    api.stayOn = domain.getStayOn();
+    api.area = domain.getArea();
+    api.bogusName = domain.getBogusName();
+    if (domain.getStartLocation() != null) {
+      api.lon = domain.getStartLocation().longitude();
+      api.lat = domain.getStartLocation().latitude();
     }
-    api.elevation = mapElevation(domain.elevation);
-    api.walkingBike = domain.walkingBike;
-    api.alerts = alertsMapper.mapToApi(domain.streetNotes);
+    api.elevation = mapElevation(domain.getRoundedElevation());
+    api.walkingBike = domain.isWalkingBike();
+    api.alerts = alertsMapper.mapToApi(domain.getStreetNotes());
 
     return api;
   }

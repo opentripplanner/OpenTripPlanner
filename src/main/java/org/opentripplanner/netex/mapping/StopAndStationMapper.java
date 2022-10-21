@@ -15,15 +15,15 @@ import java.util.stream.Collectors;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.Issue;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.issues.StopPlaceWithoutQuays;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.StopPlaceVersionAndValidityComparator;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -47,7 +47,7 @@ class StopAndStationMapper {
 
   private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
   private final StationMapper stationMapper;
-  private final StopMapper stopMapper;
+  private final QuayMapper quayMapper;
   private final TariffZoneMapper tariffZoneMapper;
   private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
   private final DataImportIssueStore issueStore;
@@ -57,7 +57,7 @@ class StopAndStationMapper {
    */
   private final Set<String> quaysAlreadyProcessed = new HashSet<>();
 
-  final List<Stop> resultStops = new ArrayList<>();
+  final List<RegularStop> resultStops = new ArrayList<>();
   final List<Station> resultStations = new ArrayList<>();
   final Multimap<String, Station> resultStationByMultiModalStationRfs = ArrayListMultimap.create();
 
@@ -68,7 +68,7 @@ class StopAndStationMapper {
     DataImportIssueStore issueStore
   ) {
     this.stationMapper = new StationMapper(issueStore, idFactory);
-    this.stopMapper = new StopMapper(idFactory, issueStore);
+    this.quayMapper = new QuayMapper(idFactory, issueStore);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;
@@ -92,7 +92,7 @@ class StopAndStationMapper {
     // were deleted in never versions of the StopPlace
     for (StopPlace stopPlace : stopPlaceAllVersions) {
       for (Quay quay : listOfQuays(stopPlace)) {
-        addNewStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
+        addStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);
       }
     }
   }
@@ -103,6 +103,7 @@ class StopAndStationMapper {
 
   private Station mapStopPlaceAllVersionsToStation(StopPlace stopPlace) {
     Station station = stationMapper.map(stopPlace);
+
     if (stopPlace.getParentSiteRef() != null) {
       resultStationByMultiModalStationRfs.put(stopPlace.getParentSiteRef().getRef(), station);
     }
@@ -153,7 +154,7 @@ class StopAndStationMapper {
       .collect(toList());
   }
 
-  private void addNewStopToParentIfNotPresent(
+  private void addStopToParentIfNotPresent(
     Quay quay,
     Station station,
     Collection<FareZone> fareZones,
@@ -173,12 +174,10 @@ class StopAndStationMapper {
 
     var wheelchair = wheelchairAccessibilityFromQuay(quay, stopPlace);
 
-    Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
+    RegularStop stop = quayMapper.mapQuayToStop(quay, station, fareZones, transitMode, wheelchair);
     if (stop == null) {
       return;
     }
-
-    station.addChildStop(stop);
 
     resultStops.add(stop);
     quaysAlreadyProcessed.add(quay.getId());
@@ -223,14 +222,14 @@ class StopAndStationMapper {
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */
-  private WheelchairAccessibility wheelchairAccessibilityFromQuay(Quay quay, StopPlace stopPlace) {
-    var defaultWheelChairBoarding = WheelchairAccessibility.NO_INFORMATION;
+  private Accessibility wheelchairAccessibilityFromQuay(Quay quay, StopPlace stopPlace) {
+    var defaultWheelChairBoarding = Accessibility.NO_INFORMATION;
 
     if (stopPlace != null) {
       defaultWheelChairBoarding =
         WheelChairMapper.wheelchairAccessibility(
           stopPlace.getAccessibilityAssessment(),
-          WheelchairAccessibility.NO_INFORMATION
+          Accessibility.NO_INFORMATION
         );
     }
 

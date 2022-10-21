@@ -2,9 +2,10 @@ package org.opentripplanner.datastore.file;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.zip.ZipEntry;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 public class ZipFileEntryDataSource implements DataSource {
 
@@ -24,6 +25,11 @@ public class ZipFileEntryDataSource implements DataSource {
   @Override
   public String path() {
     return name() + " (" + dataSource.path() + ")";
+  }
+
+  @Override
+  public URI uri() {
+    return URI.create(path());
   }
 
   @Override

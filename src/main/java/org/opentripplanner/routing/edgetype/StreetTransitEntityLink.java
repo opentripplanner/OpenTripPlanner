@@ -2,15 +2,16 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -20,43 +21,22 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   extends Edge
   implements CarPickupableEdge {
 
-  private static final long serialVersionUID = -3311099256178798981L;
   static final int STEL_TRAVERSE_COST = 1;
 
   private final T transitEntityVertex;
 
-  private final WheelchairAccessibility wheelchairAccessibility;
+  private final Accessibility wheelchairAccessibility;
 
-  public StreetTransitEntityLink(
-    StreetVertex fromv,
-    T tov,
-    WheelchairAccessibility wheelchairAccessibility
-  ) {
+  public StreetTransitEntityLink(StreetVertex fromv, T tov, Accessibility wheelchairAccessibility) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public StreetTransitEntityLink(
-    T fromv,
-    StreetVertex tov,
-    WheelchairAccessibility wheelchairAccessibility
-  ) {
+  public StreetTransitEntityLink(T fromv, StreetVertex tov, Accessibility wheelchairAccessibility) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairAccessibility = wheelchairAccessibility;
-  }
-
-  public Vertex getFromVertex() {
-    return fromv;
-  }
-
-  public Vertex getToVertex() {
-    return tov;
-  }
-
-  public String getDirection() {
-    return null;
   }
 
   public String toString() {
@@ -80,31 +60,32 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       return null;
     }
 
-    RoutingRequest req = s0.getOptions();
+    RouteRequest req = s0.getOptions();
+    RoutingPreferences pref = s0.getPreferences();
 
     // Do not check here whether any transit modes are selected. A check for the presence of
     // transit modes will instead be done in the following PreBoard edge.
     // This allows searching for nearby transit stops using walk-only options.
     StateEditor s1 = s0.edit(this);
 
-    var accessibility = s0.getOptions().wheelchairAccessibility;
-    if (accessibility.enabled()) {
+    if (req.wheelchair()) {
+      var accessibility = pref.wheelchair();
       if (
-        accessibility.stops().onlyConsiderAccessible() &&
-        wheelchairAccessibility != WheelchairAccessibility.POSSIBLE
+        accessibility.stop().onlyConsiderAccessible() &&
+        wheelchairAccessibility != Accessibility.POSSIBLE
       ) {
         return null;
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NO_INFORMATION) {
-        s1.incrementWeight(req.wheelchairAccessibility.stops().unknownCost());
-      } else if (wheelchairAccessibility == WheelchairAccessibility.NOT_POSSIBLE) {
-        s1.incrementWeight(req.wheelchairAccessibility.stops().inaccessibleCost());
+      } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
+        s1.incrementWeight(accessibility.stop().unknownCost());
+      } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
+        s1.incrementWeight(accessibility.stop().inaccessibleCost());
       }
     }
 
     switch (s0.getNonTransitMode()) {
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
-        if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
+        if (req.parkAndRide && !s0.isVehicleParked()) {
           return null;
         }
         // Forbid taking a (station) rental vehicle in the station. This allows taking along
@@ -113,7 +94,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
           s0.isRentingVehicleFromStation() &&
           !(
             s0.mayKeepRentedVehicleAtDestination() &&
-            s0.getOptions().allowKeepingRentedVehicleAtDestination
+            req.journey().rental().allowArrivingInRentedVehicleAtDestination()
           )
         ) {
           return null;
@@ -122,7 +103,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         break;
       case CAR:
         // Forbid taking your own car in the station if bike P+R activated.
-        if (s0.getOptions().parkAndRide && !s0.isVehicleParked()) {
+        if (req.parkAndRide && !s0.isVehicleParked()) {
           return null;
         }
         // For Kiss & Ride allow dropping of the passenger before entering the station
@@ -145,9 +126,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     if (
       s0.isRentingVehicleFromStation() &&
       s0.mayKeepRentedVehicleAtDestination() &&
-      s0.getOptions().allowKeepingRentedVehicleAtDestination
+      req.journey().rental().allowArrivingInRentedVehicleAtDestination()
     ) {
-      s1.incrementWeight(s0.getOptions().keepingRentedVehicleAtDestinationCost);
+      s1.incrementWeight(pref.rental().arrivingInRentalVehicleAtDestinationCost());
     }
 
     s1.setBackMode(null);
@@ -179,7 +160,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return transitEntityVertex;
   }
 
-  boolean isLeavingStreetNetwork(RoutingRequest req) {
-    return (req.arriveBy ? fromv : tov) == getTransitEntityVertex();
+  boolean isLeavingStreetNetwork(RouteRequest req) {
+    return (req.arriveBy() ? fromv : tov) == getTransitEntityVertex();
   }
 }

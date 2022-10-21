@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
 /**
  * A named area is a subset of an area with a certain set of properties (name, safety, etc). Its
@@ -11,13 +11,13 @@ import org.opentripplanner.util.I18NString;
  */
 public class NamedArea implements Serializable {
 
-  private static final long serialVersionUID = 3570078249065754760L;
-
   private Geometry originalEdges;
 
   private I18NString name;
 
   private double bicycleSafetyMultiplier;
+
+  private double walkSafetyMultiplier;
 
   private int streetClass;
 
@@ -45,6 +45,14 @@ public class NamedArea implements Serializable {
 
   public void setBicycleSafetyMultiplier(double bicycleSafetyMultiplier) {
     this.bicycleSafetyMultiplier = bicycleSafetyMultiplier;
+  }
+
+  public double getWalkSafetyMultiplier() {
+    return walkSafetyMultiplier;
+  }
+
+  public void setWalkSafetyMultiplier(double walkSafetyMultiplier) {
+    this.walkSafetyMultiplier = walkSafetyMultiplier;
   }
 
   public StreetTraversalPermission getPermission() {

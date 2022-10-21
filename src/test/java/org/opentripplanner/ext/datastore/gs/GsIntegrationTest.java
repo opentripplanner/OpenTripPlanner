@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.datastore.gs;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.datastore.gs.GsHelper.toUri;
 
 import java.io.IOException;
@@ -11,12 +11,12 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collection;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * This is a manual integration test to test the Google Cloud Storage integration. To set up the
@@ -28,7 +28,9 @@ import org.opentripplanner.datastore.FileType;
  * credentials have the proper rights. If the test run, then OTP should also run with the same
  * credentials.
  */
-@Ignore("This test is a manual integration test, because it require an Google Cloud Store to run.")
+@Disabled(
+  "This test is a manual integration test, because it require an Google Cloud Store to run."
+)
 public class GsIntegrationTest {
 
   private static final String CREDENTIALS_FILE =
@@ -39,7 +41,7 @@ public class GsIntegrationTest {
 
   private GsDataSourceRepository repo;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // Open a repository
     repo = new GsDataSourceRepository(CREDENTIALS_FILE);
@@ -65,7 +67,7 @@ public class GsIntegrationTest {
     // Assert content have at least one file
     content = dir.content();
     assertTrue(dir.exists());
-    assertTrue(content.toString(), content.size() > 0);
+    assertTrue(content.size() > 0, content.toString());
     // And the new file have the expected content
     assertEquals(DATA, IOUtils.toString(dir.entry("a.txt").asInputStream(), UTF_8));
 
@@ -75,15 +77,15 @@ public class GsIntegrationTest {
     // Verify there is no data
     assertFalse(dir.exists());
     content = dir.content();
-    assertEquals(content.toString(), 0, content.size());
+    assertEquals(0, content.size(), content.toString());
 
     // Write a file
     writeDataToDataSource(dir.entry("b.txt"));
 
     content = dir.content();
     // Assert file is moved
-    assertEquals(content.toString(), 1, content.size());
-    assertTrue(content.toString(), content.toString().contains("my-test-dir/b.txt"));
+    assertEquals(1, content.size(), content.toString());
+    assertTrue(content.toString().contains("my-test-dir/b.txt"), content.toString());
 
     // Cleanup
     dir.delete();
@@ -119,8 +121,8 @@ public class GsIntegrationTest {
     assertEquals("temp-dir/ds.txt", ds.name());
     assertEquals("gs://" + BUCKET_NAME + "/temp-dir/ds.txt", ds.path());
     assertEquals(FileType.UNKNOWN, ds.type());
-    assertTrue("LastModified: " + ds.lastModified(), ds.lastModified() > 0);
-    assertTrue("Size: " + ds.size(), ds.size() > 0);
+    assertTrue(ds.lastModified() > 0, "LastModified: " + ds.lastModified());
+    assertTrue(ds.size() > 0, "Size: " + ds.size());
     assertTrue(ds.isWritable());
     assertEquals(DATA, IOUtils.toString(ds.asInputStream(), UTF_8));
 
@@ -135,7 +137,7 @@ public class GsIntegrationTest {
 
     DataSource stops = ds.entry("stops.txt");
     String text = IOUtils.toString(stops.asInputStream(), UTF_8);
-    assertTrue(text, text.contains("stop"));
+    assertTrue(text.contains("stop"), text);
   }
 
   private void cleanUpDir(String dir) {

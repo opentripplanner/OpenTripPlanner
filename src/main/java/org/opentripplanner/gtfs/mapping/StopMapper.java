@@ -1,38 +1,40 @@
 package org.opentripplanner.gtfs.mapping;
 
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
-import org.opentripplanner.model.FareZone;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.I18NString;
+import java.util.function.Function;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.FareZone;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.util.MapUtils;
-import org.opentripplanner.util.TranslationHelper;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
 
-  private final Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
 
   private final TranslationHelper translationHelper;
+  private final Function<FeedScopedId, Station> stationLookUp;
 
-  StopMapper(TranslationHelper translationHelper) {
+  StopMapper(TranslationHelper translationHelper, Function<FeedScopedId, Station> stationLookUp) {
     this.translationHelper = translationHelper;
+    this.stationLookUp = stationLookUp;
   }
 
-  Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
+  Collection<RegularStop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
     return MapUtils.mapToList(allStops, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  Stop map(org.onebusaway.gtfs.model.Stop orginal) {
+  RegularStop map(org.onebusaway.gtfs.model.Stop orginal) {
     return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
   }
 
-  private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+  private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(
         "Expected type " +
@@ -43,59 +45,56 @@ class StopMapper {
     }
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
+    RegularStopBuilder builder = RegularStop
+      .of(base.getId())
+      .withCode(base.getCode())
+      .withCoordinate(base.getCoordinate())
+      .withWheelchairAccessibility(base.getWheelchairAccessibility())
+      .withLevel(base.getLevel())
+      .withPlatformCode(gtfsStop.getPlatformCode())
+      .withVehicleType(TransitModeMapper.mapMode(gtfsStop.getVehicleType()));
 
-    // Map single GTFS ZoneId to OTP TariffZone collection
-    Collection<FareZone> fareZones = getTariffZones(
-      gtfsStop.getZoneId(),
-      gtfsStop.getId().getAgencyId()
+    builder.withName(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "name",
+        base.getId().getId(),
+        base.getName()
+      )
     );
 
-    final I18NString name = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "name",
-      base.getId().getId(),
-      base.getName()
+    builder.withDescription(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "desc",
+        base.getId().getId(),
+        base.getDescription()
+      )
     );
 
-    final I18NString desc = translationHelper.getTranslation(
-      org.onebusaway.gtfs.model.Stop.class,
-      "desc",
-      base.getId().getId(),
-      base.getDescription()
+    builder.withUrl(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "url",
+        base.getId().getId(),
+        gtfsStop.getUrl()
+      )
     );
 
-    I18NString url = null;
-
-    if (gtfsStop.getUrl() != null) {
-      url =
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Stop.class,
-          "url",
-          base.getId().getId(),
-          gtfsStop.getUrl()
-        );
+    if (gtfsStop.getZoneId() != null) {
+      builder.addFareZones(
+        FareZone.of(new FeedScopedId(gtfsStop.getId().getAgencyId(), gtfsStop.getZoneId())).build()
+      );
     }
 
-    return new Stop(
-      base.getId(),
-      name,
-      base.getCode(),
-      desc,
-      base.getCoordinate(),
-      base.getWheelchairAccessibility(),
-      base.getLevel(),
-      gtfsStop.getPlatformCode(),
-      fareZones,
-      url,
-      gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-      TransitModeMapper.mapMode(gtfsStop.getVehicleType()),
-      null
-    );
-  }
+    if (gtfsStop.getTimezone() != null) {
+      builder.withTimeZone(ZoneId.of(gtfsStop.getTimezone()));
+    }
 
-  private Collection<FareZone> getTariffZones(String zoneId, String agencyId) {
-    return zoneId != null
-      ? Collections.singletonList(new FareZone(new FeedScopedId(agencyId, zoneId), null))
-      : Collections.emptyList();
+    if (gtfsStop.getParentStation() != null) {
+      builder.withParentStation(stationLookUp.apply(base.getParentStationId()));
+    }
+
+    return builder.build();
   }
 }

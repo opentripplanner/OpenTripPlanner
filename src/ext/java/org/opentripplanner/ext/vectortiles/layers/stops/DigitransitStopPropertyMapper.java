@@ -10,28 +10,25 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 
-public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVertex> {
+public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
 
-  private final Graph graph;
+  private final TransitService transitService;
 
-  private DigitransitStopPropertyMapper(Graph graph) {
-    this.graph = graph;
+  private DigitransitStopPropertyMapper(TransitService transitService) {
+    this.transitService = transitService;
   }
 
-  public static DigitransitStopPropertyMapper create(Graph graph) {
-    return new DigitransitStopPropertyMapper(graph);
+  public static DigitransitStopPropertyMapper create(TransitService transitService) {
+    return new DigitransitStopPropertyMapper(transitService);
   }
 
   @Override
-  public Collection<T2<String, Object>> map(TransitStopVertex input) {
-    Stop stop = input.getStop();
-    Collection<TripPattern> patternsForStop = graph.index.getPatternsForStop(stop);
+  public Collection<T2<String, Object>> map(RegularStop stop) {
+    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
 
     String type = patternsForStop
       .stream()
@@ -44,18 +41,16 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
       .map(Enum::name)
       .orElse(null);
 
-    String patterns = JSONArray.toJSONString(
-      patternsForStop
+    String routes = JSONArray.toJSONString(
+      transitService
+        .getRoutesForStop(stop)
         .stream()
-        .map(tripPattern -> {
-          String headsign = tripPattern.getStopHeadsign(tripPattern.findStopPosition(stop));
-          JSONObject pattern = new JSONObject();
-          pattern.put("headsign", Optional.ofNullable(headsign).orElse(""));
-          pattern.put("type", tripPattern.getRoute().getMode().name());
-          pattern.put("shortName", tripPattern.getRoute().getShortName());
-          return pattern;
+        .map(route -> {
+          JSONObject routeObject = new JSONObject();
+          routeObject.put("gtfsType", route.getGtfsType());
+          return routeObject;
         })
-        .collect(Collectors.toList())
+        .toList()
     );
     String desc = stop.getDescription() != null ? stop.getDescription().toString() : null;
     return List.of(
@@ -70,7 +65,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVer
         stop.getParentStation() != null ? stop.getParentStation().getId() : "null"
       ),
       new T2<>("type", type),
-      new T2<>("patterns", patterns)
+      new T2<>("routes", routes)
     );
   }
 }

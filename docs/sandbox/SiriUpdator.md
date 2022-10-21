@@ -26,7 +26,7 @@ the [Norwegian SIRI profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pa
 
 ### Configuration
 
-To enable the SIRI updator you need to add it to the updators section of the `router-config.json`.
+To enable the SIRI updator you need to add it to the updaters section of the `router-config.json`.
 
 ```
 {

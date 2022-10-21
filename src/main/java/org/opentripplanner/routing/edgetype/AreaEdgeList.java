@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.operation.distance.DistanceOp;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge
@@ -22,8 +23,6 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
  */
 public class AreaEdgeList implements Serializable {
 
-  private static final long serialVersionUID = 969137349467214074L;
-
   public final HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
 
   // these are all of the original edges of the area, whether
@@ -31,10 +30,13 @@ public class AreaEdgeList implements Serializable {
   // to fix up areas after network linking.
   private final Polygon originalEdges;
 
+  public final Set<String> references;
+
   private final List<NamedArea> areas = new ArrayList<>();
 
-  public AreaEdgeList(Polygon originalEdges) {
+  public AreaEdgeList(Polygon originalEdges, Set<String> references) {
     this.originalEdges = originalEdges;
+    this.references = references;
   }
 
   /**
@@ -92,6 +94,10 @@ public class AreaEdgeList implements Serializable {
     return areas;
   }
 
+  public Geometry getGeometry() {
+    return originalEdges;
+  }
+
   private void createSegments(
     IntersectionVertex from,
     IntersectionVertex to,
@@ -111,7 +117,7 @@ public class AreaEdgeList implements Serializable {
         intersects.add(area);
       }
     }
-    if (intersects.size() > 0) {
+    if (!intersects.isEmpty()) {
       // If more than one area intersects, we pick one by random for the name & properties
       NamedArea area = intersects.get(0);
 
@@ -131,7 +137,7 @@ public class AreaEdgeList implements Serializable {
       AreaEdge backward = new AreaEdge(
         to,
         from,
-        (LineString) line.reverse(),
+        line.reverse(),
         area.getName(),
         length,
         area.getPermission(),

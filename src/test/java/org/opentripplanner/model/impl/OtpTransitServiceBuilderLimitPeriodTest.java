@@ -3,28 +3,28 @@ package org.opentripplanner.model.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.Direction;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -37,16 +37,16 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class OtpTransitServiceBuilderLimitPeriodTest {
 
-  private static final ServiceDate D0 = new ServiceDate(2020, 1, 1);
-  private static final ServiceDate D1 = new ServiceDate(2020, 1, 8);
-  private static final ServiceDate D2 = new ServiceDate(2020, 1, 15);
-  private static final ServiceDate D3 = new ServiceDate(2020, 1, 31);
+  private static final LocalDate D0 = LocalDate.of(2020, 1, 1);
+  private static final LocalDate D1 = LocalDate.of(2020, 1, 8);
+  private static final LocalDate D2 = LocalDate.of(2020, 1, 15);
+  private static final LocalDate D3 = LocalDate.of(2020, 1, 31);
   private static final FeedScopedId SERVICE_C_IN = TransitModelForTest.id("CalSrvIn");
   private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
   private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
   private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
-  private static final Stop STOP_1 = Stop.stopForTest("Stop-1", 0.0, 0.0);
-  private static final Stop STOP_2 = Stop.stopForTest("Stop-2", 0.0, 0.0);
+  private static final RegularStop STOP_1 = TransitModelForTest.stop("Stop-1").build();
+  private static final RegularStop STOP_2 = TransitModelForTest.stop("Stop-2").build();
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
   private static final List<StopTime> STOP_TIMES = List.of(
     createStopTime(STOP_1, 0),
@@ -114,7 +114,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     assertEquals(1, patternInT2.getScheduledTimetable().getTripTimes().size());
 
     // Limit service to last half of month
-    subject.limitServiceDays(new ServiceDateInterval(D2, D3), new DataImportIssueStore(false));
+    subject.limitServiceDays(new ServiceDateInterval(D2, D3));
 
     // Verify calendar
     List<ServiceCalendar> calendars = subject.getCalendars();
@@ -155,8 +155,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
   private static ServiceCalendar createServiceCalendar(
     FeedScopedId serviceId,
-    ServiceDate start,
-    ServiceDate end
+    LocalDate start,
+    LocalDate end
   ) {
     ServiceCalendar calendar = new ServiceCalendar();
     calendar.setPeriod(new ServiceDateInterval(start, end));
@@ -165,7 +165,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     return calendar;
   }
 
-  private static StopTime createStopTime(Stop stop, int time) {
+  private static StopTime createStopTime(RegularStop stop, int time) {
     StopTime st = new StopTime();
     st.setStop(stop);
     st.setDepartureTime(time);
@@ -183,9 +183,12 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     FeedScopedId patternId = TransitModelForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
-    TripPattern p = new TripPattern(patternId, route, STOP_PATTERN);
+    TripPattern p = TripPattern
+      .of(patternId)
+      .withRoute(route)
+      .withStopPattern(STOP_PATTERN)
+      .build();
 
-    p.setName("Pattern");
     for (Trip trip : trips) {
       p.add(new TripTimes(trip, STOP_TIMES, DEDUPLICATOR));
     }
@@ -196,7 +199,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     return TransitModelForTest
       .trip(id)
       .withServiceId(serviceId)
-      .withDirection(Direction.valueOfGtfsCode(1))
+      .withDirection(Direction.INBOUND)
       .withRoute(route)
       .build();
   }

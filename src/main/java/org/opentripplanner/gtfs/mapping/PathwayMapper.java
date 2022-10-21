@@ -4,8 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.StationElement;
+import org.opentripplanner.transit.model.site.Pathway;
+import org.opentripplanner.transit.model.site.PathwayBuilder;
+import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS Pathway into the OTP model. */
@@ -43,31 +44,32 @@ class PathwayMapper {
   }
 
   private Pathway doMap(org.onebusaway.gtfs.model.Pathway rhs) {
-    Pathway lhs = new Pathway(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    PathwayBuilder pathway = Pathway
+      .of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()))
+      .withPathwayMode(PathwayModeMapper.map(rhs.getPathwayMode()))
+      .withFromStop(mapStationElement(rhs.getFromStop()))
+      .withToStop(mapStationElement(rhs.getToStop()))
+      .withName(rhs.getSignpostedAs())
+      .withReversedName(rhs.getReversedSignpostedAs())
+      .withIsBidirectional(rhs.getIsBidirectional() == 1);
 
-    lhs.setPathwayMode(rhs.getPathwayMode());
     if (rhs.isTraversalTimeSet()) {
-      lhs.setTraversalTime(rhs.getTraversalTime());
+      pathway.withTraversalTime(rhs.getTraversalTime());
     }
-    lhs.setName(rhs.getSignpostedAs());
-    lhs.setReversedName(rhs.getReversedSignpostedAs());
     if (rhs.isLengthSet()) {
-      lhs.setLength(rhs.getLength());
+      pathway.withLength(rhs.getLength());
     }
     if (rhs.isStairCountSet()) {
-      lhs.setStairCount(rhs.getStairCount());
+      pathway.withStairCount(rhs.getStairCount());
     }
     if (rhs.isMaxSlopeSet()) {
-      lhs.setSlope(rhs.getMaxSlope());
+      pathway.withSlope(rhs.getMaxSlope());
     }
-    lhs.setBidirectional(rhs.getIsBidirectional() == 1);
 
-    lhs.setFromStop(mapStationElement(rhs.getFromStop()));
-    lhs.setToStop(mapStationElement(rhs.getToStop()));
-    return lhs;
+    return pathway.build();
   }
 
-  private StationElement mapStationElement(Stop stop) {
+  private StationElement<?, ?> mapStationElement(Stop stop) {
     if (stop != null) {
       switch (stop.getLocationType()) {
         case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP:

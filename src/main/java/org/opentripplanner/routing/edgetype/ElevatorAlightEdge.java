@@ -2,13 +2,13 @@ package org.opentripplanner.routing.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A relatively low cost edge for alighting from an elevator. All narrative generation is done by
@@ -18,8 +18,6 @@ import org.opentripplanner.util.I18NString;
  * @author mattwigway
  */
 public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
-
-  private static final long serialVersionUID = 3925814840369402222L;
 
   /**
    * This is the level of this elevator exit, used in narrative generation.

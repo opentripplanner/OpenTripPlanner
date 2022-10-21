@@ -1,11 +1,12 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
-import org.junit.Test;
-import org.opentripplanner.model.WgsCoordinate;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
@@ -44,21 +45,22 @@ public class WgsCoordinateMapperTest {
     assertNull(WgsCoordinateMapper.mapToDomain(p));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void handleCoordinatesWithMissingLatitude() {
     SimplePoint_VersionStructure p;
     p =
       new SimplePoint_VersionStructure()
         .withLocation(new LocationStructure().withLongitude(LONGITUDE));
-    WgsCoordinateMapper.mapToDomain(p);
+
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void handleCoordinatesWithMissingLongitude() {
     SimplePoint_VersionStructure p;
     p =
       new SimplePoint_VersionStructure()
         .withLocation(new LocationStructure().withLatitude(LATITUDE));
-    WgsCoordinateMapper.mapToDomain(p);
+    assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 }

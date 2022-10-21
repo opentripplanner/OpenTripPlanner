@@ -13,27 +13,27 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.ext.reportapi.model.BicyleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.TransfersReport;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 @Path("/report")
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
   private final TransferService transferService;
-  private final GraphIndex index;
+  private final TransitService transitService;
 
   @SuppressWarnings("unused")
-  public ReportResource(@Context OTPServer server) {
-    this.transferService = server.getRouter().graph.getTransferService();
-    this.index = server.getRouter().graph.index;
+  public ReportResource(@Context OtpServerRequestContext requestContext) {
+    this.transferService = requestContext.transitService().getTransferService();
+    this.transitService = requestContext.transitService();
   }
 
   @GET
   @Path("/transfers.csv")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public String getTransfersAsCsv() {
-    return TransfersReport.export(transferService.listAll(), index);
+    return TransfersReport.export(transferService.listAll(), transitService);
   }
 
   @GET

@@ -11,9 +11,11 @@ import org.opentripplanner.model.plan.Itinerary;
 public class ItineraryMapper {
 
   private final LegMapper legMapper;
+  private final FareMapper fareMapper;
 
   public ItineraryMapper(Locale locale, boolean addIntermediateStops) {
     this.legMapper = new LegMapper(locale, addIntermediateStops);
+    this.fareMapper = new FareMapper(locale);
   }
 
   public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
@@ -29,23 +31,23 @@ public class ItineraryMapper {
     }
     ApiItinerary api = new ApiItinerary();
 
-    api.duration = (long) domain.durationSeconds;
+    api.duration = domain.getDuration().toSeconds();
     api.startTime = GregorianCalendar.from(domain.startTime());
     api.endTime = GregorianCalendar.from(domain.endTime());
-    api.walkTime = domain.nonTransitTimeSeconds;
-    api.transitTime = domain.transitTimeSeconds;
-    api.waitingTime = domain.waitingTimeSeconds;
-    api.walkDistance = domain.nonTransitDistanceMeters;
-    api.generalizedCost = domain.generalizedCost;
-    api.elevationLost = domain.elevationLost;
-    api.elevationGained = domain.elevationGained;
-    api.transfers = domain.nTransfers;
-    api.tooSloped = domain.tooSloped;
-    api.arrivedAtDestinationWithRentedBicycle = domain.arrivedAtDestinationWithRentedVehicle;
-    api.fare = domain.fare;
-    api.legs = legMapper.mapLegs(domain.legs);
-    api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.systemNotices);
-    api.accessibilityScore = domain.accessibilityScore;
+    api.walkTime = domain.getNonTransitDuration().toSeconds();
+    api.transitTime = domain.getTransitDuration().toSeconds();
+    api.waitingTime = domain.getWaitingDuration().toSeconds();
+    api.walkDistance = domain.getNonTransitDistanceMeters();
+    api.generalizedCost = domain.getGeneralizedCost();
+    api.elevationLost = domain.getElevationLost();
+    api.elevationGained = domain.getElevationGained();
+    api.transfers = domain.getNumberOfTransfers();
+    api.tooSloped = domain.isTooSloped();
+    api.arrivedAtDestinationWithRentedBicycle = domain.isArrivedAtDestinationWithRentedVehicle();
+    api.fare = fareMapper.mapFare(domain);
+    api.legs = legMapper.mapLegs(domain.getLegs());
+    api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.getSystemNotices());
+    api.accessibilityScore = domain.getAccessibilityScore();
 
     return api;
   }

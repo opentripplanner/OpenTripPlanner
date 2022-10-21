@@ -4,22 +4,22 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLserviceTimeRangeImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLServiceTimeRange {
 
   @Override
   public DataFetcher<Long> end() {
-    return environment -> getRoutingService(environment).getTransitServiceEnds();
+    return environment -> getTransitService(environment).getTransitServiceEnds().toEpochSecond();
   }
 
   @Override
   public DataFetcher<Long> start() {
-    return environment -> getRoutingService(environment).getTransitServiceStarts();
+    return environment -> getTransitService(environment).getTransitServiceStarts().toEpochSecond();
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 }

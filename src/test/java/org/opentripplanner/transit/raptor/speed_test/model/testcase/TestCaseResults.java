@@ -74,7 +74,7 @@ class TestCaseResults {
   }
 
   void matchItineraries(Collection<Itinerary> itineraries) {
-    actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries, skipCost));
+    actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries));
     matchedResults.clear();
     matchedResults.addAll(DiffTool.diff(expected, actual, Result.comparator(skipCost)));
     status = resolveStatus();

@@ -6,14 +6,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.onebusaway.gtfs.model.Transfer;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.IgnoredGtfsTransfer;
 import org.opentripplanner.graph_builder.issues.InvalidGtfsTransfer;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -26,10 +22,10 @@ import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.util.logging.ThrottleLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for mapping GTFS Transfer into the OTP model.
@@ -38,9 +34,6 @@ import org.slf4j.LoggerFactory;
  * of transfers you want to map.
  */
 class TransferMapper {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TransferMapper.class);
-  private static final Logger FIXED_ROUTE_ERROR = ThrottleLogger.throttle(LOG);
 
   /**
    * This transfer is recommended over other transfers. The routing algorithm should prefer this
@@ -94,6 +87,7 @@ class TransferMapper {
   private final DataImportIssueStore issueStore;
 
   private final Multimap<Route, Trip> tripsByRoute = ArrayListMultimap.create();
+  private final boolean discardMinTransferTimes;
 
   TransferMapper(
     RouteMapper routeMapper,
@@ -101,6 +95,7 @@ class TransferMapper {
     StopMapper stopMapper,
     TripMapper tripMapper,
     TripStopTimes stopTimesByTrip,
+    boolean discardMinTransferTimes,
     DataImportIssueStore issueStore
   ) {
     this.routeMapper = routeMapper;
@@ -108,6 +103,7 @@ class TransferMapper {
     this.stopMapper = stopMapper;
     this.tripMapper = tripMapper;
     this.stopTimesByTrip = stopTimesByTrip;
+    this.discardMinTransferTimes = discardMinTransferTimes;
     this.issueStore = issueStore;
   }
 
@@ -126,21 +122,37 @@ class TransferMapper {
     throw new IllegalArgumentException("Mapping missing for type: " + type);
   }
 
-  Collection<ConstrainedTransfer> map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
+  TransferMappingResult map(Collection<org.onebusaway.gtfs.model.Transfer> allTransfers) {
     setup(!allTransfers.isEmpty());
 
-    return allTransfers
+    List<ConstrainedTransfer> constrainedTransfers = allTransfers
       .stream()
       .map(this::map)
       .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+      .toList();
+
+    List<StaySeatedNotAllowed> staySeatedNotAllowed = allTransfers
+      .stream()
+      .map(this::toStaySeatedNotAllowed)
+      .filter(Objects::nonNull)
+      .toList();
+
+    return new TransferMappingResult(constrainedTransfers, staySeatedNotAllowed);
+  }
+
+  private StaySeatedNotAllowed toStaySeatedNotAllowed(Transfer t) {
+    Trip fromTrip = tripMapper.map(t.getFromTrip());
+    Trip toTrip = tripMapper.map(t.getToTrip());
+    if (t.getTransferType() == STAY_SEATED_NOT_ALLOWED) {
+      return new StaySeatedNotAllowed(fromTrip, toTrip);
+    } else return null;
   }
 
   ConstrainedTransfer map(org.onebusaway.gtfs.model.Transfer rhs) {
     Trip fromTrip = tripMapper.map(rhs.getFromTrip());
     Trip toTrip = tripMapper.map(rhs.getToTrip());
 
-    TransferConstraint constraint = mapConstraint(rhs, fromTrip, toTrip);
+    TransferConstraint constraint = mapConstraint(rhs);
 
     // If this transfer do not give any advantages in the routing, then drop it
     if (constraint.isRegularTransfer()) {
@@ -181,21 +193,18 @@ class TransferMapper {
     }
   }
 
-  private TransferConstraint mapConstraint(Transfer rhs, Trip fromTrip, Trip toTrip) {
+  private TransferConstraint mapConstraint(Transfer rhs) {
     var builder = TransferConstraint.create();
 
     builder.guaranteed(rhs.getTransferType() == GUARANTEED);
 
     // A transfer is stay seated, if it is either explicitly mapped as such, or in the same block
     // and not explicitly disallowed.
-    builder.staySeated(
-      rhs.getTransferType() == STAY_SEATED ||
-      (rhs.getTransferType() != STAY_SEATED_NOT_ALLOWED && sameBlockId(fromTrip, toTrip))
-    );
+    builder.staySeated(rhs.getTransferType() == STAY_SEATED);
 
     builder.priority(mapTypeToPriority(rhs.getTransferType()));
 
-    if (rhs.isMinTransferTimeSet()) {
+    if (!discardMinTransferTimes && rhs.isMinTransferTimeSet()) {
       builder.minTransferTime(rhs.getMinTransferTime());
     }
 
@@ -210,7 +219,7 @@ class TransferMapper {
   ) {
     Route route = routeMapper.map(rhsRoute);
     Station station = null;
-    Stop stop = null;
+    RegularStop stop = null;
 
     // A transfer is specified using Stops and/or Station, according to the GTFS specification:
     //
@@ -244,7 +253,7 @@ class TransferMapper {
     throw new IllegalStateException("Should not get here!");
   }
 
-  private int stopPosition(Trip trip, Stop stop, Station station, boolean boardTrip) {
+  private int stopPosition(Trip trip, RegularStop stop, Station station, boolean boardTrip) {
     List<StopTime> stopTimes = stopTimesByTrip.get(trip);
 
     // We can board at the first stop, but not alight.
@@ -253,7 +262,7 @@ class TransferMapper {
     final int lastStopPos = stopTimes.size() - (boardTrip ? 1 : 0);
 
     Predicate<StopLocation> stopMatches = station != null
-      ? s -> (s instanceof Stop && ((Stop) s).getParentStation() == station)
+      ? s -> (s instanceof RegularStop && ((RegularStop) s).getParentStation() == station)
       : s -> s == stop;
 
     for (int i = firstStopPos; i < lastStopPos; i++) {

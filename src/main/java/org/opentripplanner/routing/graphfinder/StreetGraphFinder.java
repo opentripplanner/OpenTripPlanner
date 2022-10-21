@@ -5,18 +5,18 @@ import static java.lang.Integer.min;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A GraphFinder which uses the street network to traverse the graph in order to find the nearest
@@ -48,10 +48,10 @@ public class StreetGraphFinder implements GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService
+    TransitService transitService
   ) {
     PlaceFinderTraverseVisitor visitor = new PlaceFinderTraverseVisitor(
-      routingService,
+      transitService,
       filterByModes,
       filterByPlaceTypes,
       filterByStops,
@@ -75,9 +75,9 @@ public class StreetGraphFinder implements GraphFinder {
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
-    RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-    rr.from = new GenericLocation(null, null, lat, lon);
-    rr.walkSpeed = 1;
+    RouteRequest rr = new RouteRequest(TraverseMode.WALK);
+    rr.setFrom(new GenericLocation(null, null, lat, lon));
+    rr.preferences().withWalk(it -> it.setSpeed(1));
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.

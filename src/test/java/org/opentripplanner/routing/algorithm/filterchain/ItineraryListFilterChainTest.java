@@ -3,24 +3,26 @@ package org.opentripplanner.routing.algorithm.filterchain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Instant;
 import java.util.List;
-import org.geotools.xml.xsi.XSISimpleTypes.ID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.services.TransitAlertService;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -75,11 +77,11 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     // Walk first, then transit sorted on arrival-time
     assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
-    assertTrue(i1.systemNotices.isEmpty());
-    assertFalse(i2.systemNotices.isEmpty());
-    assertFalse(i3.systemNotices.isEmpty());
-    assertEquals("transit-vs-street-filter", i2.systemNotices.get(0).tag);
-    assertEquals("latest-departure-time-limit", i3.systemNotices.get(0).tag);
+    assertTrue(i1.getSystemNotices().isEmpty());
+    assertFalse(i2.getSystemNotices().isEmpty());
+    assertFalse(i3.getSystemNotices().isEmpty());
+    assertEquals("transit-vs-street-filter", i2.getSystemNotices().get(0).tag);
+    assertEquals("latest-departure-time-limit", i3.getSystemNotices().get(0).tag);
   }
 
   @Test
@@ -173,6 +175,43 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
       routingErrors.get(0).code
     );
+  }
+
+  @Test
+  void transitAlertsTest() {
+    var transitAlertService = Mockito.mock(TransitAlertService.class);
+
+    // Given a chain with transit alerts
+    var chain = createBuilder(false, false, 20)
+      .withTransitAlerts(transitAlertService, ignore -> null)
+      .build();
+
+    // When running it with transit itineraries
+    chain.filter(List.of(i1, i2, i3));
+
+    // Then transitAlertService should have been called with stop and route ids
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(A.stop.getId());
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(E.stop.getId());
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getRouteAlerts(BUS_ROUTE.getId());
+  }
+
+  @Test
+  public void removeItinerariesWithSameRoutesAndStops() {
+    var i1 = newItinerary(A).bus(21, T11_06, T11_28, E).bus(41, T11_30, T11_32, D).build();
+    var i2 = newItinerary(A).bus(22, T11_09, T11_30, E).bus(42, T11_32, T11_33, D).build();
+    var i3 = newItinerary(A).bus(23, T11_10, T11_32, E).bus(43, T11_33, T11_50, D).build();
+
+    var i4 = newItinerary(A).bus(31, T11_09, T11_20, D).build();
+    var i5 = newItinerary(A).bus(32, T11_10, T11_23, D).build();
+    var i6 = newItinerary(A).bus(32, T11_10, T11_23, D).build();
+
+    ItineraryListFilterChain chain = createBuilder(false, false, 10)
+      // we need to add the group-by-distance-and-id filter because it undeletes those with the
+      // fewest transfers and we want to make sure that the filter under test comes _after_
+      .addGroupBySimilarity(GroupBySimilarity.createWithOneItineraryPerGroup(.5))
+      .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(true)
+      .build();
+    assertEquals(toStr(List.of(i4, i1)), toStr(chain.filter(List.of(i1, i2, i3, i4, i5, i6))));
   }
 
   private ItineraryListFilterChainBuilder createBuilder(

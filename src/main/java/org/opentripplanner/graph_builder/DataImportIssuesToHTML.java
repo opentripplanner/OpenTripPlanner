@@ -10,13 +10,11 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,17 +49,20 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
   //Multimap because there are multiple issues for each classname
   private final Multimap<String, String> issues = ArrayListMultimap.create();
 
-  DataImportIssuesToHTML(CompositeDataSource reportDirectory, int maxNumberOfIssuesPerFile) {
+  private final DataImportIssueStore issueStore;
+
+  public DataImportIssuesToHTML(
+    DataImportIssueStore issueStore,
+    CompositeDataSource reportDirectory,
+    int maxNumberOfIssuesPerFile
+  ) {
+    this.issueStore = issueStore;
     this.reportDirectory = reportDirectory;
     this.maxNumberOfIssuesPerFile = maxNumberOfIssuesPerFile;
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     try {
       // Delete all files in the report directory if it exist
       if (!deleteReportDirectoryAndContent()) {

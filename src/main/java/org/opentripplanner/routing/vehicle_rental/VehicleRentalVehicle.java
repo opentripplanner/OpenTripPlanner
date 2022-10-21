@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.vehicle_rental;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Set;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Implements the {@link VehicleRentalPlace} class which contains Javadoc.
@@ -21,7 +21,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public VehicleRentalStationUris rentalUris;
   public boolean isReserved = false;
   public boolean isDisabled = false;
-  public ZonedDateTime lastReported;
+  public Instant lastReported;
   public Double currentRangeMeters;
   public VehicleRentalStation station;
   public String pricingPlanId;
@@ -115,7 +115,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   }
 
   @Override
-  public boolean isKeepingVehicleRentalAtDestinationAllowed() {
+  public boolean isArrivingInRentalVehicleAtDestinationAllowed() {
     return false;
   }
 

@@ -8,21 +8,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.organization.Branding;
 
 public class RouteMapperTest {
 
-  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+  private static final Agency AGENCY = new GtfsTestData().agency;
+
+  private static final AgencyAndId ROUTE_ID = new AgencyAndId("A", "1");
 
   private static final String SHORT_NAME = "Short Name";
+
+  private static final String NETWORK_ID = "network id";
 
   private static final String LONG_NAME = "Long Name";
 
@@ -44,19 +50,15 @@ public class RouteMapperTest {
 
   private static final String BRANDING_URL = "www.url.me/brand";
 
-  private static final Agency AGENCY = new Agency();
-
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
     new AgencyMapper(TransitModelForTest.FEED_ID),
-    new DataImportIssueStore(false)
+    DataImportIssueStore.noopIssueStore(),
+    new TranslationHelper()
   );
 
   static {
-    AGENCY.setId("A");
-    AGENCY.setName("Agency Name");
-
-    ROUTE.setId(AGENCY_AND_ID);
+    ROUTE.setId(ROUTE_ID);
     ROUTE.setAgency(AGENCY);
     ROUTE.setShortName(SHORT_NAME);
     ROUTE.setLongName(LONG_NAME);
@@ -84,8 +86,8 @@ public class RouteMapperTest {
     assertEquals("A:1", result.getId().toString());
     assertNotNull(result.getAgency());
     assertEquals(SHORT_NAME, result.getShortName());
-    assertEquals(LONG_NAME, result.getLongName());
-    assertEquals(DESC, result.getDesc());
+    assertEquals(LONG_NAME, result.getLongName().toString());
+    assertEquals(DESC, result.getDescription());
     assertEquals(ROUTE_TYPE, result.getGtfsType());
     assertEquals(TRANSIT_MODE, result.getMode());
     assertEquals(URL, result.getUrl());
@@ -104,7 +106,7 @@ public class RouteMapperTest {
     Route input = new Route();
 
     // id, agency, mode and name (short or long) is required.
-    input.setId(AGENCY_AND_ID);
+    input.setId(ROUTE_ID);
     input.setAgency(AGENCY);
     input.setType(ROUTE_TYPE);
     input.setShortName(SHORT_NAME);
@@ -115,7 +117,7 @@ public class RouteMapperTest {
     assertNotNull(result.getAgency());
     assertEquals(result.getShortName(), SHORT_NAME);
     assertNull(result.getLongName());
-    assertNull(result.getDesc());
+    assertNull(result.getDescription());
     assertEquals(ROUTE_TYPE.intValue(), (int) result.getGtfsType());
     assertEquals(TRANSIT_MODE, result.getMode());
     assertNull(result.getUrl());
@@ -128,8 +130,26 @@ public class RouteMapperTest {
     assertNull(branding);
   }
 
+  @Test
+  public void mapNetworkId() {
+    Route input = new Route();
+
+    input.setId(ROUTE_ID);
+    input.setAgency(AGENCY);
+    input.setType(ROUTE_TYPE);
+    input.setShortName(SHORT_NAME);
+    input.setNetworkId(NETWORK_ID);
+
+    org.opentripplanner.transit.model.network.Route result = subject.map(input);
+
+    assertEquals(
+      List.of(NETWORK_ID),
+      result.getGroupsOfRoutes().stream().map(g -> g.getId().getId()).toList()
+    );
+  }
+
   /**
-   * Mapping the same object twice, should return the the same instance.
+   * Mapping the same object twice, should return the same instance.
    */
   @Test
   public void testMapCache() throws Exception {

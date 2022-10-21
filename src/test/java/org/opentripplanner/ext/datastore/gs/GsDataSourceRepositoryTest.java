@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.datastore.gs;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.net.URI;
-import org.junit.Test;
-import org.opentripplanner.datastore.FileType;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.datastore.api.FileType;
 
 public class GsDataSourceRepositoryTest {
 
@@ -19,8 +19,8 @@ public class GsDataSourceRepositoryTest {
   @Test
   public void findSource() throws Exception {
     assertNull(
-      "Expect to return null for unknown URI without connection to store",
-      subject.findSource(new URI("file:/a.txt"), FileType.UNKNOWN)
+      subject.findSource(new URI("file:/a.txt"), FileType.UNKNOWN),
+      "Expect to return null for unknown URI without connection to store"
     );
   }
 }

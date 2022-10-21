@@ -24,6 +24,9 @@
 - Take free-floating vehicles into account when computing state (February 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3857)
 - Fix issue with GraphQL code generator (February 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3881)
 - Add GBFS form factors for `rentalVehicle` (April 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4062)
+- Implement allowedBikeRentalNetworks while deprecating it and add allowedVehicleRentalNetworks and bannedVehicleRentalNetworks. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4279)
+- Filters place types in legacy GraphQL API so that a bike park type is not returned if a vehicle parking has no bicycle spaces and car park type is not returned if a parking has no car spaces. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4296)
+- Include departures with skipped stops in the Stop type's stopTimesForPattern query. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4299)
 
 ## Documentation
 

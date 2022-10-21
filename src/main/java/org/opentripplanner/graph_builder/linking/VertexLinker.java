@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -25,7 +24,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,11 @@ public class VertexLinker {
    * Spatial index of StreetEdges in the graph.
    */
   private final StreetSpatialIndex streetSpatialIndex = new StreetSpatialIndex();
+
   private final Graph graph;
+
+  private final StopModel stopModel;
+
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
   private Boolean addExtraEdgesToAreas = false;
 
@@ -68,11 +73,12 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph) {
+  public VertexLinker(Graph graph, StopModel stopModel) {
     for (StreetEdge se : graph.getEdgesOfType(StreetEdge.class)) {
       streetSpatialIndex.insert(se.getGeometry(), se, Scope.PERMANENT);
     }
     this.graph = graph;
+    this.stopModel = stopModel;
   }
 
   public void linkVertexPermanently(
@@ -381,7 +387,7 @@ public class VertexLinker {
 
       // TODO Consider moving this code
       if (OTPFeature.FlexRouting.isOn()) {
-        FlexLocationAdder.addFlexLocations(edge, v0, graph);
+        FlexLocationAdder.addFlexLocations(edge, v0, stopModel);
       }
 
       return v0;
@@ -424,7 +430,14 @@ public class VertexLinker {
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     } else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, splitPoint.x, splitPoint.y);
+      v =
+        new SplitterVertex(
+          graph,
+          uniqueSplitLabel,
+          splitPoint.x,
+          splitPoint.y,
+          originalEdge.getName()
+        );
     }
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the

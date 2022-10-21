@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.path;
 
-import static org.opentripplanner.util.TableFormatter.Align.Center;
-import static org.opentripplanner.util.TableFormatter.Align.Left;
-import static org.opentripplanner.util.TableFormatter.Align.Right;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
+import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.CompositeComparator;
-import org.opentripplanner.util.TableFormatter;
+import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 

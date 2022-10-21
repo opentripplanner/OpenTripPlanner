@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.network;
 
+import gnu.trove.set.TIntSet;
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
@@ -10,16 +11,14 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.LocalDate;
-import java.util.BitSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.mapping.GeometryMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.PolylineEncoder;
 
 public class JourneyPatternType {
@@ -85,19 +84,18 @@ public class JourneyPatternType {
           .argument(GraphQLArgument.newArgument().name("date").type(gqlUtil.dateScalar).build())
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
           .dataFetcher(environment -> {
-            BitSet services = GqlUtil
-              .getRoutingService(environment)
-              .getServicesRunningForDate(
+            TIntSet services = GqlUtil
+              .getTransitService(environment)
+              .getServiceCodesRunningForDate(
                 Optional
                   .ofNullable((LocalDate) environment.getArgument("date"))
-                  .map(ServiceDate::new)
-                  .orElse(new ServiceDate(LocalDate.now()))
+                  .orElse(LocalDate.now())
               );
 
             return ((TripPattern) environment.getSource()).getScheduledTimetable()
               .getTripTimes()
               .stream()
-              .filter(times -> services.get(times.getServiceCode()))
+              .filter(times -> services.contains(times.getServiceCode()))
               .map(TripTimes::getTrip)
               .collect(Collectors.toList());
           })
@@ -149,10 +147,10 @@ public class JourneyPatternType {
           .dataFetcher(environment -> {
             TripPattern tripPattern = environment.getSource();
             return GqlUtil
-              .getRoutingService(environment)
+              .getTransitService(environment)
               .getTransitAlertService()
               .getDirectionAndRouteAlerts(
-                tripPattern.getDirection().gtfsCode,
+                tripPattern.getDirection(),
                 tripPattern.getRoute().getId()
               );
           })
@@ -165,7 +163,7 @@ public class JourneyPatternType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
             TripPattern tripPattern = environment.getSource();
-            return GqlUtil.getRoutingService(environment).getNoticesByEntity(tripPattern);
+            return GqlUtil.getTransitService(environment).getNoticesByEntity(tripPattern);
           })
           .build()
       )

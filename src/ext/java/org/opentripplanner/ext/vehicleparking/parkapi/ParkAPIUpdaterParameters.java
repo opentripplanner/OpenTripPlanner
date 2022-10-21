@@ -1,9 +1,10 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
@@ -17,21 +18,24 @@ public class ParkAPIUpdaterParameters extends VehicleParkingUpdaterParameters {
   private final String feedId;
   private final Map<String, String> httpHeaders;
   private final List<String> tags;
+  private final ZoneId timeZone;
 
   public ParkAPIUpdaterParameters(
     String configRef,
     String url,
     String feedId,
     int frequencySec,
-    @NotNull Map<String, String> httpHeaders,
+    @Nonnull Map<String, String> httpHeaders,
     List<String> tags,
-    DataSourceType sourceType
+    DataSourceType sourceType,
+    ZoneId timeZone
   ) {
     super(configRef, frequencySec, sourceType);
     this.url = url;
     this.feedId = feedId;
     this.httpHeaders = httpHeaders;
     this.tags = tags;
+    this.timeZone = timeZone;
   }
 
   public String getFeedId() {
@@ -48,5 +52,9 @@ public class ParkAPIUpdaterParameters extends VehicleParkingUpdaterParameters {
 
   public Collection<String> getTags() {
     return tags;
+  }
+
+  public ZoneId getTimeZone() {
+    return timeZone;
   }
 }

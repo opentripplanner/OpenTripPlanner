@@ -3,7 +3,6 @@ package org.opentripplanner.ext.transferanalyzer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,14 +10,14 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,27 +39,36 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(DirectTransferAnalyzer.class);
 
+  private final Graph graph;
+  private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
   private final double radiusMeters;
 
-  public DirectTransferAnalyzer(double radiusMeters) {
+  public DirectTransferAnalyzer(
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
+    double radiusMeters
+  ) {
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
     this.radiusMeters = radiusMeters;
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
-    /* Initialize graph index which is needed by the nearby stop finder. */
-    graph.index = new GraphIndex(graph);
+  public void buildGraph() {
+    /* Initialize transit index which is needed by the nearby stop finder. */
+    transitModel.index();
 
     LOG.info("Analyzing transfers (this can be time consuming)...");
 
     List<TransferInfo> directTransfersTooLong = new ArrayList<>();
     List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
-    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(graph);
+    DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
+      transitModel.getStopModel()::findRegularStops
+    );
     StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 
     int stopsAnalyzed = 0;
@@ -72,36 +80,36 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
       /* Find nearby stops by euclidean distance */
       Coordinate c0 = originStopVertex.getCoordinate();
-      Map<Stop, NearbyStop> stopsEuclidean = nearbyStopFinderEuclidian
+      Map<RegularStop, NearbyStop> stopsEuclidean = nearbyStopFinderEuclidian
         .findClosestStops(c0.y, c0.x, radiusMeters)
         .stream()
-        .filter(t -> t.stop instanceof Stop)
-        .collect(Collectors.toMap(t -> (Stop) t.stop, t -> t));
+        .filter(t -> t.stop instanceof RegularStop)
+        .collect(Collectors.toMap(t -> (RegularStop) t.stop, t -> t));
 
       /* Find nearby stops by street distance */
-      Map<Stop, NearbyStop> stopsStreets = nearbyStopFinderStreets
+      Map<RegularStop, NearbyStop> stopsStreets = nearbyStopFinderStreets
         .findClosestStops(c0.y, c0.x, radiusMeters * RADIUS_MULTIPLIER)
         .stream()
-        .filter(t -> t.stop instanceof Stop)
-        .collect(Collectors.toMap(t -> (Stop) t.stop, t -> t));
+        .filter(t -> t.stop instanceof RegularStop)
+        .collect(Collectors.toMap(t -> (RegularStop) t.stop, t -> t));
 
-      Stop originStop = originStopVertex.getStop();
+      RegularStop originStop = originStopVertex.getStop();
 
       /* Get stops found by both street and euclidean search */
-      List<Stop> stopsConnected = stopsEuclidean
+      List<RegularStop> stopsConnected = stopsEuclidean
         .keySet()
         .stream()
-        .filter(t -> stopsStreets.keySet().contains(t) && t != originStop)
-        .collect(Collectors.toList());
+        .filter(t -> stopsStreets.containsKey(t) && t != originStop)
+        .toList();
 
       /* Get stops found by euclidean search but not street search */
-      List<Stop> stopsUnconnected = stopsEuclidean
+      List<RegularStop> stopsUnconnected = stopsEuclidean
         .keySet()
         .stream()
-        .filter(t -> !stopsStreets.keySet().contains(t) && t != originStop)
-        .collect(Collectors.toList());
+        .filter(t -> !stopsStreets.containsKey(t) && t != originStop)
+        .toList();
 
-      for (Stop destStop : stopsConnected) {
+      for (RegularStop destStop : stopsConnected) {
         NearbyStop euclideanStop = stopsEuclidean.get(destStop);
         NearbyStop streetStop = stopsStreets.get(destStop);
 
@@ -121,7 +129,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         }
       }
 
-      for (Stop destStop : stopsUnconnected) {
+      for (RegularStop destStop : stopsUnconnected) {
         NearbyStop euclideanStop = stopsEuclidean.get(destStop);
 
         /* Log transfers that are found by euclidean search but not by street search */
@@ -175,13 +183,18 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
   private static class TransferInfo {
 
-    final Stop origin;
-    final Stop destination;
+    final RegularStop origin;
+    final RegularStop destination;
     final double directDistance;
     final double streetDistance;
     final double ratio;
 
-    TransferInfo(Stop origin, Stop destination, double directDistance, double streetDistance) {
+    TransferInfo(
+      RegularStop origin,
+      RegularStop destination,
+      double directDistance,
+      double streetDistance
+    ) {
       this.origin = origin;
       this.destination = destination;
       this.directDistance = directDistance;

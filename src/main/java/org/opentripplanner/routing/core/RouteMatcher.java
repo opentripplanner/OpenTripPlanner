@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 
 /**
@@ -13,6 +13,8 @@ import org.opentripplanner.transit.model.network.Route;
  * We currently support route full IDs (agency ID + route ID), agency ID + route name, or route name
  * only. Support for other matching expression can be easily added later on.
  */
+
+// TODO VIA Part 2 - Cleanup this class - Depends on Model, contains parsing logic
 public class RouteMatcher implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 8066547338465440312L;

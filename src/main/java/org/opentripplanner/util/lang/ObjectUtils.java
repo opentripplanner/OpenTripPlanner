@@ -1,5 +1,6 @@
 package org.opentripplanner.util.lang;
 
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -14,5 +15,30 @@ public class ObjectUtils {
   @Nullable
   public static <T> T ifNotNull(@Nullable T value, @Nullable T defaultValue) {
     return value != null ? value : defaultValue;
+  }
+
+  /**
+   * Similar to {@link #ifNotNull(Object, Object)}, but take a function to access the
+   * entity field. The given {@code defaultValue} can be {@code null}.
+   * */
+  @Nullable
+  public static <E, T> T ifNotNull(
+    @Nullable E entity,
+    Function<E, T> getter,
+    @Nullable T defaultValue
+  ) {
+    if (entity == null) {
+      return defaultValue;
+    }
+    return ifNotNull(getter.apply(entity), defaultValue);
+  }
+
+  public static <T> T requireNotInitialized(T oldValue, T newValue) {
+    if (oldValue != null) {
+      throw new IllegalStateException(
+        "Field is already set! Old value: " + oldValue + ", new value: " + newValue
+      );
+    }
+    return newValue;
   }
 }

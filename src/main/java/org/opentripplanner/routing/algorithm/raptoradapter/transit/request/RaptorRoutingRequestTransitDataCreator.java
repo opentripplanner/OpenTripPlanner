@@ -1,11 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper.secondsSinceStartOfTime;
+import static org.opentripplanner.util.time.ServiceDateUtils.secondsSinceStartOfTime;
 
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +18,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.util.time.DurationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for creating the internal data structure of {@link
@@ -23,6 +30,10 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWi
  * are only available at construction time.
  */
 class RaptorRoutingRequestTransitDataCreator {
+
+  private static final Logger LOG = LoggerFactory.getLogger(
+    RaptorRoutingRequestTransitDataCreator.class
+  );
 
   private final TransitLayer transitLayer;
   private final ZonedDateTime transitSearchTimeZero;
@@ -46,11 +57,12 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     // Loop through all patterns, and mark all stops containing that pattern
-    int numPatterns = tripPatternsForDate.size();
-    for (int patternIndex = 0; patternIndex < numPatterns; patternIndex++) {
-      TripPatternForDates tripPatternForDateList = tripPatternsForDate.get(patternIndex);
-      for (int i : tripPatternForDateList.getTripPattern().getStopIndexes()) {
-        patternsForStop[i].add(patternIndex);
+    for (TripPatternForDates tripPatternForDateList : tripPatternsForDate) {
+      final RoutingTripPattern tripPattern = tripPatternForDateList.getTripPattern();
+      final int patternIndex = tripPattern.patternIndex();
+      final int numberOfStopsInPattern = tripPattern.numberOfStopsInPattern();
+      for (int i = 0; i < numberOfStopsInPattern; i++) {
+        patternsForStop[tripPattern.stopIndex(i)].add(patternIndex);
       }
     }
 
@@ -61,6 +73,14 @@ class RaptorRoutingRequestTransitDataCreator {
     }
 
     return result;
+  }
+
+  public List<TripPatternForDates> createPatternIndex(List<TripPatternForDates> tripPatterns) {
+    TripPatternForDates[] result = new TripPatternForDates[RoutingTripPattern.indexCounter()];
+    for (var pattern : tripPatterns) {
+      result[pattern.getTripPattern().patternIndex()] = pattern;
+    }
+    return Arrays.asList(result);
   }
 
   /**
@@ -76,7 +96,7 @@ class RaptorRoutingRequestTransitDataCreator {
   ) {
     // Group TripPatternForDate objects by TripPattern.
     // This is done in a loop to increase performance.
-    Map<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
+    Map<RoutingTripPattern, List<TripPatternForDate>> patternForDateByPattern = new HashMap<>();
     for (TripPatternForDate patternForDate : patternForDateList) {
       patternForDateByPattern
         .computeIfAbsent(patternForDate.getTripPattern(), k -> new ArrayList<>())
@@ -85,23 +105,31 @@ class RaptorRoutingRequestTransitDataCreator {
 
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
+    TObjectIntMap<LocalDate> offsetCache = new TObjectIntHashMap<>();
+
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates
-    for (Map.Entry<TripPatternWithRaptorStopIndexes, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
+    for (Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
       // Sort by date. We can mutate the array, as it was created above in the grouping.
       List<TripPatternForDate> patternsSorted = patternEntry.getValue();
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
       // Calculate offsets per date
-      List<Integer> offsets = new ArrayList<>();
+      TIntList offsets = new TIntArrayList();
       for (TripPatternForDate tripPatternForDate : patternsSorted) {
-        offsets.add(
-          secondsSinceStartOfTime(transitSearchTimeZero, tripPatternForDate.getLocalDate())
-        );
+        LocalDate serviceDate = tripPatternForDate.getLocalDate();
+        int offset;
+        if (offsetCache.containsKey(serviceDate)) {
+          offset = offsetCache.get(serviceDate);
+        } else {
+          offset = secondsSinceStartOfTime(transitSearchTimeZero, serviceDate);
+          offsetCache.put(serviceDate, offset);
+        }
+        offsets.add(offset);
       }
 
       // Combine TripPatternForDate objects
-      final TripPatternWithRaptorStopIndexes tripPattern = patternEntry.getKey();
+      final RoutingTripPattern tripPattern = patternEntry.getKey();
 
       combinedList.add(
         new TripPatternForDates(
@@ -157,6 +185,7 @@ class RaptorRoutingRequestTransitDataCreator {
     TransitDataProviderFilter filter
   ) {
     List<TripPatternForDate> tripPatternForDates = new ArrayList<>();
+    long start = System.currentTimeMillis();
 
     // This filters trips by the search date as well as additional dates before and after
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
@@ -164,6 +193,13 @@ class RaptorRoutingRequestTransitDataCreator {
         filterActiveTripPatterns(transitLayer, departureDate.plusDays(d), d == 0, filter)
       );
     }
+
+    if (LOG.isDebugEnabled()) {
+      String time = DurationUtils.msToSecondsStr(System.currentTimeMillis() - start);
+      long count = tripPatternForDates.size();
+      LOG.debug("Prepare Transit model performed in {}, count: {}.", time, count);
+    }
+
     return tripPatternForDates;
   }
 }

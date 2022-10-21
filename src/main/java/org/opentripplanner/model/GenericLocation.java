@@ -1,7 +1,7 @@
 package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
@@ -19,7 +19,8 @@ public class GenericLocation {
   public final String label;
 
   /**
-   * Refers to a specific element in the OTP model. This can currently be a Stop or StopCollection.
+   * Refers to a specific element in the OTP model. This can currently be a regular stop, area stop,
+   * group stop, station, multi-modal station or group of stations.
    */
   public final FeedScopedId stopId;
 

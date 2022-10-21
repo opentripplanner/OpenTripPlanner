@@ -2,11 +2,13 @@ package org.opentripplanner.netex.mapping;
 
 import java.util.Collection;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.MultiModalStationBuilder;
+import org.opentripplanner.transit.model.site.Station;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.StopPlace;
 
 class MultiModalStationMapper {
@@ -20,16 +22,12 @@ class MultiModalStationMapper {
   }
 
   MultiModalStation map(StopPlace stopPlace, Collection<Station> childStations) {
-    MultiModalStation multiModalStation = new MultiModalStation(
-      idFactory.createId(stopPlace.getId()),
-      childStations
-    );
-
-    if (stopPlace.getName() != null) {
-      multiModalStation.setName(new NonLocalizedString(stopPlace.getName().getValue()));
-    } else {
-      multiModalStation.setName(new NonLocalizedString("N/A"));
-    }
+    MultiModalStationBuilder multiModalStation = MultiModalStation
+      .of(idFactory.createId(stopPlace.getId()))
+      .withChildStations(childStations)
+      .withName(
+        NonLocalizedString.ofNullable(stopPlace.getName(), MultilingualString::getValue, "N/A")
+      );
 
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
 
@@ -40,8 +38,9 @@ class MultiModalStationMapper {
         multiModalStation.getId()
       );
     } else {
-      multiModalStation.setCoordinate(coordinate);
+      multiModalStation.withCoordinate(coordinate);
     }
-    return multiModalStation;
+
+    return multiModalStation.build();
   }
 }

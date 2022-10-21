@@ -1,7 +1,6 @@
 package org.opentripplanner.test.support;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -21,7 +20,7 @@ public class PolylineAssert {
       "Actual:    " +
       makeUrl(actual) +
       "\n";
-    assertThat(reason, actual, is(expected));
+    assertEquals(actual, expected, reason);
   }
 
   private static String toBase64(String line) {

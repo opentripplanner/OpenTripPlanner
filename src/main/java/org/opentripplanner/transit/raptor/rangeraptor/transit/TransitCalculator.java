@@ -5,7 +5,6 @@ import static org.opentripplanner.util.time.TimeUtils.hm2time;
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
@@ -45,7 +44,6 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
   /**
    * Return a calculator for test purpose. The following parameters are fixed:
    * <ul>
-   *     <li>'binaryTripSearchThreshold' = 10
    *     <li>'earliestDepartureTime' = 08:00:00
    *     <li>'latestArrivalTime',  = 10:00:00
    *     <li>'iterationStep' = 60 seconds
@@ -55,8 +53,8 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    */
   static <T extends RaptorTripSchedule> TransitCalculator<T> testDummyCalculator(boolean forward) {
     return forward
-      ? new ForwardTransitCalculator<>(10, hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60)
-      : new ReverseTransitCalculator<>(10, hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60);
+      ? new ForwardTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60)
+      : new ReverseTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60);
   }
 
   /**
@@ -131,7 +129,10 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * target} is the TO pattern/stop, while when searching in reverse the given target is the FROM
    * pattern/stop.
    */
-  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(RaptorRoute<T> route);
+  RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
+    RaptorTransitDataProvider<T> transitData,
+    int routeIndex
+  );
 
   /**
    * Return {@code true} if it is allowed/possible to board at a particular stop index, on a normal

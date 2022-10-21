@@ -1,17 +1,14 @@
 package org.opentripplanner.transit.model.timetable;
 
-import javax.annotation.Nonnull;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.network.TransitMode;
 import org.opentripplanner.transit.model.organization.Operator;
 
-public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
+public class TripBuilder extends AbstractEntityBuilder<Trip, TripBuilder> {
 
   private Operator operator;
   private Route route;
@@ -23,11 +20,11 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
   private FeedScopedId shapeId;
   private Direction direction;
   private BikeAccess bikesAllowed;
-  private WheelchairAccessibility wheelchairBoarding;
+  private Accessibility wheelchairBoarding;
   private String gtfsBlockId;
   private String gtfsFareId;
   private String netexInternalPlanningCode;
-  private TripAlteration netexAlteration = TripAlteration.PLANNED;
+  private TripAlteration netexAlteration;
 
   TripBuilder(FeedScopedId id) {
     super(id);
@@ -35,6 +32,21 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
 
   TripBuilder(Trip original) {
     super(original);
+    this.route = original.getRoute();
+    this.operator = original.getOperator();
+    this.serviceId = original.getServiceId();
+    this.mode = original.getMode();
+    this.netexSubmode = original.getNetexSubMode().name();
+    this.netexAlteration = original.getNetexAlteration();
+    this.shortName = original.getShortName();
+    this.headsign = original.getHeadsign();
+    this.gtfsBlockId = original.getGtfsBlockId();
+    this.shapeId = original.getShapeId();
+    this.direction = original.getDirection();
+    this.bikesAllowed = original.getBikesAllowed();
+    this.wheelchairBoarding = original.getWheelchairBoarding();
+    this.netexInternalPlanningCode = original.getNetexInternalPlanningCode();
+    this.gtfsFareId = original.getGtfsFareId();
   }
 
   public Operator getOperator() {
@@ -145,11 +157,11 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
     return this;
   }
 
-  public WheelchairAccessibility getWheelchairBoarding() {
+  public Accessibility getWheelchairBoarding() {
     return wheelchairBoarding;
   }
 
-  public TripBuilder withWheelchairBoarding(WheelchairAccessibility wheelchairBoarding) {
+  public TripBuilder withWheelchairBoarding(Accessibility wheelchairBoarding) {
     this.wheelchairBoarding = wheelchairBoarding;
     return this;
   }
@@ -175,23 +187,5 @@ public class TripBuilder extends TransitEntityBuilder<Trip, TripBuilder> {
   @Override
   protected Trip buildFromValues() {
     return new Trip(this);
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull Trip original) {
-    this.route = original.getRoute();
-    this.operator = original.getOperator();
-    this.serviceId = original.getServiceId();
-    this.mode = original.getMode();
-    this.netexSubmode = original.getNetexSubmode();
-    this.shortName = original.getShortName();
-    this.headsign = original.getHeadsign();
-    this.gtfsBlockId = original.getGtfsBlockId();
-    this.shapeId = original.getShapeId();
-    this.direction = original.getDirection();
-    this.bikesAllowed = original.getBikesAllowed();
-    this.wheelchairBoarding = original.getWheelchairBoarding();
-    this.netexInternalPlanningCode = original.getNetexInternalPlanningCode();
-    this.gtfsFareId = original.getGtfsFareId();
   }
 }

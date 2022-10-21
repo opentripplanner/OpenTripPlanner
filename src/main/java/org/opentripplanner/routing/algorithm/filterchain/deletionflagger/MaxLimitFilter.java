@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
@@ -46,16 +44,18 @@ public class MaxLimitFilter implements ItineraryDeletionFlagger {
   }
 
   @Override
-  public List<Itinerary> getFlaggedItineraries(List<Itinerary> itineraries) {
+  public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     if (itineraries.size() <= maxLimit) {
       return List.of();
     }
 
     if (cropSection == ListSection.HEAD) {
-      itineraries = Lists.reverse(itineraries);
+      int limit = itineraries.size() - maxLimit;
+      changedSubscriber.accept(itineraries.get(limit - 1));
+      return itineraries.subList(0, limit);
     }
 
     changedSubscriber.accept(itineraries.get(maxLimit));
-    return itineraries.stream().skip(maxLimit).collect(Collectors.toList());
+    return itineraries.subList(maxLimit, itineraries.size());
   }
 }

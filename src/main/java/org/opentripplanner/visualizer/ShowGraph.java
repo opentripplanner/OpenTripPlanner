@@ -8,10 +8,10 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Queue;
@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -53,6 +52,7 @@ import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import processing.core.PApplet;
 import processing.core.PFont;
 
@@ -93,7 +93,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   // these queues are filled by a search in another thread, so must be threadsafe
   private final Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<>();
   private final Queue<Edge> newHighlightedEdges = new LinkedBlockingQueue<>();
-  private final SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
+  private static final DateTimeFormatter shortDateFormat = DateTimeFormatter.ofPattern(
+    "HH:mm:ss z"
+  );
   private final LinkedBlockingQueue<State> newSPTEdges = new LinkedBlockingQueue<>();
   private final boolean drawEdges = true;
   private int videoFrameNumber = 0;
@@ -608,11 +610,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       Edge e = s.getBackEdge();
       if (e == null) continue;
 
-      if (mode != null && mode.isTransit()) {
-        stroke(200, 050, 000);
-        strokeWeight(6);
-        drawEdge(e);
-      }
+      // TODO Add support for crating transit edges on the fly
+      //      if (mode != null && mode.isTransit()) {
+      //        stroke(200, 050, 000);
+      //        strokeWeight(6);
+      //        drawEdge(e);
+      //      }
       if (e instanceof StreetEdge) {
         StreetTraversalPermission stp = ((StreetEdge) e).getPermission();
         if (stp == StreetTraversalPermission.PEDESTRIAN) {
@@ -654,7 +657,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     fill(240, 240, 240);
     Vertex v = s.getVertex();
     drawVertex(v, 8);
-    str += " " + shortDateFormat.format(new Date(s.getTimeSeconds() * 1000));
+    str += " " + shortDateFormat.format(Instant.ofEpochSecond(s.getTimeSeconds()));
     str += " [" + (int) s.getWeight() + "]";
     double x = toScreenX(v.getX()) + 10;
     double y = toScreenY(v.getY());

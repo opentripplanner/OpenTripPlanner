@@ -3,10 +3,13 @@ package org.opentripplanner.standalone.config;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -23,11 +26,11 @@ import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
@@ -69,14 +72,14 @@ public class NodeAdapter {
    */
   private final List<NodeAdapter> children = new ArrayList<>();
 
-  public NodeAdapter(@NotNull JsonNode node, String source) {
+  public NodeAdapter(@Nonnull JsonNode node, String source) {
     this(node, source, null);
   }
 
   /**
    * Constructor for nested configuration nodes.
    */
-  private NodeAdapter(@NotNull JsonNode node, String source, String contextPath) {
+  private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath) {
     this.json = node;
     this.source = source;
     this.contextPath = contextPath;
@@ -99,6 +102,10 @@ public class NodeAdapter {
 
   public boolean isNonEmptyArray() {
     return json.isArray() && json.size() > 0;
+  }
+
+  public boolean isObject() {
+    return json.isObject() && json.size() > 0;
   }
 
   public String getSource() {
@@ -180,6 +187,10 @@ public class NodeAdapter {
 
   public String asText(String paramName, String defaultValue) {
     return param(paramName).asText(defaultValue);
+  }
+
+  public String asText() {
+    return json.asText();
   }
 
   public Set<String> asTextSet(String paramName, Set<String> defaultValue) {
@@ -303,6 +314,25 @@ public class NodeAdapter {
     return FeedScopedId.parseId(asText(paramName));
   }
 
+  public List<FeedScopedId> asFeedScopedIds(String paramName, List<FeedScopedId> defaultValues) {
+    JsonNode array = param(paramName);
+
+    if (array.isMissingNode()) {
+      return defaultValues;
+    }
+    assertIsArray(paramName, array);
+
+    List<FeedScopedId> ids = new ArrayList<>();
+    for (JsonNode it : array) {
+      ids.add(FeedScopedId.parseId(it.asText()));
+    }
+    return ids;
+  }
+
+  public List<FeedScopedId> asFeedScopedIdList(String paramName, List<FeedScopedId> defaultValues) {
+    return List.copyOf(asFeedScopedIds(paramName, List.copyOf(defaultValues)));
+  }
+
   public Locale asLocale(String paramName, Locale defaultValue) {
     if (!exist(paramName)) {
       return defaultValue;
@@ -362,6 +392,27 @@ public class NodeAdapter {
     return DurationUtils.duration(param(paramName).asText());
   }
 
+  /**
+   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
+   * This version can be used to be backwards compatible when moving from an integer value
+   * to a duration.
+   */
+  public Duration asDuration2(String paramName, Duration defaultValue, ChronoUnit unit) {
+    return exist(paramName)
+      ? DurationUtils.duration(param(paramName).asText(), unit)
+      : defaultValue;
+  }
+
+  /**
+   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
+   * This version can be used to be backwards compatible when moving from an integer value
+   * to a duration.
+   */
+  public Duration asDuration2(String paramName, ChronoUnit unit) {
+    assertRequiredFieldExist(paramName);
+    return DurationUtils.duration(param(paramName).asText(), unit);
+  }
+
   public List<Duration> asDurations(String paramName, List<Duration> defaultValues) {
     JsonNode array = param(paramName);
 
@@ -378,7 +429,11 @@ public class NodeAdapter {
   }
 
   public Pattern asPattern(String paramName, String defaultValue) {
-    return Pattern.compile(asText(paramName, defaultValue));
+    String regex = asText(paramName, defaultValue);
+    if (regex == null) {
+      return null;
+    }
+    return Pattern.compile(regex);
   }
 
   public List<URI> asUris(String paramName) {
@@ -422,6 +477,27 @@ public class NodeAdapter {
         "'. The value '" +
         text +
         "' is not a valid function on the form \"a + b x\" (\"2.0 + 7.1 x\")." +
+        "Source: " +
+        source +
+        "."
+      );
+    }
+  }
+
+  public ZoneId asZoneId(String paramName, ZoneId defaultValue) {
+    if (!exist(paramName)) {
+      return defaultValue;
+    }
+    final String zoneId = param(paramName).asText();
+    try {
+      return ZoneId.of(zoneId);
+    } catch (DateTimeException e) {
+      throw new OtpAppException(
+        "Unable to parse parameter '" +
+        fullPath(paramName) +
+        "'. The value '" +
+        zoneId +
+        "' is is not a valid Zone ID, it should be parsable by java.time.ZoneId class. " +
         "Source: " +
         source +
         "."

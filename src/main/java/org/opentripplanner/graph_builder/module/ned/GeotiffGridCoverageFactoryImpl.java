@@ -9,8 +9,8 @@ import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.util.factory.Hints;
 import org.opengis.coverage.grid.GridCoverage;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -25,14 +25,16 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
   private static final Logger LOG = LoggerFactory.getLogger(GeotiffGridCoverageFactoryImpl.class);
 
   private final DataSource input;
+  private final double elevationUnitMultiplier;
   private GridCoverage2D coverage;
 
-  public GeotiffGridCoverageFactoryImpl(DataSource input) {
-    this.input = input;
+  public GeotiffGridCoverageFactoryImpl(DataSource dataSource, double elevationUnitMultiplier) {
+    this.input = dataSource;
+    this.elevationUnitMultiplier = elevationUnitMultiplier;
   }
 
   public GeotiffGridCoverageFactoryImpl(File path) {
-    this(new FileDataSource(path, FileType.DEM));
+    this(new FileDataSource(path, FileType.DEM), 1.0);
   }
 
   /**
@@ -44,6 +46,11 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
     return NoDataGridCoverage.create(
       Interpolator2D.create(getUninterpolatedGridCoverage(), new InterpolationBilinear())
     );
+  }
+
+  @Override
+  public double elevationUnitMultiplier() {
+    return elevationUnitMultiplier;
   }
 
   @Override

@@ -10,8 +10,8 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.TimeZone;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
@@ -20,6 +20,7 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarF
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Provide some of the commonly used "chain" of methods. Like all ids should be created the same
@@ -35,7 +36,7 @@ public class GqlUtil {
   public final GraphQLDirective timingData;
 
   /** private to prevent util class from instantiation */
-  public GqlUtil(TimeZone timeZone) {
+  public GqlUtil(ZoneId timeZone) {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
     this.dateScalar = DateScalarFactory.createDateScalar();
@@ -53,6 +54,10 @@ public class GqlUtil {
 
   public static RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return ((TransmodelRequestContext) environment.getContext()).getRoutingService();
+  }
+
+  public static TransitService getTransitService(DataFetchingEnvironment environment) {
+    return ((TransmodelRequestContext) environment.getContext()).getTransitService();
   }
 
   public static GraphQLFieldDefinition newTransitIdField() {

@@ -1,10 +1,8 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import javax.inject.Inject;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -19,25 +17,17 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyCheckerModule.class);
 
-  /**
-   * An set of ids which identifies what stages this graph builder provides (i.e. streets,
-   * elevation, transit)
-   */
-  public List<String> provides() {
-    return Collections.emptyList();
-  }
+  private final Graph graph;
+  private final DataImportIssueStore issueStore;
 
-  /** A list of ids of stages which must be provided before this stage */
-  public List<String> getPrerequisites() {
-    return List.of("streets");
+  @Inject
+  public GraphCoherencyCheckerModule(Graph graph, DataImportIssueStore issueStore) {
+    this.graph = graph;
+    this.issueStore = issueStore;
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     boolean coherent = true;
     LOG.info("checking graph coherency...");
     for (Vertex v : graph.getVertices()) {

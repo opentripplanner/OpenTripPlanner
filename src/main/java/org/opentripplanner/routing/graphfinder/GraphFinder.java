@@ -1,10 +1,14 @@
 package org.opentripplanner.routing.graphfinder;
 
+import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.routing.RoutingService;
+import java.util.function.Function;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Common interface between different types of GraphFinders, currently two types exist, one which
@@ -15,8 +19,13 @@ public interface GraphFinder {
    * Get a new GraphFinder instance depending on whether the graph includes a street network or
    * not.
    */
-  static GraphFinder getInstance(Graph graph) {
-    return graph.hasStreets ? new StreetGraphFinder(graph) : new DirectGraphFinder(graph);
+  static GraphFinder getInstance(
+    Graph graph,
+    Function<Envelope, Collection<RegularStop>> queryNearbyStops
+  ) {
+    return graph.hasStreets
+      ? new StreetGraphFinder(graph)
+      : new DirectGraphFinder(queryNearbyStops);
   }
 
   /**
@@ -48,8 +57,6 @@ public interface GraphFinder {
    *                                   disable the filtering.
    * @param filterByBikeRentalStations A list of VehicleRentalStation ids to use in filtering. Use
    *                                   null to disable the filtering.
-   * @param routingService             A RoutingService used in finding information about the
-   *                                   various places.
    */
   List<PlaceAtDistance> findClosestPlaces(
     double lat,
@@ -61,6 +68,6 @@ public interface GraphFinder {
     List<FeedScopedId> filterByStops,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
-    RoutingService routingService
+    TransitService transitService
   );
 }

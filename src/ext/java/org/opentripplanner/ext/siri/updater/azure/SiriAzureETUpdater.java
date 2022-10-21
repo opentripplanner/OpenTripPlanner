@@ -20,6 +20,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.HttpUtils;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -28,25 +30,32 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
-  private final Logger LOG = LoggerFactory.getLogger(getClass());
+  private static final Logger LOG = LoggerFactory.getLogger(SiriAzureSXUpdater.class);
 
-  private static final transient AtomicLong messageCounter = new AtomicLong(0);
+  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
   private final LocalDate fromDateTime;
+  private final SiriTimetableSnapshotSource snapshotSource;
+
   private long startTime;
 
-  public SiriAzureETUpdater(SiriAzureETUpdaterParameters config) {
-    super(config);
+  public SiriAzureETUpdater(
+    SiriAzureETUpdaterParameters config,
+    TransitModel transitModel,
+    SiriTimetableSnapshotSource snapshotSource
+  ) {
+    super(config, transitModel);
     this.fromDateTime = config.getFromDateTime();
+    this.snapshotSource = snapshotSource;
   }
 
   @Override
   protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {
     var message = messageContext.getMessage();
-    messageCounter.incrementAndGet();
+    MESSAGE_COUNTER.incrementAndGet();
 
-    if (messageCounter.get() % 100 == 0) {
-      LOG.info("Total SIRI-ET messages received={}", messageCounter.get());
+    if (MESSAGE_COUNTER.get() % 100 == 0) {
+      LOG.info("Total SIRI-ET messages received={}", MESSAGE_COUNTER.get());
     }
 
     processMessage(message.getBody().toString(), message.getMessageId());
@@ -104,8 +113,15 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      super.saveResultOnGraph.execute(graph ->
-        snapshotSource.applyEstimatedTimetable(graph, feedId, false, updates)
+      super.saveResultOnGraph.execute((graph, transitModel) ->
+        snapshotSource.applyEstimatedTimetable(
+          transitModel,
+          fuzzyTripMatcher(),
+          feedId,
+          false,
+          updates,
+          fuzzyTripMatching
+        )
       );
     } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
@@ -121,9 +137,16 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      super.saveResultOnGraph.execute(graph -> {
+      super.saveResultOnGraph.execute((graph, transitModel) -> {
         long t1 = System.currentTimeMillis();
-        snapshotSource.applyEstimatedTimetable(graph, feedId, false, updates);
+        snapshotSource.applyEstimatedTimetable(
+          transitModel,
+          fuzzyTripMatcher(),
+          feedId,
+          false,
+          updates,
+          fuzzyTripMatching
+        );
 
         setPrimed(true);
         LOG.info(

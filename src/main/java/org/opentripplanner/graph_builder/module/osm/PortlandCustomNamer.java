@@ -1,13 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import com.google.common.collect.Iterables;
 import java.util.HashSet;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 /**
  * These rules were developed in consultation with Grant Humphries, PJ Houser, and Mele Sax-Barnett.
@@ -152,8 +150,7 @@ public class PortlandCustomNamer implements CustomNamer {
     if (maxDepth == 0) {
       return null;
     }
-    Vertex toVertex = e.getToVertex();
-    for (StreetEdge out : Iterables.filter(toVertex.getOutgoing(), StreetEdge.class)) {
+    for (StreetEdge out : e.getToVertex().getOutgoingStreetEdges()) {
       if (out.hasBogusName()) {
         String name = nameAccordingToDestination(graph, out, maxDepth - 1);
         if (name == null) {
@@ -174,8 +171,7 @@ public class PortlandCustomNamer implements CustomNamer {
     if (maxDepth == 0) {
       return null;
     }
-    Vertex fromVertex = e.getFromVertex();
-    for (StreetEdge in : Iterables.filter(fromVertex.getIncoming(), StreetEdge.class)) {
+    for (StreetEdge in : e.getFromVertex().getIncomingStreetEdges()) {
       if (in.hasBogusName()) {
         String name = nameAccordingToOrigin(graph, in, maxDepth - 1);
         if (name == null) {

@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 import static org.opentripplanner.netex.mapping.MappingSupport.createWrappedRef;
 
@@ -13,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
@@ -57,11 +56,12 @@ class NetexTestDataSample {
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
     .withName(new MultilingualString().withValue("everyday"));
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final JourneyPattern journeyPattern;
   private final HierarchicalMapById<JourneyPattern> journeyPatternById = new HierarchicalMapById<>();
   private final HierarchicalMapById<DestinationDisplay> destinationDisplayById = new HierarchicalMapById<>();
-  private final EntityById<Stop> stopsById = new EntityById<>();
+  private final EntityById<RegularStop> stopsById = new EntityById<>();
   private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
   private final List<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
   private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
@@ -165,11 +165,7 @@ class NetexTestDataSample {
       for (int i = 0; i < DATED_SERVICE_JOURNEY_ID.size(); i++) {
         OperatingDay operatingDay = new OperatingDay()
           .withId(OPERATING_DAYS.get(i))
-          .withCalendarDate(
-            LocalDate
-              .parse(OPERATING_DAYS.get(i), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-              .atStartOfDay()
-          );
+          .withCalendarDate(LocalDate.parse(OPERATING_DAYS.get(i), DATE_FORMATTER).atStartOfDay());
         operatingDaysById.add(operatingDay);
 
         DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
@@ -184,7 +180,7 @@ class NetexTestDataSample {
     // Setup stops
     for (int i = 0; i < NUM_OF_STOPS; i++) {
       String stopId = "NSR:Quay:" + (i + 1);
-      stopsById.add(Stop.stopForTest(stopId, 60.0, 10.0));
+      stopsById.add(TransitModelForTest.stopForTest(stopId, 60.0, 10.0));
       quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
     }
   }
@@ -198,7 +194,7 @@ class NetexTestDataSample {
     return destinationDisplayById;
   }
 
-  EntityById<Stop> getStopsById() {
+  EntityById<RegularStop> getStopsById() {
     return stopsById;
   }
 

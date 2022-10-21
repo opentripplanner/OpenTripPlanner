@@ -2,12 +2,14 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
+import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -30,15 +32,13 @@ public class TripPatternCache {
    *
    * @param stopPattern         stop pattern to retrieve/create trip pattern
    * @param trip                the trip the new trip pattern will be created for
-   * @param serviceCodes        graph's service codes
    * @param originalTripPattern the trip pattern the new pattern is based. If the pattern is
    *                            completely new, this will be null
    * @return cached or newly created trip pattern
    */
   public synchronized TripPattern getOrCreateTripPattern(
-    @NotNull final StopPattern stopPattern,
-    @NotNull final Trip trip,
-    @NotNull final Map<FeedScopedId, Integer> serviceCodes,
+    @Nonnull final StopPattern stopPattern,
+    @Nonnull final Trip trip,
     final TripPattern originalTripPattern
   ) {
     Route route = trip.getRoute();
@@ -50,21 +50,15 @@ public class TripPatternCache {
       // Generate unique code for trip pattern
       var id = generateUniqueTripPatternCode(trip);
 
-      tripPattern = new TripPattern(id, route, stopPattern);
+      TripPatternBuilder tripPatternBuilder = TripPattern
+        .of(id)
+        .withRoute(route)
+        .withStopPattern(stopPattern);
 
-      // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-      tripPattern.setServiceCodes(serviceCodes);
+      tripPatternBuilder.withCreatedByRealtimeUpdater(true);
+      tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
 
-      // Finish scheduled time table
-      tripPattern.getScheduledTimetable().finish();
-
-      tripPattern.setCreatedByRealtimeUpdater();
-
-      // Copy information from the TripPattern this is replacing
-      if (originalTripPattern != null) {
-        tripPattern.setOriginalTripPattern(originalTripPattern);
-        tripPattern.setHopGeometriesFromPattern(originalTripPattern);
-      }
+      tripPattern = tripPatternBuilder.build();
 
       // Add pattern to cache
       cache.put(stopPattern, tripPattern);
@@ -79,20 +73,14 @@ public class TripPatternCache {
    */
   private FeedScopedId generateUniqueTripPatternCode(Trip trip) {
     FeedScopedId routeId = trip.getRoute().getId();
-    String directionId = trip.getGtfsDirectionIdAsString("");
+    Direction direction = trip.getDirection();
+    String directionId = direction == Direction.UNKNOWN ? "" : Integer.toString(direction.gtfsCode);
     if (counter == Integer.MAX_VALUE) {
       counter = 0;
     } else {
       counter++;
     }
-    // OBA library uses underscore as separator, we're moving toward colon.
-    String code = String.format(
-      "%s:%s:%s:rt#%d",
-      routeId.getFeedId(),
-      routeId.getId(),
-      directionId,
-      counter
-    );
-    return new FeedScopedId(trip.getId().getFeedId(), code);
+    String code = String.format("%s:%s:rt#%d", routeId.getId(), directionId, counter);
+    return new FeedScopedId(routeId.getFeedId(), code);
   }
 }

@@ -1,7 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,16 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collection;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 
 public class FrequencyMapperTest {
 
-  private static final String FEED_ID = "FEED";
+  private static final GtfsTestData DATA = new GtfsTestData();
 
-  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+  private static final String FEED_ID = "FEED";
 
   private static final Integer ID = 45;
 
@@ -32,10 +29,11 @@ public class FrequencyMapperTest {
 
   private static final int LABEL_ONLY = 1;
 
-  private static final Trip TRIP = new GtfsTestData().trip;
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
 
   private static final TripMapper TRIP_MAPPER = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false))
+    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
+    new DirectionMapper(ISSUE_STORE)
   );
 
   private static final Frequency FREQUENCY = new Frequency();
@@ -43,20 +41,17 @@ public class FrequencyMapperTest {
   private final FrequencyMapper subject;
 
   {
-    TRIP_MAPPER.map(TRIP);
     subject = new FrequencyMapper(TRIP_MAPPER);
   }
 
   static {
-    TRIP.setId(AGENCY_AND_ID);
-
     FREQUENCY.setId(ID);
     FREQUENCY.setStartTime(START_TIME);
     FREQUENCY.setEndTime(END_TIME);
     FREQUENCY.setExactTimes(EXACT_TIMES);
     FREQUENCY.setHeadwaySecs(HEADWAY_SECS);
     FREQUENCY.setLabelOnly(LABEL_ONLY);
-    FREQUENCY.setTrip(TRIP);
+    FREQUENCY.setTrip(DATA.trip);
   }
 
   @Test
@@ -75,7 +70,7 @@ public class FrequencyMapperTest {
     assertEquals(EXACT_TIMES, result.getExactTimes());
     assertEquals(HEADWAY_SECS, result.getHeadwaySecs());
     assertEquals(LABEL_ONLY, result.getLabelOnly());
-    assertNotNull(result.getTrip());
+    assertEquals(DATA.trip.getId().getId(), result.getTrip().getId().getId());
   }
 
   @Test

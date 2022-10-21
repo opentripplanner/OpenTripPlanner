@@ -17,10 +17,9 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,23 +61,18 @@ public class PlannerResource extends RoutingResource {
 
     // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
     TripPlannerResponse response = new TripPlannerResponse(uriInfo);
-    RoutingRequest request = null;
-    Router router = null;
+    RouteRequest request = null;
     RoutingResponse res = null;
     try {
       /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
       request = super.buildRequest(uriInfo.getQueryParameters());
-      router = otpServer.getRouter();
 
       // Route
-      RoutingService routingService = new RoutingService(router.graph);
-      res = routingService.route(request, router);
+      res = serverContext.routingService().route(request);
 
       // Map to API
-      TripPlanMapper tripPlanMapper = new TripPlanMapper(
-        request.locale,
-        request.showIntermediateStops
-      );
+      // TODO VIA (Leonard) - we should store the default showIntermediateStops somewhere
+      TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale(), showIntermediateStops);
       response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
       if (res.getPreviousPageCursor() != null) {
         response.setPreviousPageCursor(res.getPreviousPageCursor().encode());
@@ -95,8 +89,8 @@ public class PlannerResource extends RoutingResource {
       /* Populate up the elevation metadata */
       response.elevationMetadata = new ElevationMetadata();
       response.elevationMetadata.ellipsoidToGeoidDifference =
-        router.graph.ellipsoidToGeoidDifference;
-      response.elevationMetadata.geoidElevation = request.geoidElevation;
+        serverContext.graph().ellipsoidToGeoidDifference;
+      response.elevationMetadata.geoidElevation = request.preferences().system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
     } catch (Exception e) {
@@ -106,44 +100,44 @@ public class PlannerResource extends RoutingResource {
     }
 
     /* Log this request if such logging is enabled. */
-    logRequest(grizzlyRequest, request, router, res);
+    logRequest(grizzlyRequest, request, serverContext, res);
 
     return response;
   }
 
   private void logRequest(
     Request grizzlyRequest,
-    RoutingRequest request,
-    Router router,
+    RouteRequest request,
+    OtpServerRequestContext serverContext,
     RoutingResponse res
   ) {
-    if (request != null && router != null && router.requestLogger != null) {
+    if (request != null && serverContext != null && serverContext.requestLogger() != null) {
       StringBuilder sb = new StringBuilder();
       String clientIpAddress = grizzlyRequest.getRemoteAddr();
       //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
       sb.append(clientIpAddress);
       sb.append(' ');
-      sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
+      sb.append(request.arriveBy() ? "ARRIVE" : "DEPART");
       sb.append(' ');
-      sb.append(LocalDateTime.ofInstant(request.getDateTime(), ZoneId.systemDefault()));
+      sb.append(LocalDateTime.ofInstant(request.dateTime(), ZoneId.systemDefault()));
       sb.append(' ');
       sb.append(request.streetSubRequestModes.getAsStr());
       sb.append(' ');
-      sb.append(request.from.lat);
+      sb.append(request.from().lat);
       sb.append(' ');
-      sb.append(request.from.lng);
+      sb.append(request.from().lng);
       sb.append(' ');
-      sb.append(request.to.lat);
+      sb.append(request.to().lat);
       sb.append(' ');
-      sb.append(request.to.lng);
+      sb.append(request.to().lng);
       sb.append(' ');
       if (res != null) {
         for (Itinerary it : res.getTripPlan().itineraries) {
-          sb.append(it.durationSeconds);
+          sb.append(it.getDuration());
           sb.append(' ');
         }
       }
-      router.requestLogger.info(sb.toString());
+      serverContext.requestLogger().info(sb.toString());
     }
   }
 }

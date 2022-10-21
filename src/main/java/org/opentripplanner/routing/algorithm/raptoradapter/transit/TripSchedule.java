@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.LocalDate;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * Extension of RaptorTripSchedule passed through Raptor searches to be able to retrieve the
  * original trip from the path when creating itineraries.
  */
-public interface TripSchedule extends RaptorTripSchedule {
+public interface TripSchedule extends DefaultTripSchedule {
   LocalDate getServiceDate();
 
   /**

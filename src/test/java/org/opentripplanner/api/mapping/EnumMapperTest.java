@@ -1,13 +1,13 @@
 package org.opentripplanner.api.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.api.model.ApiAbsoluteDirection;
 import org.opentripplanner.api.model.ApiRelativeDirection;
 import org.opentripplanner.api.model.ApiVertexType;
@@ -69,7 +69,7 @@ public class EnumMapperTest {
     List<A> rest = new ArrayList<>(List.of(apiClass.getEnumConstants()));
     for (D it : domainClass.getEnumConstants()) {
       A result = mapper.apply(it);
-      assertEquals("Map " + it, mappings.get(it), result);
+      assertEquals(mappings.get(it), result, "Map " + it);
       rest.remove(result);
     }
     assertTrue(rest.isEmpty());
@@ -83,7 +83,7 @@ public class EnumMapperTest {
     List<A> rest = new ArrayList<>(List.of(apiClass.getEnumConstants()));
     for (D it : domainClass.getEnumConstants()) {
       A result = mapper.apply(it);
-      assertEquals("Map " + it, result.name(), it.name());
+      assertEquals(result.name(), it.name());
       rest.remove(result);
     }
     assertTrue(rest.isEmpty());

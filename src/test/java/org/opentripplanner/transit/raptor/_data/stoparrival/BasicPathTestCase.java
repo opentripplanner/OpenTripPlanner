@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor._data.stoparrival;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
+import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexWithOnBoard;
 import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.util.time.DurationUtils.durationToStr;
@@ -21,14 +22,14 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 /**
  * This class is used to create a journeys with stop arrivals.
@@ -152,27 +153,33 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final RaptorTransfer ACCESS = walk(STOP_A, ACCESS_DURATION, ACCESS_COST);
   private static final RaptorTransfer EGRESS = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
   // this is of course not a real flex egress
-  private static final RaptorTransfer FLEX = walk(STOP_E, EGRESS_DURATION, EGRESS_COST);
+  private static final RaptorTransfer FLEX = flexWithOnBoard(STOP_E, EGRESS_DURATION, EGRESS_COST);
 
   public static final String LINE_11 = "L11";
   public static final String LINE_21 = "L21";
   public static final String LINE_31 = "L31";
 
-  private static final TestTripSchedule TRIP_1 = TestTripSchedule
+  public static final TestTripSchedule TRIP_1 = TestTripSchedule
     .schedule(pattern(LINE_11, STOP_A, STOP_B))
     .times(L11_START, L11_END)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
-  private static final TestTripSchedule TRIP_2 = TestTripSchedule
+
+  public static final TestTripSchedule TRIP_2 = TestTripSchedule
     .schedule(pattern(LINE_21, STOP_C, STOP_D))
     .times(L21_START, L21_END)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
-  private static final TestTripSchedule TRIP_3 = TestTripSchedule
+
+  public static final TestTripSchedule TRIP_3 = TestTripSchedule
     .schedule(pattern(LINE_31, STOP_D, STOP_E))
     // The early arrival and late departure should not have any effect on tests
     .arrivals(VERY_EARLY, L31_END)
     .departures(L31_START, VERY_LATE)
+    .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
-  public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
+
+  public static final CostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
     BOARD_COST_SEC,
     TRANSFER_COST_SEC,
     WAIT_RELUCTANCE,
@@ -291,7 +298,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       EGRESS_END,
       EGRESS_COST
     );
-    var transfer = TestTransfer.walk(STOP_C, TX_END - TX_START);
+    var transfer = TestTransfer.walk(STOP_E, TX_END - TX_START);
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
@@ -402,7 +409,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       boardCost,
       ALIGHT_SLACK,
       alightTime - boardTime,
-      trip.transitReluctanceFactorIndex(),
+      trip,
       alightStop
     );
   }

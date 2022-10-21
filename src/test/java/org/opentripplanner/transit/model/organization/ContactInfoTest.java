@@ -38,14 +38,14 @@ class ContactInfoTest {
     // Copy and change the contact person
     copy = subject.copy().withContactPerson("New Person").build();
 
-    assertNotSame(copy, subject);
-    assertEquals(copy.getContactPerson(), "New Person");
-    assertEquals(copy.getPhoneNumber(), PHONE);
-    assertEquals(copy.geteMail(), EMAIL);
-    assertEquals(copy.getFaxNumber(), FAX_NUMBER);
-    assertEquals(copy.getInfoUrl(), INFO_URL);
-    assertEquals(copy.getBookingUrl(), BOOKING_URL);
-    assertEquals(copy.getAdditionalDetails(), ADD_DETAILS);
+    assertNotSame(subject, copy);
+    assertEquals("New Person", copy.getContactPerson());
+    assertEquals(PHONE, copy.getPhoneNumber());
+    assertEquals(EMAIL, copy.geteMail());
+    assertEquals(FAX_NUMBER, copy.getFaxNumber());
+    assertEquals(INFO_URL, copy.getInfoUrl());
+    assertEquals(BOOKING_URL, copy.getBookingUrl());
+    assertEquals(ADD_DETAILS, copy.getAdditionalDetails());
   }
 
   @Test

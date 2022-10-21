@@ -2,8 +2,8 @@ package org.opentripplanner.util.lang;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public class ValueObjectToStringBuilderTest {
 
@@ -99,8 +99,11 @@ public class ValueObjectToStringBuilderTest {
 
   @Test
   public void addDuration() {
-    assertEquals("35s", subject().addDuration(35).toString());
-    assertEquals("1d2h50m45s", subject().addDuration((26 * 60 + 50) * 60 + 45).toString());
+    assertEquals("35s", subject().addDurationSec(35).toString());
+    assertEquals("1d2h50m45s", subject().addDurationSec((26 * 60 + 50) * 60 + 45).toString());
+    assertEquals("35s", subject().addDuration(Duration.ofSeconds(35)).toString());
+
+    assertEquals("", subject().skipNull().addDurationSec(null).toString());
     assertEquals("", subject().skipNull().addDuration(null).toString());
   }
 

@@ -1,12 +1,12 @@
 package org.opentripplanner.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.Test;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * Created by mabu on 28.7.2015.

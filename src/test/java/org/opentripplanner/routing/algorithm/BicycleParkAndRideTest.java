@@ -18,51 +18,51 @@ public class BicycleParkAndRideTest extends ParkAndRideTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    graph =
-      graphOf(
-        new Builder() {
-          @Override
-          public void build() {
-            A = intersection("A", 47.500, 19.000);
-            B = intersection("B", 47.510, 19.000);
-            C = intersection("C", 47.520, 19.000);
-            D = intersection("D", 47.530, 19.000);
-            E = intersection("E", 47.540, 19.000);
+    var otpModel = modelOf(
+      new Builder() {
+        @Override
+        public void build() {
+          A = intersection("A", 47.500, 19.000);
+          B = intersection("B", 47.510, 19.000);
+          C = intersection("C", 47.520, 19.000);
+          D = intersection("D", 47.530, 19.000);
+          E = intersection("E", 47.540, 19.000);
 
-            street(A, B, 87, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
-            street(B, C, 87, StreetTraversalPermission.PEDESTRIAN);
-            street(C, D, 87, StreetTraversalPermission.PEDESTRIAN);
-            street(D, E, 87, StreetTraversalPermission.ALL);
+          street(A, B, 87, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+          street(B, C, 87, StreetTraversalPermission.PEDESTRIAN);
+          street(C, D, 87, StreetTraversalPermission.PEDESTRIAN);
+          street(D, E, 87, StreetTraversalPermission.ALL);
 
-            vehicleParking(
-              "AllPark",
-              47.500,
-              19.001,
-              true,
-              true,
-              List.of(vehicleParkingEntrance(A, "All Park Entrance", true, true))
-            );
+          vehicleParking(
+            "AllPark",
+            47.500,
+            19.001,
+            true,
+            true,
+            List.of(vehicleParkingEntrance(A, "All Park Entrance", true, true))
+          );
 
-            vehicleParking(
-              "BikePark",
-              47.520,
-              19.001,
-              true,
-              false,
-              List.of(vehicleParkingEntrance(C, "BikePark Entrance", false, true))
-            );
+          vehicleParking(
+            "BikePark",
+            47.520,
+            19.001,
+            true,
+            false,
+            List.of(vehicleParkingEntrance(C, "BikePark Entrance", false, true))
+          );
 
-            vehicleParking(
-              "CarPark",
-              47.530,
-              19.001,
-              false,
-              true,
-              List.of(vehicleParkingEntrance(D, "CarPark Entrance", true, true))
-            );
-          }
+          vehicleParking(
+            "CarPark",
+            47.530,
+            19.001,
+            false,
+            true,
+            List.of(vehicleParkingEntrance(D, "CarPark Entrance", true, true))
+          );
         }
-      );
+      }
+    );
+    graph = otpModel.graph();
   }
 
   // Verify that it is not possible to park at a car-only park

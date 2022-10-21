@@ -3,7 +3,8 @@ package org.opentripplanner.updater.street_notes;
 import java.util.Date;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 /**
  * Example implementation of a WFS based street note updater, which can be used to retrieve
@@ -22,8 +23,8 @@ import org.opentripplanner.util.NonLocalizedString;
 
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
 
-  public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
-    super(config);
+  public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config, Graph graph) {
+    super(config, graph);
   }
 
   protected StreetNote getNote(SimpleFeature feature) {

@@ -7,12 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -21,6 +19,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.StreetLegBuilder;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -38,30 +37,28 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A mapper class used in converting internal GraphPaths to Itineraries, which are returned by the
  * OTP APIs. This only produces itineraries for non-transit searches, as well as the non-transit
- * parts of itineraries containing transit, while the whole transit itinerary is produced by {@link
- * RaptorPathToItineraryMapper}.
+ * parts of itineraries containing transit, while the whole transit itinerary is produced by
+ * {@link RaptorPathToItineraryMapper}.
  */
 public class GraphPathToItineraryMapper {
 
   private final ZoneId timeZone;
-  private final AlertToLegMapper alertToLegMapper;
   private final StreetNotesService streetNotesService;
   private final double ellipsoidToGeoidDifference;
 
   public GraphPathToItineraryMapper(
-    TimeZone timeZone,
-    AlertToLegMapper alertToLegMapper,
+    ZoneId timeZone,
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
-    this.timeZone = timeZone.toZoneId();
-    this.alertToLegMapper = alertToLegMapper;
+    this.timeZone = timeZone;
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }
@@ -86,7 +83,7 @@ public class GraphPathToItineraryMapper {
     List<Itinerary> itineraries = new LinkedList<>();
     for (GraphPath path : paths) {
       Itinerary itinerary = generateItinerary(path);
-      if (itinerary.legs.isEmpty()) {
+      if (itinerary.getLegs().isEmpty()) {
         continue;
       }
       itineraries.add(itinerary);
@@ -127,8 +124,8 @@ public class GraphPathToItineraryMapper {
     calculateElevations(itinerary, path.edges);
 
     State lastState = path.states.getLast();
-    itinerary.generalizedCost = (int) lastState.weight;
-    itinerary.arrivedAtDestinationWithRentedVehicle = lastState.isRentingVehicleFromStation();
+    itinerary.setGeneralizedCost((int) lastState.weight);
+    itinerary.setArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
 
     return itinerary;
   }
@@ -181,20 +178,21 @@ public class GraphPathToItineraryMapper {
         forwardState.backEdge instanceof FlexTripEdge || backState.backEdge instanceof FlexTripEdge;
       var rentalChange = isRentalPickUp(backState) || isRentalDropOff(backState);
       var parkingChange = backState.isVehicleParked() != forwardState.isVehicleParked();
+      var carPickupChange = backState.getCarPickupState() != forwardState.getCarPickupState();
 
-      if (parkingChange || flexChange || rentalChange) {
+      if (parkingChange || flexChange || rentalChange || carPickupChange) {
         int nextBreak = i;
 
-        /* Remove the state for actually parking (traversing VehicleParkingEdge) from the
+        if (nextBreak > previousBreak) {
+          legsStates.add(states.subList(previousBreak, nextBreak + 1));
+        }
+
+        /* Remove the state for actually parking (traversing a VehicleParkingEdge) from the
          * states so that the leg from/to edges correspond to the actual entrances.
          * The actual time for parking is added to the walking leg in generateLeg().
          */
         if (parkingChange) {
           nextBreak++;
-        }
-
-        if (nextBreak > previousBreak) {
-          legsStates.add(states.subList(previousBreak, nextBreak + 1));
         }
 
         previousBreak = nextBreak;
@@ -212,13 +210,13 @@ public class GraphPathToItineraryMapper {
   /**
    * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
    */
-  private static void setPathwayInfo(StreetLeg leg, List<State> legStates) {
+  private static StreetLegBuilder setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
     for (State legsState : legStates) {
       if (legsState.getBackEdge() instanceof PathwayEdge pe) {
-        leg.setPathwayId(pe.getId());
-        return;
+        leg.withPathwayId(pe.getId());
       }
     }
+    return leg;
   }
 
   /**
@@ -242,9 +240,9 @@ public class GraphPathToItineraryMapper {
         double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
 
         if (change > 0) {
-          itinerary.elevationGained += change;
+          itinerary.setElevationGained(itinerary.getElevationGained() + change);
         } else if (change < 0) {
-          itinerary.elevationLost -= change;
+          itinerary.setElevationLost(itinerary.getElevationLost() - change);
         }
       }
     }
@@ -256,25 +254,32 @@ public class GraphPathToItineraryMapper {
    * @param states The states that go with the leg
    */
   private static TraverseMode resolveMode(List<State> states) {
-    for (State state : states) {
-      TraverseMode mode = state.getNonTransitMode();
+    return states
+      .stream()
+      // The first state is part of the previous leg
+      .skip(1)
+      .map(state -> {
+        var mode = state.getNonTransitMode();
 
-      if (mode != null) {
-        // Resolve correct mode if renting vehicle
-        if (state.isRentingVehicle()) {
-          return switch (state.stateData.rentalVehicleFormFactor) {
-            case BICYCLE, OTHER -> TraverseMode.BICYCLE;
-            case SCOOTER, MOPED -> TraverseMode.SCOOTER;
-            case CAR -> TraverseMode.CAR;
-          };
-        } else {
-          return mode;
+        if (mode != null) {
+          // Resolve correct mode if renting vehicle
+          if (state.isRentingVehicle()) {
+            return switch (state.stateData.rentalVehicleFormFactor) {
+              case BICYCLE, OTHER -> TraverseMode.BICYCLE;
+              case SCOOTER, MOPED -> TraverseMode.SCOOTER;
+              case CAR -> TraverseMode.CAR;
+            };
+          } else {
+            return mode;
+          }
         }
-      }
-    }
 
-    // Fallback to walking
-    return TraverseMode.WALK;
+        return null;
+      })
+      .filter(Objects::nonNull)
+      .findFirst()
+      // Fallback to walking
+      .orElse(TraverseMode.WALK);
   }
 
   private static List<P2<Double>> encodeElevationProfileWithNaN(
@@ -356,10 +361,7 @@ public class GraphPathToItineraryMapper {
     ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
-    Leg leg = new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
-
-    alertToLegMapper.addTransitAlertPatchesToLeg(leg, true);
-    return leg;
+    return new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
   }
 
   /**
@@ -408,26 +410,25 @@ public class GraphPathToItineraryMapper {
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
-    StreetLeg leg = new StreetLeg(
-      resolveMode(states),
-      startTimeState.getTime().atZone(timeZone),
-      lastState.getTime().atZone(timeZone),
-      makePlace(firstState),
-      makePlace(lastState),
-      distanceMeters,
-      (int) (lastState.getWeight() - firstState.getWeight()),
-      geometry,
-      makeElevation(edges, firstState.getOptions().geoidElevation),
-      walkSteps
-    );
+    StreetLegBuilder leg = StreetLeg
+      .create()
+      .withMode(resolveMode(states))
+      .withStartTime(startTimeState.getTime().atZone(timeZone))
+      .withEndTime(lastState.getTime().atZone(timeZone))
+      .withFrom(makePlace(firstState))
+      .withTo(makePlace(lastState))
+      .withDistanceMeters(distanceMeters)
+      .withGeneralizedCost((int) (lastState.getWeight() - firstState.getWeight()))
+      .withGeometry(geometry)
+      .withElevation(makeElevation(edges, firstState.getPreferences().system().geoidElevation()))
+      .withWalkSteps(walkSteps)
+      .withRentedVehicle(firstState.isRentingVehicle())
+      .withWalkingBike(false);
 
-    leg.setRentedVehicle(firstState.isRentingVehicle());
-    leg.setWalkingBike(false);
-
-    if (leg.getRentedVehicle()) {
+    if (firstState.isRentingVehicle()) {
       String vehicleRentalNetwork = firstState.getVehicleRentalNetwork();
       if (vehicleRentalNetwork != null) {
-        leg.setVehicleRentalNetwork(vehicleRentalNetwork);
+        leg.withVehicleRentalNetwork(vehicleRentalNetwork);
       }
     }
 
@@ -435,7 +436,7 @@ public class GraphPathToItineraryMapper {
 
     setPathwayInfo(leg, states);
 
-    return leg;
+    return leg.build();
   }
 
   /**
@@ -444,16 +445,15 @@ public class GraphPathToItineraryMapper {
    * @param leg    The leg to add the mode and alerts to
    * @param states The states that go with the leg
    */
-  private void addStreetNotes(StreetLeg leg, List<State> states) {
+  private StreetLegBuilder addStreetNotes(StreetLegBuilder leg, List<State> states) {
     for (State state : states) {
       Set<StreetNote> streetNotes = streetNotesService.getNotes(state);
 
       if (streetNotes != null) {
-        for (StreetNote streetNote : streetNotes) {
-          leg.addStretNote(streetNote);
-        }
+        leg.withStreetNotes(streetNotes);
       }
     }
+    return leg;
   }
 
   private List<P2<Double>> makeElevation(List<Edge> edges, boolean geoidElevation) {

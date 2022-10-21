@@ -3,15 +3,22 @@ package org.opentripplanner.routing.edgetype;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.api.request.preference.AccessibilityPreferences.ofOnlyAccessible;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.SimpleVertex;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.site.PathwayMode;
 
 class PathwayEdgeTest {
 
@@ -23,14 +30,36 @@ class PathwayEdgeTest {
   void zeroLength() {
     // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
     // from the vertices as they most likely have identical coordinates
-    var edge = new PathwayEdge(from, to, null, new NonLocalizedString("pathway"), 0, 0, 0, 0, true);
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      0,
+      0,
+      0,
+      0,
+      true,
+      PathwayMode.ELEVATOR
+    );
 
     assertThatEdgeIsTraversable(edge);
   }
 
   @Test
   void zeroLengthWithSteps() {
-    var edge = new PathwayEdge(from, to, null, new NonLocalizedString("pathway"), 0, 0, 2, 0, true);
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      0,
+      0,
+      2,
+      0,
+      true,
+      PathwayMode.STAIRS
+    );
 
     assertThatEdgeIsTraversable(edge);
   }
@@ -46,7 +75,8 @@ class PathwayEdgeTest {
       0,
       0,
       0,
-      true
+      true,
+      PathwayMode.ESCALATOR
     );
 
     var state = assertThatEdgeIsTraversable(edge);
@@ -65,7 +95,8 @@ class PathwayEdgeTest {
       1000,
       0,
       0,
-      true
+      true,
+      PathwayMode.MOVING_SIDEWALK
     );
 
     assertEquals(1000, edge.getDistanceMeters());
@@ -86,7 +117,8 @@ class PathwayEdgeTest {
       100,
       0,
       0,
-      true
+      true,
+      PathwayMode.WALKWAY
     );
 
     var state = assertThatEdgeIsTraversable(edge);
@@ -94,8 +126,89 @@ class PathwayEdgeTest {
     assertEquals(266, state.getWeight());
   }
 
+  @Test
+  void wheelchair() {
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      0,
+      100,
+      0,
+      0,
+      false,
+      PathwayMode.WALKWAY
+    );
+
+    var state = assertThatEdgeIsTraversable(edge, true);
+    assertEquals(133, state.getElapsedTimeSeconds());
+    assertEquals(6650.0, state.getWeight());
+  }
+
+  static Stream<Arguments> slopeCases = Stream.of(
+    // no extra cost
+    Arguments.of(0.07, 120),
+    // no extra cost
+    Arguments.of(0.08, 120),
+    // 1 % above max
+    Arguments.of(0.09, 239),
+    // 1.1 % above the max slope, tiny extra cost
+    Arguments.of(0.091, 251),
+    // 1.15 % above the max slope, will incur larger cost
+    Arguments.of(0.0915, 257),
+    // 3 % above max slope, will incur very large cost
+    Arguments.of(0.11, 480)
+  );
+
+  /**
+   * This makes sure that when you exceed the max slope in a wheelchair there isn't a hard cut-off
+   * but rather the cost increases proportional to how much you go over the maximum.
+   * <p>
+   * In other words: 0.1 % over the limit only has a small cost but 2% over increases it
+   * dramatically to the point where it's only used as a last resort.
+   */
+  @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
+  @VariableSource("slopeCases")
+  public void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
+    var edge = new PathwayEdge(
+      from,
+      to,
+      null,
+      new NonLocalizedString("pathway"),
+      60,
+      100,
+      0,
+      slope,
+      true,
+      PathwayMode.WALKWAY
+    );
+
+    var state = assertThatEdgeIsTraversable(edge, true);
+    assertEquals(60, state.getElapsedTimeSeconds());
+    assertEquals(expectedCost, (int) state.getWeight());
+  }
+
   private State assertThatEdgeIsTraversable(PathwayEdge edge) {
-    var req = new RoutingRequest();
+    return assertThatEdgeIsTraversable(edge, false);
+  }
+
+  private State assertThatEdgeIsTraversable(PathwayEdge edge, boolean wheelchair) {
+    var req = new RouteRequest();
+    req.setWheelchair(wheelchair);
+    req
+      .preferences()
+      .setWheelchair(
+        new WheelchairPreferences(
+          ofOnlyAccessible(),
+          ofOnlyAccessible(),
+          ofOnlyAccessible(),
+          25,
+          0.08,
+          1,
+          25
+        )
+      );
     var state = new State(new RoutingContext(req, graph, from, to));
 
     var afterTraversal = edge.traverse(state);

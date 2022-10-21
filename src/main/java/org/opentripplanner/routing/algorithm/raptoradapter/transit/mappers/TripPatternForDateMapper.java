@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers;
 
 import gnu.trove.set.TIntSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,13 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternWithRaptorStopIndexes;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,20 +35,13 @@ public class TripPatternForDateMapper {
 
   private final ConcurrentMap<Timetable, List<TripTimes>> sortedTripTimesForTimetable = new ConcurrentHashMap<>();
 
-  private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
-
-  private final Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld;
+  private final Map<LocalDate, TIntSet> serviceCodesRunningForDate;
 
   /**
    * @param serviceCodesRunningForDate - READ ONLY
-   * @param newTripPatternForOld       - READ ONLY
    */
-  TripPatternForDateMapper(
-    Map<ServiceDate, TIntSet> serviceCodesRunningForDate,
-    Map<TripPattern, TripPatternWithRaptorStopIndexes> newTripPatternForOld
-  ) {
+  TripPatternForDateMapper(Map<LocalDate, TIntSet> serviceCodesRunningForDate) {
     this.serviceCodesRunningForDate = Collections.unmodifiableMap(serviceCodesRunningForDate);
-    this.newTripPatternForOld = Collections.unmodifiableMap(newTripPatternForOld);
   }
 
   /**
@@ -60,10 +51,8 @@ public class TripPatternForDateMapper {
    * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
    * @return TripPatternForDate for this timetable and serviceDate
    */
-  public TripPatternForDate map(Timetable timetable, ServiceDate serviceDate) {
+  public TripPatternForDate map(Timetable timetable, LocalDate serviceDate) {
     TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
-
-    TripPattern oldTripPattern = timetable.getPattern();
 
     List<TripTimes> times = new ArrayList<>();
 
@@ -98,7 +87,7 @@ public class TripPatternForDateMapper {
       .collect(Collectors.toList());
 
     if (times.isEmpty() && frequencies.isEmpty()) {
-      if (timetable.getServiceDate() == serviceDate) {
+      if (timetable.getServiceDate() != null && timetable.getServiceDate().equals(serviceDate)) {
         LOG.debug(
           "Tried to update TripPattern {}, but no service codes are valid for date {}",
           timetable.getPattern().getId(),
@@ -109,10 +98,10 @@ public class TripPatternForDateMapper {
     }
 
     return new TripPatternForDate(
-      newTripPatternForOld.get(oldTripPattern),
+      timetable.getPattern().getRoutingTripPattern(),
       times,
       frequencies,
-      ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
+      serviceDate
     );
   }
 }

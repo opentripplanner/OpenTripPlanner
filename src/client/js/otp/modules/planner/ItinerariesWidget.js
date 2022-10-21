@@ -601,10 +601,10 @@ otp.widgets.ItinerariesWidget =
                     headsign>. Used in showing itinerary*/
                     headerHtml +=  pgettext("bus_direction", " to ") + leg.headsign;
                 }
+            }
 
-                if(leg.alerts) {
-                    headerHtml += '&nbsp;&nbsp;<img src="images/alert.png" style="vertical-align: -20%;" />';
-                }
+            if (leg.alerts) {
+                headerHtml += '&nbsp;&nbsp;<img src="images/alert.png" style="vertical-align: -20%;" />';
             }
 
             $("<h3>"+headerHtml+"</h3>").appendTo(legDiv).data('leg', leg).hover(function(evt) {
@@ -943,31 +943,6 @@ otp.widgets.ItinerariesWidget =
                     this_.module.stopViewerWidget.bringToFront();
                 });
 
-            // render any alerts
-
-            if(leg.alerts) {
-                for(var i = 0; i < leg.alerts.length; i++) {
-                    var alert = leg.alerts[i];
-
-                    var alertDiv = ich['otp-planner-alert']({ alert: alert, leg: leg }).appendTo(legDiv);
-                    alertDiv.find('.otp-itin-alert-description').hide();
-
-                    alertDiv.find('.otp-itin-alert-toggleButton').data('div', alertDiv).click(function() {
-                        var div = $(this).data('div');
-                        var desc = div.find('.otp-itin-alert-description');
-                        var toggle = div.find('.otp-itin-alert-toggleButton');
-                        if(desc.is(":visible")) {
-                            desc.slideUp();
-                            toggle.html("&#x25BC;");
-                        }
-                        else {
-                            desc.slideDown();
-                            toggle.html("&#x25B2;");
-                        }
-                    });
-                }
-            }
-
             return legDiv;
         }
         else if (leg.steps) { // walk / bike / car
@@ -1009,6 +984,30 @@ otp.widgets.ItinerariesWidget =
                         $(this).css('background', '#e8e8e8');
                         $(step.graphElement).css({display: 'none'});
                         this_.module.webapp.map.lmap.closePopup();
+                    });
+                }
+            }
+
+            // render any alerts
+            if(leg.alerts) {
+                for(var i = 0; i < leg.alerts.length; i++) {
+                    var alert = leg.alerts[i];
+
+                    var alertDiv = ich['otp-planner-alert']({ alert: alert, leg: leg }).appendTo(legDiv);
+                    alertDiv.find('.otp-itin-alert-description').hide();
+
+                    alertDiv.find('.otp-itin-alert-toggleButton').data('div', alertDiv).click(function() {
+                        var div = $(this).data('div');
+                        var desc = div.find('.otp-itin-alert-description');
+                        var toggle = div.find('.otp-itin-alert-toggleButton');
+                        if(desc.is(":visible")) {
+                            desc.slideUp();
+                            toggle.html("&#x25BC;");
+                        }
+                        else {
+                            desc.slideDown();
+                            toggle.html("&#x25B2;");
+                        }
                     });
                 }
             }

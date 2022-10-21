@@ -4,8 +4,6 @@ import graphql.schema.GraphQLEnumType;
 import java.util.Arrays;
 import java.util.function.Function;
 import org.opentripplanner.model.BookingMethod;
-import org.opentripplanner.model.Direction;
-import org.opentripplanner.model.TripAlteration;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
@@ -18,23 +16,34 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.routing.trippattern.OccupancyStatus;
-import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.BikeAccess;
-import org.opentripplanner.transit.model.network.TransitMode;
+import org.opentripplanner.transit.model.timetable.Direction;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.TripAlteration;
 
 public class EnumTypes {
 
   public static GraphQLEnumType WHEELCHAIR_BOARDING = GraphQLEnumType
     .newEnum()
     .name("WheelchairBoarding")
-    .value("noInformation", 0, "There is no accessibility information for the stopPlace/quay.")
+    .value(
+      "noInformation",
+      Accessibility.NO_INFORMATION,
+      "There is no accessibility information for the stopPlace/quay."
+    )
     .value(
       "possible",
-      1,
+      Accessibility.POSSIBLE,
       "Boarding wheelchair-accessible serviceJourneys is possible at this stopPlace/quay."
     )
-    .value("notPossible", 2, "Wheelchair boarding/alighting is not possible at this stop.")
+    .value(
+      "notPossible",
+      Accessibility.NOT_POSSIBLE,
+      "Wheelchair boarding/alighting is not possible at this stop."
+    )
     .build();
 
   public static GraphQLEnumType INTERCHANGE_WEIGHTING = GraphQLEnumType
@@ -245,29 +254,25 @@ public class EnumTypes {
     )
     .build();
 
-  public static GraphQLEnumType MODE = GraphQLEnumType
+  public static GraphQLEnumType LEG_MODE = GraphQLEnumType
     .newEnum()
     .name("Mode")
-    .value("air", TraverseMode.AIRPLANE)
+    .value("air", TransitMode.AIRPLANE)
     .value("bicycle", TraverseMode.BICYCLE)
-    .value("bus", TraverseMode.BUS)
-    .value("cableway", TraverseMode.CABLE_CAR)
-    .value("water", TraverseMode.FERRY)
-    .value("funicular", TraverseMode.FUNICULAR)
-    .value("lift", TraverseMode.GONDOLA)
-    .value("rail", TraverseMode.RAIL)
-    .value("metro", TraverseMode.SUBWAY)
-    .value("tram", TraverseMode.TRAM)
-    .value("coach", TraverseMode.BUS)
-    .description("NOT IMPLEMENTED")
-    .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
+    .value("bus", TransitMode.BUS)
+    .value("cableway", TransitMode.CABLE_CAR)
+    .value("water", TransitMode.FERRY)
+    .value("funicular", TransitMode.FUNICULAR)
+    .value("lift", TransitMode.GONDOLA)
+    .value("rail", TransitMode.RAIL)
+    .value("metro", TransitMode.SUBWAY)
+    .value("tram", TransitMode.TRAM)
+    .value("trolleybus", TransitMode.TROLLEYBUS)
+    .value("monorail", TransitMode.MONORAIL)
+    .value("coach", TransitMode.COACH)
     .value("foot", TraverseMode.WALK)
     .value("car", TraverseMode.CAR)
     .value("scooter", TraverseMode.SCOOTER)
-    // TODO OTP2 - Car park no added
-    // .value("car_park", TraverseMode.CAR_PARK, "Combine with foot and transit for park and ride.")
-    // .value("car_dropoff", TraverseMode.CAR_DROPOFF, "Combine with foot and transit for kiss and ride.")
-    // .value("car_pickup", TraverseMode.CAR_PICKUP, "Combine with foot and transit for ride and kiss.")
     .build();
 
   public static GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType
@@ -349,7 +354,7 @@ public class EnumTypes {
   public static GraphQLEnumType TRANSPORT_SUBMODE = createEnum(
     "TransportSubmode",
     TransmodelTransportSubmode.values(),
-    (t -> t.getValue())
+    TransmodelTransportSubmode::getValue
   );
   /*
 
@@ -495,7 +500,7 @@ public class EnumTypes {
     .value("sameLine", AlternativeLegsFilter.SAME_ROUTE)
     .build();
 
-  private static <T extends Enum> GraphQLEnumType createEnum(
+  private static <T extends Enum<?>> GraphQLEnumType createEnum(
     String name,
     T[] values,
     Function<T, String> mapping

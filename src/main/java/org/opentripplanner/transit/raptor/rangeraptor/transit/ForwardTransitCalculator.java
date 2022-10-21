@@ -2,36 +2,33 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorConstrainedTripScheduleBoardingSearch;
-import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
  * Used to calculate times in a forward trip search.
  */
-final class ForwardTransitCalculator<T extends RaptorTripSchedule>
+public final class ForwardTransitCalculator<T extends RaptorTripSchedule>
   extends ForwardTimeCalculator
   implements TransitCalculator<T> {
 
-  private final int tripSearchBinarySearchThreshold;
   private final int earliestDepartureTime;
   private final int searchWindowInSeconds;
   private final int latestAcceptableArrivalTime;
   private final int iterationStep;
 
-  ForwardTransitCalculator(SearchParams s, RaptorTuningParameters t) {
+  public ForwardTransitCalculator(SearchParams s, RaptorTuningParameters t) {
     this(
-      t.scheduledTripBinarySearchThreshold(),
       s.earliestDepartureTime(),
       s.searchWindowInSeconds(),
       s.latestArrivalTime(),
@@ -40,13 +37,11 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule>
   }
 
   ForwardTransitCalculator(
-    int tripSearchBinarySearchThreshold,
     int earliestDepartureTime,
     int searchWindowInSeconds,
     int latestAcceptableArrivalTime,
     int iterationStep
   ) {
-    this.tripSearchBinarySearchThreshold = tripSearchBinarySearchThreshold;
     this.earliestDepartureTime = earliestDepartureTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
     this.latestAcceptableArrivalTime =
@@ -101,9 +96,10 @@ final class ForwardTransitCalculator<T extends RaptorTripSchedule>
 
   @Override
   public RaptorConstrainedTripScheduleBoardingSearch<T> transferConstraintsSearch(
-    RaptorRoute<T> route
+    RaptorTransitDataProvider<T> transitData,
+    int routeIndex
   ) {
-    return route.transferConstraintsForwardSearch();
+    return transitData.transferConstraintsForwardSearch(routeIndex);
   }
 
   @Override

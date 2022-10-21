@@ -1,8 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearch;
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearchApproximateTime;
@@ -10,12 +9,12 @@ import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSe
 import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearchApproximateTime;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrLong;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
 import org.opentripplanner.transit.raptor._data.stoparrival.Access;
 import org.opentripplanner.transit.raptor._data.stoparrival.Bus;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.BoardAndAlightTime;
+import org.opentripplanner.transit.raptor.api.transit.BoardAndAlightTime;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TripTimesSearchTest implements RaptorTestConstants {
@@ -115,62 +114,56 @@ public class TripTimesSearchTest implements RaptorTestConstants {
 
   @Test
   public void noTripFoundWhenArrivalIsToEarly() {
-    try {
-      findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME - 1));
-      fail();
-    } catch (IllegalStateException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'toStop'."));
-    }
+    assertThrows(
+      IllegalStateException.class,
+      () -> findTripForwardSearch(busFwd(STOP_A, STOP_C, C_ALIGHT_TIME - 1)),
+      "No stops matching 'toStop'."
+    );
   }
 
   @Test
   public void noTripFoundWhenReverseArrivalIsToLate() {
-    try {
-      findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME + 1));
-      fail();
-    } catch (IllegalStateException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'fromStop'."));
-    }
+    assertThrows(
+      IllegalStateException.class,
+      () -> findTripReverseSearch(busRev(STOP_C, STOP_A, A_BOARD_TIME + 1)),
+      "No stops matching 'fromStop'."
+    );
   }
 
   @Test
   public void noTripFoundWhenArrivalIsWayTooEarly() {
-    try {
-      findTripForwardSearch(busFwd(STOP_A, STOP_C, 0));
-      fail();
-    } catch (IllegalStateException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'toStop'."));
-    }
+    assertThrows(
+      IllegalStateException.class,
+      () -> findTripForwardSearch(busFwd(STOP_A, STOP_C, 0)),
+      "No stops matching 'toStop'."
+    );
   }
 
   @Test
   public void noTripFoundWhenReverseArrivalIsWayTooEarly() {
-    try {
-      findTripReverseSearch(busRev(STOP_C, STOP_A, 10_000));
-      fail();
-    } catch (IllegalStateException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'fromStop'."));
-    }
+    assertThrows(
+      IllegalStateException.class,
+      () -> findTripReverseSearch(busRev(STOP_C, STOP_A, 10_000)),
+      "No stops matching 'fromStop'."
+    );
   }
 
   @Test
   public void noTripFoundWhenFromStopIsMissing() {
-    try {
-      findTripForwardSearch(busFwd(STOP_A, STOP_A, C_ALIGHT_LATE));
-      fail();
-    } catch (IllegalStateException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'fromStop'."));
-    }
+    assertThrows(
+      IllegalStateException.class,
+      () -> findTripForwardSearch(busFwd(STOP_A, STOP_A, C_ALIGHT_LATE)),
+      "No stops matching 'fromStop'."
+    );
   }
 
   @Test
   public void noTripFoundWhenToStopIsMissingInReverseSearch() {
-    try {
-      findTripReverseSearch(busRev(STOP_C, STOP_C, A_BOARD_EARLY));
-      fail();
-    } catch (IllegalStateException e) {
-      assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'toStop'"));
-    }
+    assertThrows(
+      IllegalStateException.class,
+      () -> findTripReverseSearch(busRev(STOP_C, STOP_C, A_BOARD_EARLY)),
+      "No stops matching 'toStop'"
+    );
   }
 
   /**

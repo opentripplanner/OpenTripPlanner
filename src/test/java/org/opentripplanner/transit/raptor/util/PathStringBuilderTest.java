@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.raptor.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorStopNameResolver;
 
 public class PathStringBuilderTest {

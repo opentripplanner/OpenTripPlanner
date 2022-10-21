@@ -5,10 +5,10 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLSchema;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class PlaceInterfaceType {
 
@@ -47,7 +47,7 @@ public class PlaceInterfaceType {
         // we get the type from the schema. This also follows how it is done in the
         // LegacyGraphQLNodeTypeResolver.
 
-        if (o instanceof Stop) {
+        if (o instanceof RegularStop) {
           return schema.getObjectType("Quay");
         }
         if (o instanceof MonoOrMultiModalStation) {

@@ -1,22 +1,20 @@
 package org.opentripplanner.netex;
 
-import java.util.HashMap;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.TripOnServiceDate;
+import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.routing.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.OTPFeature;
 
 /**
@@ -27,10 +25,12 @@ import org.opentripplanner.util.OTPFeature;
  */
 public class NetexModule implements GraphBuilderModule {
 
-  private final double maxStopToShapeSnapDistance;
   private final int subwayAccessTime;
-  private final int maxInterlineDistance;
   private final String netexFeedId;
+
+  private final Graph graph;
+  private final TransitModel transitModel;
+  private final DataImportIssueStore issueStore;
 
   /**
    * @see BuildConfig#transitServiceStart
@@ -40,34 +40,30 @@ public class NetexModule implements GraphBuilderModule {
 
   private final List<NetexBundle> netexBundles;
 
-  private final FareServiceFactory fareServiceFactory = new DefaultFareServiceFactory();
-
   public NetexModule(
     String netexFeedId,
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore,
     int subwayAccessTime,
-    int maxInterlineDistance,
-    double maxStopToShapeSnapDistance,
     ServiceDateInterval transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
     this.netexFeedId = netexFeedId;
+    this.graph = graph;
+    this.transitModel = transitModel;
+    this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
-    this.maxInterlineDistance = maxInterlineDistance;
     this.transitPeriodLimit = transitPeriodLimit;
     this.netexBundles = netexBundles;
-    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
   }
 
   @Override
-  public void buildGraph(
-    Graph graph,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
-    graph.clearTimeZone();
-    CalendarServiceData calendarServiceData = graph.getCalendarDataService();
-    boolean hasTransit = false;
+  public void buildGraph() {
     try {
+      var calendarServiceData = new CalendarServiceData();
+      boolean hasActiveTransit = false;
+
       for (NetexBundle netexBundle : netexBundles) {
         netexBundle.checkInputs();
 
@@ -75,11 +71,9 @@ public class NetexModule implements GraphBuilderModule {
           graph.deduplicator,
           issueStore
         );
-        transitBuilder.limitServiceDays(transitPeriodLimit, issueStore);
-        for (TripOnServiceDate tripOnServiceDate : transitBuilder
-          .getTripOnServiceDates()
-          .values()) {
-          graph.getTripOnServiceDates().put(tripOnServiceDate.getId(), tripOnServiceDate);
+        transitBuilder.limitServiceDays(transitPeriodLimit);
+        for (var tripOnServiceDate : transitBuilder.getTripOnServiceDates().values()) {
+          transitModel.getTripOnServiceDates().put(tripOnServiceDate.getId(), tripOnServiceDate);
         }
         calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
@@ -89,40 +83,40 @@ public class NetexModule implements GraphBuilderModule {
             .addAll(FlexTripsMapper.createFlexTrips(transitBuilder, issueStore));
         }
 
+        validateStopTimesForEachTrip(transitBuilder.getStopTimesSortedByTrip());
+
         OtpTransitService otpService = transitBuilder.build();
 
         // if this or previously processed netex bundle has transit that has not been filtered out
-        hasTransit = hasTransit || otpService.hasActiveTransit();
+        hasActiveTransit = hasActiveTransit || otpService.hasActiveTransit();
 
         // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph
-        //           - and make sure thay also work with GTFS feeds - GTFS do no
+        //           - and make sure they also work with GTFS feeds - GTFS do no
         //           - have operators and notice assignments.
-        graph.getOperators().addAll(otpService.getAllOperators());
-        graph.addNoticeAssignments(otpService.getNoticeAssignments());
+        transitModel.getOperators().addAll(otpService.getAllOperators());
+        transitModel.addNoticeAssignments(otpService.getNoticeAssignments());
 
         GtfsFeedId feedId = new GtfsFeedId.Builder().id(netexFeedId).build();
 
-        AddTransitModelEntitiesToGraph.addToGraph(feedId, otpService, subwayAccessTime, graph);
-
-        new GeometryAndBlockProcessor(
+        AddTransitModelEntitiesToGraph.addToGraph(
+          feedId,
           otpService,
-          fareServiceFactory,
-          maxStopToShapeSnapDistance,
-          maxInterlineDistance
-        )
-          .run(graph, issueStore);
+          subwayAccessTime,
+          graph,
+          transitModel
+        );
+
+        transitModel.validateTimeZones();
       }
+
+      transitModel.updateCalendarServiceData(hasActiveTransit, calendarServiceData, issueStore);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
 
-    graph.clearCachedCalenderService();
-    graph.putService(CalendarServiceData.class, calendarServiceData);
-    graph.updateTransitFeedValidity(calendarServiceData, issueStore);
-
-    // If the graph's hasTransit flag isn't set to true already, set it based on this module's run
-    graph.hasTransit = graph.hasTransit || hasTransit;
-    graph.calculateTransitCenter();
+  private void validateStopTimesForEachTrip(TripStopTimes stopTimesByTrip) {
+    new ValidateAndInterpolateStopTimesForEachTrip(stopTimesByTrip, false, issueStore).run();
   }
 
   @Override

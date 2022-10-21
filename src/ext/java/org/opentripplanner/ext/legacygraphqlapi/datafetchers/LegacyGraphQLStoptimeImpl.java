@@ -7,7 +7,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.trippattern.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptime {
@@ -24,20 +24,14 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<String> dropoffType() {
-    return environment -> {
-      switch (getSource(environment).getDropoffType().getGtfsCode()) {
-        case 0:
-          return "SCHEDULED";
-        case 1:
-          return "NONE";
-        case 2:
-          return "CALL_AGENCY";
-        case 3:
-          return "COORDINATE_WITH_DRIVER";
-        default:
-          return null;
-      }
-    };
+    return environment ->
+      switch (getSource(environment).getDropoffType()) {
+        case SCHEDULED -> "SCHEDULED";
+        case NONE -> "NONE";
+        case CALL_AGENCY -> "CALL_AGENCY";
+        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
+        case CANCELLED -> null;
+      };
   }
 
   @Override
@@ -47,20 +41,14 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
 
   @Override
   public DataFetcher<String> pickupType() {
-    return environment -> {
-      switch (getSource(environment).getPickupType().getGtfsCode()) {
-        case 0:
-          return "SCHEDULED";
-        case 1:
-          return "NONE";
-        case 2:
-          return "CALL_AGENCY";
-        case 3:
-          return "COORDINATE_WITH_DRIVER";
-        default:
-          return null;
-      }
-    };
+    return environment ->
+      switch (getSource(environment).getPickupType()) {
+        case SCHEDULED -> "SCHEDULED";
+        case NONE -> "NONE";
+        case CALL_AGENCY -> "CALL_AGENCY";
+        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
+        case CANCELLED -> null;
+      };
   }
 
   @Override

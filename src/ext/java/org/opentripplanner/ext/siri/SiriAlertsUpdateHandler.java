@@ -9,20 +9,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.DateMapper;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.network.TransitMode;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.TranslatedString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.SubMode;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.ifopt.siri20.StopPlaceRef;
@@ -59,16 +59,16 @@ public class SiriAlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
   private final String feedId;
-  private final Graph graph;
+  private final TransitModel transitModel;
   private final Set<TransitAlert> alerts = new HashSet<>();
   private TransitAlertService transitAlertService;
   /** How long before the posted start of an event it should be displayed to users */
   private long earlyStart;
   private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
-  public SiriAlertsUpdateHandler(String feedId, Graph graph) {
+  public SiriAlertsUpdateHandler(String feedId, TransitModel transitModel) {
     this.feedId = feedId;
-    this.graph = graph;
+    this.transitModel = transitModel;
   }
 
   public void update(ServiceDelivery delivery) {
@@ -225,7 +225,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
 
-          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue());
+          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue(), feedId);
 
           if (stopId == null) {
             stopId = new FeedScopedId(feedId, stopPointRef.getValue());
@@ -245,7 +245,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
 
-          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue());
+          FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue(), feedId);
 
           if (stopId == null) {
             stopId = new FeedScopedId(feedId, stopPlace.getValue());
@@ -292,7 +292,8 @@ public class SiriAlertsUpdateHandler {
               if (!affectedStops.isEmpty()) {
                 for (AffectedStopPointStructure affectedStop : affectedStops) {
                   FeedScopedId stop = siriFuzzyTripMatcher.getStop(
-                    affectedStop.getStopPointRef().getValue()
+                    affectedStop.getStopPointRef().getValue(),
+                    feedId
                   );
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -358,9 +359,11 @@ public class SiriAlertsUpdateHandler {
                 ? affectedVehicleJourney.getOriginAimedDepartureTime()
                 : ZonedDateTime.now();
 
-              ZonedDateTime startOfService = DateMapper.asStartOfService(originAimedDepartureTime);
+              ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
+                originAimedDepartureTime
+              );
 
-              ServiceDate serviceDate = new ServiceDate(startOfService.toLocalDate());
+              LocalDate serviceDate = startOfService.toLocalDate();
 
               if (tripIdFromVehicleJourney != null) {
                 tripIds.add(tripIdFromVehicleJourney);
@@ -370,7 +373,7 @@ public class SiriAlertsUpdateHandler {
                     vehicleJourneyRef.getValue(),
                     serviceDate,
                     TransitMode.RAIL,
-                    "railReplacementBus"
+                    SubMode.of("railReplacementBus")
                   );
               }
 
@@ -378,7 +381,8 @@ public class SiriAlertsUpdateHandler {
                 if (!affectedStops.isEmpty()) {
                   for (AffectedStopPointStructure affectedStop : affectedStops) {
                     FeedScopedId stop = siriFuzzyTripMatcher.getStop(
-                      affectedStop.getStopPointRef().getValue()
+                      affectedStop.getStopPointRef().getValue(),
+                      feedId
                     );
                     if (stop == null) {
                       stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
@@ -407,25 +411,16 @@ public class SiriAlertsUpdateHandler {
             FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef, feedId);
 
             if (tripId != null) {
-              ServiceDate serviceDate = null;
+              LocalDate serviceDate = null;
               if (dataFrameRef != null && dataFrameRef.getValue() != null) {
-                ZonedDateTime startOfService = DateMapper.asStartOfService(
-                  LocalDate.parse(dataFrameRef.getValue()),
-                  graph.getTimeZone().toZoneId()
-                );
-
-                serviceDate =
-                  new ServiceDate(
-                    startOfService.getYear(),
-                    startOfService.getMonthValue(),
-                    startOfService.getDayOfMonth()
-                  );
+                serviceDate = LocalDate.parse(dataFrameRef.getValue());
               }
 
               if (!affectedStops.isEmpty()) {
                 for (AffectedStopPointStructure affectedStop : affectedStops) {
                   FeedScopedId stop = siriFuzzyTripMatcher.getStop(
-                    affectedStop.getStopPointRef().getValue()
+                    affectedStop.getStopPointRef().getValue(),
+                    feedId
                   );
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());

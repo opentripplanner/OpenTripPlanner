@@ -3,6 +3,7 @@ package org.opentripplanner.util.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,11 @@ public class DurationUtilsTest {
     assertEquals(D9s, DurationUtils.duration("PT9s"));
     assertEquals(D3d, DurationUtils.duration("P3d"));
     assertEquals(D3d5m9s, DurationUtils.duration("P3dT5m9s"));
+
+    // With unit
+    assertEquals(D9s, DurationUtils.duration("PT9s", ChronoUnit.DAYS), "ignore unit");
+    assertEquals(D9s, DurationUtils.duration("9", ChronoUnit.SECONDS));
+    assertEquals(-D9s.toSeconds(), DurationUtils.duration("-9", ChronoUnit.SECONDS).toSeconds());
   }
 
   @Test

@@ -11,7 +11,7 @@ public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Integer> cents() {
-    return environment -> ((Money) getSource(environment).get("fare")).getCents();
+    return environment -> ((Money) getSource(environment).get("fare")).cents();
   }
 
   @Override
@@ -21,13 +21,12 @@ public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> currency() {
-    return environment ->
-      ((Money) getSource(environment).get("fare")).getCurrency().getCurrencyCode();
+    return environment -> ((Money) getSource(environment).get("fare")).currency().getCurrencyCode();
   }
 
   @Override
   public DataFetcher<String> type() {
-    return environment -> (String) getSource(environment).get("name");
+    return environment -> getSource(environment).get("name").toString();
   }
 
   private Map<String, Object> getSource(DataFetchingEnvironment environment) {

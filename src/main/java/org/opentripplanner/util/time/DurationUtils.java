@@ -5,16 +5,16 @@ import static java.util.Locale.ROOT;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.calendar.ServiceDate;
 
 /**
  * This class extend the Java {@link LocalTime} and with the ability to span multiple days and be
  * negative.
  * <p>
- * The class is used to track time relative to a {@link ServiceDate}.
+ * The class is used to track time relative to a {@link java.time.LocalDate}.
  * <p>
  * The RelativeTime can also be used relative to some other time, in which case it is similar to the
  * JAva {@link Duration}.
@@ -89,6 +89,18 @@ public class DurationUtils {
   }
 
   /**
+   * Parses the given duration string. If the string contains an integer number the string is
+   * converted to a duration using the given unit. If not, the {@link #durations(String)} is used
+   * and the given unit is ignored.
+   */
+  public static Duration duration(String duration, ChronoUnit unit) {
+    if (duration.matches("-?\\d+")) {
+      return Duration.of(Integer.parseInt(duration), unit);
+    }
+    return duration(duration);
+  }
+
+  /**
    * Same as {@link #durationInSeconds(String)}, but returns the {@link Duration}, not the {@code
    * int} seconds.
    */
@@ -107,8 +119,8 @@ public class DurationUtils {
       return Duration.parse(d);
     } catch (DateTimeParseException e) {
       throw new DateTimeParseException(
-        e.getMessage() + ": " + e.getParsedString(),
-        e.getParsedString(),
+        e.getMessage() + ": '" + duration + "'",
+        duration,
         e.getErrorIndex()
       );
     }

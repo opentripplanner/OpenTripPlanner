@@ -21,7 +21,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -47,14 +48,20 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
   public VehicleParkingUpdater(
     VehicleParkingUpdaterParameters parameters,
-    DataSource<VehicleParking> source
+    DataSource<VehicleParking> source,
+    VertexLinker vertexLinker,
+    VehicleParkingService vehicleParkingService
   ) {
     super(parameters);
     this.source = source;
+    // Creation of network linker library will not modify the graph
+    this.linker = vertexLinker;
+    // Adding a vehicle parking station service needs a graph writer runnable
+    this.vehicleParkingService = vehicleParkingService;
 
     LOG.info(
       "Creating vehicle-parking updater running every {} seconds : {}",
-      pollingPeriodSeconds,
+      pollingPeriodSeconds(),
       source
     );
   }
@@ -65,19 +72,8 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(Graph graph) {
-    // Creation of network linker library will not modify the graph
-    linker = graph.getLinker();
-    // Adding a vehicle parking station service needs a graph writer runnable
-    vehicleParkingService = graph.getService(VehicleParkingService.class, true);
-  }
-
-  @Override
-  public void teardown() {}
-
-  @Override
   protected void runPolling() throws Exception {
-    LOG.debug("Updating vehicle parkings from " + source);
+    LOG.debug("Updating vehicle parkings from {}", source);
     if (!source.update()) {
       LOG.debug("No updates");
       return;
@@ -105,7 +101,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void run(Graph graph) {
+    public void run(Graph graph, TransitModel transitModel) {
       // Apply stations to graph
       /* Add any new park and update space available for existing parks */
       Set<VehicleParking> toAdd = new HashSet<>();

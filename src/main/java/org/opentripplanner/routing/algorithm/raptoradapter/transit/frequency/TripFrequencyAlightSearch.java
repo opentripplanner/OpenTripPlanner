@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.frequency;
 
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripPatternForDates;
-import org.opentripplanner.routing.trippattern.FrequencyEntry;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
 
@@ -13,13 +12,13 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleSearch;
  * Searches for a concrete trip time for a frequency based pattern. The {@link FrequencyEntry}s are
  * scanned to find the earliest possible departure time.
  */
-public final class TripFrequencyAlightSearch<T extends RaptorTripSchedule>
+public final class TripFrequencyAlightSearch<T extends DefaultTripSchedule>
   implements RaptorTripScheduleSearch<T> {
 
-  private final TripPatternForDates timeTable;
+  private final TripPatternForDates patternForDates;
 
-  public TripFrequencyAlightSearch(RaptorTimeTable<T> timeTable) {
-    this.timeTable = (TripPatternForDates) timeTable;
+  public TripFrequencyAlightSearch(TripPatternForDates patternForDates) {
+    this.patternForDates = patternForDates;
   }
 
   @Override
@@ -28,11 +27,11 @@ public final class TripFrequencyAlightSearch<T extends RaptorTripSchedule>
     int stopPositionInPattern,
     int tripIndexLimit
   ) {
-    IntIterator indexIterator = timeTable.tripPatternForDatesIndexIterator(false);
+    IntIterator indexIterator = patternForDates.tripPatternForDatesIndexIterator(false);
     while (indexIterator.hasNext()) {
       int i = indexIterator.next();
-      var pattern = timeTable.tripPatternForDate(i);
-      int offset = timeTable.tripPatternForDateOffsets(i);
+      var pattern = patternForDates.tripPatternForDate(i);
+      int offset = patternForDates.tripPatternForDateOffsets(i);
 
       for (int j = pattern.getFrequencies().size() - 1; j >= 0; j--) {
         final FrequencyEntry frequency = pattern.getFrequencies().get(j);
@@ -49,9 +48,8 @@ public final class TripFrequencyAlightSearch<T extends RaptorTripSchedule>
           );
 
           return new FrequencyAlightEvent<>(
-            timeTable,
+            patternForDates,
             tripTimes,
-            pattern.getTripPattern().getPattern(),
             stopPositionInPattern,
             arrivalTime + headway,
             headway,

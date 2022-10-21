@@ -1,8 +1,9 @@
 package org.opentripplanner.ext.datastore.gs;
 
 import com.google.cloud.storage.BlobId;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import java.net.URI;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 abstract class AbstractGsDataSource implements DataSource {
 
@@ -22,6 +23,11 @@ abstract class AbstractGsDataSource implements DataSource {
   @Override
   public final String path() {
     return GsHelper.toUriString(blobId);
+  }
+
+  @Override
+  public URI uri() {
+    return URI.create(path());
   }
 
   @Override

@@ -7,16 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.netex.mapping.MappingSupport.createJaxbElement;
 
 import com.google.common.collect.ArrayListMultimap;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -35,12 +35,14 @@ import org.rutebanken.netex.model.PresentationStructure;
 public class RouteMapperTest {
 
   private static final String NETWORK_ID = "RUT:Network:1";
-  private static final String GROUP_OF_LINES_ID_1 = "RUT:GroupOfLines:1";
-  private static final String GROUP_OF_LINES_ID_2 = "RUT:GroupOfLines:2";
+  private static final String GOL_ID_1 = "RUT:GroupOfLines:1";
+  private static final String GOL_ID_2 = "RUT:GroupOfLines:2";
+  private static final String GOL_NAME_1 = "G1";
+  private static final String GOL_NAME_2 = "G2";
   private static final String AUTHORITY_ID = "RUT:Authority:1";
   private static final String BRANDING_ID = "RUT:Branding:1";
-  private static final String RUT_LINE_ID = "RUT:Line:1";
-  private static final String RUT_FERRY_WITHOUT_BICYCLES_ID = "RUT:Line:2:NoBicycles";
+  private static final String LINE_ID = "RUT:Line:1";
+  private static final String FERRY_WITHOUT_BICYCLES_ID = "RUT:Line:2:NoBicycles";
 
   private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
@@ -50,7 +52,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -58,14 +60,14 @@ public class RouteMapperTest {
       ArrayListMultimap.create(),
       new EntityById<>(),
       netexEntityIndex.readOnlyView(),
-      TimeZone.getDefault().toString(),
+      ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
     Route route = routeMapper.mapRoute(line);
 
-    assertEquals(MappingSupport.ID_FACTORY.createId("RUT:Line:1"), route.getId());
-    assertEquals("Line 1", route.getLongName());
+    assertEquals(MappingSupport.ID_FACTORY.createId(LINE_ID), route.getId());
+    assertEquals("Line 1", route.getLongName().toString());
     assertEquals("L1", route.getShortName());
   }
 
@@ -88,7 +90,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -114,7 +116,7 @@ public class RouteMapperTest {
     line.setPresentation(new PresentationStructure().withColour(color).withTextColour(textColor));
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -122,7 +124,7 @@ public class RouteMapperTest {
       ArrayListMultimap.create(),
       new EntityById<>(),
       netexEntityIndex.readOnlyView(),
-      TimeZone.getDefault().toString(),
+      ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -135,11 +137,11 @@ public class RouteMapperTest {
   @Test
   public void allowBicyclesOnFerries() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
-    Line lineWithBicycles = createExampleFerry(RUT_LINE_ID);
-    Line lineWithOutBicycles = createExampleFerry(RUT_FERRY_WITHOUT_BICYCLES_ID);
+    Line lineWithBicycles = createExampleFerry(LINE_ID);
+    Line lineWithOutBicycles = createExampleFerry(FERRY_WITHOUT_BICYCLES_ID);
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -147,8 +149,8 @@ public class RouteMapperTest {
       ArrayListMultimap.create(),
       new EntityById<>(),
       netexEntityIndex.readOnlyView(),
-      TimeZone.getDefault().toString(),
-      Set.of(RUT_FERRY_WITHOUT_BICYCLES_ID)
+      ZoneId.systemDefault().getId(),
+      Set.of(FERRY_WITHOUT_BICYCLES_ID)
     );
 
     Route ferryWithBicycles = routeMapper.mapRoute(lineWithBicycles);
@@ -164,7 +166,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       new EntityById<>(),
       new EntityById<>(),
@@ -172,7 +174,7 @@ public class RouteMapperTest {
       ArrayListMultimap.create(),
       new EntityById<>(),
       netexEntityIndex.readOnlyView(),
-      TimeZone.getDefault().toString(),
+      ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
     );
 
@@ -193,7 +195,7 @@ public class RouteMapperTest {
     Line line = createExampleLine();
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -219,17 +221,14 @@ public class RouteMapperTest {
 
     Line line = createExampleLine();
 
-    line.getRepresentedByGroupRef().setRef(GROUP_OF_LINES_ID_1);
-    transitBuilder.getGroupOfRouteById().add(createGroupOfRoutes(GROUP_OF_LINES_ID_1));
+    line.getRepresentedByGroupRef().setRef(GOL_ID_1);
+    transitBuilder.getGroupOfRouteById().add(createGroupOfRoutes(GOL_ID_1, GOL_NAME_1));
     transitBuilder
       .getGroupsOfRoutesByRouteId()
-      .put(
-        MappingSupport.ID_FACTORY.createId(RUT_LINE_ID),
-        createGroupOfRoutes(GROUP_OF_LINES_ID_2)
-      );
+      .put(MappingSupport.ID_FACTORY.createId(LINE_ID), createGroupOfRoutes(GOL_ID_2, GOL_NAME_2));
 
     RouteMapper routeMapper = new RouteMapper(
-      new DataImportIssueStore(false),
+      DataImportIssueStore.noopIssueStore(),
       MappingSupport.ID_FACTORY,
       transitBuilder.getAgenciesById(),
       transitBuilder.getOperatorsById(),
@@ -246,17 +245,13 @@ public class RouteMapperTest {
     List<GroupOfRoutes> groupsOfLines = route.getGroupsOfRoutes();
 
     assertEquals(2, groupsOfLines.size());
-    assertTrue(
-      groupsOfLines.stream().anyMatch(gol -> GROUP_OF_LINES_ID_1.equals(gol.getId().getId()))
-    );
-    assertTrue(
-      groupsOfLines.stream().anyMatch(gol -> GROUP_OF_LINES_ID_2.equals(gol.getId().getId()))
-    );
+    assertTrue(groupsOfLines.stream().anyMatch(gol -> GOL_ID_1.equals(gol.getId().getId())));
+    assertTrue(groupsOfLines.stream().anyMatch(gol -> GOL_ID_2.equals(gol.getId().getId())));
   }
 
   private Line createExampleLine() {
     Line line = new Line();
-    line.setId(RUT_LINE_ID);
+    line.setId(LINE_ID);
     line.setTransportMode(AllVehicleModesOfTransportEnumeration.METRO);
     line.setName(new MultilingualString().withValue("Line 1"));
     line.setPublicCode("L1");
@@ -280,7 +275,7 @@ public class RouteMapperTest {
       .build();
   }
 
-  private GroupOfRoutes createGroupOfRoutes(String id) {
-    return GroupOfRoutes.of(MappingSupport.ID_FACTORY.createId(id)).build();
+  private GroupOfRoutes createGroupOfRoutes(String id, String name) {
+    return GroupOfRoutes.of(MappingSupport.ID_FACTORY.createId(id)).withName(name).build();
   }
 }

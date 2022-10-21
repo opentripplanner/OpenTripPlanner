@@ -35,13 +35,11 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
 ```json
 {
   "areaVisibility": true,
-  "parentStopLinking": true,
   "platformEntriesLinking": true,
-  "osmWayPropertySet": "norway",
   "islandWithoutStopsMaxSize": 5,
   "islandWithStopsMaxSize": 5,
   "dataImportReport": true,
-  "netex" : {
+  "netexDefaults" : {
     "moduleFilePattern" : ".*-netex\\.zip",
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
@@ -52,7 +50,14 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
       "NYC:Line:012fc5c4-131b-4dfc-8160-4e49136e531a",
       "NYC:Line:8bfef12a-ac98-4376-8a2a-eb5a336d107b"
     ]
-  }
+  },
+  "osm": [
+    {
+      "source": "norway-latest.osm.pbf",
+      "osmTagMapping": "norway",
+      "timeZone": "Europe/Oslo"
+    }
+    ]
 }
 ```
 

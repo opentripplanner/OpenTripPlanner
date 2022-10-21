@@ -2,11 +2,11 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.time.LocalDate;
 import java.util.function.IntUnaryOperator;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.WheelchairAccessibility;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.util.lang.ToStringBuilder;
@@ -21,13 +21,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   private final TripPatternForDates pattern;
   private final int sortIndex;
-  private final int transitReluctanceIndex;
   private final int tripIndexForDates;
   private final IntUnaryOperator arrivalTimes;
   private final IntUnaryOperator departureTimes;
 
   // Computed when needed later for RaptorPathToItineraryMapper
-  private int index;
   private TripTimes tripTimes = null;
   private LocalDate serviceDate = null;
   private int secondsOffset;
@@ -35,8 +33,6 @@ public final class TripScheduleWithOffset implements TripSchedule {
   TripScheduleWithOffset(TripPatternForDates pattern, int tripIndexForDates) {
     this.tripIndexForDates = tripIndexForDates;
     this.pattern = pattern;
-    // Mode ordinal is used to index the transit factor/reluctance
-    this.transitReluctanceIndex = pattern.getTripPattern().getPattern().getMode().ordinal();
 
     // get arrival/departures lambda
     this.arrivalTimes = pattern.getArrivalTimesForTrip(tripIndexForDates);
@@ -68,11 +64,11 @@ public final class TripScheduleWithOffset implements TripSchedule {
 
   @Override
   public int transitReluctanceFactorIndex() {
-    return transitReluctanceIndex;
+    return pattern.transitReluctanceFactorIndex();
   }
 
   @Override
-  public WheelchairAccessibility wheelchairBoarding() {
+  public Accessibility wheelchairBoarding() {
     return pattern.wheelchairBoardingForTrip(tripIndexForDates);
   }
 
@@ -112,12 +108,12 @@ public final class TripScheduleWithOffset implements TripSchedule {
     return ToStringBuilder
       .of(TripScheduleWithOffset.class)
       .addObj("trip", pattern.debugInfo())
-      .addServiceTime("depart", secondsOffset + tripTimes.getDepartureTime(0))
+      .addServiceTime("depart", secondsOffset + getOriginalTripTimes().getDepartureTime(0))
       .toString();
   }
 
   private void findTripTimes() {
-    index = tripIndexForDates;
+    int index = tripIndexForDates;
     IntIterator indexIterator = pattern.tripPatternForDatesIndexIterator(true);
     while (indexIterator.hasNext()) {
       int i = indexIterator.next();

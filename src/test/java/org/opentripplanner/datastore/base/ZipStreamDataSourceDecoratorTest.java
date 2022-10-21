@@ -1,9 +1,9 @@
 package org.opentripplanner.datastore.base;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.datastore.FileType.GTFS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.datastore.api.FileType.GTFS;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +12,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.datastore.CompositeDataSource;
-import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.file.FileDataSource;
 
 public class ZipStreamDataSourceDecoratorTest {
@@ -37,14 +37,14 @@ public class ZipStreamDataSourceDecoratorTest {
     String expectedPath = target.getPath();
 
     // Verify zip file exist before we start the test
-    assertTrue(target.getAbsolutePath(), target.exists());
+    assertTrue(target.exists(), target.getAbsolutePath());
 
     // Then
     assertEquals("caltrain_gtfs.zip", subject.name());
     assertEquals(expectedPath, subject.path());
     assertEquals(GTFS, subject.type());
-    assertTrue("Last modified: " + subject.lastModified(), subject.lastModified() > TIME);
-    assertTrue("Size: " + subject.size(), subject.size() > 100);
+    assertTrue(subject.lastModified() > TIME, "Last modified: " + subject.lastModified());
+    assertTrue(subject.size() > 100, "Size: " + subject.size());
     assertTrue(subject.exists());
     // We do not support writing to zip files
     assertFalse(subject.isWritable());
@@ -68,7 +68,6 @@ public class ZipStreamDataSourceDecoratorTest {
 
     System.out.println(names);
     assertTrue(
-      names.toString(),
       names.containsAll(
         List.of(
           "trips.txt",
@@ -82,7 +81,8 @@ public class ZipStreamDataSourceDecoratorTest {
           "stop_times.txt",
           "stops.txt"
         )
-      )
+      ),
+      names.toString()
     );
 
     DataSource entry = subject.entry("agency.txt");
@@ -106,8 +106,8 @@ public class ZipStreamDataSourceDecoratorTest {
     assertEquals("trips.txt", entry.name());
     assertEquals("trips.txt (" + subject.path() + ")", entry.path());
     assertEquals(GTFS, entry.type());
-    assertTrue("Last modified: " + entry.lastModified(), entry.lastModified() > TIME);
-    assertTrue("Size: " + entry.size(), entry.size() > 100);
+    assertTrue(entry.lastModified() > TIME, "Last modified: " + entry.lastModified());
+    assertTrue(entry.size() > 100, "Size: " + entry.size());
     assertTrue(entry.exists());
     // We do not support writing to zip entries
     assertFalse(entry.isWritable());

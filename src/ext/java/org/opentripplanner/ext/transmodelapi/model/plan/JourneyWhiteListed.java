@@ -10,8 +10,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -28,6 +29,12 @@ public class JourneyWhiteListed {
     )
     .field(newIdListInputField("lines", "Set of ids for lines that should be used"))
     .field(newIdListInputField("authorities", "Set of ids for authorities that should be used"))
+    .field(
+      GqlUtil.newIdListInputField(
+        "rentalNetworks",
+        "Set of ids of rental networks that should be used for renting vehicles."
+      )
+    )
     .build();
 
   public final Set<FeedScopedId> authorityIds;

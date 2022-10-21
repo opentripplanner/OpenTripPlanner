@@ -2,40 +2,57 @@ package org.opentripplanner.transit.model.network;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import javax.annotation.Nonnull;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.transit.model.basic.TransitEntityBuilder;
+import java.util.Locale;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
 import org.opentripplanner.transit.model.organization.Operator;
 
 @SuppressWarnings("UnusedReturnValue")
-public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder> {
+public final class RouteBuilder extends AbstractEntityBuilder<Route, RouteBuilder> {
 
   private Agency agency;
   private Operator operator;
   private Branding branding;
   private List<GroupOfRoutes> groupsOfRoutes;
   private String shortName;
-  private String longName;
+  private I18NString longName;
   private TransitMode mode;
   private Integer gtfsType;
   private Integer gtfsSortOrder;
   private String netexSubmode;
   private String flexibleLineType;
-  private String desc;
+  private String description;
   private String url;
   private String color;
   private String textColor;
   private BikeAccess bikesAllowed = BikeAccess.UNKNOWN;
 
-  public RouteBuilder(FeedScopedId id) {
+  RouteBuilder(FeedScopedId id) {
     super(id);
   }
 
-  public RouteBuilder(Route route) {
-    super(route);
+  RouteBuilder(Route original) {
+    super(original);
+    this.agency = original.getAgency();
+    this.operator = original.getOperator();
+    this.branding = original.getBranding();
+    this.groupsOfRoutes = new ArrayList<>(original.getGroupsOfRoutes());
+    this.shortName = original.getShortName();
+    this.longName = original.getLongName();
+    this.mode = original.getMode();
+    this.gtfsType = original.getGtfsType();
+    this.gtfsSortOrder = original.getGtfsSortOrder();
+    this.netexSubmode = original.getNetexSubmode().name();
+    this.flexibleLineType = original.getFlexibleLineType();
+    this.description = original.getDescription();
+    this.url = original.getUrl();
+    this.color = original.getColor();
+    this.textColor = original.getTextColor();
+    this.bikesAllowed = original.getBikesAllowed();
   }
 
   public Agency getAgency() {
@@ -66,7 +83,11 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
   }
 
   public String getName() {
-    return Objects.requireNonNullElse(shortName, longName);
+    return shortName != null ? shortName : longName.toString();
+  }
+
+  public String getName(Locale locale) {
+    return shortName != null ? shortName : longName.toString(locale);
   }
 
   public String getShortName() {
@@ -78,21 +99,21 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
     return this;
   }
 
-  public String getLongName() {
+  public I18NString getLongName() {
     return longName;
   }
 
-  public RouteBuilder withLongName(String longName) {
+  public RouteBuilder withLongName(I18NString longName) {
     this.longName = longName;
     return this;
   }
 
-  public String getDesc() {
-    return desc;
+  public String getDescription() {
+    return description;
   }
 
   public RouteBuilder withDescription(String desc) {
-    this.desc = desc;
+    this.description = desc;
     return this;
   }
 
@@ -185,31 +206,7 @@ public final class RouteBuilder extends TransitEntityBuilder<Route, RouteBuilder
   }
 
   @Override
-  public String toString() {
-    return "<Route " + getId() + " " + getName() + ">";
-  }
-
-  @Override
   protected Route buildFromValues() {
     return new Route(this);
-  }
-
-  @Override
-  protected void updateLocal(@Nonnull Route original) {
-    this.agency = original.getAgency();
-    this.operator = original.getOperator();
-    this.branding = original.getBranding();
-    this.groupsOfRoutes = new ArrayList<>(original.getGroupsOfRoutes());
-    this.shortName = original.getShortName();
-    this.longName = original.getLongName();
-    this.mode = original.getMode();
-    this.gtfsType = original.getGtfsType();
-    this.netexSubmode = original.getNetexSubmode();
-    this.flexibleLineType = original.getFlexibleLineType();
-    this.desc = original.getDesc();
-    this.url = original.getUrl();
-    this.color = original.getColor();
-    this.textColor = original.getTextColor();
-    this.bikesAllowed = original.getBikesAllowed();
   }
 }

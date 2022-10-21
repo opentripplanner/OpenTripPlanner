@@ -12,8 +12,8 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelchairAccessibility;
-import org.opentripplanner.util.TranslationHelper;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class StopAndStationMapperTest {
 
@@ -43,13 +43,13 @@ public class StopAndStationMapperTest {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final WheelchairAccessibility WHEELCHAIR_BOARDING_ENUM =
-    WheelchairAccessibility.POSSIBLE;
+  private static final Accessibility WHEELCHAIR_BOARDING_ENUM = Accessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
-  private final StopMapper subject = new StopMapper(new TranslationHelper());
+
+  private final StopMapper subject = new StopMapper(new TranslationHelper(), stationId -> null);
 
   static {
     STOP.setId(AGENCY_AND_ID);
@@ -77,7 +77,7 @@ public class StopAndStationMapperTest {
 
   @Test
   public void testMap() {
-    org.opentripplanner.model.Stop result = subject.map(STOP);
+    RegularStop result = subject.map(STOP);
 
     assertEquals("A:1", result.getId().toString());
     assertEquals(CODE, result.getCode());
@@ -86,7 +86,7 @@ public class StopAndStationMapperTest {
     assertEquals(LON, result.getLon(), 0.0001d);
     assertEquals(NAME, result.getName().toString());
     assertEquals(URL, result.getUrl().toString());
-    assertEquals(WheelchairAccessibility.POSSIBLE, result.getWheelchairAccessibility());
+    assertEquals(Accessibility.POSSIBLE, result.getWheelchairAccessibility());
     assertEquals(ZONE_ID, result.getFirstZoneAsString());
   }
 
@@ -96,7 +96,7 @@ public class StopAndStationMapperTest {
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
 
-    org.opentripplanner.model.Stop result = subject.map(input);
+    RegularStop result = subject.map(input);
 
     assertNotNull(result.getId());
     assertNull(result.getCode());
@@ -106,7 +106,7 @@ public class StopAndStationMapperTest {
     assertNull(result.getCode());
     assertNull(result.getUrl());
     // Skip getting coordinate, it will throw an exception
-    assertEquals(WheelchairAccessibility.NO_INFORMATION, result.getWheelchairAccessibility());
+    assertEquals(Accessibility.NO_INFORMATION, result.getWheelchairAccessibility());
     assertNull(result.getFirstZoneAsString());
   }
 
@@ -116,7 +116,7 @@ public class StopAndStationMapperTest {
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
 
-    org.opentripplanner.model.Stop result = subject.map(input);
+    RegularStop result = subject.map(input);
 
     // Getting the coordinate will throw an IllegalArgumentException if not set,
     // this is considered to be a implementation error
@@ -126,8 +126,8 @@ public class StopAndStationMapperTest {
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() {
-    org.opentripplanner.model.Stop result1 = subject.map(STOP);
-    org.opentripplanner.model.Stop result2 = subject.map(STOP);
+    RegularStop result1 = subject.map(STOP);
+    RegularStop result2 = subject.map(STOP);
 
     assertSame(result1, result2);
   }

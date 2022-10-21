@@ -1,17 +1,15 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static java.util.Collections.emptySet;
-
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
 @ExtendWith(SnapshotExtension.class)
 public class TransitSnapshotTest extends SnapshotTestBase {
@@ -66,92 +64,74 @@ public class TransitSnapshotTest extends SnapshotTestBase {
 
   @Test
   public void test_trip_planning_with_walk_only() {
-    RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        emptySet()
-      );
-    request.from = p0;
-    request.to = p2;
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transit().setModes(List.of());
+    request.setFrom(p0);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
 
   @Test
   public void test_trip_planning_with_walk_only_stop() {
-    RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        emptySet()
-      );
-    request.from = ps;
-    request.to = p2;
+    request.journey().access().setMode(StreetMode.WALK);
+    request.journey().egress().setMode(StreetMode.WALK);
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().transit().setModes(List.of());
+    request.setFrom(ps);
+    request.setTo(p2);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
 
   @Test
   public void test_trip_planning_with_walk_only_stop_collection() {
-    RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        emptySet()
-      );
-    request.from = ptc;
-    request.to = p3;
+    request.journey().access().setMode(StreetMode.WALK);
+    request.journey().egress().setMode(StreetMode.WALK);
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().transit().setModes(List.of());
+    request.setFrom(ptc);
+    request.setTo(p3);
 
     expectRequestResponseToMatchSnapshot(request);
     // not equal - expectArriveByToMatchDepartAtAndSnapshot(request);
   }
 
   @Test
-  @Disabled("This test fails on some machines, but not others, snapshot @line 2704")
   public void test_trip_planning_with_transit() {
-    RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        AllowedTransitMode.getAllTransitModes()
-      );
-    request.from = p1;
-    request.to = p2;
+    request.journey().access().setMode(StreetMode.WALK);
+    request.journey().egress().setMode(StreetMode.WALK);
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().transit().setModes(MainAndSubMode.all());
+    request.setFrom(p1);
+    request.setTo(p2);
 
     expectRequestResponseToMatchSnapshot(request);
   }
 
   @Test
   public void test_trip_planning_with_transit_stop() {
-    RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        AllowedTransitMode.getAllTransitModes()
-      );
-    request.from = ps;
-    request.to = p3;
+    request.journey().access().setMode(StreetMode.WALK);
+    request.journey().egress().setMode(StreetMode.WALK);
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().transit().setModes(MainAndSubMode.all());
+
+    request.setFrom(ps);
+    request.setTo(p3);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -159,18 +139,15 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   @Test
   @Disabled
   public void test_trip_planning_with_transit_stop_collection() {
-    RoutingRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.modes =
-      new RequestModes(
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        StreetMode.WALK,
-        AllowedTransitMode.getAllTransitModes()
-      );
-    request.from = ptc;
-    request.to = p3;
+    request.journey().access().setMode(StreetMode.WALK);
+    request.journey().egress().setMode(StreetMode.WALK);
+    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().transit().setModes(MainAndSubMode.all());
+    request.setFrom(ptc);
+    request.setTo(p3);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

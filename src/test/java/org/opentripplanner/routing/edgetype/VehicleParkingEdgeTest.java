@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -15,8 +15,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.transit.model.basic.FeedScopedId;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 
 class VehicleParkingEdgeTest extends GraphRoutingTest {
 
@@ -180,9 +180,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
 
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 
-    RoutingRequest routingRequest = new RoutingRequest();
+    RouteRequest routingRequest = new RouteRequest();
     routingRequest.parkAndRide = true;
-    routingRequest.useVehicleParkingAvailabilityInformation = realtime;
+    routingRequest.preferences().parking().setUseAvailabilityInformation(realtime);
     routingRequest.streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK, parkingMode);
     routingContext = new RoutingContext(routingRequest, graph, vertex, vertex);
   }
@@ -194,7 +194,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   ) {
     return VehicleParking
       .builder()
-      .id(new FeedScopedId(TEST_FEED_ID, "VehicleParking"))
+      .id(TransitModelForTest.id("VehicleParking"))
       .bicyclePlaces(bicyclePlaces)
       .carPlaces(carPlaces)
       .availability(availability)
@@ -205,10 +205,6 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   private VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance() {
     String id = "Entrance";
     return builder ->
-      builder
-        .entranceId(new FeedScopedId(TEST_FEED_ID, id))
-        .name(new NonLocalizedString(id))
-        .x(0)
-        .y(0);
+      builder.entranceId(TransitModelForTest.id(id)).name(new NonLocalizedString(id)).x(0).y(0);
   }
 }

@@ -3,17 +3,17 @@ package org.opentripplanner.graph_builder.module.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,26 +29,24 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
 
   private static final Logger log = LoggerFactory.getLogger(BusRouteStreetMatcher.class);
 
-  public List<String> provides() {
-    return List.of("edge matching");
+  private final Graph graph;
+  private final TransitModel transitModel;
+
+  @Inject
+  public BusRouteStreetMatcher(Graph graph, TransitModel transitModel) {
+    this.graph = graph;
+    this.transitModel = transitModel;
   }
 
-  public List<String> getPrerequisites() {
-    return Arrays.asList("streets", "transit");
-  }
-
-  public void buildGraph(
-    Graph graph,
-    HashMap<Class<?>, Object> extra,
-    DataImportIssueStore issueStore
-  ) {
+  public void buildGraph() {
     // Mapbuilder needs transit index
-    graph.index();
+    transitModel.index();
+    graph.index(transitModel.getStopModel());
 
     StreetMatcher matcher = new StreetMatcher(graph);
     log.info("Finding corresponding street edges for trip patterns...");
     // Why do we need to iterate over the routes? Why not just patterns?
-    Collection<Route> allRoutes = graph.index.getAllRoutes();
+    Collection<Route> allRoutes = transitModel.getTransitModelIndex().getAllRoutes();
 
     // Track progress
     ProgressTracker progress = ProgressTracker.track(
@@ -59,7 +57,10 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     log.info(progress.startMessage());
 
     for (Route route : allRoutes) {
-      for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
+      for (TripPattern pattern : transitModel
+        .getTransitModelIndex()
+        .getPatternsForRoute()
+        .get(route)) {
         if (pattern.getMode().onStreet()) {
           /* we can only match geometry to streets on bus routes */
           log.debug("Matching {}", pattern);

@@ -12,7 +12,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
-import java.util.TimeZone;
 
 public final class DateTimeScalarFactory {
 
@@ -27,7 +26,7 @@ public final class DateTimeScalarFactory {
   private DateTimeScalarFactory() {}
 
   public static GraphQLScalarType createMillisecondsSinceEpochAsDateTimeStringScalar(
-    TimeZone timeZone
+    ZoneId timeZone
   ) {
     return GraphQLScalarType
       .newScalar()
@@ -38,8 +37,7 @@ public final class DateTimeScalarFactory {
           @Override
           public String serialize(Object input) {
             if (input instanceof Long) {
-              return ((Instant.ofEpochMilli((Long) input))).atZone(timeZone.toZoneId())
-                .format(FORMATTER);
+              return ((Instant.ofEpochMilli((Long) input))).atZone(timeZone).format(FORMATTER);
             }
             return null;
           }
@@ -56,8 +54,7 @@ public final class DateTimeScalarFactory {
               );
 
               if (temporalAccessor instanceof LocalDateTime) {
-                instant =
-                  ((LocalDateTime) temporalAccessor).atZone(ZoneId.systemDefault()).toInstant();
+                instant = ((LocalDateTime) temporalAccessor).atZone(timeZone).toInstant();
               } else {
                 instant = Instant.from(temporalAccessor);
               }

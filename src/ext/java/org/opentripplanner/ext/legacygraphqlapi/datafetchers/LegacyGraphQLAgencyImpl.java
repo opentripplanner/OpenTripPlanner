@@ -10,19 +10,19 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.service.TransitService;
 
 public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAgency {
 
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
-      TransitAlertService alertService = getRoutingService(environment).getTransitAlertService();
+      TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLAgencyAlertsArgs(environment.getArguments());
       Iterable<LegacyGraphQLTypes.LegacyGraphQLAgencyAlertType> types = args.getLegacyGraphQLTypes();
       if (types != null) {
@@ -99,7 +99,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
 
   @Override
   public DataFetcher<String> timezone() {
-    return environment -> getSource(environment).getTimezone();
+    return environment -> getSource(environment).getTimezone().getId();
   }
 
   @Override
@@ -108,15 +108,15 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
   }
 
   private List<Route> getRoutes(DataFetchingEnvironment environment) {
-    return getRoutingService(environment)
+    return getTransitService(environment)
       .getAllRoutes()
       .stream()
       .filter(route -> route.getAgency().equals(getSource(environment)))
       .collect(Collectors.toList());
   }
 
-  private RoutingService getRoutingService(DataFetchingEnvironment environment) {
-    return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+  private TransitService getTransitService(DataFetchingEnvironment environment) {
+    return environment.<LegacyGraphQLRequestContext>getContext().getTransitService();
   }
 
   private Agency getSource(DataFetchingEnvironment environment) {

@@ -5,15 +5,15 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +43,14 @@ public class GraphPathFinder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphPathFinder.class);
 
-  Router router;
+  @Nullable
+  private final TraverseVisitor traverseVisitor;
 
-  public GraphPathFinder(Router router) {
-    this.router = router;
+  private final Duration streetRoutingTimeout;
+
+  public GraphPathFinder(@Nullable TraverseVisitor traverseVisitor, Duration streetRoutingTimeout) {
+    this.traverseVisitor = traverseVisitor;
+    this.streetRoutingTimeout = streetRoutingTimeout;
   }
 
   /**
@@ -59,22 +63,22 @@ public class GraphPathFinder {
       return null;
     }
 
-    RoutingRequest options = routingContext.opt;
-
-    if (options.streetSubRequestModes.isTransit()) {
-      throw new UnsupportedOperationException("Transit search not supported");
-    }
+    RouteRequest options = routingContext.opt;
+    RoutingPreferences preferences = routingContext.opt.preferences();
 
     AStarBuilder aStar = AStarBuilder
-      .oneToOneMaxDuration(options.getMaxDirectStreetDuration(options.modes.directMode))
+      .oneToOneMaxDuration(
+        preferences.street().maxDirectDuration().valueOf(options.journey().direct().mode())
+      )
       // FORCING the dominance function to weight only
       .setDominanceFunction(new DominanceFunction.MinimumWeight())
       .setContext(routingContext)
-      .setTimeout(Duration.ofMillis((long) (router.streetRoutingTimeoutSeconds() * 1000)));
+      .setTimeout(streetRoutingTimeout);
 
-    // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
-    if (router.graphVisualizer != null) {
-      aStar.setTraverseVisitor(router.graphVisualizer.traverseVisitor);
+    // If the search has a traverseVisitor(GraphVisualizer) attached to it, set it as a callback
+    // for the AStar search
+    if (traverseVisitor != null) {
+      aStar.setTraverseVisitor(traverseVisitor);
     }
 
     LOG.debug("rreq={}", options);
@@ -86,7 +90,7 @@ public class GraphPathFinder {
 
     LOG.debug("we have {} paths", paths.size());
     LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-    paths.sort(options.getPathComparator(options.arriveBy));
+    paths.sort(new PathComparator(options.arriveBy()));
     return paths;
   }
 
@@ -94,8 +98,8 @@ public class GraphPathFinder {
    * Try to find N paths through the Graph
    */
   public List<GraphPath> graphPathFinderEntryPoint(RoutingContext routingContext) {
-    RoutingRequest request = routingContext.opt;
-    Instant reqTime = request.getDateTime().truncatedTo(ChronoUnit.MILLIS);
+    RouteRequest request = routingContext.opt;
+    Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
 
     List<GraphPath> paths = getPaths(routingContext);
 
@@ -106,7 +110,7 @@ public class GraphPathFinder {
       while (gpi.hasNext()) {
         GraphPath graphPath = gpi.next();
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
-        if (request.arriveBy) {
+        if (request.arriveBy()) {
           if (graphPath.states.getLast().getTime().isAfter(reqTime)) {
             LOG.error("A graph path arrives after the requested time. This implies a bug.");
             gpi.remove();
@@ -121,7 +125,7 @@ public class GraphPathFinder {
     }
 
     if (paths == null || paths.size() == 0) {
-      LOG.debug("Path not found: " + request.from + " : " + request.to);
+      LOG.debug("Path not found: {} : {}", request.from(), request.to());
       throw new PathNotFoundException();
     }
 

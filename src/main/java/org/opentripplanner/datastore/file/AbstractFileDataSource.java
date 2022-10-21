@@ -1,9 +1,10 @@
 package org.opentripplanner.datastore.file;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Objects;
-import org.opentripplanner.datastore.DataSource;
-import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.datastore.api.FileType;
 
 /**
  * Abstract DataSource which wraps a {@link File}.
@@ -31,6 +32,11 @@ public abstract class AbstractFileDataSource implements DataSource {
   @Override
   public final String path() {
     return file.getPath();
+  }
+
+  @Override
+  public URI uri() {
+    return file.toURI();
   }
 
   @Override
