@@ -114,7 +114,7 @@ public class VectorTilesResource {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         mvtBuilder.addLayers(
           VectorTilesResource.layers
-            .get(LayerType.valueOf(layerParameters.type()))
+            .get(layerParameters.type())
             .create(serverContext.graph(), serverContext.transitService(), layerParameters)
             .build(envelope, layerParameters)
         );
@@ -166,7 +166,7 @@ public class VectorTilesResource {
     return protocol + "://" + host;
   }
 
-  enum LayerType {
+  public enum LayerType {
     Stop,
     Station,
     VehicleRental,
@@ -182,7 +182,7 @@ public class VectorTilesResource {
   public interface LayerParameters {
     String name();
 
-    String type();
+    LayerType type();
 
     String mapper();
 
