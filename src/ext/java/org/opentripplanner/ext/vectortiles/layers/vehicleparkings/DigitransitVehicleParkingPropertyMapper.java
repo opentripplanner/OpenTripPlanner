@@ -13,11 +13,11 @@ public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<Vehi
 
   private final I18NStringMapper i18NStringMapper;
 
-  public DigitransitVehicleParkingPropertyMapper(Locale locale) {
+  private DigitransitVehicleParkingPropertyMapper(Locale locale) {
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  public static DigitransitVehicleParkingPropertyMapper create(Locale locale) {
+  protected static DigitransitVehicleParkingPropertyMapper create(Locale locale) {
     return new DigitransitVehicleParkingPropertyMapper(locale);
   }
 

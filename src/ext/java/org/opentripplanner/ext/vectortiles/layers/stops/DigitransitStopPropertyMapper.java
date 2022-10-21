@@ -25,7 +25,10 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  public static DigitransitStopPropertyMapper create(TransitService transitService, Locale locale) {
+  protected static DigitransitStopPropertyMapper create(
+    TransitService transitService,
+    Locale locale
+  ) {
     return new DigitransitStopPropertyMapper(transitService, locale);
   }
 

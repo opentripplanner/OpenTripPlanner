@@ -153,7 +153,7 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
-    DigitransitVehicleParkingPropertyMapper mapper = new DigitransitVehicleParkingPropertyMapper(
+    DigitransitVehicleParkingPropertyMapper mapper = DigitransitVehicleParkingPropertyMapper.create(
       new Locale("en-US")
     );
     Map<String, Object> map = new HashMap<>();
@@ -170,7 +170,7 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void digitransitVehicleParkingPropertyMapperTranslationTest() {
-    DigitransitVehicleParkingPropertyMapper mapper = new DigitransitVehicleParkingPropertyMapper(
+    DigitransitVehicleParkingPropertyMapper mapper = DigitransitVehicleParkingPropertyMapper.create(
       new Locale("de")
     );
     Map<String, Object> map = new HashMap<>();

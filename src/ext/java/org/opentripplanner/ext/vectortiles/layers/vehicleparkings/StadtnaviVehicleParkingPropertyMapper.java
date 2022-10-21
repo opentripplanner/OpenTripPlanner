@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.basic.TranslatedString;
 
 public class StadtnaviVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 
-  public static StadtnaviVehicleParkingPropertyMapper create(Locale locale) {
+  protected static StadtnaviVehicleParkingPropertyMapper create(Locale locale) {
     return new StadtnaviVehicleParkingPropertyMapper();
   }
 
