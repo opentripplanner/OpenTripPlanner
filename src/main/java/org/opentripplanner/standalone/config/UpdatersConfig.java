@@ -108,7 +108,8 @@ public class UpdatersConfig implements UpdatersParameters {
       .asObjects(it -> {
         Type type = it.of("type").withDoc(NA, /*TODO DOC*/"TODO").asEnum(Type.class);
         configList.put(type, type.parseConfig(it));
-        return "OK";
+        // We do not care what we return here
+        return Void.class;
       });
   }
 
