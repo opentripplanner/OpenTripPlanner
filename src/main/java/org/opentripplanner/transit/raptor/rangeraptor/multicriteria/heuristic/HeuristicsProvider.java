@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -86,10 +87,10 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (h == null) {
       return false;
     }
-    int minArrivalTime = arrivalTime + h.getMinTravelDuration();
-    int minNumberOfTransfers = roundProvider.round() - 1 + h.getMinNumTransfers();
-    int minTravelDuration = travelDuration + h.getMinTravelDuration();
-    int minCost = cost + h.getMinCost();
+    int minArrivalTime = arrivalTime + h.minTravelDuration();
+    int minNumberOfTransfers = roundProvider.round() - 1 + h.minNumTransfers();
+    int minTravelDuration = travelDuration + h.minTravelDuration();
+    int minCost = cost + h.minCost();
     int departureTime = minArrivalTime - minTravelDuration;
     return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost);
   }
