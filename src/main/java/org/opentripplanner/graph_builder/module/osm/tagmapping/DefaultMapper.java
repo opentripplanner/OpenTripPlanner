@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
@@ -8,6 +8,8 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.module.osm.WayProperties;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -37,9 +39,9 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
  * TODO clarify why this needs a separate factory interface.
  *
  * @author bdferris, novalis
- * @see WayPropertySetSource
+ * @see OsmTagMapper
  */
-public class DefaultWayPropertySetSource implements WayPropertySetSource {
+public class DefaultMapper implements OsmTagMapper {
 
   /* Populate properties on existing WayPropertySet */
   public void populateProperties(WayPropertySet props) {

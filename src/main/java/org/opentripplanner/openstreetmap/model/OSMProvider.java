@@ -2,12 +2,12 @@ package org.opentripplanner.openstreetmap.model;
 
 import java.time.ZoneId;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 
 public interface OSMProvider {
   ZoneId getZoneId();
 
-  WayPropertySetSource getWayPropertySetSource();
+  OsmTagMapper getOsmTagMapper();
 
   WayPropertySet getWayPropertySet();
 }
