@@ -29,8 +29,9 @@ class ConfigTypeTest {
   }
 
   @Test
-  void examples() {
-    assertEquals("3.15", DOUBLE.examples());
+  void examplesToMarkdown() {
+    assertEquals("`3.15`", DOUBLE.examplesToMarkdown());
+    assertEquals("`\"This is a string!\"`", STRING.examplesToMarkdown());
   }
 
   @Test

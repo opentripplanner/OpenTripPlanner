@@ -11,7 +11,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.LO
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.REGEXP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ZONE_ID;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_ZONE;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
@@ -334,7 +334,7 @@ public class ParameterBuilder {
   }
 
   public ZoneId asZoneId(ZoneId defaultValue) {
-    return ofOptional(ZONE_ID, defaultValue, n -> parseZoneId(n.asText()));
+    return ofOptional(TIME_ZONE, defaultValue, n -> parseZoneId(n.asText()));
   }
 
   /* Custom OTP types */
