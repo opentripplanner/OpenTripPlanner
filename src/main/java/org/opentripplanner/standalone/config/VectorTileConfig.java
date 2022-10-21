@@ -17,7 +17,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
   List<VectorTilesResource.LayerParameters> layers;
 
   public VectorTileConfig(Collection<? extends VectorTilesResource.LayerParameters> layers) {
-    layers = List.copyOf(layers);
+    this.layers = List.copyOf(layers);
   }
 
   @Override
