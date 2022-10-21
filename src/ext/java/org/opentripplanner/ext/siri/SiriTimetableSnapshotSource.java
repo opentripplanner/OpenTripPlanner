@@ -789,7 +789,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         throw new IllegalStateException(
           String.format(
             "Non-increasing triptimes for added trip at stop index %d",
-            invalidStopIndex
+            invalidStopIndex.stopIndex()
           )
         );
       });
