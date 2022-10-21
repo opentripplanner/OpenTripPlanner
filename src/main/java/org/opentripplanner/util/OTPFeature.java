@@ -85,9 +85,9 @@ public enum OTPFeature {
   private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
   private boolean enabled;
 
-  private boolean sandbox;
+  private final boolean sandbox;
 
-  private String doc;
+  private final String doc;
 
   OTPFeature(boolean defaultEnabled, boolean sandbox, String doc) {
     this.enabled = defaultEnabled;
