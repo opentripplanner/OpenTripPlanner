@@ -75,7 +75,7 @@ public class NetexConfigure {
       hierarchy(source, config),
       config.ferryIdsNotAllowedForBicycle(),
       buildParams.maxStopToShapeSnapDistance,
-      buildParams.netexDefaults.noTransfersOnIsolatedStops()
+      config.noTransfersOnIsolatedStops()
     );
   }
 
