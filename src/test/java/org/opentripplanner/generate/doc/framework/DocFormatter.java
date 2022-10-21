@@ -17,7 +17,7 @@ public class DocFormatter {
 
   /** Return the given input formatted as an inline code fragment. */
   public static String code(Object text) {
-    return text == null ? "" : "<code>" + text + "</code>";
+    return text == null ? "" : "`" + text + "`";
   }
 
   /**

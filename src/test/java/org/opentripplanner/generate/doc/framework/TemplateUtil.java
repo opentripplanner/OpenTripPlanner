@@ -20,7 +20,7 @@ public class TemplateUtil {
   private static final String AUTO_GENERATION_INFO =
     "\n<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->\n";
 
-  public static String replace(String doc, String token, String replacement) {
+  public static String replaceSection(String doc, String token, String replacement) {
     var start = start(token);
     var end = end(token);
 
@@ -57,6 +57,6 @@ public class TemplateUtil {
     var expected = text.formatted(expectedText);
     var doc = text.formatted("^ANY TEXT $1 - With special chars...");
 
-    assertEquals(expected, replace(doc, "TEST", expectedText));
+    assertEquals(expected, replaceSection(doc, "TEST", expectedText));
   }
 }
