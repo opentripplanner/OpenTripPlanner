@@ -69,7 +69,6 @@ public class GraphBuilderModules {
       providers,
       config.boardingLocationTags,
       graph,
-      config.osmDefaults.timeZone,
       issueStore
     );
   }

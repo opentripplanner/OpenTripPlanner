@@ -1,22 +1,24 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.AtlantaMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
-class AtlantaWayPropertySetSourceTest {
+class AtlantaMapperTest {
 
   static WayPropertySet wps = new WayPropertySet();
 
   static {
-    AtlantaWayPropertySetSource source = new AtlantaWayPropertySetSource();
+    AtlantaMapper source = new AtlantaMapper();
     source.populateProperties(wps);
   }
 
   // Most OSM trunk roads in Atlanta are (large) city roads that are permitted for all modes.
-  // (The default WayPropertySetSource implementation is car-only.)
+  // (The default TagMapper implementation is car-only.)
   // TODO: Handle exceptions such as:
   //  - Northside Drive between Marietta Street and Tech Parkway (northbound)
   //    (https://www.openstreetmap.org/way/96395009, no sidewalk, but possible to bike)

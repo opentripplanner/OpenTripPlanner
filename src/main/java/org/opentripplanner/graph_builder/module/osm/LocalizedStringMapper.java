@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedString;
@@ -40,9 +41,8 @@ class LocalizedStringMapper {
    * be used)
    * </p>
    *
-   * @param key key of translation for this way set in
-   *            {@link org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource}
-   *            and translations read from properties Files
+   * @param key key of translation for this way set in {@link DefaultMapper} and translations read
+   *            from properties Files
    * @param way OSM way from which tag values are read
    */
   LocalizedString map(String key, OSMWithTags way) {
