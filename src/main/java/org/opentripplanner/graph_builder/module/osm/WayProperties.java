@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.Objects;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
