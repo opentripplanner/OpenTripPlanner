@@ -1,6 +1,7 @@
 package org.opentripplanner.util.lang;
 
 import java.util.Arrays;
+import javax.annotation.Nonnull;
 
 /**
  * OTP String utils extending the Java lang String...
@@ -62,5 +63,10 @@ public class StringUtils {
     char[] array = new char[length];
     Arrays.fill(array, ch);
     return new String(array);
+  }
+
+  /** Replace single quotes with double quotes.  */
+  public static String quoteReplace(@Nonnull String text) {
+    return text.replace('\'', '\"');
   }
 }

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.lang.StringUtils;
 
 class ConfigFileLoaderTest {
 
@@ -122,6 +123,6 @@ class ConfigFileLoaderTest {
   }
 
   private static String json(String text) {
-    return text.replace('\'', '\"');
+    return StringUtils.quoteReplace(text);
   }
 }

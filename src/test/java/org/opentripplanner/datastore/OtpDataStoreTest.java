@@ -34,6 +34,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.util.lang.StringUtils;
 
 public class OtpDataStoreTest {
 
@@ -131,7 +132,7 @@ public class OtpDataStoreTest {
     }
 
     // Insert a URI for osm, gtfs, graph and report data sources
-    String buildConfigJson =
+    String buildConfigJson = StringUtils.quoteReplace(
       """
       {
         osm: [{
@@ -150,9 +151,9 @@ public class OtpDataStoreTest {
           uri + GRAPH_FILENAME,
           uri + REPORT_FILENAME
         )
-        .replace('\'', '\"');
+    );
 
-    // Create build-config  and a unknown file in the 'baseDir'
+    // Create build-config  and an unknown file in the 'baseDir'
     write(baseDir, BUILD_CONFIG_FILENAME, buildConfigJson);
     write(baseDir, "unknown.txt", "Data");
 

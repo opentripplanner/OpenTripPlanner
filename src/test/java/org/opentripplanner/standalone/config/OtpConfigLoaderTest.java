@@ -16,6 +16,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
+import org.opentripplanner.util.lang.StringUtils;
 
 public class OtpConfigLoaderTest {
 
@@ -123,6 +124,6 @@ public class OtpConfigLoaderTest {
   }
 
   private static String json(String text) {
-    return text.replace('\'', '\"');
+    return StringUtils.quoteReplace(text);
   }
 }

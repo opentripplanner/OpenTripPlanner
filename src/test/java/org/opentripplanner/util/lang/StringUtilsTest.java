@@ -49,4 +49,9 @@ class StringUtilsTest {
   void fill() {
     assertEquals("$$$", StringUtils.fill('$', 3));
   }
+
+  @Test
+  void quoteReplace() {
+    assertEquals("\"key\" : \"value\"", StringUtils.quoteReplace("'key' : 'value'"));
+  }
 }
