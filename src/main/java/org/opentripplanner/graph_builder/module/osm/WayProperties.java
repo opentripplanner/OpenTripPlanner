@@ -33,24 +33,14 @@ public class WayProperties {
   }
 
   public int hashCode() {
-    return (
-      (bicycleSafetyFeatures != null ? bicycleSafetyFeatures.hashCode() : 0) +
-      (walkSafetyFeatures != null ? walkSafetyFeatures.hashCode() : 0) +
-      permission.hashCode()
-    );
+    return Objects.hash(bicycleSafetyFeatures, walkSafetyFeatures, permission);
   }
 
   public boolean equals(Object o) {
     if (o instanceof WayProperties other) {
       return (
-        (
-          (bicycleSafetyFeatures == null && other.bicycleSafetyFeatures == null) ||
-          bicycleSafetyFeatures.equals(other.bicycleSafetyFeatures)
-        ) &&
-        (
-          (walkSafetyFeatures == null && other.walkSafetyFeatures == null) ||
-          walkSafetyFeatures.equals(other.walkSafetyFeatures)
-        ) &&
+        Objects.equals(bicycleSafetyFeatures, other.bicycleSafetyFeatures) &&
+        Objects.equals(walkSafetyFeatures, other.walkSafetyFeatures) &&
         permission == other.permission
       );
     }
