@@ -46,6 +46,9 @@ public class MarkDownDocWriter {
   }
 
   public void printSection(String section) {
+    if (section == null) {
+      return;
+    }
     out.println(section.trim());
     printNewLine();
   }

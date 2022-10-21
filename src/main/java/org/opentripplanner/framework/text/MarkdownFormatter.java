@@ -1,23 +1,33 @@
-package org.opentripplanner.framework.doc;
+package org.opentripplanner.framework.text;
 
-public class DocFormatter {
+import javax.annotation.Nullable;
+
+/**
+ * This utility can be used to format Markdown text. This is useful when generating documentation.
+ */
+public class MarkdownFormatter {
 
   private static final char NBSP = '\u00A0';
   private static final String INDENT_NBSP = "" + NBSP + NBSP + NBSP + NBSP;
 
   /** Return the given input as emphasise text. */
   public static String em(String text) {
-    return "<em>" + text + "</em>";
+    return "*" + text + "*";
   }
 
   /** Return the given input as bold text. */
   public static String bold(Object text) {
-    return text == null ? "" : "<b>" + text + "</b>";
+    return text == null ? "" : "**" + text + "**";
   }
 
   /** Return the given input formatted as an inline code fragment. */
-  public static String code(Object text) {
+  public static String code(@Nullable Object text) {
     return text == null ? "" : "`" + text + "`";
+  }
+
+  /** Return the given input formatted as an inline code fragment. */
+  public static String quote(@Nullable Object text) {
+    return text == null ? "" : "\"" + text + "\"";
   }
 
   /**

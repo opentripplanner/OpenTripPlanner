@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.text.MarkdownFormatter;
+import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
@@ -107,9 +109,9 @@ public enum ConfigType {
   public String examplesToMarkdown() {
     return Arrays
       .stream(examples)
-      .map(it -> it.replace('\'', '\"'))
-      .map(it -> type == JsonType.string ? "\"" + it + "\"" : it)
-      .map(it -> "`" + it + "`")
+      .map(StringUtils::quoteReplace)
+      .map(this::quote)
+      .map(MarkdownFormatter::code)
       .collect(Collectors.joining(", "));
   }
 
@@ -121,7 +123,7 @@ public enum ConfigType {
    * Quote the given {@code value} is the JSON type is a {@code string}.
    */
   public String quote(@Nonnull Object value) {
-    return type == JsonType.string ? "\"" + value + "\"" : value.toString();
+    return type == JsonType.string ? MarkdownFormatter.quote(value) : value.toString();
   }
 
   /**

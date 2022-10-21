@@ -4,7 +4,7 @@ import static org.opentripplanner.generate.doc.framework.MarkDownDocWriter.conte
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.doc.DocFormatter;
+import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ abstract class AbstractTable {
         if (child != null && !child.isEmpty()) {
           addParametersTable(child, table);
         } else {
-          LOG.error("Not found: '{} : {}'.", node.fullPath(it.name()), it.type().docName());
+          LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
         }
       }
     }
@@ -52,23 +52,25 @@ abstract class AbstractTable {
       parameter =
         skipFunction
           .linkToDoc(info)
-          .map(link -> DocFormatter.linkToDoc(info.name(), link))
+          .map(link -> MarkdownFormatter.linkToDoc(info.name(), link))
           .orElse(info.name());
     } else if (info.printDetails()) {
-      parameter = DocFormatter.linkToAnchor(parameter, node.fullPath(parameter));
+      parameter = MarkdownFormatter.linkToAnchor(parameter, node.fullPath(parameter));
     }
     return contextIndented(node.contextPath()) + parameter;
   }
 
   String requiredOrOptional(NodeInfo info) {
     String text = info.required() ? "Required" : "Optional";
-    return DocFormatter.em(text);
+    return MarkdownFormatter.em(text);
   }
 
   String defaultValue(NodeInfo info) {
     return info.defaultValue() == null
       ? ""
-      : DocFormatter.code(info.type().quote(DocFormatter.escapeInTable(info.defaultValue())));
+      : MarkdownFormatter.code(
+        info.type().quote(MarkdownFormatter.escapeInTable(info.defaultValue()))
+      );
   }
 
   private boolean skip(NodeInfo info) {

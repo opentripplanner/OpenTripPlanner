@@ -5,10 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.doc.DocFormatter;
+import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.TableFormatter;
 
+@SuppressWarnings("NewClassNamingConvention")
 public class OTPFeatureTable {
 
   private static final String NEW_LINE = "\n";
@@ -19,7 +20,12 @@ public class OTPFeatureTable {
 
     for (var it : OTPFeature.values()) {
       list.add(
-        List.of(DocFormatter.code(it.name()), it.doc(), yesNo(it.isOn()), yesNo(it.isSandbox()))
+        List.of(
+          MarkdownFormatter.code(it.name()),
+          it.doc(),
+          yesNo(it.isOn()),
+          yesNo(it.isSandbox())
+        )
       );
     }
     var rows = TableFormatter.asMarkdownTable(list);
@@ -35,6 +41,6 @@ public class OTPFeatureTable {
   }
 
   private static String yesNo(boolean yes) {
-    return yes ? "yes" : "no";
+    return MarkdownFormatter.checkMark(yes);
   }
 }

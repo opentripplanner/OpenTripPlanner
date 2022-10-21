@@ -1,7 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
 import java.util.List;
-import org.opentripplanner.framework.doc.DocFormatter;
+import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 
@@ -33,7 +33,7 @@ public class ParameterSummaryTable extends AbstractTable {
     table.add(
       List.of(
         parameterNameIndented(node, info),
-        DocFormatter.code(info.type().docName()),
+        MarkdownFormatter.code(info.type().docName()),
         info.summary(),
         requiredOrOptional(info),
         info.type().isSimple() ? defaultValue(info) : "",

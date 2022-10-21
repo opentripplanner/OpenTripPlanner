@@ -46,17 +46,20 @@ public class TemplateUtil {
 
   @Test
   public void test() {
-    var expectedText = """
-    Expected line 1.
-    Expected line 2.
-    """;
+    var body = """
+      Expected line 1.
+      Expected line 2.
+      """;
     var text = """
-      <!-- TEST_START -->%s<!-- TEST_END -->
+      <!-- TEST BEGIN -->%s<!-- TEST END -->
       """;
 
-    var expected = text.formatted(expectedText);
+    var expected = text.formatted(
+      "\n<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->\n" +
+      body
+    );
     var doc = text.formatted("^ANY TEXT $1 - With special chars...");
 
-    assertEquals(expected, replaceSection(doc, "TEST", expectedText));
+    assertEquals(expected, replaceSection(doc, "TEST", body));
   }
 }

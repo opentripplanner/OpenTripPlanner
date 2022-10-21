@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.doc.DocFormatter;
+import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.util.lang.TableFormatter;
 
@@ -19,7 +19,9 @@ public class ConfigTypeTable {
     list.add(List.of("Type", "Description", "Examples"));
 
     for (var it : ConfigType.values()) {
-      list.add(List.of(DocFormatter.code(it.docName()), it.description(), it.examplesToMarkdown()));
+      list.add(
+        List.of(MarkdownFormatter.code(it.docName()), it.description(), it.examplesToMarkdown())
+      );
     }
     var rows = TableFormatter.asMarkdownTable(list);
     return String.join(NEW_LINE, rows) + NEW_LINE;

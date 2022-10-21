@@ -1,6 +1,6 @@
 package org.opentripplanner.generate.doc.framework;
 
-import org.opentripplanner.framework.doc.DocFormatter;
+import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class ParameterDetailsList {
         if (child != null && !child.isEmpty()) {
           addParametersList(child);
         } else {
-          LOG.error("Not found: '{} : {}'.", node.fullPath(it.name()), it.type());
+          LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
         }
       }
     }
@@ -47,7 +47,7 @@ public class ParameterDetailsList {
       return;
     }
     writer.printHeader2(it.name(), node.fullPath(it.name()));
-    writer.printSection(DocFormatter.em(parameterSummaryLine(it, node.contextPath())));
+    writer.printSection(MarkdownFormatter.em(parameterSummaryLine(it, node.contextPath())));
     writer.printSection(it.summary());
     //noinspection ConstantConditions
     writer.printSection(it.description());
@@ -58,24 +58,24 @@ public class ParameterDetailsList {
     var delimiter = " ∙ ";
     buf
       .append("Since version: ")
-      .append(DocFormatter.code(info.since()))
+      .append(MarkdownFormatter.code(info.since()))
       .append(delimiter)
       .append("Type: ")
-      .append(DocFormatter.code(info.type().docName()))
+      .append(MarkdownFormatter.code(info.type().docName()))
       .append(delimiter)
-      .append(DocFormatter.code(info.required() ? "Required" : "Optional"))
+      .append(MarkdownFormatter.code(info.required() ? "Required" : "Optional"))
       .append(delimiter);
 
     if (info.type().isSimple() && info.defaultValue() != null) {
       buf.append("Default value: ").append(defaultValue(info)).append(delimiter);
     }
-    buf.append("Path: ").append(DocFormatter.code(path == null ? "Root" : path));
+    buf.append("Path: ").append(MarkdownFormatter.code(path == null ? "Root" : path));
 
     return buf.toString();
   }
 
   String defaultValue(NodeInfo info) {
     var defautlValue = info.defaultValue();
-    return defautlValue == null ? "" : DocFormatter.code(info.type().quote(defautlValue));
+    return defautlValue == null ? "" : MarkdownFormatter.code(info.type().quote(defautlValue));
   }
 }
