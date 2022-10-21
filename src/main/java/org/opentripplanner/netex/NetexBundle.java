@@ -43,6 +43,7 @@ public class NetexBundle implements Closeable {
   private final String feedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final double maxStopToShapeSnapDistance;
+  private final boolean noTransfersOnIsolatedStops;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
   /** Report errors to issue store */
@@ -56,13 +57,15 @@ public class NetexBundle implements Closeable {
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
     Set<String> ferryIdsNotAllowedForBicycle,
-    double maxStopToShapeSnapDistance
+    double maxStopToShapeSnapDistance,
+    boolean noTransfersOnIsolatedStops
   ) {
     this.feedId = feedId;
     this.source = source;
     this.hierarchy = hierarchy;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
   }
 
   /** load the bundle, map it to the OTP transit model and return */
@@ -86,7 +89,8 @@ public class NetexBundle implements Closeable {
         deduplicator,
         issueStore,
         ferryIdsNotAllowedForBicycle,
-        maxStopToShapeSnapDistance
+        maxStopToShapeSnapDistance,
+        noTransfersOnIsolatedStops
       );
 
     // Load data

@@ -153,4 +153,10 @@ public final class RegularStop
       Objects.equals(fareZones, other.fareZones)
     );
   }
+
+  @Override
+  public boolean transfersNotAllowed() {
+    var parentStation = getParentStation();
+    return parentStation != null && parentStation.isTransfersNotAllowed();
+  }
 }
