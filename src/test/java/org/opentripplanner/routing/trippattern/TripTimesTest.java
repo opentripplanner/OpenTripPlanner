@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -94,18 +93,18 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
 
-    OptionalInt invalidStopOIndex = updatedTripTimesA.findFirstNoneIncreasingStopTime();
+    var invalidStopOIndex = updatedTripTimesA.findFirstNonIncreasingStopTime();
     assertTrue(invalidStopOIndex.isPresent());
-    assertEquals(1, invalidStopOIndex.getAsInt());
+    assertEquals(1, invalidStopOIndex.get().stopIndex());
 
     TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
 
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
 
-    invalidStopOIndex = updatedTripTimesB.findFirstNoneIncreasingStopTime();
+    invalidStopOIndex = updatedTripTimesB.findFirstNonIncreasingStopTime();
     assertTrue(invalidStopOIndex.isPresent());
-    assertEquals(7, invalidStopOIndex.getAsInt());
+    assertEquals(7, invalidStopOIndex.get().stopIndex());
   }
 
   @Test
@@ -115,7 +114,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
 
-    assertTrue(updatedTripTimesA.findFirstNoneIncreasingStopTime().isEmpty());
+    assertTrue(updatedTripTimesA.findFirstNonIncreasingStopTime().isEmpty());
   }
 
   @Test
@@ -182,8 +181,8 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 89);
     updatedTripTimesA.updateDepartureTime(1, 98);
 
-    OptionalInt invalidStopOIndex = updatedTripTimesA.findFirstNoneIncreasingStopTime();
+    var invalidStopOIndex = updatedTripTimesA.findFirstNonIncreasingStopTime();
     assertTrue(invalidStopOIndex.isPresent());
-    assertEquals(2, invalidStopOIndex.getAsInt());
+    assertEquals(2, invalidStopOIndex.get().stopIndex());
   }
 }

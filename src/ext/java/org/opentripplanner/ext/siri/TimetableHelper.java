@@ -4,7 +4,6 @@ import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -390,15 +388,16 @@ public class TimetableHelper {
       newTimes.cancelTrip();
     }
 
-    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
-    if (invalidStopIndex.isPresent()) {
+    var maybeError = newTimes.findFirstNonIncreasingStopTime();
+    if (maybeError.isPresent()) {
+      var updateError = maybeError.get();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         journey.getLineRef().getValue(),
         tripId,
-        invalidStopIndex.getAsInt()
+        updateError.stopIndex()
       );
-      return UpdateError.result(tripId, NON_INCREASING_TRIP_TIMES);
+      return Result.failure(updateError);
     }
 
     if (newTimes.getNumStops() != pattern.numberOfStops()) {
@@ -782,15 +781,16 @@ public class TimetableHelper {
       }
     }
 
-    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
-    if (invalidStopIndex.isPresent()) {
+    var maybeError = newTimes.findFirstNonIncreasingStopTime();
+    if (maybeError.isPresent()) {
+      var error = maybeError.get();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         timetable.getPattern().getRoute().getId(),
         tripId,
-        invalidStopIndex.getAsInt()
+        error.stopIndex()
       );
-      return Result.failure(new UpdateError(tripId, NON_INCREASING_TRIP_TIMES));
+      return Result.failure(error);
     }
 
     //If state is already MODIFIED - keep existing state

@@ -339,7 +339,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .keySet()
         .forEach(key -> {
           var value = errorIndex.get(key);
-          var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
+          var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
           LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
         });
 

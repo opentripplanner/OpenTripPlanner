@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.STOP_DEPARTURE_BEFORE_ARRIVAL;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.util.TestUtils.AUGUST;
 
@@ -135,7 +135,7 @@ public class TimetableTest {
     );
     assertTrue(result.isFailure());
 
-    result.ifFailure(e -> assertEquals(NON_INCREASING_TRIP_TIMES, e.errorType()));
+    result.ifFailure(e -> assertEquals(STOP_DEPARTURE_BEFORE_ARRIVAL, e.errorType()));
   }
 
   @Test
@@ -534,7 +534,7 @@ public class TimetableTest {
     assertTrue(result.isFailure());
 
     result.ifFailure(err -> {
-      assertEquals(err.errorType(), NON_INCREASING_TRIP_TIMES);
+      assertEquals(err.errorType(), STOP_DEPARTURE_BEFORE_ARRIVAL);
     });
   }
 

@@ -4,7 +4,6 @@ import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRI
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
@@ -21,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -330,14 +328,14 @@ public class Timetable implements Serializable {
       }
     }
 
-    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
-    if (invalidStopIndex.isPresent()) {
+    var maybeError = newTimes.findFirstNonIncreasingStopTime();
+    if (maybeError.isPresent()) {
       LOG.debug(
         "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
         tripId,
-        invalidStopIndex.getAsInt()
+        maybeError.get().stopIndex()
       );
-      return Result.failure(new UpdateError(feedScopedTripId, NON_INCREASING_TRIP_TIMES));
+      return Result.failure(maybeError.get());
     }
 
     if (tripUpdate.hasVehicle()) {

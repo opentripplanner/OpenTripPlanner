@@ -784,7 +784,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     pattern.add(tripTimes);
 
     tripTimes
-      .findFirstNoneIncreasingStopTime()
+      .findFirstNonIncreasingStopTime()
       .ifPresent(invalidStopIndex -> {
         throw new IllegalStateException(
           String.format(
