@@ -256,6 +256,4 @@ public class UpdatersConfig implements UpdatersParameters {
       return factory.apply(this.name(), nodeAdapter);
     }
   }
-
-  private record ConfigParameterEntry(Type type, Object parameters) {}
 }
