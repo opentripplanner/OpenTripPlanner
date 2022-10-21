@@ -2,6 +2,8 @@ package org.opentripplanner.transit.model._data;
 
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
+import java.util.List;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -13,10 +15,13 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.RouteBuilder;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
@@ -128,12 +133,37 @@ public class TransitModelForTest {
       .withPriority(StopTransferPriority.ALLOWED);
   }
 
+  public static GroupStop groupStopForTest(String idAndName, List<RegularStop> stops) {
+    var builder = GroupStop.of(id(idAndName)).withName(new NonLocalizedString(idAndName));
+
+    stops.forEach(builder::addLocation);
+
+    return builder.build();
+  }
+
+  public static AreaStop areaStopForTest(String idAndName, Geometry geometry) {
+    return AreaStop
+      .of(id(idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withGeometry(geometry)
+      .build();
+  }
+
   public static StopTime stopTime(Trip trip, int seq) {
     var stopTime = new StopTime();
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
 
     var stop = TransitModelForTest.stopForTest("stop-" + seq, 0, 0);
+    stopTime.setStop(stop);
+
+    return stopTime;
+  }
+
+  public static StopTime stopTime(Trip trip, int seq, StopLocation stop) {
+    var stopTime = new StopTime();
+    stopTime.setTrip(trip);
+    stopTime.setStopSequence(seq);
     stopTime.setStop(stop);
 
     return stopTime;
