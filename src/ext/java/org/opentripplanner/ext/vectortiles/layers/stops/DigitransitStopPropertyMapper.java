@@ -30,7 +30,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
   }
 
   @Override
-  public Collection<T2<String, Object>> map(RegularStop stop) {
+  protected Collection<T2<String, Object>> map(RegularStop stop) {
     Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
 
     String type = patternsForStop

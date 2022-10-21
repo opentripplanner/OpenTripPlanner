@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -16,9 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.DigitransitVehicleParkingGroupPropertyMapper;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingAndGroup;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;

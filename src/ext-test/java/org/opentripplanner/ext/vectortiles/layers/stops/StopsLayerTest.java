@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.ext.vectortiles.layers.stops;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.vectortiles.layers.stops.DigitransitStopPropertyMapper;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

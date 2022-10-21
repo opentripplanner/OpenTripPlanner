@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,10 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.DigitransitVehicleParkingPropertyMapper;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.StadtnaviVehicleParkingPropertyMapper;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
@@ -97,7 +92,7 @@ public class VehicleParkingsLayerTest {
         "vectorTileLayers"
       );
       assertEquals(1, tiles.layers().size());
-      VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
+      VehicleParkingsLayerBuilder builder = new VehicleParkingsLayerBuilder(
         graph,
         tiles.layers().get(0),
         new Locale("en-US")
@@ -117,7 +112,7 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void stadtnaviVehicleParkingPropertyMapperTest() {
-    StadtnaviVehicleParkingPropertyMapperWithPublicMap mapper = new StadtnaviVehicleParkingPropertyMapperWithPublicMap();
+    StadtnaviVehicleParkingPropertyMapper mapper = new StadtnaviVehicleParkingPropertyMapper();
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
 
@@ -158,7 +153,7 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
-    DigitransitVehicleParkingPropertyMapperWithPublicMap mapper = new DigitransitVehicleParkingPropertyMapperWithPublicMap(
+    DigitransitVehicleParkingPropertyMapper mapper = new DigitransitVehicleParkingPropertyMapper(
       new Locale("en-US")
     );
     Map<String, Object> map = new HashMap<>();
@@ -175,55 +170,12 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void digitransitVehicleParkingPropertyMapperTranslationTest() {
-    DigitransitVehicleParkingPropertyMapperWithPublicMap mapper = new DigitransitVehicleParkingPropertyMapperWithPublicMap(
+    DigitransitVehicleParkingPropertyMapper mapper = new DigitransitVehicleParkingPropertyMapper(
       new Locale("de")
     );
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));
 
     assertEquals("DE", map.get("name").toString());
-  }
-
-  private static class VehicleParkingsLayerBuilderWithPublicGeometry
-    extends VehicleParkingsLayerBuilder {
-
-    public VehicleParkingsLayerBuilderWithPublicGeometry(
-      Graph graph,
-      VectorTilesResource.LayerParameters layerParameters,
-      Locale locale
-    ) {
-      super(graph, layerParameters, locale);
-    }
-
-    @Override
-    public List<Geometry> getGeometries(Envelope query) {
-      return super.getGeometries(query);
-    }
-  }
-
-  private static class StadtnaviVehicleParkingPropertyMapperWithPublicMap
-    extends StadtnaviVehicleParkingPropertyMapper {
-
-    public StadtnaviVehicleParkingPropertyMapperWithPublicMap() {
-      super();
-    }
-
-    @Override
-    public Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
-      return super.map(vehicleParking);
-    }
-  }
-
-  private static class DigitransitVehicleParkingPropertyMapperWithPublicMap
-    extends DigitransitVehicleParkingPropertyMapper {
-
-    public DigitransitVehicleParkingPropertyMapperWithPublicMap(Locale locale) {
-      super(locale);
-    }
-
-    @Override
-    public Collection<T2<String, Object>> map(VehicleParking vehicleParking) {
-      return super.map(vehicleParking);
-    }
   }
 }
