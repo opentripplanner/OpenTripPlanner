@@ -41,9 +41,8 @@ class LocalizedStringMapper {
    * be used)
    * </p>
    *
-   * @param key key of translation for this way set in
-   *            {@link DefaultMapper}
-   *            and translations read from properties Files
+   * @param key key of translation for this way set in {@link DefaultMapper} and translations read
+   *            from properties Files
    * @param way OSM way from which tag values are read
    */
   LocalizedString map(String key, OSMWithTags way) {
