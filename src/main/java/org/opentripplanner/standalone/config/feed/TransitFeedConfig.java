@@ -1,53 +1,75 @@
 package org.opentripplanner.standalone.config.feed;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.List;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
+import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-/**
- * Configuration for a transit data feed.
- */
-public class TransitFeedConfig implements DataSourceConfig {
+public class TransitFeedConfig {
 
-  /**
-   * The unique ID for this feed.
-   */
-  private final String feedId;
+  public static TransitFeeds mapTransitFeeds(
+    NodeAdapter root,
+    String parameterName,
+    NetexFeedParameters netexDefaults
+  ) {
+    List<DataSourceConfig> list = root
+      .of(parameterName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
 
-  /**
-   * URI to data files.
-   * <p>
-   * Example:
-   * {@code "file:///Users/kelvin/otp/netex.zip", "gs://my-bucket/netex.zip"  }
-   * <p>
-   */
-  private final URI source;
-
-  public TransitFeedConfig(NodeAdapter config) {
-    this(
-      config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(),
-      config
-        .of("feedId")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null)
+    return new TransitFeeds(
+      filterListOnSubType(list, GtfsFeedParameters.class),
+      filterListOnSubType(list, NetexFeedParameters.class)
     );
   }
 
-  public TransitFeedConfig(URI source, String feedId) {
-    this.source = Objects.requireNonNull(source);
-    this.feedId = feedId;
+  private static DataSourceConfig mapTransitFeed(
+    NodeAdapter feedNode,
+    NetexFeedParameters netexDefaults
+  ) {
+    var type = feedNode
+      .of("type")
+      .withDoc(V2_2, "The feed input format.")
+      .asEnum(TransitFeedType.class);
+    return switch (type) {
+      case GTFS -> mapGtfsFeed(feedNode);
+      case NETEX -> NetexConfig.mapNetexFeed(feedNode, netexDefaults);
+    };
   }
 
-  @Override
-  public URI source() {
-    return source;
+  private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
+    return new GtfsFeedParametersBuilder()
+      .withFeedId(
+        node
+          .of("feedId")
+          .withDoc(NA, /*TODO DOC*/"TODO")
+          .withExample(/*TODO DOC*/"TODO")
+          .asString(null)
+      )
+      .withSource(
+        node.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri()
+      )
+      .build();
   }
 
-  public Optional<String> feedId() {
-    return Optional.ofNullable(feedId);
+  @SuppressWarnings("unchecked")
+  private static <T> List<T> filterListOnSubType(List<? super T> list, Class<T> type) {
+    return list
+      .stream()
+      .filter(it -> type.isAssignableFrom(it.getClass()))
+      .map(it -> (T) it)
+      .toList();
+  }
+
+  enum TransitFeedType {
+    GTFS,
+    NETEX,
   }
 }

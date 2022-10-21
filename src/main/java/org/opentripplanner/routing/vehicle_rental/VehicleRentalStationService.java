@@ -12,8 +12,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleRentalStationService implements Serializable {
 
-  private static final long serialVersionUID = -1288992939159246764L;
-
   private final Map<FeedScopedId, VehicleRentalPlace> vehicleRentalStations = new HashMap<>();
 
   public Collection<VehicleRentalPlace> getVehicleRentalPlaces() {
