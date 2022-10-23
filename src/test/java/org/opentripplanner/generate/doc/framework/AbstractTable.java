@@ -2,9 +2,10 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.generate.doc.framework.MarkDownDocWriter.contextIndented;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.text.MarkdownFormatter;
+import org.opentripplanner.framework.text.Table;
+import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -22,16 +23,17 @@ abstract class AbstractTable {
 
   abstract List<String> headers();
 
-  abstract void addRow(NodeAdapter node, List<List<?>> table, NodeInfo it);
+  abstract List<Table.Align> alignment();
 
-  List<List<?>> createTable(NodeAdapter root) {
-    List<List<?>> table = new ArrayList<>();
-    table.add(headers());
+  abstract void addRow(NodeAdapter node, TableBuilder table, NodeInfo it);
+
+  Table createTable(NodeAdapter root) {
+    var table = Table.of().withHeaders(headers()).withAlights(alignment());
     addParametersTable(root, table);
-    return table;
+    return table.build();
   }
 
-  private void addParametersTable(NodeAdapter node, List<List<?>> table) {
+  private void addParametersTable(NodeAdapter node, TableBuilder table) {
     for (NodeInfo it : node.parametersSorted()) {
       addRow(node, table, it);
 

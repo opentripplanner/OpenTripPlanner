@@ -51,7 +51,10 @@ public class MarkdownFormatter {
     return enable ? "✓️" : "";
   }
 
-  /** Return the given text escaped, so it is safe to put it in a table cell. */
+  /**
+   * Pipes '|' in the text in a Markdown table cell will cause the table to be rendered wrong,
+   * so we must escape '|' in the text.
+   */
   public static String escapeInTable(String text) {
     return text == null ? null : text.replace("|", "\\|");
   }

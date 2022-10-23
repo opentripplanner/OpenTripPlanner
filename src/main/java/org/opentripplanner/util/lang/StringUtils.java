@@ -42,17 +42,55 @@ public class StringUtils {
   }
 
   /**
-   * Pad the {@code buffer} so that the length equals the new length. The {@code ch} is appended as
-   * many times as required. If the {@code buffer} length is equals or longer then the
-   * {@code newLenght} then the {@code buffer} is returned unchanged.
-   *
-   * @return the given buffer input for convenient chaining.
+   * Add the given number of characters to the buffer.
+   * @param buffer the buffer to append to.
+   * @param ch the character to add to the buffer.
+   * @param count the number of characters to add. If 0 or negative nothing is added.
+   * @return the given buffer input for convenient chaining
    */
-  public static StringBuilder pad(StringBuilder buffer, char ch, int newLength) {
-    while (buffer.length() < newLength) {
+  public static StringBuilder append(StringBuilder buffer, char ch, int count) {
+    while (count > 0) {
       buffer.append(ch);
+      --count;
     }
     return buffer;
+  }
+
+  public static String padLeft(String value, char ch, int width) {
+    if (value == null) {
+      return fill(ch, width);
+    }
+    if (value.length() >= width) {
+      return value;
+    }
+    return StringUtils
+      .append(new StringBuilder(), ch, width - value.length())
+      .append(value)
+      .toString();
+  }
+
+  public static String padBoth(String value, char ch, int width) {
+    if (value == null) {
+      return fill(ch, width);
+    }
+    if (value.length() >= width) {
+      return value;
+    }
+    var buf = new StringBuilder();
+    StringUtils.append(buf, ch, (width + 1 - value.length()) / 2);
+    buf.append(value);
+    StringUtils.append(buf, ch, width - buf.length());
+    return buf.toString();
+  }
+
+  public static String padRight(String value, char ch, int width) {
+    if (value == null) {
+      return fill(ch, width);
+    }
+    if (value.length() >= width) {
+      return value;
+    }
+    return StringUtils.append(new StringBuilder(value), ch, width - value.length()).toString();
   }
 
   /**

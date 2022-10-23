@@ -2,11 +2,9 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.framework.text.TableFormatter;
+import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 
 @SuppressWarnings("NewClassNamingConvention")
@@ -15,15 +13,15 @@ public class ConfigTypeTable {
   private static final String NEW_LINE = "\n";
 
   public static String configTypeTable() {
-    List<List<?>> list = new ArrayList<>();
-    list.add(List.of("Type", "Description", "Examples"));
+    var tbl = Table
+      .of()
+      .withHeaders("Type", "Description", "Examples")
+      .withAlights(Table.Align.Left, Table.Align.Left, Table.Align.Left);
 
     for (var it : ConfigType.values()) {
-      list.add(
-        List.of(MarkdownFormatter.code(it.docName()), it.description(), it.examplesToMarkdown())
-      );
+      tbl.addRow(MarkdownFormatter.code(it.docName()), it.description(), it.examplesToMarkdown());
     }
-    var rows = TableFormatter.asMarkdownTable(list);
+    var rows = tbl.build().toMarkdownRows();
     return String.join(NEW_LINE, rows) + NEW_LINE;
   }
 

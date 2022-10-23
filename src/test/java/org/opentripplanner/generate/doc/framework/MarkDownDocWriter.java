@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.text.TableFormatter;
+import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.util.lang.StringUtils;
 
 /**
@@ -70,8 +69,8 @@ public class MarkDownDocWriter {
     header(4, header, anchor);
   }
 
-  public void printTable(List<List<?>> table) {
-    for (String row : TableFormatter.asMarkdownTable(table)) {
+  public void printTable(Table table) {
+    for (String row : table.toMarkdownRows()) {
       out.println(row);
     }
     printNewLine();

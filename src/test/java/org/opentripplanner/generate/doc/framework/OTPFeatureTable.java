@@ -1,12 +1,13 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.framework.text.MarkdownFormatter.checkMark;
+import static org.opentripplanner.framework.text.Table.Align.Center;
+import static org.opentripplanner.framework.text.Table.Align.Left;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.text.MarkdownFormatter;
-import org.opentripplanner.framework.text.TableFormatter;
+import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.util.OTPFeature;
 
 @SuppressWarnings("NewClassNamingConvention")
@@ -15,21 +16,20 @@ public class OTPFeatureTable {
   private static final String NEW_LINE = "\n";
 
   public static String otpFeaturesTable() {
-    List<List<?>> list = new ArrayList<>();
-    list.add(List.of("Feature", "Description", "Enabled by default", "Sandbox"));
+    var table = Table
+      .of()
+      .withHeaders("Feature", "Description", "Enabled by default", "Sandbox")
+      .withAlights(Left, Left, Center, Center);
 
     for (var it : OTPFeature.values()) {
-      list.add(
-        List.of(
-          MarkdownFormatter.code(it.name()),
-          it.doc(),
-          yesNo(it.isOn()),
-          yesNo(it.isSandbox())
-        )
+      table.addRow(
+        MarkdownFormatter.code(it.name()),
+        it.doc(),
+        checkMark(it.isOn()),
+        checkMark(it.isSandbox())
       );
     }
-    var rows = TableFormatter.asMarkdownTable(list);
-    return String.join(NEW_LINE, rows) + NEW_LINE;
+    return String.join(NEW_LINE, table.build().toMarkdownRows()) + NEW_LINE;
   }
 
   @Test
@@ -38,9 +38,5 @@ public class OTPFeatureTable {
     for (OTPFeature it : OTPFeature.values()) {
       assertTrue(table.contains(it.name()), table);
     }
-  }
-
-  private static String yesNo(boolean yes) {
-    return MarkdownFormatter.checkMark(yes);
   }
 }
