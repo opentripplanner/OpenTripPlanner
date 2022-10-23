@@ -5,12 +5,12 @@ import static org.opentripplanner.util.time.DurationUtils.msToSecondsStr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.text.TableFormatter;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.util.lang.IntUtils;
-import org.opentripplanner.util.lang.TableFormatter;
 
 /**
  * Printing stuff clutters up the code, so it is convenient to put printing and formatting output

@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
-import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
+import static org.opentripplanner.framework.text.TableFormatter.Align.Center;
+import static org.opentripplanner.framework.text.TableFormatter.Align.Left;
+import static org.opentripplanner.framework.text.TableFormatter.Align.Right;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 import java.text.NumberFormat;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.text.TableFormatter;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
@@ -22,7 +23,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.lang.StringUtils;
-import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 

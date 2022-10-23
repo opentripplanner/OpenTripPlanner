@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.text.TableFormatter;
 import org.opentripplanner.util.lang.StringUtils;
-import org.opentripplanner.util.lang.TableFormatter;
 
 /**
  * This class is responsible for producing the markdown to format a document properly.

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.text.MarkdownFormatter;
+import org.opentripplanner.framework.text.TableFormatter;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.util.lang.TableFormatter;
 
 @SuppressWarnings("NewClassNamingConvention")
 public class OTPFeatureTable {
