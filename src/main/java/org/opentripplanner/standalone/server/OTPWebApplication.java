@@ -63,7 +63,7 @@ public class OTPWebApplication extends Application {
     Set<Class<?>> classes = new HashSet<>(APIEndpoints.listAPIEndpoints());
 
     /* Features and Filters: extend Jersey, manipulate requests and responses. */
-    classes.add(CorsFilter.class);
+    classes.addAll(Set.of(CorsFilter.class, EtagRequestFilter.class, VaryRequestFilter.class));
 
     return classes;
   }
@@ -120,7 +120,8 @@ public class OTPWebApplication extends Application {
    * handlers, but in OTP we always just inject this OTP server context and grab anything else we
    * need (graph and other application components) from this single object.
    * <p>
-   * More on custom injection in Jersey 2: http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
+   * More on custom injection in Jersey 2:
+   * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
   private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
     return new AbstractBinder() {
