@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings("NewClassNamingConvention")
 public class TemplateUtil {
 
+  private static final String NEW_LINE = "\n";
   private static final String COMMENT_OPEN = "<!-- ";
   private static final String COMMENT_CLOSE = " -->";
   private static final String START = " BEGIN";
@@ -32,8 +33,15 @@ public class TemplateUtil {
     }
 
     return (
-      doc.substring(0, m.start(1)) + AUTO_GENERATION_INFO + replacement + doc.substring(m.end(1))
+      doc.substring(0, m.start(1)) +
+      AUTO_GENERATION_INFO +
+      air(replacement) +
+      doc.substring(m.end(1))
     );
+  }
+
+  private static String air(String section) {
+    return NEW_LINE + NEW_LINE + section + NEW_LINE;
   }
 
   private static String start(String token) {
