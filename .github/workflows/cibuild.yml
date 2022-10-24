@@ -30,6 +30,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
+          distribution: adopt
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
@@ -75,6 +76,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
+          distribution: adopt
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
