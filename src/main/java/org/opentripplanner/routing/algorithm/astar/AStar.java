@@ -184,7 +184,7 @@ public class AStar {
       /*
        * Terminate based on timeout?
        */
-      if (timeout != null && System.currentTimeMillis() > abortTime) {
+      if (timeout != null && nVisited % 100 == 0 && System.currentTimeMillis() > abortTime) {
         LOG.warn("Search timeout. origin={} target={}", fromVertices, toVertices);
         // Rather than returning null to indicate that the search was aborted/timed out, we instead
         // set a flag in the SPT and return it anyway. This allows returning a partial list results
