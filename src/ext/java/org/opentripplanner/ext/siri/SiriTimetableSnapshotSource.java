@@ -784,12 +784,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     pattern.add(tripTimes);
 
     tripTimes
-      .findFirstNonIncreasingStopTime()
-      .ifPresent(invalidStopIndex -> {
+      .validateNonIncreasingTimes()
+      .ifFailure(error -> {
         throw new IllegalStateException(
           String.format(
-            "Non-increasing triptimes for added trip at stop index %d",
-            invalidStopIndex.stopIndex()
+            "Non-increasing triptimes for added trip at stop index %d, error %s",
+            error.stopIndex(),
+            error.errorType()
           )
         );
       });

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.STOP_DEPARTURE_BEFORE_ARRIVAL;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import org.opentripplanner.common.model.Result;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.UpdateError;
@@ -362,7 +362,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public Optional<UpdateError> findFirstNonIncreasingStopTime() {
+  public Result<?, UpdateError> validateNonIncreasingTimes() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -370,14 +370,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        return Optional.of(new UpdateError(getTrip().getId(), STOP_DEPARTURE_BEFORE_ARRIVAL, s));
+        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_DWELL_TIME, s));
       }
       if (prevDep > arr) {
-        return Optional.of(new UpdateError(getTrip().getId(), NEGATIVE_HOP_TIME, s));
+        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_HOP_TIME, s));
       }
       prevDep = dep;
     }
-    return Optional.empty();
+    return Result.success();
   }
 
   /** Cancel this entire trip */

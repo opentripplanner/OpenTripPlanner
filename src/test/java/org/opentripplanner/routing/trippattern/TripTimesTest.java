@@ -3,6 +3,8 @@ package org.opentripplanner.routing.trippattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -93,18 +95,20 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
 
-    var invalidStopOIndex = updatedTripTimesA.findFirstNonIncreasingStopTime();
-    assertTrue(invalidStopOIndex.isPresent());
-    assertEquals(1, invalidStopOIndex.get().stopIndex());
+    var error = updatedTripTimesA.validateNonIncreasingTimes();
+    assertTrue(error.isFailure());
+    assertEquals(1, error.failureValue().stopIndex());
+    assertEquals(NEGATIVE_DWELL_TIME, error.failureValue().errorType());
 
     TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
 
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
 
-    invalidStopOIndex = updatedTripTimesB.findFirstNonIncreasingStopTime();
-    assertTrue(invalidStopOIndex.isPresent());
-    assertEquals(7, invalidStopOIndex.get().stopIndex());
+    error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertTrue(error.isFailure());
+    assertEquals(7, error.failureValue().stopIndex());
+    assertEquals(NEGATIVE_HOP_TIME, error.failureValue().errorType());
   }
 
   @Test
@@ -114,7 +118,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
 
-    assertTrue(updatedTripTimesA.findFirstNonIncreasingStopTime().isEmpty());
+    assertTrue(updatedTripTimesA.validateNonIncreasingTimes().isSuccess());
   }
 
   @Test
@@ -181,8 +185,8 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 89);
     updatedTripTimesA.updateDepartureTime(1, 98);
 
-    var invalidStopOIndex = updatedTripTimesA.findFirstNonIncreasingStopTime();
-    assertTrue(invalidStopOIndex.isPresent());
-    assertEquals(2, invalidStopOIndex.get().stopIndex());
+    var invalidStopOIndex = updatedTripTimesA.validateNonIncreasingTimes();
+    assertTrue(invalidStopOIndex.isFailure());
+    assertEquals(2, invalidStopOIndex.failureValue().stopIndex());
   }
 }
