@@ -1,5 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
+import static org.opentripplanner.framework.text.MarkdownFormatter.code;
+import static org.opentripplanner.framework.text.MarkdownFormatter.escapeInTable;
 import static org.opentripplanner.generate.doc.framework.MarkDownDocWriter.contextIndented;
 
 import java.util.List;
@@ -27,7 +29,7 @@ abstract class AbstractTable {
 
   abstract void addRow(NodeAdapter node, TableBuilder table, NodeInfo it);
 
-  Table createTable(NodeAdapter root) {
+  public Table createTable(NodeAdapter root) {
     var table = Table.of().withHeaders(headers()).withAlights(alignment());
     addParametersTable(root, table);
     return table.build();
@@ -68,11 +70,11 @@ abstract class AbstractTable {
   }
 
   String defaultValue(NodeInfo info) {
-    return info.defaultValue() == null
-      ? ""
-      : MarkdownFormatter.code(
-        info.type().quote(MarkdownFormatter.escapeInTable(info.defaultValue()))
-      );
+    if (info.defaultValue() == null) {
+      return "";
+    }
+    var defaultValue = info.type().quote(info.defaultValue());
+    return escapeInTable(code(defaultValue));
   }
 
   private boolean skip(NodeInfo info) {

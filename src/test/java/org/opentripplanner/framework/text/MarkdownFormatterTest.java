@@ -45,7 +45,7 @@ class MarkdownFormatterTest {
   @Test
   void escapeInTable() {
     assertEquals(
-      "Text with pipe '\\|' in it!",
+      "Text with pipe '¦' in it!",
       MarkdownFormatter.escapeInTable("Text with pipe '|' in it!")
     );
   }
