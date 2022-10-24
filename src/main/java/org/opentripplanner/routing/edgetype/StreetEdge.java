@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -1210,9 +1209,7 @@ public class StreetEdge
   ) {
     if (isNoThruTraffic(traverseMode)) {
       // Record transition into no-through-traffic area.
-      if (
-        backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isNoThruTraffic(traverseMode)
-      ) {
+      if (backEdge instanceof StreetEdge sbe && !sbe.isNoThruTraffic(traverseMode)) {
         s1.setEnteredNoThroughTrafficArea();
       }
     } else if (s0.hasEnteredNoThruTrafficArea()) {
