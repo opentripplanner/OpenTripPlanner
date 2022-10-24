@@ -36,7 +36,7 @@ public record NodeInfo(
   String summary,
   @Nullable String description,
   ConfigType type,
-  @Nullable Class<Enum<?>> enumType,
+  @Nullable Class<? extends Enum<?>> enumType,
   @Nullable ConfigType elementType,
   OtpVersion since,
   @Nullable String defaultValue,

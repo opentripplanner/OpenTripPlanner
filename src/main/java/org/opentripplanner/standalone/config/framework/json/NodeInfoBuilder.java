@@ -13,7 +13,7 @@ class NodeInfoBuilder {
 
   private String name;
   private ConfigType type;
-  private Class<Enum<?>> enumType;
+  private Class<? extends Enum<?>> enumType;
   private ConfigType elementType;
   private OtpVersion since = OtpVersion.NA;
   private String summary = "TODO: Add short summary.";
@@ -78,7 +78,7 @@ class NodeInfoBuilder {
     return this;
   }
 
-  NodeInfoBuilder withEnum(Class<Enum<?>> enumType) {
+  NodeInfoBuilder withEnum(Class<? extends Enum<?>> enumType) {
     this.type = ENUM;
     this.enumType = enumType;
     return this;
@@ -96,14 +96,14 @@ class NodeInfoBuilder {
     return this;
   }
 
-  NodeInfoBuilder withEnumMap(Class<Enum<?>> enumType, ConfigType elementType) {
+  NodeInfoBuilder withEnumMap(Class<? extends Enum<?>> enumType, ConfigType elementType) {
     this.type = ENUM_MAP;
     this.enumType = enumType;
     this.elementType = elementType;
     return this;
   }
 
-  NodeInfoBuilder withEnumSet(Class<Enum<?>> enumType) {
+  NodeInfoBuilder withEnumSet(Class<? extends Enum<?>> enumType) {
     this.type = ENUM_SET;
     this.elementType = ENUM;
     this.enumType = enumType;

@@ -173,23 +173,23 @@ public class ParameterBuilder {
   }
 
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
-    //noinspection unchecked
-    info.withRequired().withEnum((Class<Enum<?>>) enumType);
+    info.withRequired().withEnum(enumType);
     return parseEnum(build().asText(), enumType);
   }
 
   /** Get optional enum value. Parser is not case sensitive. */
   @SuppressWarnings("unchecked")
   public <T extends Enum<T>> T asEnum(T defaultValue) {
-    info.withEnum((Class<Enum<?>>) defaultValue.getClass()).withOptional(defaultValue.name());
+    info
+      .withEnum((Class<? extends Enum<?>>) defaultValue.getClass())
+      .withOptional(defaultValue.name());
     // Do not inline the node, calling the build is required.
     var node = build();
     return exist() ? parseEnum(node.asText(), (Class<T>) defaultValue.getClass()) : defaultValue;
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
-    //noinspection unchecked
-    info.withOptional().withEnumSet((Class<Enum<?>>) enumClass);
+    info.withOptional().withEnumSet(enumClass);
     List<T> result = buildAndListSimpleArrayElements(
       List.of(),
       it -> parseEnum(it.asText(), enumClass)
@@ -198,7 +198,7 @@ public class ParameterBuilder {
   }
 
   /**
-   * Get a map of enum values listed in the config like this: (This example have Boolean values)
+   * Get a map of enum values listed in the config like this: (This example has Boolean values)
    * <pre>
    * key : {
    *   A : true,  // turned on
@@ -214,8 +214,7 @@ public class ParameterBuilder {
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(Class<E> enumType, Class<T> elementJavaType) {
     var elementType = ConfigType.of(elementJavaType);
-    //noinspection unchecked
-    info.withOptional().withEnumMap((Class<Enum<?>>) enumType, elementType);
+    info.withOptional().withEnumMap(enumType, elementType);
 
     var mapNode = buildObject();
 
