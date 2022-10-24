@@ -1157,13 +1157,6 @@ public class StreetEdge
     boolean walkingBike,
     boolean wheelchair
   ) {
-    Supplier<Double> nonWheelchairReluctance = () ->
-      StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
-        traverseMode,
-        walkingBike,
-        isStairs()
-      );
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
@@ -1175,21 +1168,29 @@ public class StreetEdge
           isWheelchairAccessible(),
           isStairs()
         );
-    } else if (walkingBike) {
-      // take slopes into account when walking bikes
-      time = weight = (getEffectiveBikeDistance() / speed);
-      weight *= nonWheelchairReluctance.get();
     } else {
-      // take slopes into account when walking
-      time = getEffectiveWalkDistance() / speed;
-      weight =
-        getEffectiveWalkSafetyDistance() *
-        preferences.walk().safetyFactor() +
-        getEffectiveWalkDistance() *
-        (1 - preferences.walk().safetyFactor());
-      weight /= speed;
-      weight *= nonWheelchairReluctance.get();
+      if (walkingBike) {
+        // take slopes into account when walking bikes
+        time = weight = (getEffectiveBikeDistance() / speed);
+      } else {
+        // take slopes into account when walking
+        time = getEffectiveWalkDistance() / speed;
+        weight =
+          getEffectiveWalkSafetyDistance() *
+          preferences.walk().safetyFactor() +
+          getEffectiveWalkDistance() *
+          (1 - preferences.walk().safetyFactor());
+        weight /= speed;
+      }
+      weight *=
+        StreetEdgeReluctanceCalculator.computeReluctance(
+          preferences,
+          traverseMode,
+          walkingBike,
+          isStairs()
+        );
     }
+
     return new TraversalCosts(time, weight);
   }
 
