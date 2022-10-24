@@ -488,7 +488,10 @@ public class BuildConfig implements OtpDataStoreConfig {
         .since(NA)
         .summary("Perform visibility calculations.")
         .description(
-          "If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming)."
+          """
+          If this is `true` OTP attempts to calculate a path straight through an OSM area using the 
+          shortest way rather than around the edge of it. (These calculations can be time consuming).
+          """
         )
         .asBoolean(false);
     banDiscouragedWalking =

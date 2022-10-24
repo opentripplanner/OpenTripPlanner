@@ -20,7 +20,7 @@ public class MarkDownDocWriter {
 
   private final PrintStream out;
 
-  private MarkDownDocWriter(PrintStream out) {
+  public MarkDownDocWriter(PrintStream out) {
     this.out = out;
   }
 

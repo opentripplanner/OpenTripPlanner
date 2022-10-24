@@ -13,7 +13,7 @@ public class ParameterDetailsList {
   private final SkipFunction skipNodeOp;
   private final MarkDownDocWriter writer;
 
-  public ParameterDetailsList(MarkDownDocWriter writer, SkipFunction skipNodeOp) {
+  private ParameterDetailsList(MarkDownDocWriter writer, SkipFunction skipNodeOp) {
     this.writer = writer;
     this.skipNodeOp = skipNodeOp;
   }
