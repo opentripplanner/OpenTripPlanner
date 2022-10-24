@@ -26,6 +26,10 @@ jobs:
             iterations: 4
             jfr-delay: "50s"
 
+          - location: skanetrafiken
+            iteration: 1
+            jfr-delay: "50s"
+
     steps:
       - uses: actions/checkout@v2.3.2
         with:

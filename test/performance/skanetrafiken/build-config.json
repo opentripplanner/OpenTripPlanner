@@ -1,0 +1,45 @@
+{
+  "transitServiceStart" : "2022-05-01",
+  "transitServiceEnd": "2022-12-30",
+  "transitModelTimeZone": "Europe/Oslo",
+  "areaVisibility": true,
+  "parentStopLinking": true,
+  "platformEntriesLinking": true,
+  "islandWithoutStopsMaxSize": 5,
+  "islandWithStopsMaxSize": 5,
+  "dataImportReport": true,
+  "maxTransferDistance": 5000,
+  "maxStopToShapeSnapDistance": 500,
+  "stopEntriesLinking": false,
+  "osmDefaults": {
+    "osmTagMapping": "norway",
+    "timeZone": "Europe/Oslo"
+  },
+  "netexDefaults" : {
+    "sharedFilePattern" : "ST_stops.xml",
+    "sharedGroupFilePattern" : "(\\w{2})_shared_data.xml",
+    "groupFilePattern" : "(\\w{2})_line.*\\.xml",
+    "feedId": "ST",
+    "noTransfersOnIsolatedStops": true
+  },
+  "transitFeeds": [
+    {
+      "type": "netex",
+      "source": "https://otp-performance.leonard.io/data/skane/ST_netex-2022-10-19.zip",
+      "feedId": "ST"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/skane/GTFS-filtered-2022-10-19.zip",
+      "feedId": "DK"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://otp-performance.leonard.io/data/skane/denmark-oresund-2022-10-19.osm.pbf"
+    },
+    {
+      "source": "https://otp-performance.leonard.io/data/skane/sweden-filtered-2022-10-29.osm.pbf"
+    }
+  ]
+}

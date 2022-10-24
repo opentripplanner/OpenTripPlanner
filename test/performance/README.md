@@ -49,3 +49,9 @@ If the link above do not work you should be able to find it on the ENTUR web:
 #### Germany
 
 - [Tidied GTFS data](https://otp-performance.leonard.io/data/germany/germany-2022-08-23.tidy.gtfs.zip)
+
+#### Skånetrafiken
+- [Sweden NeTEx](https://ressapublic.blob.core.windows.net/ressapub/ST_netex.zip)
+- [Sweden OSM](https://ressapublic.blob.core.windows.net/ressapub/sweden-filtered.osm.pbf)
+- [Denmark GTFS](https://ressapublic.blob.core.windows.net/ressapub/GTFS-filtered.zip)
+- [Denmark OSM](https://ressapublic.blob.core.windows.net/ressapub/denmark-oresund.osm.pbf)
