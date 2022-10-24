@@ -274,19 +274,11 @@ public class StreetEdge
   }
 
   public boolean isNoThruTraffic(TraverseMode traverseMode) {
-    if (traverseMode.isCycling()) {
-      return isBicycleNoThruTraffic();
-    }
-
-    if (traverseMode.isDriving()) {
-      return isMotorVehicleNoThruTraffic();
-    }
-
-    if (traverseMode.isWalking()) {
-      return isWalkNoThruTraffic();
-    }
-
-    return false;
+    return switch (traverseMode) {
+      case WALK -> isWalkNoThruTraffic();
+      case BICYCLE, SCOOTER -> isBicycleNoThruTraffic();
+      case CAR, FLEX -> isMotorVehicleNoThruTraffic();
+    };
   }
 
   /**
