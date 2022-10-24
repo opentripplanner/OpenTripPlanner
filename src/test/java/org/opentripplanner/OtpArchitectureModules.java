@@ -17,6 +17,7 @@ public interface OtpArchitectureModules {
   Package FRAMEWORK_TEXT = FRAMEWORK.subPackage("text");
   Package UTIL = OTP_ROOT.subPackage("util");
   Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
+  Package COMMON_MODEL = OTP_ROOT.subPackage("common.model");
 
   Package RAPTOR_ADAPTER = OTP_ROOT
     .subPackage("routing")

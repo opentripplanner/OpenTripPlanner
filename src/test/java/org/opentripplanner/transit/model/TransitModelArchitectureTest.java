@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
+import static org.opentripplanner.OtpArchitectureModules.COMMON_MODEL;
 import static org.opentripplanner.OtpArchitectureModules.GEO_UTIL;
 import static org.opentripplanner.OtpArchitectureModules.JACKSON_ANNOTATIONS;
 import static org.opentripplanner.OtpArchitectureModules.JTS_GEOM;
@@ -49,7 +50,7 @@ public class TransitModelArchitectureTest {
       )
       .verify();
     TIMETABLE
-      .dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL)
+      .dependsOn(UTILS, FRAMEWORK, BASIC, ORGANIZATION, NETWORK, SITE, LEGACY_MODEL, COMMON_MODEL)
       .verify();
   }
 
