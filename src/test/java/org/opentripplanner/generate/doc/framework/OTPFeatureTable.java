@@ -25,7 +25,7 @@ public class OTPFeatureTable {
       table.addRow(
         MarkdownFormatter.code(it.name()),
         it.doc(),
-        checkMark(it.isOn()),
+        checkMark(it.isEnabledByDefault()),
         checkMark(it.isSandbox())
       );
     }

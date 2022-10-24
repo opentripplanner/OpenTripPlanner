@@ -80,16 +80,18 @@ public enum OTPFeature {
   TransferAnalyzer(false, true, "Analyze transfers during graph build."),
   VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries.");
 
-  private static final Object TEST_SEMAPHORE = new Object();
+  private static final Object TEST_LOCK = new Object();
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
-  private boolean enabled;
 
+  private final boolean enabledByDefault;
   private final boolean sandbox;
 
+  private boolean enabled;
   private final String doc;
 
   OTPFeature(boolean defaultEnabled, boolean sandbox, String doc) {
+    this.enabledByDefault = defaultEnabled;
     this.enabled = defaultEnabled;
     this.sandbox = sandbox;
     this.doc = doc;
@@ -142,6 +144,13 @@ public enum OTPFeature {
   }
 
   /**
+   * Return {@code true} is enabled by default.
+   */
+  public boolean isEnabledByDefault() {
+    return enabledByDefault;
+  }
+
+  /**
    * Return {@code true} if feature is turned 'off'.
    */
   public boolean isOff() {
@@ -175,7 +184,7 @@ public enum OTPFeature {
   }
 
   private void testEnabled(boolean enabled, Runnable task) {
-    synchronized (TEST_SEMAPHORE) {
+    synchronized (TEST_LOCK) {
       boolean originalValue = this.enabled;
       try {
         set(enabled);
