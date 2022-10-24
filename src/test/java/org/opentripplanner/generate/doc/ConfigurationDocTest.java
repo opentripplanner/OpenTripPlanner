@@ -1,6 +1,7 @@
 package org.opentripplanner.generate.doc;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.generate.doc.framework.ConfigTypeTable.configTypeTable;
 import static org.opentripplanner.generate.doc.framework.OTPFeatureTable.otpFeaturesTable;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
@@ -15,9 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("NewClassNamingConvention")
-public class ConfigurationDocGenerator {
+public class ConfigurationDocTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ConfigurationDocGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ConfigurationDocTest.class);
 
   private static final File FILE = new File("docs", "Configuration.md");
 
@@ -32,6 +33,9 @@ public class ConfigurationDocGenerator {
    *   <li>The configuration type table</li>
    *   <li>The list of OTP features</li>
    * </ul>
+   * This test fails if the document have changed. This make sure that this test fails in the
+   * CI pipeline if config file changes is not committed. Manually inspect the changes in the
+   * configuration, commit the configuration document, and run test again to pass.
    */
   @Test
   public void updateConfigurationDoc() {
@@ -40,6 +44,8 @@ public class ConfigurationDocGenerator {
     doc = replaceSection(doc, CONFIG_TYPE_PLACEHOLDER, air(configTypeTable()));
     doc = replaceSection(doc, OTP_FEATURE_PLACEHOLDER, air(otpFeaturesTable()));
     writeToConfigurationFile(doc);
+
+    assertEquals(doc, readInConfigurationFile());
   }
 
   private String readInConfigurationFile() {
