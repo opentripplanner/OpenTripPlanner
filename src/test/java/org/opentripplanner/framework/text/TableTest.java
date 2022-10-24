@@ -12,17 +12,23 @@ public class TableTest {
 
   @Test
   public void buildAndPrintTable() {
-    String expect =
+    var builder = Table
+      .of()
+      .withAlights(Left, Center, Right)
+      .withHeaders("LEFT", "CENTER", "RIGHT")
+      .addRow("AAA", "Long-value", 2)
+      .addRow(null, "Short", 123);
+
+    var expected =
       """
       LEFT |   CENTER   | RIGHT
       AAA  | Long-value |     2
            |    Short   |   123
       """;
 
-    var table = Table.of().withAlights(Left, Center, Right).withHeaders("LEFT", "CENTER", "RIGHT");
-    table.addRow("AAA", "Long-value", 2);
-    table.addRow(null, "Short", 123);
-    assertEquals(expect, table.toString());
+    // Both the builder and the Table returns the same table as toString()
+    assertEquals(expected, builder.toString());
+    assertEquals(expected, builder.build().toString());
   }
 
   @Test
@@ -52,13 +58,18 @@ public class TableTest {
       .addRow("(A|B)", "|")
       .build();
 
-    var result = table.toMarkdownRows();
-    assertEquals("|   A   | B | Total |", result.get(0));
-    assertEquals("|:-----:|:-:|:-----:|", result.get(1));
-    assertEquals("|  100  | 2 |  102  |", result.get(2));
-    assertEquals("|  One  |   |       |", result.get(3));
-    assertEquals("| (A\\|B) | \\| |       |", result.get(4));
-    assertEquals(5, result.size());
+    var result = table.toMarkdownTable();
+
+    assertEquals(
+      """
+        |   A   | B | Total |
+        |:-----:|:-:|:-----:|
+        |  100  | 2 |  102  |
+        |  One  |   |       |
+        | (A\\|B) | \\| |       |
+        """,
+      result
+    );
   }
 
   @Test

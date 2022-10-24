@@ -73,6 +73,13 @@ public class Table {
   }
 
   /**
+   * Join all rows into a table. See {@link #toMarkdownRows()}
+   */
+  public String toMarkdownTable() {
+    return String.join("\n", toMarkdownRows()) + "\n";
+  }
+
+  /**
    * This method convert the table to a list of rows including a header row.
    * <p>
    * It formats each row using the maximum width of all elements in each column:
@@ -109,13 +116,12 @@ public class Table {
     return TableRowFormatter.logFormatter(aligns, widths).format(list);
   }
 
+  /**
+   * Return table as text. See {@link #toTextRows()}.
+   */
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    for (String line : toTextRows()) {
-      buf.append(line).append('\n');
-    }
-    return buf.toString();
+    return String.join("\n", toTextRows()) + "\n";
   }
 
   /* private methods */
