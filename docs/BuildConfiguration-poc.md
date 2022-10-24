@@ -12,37 +12,6 @@ Sections follow that describe particular settings in more depth.
 
 <!-- PARAMETERS-TABLE END -->
 
-
-## Transit Feeds
-
-The transitFeeds section of `build-config.json` allows you to override the default behavior of scanning
-for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
-located outside the local filesystem (including cloud storage services) or at various
-different locations around the local filesystem.  
-When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds section, auto-scanning in the base directory for this feed type will be disabled.
-
-| config key                | description                                                                                                                                         | value type      | value default |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------|---------------|
-| `type`                    | The type of transit data. Supported types are `netex` and `gtfs`.                                                                                   | string          | mandatory     |
-| `feedId`                  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                             | string          | `null`        |
-| `source`                  | The unique URI pointing to the data file.                                                                                                           | uri             | `null`        |
-| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.       | regexp pattern  | `null`        |
-| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults. | regexp pattern  | `null`        |
-| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.            | regexp pattern  | `null`        |
-| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type. Overrides the pattern specified in netexDefaults.                          | regexp pattern  | `null`        |
-
-## NeTEx Defaults
-
-The netexDefaults section of `build-config.json` allows you to specify default properties for NeTEx files.
-
-| config key                | description                                                                                       | value type      | value default |
-|---------------------------|---------------------------------------------------------------------------------------------------|-----------------|---------------|
-| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type.       | regexp pattern  | `null`        |
-| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. | regexp pattern  | `null`        |
-| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type.            | regexp pattern  | `null`        |
-| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type.                          | regexp pattern  | `null`        |
-
-
 ## OSM 
 
 The osm section of `build-config.json` allows you to override the default behavior of scanning

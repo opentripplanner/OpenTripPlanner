@@ -540,12 +540,35 @@ public class BuildConfig implements OtpDataStoreConfig {
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
     elevationUnitMultiplier =
-      root.of("elevationUnitMultiplier").since(NA).summary("TODO").asDouble(1);
-    embedRouterConfig = root.of("embedRouterConfig").since(NA).summary("TODO").asBoolean(true);
+      root
+        .of("elevationUnitMultiplier")
+        .since(NA)
+        .summary("Specify a multiplier to convert elevation units from source to meters.")
+        .asDouble(1);
+    embedRouterConfig =
+      root
+        .of("embedRouterConfig")
+        .since(NA)
+        .summary(
+          "Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire."
+        )
+        .asBoolean(true);
     extraEdgesStopPlatformLink =
-      root.of("extraEdgesStopPlatformLink").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("extraEdgesStopPlatformLink")
+        .since(NA)
+        .summary(
+          "Add extra edges when linking a stop to a platform, to prevent detours along the platform edge."
+        )
+        .asBoolean(false);
     includeEllipsoidToGeoidDifference =
-      root.of("includeEllipsoidToGeoidDifference").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("includeEllipsoidToGeoidDifference")
+        .since(NA)
+        .summary(
+          "Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge."
+        )
+        .asBoolean(false);
     pruningThresholdIslandWithStops =
       root.of("islandWithStopsMaxSize").since(NA).summary("TODO").asInt(5);
     pruningThresholdIslandWithoutStops =
