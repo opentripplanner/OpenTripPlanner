@@ -62,10 +62,10 @@ public class NetexConfig {
 
               File names are matched in the following order - and treated accordingly to the first match:
               <ol>
-                  <li>{@link #ignoreFilePattern}</li>
-                  <li>Shared file pattern (this)</li>
-                  <li>{@link #sharedGroupFilePattern}.</li>
-                  <li>{@link #groupFilePattern}.</li>
+                  <li>`ignoreFilePattern`</li>
+                  <li>`sharedFilePattern`</li>
+                  <li>`sharedGroupFilePattern`</li>
+                  <li>`groupFilePattern`</li>
               </ol>
               """
           )
