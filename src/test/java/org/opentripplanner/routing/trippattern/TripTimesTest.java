@@ -185,8 +185,9 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(1, 89);
     updatedTripTimesA.updateDepartureTime(1, 98);
 
-    var invalidStopOIndex = updatedTripTimesA.validateNonIncreasingTimes();
-    assertTrue(invalidStopOIndex.isFailure());
-    assertEquals(2, invalidStopOIndex.failureValue().stopIndex());
+    var validationResult = updatedTripTimesA.validateNonIncreasingTimes();
+    assertTrue(validationResult.isFailure());
+    assertEquals(2, validationResult.failureValue().stopIndex());
+    assertEquals(NEGATIVE_DWELL_TIME, validationResult.failureValue().errorType());
   }
 }
