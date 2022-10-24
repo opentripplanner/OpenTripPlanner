@@ -35,10 +35,10 @@ class NodeInfoTest {
 
   @Test
   void printDetails() {
-    assertFalse(createBuilderStringNode().build().printDetails());
-    assertTrue(createBuilderStringNode().withDescription("D").build().printDetails());
-    assertTrue(createBuilderStringNode().withArray(ConfigType.STRING).build().printDetails());
-    assertTrue(createBuilderStringNode().withMap(ConfigType.DURATION).build().printDetails());
+    assertFalse(createBuilder().build().printDetails());
+    assertTrue(createBuilder().withDescription("D").build().printDetails());
+    assertTrue(createBuilder().withArray(ConfigType.STRING).build().printDetails());
+    assertTrue(createBuilder().withMap(ConfigType.DURATION).build().printDetails());
   }
 
   @Test
@@ -47,9 +47,33 @@ class NodeInfoTest {
   }
 
   @Test
-  void compareTo() {}
+  void typeDescription() {
+    for (ConfigType configType : ConfigType.values()) {
+      if (configType.isSimple() && ConfigType.ENUM != configType) {
+        assertEquals(
+          configType.docName(),
+          createBuilder().withType(configType).build().typeDescription()
+        );
+      }
+    }
+    assertEquals("enum", createBuilder().withEnum(AnEnum.class).build().typeDescription());
+    assertEquals("object", createBuilder().withType(ConfigType.OBJECT).build().typeDescription());
+    assertEquals(
+      "string[]",
+      createBuilder().withArray(ConfigType.STRING).build().typeDescription()
+    );
+    assertEquals(
+      "map of duration",
+      createBuilder().withMap(ConfigType.DURATION).build().typeDescription()
+    );
+    assertEquals(
+      "enum map of object",
+      createBuilder().withEnumMap(AnEnum.class, ConfigType.OBJECT).build().typeDescription()
+    );
+    assertEquals("enum set", createBuilder().withEnumSet(AnEnum.class).build().typeDescription());
+  }
 
-  private NodeInfoBuilder createBuilderStringNode() {
+  private NodeInfoBuilder createBuilder() {
     return NodeInfo
       .of()
       .withType(ConfigType.STRING)

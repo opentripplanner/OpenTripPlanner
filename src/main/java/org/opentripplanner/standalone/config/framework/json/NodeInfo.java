@@ -1,9 +1,5 @@
 package org.opentripplanner.standalone.config.framework.json;
 
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ARRAY;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
 import java.util.Objects;
@@ -92,6 +88,17 @@ public record NodeInfo(
     return new NodeInfoBuilder();
   }
 
+  @SuppressWarnings("ConstantConditions")
+  public String typeDescription() {
+    return switch (type) {
+      case ARRAY -> elementType.docName() + "[]";
+      case MAP -> "map of " + elementType.docName();
+      case ENUM_MAP -> "enum map of " + elementType.docName();
+      case ENUM_SET -> "enum set";
+      default -> type.docName();
+    };
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -105,22 +112,13 @@ public record NodeInfo(
     return Objects.hash(name);
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Override
   public String toString() {
-    var builder = ValueObjectToStringBuilder.of().addText(name).addText(" : ");
-
-    if (type == ARRAY) {
-      builder.addText(elementType.docName()).addText("[]");
-    } else if (type == MAP) {
-      builder.addText("map of ").addText(elementType.docName());
-    } else if (type == ENUM_MAP) {
-      builder.addText("enum map of ").addText(elementType.docName());
-    } else if (type == ENUM_SET) {
-      builder.addText("set of ").addText(elementType.docName());
-    } else {
-      builder.addText(type.docName());
-    }
+    var builder = ValueObjectToStringBuilder
+      .of()
+      .addText(name)
+      .addText(" : ")
+      .addText(typeDescription());
 
     if (required) {
       builder.addText(" Required");

@@ -61,7 +61,7 @@ public class ParameterDetailsList {
       .append(MarkdownFormatter.code(info.since()))
       .append(delimiter)
       .append("Type: ")
-      .append(MarkdownFormatter.code(info.type().docName()))
+      .append(MarkdownFormatter.code(info.typeDescription()))
       .append(delimiter)
       .append(MarkdownFormatter.code(info.required() ? "Required" : "Optional"))
       .append(delimiter);

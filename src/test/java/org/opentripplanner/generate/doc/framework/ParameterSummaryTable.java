@@ -42,7 +42,7 @@ public class ParameterSummaryTable extends AbstractTable {
     }
     table.addRow(
       parameterNameIndented(node, info),
-      MarkdownFormatter.code(info.type().docName()),
+      MarkdownFormatter.code(info.typeDescription()),
       info.summary(),
       requiredOrOptional(info),
       info.type().isSimple() ? defaultValue(info) : "",
