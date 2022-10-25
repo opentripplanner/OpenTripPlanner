@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
-import org.opentripplanner.util.lang.ToStringBuilder;
+import java.time.Duration;
 
 /**
  * Heuristic data for a given stop.
@@ -8,11 +8,15 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 public record HeuristicAtStop(int minTravelDuration, int minNumTransfers, int minCost) {
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(HeuristicAtStop.class)
-      .addDurationSec("minTravelDuration", minTravelDuration)
-      .addNum("minNumTransfers", minNumTransfers)
-      .addCostCenti("minCost", minCost, null)
-      .toString();
+    return (
+      "HeuristicAtStop{" +
+      "minTravelDuration: " +
+      Duration.ofSeconds(minTravelDuration).toString() +
+      ", minNumTransfers: " +
+      minNumTransfers +
+      ", minCost: $" +
+      (minCost / 100.0) +
+      "}"
+    );
   }
 }
