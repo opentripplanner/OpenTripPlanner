@@ -8,9 +8,13 @@ import org.opentripplanner.transit.model.timetable.Direction;
 public interface EntitySelector {
   EntityKey key();
 
+  default boolean matches(EntitySelector other) {
+    return this.equals(other);
+  }
+
   record Agency(FeedScopedId agencyId) implements EntitySelector {
     @Override
-    public EntityKey key() {
+    public EntityKey.Agency key() {
       return new EntityKey.Agency(agencyId);
     }
   }
@@ -21,14 +25,25 @@ public interface EntitySelector {
     }
 
     @Override
-    public EntityKey key() {
+    public EntityKey.Stop key() {
       return new EntityKey.Stop(stopId);
+    }
+
+    @Override
+    public boolean matches(EntitySelector other) {
+      if (!(other instanceof EntitySelector.Stop s)) {
+        return false;
+      }
+      return (
+        stopId.equals(s.stopId) &&
+        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions)
+      );
     }
   }
 
   record Route(FeedScopedId routeId) implements EntitySelector {
     @Override
-    public EntityKey key() {
+    public EntityKey.Route key() {
       return new EntityKey.Route(routeId);
     }
   }
@@ -39,8 +54,19 @@ public interface EntitySelector {
     }
 
     @Override
-    public EntityKey key() {
+    public EntityKey.Trip key() {
       return new EntityKey.Trip(tripId);
+    }
+
+    @Override
+    public boolean matches(EntitySelector other) {
+      if (!(other instanceof EntitySelector.Trip t)) {
+        return false;
+      }
+      return (
+        tripId.equals(t.tripId) &&
+        (serviceDate == null || t.serviceDate == null || serviceDate.equals(t.serviceDate))
+      );
     }
   }
 
@@ -59,8 +85,20 @@ public interface EntitySelector {
     }
 
     @Override
-    public EntityKey key() {
+    public EntityKey.StopAndRoute key() {
       return new EntityKey.StopAndRoute(stopId, routeId);
+    }
+
+    @Override
+    public boolean matches(EntitySelector other) {
+      if (!(other instanceof EntitySelector.StopAndRoute s)) {
+        return false;
+      }
+      return (
+        stopId.equals(s.stopId) &&
+        routeId.equals(s.routeId) &&
+        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions)
+      );
     }
   }
 
@@ -80,35 +118,48 @@ public interface EntitySelector {
     }
 
     @Override
-    public EntityKey key() {
+    public EntityKey.StopAndTrip key() {
       return new EntityKey.StopAndTrip(stopId, tripId);
+    }
+
+    @Override
+    public boolean matches(EntitySelector other) {
+      if (!(other instanceof EntitySelector.StopAndTrip s)) {
+        return false;
+      }
+      return (
+        stopId.equals(s.stopId) &&
+        tripId.equals(s.tripId) &&
+        StopConditionsHelper.matchesStopCondition(stopConditions, s.stopConditions) &&
+        (serviceDate == null || s.serviceDate == null || serviceDate.equals(s.serviceDate))
+      );
     }
   }
 
   record Unknown(String description) implements EntitySelector {
     @Override
-    public EntityKey key() {
+    public EntityKey.Unknown key() {
       return new EntityKey.Unknown();
     }
   }
 
   record RouteType(String feedId, int routeType) implements EntitySelector {
     @Override
-    public EntityKey key() {
+    public EntityKey.RouteType key() {
       return new EntityKey.RouteType(feedId, routeType);
     }
   }
 
   record RouteTypeAndAgency(FeedScopedId agencyId, int routeType) implements EntitySelector {
     @Override
-    public EntityKey key() {
+    public EntityKey.RouteTypeAndAgency key() {
       return new EntityKey.RouteTypeAndAgency(agencyId, routeType);
     }
   }
 
   record DirectionAndRoute(FeedScopedId routeId, Direction direction) implements EntitySelector {
     @Override
-    public EntityKey key() {
+    public EntityKey.DirectionAndRoute key() {
       return new EntityKey.DirectionAndRoute(routeId, direction);
     }
   }

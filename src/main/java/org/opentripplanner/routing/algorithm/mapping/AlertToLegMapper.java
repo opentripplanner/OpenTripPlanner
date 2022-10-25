@@ -47,10 +47,6 @@ public class AlertToLegMapper {
       return;
     }
 
-    Set<StopCondition> departingStopConditions = isFirstLeg
-      ? StopCondition.DEPARTURE
-      : StopCondition.FIRST_DEPARTURE;
-
     ZonedDateTime legStartTime = leg.getStartTime();
     ZonedDateTime legEndTime = leg.getEndTime();
     StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
@@ -61,31 +57,43 @@ public class AlertToLegMapper {
     LocalDate serviceDate = leg.getServiceDate();
 
     if (fromStop instanceof RegularStop stop) {
-      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
-      alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
-      // departingStopConditions
+      Set<StopCondition> stopConditions = isFirstLeg
+        ? StopCondition.DEPARTURE
+        : StopCondition.FIRST_DEPARTURE;
+
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
+      alerts.addAll(
+        getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
+      );
       addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
     }
     if (toStop instanceof RegularStop stop) {
-      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
-      alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
-      // StopCondition.ARRIVING
+      Set<StopCondition> stopConditions = StopCondition.ARRIVING;
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
+      alerts.addAll(
+        getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
+      );
       addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
     }
 
     if (leg.getIntermediateStops() != null) {
+      Set<StopCondition> stopConditions = StopCondition.PASSING;
       for (StopArrival visit : leg.getIntermediateStops()) {
         if (visit.place.stop instanceof RegularStop stop) {
-          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
-          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
-          alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
+          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
+          alerts.addAll(
+            getAlertsForRelatedStops(
+              stop,
+              id -> transitAlertService.getStopAlerts(id, stopConditions)
+            )
+          );
 
           ZonedDateTime stopArrival = visit.arrival;
           ZonedDateTime stopDeparture = visit.departure;
 
-          // StopCondition.PASSING
           addTransitAlertsToLeg(leg, alerts, stopArrival, stopDeparture);
         }
       }
@@ -93,12 +101,8 @@ public class AlertToLegMapper {
 
     Collection<TransitAlert> alerts;
 
-    // trips - alerts tagged on ServiceDate
+    // trips
     alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
-    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
-
-    // trips - alerts tagged on any date
-    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), null);
     addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
 
     // route
@@ -137,34 +141,25 @@ public class AlertToLegMapper {
 
   private Collection<TransitAlert> getAlertsForStopAndRoute(
     RegularStop stop,
-    FeedScopedId routeId
+    FeedScopedId routeId,
+    Set<StopCondition> stopConditions
   ) {
     return getAlertsForRelatedStops(
       stop,
-      id -> transitAlertService.getStopAndRouteAlerts(id, routeId)
+      id -> transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions)
     );
   }
 
   private Collection<TransitAlert> getAlertsForStopAndTrip(
     RegularStop stop,
     FeedScopedId tripId,
-    LocalDate serviceDate
+    LocalDate serviceDate,
+    Set<StopCondition> stopConditions
   ) {
-    // Finding alerts for ServiceDate
-    final Collection<TransitAlert> alerts = getAlertsForRelatedStops(
+    return getAlertsForRelatedStops(
       stop,
-      id -> transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate)
+      id -> transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate, stopConditions)
     );
-
-    // Finding alerts for any date
-    alerts.addAll(
-      getAlertsForRelatedStops(
-        stop,
-        id -> transitAlertService.getStopAndTripAlerts(id, tripId, null)
-      )
-    );
-
-    return alerts;
   }
 
   /**

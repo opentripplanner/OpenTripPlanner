@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.StopConditionsHelper;
@@ -401,12 +402,13 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
     assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-    // Verify that requesting specific date does not include alert for all dates
+    // Verify that requesting specific date does include alert for all dates
     LocalDate serviceDate = LocalDate.of(2014, 1, 1);
     Collection<TransitAlert> tripPatches = transitAlertService.getTripAlerts(tripId, serviceDate);
 
     assertNotNull(tripPatches);
-    assertEquals(0, tripPatches.size());
+    assertEquals(1, tripPatches.size());
+    final TransitAlert datedTransitAlert = tripPatches.iterator().next();
 
     // Verify that NOT requesting specific date includes alert for all dates
     serviceDate = null;
@@ -416,8 +418,6 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertEquals(1, tripPatches.size());
 
     final TransitAlert transitAlert = tripPatches.iterator().next();
-
-    final TransitAlert datedTransitAlert = tripPatches.iterator().next();
 
     assertEquals(transitAlert, datedTransitAlert);
 
@@ -1072,14 +1072,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     boolean foundMatch = false;
     for (EntitySelector entity : transitAlert.getEntities()) {
       if (!foundMatch) {
-        if (entity instanceof EntitySelector.StopAndRoute stopAndRoute) {
-          foundMatch =
-            stopAndRoute.equals((new EntitySelector.StopAndRoute(stopId, routeOrTripId, Set.of())));
+        if (entity.key() instanceof EntityKey.StopAndRoute stopAndRoute) {
+          foundMatch = stopAndRoute.equals((new EntityKey.StopAndRoute(stopId, routeOrTripId)));
         } else if (entity instanceof EntitySelector.StopAndTrip stopAndTrip) {
           foundMatch =
-            stopAndTrip.equals(
-              (new EntitySelector.StopAndTrip(stopId, routeOrTripId, serviceDate, Set.of()))
-            );
+            stopAndTrip.key().equals(new EntityKey.StopAndTrip(stopId, routeOrTripId)) &&
+            stopAndTrip.serviceDate().equals(serviceDate);
         }
       }
     }

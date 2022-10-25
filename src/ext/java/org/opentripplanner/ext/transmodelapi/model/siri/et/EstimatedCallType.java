@@ -395,17 +395,20 @@ public class EstimatedCallType {
       StopCondition.EXCEPTIONAL_STOP
     );
 
-    // TODO StopConditions: To ensure correct handling of StopConditions, these need to be taken
-    //  into account when fetching relevant alerts -e.g.
-    //  alertPatchService.getStopAlerts(stopId, stopConditions)
     // Quay
-    allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate));
-    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId));
+    allAlerts.addAll(alertPatchService.getStopAlerts(stopId, stopConditions));
+    allAlerts.addAll(
+      alertPatchService.getStopAndTripAlerts(stopId, tripId, serviceDate, stopConditions)
+    );
+    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions));
     // StopPlace
-    allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate));
-    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(parentStopId, routeId));
+    allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId, stopConditions));
+    allAlerts.addAll(
+      alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate, stopConditions)
+    );
+    allAlerts.addAll(
+      alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions)
+    );
     // Trip
     allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route

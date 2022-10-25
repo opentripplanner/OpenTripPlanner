@@ -7,8 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.alertpatch.StopConditionsHelper;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -58,11 +61,17 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getStopAlerts(FeedScopedId stopId) {
-    // TODO StopConditions: Need to take the required StopConditions into account.
-    //  These are matched using equals/hashCode, but required StopConditions do not necessarily
-    //  match, but may be a subset/superset.
-    Set<TransitAlert> result = new HashSet<>(alerts.get(new EntityKey.Stop(stopId)));
+  public Collection<TransitAlert> getStopAlerts(
+    FeedScopedId stopId,
+    Set<StopCondition> stopConditions
+  ) {
+    Set<TransitAlert> result = new HashSet<>();
+    EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
+    for (TransitAlert alert : alerts.get(entitySelector.key())) {
+      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+        result.add(alert);
+      }
+    }
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
       if (transitModel != null) {
@@ -92,8 +101,14 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
-    // TODO: Filter serviceDate
-    return alerts.get(new EntityKey.Trip(trip));
+    Set<TransitAlert> result = new HashSet<>();
+    EntitySelector.Trip entitySelector = new EntitySelector.Trip(trip, serviceDate);
+    for (TransitAlert alert : alerts.get(entitySelector.key())) {
+      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+        result.add(alert);
+      }
+    }
+    return result;
   }
 
   @Override
@@ -102,26 +117,45 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
-  public Collection<TransitAlert> getStopAndRouteAlerts(FeedScopedId stop, FeedScopedId route) {
-    // TODO StopConditions: Need to take the required StopConditions into account.
-    //  These are matched using equals/hashCode, but required StopConditions do not necessarily
-    //  match, but may be a subset/superset.
-
-    return alerts.get(new EntityKey.StopAndRoute(stop, route));
+  public Collection<TransitAlert> getStopAndRouteAlerts(
+    FeedScopedId stop,
+    FeedScopedId route,
+    Set<StopCondition> stopConditions
+  ) {
+    Set<TransitAlert> result = new HashSet<>();
+    EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
+      stop,
+      route,
+      stopConditions
+    );
+    for (TransitAlert alert : alerts.get(entitySelector.key())) {
+      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+        result.add(alert);
+      }
+    }
+    return result;
   }
 
   @Override
   public Collection<TransitAlert> getStopAndTripAlerts(
     FeedScopedId stop,
     FeedScopedId trip,
-    LocalDate serviceDate
+    LocalDate serviceDate,
+    Set<StopCondition> stopConditions
   ) {
-    // TODO StopConditions: Need to take the required StopConditions into account.
-    //  These are matched using equals/hashCode, but required StopConditions do not necessarily
-    //  match, but may be a subset/superset.
-    // TODO: serviceDate
-
-    return alerts.get(new EntityKey.StopAndTrip(stop, trip));
+    Set<TransitAlert> result = new HashSet<>();
+    EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
+      stop,
+      trip,
+      serviceDate,
+      stopConditions
+    );
+    for (TransitAlert alert : alerts.get(entitySelector.key())) {
+      if (alert.getEntities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+        result.add(alert);
+      }
+    }
+    return result;
   }
 
   @Override
