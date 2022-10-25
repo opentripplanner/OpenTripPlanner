@@ -4,8 +4,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 
 import java.util.List;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.config.RoutingRequestMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper;
 
 public class TransferRequestConfig {
 
@@ -13,7 +13,6 @@ public class TransferRequestConfig {
     return root
       .of(transferRequestsName)
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObjects(List.of(new RouteRequest()), RoutingRequestMapper::mapRoutingRequest);
   }

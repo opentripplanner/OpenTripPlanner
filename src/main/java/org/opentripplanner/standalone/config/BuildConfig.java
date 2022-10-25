@@ -29,6 +29,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
+import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransferRequestConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
@@ -486,8 +487,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       root.of("banDiscouragedWalking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     banDiscouragedBiking =
       root.of("banDiscouragedBiking").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
-    configVersion =
-      root.of("configVersion").withDoc(NA, "TODO DOC").withExample("2.2.12_12").asString(null);
+    configVersion = root.of("configVersion").withDoc(NA, "TODO DOC").asString(null);
     dataImportReport = root.of("dataImportReport").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
     distanceBetweenElevationSamples =
       root
@@ -499,7 +499,6 @@ public class BuildConfig implements OtpDataStoreConfig {
         root
           .of("elevationBucket")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .withDescription(/*TODO DOC*/"TODO")
           .asObject()
       );
@@ -578,7 +577,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("boardingLocationTags")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .asStringSet(List.copyOf(Set.of("ref")));
     discardMinTransferTimes =
       root.of("discardMinTransferTimes").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
@@ -586,7 +584,6 @@ public class BuildConfig implements OtpDataStoreConfig {
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
     gtfsLocalFilePattern =
@@ -610,26 +607,10 @@ public class BuildConfig implements OtpDataStoreConfig {
         .withDoc(NA, /*TODO DOC*/"TODO")
         .asPattern(DEFAULT_DEM_PATTERN);
 
-    gsCredentials =
-      root
-        .of("gsCredentials")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
-    graph =
-      root.of("graph").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri(null);
-    streetGraph =
-      root
-        .of("streetGraph")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri(null);
-    buildReportDir =
-      root
-        .of("buildReportDir")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asUri(null);
+    gsCredentials = root.of("gsCredentials").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
+    graph = root.of("graph").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
+    streetGraph = root.of("streetGraph").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
+    buildReportDir = root.of("buildReportDir").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");

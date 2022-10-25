@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.config.framework.json;
 
 import static java.util.Comparator.comparing;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import javax.annotation.Nonnull;
 import org.opentripplanner.util.OtpAppException;
 
@@ -71,23 +69,6 @@ public class NodeAdapter {
     parent.childrenByName.put(paramName, this);
   }
 
-  /** @deprecated TODO DOC Use {@link #asList(String, Function)} */
-  @Deprecated
-  public List<NodeAdapter> asList() {
-    List<NodeAdapter> result = new ArrayList<>();
-
-    // Count elements starting at 1
-    int i = 1;
-    for (JsonNode node : json) {
-      String arrayElementName = "[" + i + "]";
-      NodeAdapter child = path(arrayElementName, node);
-      result.add(child);
-      childrenByName.put(arrayElementName, child);
-      ++i;
-    }
-    return result;
-  }
-
   public String contextPath() {
     return contextPath;
   }
@@ -120,21 +101,6 @@ public class NodeAdapter {
 
   public boolean isEmpty() {
     return json.isMissingNode();
-  }
-
-  public <T> List<T> asList(String paramName, Function<NodeAdapter, T> mapper) {
-    return of(paramName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
-      .asObjects(mapper);
-  }
-
-  public <T> List<T> asList(
-    String paramName,
-    List<T> defaultValue,
-    Function<NodeAdapter, T> mapper
-  ) {
-    return of(paramName).withDoc(NA, /*TODO DOC*/"TODO").asObjects(defaultValue, mapper);
   }
 
   /** Delegates to {@link JsonNode#has(String)} */

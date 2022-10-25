@@ -15,7 +15,6 @@ public class DataOverlayConfigMapper {
     var node = root
       .of(dataOverlayName)
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
 
@@ -23,37 +22,19 @@ public class DataOverlayConfigMapper {
       return null;
     }
     return new DataOverlayConfig(
-      node
-        .of("fileName")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(),
-      node
-        .of("latitudeVariable")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(),
-      node
-        .of("longitudeVariable")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(),
-      node
-        .of("timeVariable")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(),
+      node.of("fileName").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      node.of("latitudeVariable").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      node.of("longitudeVariable").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      node.of("timeVariable").withDoc(NA, /*TODO DOC*/"TODO").asString(),
       node.of("timeFormat").withDoc(NA, /*TODO DOC*/"TODO").asEnum(TimeUnit.class),
       node
         .of("indexVariables")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObjects(DataOverlayConfigMapper::mapIndexVariable),
       node
         .of("requestParameters")
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObjects(DataOverlayConfigMapper::mapRequestParameter)
     );
@@ -61,21 +42,17 @@ public class DataOverlayConfigMapper {
 
   private static IndexVariable mapIndexVariable(NodeAdapter c) {
     return new IndexVariable(
-      c.of("name").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
-      c
-        .of("displayName")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(),
-      c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
+      c.of("name").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      c.of("displayName").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").asString()
     );
   }
 
   private static ParameterBinding mapRequestParameter(NodeAdapter c) {
     return new ParameterBinding(
       c.of("name").withDoc(NA, /*TODO DOC*/"TODO").asEnum(ParameterName.class),
-      c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
-      c.of("formula").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
+      c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      c.of("formula").withDoc(NA, /*TODO DOC*/"TODO").asString()
     );
   }
 }

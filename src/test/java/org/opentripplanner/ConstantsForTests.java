@@ -39,7 +39,7 @@ import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -363,6 +363,6 @@ public class ConstantsForTests {
   }
 
   private static BuildConfig createNetexBuilderParameters() {
-    return new ConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
+    return new OtpConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
   }
 }

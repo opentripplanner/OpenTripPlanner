@@ -35,13 +35,7 @@ public class ParameterDetailsList {
         if (child != null && !child.isEmpty()) {
           addParametersList(child);
         } else {
-          LOG.error(
-            "Not found: '{} : {}'. Add to JSON input: {} : {}",
-            node.fullPath(it.name()),
-            it.type(),
-            it.name(),
-            it.exampleValueJson()
-          );
+          LOG.error("Not found: '{} : {}'.", node.fullPath(it.name()), it.type());
         }
       }
     }

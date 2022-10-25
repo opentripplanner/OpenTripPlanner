@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * with no fields defined.
  * <p>
  * This class is responsible for logging when a configuration file is loaded, and if the
- * loading fails. It delegates most of this responsibility to the {@link ConfigLoader}.
+ * loading fails. It delegates most of this responsibility to the {@link OtpConfigLoader}.
  */
 public class ConfigModel {
 
@@ -60,7 +60,7 @@ public class ConfigModel {
     initializeOtpFeatures(otpConfig);
   }
 
-  public ConfigModel(ConfigLoader loader) {
+  public ConfigModel(OtpConfigLoader loader) {
     this(loader.loadOtpConfig(), loader.loadBuildConfig(), loader.loadRouterConfig());
   }
 
@@ -73,7 +73,7 @@ public class ConfigModel {
       LOG.info("Using the graph embedded JSON router configuration.");
       this.routerConfig = routerConfig;
     }
-    ConfigLoader.logConfigVersion(
+    OtpConfigLoader.logConfigVersion(
       this.otpConfig.configVersion,
       this.buildConfig.configVersion,
       this.routerConfig.getConfigVersion()

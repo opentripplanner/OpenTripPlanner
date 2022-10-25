@@ -19,7 +19,6 @@ public class NetexConfig {
     var node = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
 
@@ -29,13 +28,7 @@ public class NetexConfig {
   static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode, NetexFeedParameters original) {
     return mapFilePatternParameters(feedNode, original)
       .withFeedId(readFeedId(feedNode).asString())
-      .withSource(
-        feedNode
-          .of("source")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asUri()
-      )
+      .withSource(feedNode.of("source").withDoc(NA, /*TODO DOC*/"TODO").asUri())
       .build();
   }
 
@@ -89,7 +82,6 @@ public class NetexConfig {
         config
           .of("ferryIdsNotAllowedForBicycle")
           .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
           .asStringSet(original.ferryIdsNotAllowedForBicycle())
       );
   }
@@ -102,7 +94,6 @@ public class NetexConfig {
         V2_2,
         "This field is used to identify the specific NeTEx feed. It is used instead of " +
         "the feed_id field in GTFS file feed_info.txt."
-      )
-      .withExample("EN");
+      );
   }
 }
