@@ -4,8 +4,8 @@ import java.net.URI;
 import java.time.ZoneId;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
-import org.opentripplanner.standalone.config.feed.DataSourceConfig;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 
 /**
  * Configure an OpenStreetMap extract.
@@ -16,13 +16,13 @@ public class OsmExtractParameters implements DataSourceConfig {
 
   private final URI source;
 
-  private final WayPropertySetSource osmWayPropertySet;
+  private final OsmTagMapper osmTagMapper;
 
   private final ZoneId timeZone;
 
   OsmExtractParameters(OsmExtractParametersBuilder builder) {
     this.source = Objects.requireNonNull(builder.getSource());
-    this.osmWayPropertySet = builder.getOsmWayPropertySet();
+    this.osmTagMapper = builder.getOsmTagMapper();
     this.timeZone = builder.getTimeZone();
   }
 
@@ -33,10 +33,10 @@ public class OsmExtractParameters implements DataSourceConfig {
 
   /**
    *
-   * @return the custom OSM way properties for this OSM extract. Overrides {@link OsmDefaultParameters#osmWayPropertySetSource}.
+   * @return the custom OSM way properties for this OSM extract. Overrides {@link OsmDefaultParameters#osmOsmTagMapper}.
    */
-  public Optional<WayPropertySetSource> osmWayPropertySet() {
-    return Optional.ofNullable(osmWayPropertySet);
+  public Optional<OsmTagMapper> osmTagMapper() {
+    return Optional.ofNullable(osmTagMapper);
   }
 
   /**

@@ -17,17 +17,17 @@ import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
-import org.opentripplanner.netex.configure.NetexConfig;
+import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -40,7 +40,6 @@ import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.feed.NetexFeedConfigBuilder;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -118,7 +117,7 @@ public class ConstantsForTests {
   }
 
   public static NetexBundle createMinimalNetexBundle() {
-    return NetexConfig.netexBundleForTest(
+    return NetexConfigure.netexBundleForTest(
       createNetexBuilderParameters(),
       new File(ConstantsForTests.NETEX_DIR, ConstantsForTests.NETEX_FILENAME)
     );
@@ -141,8 +140,8 @@ public class ConstantsForTests {
           Set.of(),
           // Need to use a mutable set here, since it is used
           graph,
-          transitModel.getTimeZone(),
-          noopIssueStore()
+          noopIssueStore(),
+          new DefaultMapper()
         );
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
@@ -191,10 +190,9 @@ public class ConstantsForTests {
         List.of(osmProvider),
         Set.of(),
         graph,
-        transitModel.getTimeZone(),
-        noopIssueStore()
+        noopIssueStore(),
+        new DefaultMapper()
       );
-      osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
       osmModule.skipVisibility = true;
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
@@ -251,26 +249,23 @@ public class ConstantsForTests {
           List.of(osmProvider),
           Set.of(),
           graph,
-          transitModel.getTimeZone(),
-          noopIssueStore()
+          noopIssueStore(),
+          new DefaultMapper()
         );
         osmModule.skipVisibility = true;
         osmModule.buildGraph();
       }
       // Add transit data from Netex
       {
-        new NetexConfig(createNetexBuilderParameters())
-          .createNetexModule(
-            List.of(
-              new ConfiguredDataSource<>(
-                NETEX_MINIMAL_DATA_SOURCE,
-                new NetexFeedConfigBuilder().withSource(NETEX_MINIMAL_DATA_SOURCE.uri()).build()
-              )
-            ),
-            transitModel,
-            graph,
-            noopIssueStore()
-          )
+        var buildConfig = createNetexBuilderParameters();
+        var netexConfig = buildConfig.netexDefaults
+          .copyOf()
+          .withSource(NETEX_MINIMAL_DATA_SOURCE.uri())
+          .build();
+        var sources = List.of(new ConfiguredDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig));
+
+        new NetexConfigure(buildConfig)
+          .createNetexModule(sources, transitModel, graph, noopIssueStore())
           .buildGraph();
       }
       // Link transit stops to streets

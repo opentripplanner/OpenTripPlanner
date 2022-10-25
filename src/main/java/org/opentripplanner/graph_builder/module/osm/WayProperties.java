@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import java.util.Objects;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
@@ -33,14 +34,14 @@ public class WayProperties {
   }
 
   public int hashCode() {
-    return bicycleSafetyFeatures.hashCode() + walkSafetyFeatures.hashCode() + permission.hashCode();
+    return Objects.hash(bicycleSafetyFeatures, walkSafetyFeatures, permission);
   }
 
   public boolean equals(Object o) {
     if (o instanceof WayProperties other) {
       return (
-        bicycleSafetyFeatures.equals(other.bicycleSafetyFeatures) &&
-        walkSafetyFeatures.equals(other.walkSafetyFeatures) &&
+        Objects.equals(bicycleSafetyFeatures, other.bicycleSafetyFeatures) &&
+        Objects.equals(walkSafetyFeatures, other.walkSafetyFeatures) &&
         permission == other.permission
       );
     }

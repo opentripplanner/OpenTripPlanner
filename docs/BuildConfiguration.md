@@ -79,12 +79,13 @@ When a feed of a particular type (`netex` or `gtfs`) is specified in the transit
 
 The netexDefaults section of `build-config.json` allows you to specify default properties for NeTEx files.
 
-| config key                | description                                                                                       | value type      | value default |
-|---------------------------|---------------------------------------------------------------------------------------------------|-----------------|---------------|
-| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type.       | regexp pattern  | `null`        |
-| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. | regexp pattern  | `null`        |
-| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type.            | regexp pattern  | `null`        |
-| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type.                          | regexp pattern  | `null`        |
+| config key                   | description                                                                                                   | value type      | value default |
+|------------------------------|---------------------------------------------------------------------------------------------------------------|-----------------|---------------|
+| `sharedFilePattern`          | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type.                   | regexp pattern  | `null`        |
+| `sharedGroupFilePattern`     | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type.             | regexp pattern  | `null`        |
+| `ignoreFilePattern`          | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type.                        | regexp pattern  | `null`        |
+| `groupFilePattern`           | Pattern for matching group NeTEx files. Valid only for the `netex` type.                                      | regexp pattern  | `null`        |
+| `noTransfersOnIsolatedStops` | In case StopPlace is marked with limitedUsage ISOLATED do not generate any transfers from or to that station. | boolean         | `false`       |
 
 
 ## OSM 

@@ -9,6 +9,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.loader.GroupEntries;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
@@ -16,7 +17,6 @@ import org.opentripplanner.netex.loader.NetexXmlParser;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.mapping.NetexMapper;
 import org.opentripplanner.netex.validation.Validator;
-import org.opentripplanner.standalone.config.feed.NetexDefaultsConfig;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
  * keeping an index of entities to enable linking. The convention is documented here {@link
- * NetexDefaultsConfig#sharedFilePattern} and here {@link NetexDataSourceHierarchy}.
+ * NetexFeedParameters#sharedFilePattern()} and here {@link NetexDataSourceHierarchy}.
  * <p>
  * This class is also responsible for logging progress and exception handling.
  */
@@ -40,9 +40,10 @@ public class NetexBundle implements Closeable {
 
   private final NetexDataSourceHierarchy hierarchy;
 
-  private final String netexFeedId;
+  private final String feedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
   private final double maxStopToShapeSnapDistance;
+  private final boolean noTransfersOnIsolatedStops;
   /** The NeTEx entities loaded from the input files and passed on to the mapper. */
   private NetexEntityIndex index = new NetexEntityIndex();
   /** Report errors to issue store */
@@ -52,17 +53,19 @@ public class NetexBundle implements Closeable {
   private NetexXmlParser xmlParser;
 
   public NetexBundle(
-    String netexFeedId,
+    String feedId,
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
     Set<String> ferryIdsNotAllowedForBicycle,
-    double maxStopToShapeSnapDistance
+    double maxStopToShapeSnapDistance,
+    boolean noTransfersOnIsolatedStops
   ) {
-    this.netexFeedId = netexFeedId;
+    this.feedId = feedId;
     this.source = source;
     this.hierarchy = hierarchy;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
   }
 
   /** load the bundle, map it to the OTP transit model and return */
@@ -82,11 +85,12 @@ public class NetexBundle implements Closeable {
     mapper =
       new NetexMapper(
         transitBuilder,
-        netexFeedId,
+        feedId,
         deduplicator,
         issueStore,
         ferryIdsNotAllowedForBicycle,
-        maxStopToShapeSnapDistance
+        maxStopToShapeSnapDistance,
+        noTransfersOnIsolatedStops
       );
 
     // Load data

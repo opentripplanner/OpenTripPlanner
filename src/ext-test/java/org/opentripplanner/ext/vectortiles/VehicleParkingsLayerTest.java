@@ -83,8 +83,8 @@ public class VehicleParkingsLayerTest {
         }
 
         @Override
-        public String type() {
-          return "VehicleParking";
+        public VectorTilesResource.LayerType type() {
+          return VectorTilesResource.LayerType.VehicleParking;
         }
 
         @Override
