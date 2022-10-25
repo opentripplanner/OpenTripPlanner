@@ -11,17 +11,17 @@ public class SiriETUpdaterConfig {
   public static SiriETUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriETUpdaterParameters(
       configRef,
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-      c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("blockReadinessUntilInitialized").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-      c.of("requestorRef").withDoc(NA, /*TODO DOC*/"TODO").asString("otp-" + UUID.randomUUID()),
-      c.of("timeoutSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("previewIntervalMinutes").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
+      c.of("feedId").since(NA).summary("TODO").asString(null),
+      c.of("logFrequency").since(NA).summary("TODO").asInt(-1),
+      c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
+      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(false),
+      c.of("blockReadinessUntilInitialized").since(NA).summary("TODO").asBoolean(false),
+      c.of("url").since(NA).summary("TODO").asString(),
+      c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+      c.of("requestorRef").since(NA).summary("TODO").asString("otp-" + UUID.randomUUID()),
+      c.of("timeoutSec").since(NA).summary("TODO").asInt(-1),
+      c.of("previewIntervalMinutes").since(NA).summary("TODO").asInt(-1),
+      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false)
     );
   }
 }

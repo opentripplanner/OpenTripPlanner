@@ -12,18 +12,15 @@ public class SiriETGooglePubsubUpdaterConfig {
   public static SiriETGooglePubsubUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriETGooglePubsubUpdaterParameters(
       configRef,
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-      c.of("type").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("projectName").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("topicName").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("dataInitializationUrl").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-      c.of("reconnectPeriod").withDoc(NA, /*TODO DOC*/"TODO").asDuration(RECONNECT_PERIOD),
-      c
-        .of("initialGetDataTimeout")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .asDuration(INITIAL_GET_DATA_TIMEOUT),
-      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false)
+      c.of("feedId").since(NA).summary("TODO").asString(null),
+      c.of("type").since(NA).summary("TODO").asString(),
+      c.of("projectName").since(NA).summary("TODO").asString(),
+      c.of("topicName").since(NA).summary("TODO").asString(),
+      c.of("dataInitializationUrl").since(NA).summary("TODO").asString(null),
+      c.of("reconnectPeriod").since(NA).summary("TODO").asDuration(RECONNECT_PERIOD),
+      c.of("initialGetDataTimeout").since(NA).summary("TODO").asDuration(INITIAL_GET_DATA_TIMEOUT),
+      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(false),
+      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false)
     );
   }
 }

@@ -10,9 +10,9 @@ public class WFSNotePollingGraphUpdaterConfig {
   public static WFSNotePollingGraphUpdaterParameters create(String configRef, NodeAdapter c) {
     return new WFSNotePollingGraphUpdaterParameters(
       configRef,
-      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("featureType").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60)
+      c.of("url").since(NA).summary("TODO").asString(),
+      c.of("featureType").since(NA).summary("TODO").asString(),
+      c.of("frequencySec").since(NA).summary("TODO").asInt(60)
     );
   }
 }

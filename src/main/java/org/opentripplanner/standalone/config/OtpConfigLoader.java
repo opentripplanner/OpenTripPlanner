@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Generic config file loader. This is used to load all configuration files.
  * <p>
- * This class is also provide logging when a config file is loaded. We load and parse config files
+ * This class also provides logging when a config file is loaded. We load and parse config files
  * early to reveal syntax errors without waiting for graph build.
  */
 public class OtpConfigLoader {

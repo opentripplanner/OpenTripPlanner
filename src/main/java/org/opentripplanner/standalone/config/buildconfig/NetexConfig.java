@@ -18,8 +18,9 @@ public class NetexConfig {
   ) {
     var node = root
       .of(parameterName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
+      .description(/*TODO DOC*/"TODO")
       .asObject();
 
     return mapDefaultParameters(node);
@@ -28,7 +29,7 @@ public class NetexConfig {
   static NetexFeedParameters mapNetexFeed(NodeAdapter feedNode, NetexFeedParameters original) {
     return mapFilePatternParameters(feedNode, original)
       .withFeedId(readFeedId(feedNode).asString())
-      .withSource(feedNode.of("source").withDoc(NA, /*TODO DOC*/"TODO").asUri())
+      .withSource(feedNode.of("source").since(NA).summary("TODO").asUri())
       .build();
   }
 
@@ -48,32 +49,36 @@ public class NetexConfig {
       .withSharedFilePattern(
         config
           .of("sharedFilePattern")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asPattern(original.sharedFilePattern().pattern())
       )
       .withSharedGroupFilePattern(
         config
           .of("sharedGroupFilePattern")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asPattern(original.sharedGroupFilePattern().pattern())
       )
       .withGroupFilePattern(
         config
           .of("groupFilePattern")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asPattern(original.groupFilePattern().pattern())
       )
       .withIgnoreFilePattern(
         config
           .of("ignoreFilePattern")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asPattern(original.ignoreFilePattern().pattern())
       )
       .withNoTransfersOnIsolatedStops(
         config
           .of("noTransfersOnIsolatedStops")
-          .withDoc(
-            V2_2,
+          .since(V2_2)
+          .summary(
             "Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED"
           )
           .asBoolean(original.noTransfersOnIsolatedStops())
@@ -81,7 +86,8 @@ public class NetexConfig {
       .addFerryIdsNotAllowedForBicycle(
         config
           .of("ferryIdsNotAllowedForBicycle")
-          .withDoc(NA, /*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
           .asStringSet(original.ferryIdsNotAllowedForBicycle())
       );
   }
@@ -90,8 +96,8 @@ public class NetexConfig {
   private static ParameterBuilder readFeedId(NodeAdapter config) {
     return config
       .of("feedId")
-      .withDoc(
-        V2_2,
+      .since(V2_2)
+      .summary(
         "This field is used to identify the specific NeTEx feed. It is used instead of " +
         "the feed_id field in GTFS file feed_info.txt."
       );

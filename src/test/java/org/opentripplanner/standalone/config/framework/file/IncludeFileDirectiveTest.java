@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.util.lang.StringUtils;
 
 public class IncludeFileDirectiveTest {
 
@@ -24,24 +25,24 @@ public class IncludeFileDirectiveTest {
 
   @Test
   void includeFileWithoutQuotes() throws IOException {
-    savePartialFile(quote("value"));
+    savePartialFile(json("value"));
     String result = IncludeFileDirective.includeFileDirective(
       CONFIG_DIR,
-      quote("{${includeFile:" + PART_FILE_NAME + "}}"),
+      json("{${includeFile:" + PART_FILE_NAME + "}}"),
       PART_FILE_NAME
     );
-    assertEquals(quote("{value}"), result);
+    assertEquals(json("{value}"), result);
   }
 
   @Test
   void includeFileWithQuotesAndProperJsonInput() throws IOException {
-    savePartialFile(quote("\t {\n  'foo' : 'bar' \n  }\n"));
+    savePartialFile(json("\t {\n  'foo' : 'bar' \n  }\n"));
     String result = IncludeFileDirective.includeFileDirective(
       CONFIG_DIR,
-      quote("{ 'key' : '${includeFile:" + PART_FILE_NAME + "}'}"),
+      json("{ 'key' : '${includeFile:" + PART_FILE_NAME + "}'}"),
       PART_FILE_NAME
     );
-    assertEquals(quote("{ 'key' : \t {\n  'foo' : 'bar' \n  }\n}"), result);
+    assertEquals(json("{ 'key' : \t {\n  'foo' : 'bar' \n  }\n}"), result);
   }
 
   @Test
@@ -49,14 +50,14 @@ public class IncludeFileDirectiveTest {
     savePartialFile("value");
     String result = IncludeFileDirective.includeFileDirective(
       CONFIG_DIR,
-      quote("{ 'key' : '${includeFile:" + PART_FILE_NAME + "}' }"),
+      json("{ 'key' : '${includeFile:" + PART_FILE_NAME + "}' }"),
       PART_FILE_NAME
     );
-    assertEquals(quote("{ 'key' : 'value' }"), result);
+    assertEquals(json("{ 'key' : 'value' }"), result);
   }
 
-  private static String quote(String text) {
-    return text.replace('\'', '"');
+  private static String json(String text) {
+    return StringUtils.quoteReplace(text);
   }
 
   private static void savePartialFile(String text) throws IOException {

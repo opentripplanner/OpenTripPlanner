@@ -69,4 +69,15 @@ public class OTPFeatureTest {
     assertTrue(OTPFeature.APIBikeRental.isOff());
     assertTrue(OTPFeature.MinimumTransferTimeIsDefinitive.isOn());
   }
+
+  @Test
+  public void doc() {
+    assertEquals("Endpoint for actuators (service health status).", OTPFeature.ActuatorAPI.doc());
+  }
+
+  @Test
+  public void isSandbox() {
+    assertFalse(OTPFeature.APIServerInfo.isSandbox());
+    assertTrue(OTPFeature.ActuatorAPI.isSandbox());
+  }
 }

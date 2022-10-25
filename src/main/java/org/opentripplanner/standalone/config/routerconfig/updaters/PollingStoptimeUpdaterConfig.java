@@ -15,9 +15,9 @@ public class PollingStoptimeUpdaterConfig {
     String url = null;
 
     if (c.exist("file")) {
-      file = c.of("file").withDoc(NA, /*TODO DOC*/"TODO").asString();
+      file = c.of("file").since(NA).summary("TODO").asString();
     } else if (c.exist("url")) {
-      url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString();
+      url = c.of("url").since(NA).summary("TODO").asString();
     } else {
       throw new OtpAppException(
         "Need either 'url' or 'file' properties to configure " +
@@ -31,15 +31,16 @@ public class PollingStoptimeUpdaterConfig {
 
     return new PollingTripUpdaterParameters(
       configRef,
-      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-      c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("fuzzyTripMatching").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+      c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+      c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
+      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(false),
+      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false),
       c
         .of("backwardsDelayPropagationType")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
+      c.of("feedId").since(NA).summary("TODO").asString(null),
       url,
       file
     );

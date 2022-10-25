@@ -12,8 +12,9 @@ public class TransferRequestConfig {
   public static List<RouteRequest> map(NodeAdapter root, String transferRequestsName) {
     return root
       .of(transferRequestsName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
+      .description(/*TODO DOC*/"TODO")
       .asObjects(List.of(new RouteRequest()), RoutingRequestMapper::mapRoutingRequest);
   }
 }

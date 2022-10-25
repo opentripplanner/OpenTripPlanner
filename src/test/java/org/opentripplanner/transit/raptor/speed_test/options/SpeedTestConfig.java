@@ -41,24 +41,27 @@ public class SpeedTestConfig {
     testDate =
       adapter
         .of("testDate")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
-    graph = adapter.of("graph").withDoc(NA, /*TODO DOC*/"TODO").asUri(null);
-    feedId = adapter.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString();
+    graph = adapter.of("graph").since(NA).summary("TODO").asUri(null);
+    feedId = adapter.of("feedId").since(NA).summary("TODO").asString();
     transitRoutingParams =
       new TransitRoutingConfig(
         adapter
           .of("tuningParameters")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
     request =
       mapRoutingRequest(
         adapter
           .of("routingDefaults")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
   }

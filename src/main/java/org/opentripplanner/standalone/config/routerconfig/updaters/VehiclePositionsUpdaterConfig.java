@@ -10,10 +10,9 @@ import org.opentripplanner.util.OtpAppException;
 public class VehiclePositionsUpdaterConfig {
 
   public static VehiclePositionsUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var feedId = c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString();
-    var frequencySec = c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60);
-
-    var url = c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asUri();
+    var feedId = c.of("feedId").since(NA).summary("TODO").asString();
+    var frequencySec = c.of("frequencySec").since(NA).summary("TODO").asInt(60);
+    var url = c.of("url").since(NA).summary("TODO").asUri();
     return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequencySec);
   }
 }

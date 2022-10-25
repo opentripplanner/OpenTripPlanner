@@ -31,21 +31,22 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     return new VectorTileConfig(
       root
         .of(vectorTileLayers)
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withDescription(/*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
+        .description(/*TODO DOC*/"TODO")
         .asObjects(VectorTileConfig::mapLayer)
     );
   }
 
   public static Layer mapLayer(NodeAdapter node) {
     return new Layer(
-      node.of("name").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      node.of("type").withDoc(NA, /*TODO DOC*/"TODO").asEnum(VectorTilesResource.LayerType.class),
-      node.of("mapper").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      node.of("maxZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MAX_ZOOM),
-      node.of("minZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MIN_ZOOM),
-      node.of("cacheMaxSeconds").withDoc(NA, /*TODO DOC*/"TODO").asInt(CACHE_MAX_SECONDS),
-      node.of("expansionFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(EXPANSION_FACTOR)
+      node.of("name").since(NA).summary("TODO").asString(),
+      node.of("type").since(NA).summary("TODO").asEnum(VectorTilesResource.LayerType.class),
+      node.of("mapper").since(NA).summary("TODO").asString(),
+      node.of("maxZoom").since(NA).summary("TODO").asInt(MAX_ZOOM),
+      node.of("minZoom").since(NA).summary("TODO").asInt(MIN_ZOOM),
+      node.of("cacheMaxSeconds").since(NA).summary("TODO").asInt(CACHE_MAX_SECONDS),
+      node.of("expansionFactor").since(NA).summary("TODO").asDouble(EXPANSION_FACTOR)
     );
   }
 

@@ -1,14 +1,15 @@
 package org.opentripplanner.transit.raptor.speed_test.model.testcase;
 
-import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
+import static org.opentripplanner.framework.text.Table.Align.Center;
+import static org.opentripplanner.framework.text.Table.Align.Left;
+import static org.opentripplanner.framework.text.Table.Align.Right;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.text.Table;
+import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.routing.util.DiffEntry;
-import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -22,7 +23,7 @@ public class TableTestReport {
       return "NO RESULTS FOUND FOR TEST CASE!";
     }
 
-    TableFormatter table = newTable();
+    TableBuilder table = newTable();
 
     for (DiffEntry<Result> it : results) {
       addTo(table, it);
@@ -32,10 +33,11 @@ public class TableTestReport {
 
   /* private methods */
 
-  private static TableFormatter newTable() {
-    return new TableFormatter(
-      List.of(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
-      List.of(
+  private static TableBuilder newTable() {
+    return Table
+      .of()
+      .withAlights(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left)
+      .withHeaders(
         "STATUS",
         "TX",
         "Duration",
@@ -47,11 +49,10 @@ public class TableTestReport {
         "Routes",
         "Stops",
         "Legs"
-      )
-    );
+      );
   }
 
-  private static void addTo(TableFormatter table, DiffEntry<Result> e) {
+  private static void addTo(TableBuilder table, DiffEntry<Result> e) {
     Result result = e.element();
     table.addRow(
       e.status(TestStatus.OK.label, TestStatus.FAILED.label, TestStatus.WARN.label),

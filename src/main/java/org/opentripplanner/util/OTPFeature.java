@@ -14,47 +14,87 @@ import org.slf4j.LoggerFactory;
  * file.
  */
 public enum OTPFeature {
-  APIBikeRental(true),
-  APIServerInfo(true),
-  APIGraphInspectorTile(true),
-  APIUpdaterStatus(true),
-  ConsiderPatternsForDirectTransfers(true),
-  DebugClient(true),
-  FloatingBike(true),
+  APIBikeRental(true, false, "Enable the bike rental endpoint."),
+  APIServerInfo(true, false, "Enable the server info endpoint."),
+  APIGraphInspectorTile(
+    true,
+    false,
+    "Enable the inspector  endpoint for graph information for inspection/debugging purpose."
+  ),
+  APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
+  ConsiderPatternsForDirectTransfers(
+    true,
+    false,
+    "Enable limiting transfers so that there is only a single transfer to each pattern."
+  ),
+  DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
+  FloatingBike(true, false, "Enable floating bike routing."),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
    * take according to OSM data, for example if you want to set a very low transfer time like 1
    * minute, when walking the distance take 1m30s.
+   *
+   * TODO Harmonize the JavaDoc with the user doc and delete JavaDoc
    */
-  MinimumTransferTimeIsDefinitive(false),
-  OptimizeTransfers(true),
-  ParallelRouting(false),
-  TransferConstraints(true),
+  MinimumTransferTimeIsDefinitive(
+    false,
+    false,
+    "If the minimum transfer time is a lower bound (default) or the definitive time for the " +
+    "transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives " +
+    "from OSM data."
+  ),
 
-  // Sandbox extension features - Must be turned OFF by default
-  ActuatorAPI(false),
-  DataOverlay(false),
-  FaresV2(false),
-  FlexRouting(false),
-  GoogleCloudStorage(false),
-  ReportApi(false),
-  SandboxAPIGeocoder(false),
-  SandboxAPILegacyGraphQLApi(false),
-  SandboxAPIMapboxVectorTilesApi(false),
-  SandboxAPIParkAndRideApi(false),
-  SandboxAPITransmodelApi(false),
-  SandboxAPITravelTime(false),
-  TransferAnalyzer(false),
-  VehicleToStopHeuristics(false);
+  OptimizeTransfers(
+    true,
+    false,
+    "OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account."
+  ),
 
-  private static final Object TEST_SEMAPHORE = new Object();
+  ParallelRouting(false, false, "Enable performing parts of the trip planning in parallel."),
+  TransferConstraints(
+    true,
+    false,
+    "Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little."
+  ),
+
+  /* Sandbox extension features - Must be turned OFF by default */
+
+  ActuatorAPI(false, true, "Endpoint for actuators (service health status)."),
+
+  DataOverlay(
+    false,
+    true,
+    "Enable usage of data overlay when calculating costs for the street network."
+  ),
+  FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
+  FlexRouting(false, true, "Enable FLEX routing."),
+  GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
+  ReportApi(false, true, "Enable the report API."),
+  SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
+  SandboxAPILegacyGraphQLApi(false, true, "Enable (GTFS) GraphQL API."),
+  SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
+  SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
+  SandboxAPITransmodelApi(false, true, "Enable Entur Transmodel(NeTEx) GraphQL API."),
+  SandboxAPITravelTime(false, true, "Enable the isochrone/travel time surface API."),
+  TransferAnalyzer(false, true, "Analyze transfers during graph build."),
+  VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries.");
+
+  private static final Object TEST_LOCK = new Object();
 
   private static final Logger LOG = LoggerFactory.getLogger(OTPFeature.class);
-  private boolean enabled;
 
-  OTPFeature(boolean defaultEnabled) {
+  private final boolean enabledByDefault;
+  private final boolean sandbox;
+
+  private boolean enabled;
+  private final String doc;
+
+  OTPFeature(boolean defaultEnabled, boolean sandbox, String doc) {
+    this.enabledByDefault = defaultEnabled;
     this.enabled = defaultEnabled;
+    this.sandbox = sandbox;
+    this.doc = doc;
   }
 
   /**
@@ -104,6 +144,13 @@ public enum OTPFeature {
   }
 
   /**
+   * Return {@code true} is enabled by default.
+   */
+  public boolean isEnabledByDefault() {
+    return enabledByDefault;
+  }
+
+  /**
    * Return {@code true} if feature is turned 'off'.
    */
   public boolean isOff() {
@@ -117,6 +164,16 @@ public enum OTPFeature {
     return isOn() ? supplier.get() : null;
   }
 
+  /** This feature enable a Sandbox feature */
+  public boolean isSandbox() {
+    return sandbox;
+  }
+
+  /** Return user documentation. */
+  public String doc() {
+    return doc;
+  }
+
   /* private members */
 
   /**
@@ -127,7 +184,7 @@ public enum OTPFeature {
   }
 
   private void testEnabled(boolean enabled, Runnable task) {
-    synchronized (TEST_SEMAPHORE) {
+    synchronized (TEST_LOCK) {
       boolean originalValue = this.enabled;
       try {
         set(enabled);

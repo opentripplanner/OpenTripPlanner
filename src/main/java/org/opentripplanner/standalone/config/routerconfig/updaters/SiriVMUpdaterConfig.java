@@ -11,15 +11,15 @@ public class SiriVMUpdaterConfig {
   public static SiriVMUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriVMUpdaterParameters(
       configRef,
-      c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-      c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("maxSnapshotFrequencyMs").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1),
-      c.of("purgeExpiredData").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("blockReadinessUntilInitialized").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
-      c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(),
-      c.of("requestorRef").withDoc(NA, /*TODO DOC*/"TODO").asString("otp-" + UUID.randomUUID()),
-      c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-      c.of("timeoutSec").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
+      c.of("feedId").since(NA).summary("TODO").asString(null),
+      c.of("logFrequency").since(NA).summary("TODO").asInt(-1),
+      c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
+      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(false),
+      c.of("blockReadinessUntilInitialized").since(NA).summary("TODO").asBoolean(false),
+      c.of("url").since(NA).summary("TODO").asString(),
+      c.of("requestorRef").since(NA).summary("TODO").asString("otp-" + UUID.randomUUID()),
+      c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+      c.of("timeoutSec").since(NA).summary("TODO").asInt(-1)
     );
   }
 }

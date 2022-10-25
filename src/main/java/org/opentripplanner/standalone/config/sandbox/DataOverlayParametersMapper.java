@@ -14,7 +14,8 @@ public class DataOverlayParametersMapper {
     for (String param : DataOverlayParameters.parametersAsString()) {
       c
         .of(param)
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asDoubleOptional()
         .ifPresent(it -> builder.add(param, it));
     }

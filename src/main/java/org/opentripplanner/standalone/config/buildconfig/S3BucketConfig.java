@@ -15,14 +15,19 @@ public class S3BucketConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(S3BucketConfig.class);
 
-  /** Credentials: the Amazon Web Services access key */
   public String accessKey;
-
-  /** Credentials: the Amazon Web Services secret key corresponding to the access key. */
   public String secretKey;
-
-  /** The bucket from which you want to download. */
   public String bucketName;
+
+  public static S3BucketConfig fromConfig(NodeAdapter root, String elevationBucketName) {
+    return fromConfig(
+      root
+        .of(elevationBucketName)
+        .since(NA)
+        .summary("If specified, download NED elevation tiles from the given AWS S3 bucket")
+        .asObject()
+    );
+  }
 
   /** Create a BucketConfig from a JSON configuration node. */
   public static S3BucketConfig fromConfig(NodeAdapter config) {
@@ -32,15 +37,26 @@ public class S3BucketConfig {
     }
     S3BucketConfig bucketConfig = new S3BucketConfig();
     try {
-      /*TODO DOC*/
-      /*TODO DOC*/
-      bucketConfig.accessKey = config.of("accessKey").withDoc(NA, /*TODO DOC*/"TODO").asString();
-      /*TODO DOC*/
-      /*TODO DOC*/
-      bucketConfig.secretKey = config.of("secretKey").withDoc(NA, /*TODO DOC*/"TODO").asString();
-      /*TODO DOC*/
-      /*TODO DOC*/
-      bucketConfig.bucketName = config.of("bucketName").withDoc(NA, /*TODO DOC*/"TODO").asString();
+      bucketConfig.accessKey =
+        config
+          .of("accessKey")
+          .since(NA)
+          .summary("Credentials: the Amazon Web Services access key")
+          .asString();
+      bucketConfig.secretKey =
+        config
+          .of("secretKey")
+          .since(NA)
+          .summary(
+            "Credentials: the Amazon Web Services secret key corresponding to the access key."
+          )
+          .asString();
+      bucketConfig.bucketName =
+        config
+          .of("bucketName")
+          .since(NA)
+          .summary("The bucket from which you want to download.")
+          .asString();
     } catch (OtpAppException ex) {
       LOG.error(
         "You must specify an accessKey, a secretKey, and a bucketName when " +

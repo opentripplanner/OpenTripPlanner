@@ -26,57 +26,40 @@ public class VehicleParkingUpdaterConfig {
   }
 
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
-    var sourceType = c
-      .of("sourceType")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .asEnum(DataSourceType.class);
-    var feedId = c.of("feedId").withDoc(NA, /*TODO DOC*/"TODO").asString(null);
-    var timeZone = c.of("timeZone").withDoc(NA, /*TODO DOC*/"TODO").asZoneId(null);
+    var sourceType = c.of("sourceType").since(NA).summary("TODO").asEnum(DataSourceType.class);
+    var feedId = c.of("feedId").since(NA).summary("TODO").asString(null);
+    var timeZone = c.of("timeZone").since(NA).summary("TODO").asZoneId(null);
     switch (sourceType) {
       case HSL_PARK:
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
         return new HslParkUpdaterParameters(
           updaterRef,
-          c.of("facilitiesFrequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(3600),
-          c.of("facilitiesUrl").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
+          c.of("facilitiesFrequencySec").since(NA).summary("TODO").asInt(3600),
+          c.of("facilitiesUrl").since(NA).summary("TODO").asString(null),
           feedId,
           sourceType,
-          c.of("utilizationsFrequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(600),
-          c.of("utilizationsUrl").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
+          c.of("utilizationsFrequencySec").since(NA).summary("TODO").asInt(600),
+          c.of("utilizationsUrl").since(NA).summary("TODO").asString(null),
           timeZone
         );
       case KML:
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
         return new KmlUpdaterParameters(
           updaterRef,
-          c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
+          c.of("url").since(NA).summary("TODO").asString(null),
           feedId,
-          c.of("namePrefix").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
-          c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-          c.of("zip").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false),
+          c.of("namePrefix").since(NA).summary("TODO").asString(null),
+          c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+          c.of("zip").since(NA).summary("TODO").asBoolean(false),
           sourceType
         );
       case PARK_API:
       case BICYCLE_PARK_API:
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
-        /*TODO DOC*/
         return new ParkAPIUpdaterParameters(
           updaterRef,
-          c.of("url").withDoc(NA, /*TODO DOC*/"TODO").asString(null),
+          c.of("url").since(NA).summary("TODO").asString(null),
           feedId,
-          c.of("frequencySec").withDoc(NA, /*TODO DOC*/"TODO").asInt(60),
-          c.of("headers").withDoc(NA, /*TODO DOC*/"TODO").asStringMap(),
-          new ArrayList<>(c.of("tags").withDoc(NA, /*TODO DOC*/"TODO").asStringSet(Set.of())),
+          c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+          c.of("headers").since(NA).summary("TODO").asStringMap(),
+          new ArrayList<>(c.of("tags").since(NA).summary("TODO").asStringSet(Set.of())),
           sourceType,
           timeZone
         );

@@ -13,6 +13,8 @@ public interface OtpArchitectureModules {
   /* OTP Modules */
 
   Package OTP_ROOT = Package.of("org.opentripplanner");
+  Package FRAMEWORK = OTP_ROOT.subPackage("framework");
+  Package FRAMEWORK_TEXT = FRAMEWORK.subPackage("text");
   Package UTIL = OTP_ROOT.subPackage("util");
   Package GEO_UTIL = OTP_ROOT.subPackage("common.geometry");
 

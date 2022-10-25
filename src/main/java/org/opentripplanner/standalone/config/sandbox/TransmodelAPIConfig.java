@@ -16,9 +16,9 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
   private final Collection<String> tracingHeaderTags;
 
   public TransmodelAPIConfig(NodeAdapter node) {
-    hideFeedId = node.of("hideFeedId").withDoc(NA, /*TODO DOC*/"TODO").asBoolean(false);
+    hideFeedId = node.of("hideFeedId").since(NA).summary("TODO").asBoolean(false);
     tracingHeaderTags =
-      node.of("tracingHeaderTags").withDoc(NA, /*TODO DOC*/"TODO").asStringList(Set.of());
+      node.of("tracingHeaderTags").since(NA).summary("TODO").asStringList(Set.of());
   }
 
   @Override
