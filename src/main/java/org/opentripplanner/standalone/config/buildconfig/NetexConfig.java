@@ -72,8 +72,8 @@ public class NetexConfig {
       .withNoTransfersOnIsolatedStops(
         config
           .of("noTransfersOnIsolatedStops")
-          .withDoc(
-            V2_2,
+          .since(V2_2)
+          .summary(
             "Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED"
           )
           .asBoolean(original.noTransfersOnIsolatedStops())
