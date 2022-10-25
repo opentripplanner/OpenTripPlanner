@@ -163,8 +163,7 @@ public class ParameterBuilder {
    * An empty list is returned if there is no elements in the list or the list is not present.
    */
   public <T> List<T> asObjects(Function<NodeAdapter, T> mapper) {
-    info.withOptional("[]").withArray(OBJECT);
-    return buildAndListComplexArrayElements(List.of(), mapper);
+    return asObjects(List.of(), mapper);
   }
 
   public <T> List<T> asObjects(List<T> defaultValues, Function<NodeAdapter, T> mapper) {
@@ -462,7 +461,7 @@ public class ParameterBuilder {
 
   /**
    * Build node info for "complex" element types and list all values. Use
-   * {@link #buildAndListSimpleArrayElements(List, Function)} for building array with complex
+   * {@link #buildAndListSimpleArrayElements(List, Function)} for building an array with simple
    * elements.
    */
   private <T> List<T> buildAndListComplexArrayElements(
@@ -470,6 +469,7 @@ public class ParameterBuilder {
     Function<NodeAdapter, T> parse
   ) {
     var array = build();
+
     if (array.isMissingNode()) {
       return defaultValues;
     }
@@ -505,7 +505,7 @@ public class ParameterBuilder {
     }
   }
 
-  private <T extends Enum<T>> T parseEnum(String value, Class<T> ofType) {
+  private <E extends Enum<E>> E parseEnum(String value, Class<E> ofType) {
     var upperCaseValue = value.toUpperCase().replace('-', '_');
     return Stream
       .of(ofType.getEnumConstants())

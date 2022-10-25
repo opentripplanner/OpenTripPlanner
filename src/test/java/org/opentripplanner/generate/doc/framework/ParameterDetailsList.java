@@ -1,6 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
 import org.opentripplanner.framework.text.MarkdownFormatter;
+import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -32,10 +33,15 @@ public class ParameterDetailsList {
 
       if (it.type().isComplex() && !skipNodeOp.skip(it)) {
         var child = node.child(it.name());
-        if (child != null && !child.isEmpty()) {
-          addParametersList(child);
-        } else {
+
+        if (child == null || child.isEmpty()) {
           LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
+        } else if (it.type() == ConfigType.ARRAY) {
+          for (String childName : child.listChildrenByName()) {
+            addParametersList(child.child(childName));
+          }
+        } else {
+          addParametersList(child);
         }
       }
     }
@@ -49,7 +55,6 @@ public class ParameterDetailsList {
     writer.printHeader2(it.name(), node.fullPath(it.name()));
     writer.printSection(MarkdownFormatter.em(parameterSummaryLine(it, node.contextPath())));
     writer.printSection(it.summary());
-    //noinspection ConstantConditions
     writer.printSection(it.description());
   }
 
