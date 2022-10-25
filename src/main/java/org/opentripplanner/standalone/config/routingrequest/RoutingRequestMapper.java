@@ -251,11 +251,7 @@ public class RoutingRequestMapper {
           .asEnumMap(TransitMode.class, Double.class)
       )
       .setUnpreferredCost(
-        c
-          .of("unpreferredRouteCost")
-          .since(NA)
-          .summary("TODO")
-          .asLinearFunction(dft.unpreferredCost())
+        c.of("unpreferredCost").since(NA).summary("TODO").asLinearFunction(dft.unpreferredCost())
       );
   }
 
