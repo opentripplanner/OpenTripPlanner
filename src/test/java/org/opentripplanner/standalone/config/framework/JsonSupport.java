@@ -70,6 +70,17 @@ public class JsonSupport {
     }
   }
 
+  /**
+   * Load a JSON file from a Path.
+   */
+  public static JsonNode jsonNodeFromString(String input) {
+    try {
+      return LENIENT_MAPPER.readTree(input);
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
   public static NodeAdapter newNodeAdapterForTest(String configText) {
     JsonNode config = jsonNodeForTest(configText);
     return new NodeAdapter(config, "Test");

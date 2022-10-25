@@ -11,7 +11,7 @@ is not working. Remove it if you want to run OTP. It is provided for others as a
 configure the SIRI updaters. The same goes for the `storage` section in the `build-config.json`,
 remove it run OTP locally.
 
-The `<host>`, `<OperatorNameSpace>` and `<bucket>` are placeholders you need to change.
+The `<host>`, `<OperatorNameSpace>` and `${GCS_BUCKET}` are placeholders you need to change.
 
 ## Data input files
 

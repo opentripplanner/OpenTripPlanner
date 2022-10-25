@@ -63,6 +63,14 @@ class EnvironmentVariableReplacer {
    *                                  environment variable do not exist.
    */
   public static String insertEnvironmentVariables(String text, String source) {
+    return insertEnvironmentVariables(text, source, System.getenv());
+  }
+
+  public static String insertEnvironmentVariables(
+    String text,
+    String source,
+    Map<String, String> variables
+  ) {
     Map<String, String> environmentVariables = new HashMap<>();
     Matcher matcher = PATTERN.matcher(text);
 
@@ -70,7 +78,7 @@ class EnvironmentVariableReplacer {
       String envVar = matcher.group(0);
       String nameOnly = matcher.group(1);
       if (!environmentVariables.containsKey(nameOnly)) {
-        String value = System.getenv(nameOnly);
+        String value = variables.get(nameOnly);
         if (value != null) {
           environmentVariables.put(envVar, value);
         } else if (PROJECT_INFO.containsKey(nameOnly)) {
