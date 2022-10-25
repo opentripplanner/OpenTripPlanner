@@ -54,7 +54,6 @@ public class NetexConfigure {
     }
 
     return new NetexModule(
-      buildParams.netexDefaults.feedId(),
       graph,
       transitModel,
       issueStore,
@@ -74,7 +73,8 @@ public class NetexConfigure {
       source,
       hierarchy(source, config),
       config.ferryIdsNotAllowedForBicycle(),
-      buildParams.maxStopToShapeSnapDistance
+      buildParams.maxStopToShapeSnapDistance,
+      config.noTransfersOnIsolatedStops()
     );
   }
 

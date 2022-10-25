@@ -67,9 +67,11 @@ class StopAndStationMapper {
     ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
     TariffZoneMapper tariffZoneMapper,
     ZoneId defaultTimeZone,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    boolean noTransfersOnIsolatedStops
   ) {
-    this.stationMapper = new StationMapper(issueStore, idFactory, defaultTimeZone);
+    this.stationMapper =
+      new StationMapper(issueStore, idFactory, defaultTimeZone, noTransfersOnIsolatedStops);
     this.quayMapper = new QuayMapper(idFactory, issueStore);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;

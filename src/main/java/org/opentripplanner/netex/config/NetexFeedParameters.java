@@ -24,6 +24,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private static final String SHARED_FILE_PATTERN = "shared-data\\.xml";
   private static final String SHARED_GROUP_FILE_PATTERN = "(\\w{3})-.*-shared\\.xml";
   private static final String GROUP_FILE_PATTERN = "(\\w{3})-.*\\.xml";
+  private static final boolean NO_TRANSFERS_ON_ISOLATED_STOPS = false;
 
   private static final Set<String> FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE = Collections.emptySet();
 
@@ -41,6 +42,7 @@ public class NetexFeedParameters implements DataSourceConfig {
   private final String groupFilePattern;
   private final String ignoreFilePattern;
   private final Set<String> ferryIdsNotAllowedForBicycle;
+  private final boolean noTransfersOnIsolatedStops;
 
   private NetexFeedParameters() {
     this.source = null;
@@ -54,6 +56,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.ignoreFilePattern = Pattern.compile(IGNORE_FILE_PATTERN).pattern();
     }
     this.ferryIdsNotAllowedForBicycle = FERRY_IDS_NOT_ALLOWED_FOR_BICYCLE;
+    this.noTransfersOnIsolatedStops = NO_TRANSFERS_ON_ISOLATED_STOPS;
   }
 
   private NetexFeedParameters(Builder builder) {
@@ -64,6 +67,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     this.groupFilePattern = requireNonNull(builder.groupFilePattern);
     this.ignoreFilePattern = requireNonNull(builder.ignoreFilePattern);
     this.ferryIdsNotAllowedForBicycle = Set.copyOf(builder.ferryIdsNotAllowedForBicycle);
+    this.noTransfersOnIsolatedStops = builder.noTransfersOnIsolatedStops;
   }
 
   public static Builder of() {
@@ -165,6 +169,10 @@ public class NetexFeedParameters implements DataSourceConfig {
     return ferryIdsNotAllowedForBicycle;
   }
 
+  public boolean noTransfersOnIsolatedStops() {
+    return noTransfersOnIsolatedStops;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -218,6 +226,7 @@ public class NetexFeedParameters implements DataSourceConfig {
     private String groupFilePattern;
     private String ignoreFilePattern;
     private final Set<String> ferryIdsNotAllowedForBicycle = new HashSet<>();
+    private boolean noTransfersOnIsolatedStops;
 
     private Builder(NetexFeedParameters original) {
       this.original = original;
@@ -228,6 +237,7 @@ public class NetexFeedParameters implements DataSourceConfig {
       this.groupFilePattern = original.groupFilePattern;
       this.ignoreFilePattern = original.ignoreFilePattern;
       this.ferryIdsNotAllowedForBicycle.addAll(original.ferryIdsNotAllowedForBicycle);
+      this.noTransfersOnIsolatedStops = original.noTransfersOnIsolatedStops;
     }
 
     public URI source() {
@@ -266,6 +276,11 @@ public class NetexFeedParameters implements DataSourceConfig {
 
     public Builder addFerryIdsNotAllowedForBicycle(Collection<String> ferryId) {
       ferryIdsNotAllowedForBicycle.addAll(ferryId);
+      return this;
+    }
+
+    public Builder withNoTransfersOnIsolatedStops(boolean noTransfersOnIsolatedStops) {
+      this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
       return this;
     }
 

@@ -49,8 +49,6 @@ public class AddTransitModelEntitiesToGraph {
 
   private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
 
-  private final GtfsFeedId feedId;
-
   private final OtpTransitService otpTransitService;
 
   // Map of all station elements and their vertices in the graph
@@ -63,23 +61,20 @@ public class AddTransitModelEntitiesToGraph {
    *                         negative the default value of zero is used.
    */
   private AddTransitModelEntitiesToGraph(
-    GtfsFeedId feedId,
     OtpTransitService otpTransitService,
     int subwayAccessTime
   ) {
-    this.feedId = feedId;
     this.otpTransitService = otpTransitService;
     this.subwayAccessTime = Math.max(subwayAccessTime, 0);
   }
 
   public static void addToGraph(
-    GtfsFeedId feedId,
     OtpTransitService otpTransitService,
     int subwayAccessTime,
     Graph graph,
     TransitModel transitModel
   ) {
-    new AddTransitModelEntitiesToGraph(feedId, otpTransitService, subwayAccessTime)
+    new AddTransitModelEntitiesToGraph(otpTransitService, subwayAccessTime)
       .applyToGraph(graph, transitModel);
   }
 
@@ -347,7 +342,7 @@ public class AddTransitModelEntitiesToGraph {
 
   private void addAgenciesToGraph(TransitModel transitModel) {
     for (Agency agency : otpTransitService.getAllAgencies()) {
-      transitModel.addAgency(feedId.getId(), agency);
+      transitModel.addAgency(agency);
     }
   }
 
