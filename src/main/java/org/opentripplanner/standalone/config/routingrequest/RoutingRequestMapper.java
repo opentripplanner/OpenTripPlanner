@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.routingrequest;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.routingrequest.ItineraryFiltersMapper.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routingrequest.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
@@ -251,7 +252,17 @@ public class RoutingRequestMapper {
           .asEnumMap(TransitMode.class, Double.class)
       )
       .setUnpreferredCost(
-        c.of("unpreferredCost").since(NA).summary("TODO").asLinearFunction(dft.unpreferredCost())
+        c
+          .of("unpreferredCost")
+          .since(V2_2)
+          .summary("A cost function used to calculate penalty for an unpreferred route.")
+          .description(
+            """
+            Function should return number of seconds that we are willing to wait for preferred route
+            or for an unpreferred agency's departure. For example, 600 + 2.0 x
+            """
+          )
+          .asLinearFunction(dft.unpreferredCost())
       );
   }
 
