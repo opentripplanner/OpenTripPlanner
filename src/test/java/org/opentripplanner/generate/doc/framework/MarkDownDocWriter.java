@@ -1,5 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
+import static org.opentripplanner.framework.text.MarkdownFormatter.normalizeAnchor;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -79,7 +81,7 @@ public class MarkDownDocWriter {
   private void header(int level, String header, @Nullable String anchor) {
     printNewLine();
     if (anchor != null && !anchor.isBlank()) {
-      out.printf("<h%d id=\"%s\">%s</h%d>%n", level, anchor, header, level);
+      out.printf("<h%d id=\"%s\">%s</h%d>%n", level, normalizeAnchor(anchor), header, level);
     } else {
       out.printf("<h%d>%s</h%d>%n", level, header, level);
     }
