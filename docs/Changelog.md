@@ -129,6 +129,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove unnecessary sourceType attribute from GTFS-RT configuration  [#4525](https://github.com/opentripplanner/OpenTripPlanner/pull/4525)
 - Do not allow boarding/alighting at GroupStops in RAPTOR [#4534](https://github.com/opentripplanner/OpenTripPlanner/pull/4534)
 - Add skanetrafiken to deployment docs [#4535](https://github.com/opentripplanner/OpenTripPlanner/pull/4535)
+- Read the feed id from the agency when storing agencies [#4536](https://github.com/opentripplanner/OpenTripPlanner/pull/4536)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
