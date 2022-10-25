@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner.standalone.config.framework.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 import org.opentripplanner.test.support.FilePatternSource;
 
 public class ExampleConfigTest {
