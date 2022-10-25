@@ -74,7 +74,7 @@ public class ConfigFileLoader {
   }
 
   /**
-   * Load the configuration file as a JsonNode three. An empty node is returned if the given
+   * Load the configuration file as a JsonNode tree. An empty node is returned if the given
    * {@code configDir}  is {@code null} or config file is NOT found.
    * <p>
    * This is public to allow loading configuration files from tests like the SpeedTest.
