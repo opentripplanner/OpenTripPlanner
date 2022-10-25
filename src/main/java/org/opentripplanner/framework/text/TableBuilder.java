@@ -63,7 +63,7 @@ public class TableBuilder {
   }
 
   /**
-   * Set minimum witch for each column. This is not necessary if all values are added to the
+   * Set minimum width for each column. This is not necessary if all values are added to the
    * table before printing it. But, if the table is used to format e.g. log lines and created
    * before the logging start, then you can set the minimum column widths. If the header is wider
    * the width of the header is used. If a cell is wider than the width used, then the cell is
