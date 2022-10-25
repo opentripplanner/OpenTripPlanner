@@ -127,23 +127,23 @@ public class EntitySelectorTest {
   public void testStopConditionMatcher() {
     // Assert default behaviour - no StopConditions should always return "true"
     assertTrue(
-      EntitySelectorHelper.matchesStopCondition(Collections.EMPTY_SET, Set.of(StopCondition.STOP))
+      StopConditionsHelper.matchesStopCondition(Collections.EMPTY_SET, Set.of(StopCondition.STOP))
     );
 
     assertTrue(
-      EntitySelectorHelper.matchesStopCondition(Set.of(StopCondition.STOP), Collections.EMPTY_SET)
+      StopConditionsHelper.matchesStopCondition(Set.of(StopCondition.STOP), Collections.EMPTY_SET)
     );
 
     // Assert match - since StopCondition not edmpty, it must match
     assertTrue(
-      EntitySelectorHelper.matchesStopCondition(
+      StopConditionsHelper.matchesStopCondition(
         Set.of(StopCondition.START_POINT),
         Set.of(StopCondition.START_POINT)
       )
     );
 
     assertFalse(
-      EntitySelectorHelper.matchesStopCondition(
+      StopConditionsHelper.matchesStopCondition(
         Set.of(StopCondition.START_POINT),
         Set.of(StopCondition.STOP)
       )

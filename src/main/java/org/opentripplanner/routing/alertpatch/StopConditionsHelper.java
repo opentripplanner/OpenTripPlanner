@@ -2,7 +2,7 @@ package org.opentripplanner.routing.alertpatch;
 
 import java.util.Collection;
 
-public class EntitySelectorHelper {
+public class StopConditionsHelper {
 
   /**
    * Matches an EntitySelector's stopConditions with the stopConditions required. Returns true
@@ -37,21 +37,12 @@ public class EntitySelectorHelper {
     EntitySelector entitySelector,
     Collection<StopCondition> requestConditions
   ) {
-    if (entitySelector instanceof EntitySelector.Stop) {
-      return matchesStopCondition(
-        ((EntitySelector.Stop) entitySelector).stopConditions,
-        requestConditions
-      );
-    } else if (entitySelector instanceof EntitySelector.StopAndRoute) {
-      return matchesStopCondition(
-        ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute.stopConditions,
-        requestConditions
-      );
-    } else if (entitySelector instanceof EntitySelector.StopAndTrip) {
-      return matchesStopCondition(
-        ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip.stopConditions,
-        requestConditions
-      );
+    if (entitySelector instanceof EntitySelector.Stop stop) {
+      return matchesStopCondition(stop.stopConditions(), requestConditions);
+    } else if (entitySelector instanceof EntitySelector.StopAndRoute stopAndRoute) {
+      return matchesStopCondition(stopAndRoute.stopConditions(), requestConditions);
+    } else if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
+      return matchesStopCondition(stopAndTrip.stopConditions(), requestConditions);
     }
     // Always return true when no StopConditions exist
     return true;

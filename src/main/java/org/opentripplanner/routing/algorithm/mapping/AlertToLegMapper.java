@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -18,8 +17,6 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-
-import static org.opentripplanner.routing.alertpatch.EntitySelectorHelper.matchesStopCondition;
 
 /**
  * This class is responsible for finding and adding transit alerts to individual transit legs.
@@ -67,13 +64,15 @@ public class AlertToLegMapper {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
-      addTransitAlertsToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
+      // departingStopConditions
+      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
     }
     if (toStop instanceof RegularStop stop) {
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
       alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
-      addTransitAlertsToLeg(leg, StopCondition.ARRIVING, alerts, legStartTime, legEndTime);
+      // StopCondition.ARRIVING
+      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
     }
 
     if (leg.getIntermediateStops() != null) {
@@ -86,7 +85,8 @@ public class AlertToLegMapper {
           ZonedDateTime stopArrival = visit.arrival;
           ZonedDateTime stopDeparture = visit.departure;
 
-          addTransitAlertsToLeg(leg, StopCondition.PASSING, alerts, stopArrival, stopDeparture);
+          // StopCondition.PASSING
+          addTransitAlertsToLeg(leg, alerts, stopArrival, stopDeparture);
         }
       }
     }
@@ -118,12 +118,10 @@ public class AlertToLegMapper {
   }
 
   /**
-   * Add alerts for the leg, if they are valid for the duration of the leg, and if the stop
-   * condition(s) match
+   * Add alerts for the leg, if they are valid for the duration of the leg.
    */
   private static void addTransitAlertsToLeg(
     Leg leg,
-    Collection<StopCondition> stopConditions,
     Collection<TransitAlert> alerts,
     ZonedDateTime fromTime,
     ZonedDateTime toTime
@@ -131,36 +129,10 @@ public class AlertToLegMapper {
     if (alerts != null) {
       for (TransitAlert alert : alerts) {
         if (alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond())) {
-          if (
-            !alert.getStopConditions().isEmpty() && // Skip if stopConditions are not set for alert
-            stopConditions != null &&
-            !stopConditions.isEmpty()
-          ) { // ...or specific stopConditions are not requested
-            for (StopCondition stopCondition : stopConditions) {
-              if (alert.getStopConditions().contains(stopCondition)) {
-                leg.addAlert(alert);
-                break; //Only add alert once
-              }
-            }
-          } else {
-            leg.addAlert(alert);
-          }
+          leg.addAlert(alert);
         }
       }
     }
-  }
-
-  /**
-   * Add alerts for the leg, if they are valid for the duration of the leg, without considering the
-   * stop condition(s) of the alert
-   */
-  private static void addTransitAlertsToLeg(
-    Leg leg,
-    Collection<TransitAlert> alerts,
-    ZonedDateTime fromTime,
-    ZonedDateTime toTime
-  ) {
-    addTransitAlertsToLeg(leg, null, alerts, fromTime, toTime);
   }
 
   private Collection<TransitAlert> getAlertsForStopAndRoute(
@@ -172,23 +144,6 @@ public class AlertToLegMapper {
       id -> transitAlertService.getStopAndRouteAlerts(id, routeId)
     );
   }
-
-//  private static void filterByStopConditions(
-//    Collection<TransitAlert> alerts,
-//    Collection<StopCondition> stopConditions
-//  ) {
-//    if (alerts != null && stopConditions != null && !stopConditions.isEmpty()) {
-//      alerts.removeIf(alert -> {
-//        for (EntitySelector entity : alert.getEntities()) {
-//          if (!matchesStopCondition(entity, stopConditions)) {
-//            // No match - return true to trigger removal from Collection
-//            return true;
-//          }
-//        }
-//        return false;
-//      });
-//    }
-//  }
 
   private Collection<TransitAlert> getAlertsForStopAndTrip(
     RegularStop stop,

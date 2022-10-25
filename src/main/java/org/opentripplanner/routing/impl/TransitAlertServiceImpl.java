@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.routing.alertpatch.EntityKey;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -23,7 +24,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   private final TransitModel transitModel;
 
-  private Multimap<EntitySelector, TransitAlert> alerts = HashMultimap.create();
+  private Multimap<EntityKey, TransitAlert> alerts = HashMultimap.create();
 
   public TransitAlertServiceImpl(TransitModel transitModel) {
     this.transitModel = transitModel;
@@ -31,10 +32,10 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public void setAlerts(Collection<TransitAlert> alerts) {
-    Multimap<EntitySelector, TransitAlert> newAlerts = HashMultimap.create();
+    Multimap<EntityKey, TransitAlert> newAlerts = HashMultimap.create();
     for (TransitAlert alert : alerts) {
       for (EntitySelector entity : alert.getEntities()) {
-        newAlerts.put(entity, alert);
+        newAlerts.put(entity.key(), alert);
       }
     }
 
@@ -61,9 +62,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     // TODO StopConditions: Need to take the required StopConditions into account.
     //  These are matched using equals/hashCode, but required StopConditions do not necessarily
     //  match, but may be a subset/superset.
-    Set<TransitAlert> result = new HashSet<>(
-      alerts.get(new EntitySelector.Stop(stopId, Collections.EMPTY_SET))
-    );
+    Set<TransitAlert> result = new HashSet<>(alerts.get(new EntityKey.Stop(stopId)));
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
       if (transitModel != null) {
@@ -88,17 +87,18 @@ public class TransitAlertServiceImpl implements TransitAlertService {
 
   @Override
   public Collection<TransitAlert> getRouteAlerts(FeedScopedId route) {
-    return alerts.get(new EntitySelector.Route(route));
+    return alerts.get(new EntityKey.Route(route));
   }
 
   @Override
   public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
-    return alerts.get(new EntitySelector.Trip(trip, serviceDate));
+    // TODO: Filter serviceDate
+    return alerts.get(new EntityKey.Trip(trip));
   }
 
   @Override
   public Collection<TransitAlert> getAgencyAlerts(FeedScopedId agency) {
-    return alerts.get(new EntitySelector.Agency(agency));
+    return alerts.get(new EntityKey.Agency(agency));
   }
 
   @Override
@@ -107,7 +107,7 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     //  These are matched using equals/hashCode, but required StopConditions do not necessarily
     //  match, but may be a subset/superset.
 
-    return alerts.get(new EntitySelector.StopAndRoute(stop, route));
+    return alerts.get(new EntityKey.StopAndRoute(stop, route));
   }
 
   @Override
@@ -119,18 +119,19 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     // TODO StopConditions: Need to take the required StopConditions into account.
     //  These are matched using equals/hashCode, but required StopConditions do not necessarily
     //  match, but may be a subset/superset.
+    // TODO: serviceDate
 
-    return alerts.get(new EntitySelector.StopAndTrip(stop, trip, serviceDate));
+    return alerts.get(new EntityKey.StopAndTrip(stop, trip));
   }
 
   @Override
   public Collection<TransitAlert> getRouteTypeAndAgencyAlerts(int routeType, FeedScopedId agency) {
-    return alerts.get(new EntitySelector.RouteTypeAndAgency(routeType, agency));
+    return alerts.get(new EntityKey.RouteTypeAndAgency(agency, routeType));
   }
 
   @Override
   public Collection<TransitAlert> getRouteTypeAlerts(int routeType, String feedId) {
-    return alerts.get(new EntitySelector.RouteType(routeType, feedId));
+    return alerts.get(new EntityKey.RouteType(feedId, routeType));
   }
 
   @Override
@@ -138,6 +139,6 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     Direction direction,
     FeedScopedId route
   ) {
-    return alerts.get(new EntitySelector.DirectionAndRoute(direction, route));
+    return alerts.get(new EntityKey.DirectionAndRoute(route, direction));
   }
 }

@@ -69,17 +69,17 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
                   .anyMatch(entity ->
                     (
                       types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) &&
-                      entity instanceof EntitySelector.StopAndRoute &&
-                      ((StopAndRoute) entity).stopAndRoute.stop.equals(id)
+                      entity instanceof StopAndRoute stopAndRoute &&
+                      stopAndRoute.stopId().equals(id)
                     ) ||
                     (
                       types.contains(LegacyGraphQLStopAlertType.STOP_ON_TRIPS) &&
-                      entity instanceof EntitySelector.StopAndTrip &&
-                      ((EntitySelector.StopAndTrip) entity).stopAndTrip.stop.equals(id)
+                      entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                      stopAndTrip.stopId().equals(id)
                     )
                   )
               )
-              .collect(Collectors.toList())
+              .toList()
           );
         }
         if (

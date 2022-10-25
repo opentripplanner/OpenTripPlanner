@@ -13,11 +13,10 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -390,6 +389,12 @@ public class EstimatedCallType {
 
     final LocalDate serviceDate = tripTimeOnDate.getServiceDay();
 
+    Set<StopCondition> stopConditions = Set.of(
+      StopCondition.STOP,
+      StopCondition.START_POINT,
+      StopCondition.EXCEPTIONAL_STOP
+    );
+
     // TODO StopConditions: To ensure correct handling of StopConditions, these need to be taken
     //  into account when fetching relevant alerts -e.g.
     //  alertPatchService.getStopAlerts(stopId, stopConditions)
@@ -418,8 +423,7 @@ public class EstimatedCallType {
     filterSituationsByDateAndStopConditions(
       allAlerts,
       Instant.ofEpochSecond(serviceDay + arrivalTime),
-      Instant.ofEpochSecond(serviceDay + departureTime),
-      Arrays.asList(StopCondition.STOP, StopCondition.START_POINT, StopCondition.EXCEPTIONAL_STOP)
+      Instant.ofEpochSecond(serviceDay + departureTime)
     );
 
     return allAlerts;
@@ -428,8 +432,7 @@ public class EstimatedCallType {
   private static void filterSituationsByDateAndStopConditions(
     Collection<TransitAlert> alertPatches,
     Instant fromTime,
-    Instant toTime,
-    List<StopCondition> stopConditions
+    Instant toTime
   ) {
     if (alertPatches != null) {
       // First and last period
@@ -441,13 +444,6 @@ public class EstimatedCallType {
       // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch ->
         !alertPatch.displayDuring(fromTime.getEpochSecond(), toTime.getEpochSecond())
-      );
-
-      alertPatches.removeIf(alert ->
-        !alert.getStopConditions().isEmpty() &&
-        stopConditions
-          .stream()
-          .noneMatch(stopCondition -> alert.getStopConditions().contains(stopCondition))
       );
     }
   }

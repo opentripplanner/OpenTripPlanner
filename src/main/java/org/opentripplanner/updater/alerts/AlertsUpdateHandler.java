@@ -152,8 +152,8 @@ public class AlertsUpdateHandler {
         } else if (directionId != MISSING_INT_FIELD_VALUE) {
           alertText.addEntity(
             new EntitySelector.DirectionAndRoute(
-              directionMapper.map(directionId),
-              new FeedScopedId(feedId, routeId)
+              new FeedScopedId(feedId, routeId),
+              directionMapper.map(directionId)
             )
           );
         } else {
@@ -164,12 +164,12 @@ public class AlertsUpdateHandler {
       } else if (agencyId != null) {
         FeedScopedId feedScopedAgencyId = new FeedScopedId(feedId, agencyId);
         if (routeType != MISSING_INT_FIELD_VALUE) {
-          alertText.addEntity(new EntitySelector.RouteTypeAndAgency(routeType, feedScopedAgencyId));
+          alertText.addEntity(new EntitySelector.RouteTypeAndAgency(feedScopedAgencyId, routeType));
         } else {
           alertText.addEntity(new EntitySelector.Agency(feedScopedAgencyId));
         }
       } else if (routeType != MISSING_INT_FIELD_VALUE) {
-        alertText.addEntity(new EntitySelector.RouteType(routeType, feedId));
+        alertText.addEntity(new EntitySelector.RouteType(feedId, routeType));
       } else {
         String description = "Entity selector: " + informed;
         alertText.addEntity(new EntitySelector.Unknown(description));

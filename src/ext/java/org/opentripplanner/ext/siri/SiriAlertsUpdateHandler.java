@@ -390,9 +390,9 @@ public class SiriAlertsUpdateHandler {
                     // Creating unique, deterministic id for the alert
                     EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
                       stop,
-                      resolveStopConditions(affectedStop.getStopConditions()),
                       tripId,
-                      serviceDate
+                      serviceDate,
+                      resolveStopConditions(affectedStop.getStopConditions())
                     );
                     alert.addEntity(entitySelector);
                   }
@@ -429,9 +429,9 @@ public class SiriAlertsUpdateHandler {
                   alert.addEntity(
                     new EntitySelector.StopAndTrip(
                       stop,
-                      resolveStopConditions(affectedStop.getStopConditions()),
                       tripId,
-                      serviceDate
+                      serviceDate,
+                      resolveStopConditions(affectedStop.getStopConditions())
                     )
                   );
                 }

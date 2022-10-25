@@ -22,7 +22,6 @@ import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripMod
 import org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.EntitySelector.DirectionAndRoute;
-import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRouteOrTripKey;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
@@ -43,11 +42,11 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
       getSource(environment)
         .getEntities()
         .stream()
-        .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
+        .filter(EntitySelector.Agency.class::isInstance)
         .findAny()
         .map(EntitySelector.Agency.class::cast)
         .map(entitySelector ->
-          getTransitService(environment).getAgencyForId(entitySelector.agencyId)
+          getTransitService(environment).getAgencyForId(entitySelector.agencyId())
         )
         .orElse(null);
   }
@@ -155,30 +154,28 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .stream()
         .map(entitySelector -> {
           if (entitySelector instanceof EntitySelector.Stop) {
-            FeedScopedId id = ((EntitySelector.Stop) entitySelector).stopId;
+            FeedScopedId id = ((EntitySelector.Stop) entitySelector).stopId();
             StopLocation stop = getTransitService(environment).getRegularStop(id);
             return List.of(getAlertEntityOrUnknown(stop, id.toString(), "stop"));
           }
           if (entitySelector instanceof EntitySelector.Agency) {
-            FeedScopedId id = ((EntitySelector.Agency) entitySelector).agencyId;
+            FeedScopedId id = ((EntitySelector.Agency) entitySelector).agencyId();
             Agency agency = getTransitService(environment).getAgencyForId(id);
             return List.of(getAlertEntityOrUnknown(agency, id.toString(), "agency"));
           }
           if (entitySelector instanceof EntitySelector.Route) {
-            FeedScopedId id = ((EntitySelector.Route) entitySelector).routeId;
+            FeedScopedId id = ((EntitySelector.Route) entitySelector).routeId();
             Route route = getTransitService(environment).getRouteForId(id);
             return List.of(getAlertEntityOrUnknown(route, id.toString(), "route"));
           }
           if (entitySelector instanceof EntitySelector.Trip) {
-            FeedScopedId id = ((EntitySelector.Trip) entitySelector).tripId;
+            FeedScopedId id = ((EntitySelector.Trip) entitySelector).tripId();
             Trip trip = getTransitService(environment).getTripForId(id);
             return List.of(getAlertEntityOrUnknown(trip, id.toString(), "trip"));
           }
-          if (entitySelector instanceof EntitySelector.StopAndRoute) {
-            StopAndRouteOrTripKey stopAndRouteKey =
-              ((EntitySelector.StopAndRoute) entitySelector).stopAndRoute;
-            FeedScopedId stopId = stopAndRouteKey.stop;
-            FeedScopedId routeId = stopAndRouteKey.routeOrTrip;
+          if (entitySelector instanceof EntitySelector.StopAndRoute stopAndRoute) {
+            FeedScopedId stopId = stopAndRoute.stopId();
+            FeedScopedId routeId = stopAndRoute.routeId();
             StopLocation stop = getTransitService(environment).getRegularStop(stopId);
             Route route = getTransitService(environment).getRouteForId(routeId);
             return List.of(
@@ -194,11 +191,9 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
                 )
             );
           }
-          if (entitySelector instanceof EntitySelector.StopAndTrip) {
-            StopAndRouteOrTripKey stopAndTripKey =
-              ((EntitySelector.StopAndTrip) entitySelector).stopAndTrip;
-            FeedScopedId stopId = stopAndTripKey.stop;
-            FeedScopedId tripId = stopAndTripKey.routeOrTrip;
+          if (entitySelector instanceof EntitySelector.StopAndTrip stopAndTrip) {
+            FeedScopedId stopId = stopAndTrip.stopId();
+            FeedScopedId tripId = stopAndTrip.tripId();
             StopLocation stop = getTransitService(environment).getRegularStop(stopId);
             Trip trip = getTransitService(environment).getTripForId(tripId);
             return List.of(
@@ -215,8 +210,8 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             );
           }
           if (entitySelector instanceof EntitySelector.RouteTypeAndAgency) {
-            FeedScopedId agencyId = ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId;
-            int routeType = ((EntitySelector.RouteTypeAndAgency) entitySelector).routeType;
+            FeedScopedId agencyId = ((EntitySelector.RouteTypeAndAgency) entitySelector).agencyId();
+            int routeType = ((EntitySelector.RouteTypeAndAgency) entitySelector).routeType();
             Agency agency = getTransitService(environment).getAgencyForId(agencyId);
             return List.of(
               agency != null
@@ -232,13 +227,13 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
             );
           }
           if (entitySelector instanceof EntitySelector.RouteType) {
-            int routeType = ((EntitySelector.RouteType) entitySelector).routeType;
-            String feedId = ((EntitySelector.RouteType) entitySelector).feedId;
+            int routeType = ((EntitySelector.RouteType) entitySelector).routeType();
+            String feedId = ((EntitySelector.RouteType) entitySelector).feedId();
             return List.of(new LegacyGraphQLRouteTypeModel(null, routeType, feedId));
           }
           if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
-            Direction direction = ((DirectionAndRoute) entitySelector).direction;
-            FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId;
+            Direction direction = ((DirectionAndRoute) entitySelector).direction();
+            FeedScopedId routeId = ((EntitySelector.DirectionAndRoute) entitySelector).routeId();
             Route route = getTransitService(environment).getRouteForId(routeId);
             return route != null
               ? getTransitService(environment)
@@ -259,7 +254,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
           }
           if (entitySelector instanceof EntitySelector.Unknown) {
             return List.of(
-              new LegacyGraphQLUnknownModel(((EntitySelector.Unknown) entitySelector).description)
+              new LegacyGraphQLUnknownModel(((EntitySelector.Unknown) entitySelector).description())
             );
           }
           return List.of();
@@ -294,7 +289,9 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
         .findAny()
         .map(EntitySelector.Route.class::cast)
-        .map(entitySelector -> getTransitService(environment).getRouteForId(entitySelector.routeId))
+        .map(entitySelector ->
+          getTransitService(environment).getRouteForId(entitySelector.routeId())
+        )
         .orElse(null);
   }
 
@@ -307,7 +304,9 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
         .findAny()
         .map(EntitySelector.Stop.class::cast)
-        .map(entitySelector -> getTransitService(environment).getRegularStop(entitySelector.stopId))
+        .map(entitySelector ->
+          getTransitService(environment).getRegularStop(entitySelector.stopId())
+        )
         .orElse(null);
   }
 
@@ -320,7 +319,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
         .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
         .findAny()
         .map(EntitySelector.Trip.class::cast)
-        .map(entitySelector -> getTransitService(environment).getTripForId(entitySelector.tripId))
+        .map(entitySelector -> getTransitService(environment).getTripForId(entitySelector.tripId()))
         .orElse(null);
   }
 

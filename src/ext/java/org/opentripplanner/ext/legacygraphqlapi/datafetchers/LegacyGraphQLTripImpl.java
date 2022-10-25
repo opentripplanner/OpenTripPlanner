@@ -100,20 +100,16 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
                       .stream()
                       .anyMatch(entity ->
                         (
-                          entity instanceof EntitySelector.StopAndRoute &&
-                          ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
-                              getRoute(environment).getId()
-                            )
+                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                          stopAndRoute.routeId().equals(getRoute(environment).getId())
                         ) ||
                         (
-                          entity instanceof EntitySelector.StopAndTrip &&
-                          ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
-                              getSource(environment).getId()
-                            )
+                          entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                          stopAndTrip.tripId().equals(getSource(environment).getId())
                         )
                       )
                   )
-                  .collect(Collectors.toList())
+                  .toList()
               );
               getStops(environment)
                 .forEach(stop -> {
