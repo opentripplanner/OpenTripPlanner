@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm.parameters;
 
 import java.time.ZoneId;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 
 /**
  * Default configuration for OpenStreetMap feeds.
@@ -11,7 +11,7 @@ public class OsmDefaultParameters {
   /**
    * The default set of rules for mapping OSM tags.
    */
-  public final WayPropertySetSource osmWayPropertySetSource;
+  public final OsmTagMapper osmOsmTagMapper;
 
   /**
    * The default time zone for parsing opening hours.
@@ -22,11 +22,8 @@ public class OsmDefaultParameters {
     this(null, null);
   }
 
-  public OsmDefaultParameters(WayPropertySetSource osmWayPropertySetSource, ZoneId timeZone) {
-    this.osmWayPropertySetSource =
-      osmWayPropertySetSource != null
-        ? osmWayPropertySetSource
-        : WayPropertySetSource.defaultWayPropertySetSource();
+  public OsmDefaultParameters(OsmTagMapper osmOsmTagMapper, ZoneId timeZone) {
+    this.osmOsmTagMapper = osmOsmTagMapper != null ? osmOsmTagMapper : OsmTagMapper.defaultMapper();
     this.timeZone = timeZone;
   }
 }

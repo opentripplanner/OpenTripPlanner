@@ -2,8 +2,8 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -16,8 +16,8 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
 
   List<VectorTilesResource.LayerParameters> layers;
 
-  public VectorTileConfig(List<NodeAdapter> vectorTileLayers) {
-    layers = vectorTileLayers.stream().map(Layer::new).collect(Collectors.toList());
+  public VectorTileConfig(Collection<? extends VectorTilesResource.LayerParameters> layers) {
+    this.layers = List.copyOf(layers);
   }
 
   @Override
@@ -25,68 +25,40 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     return layers;
   }
 
-  static class Layer implements VectorTilesResource.LayerParameters {
-
-    private final String name;
-    private final String type;
-    private final String mapper;
-    private final Integer maxZoom;
-    private final Integer minZoom;
-    private final Integer cacheMaxSeconds;
-    private final double expansionFactor;
-
-    public Layer(NodeAdapter node) {
-      name =
-        node.of("name").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
-      type =
-        node.of("type").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString();
-      mapper =
-        node
-          .of("mapper")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asString();
-      maxZoom = node.of("maxZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MAX_ZOOM);
-      minZoom = node.of("minZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MIN_ZOOM);
-      cacheMaxSeconds =
-        node.of("cacheMaxSeconds").withDoc(NA, /*TODO DOC*/"TODO").asInt(CACHE_MAX_SECONDS);
-      expansionFactor =
-        node.of("expansionFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(EXPANSION_FACTOR);
-    }
-
-    @Override
-    public String name() {
-      return name;
-    }
-
-    @Override
-    public String type() {
-      return type;
-    }
-
-    @Override
-    public String mapper() {
-      return mapper;
-    }
-
-    @Override
-    public int maxZoom() {
-      return maxZoom;
-    }
-
-    @Override
-    public int minZoom() {
-      return minZoom;
-    }
-
-    @Override
-    public int cacheMaxSeconds() {
-      return cacheMaxSeconds;
-    }
-
-    @Override
-    public double expansionFactor() {
-      return expansionFactor;
-    }
+  public static VectorTileConfig mapVectorTilesParameters(
+    NodeAdapter root,
+    String vectorTileLayers
+  ) {
+    return new VectorTileConfig(
+      root
+        .of(vectorTileLayers)
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObjects(VectorTileConfig::mapLayer)
+    );
   }
+
+  public static Layer mapLayer(NodeAdapter node) {
+    return new Layer(
+      node.of("name").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      node.of("type").withDoc(NA, /*TODO DOC*/"TODO").asEnum(VectorTilesResource.LayerType.class),
+      node.of("mapper").withDoc(NA, /*TODO DOC*/"TODO").asString(),
+      node.of("maxZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MAX_ZOOM),
+      node.of("minZoom").withDoc(NA, /*TODO DOC*/"TODO").asInt(MIN_ZOOM),
+      node.of("cacheMaxSeconds").withDoc(NA, /*TODO DOC*/"TODO").asInt(CACHE_MAX_SECONDS),
+      node.of("expansionFactor").withDoc(NA, /*TODO DOC*/"TODO").asDouble(EXPANSION_FACTOR)
+    );
+  }
+
+  record Layer(
+    String name,
+    VectorTilesResource.LayerType type,
+    String mapper,
+    int maxZoom,
+    int minZoom,
+    int cacheMaxSeconds,
+    double expansionFactor
+  )
+    implements VectorTilesResource.LayerParameters {}
 }

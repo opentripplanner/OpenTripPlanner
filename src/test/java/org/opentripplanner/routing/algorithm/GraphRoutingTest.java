@@ -52,6 +52,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayMode;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.util.geometry.GeometryUtils;
@@ -202,16 +203,42 @@ public abstract class GraphRoutingTest {
         .build();
     }
 
-    public RegularStop stopEntity(String id, double latitude, double longitude) {
-      var stop = TransitModelForTest.stop(id).withCoordinate(latitude, longitude).build();
+    public RegularStop stopEntity(
+      String id,
+      double latitude,
+      double longitude,
+      boolean noTransfers
+    ) {
+      var stopBuilder = TransitModelForTest.stop(id).withCoordinate(latitude, longitude);
+      if (noTransfers) {
+        stopBuilder.withParentStation(
+          Station
+            .of(TransitModelForTest.id("1"))
+            .withName(new NonLocalizedString("Malmö C"))
+            .withCoordinate(latitude, longitude)
+            .withTransfersNotAllowed(true)
+            .build()
+        );
+      }
+
+      var stop = stopBuilder.build();
       transitModel.mergeStopModels(StopModel.of().withRegularStop(stop).build());
       return stop;
     }
 
     public TransitStopVertex stop(String id, double latitude, double longitude) {
+      return stop(id, latitude, longitude, false);
+    }
+
+    public TransitStopVertex stop(
+      String id,
+      double latitude,
+      double longitude,
+      boolean noTransfers
+    ) {
       return new TransitStopVertexBuilder()
         .withGraph(graph)
-        .withStop(stopEntity(id, latitude, longitude))
+        .withStop(stopEntity(id, latitude, longitude, noTransfers))
         .build();
     }
 

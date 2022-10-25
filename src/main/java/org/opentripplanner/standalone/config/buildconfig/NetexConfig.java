@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.feed;
+package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
@@ -75,6 +75,15 @@ public class NetexConfig {
           .of("ignoreFilePattern")
           .withDoc(NA, /*TODO DOC*/"TODO")
           .asPattern(original.ignoreFilePattern().pattern())
+      )
+      .withNoTransfersOnIsolatedStops(
+        config
+          .of("noTransfersOnIsolatedStops")
+          .withDoc(
+            V2_2,
+            "Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED"
+          )
+          .asBoolean(original.noTransfersOnIsolatedStops())
       )
       .addFerryIdsNotAllowedForBicycle(
         config

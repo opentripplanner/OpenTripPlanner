@@ -2,8 +2,6 @@ package org.opentripplanner.standalone.config.sandbox;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.IndexVariable;
@@ -13,53 +11,52 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class DataOverlayConfigMapper {
 
-  public static DataOverlayConfig map(NodeAdapter c) {
-    if (c.isEmpty()) {
+  public static DataOverlayConfig map(NodeAdapter root, String dataOverlayName) {
+    var node = root
+      .of(dataOverlayName)
+      .withDoc(NA, /*TODO DOC*/"TODO")
+      .withExample(/*TODO DOC*/"TODO")
+      .withDescription(/*TODO DOC*/"TODO")
+      .asObject();
+
+    if (node.isEmpty()) {
       return null;
     }
     return new DataOverlayConfig(
-      c.of("fileName").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString(),
-      c
+      node
+        .of("fileName")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .asString(),
+      node
         .of("latitudeVariable")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(),
-      c
+      node
         .of("longitudeVariable")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(),
-      c
+      node
         .of("timeVariable")
         .withDoc(NA, /*TODO DOC*/"TODO")
         .withExample(/*TODO DOC*/"TODO")
         .asString(),
-      c.of("timeFormat").withDoc(NA, /*TODO DOC*/"TODO").asEnum(TimeUnit.class),
-      mapIndexVariables(
-        c
-          .of("indexVariables")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      ),
-      mapRequestParameters(
-        c
-          .of("requestParameters")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      )
+      node.of("timeFormat").withDoc(NA, /*TODO DOC*/"TODO").asEnum(TimeUnit.class),
+      node
+        .of("indexVariables")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObjects(DataOverlayConfigMapper::mapIndexVariable),
+      node
+        .of("requestParameters")
+        .withDoc(NA, /*TODO DOC*/"TODO")
+        .withExample(/*TODO DOC*/"TODO")
+        .withDescription(/*TODO DOC*/"TODO")
+        .asObjects(DataOverlayConfigMapper::mapRequestParameter)
     );
-  }
-
-  private static List<IndexVariable> mapIndexVariables(NodeAdapter c) {
-    return c
-      .asList()
-      .stream()
-      .map(DataOverlayConfigMapper::mapIndexVariable)
-      .collect(Collectors.toList());
   }
 
   private static IndexVariable mapIndexVariable(NodeAdapter c) {
@@ -72,14 +69,6 @@ public class DataOverlayConfigMapper {
         .asString(),
       c.of("variable").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asString()
     );
-  }
-
-  private static List<ParameterBinding> mapRequestParameters(NodeAdapter c) {
-    return c
-      .asList()
-      .stream()
-      .map(DataOverlayConfigMapper::mapRequestParameter)
-      .collect(Collectors.toList());
   }
 
   private static ParameterBinding mapRequestParameter(NodeAdapter c) {

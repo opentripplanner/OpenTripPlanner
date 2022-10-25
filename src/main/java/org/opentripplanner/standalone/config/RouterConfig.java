@@ -97,16 +97,7 @@ public class RouterConfig implements Serializable {
           .asObject()
       );
     this.updatersParameters = new UpdatersConfig(root);
-    this.vectorTileLayers =
-      new VectorTileConfig(
-        root
-          .of("vectorTileLayers")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-          .asList()
-      );
+    this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig =
       new FlexConfig(
         root

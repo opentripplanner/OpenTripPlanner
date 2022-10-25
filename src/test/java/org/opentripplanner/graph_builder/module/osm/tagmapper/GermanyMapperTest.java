@@ -1,18 +1,20 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.GermanyMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
-public class GermanyWayPropertySetSourceTest {
+public class GermanyMapperTest {
 
   static WayPropertySet wps = new WayPropertySet();
   static float epsilon = 0.01f;
 
   static {
-    var source = new GermanyWayPropertySetSource();
+    var source = new GermanyMapper();
     source.populateProperties(wps);
   }
 

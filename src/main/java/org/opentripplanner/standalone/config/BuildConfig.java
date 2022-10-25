@@ -26,11 +26,12 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.standalone.config.feed.DemConfig;
-import org.opentripplanner.standalone.config.feed.NetexConfig;
-import org.opentripplanner.standalone.config.feed.OsmConfig;
-import org.opentripplanner.standalone.config.feed.TransitFeedConfig;
-import org.opentripplanner.standalone.config.feed.TransitFeeds;
+import org.opentripplanner.standalone.config.buildconfig.DemConfig;
+import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
+import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
+import org.opentripplanner.standalone.config.buildconfig.TransferRequestConfig;
+import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
+import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
 import org.opentripplanner.util.lang.ObjectUtils;
@@ -640,39 +641,9 @@ public class BuildConfig implements OtpDataStoreConfig {
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
     customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
-    dataOverlay =
-      DataOverlayConfigMapper.map(
-        root
-          .of("dataOverlay")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
-    if (
-      root
-        .of("transferRequests")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .withDescription(/*TODO DOC*/"TODO")
-        .asObject()
-        .isNonEmptyArray()
-    ) {
-      transferRequests =
-        root
-          .of("transferRequests")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
-          .asList()
-          .stream()
-          .map(RoutingRequestMapper::mapRoutingRequest)
-          .toList();
-    } else {
-      transferRequests = List.of(new RouteRequest());
-    }
+    transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);

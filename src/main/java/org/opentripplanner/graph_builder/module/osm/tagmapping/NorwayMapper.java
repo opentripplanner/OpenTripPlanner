@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
@@ -9,6 +9,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.NON
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier;
 
@@ -18,10 +19,10 @@ import org.opentripplanner.graph_builder.module.osm.specifier.LogicalOrSpecifier
  * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dtrunk http://wiki.openstreetmap.org/wiki/Highway:International_equivalence
  *
  * @author seime
- * @see WayPropertySetSource
- * @see DefaultWayPropertySetSource
+ * @see OsmTagMapper
+ * @see DefaultMapper
  */
-public class NorwayWayPropertySetSource implements WayPropertySetSource {
+public class NorwayMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -728,7 +729,7 @@ public class NorwayWayPropertySetSource implements WayPropertySetSource {
 
     props.defaultSpeed = 22.22f; // 80kph
 
-    new DefaultWayPropertySetSource().populateNotesAndNames(props);
+    new DefaultMapper().populateNotesAndNames(props);
 
     props.setSlopeOverride(new BestMatchSpecifier("bridge=*"), true);
     props.setSlopeOverride(new BestMatchSpecifier("embankment=*"), false);

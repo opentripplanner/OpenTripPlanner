@@ -37,6 +37,7 @@ import org.opentripplanner.util.WorldEnvelope;
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
 
+  public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
   private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
   private final OtpServerRequestContext serverContext;
   private final String ignoreRouterId;
@@ -82,7 +83,7 @@ public class VectorTilesResource {
 
   @GET
   @Path("/{layers}/{z}/{x}/{y}.pbf")
-  @Produces("application/x-protobuf")
+  @Produces(APPLICATION_X_PROTOBUF)
   public Response tileGet(
     @PathParam("x") int x,
     @PathParam("y") int y,
@@ -114,7 +115,7 @@ public class VectorTilesResource {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         mvtBuilder.addLayers(
           VectorTilesResource.layers
-            .get(LayerType.valueOf(layerParameters.type()))
+            .get(layerParameters.type())
             .create(serverContext.graph(), serverContext.transitService(), layerParameters)
             .build(envelope, layerParameters)
         );
@@ -166,7 +167,7 @@ public class VectorTilesResource {
     return protocol + "://" + host;
   }
 
-  enum LayerType {
+  public enum LayerType {
     Stop,
     Station,
     VehicleRental,
@@ -182,7 +183,7 @@ public class VectorTilesResource {
   public interface LayerParameters {
     String name();
 
-    String type();
+    LayerType type();
 
     String mapper();
 

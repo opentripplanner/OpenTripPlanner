@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.opentripplanner.graph_builder.module.osm.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
@@ -6,15 +6,17 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.BIC
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
+
 /**
  * OSM way properties for German roads. Speed limits where adjusted to German regulation and some
  * bike safety settings tweaked, especially including tracktype's grade and preference of bicycle
  * networks.
  *
- * @see WayPropertySetSource
- * @see DefaultWayPropertySetSource
+ * @see OsmTagMapper
+ * @see DefaultMapper
  */
-public class GermanyWayPropertySetSource implements WayPropertySetSource {
+public class GermanyMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -85,6 +87,6 @@ public class GermanyWayPropertySetSource implements WayPropertySetSource {
     props.setProperties("highway=unclassified;cycleway=lane", withModes(ALL).bicycleSafety(0.87));
 
     // Read the rest from the default set
-    new DefaultWayPropertySetSource().populateProperties(props);
+    new DefaultMapper().populateProperties(props);
   }
 }

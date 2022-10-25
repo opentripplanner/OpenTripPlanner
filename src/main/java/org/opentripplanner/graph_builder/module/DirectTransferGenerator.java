@@ -107,6 +107,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
          * Use map based on the list of edges, so that only distinct transfers are stored. */
         Map<TransferKey, PathTransfer> distinctTransfers = new HashMap<>();
         RegularStop stop = ts0.getStop();
+
+        if (stop.transfersNotAllowed()) {
+          return;
+        }
+
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         for (RouteRequest transferProfile : transferRequests) {
@@ -121,6 +126,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           )) {
             // Skip the origin stop, loop transfers are not needed.
             if (sd.stop == stop) {
+              continue;
+            }
+            if (sd.stop.transfersNotAllowed()) {
               continue;
             }
             distinctTransfers.put(
