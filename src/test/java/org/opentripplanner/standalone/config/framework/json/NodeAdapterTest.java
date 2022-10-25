@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.framework.json;
 
-import static java.time.temporal.ChronoUnit.DECADES;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -60,7 +59,7 @@ public class NodeAdapterTest {
   public void docInfo() {
     NodeAdapter subject = newNodeAdapterForTest("{ bool: false }");
     subject.of("bool").withDoc(V2_0, "B Summary").withDescription("Ddd").asBoolean();
-    subject.of("en").withDoc(V2_1, "EN Summary").withExample(DECADES).asEnum(SECONDS);
+    subject.of("en").withDoc(V2_1, "EN Summary").asEnum(SECONDS);
     subject.of("em").withDoc(V2_1, "EM Summary").asEnumMap(ChronoUnit.class, String.class);
 
     List<NodeInfo> infos = subject.parametersSorted();
@@ -77,8 +76,6 @@ public class NodeAdapterTest {
     assertEquals("B Summary", infos.get(0).summary());
     assertEquals("Ddd", infos.get(0).description());
     assertEquals(BOOLEAN, infos.get(0).type());
-    assertEquals("{NANOS : \"A String\"}", infos.get(1).exampleValueJson());
-    assertEquals(DECADES, infos.get(2).exampleValue());
   }
 
   @Test

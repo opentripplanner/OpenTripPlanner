@@ -20,7 +20,6 @@ public class OsmConfig {
     var osmDefaults = root
       .of(parameterName)
       .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
       .withDescription(/*TODO DOC*/"TODO")
       .asObject();
 
@@ -32,7 +31,6 @@ public class OsmConfig {
       root
         .of(parameterName)
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObjects(OsmConfig::mapOsmExtractConfig)
     );
@@ -47,11 +45,7 @@ public class OsmConfig {
   }
 
   private static URI mapSource(NodeAdapter config) {
-    return config
-      .of("source")
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .asUri();
+    return config.of("source").withDoc(NA, /*TODO DOC*/"TODO").asUri();
   }
 
   private static ZoneId mapTimeZone(NodeAdapter config) {

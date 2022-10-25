@@ -46,13 +46,7 @@ abstract class AbstractTable {
         if (child != null && !child.isEmpty()) {
           addParametersTable(child, table);
         } else {
-          LOG.error(
-            "Not found: '{} : {}'. Add to JSON input: {} : {}",
-            node.fullPath(it.name()),
-            it.type().docName(),
-            it.name(),
-            it.exampleValueJson()
-          );
+          LOG.error("Not found: '{} : {}'.", node.fullPath(it.name()), it.type().docName());
         }
       }
     }

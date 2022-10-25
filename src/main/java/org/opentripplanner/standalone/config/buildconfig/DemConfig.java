@@ -17,7 +17,6 @@ public class DemConfig {
       root
         .of(parameterName)
         .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
         .withDescription(/*TODO DOC*/"TODO")
         .asObjects(DemConfig::mapDemExtract)
     );
@@ -25,9 +24,7 @@ public class DemConfig {
 
   private static DemExtractParameters mapDemExtract(NodeAdapter config) {
     return new DemExtractParametersBuilder()
-      .withSource(
-        config.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri()
-      )
+      .withSource(config.of("source").withDoc(NA, /*TODO DOC*/"TODO").asUri())
       .withElevationUnitMultiplier(
         config
           .of("elevationUnitMultiplier")

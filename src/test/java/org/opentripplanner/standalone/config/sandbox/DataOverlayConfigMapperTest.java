@@ -9,7 +9,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 class DataOverlayConfigMapperTest {
 
   @Test
-  void map() {
+  void validateExample() {
     var node = jsonNodeFromResource("standalone/config/sandbox/build-config-data-overlay.json");
 
     // Setup so we get access to the NodeAdapter

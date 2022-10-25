@@ -19,7 +19,7 @@ public class BuildConfigTest {
    * Test that the build-config.json example used in documentation is valid.
    */
   @Test
-  void validateBuildConfigExample() {
+  void validateExample() {
     var node = jsonNodeFromResource("standalone/config/build-config.json");
 
     // Setup so we get access to the NodeAdapter

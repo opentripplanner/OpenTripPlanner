@@ -19,7 +19,6 @@ class NodeInfoBuilder {
   private String summary = "TODO: Add short summary.";
   private String description = null;
   private String defaultValue = null;
-  private Object exampleValue = null;
   private boolean required = true;
 
   private boolean skipChildren = false;
@@ -61,11 +60,6 @@ class NodeInfoBuilder {
 
   NodeInfoBuilder withDeprecated(OtpVersion deprecatedSince, String description) {
     this.deprecated = new DeprecatedInfo(deprecatedSince, description);
-    return this;
-  }
-
-  NodeInfoBuilder withExample(Object exampleValue) {
-    this.exampleValue = exampleValue;
     return this;
   }
 
@@ -122,11 +116,6 @@ class NodeInfoBuilder {
   }
 
   NodeInfo build() {
-    // Use the first enum as an example value, if not set
-    if (exampleValue == null && enumType != null) {
-      exampleValue = enumType.getEnumConstants()[0];
-    }
-
     return new NodeInfo(
       name,
       summary,
@@ -136,7 +125,6 @@ class NodeInfoBuilder {
       elementType,
       since,
       defaultValue,
-      exampleValue,
       required,
       skipChildren,
       deprecated

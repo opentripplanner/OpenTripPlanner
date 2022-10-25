@@ -75,12 +75,6 @@ public class ParameterBuilder {
     return this;
   }
 
-  /** Add documentation detail description to a parameter. */
-  public ParameterBuilder withExample(Object example) {
-    this.info.withExample(example);
-    return this;
-  }
-
   /** @throws OtpAppException if parameter is missing. */
   public Boolean asBoolean() {
     return ofRequired(BOOLEAN).asBoolean();
