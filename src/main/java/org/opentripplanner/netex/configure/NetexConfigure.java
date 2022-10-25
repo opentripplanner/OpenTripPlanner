@@ -54,7 +54,6 @@ public class NetexConfigure {
     }
 
     return new NetexModule(
-      buildParams.netexDefaults.feedId(),
       graph,
       transitModel,
       issueStore,
