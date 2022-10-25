@@ -107,12 +107,12 @@ public class VehicleParkingGroupsLayerTest {
       new VectorTilesResource.LayerParameters() {
         @Override
         public String name() {
-          return "vehicleparkings";
+          return "vehicleParkingGroups";
         }
 
         @Override
-        public String type() {
-          return "VehicleParking";
+        public VectorTilesResource.LayerType type() {
+          return VectorTilesResource.LayerType.VehicleParkingGroup;
         }
 
         @Override
@@ -132,7 +132,7 @@ public class VehicleParkingGroupsLayerTest {
 
         @Override
         public int cacheMaxSeconds() {
-          return 60;
+          return 600;
         }
 
         @Override
