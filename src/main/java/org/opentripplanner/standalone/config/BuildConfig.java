@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
  * TODO maybe have only one giant config file and just annotate the parameters to indicate which
  * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
  * is the build configuration and the other is the router configuration.
+ * <p>
+ * The individual fields are documented in their mapping form the JSON node.
  */
 public class BuildConfig implements OtpDataStoreConfig {
 
@@ -83,8 +85,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   private static final String DEFAULT_OSM_PATTERN = "(?i)(\\.pbf|\\.osm|\\.osm\\.xml)$";
 
   /**
-   * Default: {@code (?i).tiff?$} - Match all filenames that ends with suffix {@code .tif} or {@code
-   * .tiff}. The pattern is NOT Case sensitive.
+   * Default: {@code (?i).tiff?$} - Match all filenames that ends with suffix {@code .tif} or
+   * {@code .tiff}. The pattern is NOT Case sensitive.
    */
   private static final String DEFAULT_DEM_PATTERN = "(?i)\\.tiff?$";
 
@@ -93,78 +95,29 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   private final NodeAdapter root;
 
-  /**
-   * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
-   * server and verify that it uses the correct version of the config. The version must be injected
-   * into the config in the operation deployment pipeline. How this is done is up to the
-   * deployment.
-   * <p>
-   * The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
-   * or format check on the version and it can be any string.
-   * <p>
-   * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
-   * <p>
-   * This parameter is optional, and the default is {@code null}.
-   */
   public final String configVersion;
 
-  /**
-   * Generates nice HTML report of Graph errors/warnings. They are stored in the same location as
-   * the graph.
-   */
   public final boolean dataImportReport;
 
-  /**
-   * If the number of issues is larger then {@code #maxDataImportIssuesPerFile}, then the files will
-   * be split in multiple files. Since browsers have problems opening large HTML files.
-   */
   public final int maxDataImportIssuesPerFile;
 
-  /**
-   * Include all transit input files (GTFS) from scanned directory.
-   */
   public final boolean transit;
 
-  /**
-   * Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the
-   * street. Perhaps this should be a runtime router parameter rather than a graph build parameter.
-   */
   public final double subwayAccessTime;
 
-  /**
-   * Include street input files (OSM/PBF).
-   */
   public final boolean streets;
 
-  /**
-   * Embed the Router config in the graph, which allows it to be sent to a server fully configured
-   * over the wire.
-   */
   public final boolean embedRouterConfig;
 
-  /**
-   * Perform visibility calculations on OSM areas (these calculations can be time consuming).
-   */
   public final boolean areaVisibility;
 
-  /**
-   * Link unconnected entries to public transport platforms.
-   */
   public final boolean platformEntriesLinking;
 
-  /**
-   * Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.
-   */
   public final boolean matchBusRoutesToStreets;
 
   /** See {@link S3BucketConfig}. */
   public final S3BucketConfig elevationBucket;
 
-  /**
-   * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
-   * are defined in meters in the source data. If, for example, decimetres are used in the source
-   * data, this should be set to 0.1.
-   */
   public final double elevationUnitMultiplier;
 
   /**
@@ -172,94 +125,20 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public final FareServiceFactory fareServiceFactory;
 
-  /**
-   * Patterns for matching NeTEx zip files or directories. If the filename contains the given
-   * pattern it is considered a match. Any legal Java Regular expression is allowed.
-   * <p>
-   * This parameter is optional.
-   * <p>
-   * Default: {@code (?i)netex} - Match all filenames that contain "netex". The default pattern is
-   * NOT case sensitive.
-   */
   private final Pattern netexLocalFilePattern;
 
-  /**
-   * Patterns for matching GTFS zip-files or directories. If the filename contains the given
-   * pattern it is considered a match. Any legal Java Regular expression is allowed.
-   * <p>
-   * This parameter is optional.
-   * <p>
-   * Default: {@code (?i)gtfs} - Match all filenames that contain "gtfs". The default pattern is
-   * NOT case sensitive.
-   */
   private final Pattern gtfsLocalFilePattern;
 
-  /**
-   * Pattern for matching Open Street Map input files. If the filename contains the given pattern
-   * it is considered a match. Any legal Java Regular expression is allowed.
-   * <p>
-   * This parameter is optional.
-   * <p>
-   * Default: {@code (?i)(.pbf|.osm|.osm.xml)$} - Match all filenames that ends with suffix {@code
-   * .pbf}, {@code .osm} or {@code .osm.xml}. The default pattern is NOT case sensitive.
-   */
   private final Pattern osmLocalFilePattern;
 
-  /**
-   * Pattern for matching elevation DEM files. If the filename contains the given pattern it is
-   * considered a match. Any legal Java Regular expression is allowed.
-   * <p>
-   * This parameter is optional.
-   * <p>
-   * Default: {@code (?i).tiff?$} - Match all filenames that ends with suffix {@code .tif} or
-   * {@code .tiff}. The default pattern is NOT case sensitive.
-   */
   private final Pattern demLocalFilePattern;
 
-  /**
-   * Local file system path to Google Cloud Platform service accounts credentials file. The
-   * credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
-   * need to provide a path the the service credentials. Environment variables in the path is
-   * resolved.
-   * <p>
-   * Example: {@code "credentialsFile" : "${MY_GOC_SERVICE}"} or {@code "app-1-3983f9f66728.json" :
-   * "~/"}
-   * <p>
-   * This is a path to a file on the local file system, not an URI.
-   * <p>
-   * This parameter is optional. Default is {@code null}.
-   */
   private final String gsCredentials;
 
-  /**
-   * URI to the street graph object file for reading and writing. The file is created or overwritten
-   * if OTP saves the graph to the file.
-   * <p>
-   * Example: {@code "streetGraph" : "file:///Users/kelvin/otp/streetGraph.obj" }
-   * <p>
-   * This parameter is optional. Default is {@code null}.
-   */
   private final URI streetGraph;
 
-  /**
-   * URI to the graph object file for reading and writing. The file is created or overwritten if OTP
-   * saves the graph to the file.
-   * <p>
-   * Example: {@code "graph" : "gs://my-bucket/otp/graph.obj" }
-   * <p>
-   * This parameter is optional. Default is {@code null}.
-   */
   private final URI graph;
 
-  /**
-   * URI to the directory where the graph build report should be written to. The html report is
-   * written into this directory. If the directory exist, any existing files are deleted. If it does
-   * not exist, it is created.
-   * <p>
-   * Example: {@code "osm" : "file:///Users/kelvin/otp/buildReport" }
-   * <p>
-   * This parameter is optional. Default is {@code null} in which case the report is skipped.
-   */
   private final URI buildReportDir;
 
   /**
@@ -267,73 +146,39 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public final CustomNamer customNamer;
 
-  /**
-   * When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
-   * for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
-   * to cache the entire osm file im memory. The trade off is of cause that OTP might use more
-   * memory while loading osm data. You can use this parameter to choose what is best for your
-   * deployment depending on your infrastructure. Set the parameter to {@code true} to cache the
-   * data, and to {@code false} to read the stream from the source each time. The default value is
-   * {@code false}.
-   */
   public final boolean osmCacheDataInMem;
-  /**
-   * This field indicates the pruning threshold for islands without stops. Any such island under
-   * this size will be pruned.
-   */
   public final int pruningThresholdIslandWithoutStops;
-  /**
-   * This field indicates the pruning threshold for islands with stops. Any such island under this
-   * size will be pruned.
-   */
   public final int pruningThresholdIslandWithStops;
-  /**
-   * This field indicates whether walking should be allowed on OSM ways tagged with
-   * "foot=discouraged".
-   */
   public final boolean banDiscouragedWalking;
-  /**
-   * This field indicates whether bicycling should be allowed on OSM ways tagged with
-   * "bicycle=discouraged".
-   */
   public final boolean banDiscouragedBiking;
-  /**
-   * Transfers up to this duration with the default walk speed value will be pre-calculated and
-   * included in the Graph.
-   */
   public final double maxTransferDurationSeconds;
-  /**
-   * This will add extra edges when linking a stop to a platform, to prevent detours along the
-   * platform edge.
-   */
   public final Boolean extraEdgesStopPlatformLink;
-  /**
-   * Netex specific build parameters.
-   */
   public final NetexFeedParameters netexDefaults;
 
-  /**
-   * OpenStreetMap specific build parameters.
-   */
   public final OsmDefaultParameters osmDefaults;
 
   public final List<RouteRequest> transferRequests;
 
-  /**
-   * Visibility calculations for an area will not be done if there are more nodes than this limit.
-   */
   public final int maxAreaNodes;
-  /**
-   * Config for the DataOverlay Sandbox module
-   */
-  public final DataOverlayConfig dataOverlay;
-  /**
-   * This field is used for mapping routes geometry shapes. It determines max distance between shape
-   * points and their stop sequence. If mapper can not find any stops within this radius it will
-   * default to simple stop-to-stop geometry instead.
-   */
-  public final double maxStopToShapeSnapDistance;
 
+  public final DataOverlayConfig dataOverlay;
+  public final double maxStopToShapeSnapDistance;
+  public final Set<String> boardingLocationTags;
+  /**
+   * Specify parameters for DEM extracts. If not specified OTP will fall back to auto-detection
+   * based on the directory provided on the command line.
+   */
+  public final DemExtractParametersList dem;
+  /**
+   * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
+   * auto-detection based on the directory provided on the command line..
+   */
+  public final OsmExtractParametersList osm;
+  /**
+   * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
+   * based on the directory provided on the command line..
+   */
+  public final TransitFeeds transitFeeds;
   /**
    * Whether we should create car P+R stations from OSM data.
    */
@@ -343,8 +188,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public boolean staticBikeParkAndRide;
   /**
-   * Maximal distance between stops in meters that will connect consecutive trips that are made with
-   * same vehicle
+   *
    */
   public int maxInterlineDistance;
   /**
@@ -376,9 +220,9 @@ public class BuildConfig implements OtpDataStoreConfig {
    * Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
    * graph.
    * <p>
-   * NOTE: if this is set to true for graph building, make sure to not set the value of {@link
-   * RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to all of
-   * the elevation values in the street edges.
+   * NOTE: if this is set to true for graph building, make sure to not set the value of
+   * {@link RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to
+   * all of the elevation values in the street edges.
    */
   public boolean includeEllipsoidToGeoidDifference;
   /**
@@ -428,43 +272,9 @@ public class BuildConfig implements OtpDataStoreConfig {
    * @see Period#parse(CharSequence) for period format accepted.
    */
   public LocalDate transitServiceEnd;
-  public final Set<String> boardingLocationTags;
-
-  /**
-   * Should minimum transfer times in GTFS files be discarded. This is useful eg. when the minimum
-   * transfer time is only set for ticketing purposes, but we want to calculate the transfers always
-   * from OSM data.
-   */
   public boolean discardMinTransferTimes;
-
-  /**
-   * Time zone for the graph. This is used to store the timetables in the transit model, and to
-   * interpret times in incoming requests.
-   */
   public ZoneId transitModelTimeZone;
-
-  /**
-   * Whether to create stay-seated transfers in between two trips with the same block id.
-   */
   public boolean blockBasedInterlining;
-
-  /**
-   * Specify parameters for DEM extracts. If not specified OTP will fall back to auto-detection
-   * based on the directory provided on the command line.
-   */
-  public final DemExtractParametersList dem;
-
-  /**
-   * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
-   * auto-detection based on the directory provided on the command line..
-   */
-  public final OsmExtractParametersList osm;
-
-  /**
-   * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
-   * based on the directory provided on the command line..
-   */
-  public final TransitFeeds transitFeeds;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -489,9 +299,9 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("Perform visibility calculations.")
         .description(
           """
-          If this is `true` OTP attempts to calculate a path straight through an OSM area using the 
-          shortest way rather than around the edge of it. (These calculations can be time consuming).
-          """
+            If this is `true` OTP attempts to calculate a path straight through an OSM area using the 
+            shortest way rather than around the edge of it. (These calculations can be time consuming).
+            """
         )
         .asBoolean(false);
     banDiscouragedWalking =
@@ -513,16 +323,16 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("Deployment version of the *build-config.json*.")
         .description(
           """
-          The config-version is a parameter which each OTP deployment may set to be able to query
-          the OTP server and verify that it uses the correct version of the config. The version
-          must be injected into the config in the operation deployment pipeline. How this is done
-          is up to the deployment.
-          <p>
-          The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
-          or format check on the version and it can be any string.
-          <p>
-          Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
-          """
+            The config-version is a parameter which each OTP deployment may set to be able to query
+            the OTP server and verify that it uses the correct version of the config. The version
+            must be injected into the config in the operation deployment pipeline. How this is done
+            is up to the deployment.
+            <p>
+            The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+            or format check on the version and it can be any string.
+            <p>
+            Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+            """
         )
         .asString(null);
     dataImportReport =
@@ -544,6 +354,13 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("elevationUnitMultiplier")
         .since(NA)
         .summary("Specify a multiplier to convert elevation units from source to meters.")
+        .description(
+          """
+            Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+            are defined in meters in the source data. If, for example, decimetres are used in the source
+            data, this should be set to 0.1.
+            """
+        )
         .asDouble(1);
     embedRouterConfig =
       root
@@ -570,49 +387,148 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .asBoolean(false);
     pruningThresholdIslandWithStops =
-      root.of("islandWithStopsMaxSize").since(NA).summary("TODO").asInt(5);
+      root
+        .of("islandWithStopsMaxSize")
+        .since(NA)
+        .summary("When a graph island with stops in it should be pruned.")
+        .description(
+          """
+        This field indicates the pruning threshold for islands with stops. Any such island under this
+        size will be pruned.
+        """
+        )
+        .asInt(5);
     pruningThresholdIslandWithoutStops =
-      root.of("islandWithoutStopsMaxSize").since(NA).summary("TODO").asInt(40);
+      root
+        .of("islandWithoutStopsMaxSize")
+        .since(NA)
+        .summary("When a graph island without stops should be pruned.")
+        .description(
+          """
+        This field indicates the pruning threshold for islands without stops. Any such island under
+        this size will be pruned.
+        """
+        )
+        .asInt(40);
     matchBusRoutesToStreets =
-      root.of("matchBusRoutesToStreets").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("matchBusRoutesToStreets")
+        .since(NA)
+        .summary(
+          "Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking."
+        )
+        .asBoolean(false);
     maxDataImportIssuesPerFile =
-      root.of("maxDataImportIssuesPerFile").since(NA).summary("TODO").asInt(1000);
-    maxInterlineDistance = root.of("maxInterlineDistance").since(NA).summary("TODO").asInt(200);
+      root
+        .of("maxDataImportIssuesPerFile")
+        .since(NA)
+        .summary("When to split the import report.")
+        .description(
+          """
+              If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
+              be split in multiple files. Since browsers have problems opening large HTML files.
+            """
+        )
+        .asInt(1000);
+    maxInterlineDistance =
+      root
+        .of("maxInterlineDistance")
+        .since(NA)
+        .summary(
+          "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
+        )
+        .asInt(200);
     blockBasedInterlining =
-      root.of("blockBasedInterlining").since(NA).summary("TODO").asBoolean(true);
+      root
+        .of("blockBasedInterlining")
+        .since(NA)
+        .summary(
+          "Whether to create stay-seated transfers in between two trips with the same block id."
+        )
+        .asBoolean(true);
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
+        )
         .asDouble((double) Duration.ofMinutes(30).toSeconds());
     maxStopToShapeSnapDistance =
-      root.of("maxStopToShapeSnapDistance").since(NA).summary("TODO").asDouble(150);
+      root
+        .of("maxStopToShapeSnapDistance")
+        .since(NA)
+        .summary("Maximum distance between route shapes and their stops.")
+        .description(
+          """
+        This field is used for mapping routes geometry shapes. It determines max distance between shape
+        points and their stop sequence. If mapper can not find any stops within this radius it will
+        default to simple stop-to-stop geometry instead.
+        """
+        )
+        .asDouble(150);
     multiThreadElevationCalculations =
       root.of("multiThreadElevationCalculations").since(NA).summary("TODO").asBoolean(false);
-    osmCacheDataInMem = root.of("osmCacheDataInMem").since(NA).summary("TODO").asBoolean(false);
+    osmCacheDataInMem =
+      root
+        .of("osmCacheDataInMem")
+        .since(NA)
+        .summary("If OSM data should be cached in memory during processing.")
+        .description(
+          """
+      When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
+      for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
+      to cache the entire osm file im memory. The trade off is of cause that OTP might use more
+      memory while loading osm data. You can use this parameter to choose what is best for your
+      deployment depending on your infrastructure. Set the parameter to `true` to cache the
+      data, and to `false` to read the stream from the source each time.
+      """
+        )
+        .asBoolean(false);
     platformEntriesLinking =
-      root.of("platformEntriesLinking").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("platformEntriesLinking")
+        .since(NA)
+        .summary("Link unconnected entries to public transport platforms.")
+        .asBoolean(false);
     readCachedElevations =
       root.of("readCachedElevations").since(NA).summary("TODO").asBoolean(true);
     staticBikeParkAndRide =
       root.of("staticBikeParkAndRide").since(NA).summary("TODO").asBoolean(false);
     staticParkAndRide = root.of("staticParkAndRide").since(NA).summary("TODO").asBoolean(true);
-    streets = root.of("streets").since(NA).summary("TODO").asBoolean(true);
+    streets =
+      root.of("streets").since(NA).summary("Include street input files (OSM/PBF).").asBoolean(true);
     subwayAccessTime =
       root
         .of("subwayAccessTime")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
+        )
+        .description(
+          "Perhaps this should be a runtime router parameter rather than a graph build parameter."
+        )
         .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    transit = root.of("transit").since(NA).summary("TODO").asBoolean(true);
+    transit =
+      root
+        .of("transit")
+        .since(NA)
+        .summary("Include all transit input files (GTFS) from scanned directory.")
+        .asBoolean(true);
 
     // Time Zone dependent config
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone
       // will just shift the period with one day, so the consequences is limited.
       transitModelTimeZone =
-        root.of("transitModelTimeZone").since(NA).summary("TODO").asZoneId(null);
+        root
+          .of("transitModelTimeZone")
+          .since(NA)
+          .summary("Time zone for the graph.")
+          .description(
+            "This is used to store the timetables in the transit model, and to interpret times in incoming requests."
+          )
+          .asZoneId(null);
       var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
       transitServiceStart =
         root
@@ -630,7 +546,14 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     writeCachedElevations =
       root.of("writeCachedElevations").since(NA).summary("TODO").asBoolean(false);
-    maxAreaNodes = root.of("maxAreaNodes").since(NA).summary("TODO").asInt(500);
+    maxAreaNodes =
+      root
+        .of("maxAreaNodes")
+        .since(NA)
+        .summary(
+          "Visibility calculations for an area will not be done if there are more nodes than this limit."
+        )
+        .asInt(500);
     maxElevationPropagationMeters =
       root.of("maxElevationPropagationMeters").since(NA).summary("TODO").asInt(2000);
     boardingLocationTags =
@@ -640,7 +563,17 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("TODO")
         .asStringSet(List.copyOf(Set.of("ref")));
     discardMinTransferTimes =
-      root.of("discardMinTransferTimes").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("discardMinTransferTimes")
+        .since(NA)
+        .summary("Should minimum transfer times in GTFS files be discarded.")
+        .description(
+          """
+        This is useful eg. when the minimum transfer time is only set for ticketing purposes, 
+        but we want to calculate the transfers always from OSM data.
+        """
+        )
+        .asBoolean(false);
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
@@ -652,31 +585,94 @@ public class BuildConfig implements OtpDataStoreConfig {
       localFileNamePatternsConfig
         .of("gtfs")
         .since(NA)
-        .summary("TODO")
+        .summary("Patterns for matching GTFS zip-files or directories.")
+        .description(
+          """
+            If the filename contains the given pattern it is considered a match. 
+            Any legal Java Regular expression is allowed.
+            """
+        )
         .asPattern(DEFAULT_GTFS_PATTERN);
     netexLocalFilePattern =
       localFileNamePatternsConfig
         .of("netex")
         .since(NA)
-        .summary("TODO")
+        .summary("Patterns for matching NeTEx zip files or directories.")
+        .description(
+          """
+            If the filename contains the given
+            pattern it is considered a match. Any legal Java Regular expression is allowed.
+            """
+        )
         .asPattern(DEFAULT_NETEX_PATTERN);
     osmLocalFilePattern =
       localFileNamePatternsConfig
         .of("osm")
         .since(NA)
-        .summary("TODO")
+        .summary("Pattern for matching Open Street Map input files.")
+        .description(
+          """
+            If the filename contains the given pattern
+            it is considered a match. Any legal Java Regular expression is allowed.
+            """
+        )
         .asPattern(DEFAULT_OSM_PATTERN);
     demLocalFilePattern =
       localFileNamePatternsConfig
         .of("dem")
         .since(NA)
-        .summary("TODO")
+        .summary("Pattern for matching elevation DEM files.")
+        .description(
+          """
+            If the filename contains the given pattern it is
+            considered a match. Any legal Java Regular expression is allowed.
+            """
+        )
         .asPattern(DEFAULT_DEM_PATTERN);
 
-    gsCredentials = root.of("gsCredentials").since(NA).summary("TODO").asString(null);
-    graph = root.of("graph").since(NA).summary("TODO").asUri(null);
-    streetGraph = root.of("streetGraph").since(NA).summary("TODO").asUri(null);
-    buildReportDir = root.of("buildReportDir").since(NA).summary("TODO").asUri(null);
+    gsCredentials =
+      root
+        .of("gsCredentials")
+        .since(NA)
+        .summary(
+          "Local file system path to Google Cloud Platform service accounts credentials file."
+        )
+        .description(
+          """
+            The credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
+            need to provide a path the the service credentials. Environment variables in the path is
+            resolved.
+                  
+            This is a path to a file on the local file system, not an URI.
+            """
+        )
+        .asString(null);
+    graph =
+      root
+        .of("graph")
+        .since(NA)
+        .summary("URI to the graph object file for reading and writing.")
+        .description("The file is created or overwritten if OTP saves the graph to the file.")
+        .asUri(null);
+    streetGraph =
+      root
+        .of("streetGraph")
+        .since(NA)
+        .summary("URI to the street graph object file for reading and writing.")
+        .description("The file is created or overwritten if OTP saves the graph to the file")
+        .asUri(null);
+    buildReportDir =
+      root
+        .of("buildReportDir")
+        .since(NA)
+        .summary("URI to the directory where the graph build report should be written to.")
+        .description(
+          """
+      The html report is written into this directory. If the directory exist, any existing files are deleted. 
+      If it does not exist, it is created.
+      """
+        )
+        .asUri(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm");
