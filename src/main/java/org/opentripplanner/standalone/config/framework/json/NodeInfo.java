@@ -84,8 +84,8 @@ public record NodeInfo(
    */
   public NodeInfo arraysChild() {
     return of()
-      .withName("[ ]")
-      .withSummary("")
+      .withName("[ array object ]")
+      .withSummary("Nested object in array. The type is determined by the parameters.")
       .withType(elementType)
       .withSince(since)
       .withOptional()

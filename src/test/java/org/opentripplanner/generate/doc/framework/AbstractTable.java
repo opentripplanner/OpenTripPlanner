@@ -44,11 +44,11 @@ abstract class AbstractTable {
       addRow(node, table, it);
 
       if (it.type().isComplex() && !skip(it)) {
-        if(it.type() == ENUM_SET) {
+        if (it.type() == ENUM_SET) {
           continue;
         }
         //noinspection ConstantConditions
-        if(it.type() == ENUM_MAP && it.elementType().isSimple()) {
+        if (it.type() == ENUM_MAP && it.elementType().isSimple()) {
           continue;
         }
         var child = node.child(it.name());
@@ -65,9 +65,13 @@ abstract class AbstractTable {
   }
 
   private void addArrayChildrenToTable(NodeInfo info, NodeAdapter node, TableBuilder table) {
+    boolean skipNestedObjectRow = node.listChildrenByName().size() == 1;
+
     for (String childName : node.listChildrenByName()) {
       NodeAdapter child = node.child(childName);
-      addRow(node, table, info.arraysChild());
+      if (!skipNestedObjectRow) {
+        addRow(node, table, info.arraysChild());
+      }
       addParametersToTable(child, table);
     }
   }

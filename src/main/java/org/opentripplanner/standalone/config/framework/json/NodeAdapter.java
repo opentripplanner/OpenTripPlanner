@@ -129,7 +129,7 @@ public class NodeAdapter {
   /**
    * List all children parsed - this includes arrays elements.
    */
-  public Iterable<String> listChildrenByName() {
+  public List<String> listChildrenByName() {
     return childrenByName.keySet().stream().sorted().toList();
   }
 
