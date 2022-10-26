@@ -21,6 +21,7 @@ public class JsonSupport {
     try {
       ObjectMapper mapper = new ObjectMapper();
       mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+      mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
       mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
 
       // Replace ' with "

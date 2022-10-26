@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.WayTestData;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 class WayPropertySetTest {
@@ -30,7 +31,7 @@ class WayPropertySetTest {
   @Nonnull
   private static WayPropertySet wps() {
     var wps = new WayPropertySet();
-    var source = new WayPropertySetSource() {
+    var source = new OsmTagMapper() {
       @Override
       public void populateProperties(WayPropertySet props) {
         props.setProperties("highway=primary", withModes(CAR));

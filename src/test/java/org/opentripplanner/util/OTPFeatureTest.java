@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.OtpConfigLoader;
 
 public class OTPFeatureTest {
 
@@ -60,7 +60,7 @@ public class OTPFeatureTest {
         }
         """;
 
-    var configLoader = ConfigLoader.fromString(json);
+    var configLoader = OtpConfigLoader.fromString(json);
     var config = configLoader.loadOtpConfig();
     // When
     OTPFeature.enableFeatures(config.otpFeatures);
@@ -68,5 +68,16 @@ public class OTPFeatureTest {
     // Then
     assertTrue(OTPFeature.APIBikeRental.isOff());
     assertTrue(OTPFeature.MinimumTransferTimeIsDefinitive.isOn());
+  }
+
+  @Test
+  public void doc() {
+    assertEquals("Endpoint for actuators (service health status).", OTPFeature.ActuatorAPI.doc());
+  }
+
+  @Test
+  public void isSandbox() {
+    assertFalse(OTPFeature.APIServerInfo.isSandbox());
+    assertTrue(OTPFeature.ActuatorAPI.isSandbox());
   }
 }

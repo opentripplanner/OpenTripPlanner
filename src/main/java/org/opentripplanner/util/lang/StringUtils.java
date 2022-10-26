@@ -1,5 +1,8 @@
 package org.opentripplanner.util.lang;
 
+import java.util.Arrays;
+import javax.annotation.Nonnull;
+
 /**
  * OTP String utils extending the Java lang String...
  */
@@ -39,16 +42,69 @@ public class StringUtils {
   }
 
   /**
-   * Pad the {@code buffer} so that the length equals the new length. The {@code ch} is appended as
-   * many times as required. If the {@code buffer} length is equals or longer then the
-   * {@code newLenght} then the {@code buffer} is returned unchanged.
-   *
-   * @return the given buffer input for convenient chaining.
+   * Add the given number of characters to the buffer.
+   * @param buffer the buffer to append to.
+   * @param ch the character to add to the buffer.
+   * @param count the number of characters to add. If 0 or negative nothing is added.
+   * @return the given buffer input for convenient chaining
    */
-  public static StringBuilder pad(StringBuilder buffer, char ch, int newLenght) {
-    while (buffer.length() < newLenght) {
+  public static StringBuilder append(StringBuilder buffer, char ch, int count) {
+    while (count > 0) {
       buffer.append(ch);
+      --count;
     }
     return buffer;
+  }
+
+  public static String padLeft(String value, char ch, int width) {
+    if (value == null) {
+      return fill(ch, width);
+    }
+    if (value.length() >= width) {
+      return value;
+    }
+    return StringUtils
+      .append(new StringBuilder(), ch, width - value.length())
+      .append(value)
+      .toString();
+  }
+
+  public static String padBoth(String value, char ch, int width) {
+    if (value == null) {
+      return fill(ch, width);
+    }
+    if (value.length() >= width) {
+      return value;
+    }
+    var buf = new StringBuilder();
+    StringUtils.append(buf, ch, (width + 1 - value.length()) / 2);
+    buf.append(value);
+    StringUtils.append(buf, ch, width - buf.length());
+    return buf.toString();
+  }
+
+  public static String padRight(String value, char ch, int width) {
+    if (value == null) {
+      return fill(ch, width);
+    }
+    if (value.length() >= width) {
+      return value;
+    }
+    return StringUtils.append(new StringBuilder(value), ch, width - value.length()).toString();
+  }
+
+  /**
+   * Create a new String with the given {@code length} and all characters set to the given {@code ch}
+   * character.
+   */
+  public static String fill(char ch, int length) {
+    char[] array = new char[length];
+    Arrays.fill(array, ch);
+    return new String(array);
+  }
+
+  /** Replace single quotes with double quotes.  */
+  public static String quoteReplace(@Nonnull String text) {
+    return text.replace('\'', '\"');
   }
 }

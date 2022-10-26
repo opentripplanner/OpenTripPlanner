@@ -29,6 +29,7 @@
 - Include departures with skipped stops in the Stop type's stopTimesForPattern query. (July 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4299)
 - Add built-in GraphQL client. (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4499)
 - Implement support for omitCanceled parameter in some stop's stoptime queries (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4504)
+- Rename unpreferredRouteCost to unpreferredCost (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4543)
 
 ## Documentation
 

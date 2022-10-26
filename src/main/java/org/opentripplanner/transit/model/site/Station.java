@@ -39,6 +39,7 @@ public class Station
   private final StopTransferPriority priority;
   private final I18NString url;
   private final ZoneId timezone;
+  private final boolean transfersNotAllowed;
 
   // We serialize this class to json only for snapshot tests, and this creates cyclical structures
   @JsonBackReference
@@ -52,6 +53,7 @@ public class Station
     this.name = Objects.requireNonNull(builder.getName());
     this.coordinate = Objects.requireNonNull(builder.getCoordinate());
     this.priority = Objects.requireNonNullElse(builder.getPriority(), DEFAULT_PRIORITY);
+    this.transfersNotAllowed = builder.isTransfersNotAllowed();
 
     // Optional fields
     this.code = builder.getCode();
@@ -138,6 +140,13 @@ public class Station
   @Nullable
   public ZoneId getTimezone() {
     return timezone;
+  }
+
+  /**
+   * If true do not allow any transfers to or from any stop within station
+   */
+  public boolean isTransfersNotAllowed() {
+    return transfersNotAllowed;
   }
 
   /**

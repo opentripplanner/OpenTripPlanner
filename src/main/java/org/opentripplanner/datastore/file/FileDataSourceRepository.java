@@ -10,7 +10,7 @@ import static org.opentripplanner.datastore.api.FileType.OSM;
 import static org.opentripplanner.datastore.api.FileType.REPORT;
 import static org.opentripplanner.datastore.api.FileType.UNKNOWN;
 import static org.opentripplanner.datastore.base.LocalDataSourceRepository.isCurrentDir;
-import static org.opentripplanner.standalone.config.ConfigLoader.isConfigFile;
+import static org.opentripplanner.standalone.config.OtpConfigLoader.isConfigFile;
 
 import java.io.File;
 import java.net.URI;

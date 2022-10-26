@@ -41,4 +41,12 @@ public class ObjectUtils {
     }
     return newValue;
   }
+
+  /**
+   * Map an object to a string. This is null safe and a empty string is returned if the given input
+   * is {@code null}.
+   */
+  public static String toString(Object object) {
+    return object == null ? "" : object.toString();
+  }
 }
