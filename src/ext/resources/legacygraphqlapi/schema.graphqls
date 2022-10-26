@@ -1114,20 +1114,21 @@ input InputUnpreferred {
     agencies: String
 
     """
-    An cost function used to calculate penalty for an unpreferred route. Function should return
-    number of seconds that we are willing to wait for preferred route. String must be of the format:
+    An cost function used to calculate penalty for an unpreferred route/agency. Function should return
+    number of seconds that we are willing to wait for unpreferred route/agency.
+    String must be of the format:
     `A + B x`, where A is fixed penalty and B is a multiplier of transit leg travel time x.
     For example: `600 + 2.0 x`
     """
-    unpreferredRouteCost: String
+    unpreferredCost: String
 
     """
     Penalty added for using route that is unpreferred, i.e. number of seconds that we are willing to
     wait for route that is unpreferred.
 
-    Deprecated: Use `unpreferredRouteCost` instead.
+    Deprecated: Use `unpreferredCost` instead.
     """
-    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredRouteCost instead")
+    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredCost instead")
 }
 
 enum RoutingErrorCode {

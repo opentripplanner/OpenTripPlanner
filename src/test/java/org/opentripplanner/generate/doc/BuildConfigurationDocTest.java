@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.MarkDownDocWriter;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
@@ -42,7 +41,6 @@ public class BuildConfigurationDocTest {
    *   <li>The list of OTP features</li>
    * </ul>
    */
-  @Disabled
   @Test
   public void updateBuildConfigurationDoc() {
     NodeAdapter node = readBuildConfig();
