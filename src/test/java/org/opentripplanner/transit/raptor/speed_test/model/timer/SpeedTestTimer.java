@@ -122,7 +122,7 @@ public class SpeedTestTimer {
     }
   }
 
-  public void globalUploadCount(String meterName, Number count) {
+  public void uploadGlobalCount(String meterName, Number count) {
     var counter = uploadRegistry.counter(meterName);
     counter.increment(count.doubleValue());
   }

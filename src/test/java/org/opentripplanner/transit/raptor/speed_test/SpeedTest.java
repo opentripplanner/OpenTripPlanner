@@ -166,16 +166,29 @@ public class SpeedTest {
     printProfileStatistics();
 
     final var transitService = serverContext.transitService();
+<<<<<<< HEAD
     timer.globalUploadCount("transitdata_stops", transitService.listStopLocations().size());
     timer.globalUploadCount("transitdata_patterns", transitService.getAllTripPatterns().size());
     timer.globalUploadCount("transitdata_trips", transitService.getAllTrips().size());
+=======
+    timer.uploadGlobalCount("transitdata_stops", transitService.listStopLocations().size());
+    timer.uploadGlobalCount("transitdata_patterns", transitService.getAllTripPatterns().size());
+    timer.uploadGlobalCount("transitdata_trips", transitService.getAllTrips().size());
+>>>>>>> 576584011c (Use upload registry)
 
+    // we want to get the numbers after the garbage collection
     forceGCToAvoidGCLater();
 
     final var runtime = Runtime.getRuntime();
+<<<<<<< HEAD
     timer.globalUploadCount("jvm_free_memory", runtime.freeMemory());
     timer.globalUploadCount("jvm_max_memory", runtime.maxMemory());
     timer.globalUploadCount("jvm_total_memory", runtime.totalMemory());
+=======
+    timer.uploadGlobalCount("jvm_free_memory", runtime.freeMemory());
+    timer.uploadGlobalCount("jvm_max_memory", runtime.maxMemory());
+    timer.uploadGlobalCount("jvm_total_memory", runtime.totalMemory());
+>>>>>>> 576584011c (Use upload registry)
 
     timer.finishUp();
 
