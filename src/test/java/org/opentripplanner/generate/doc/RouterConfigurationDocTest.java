@@ -15,7 +15,7 @@ import org.opentripplanner.generate.doc.framework.MarkDownDocWriter;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
-import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class RouterConfigurationDocTest {
@@ -53,7 +53,7 @@ public class RouterConfigurationDocTest {
 
   private NodeAdapter readBuildConfig() {
     var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
-    var conf = new BuildConfig(json, BUILD_CONFIG_FILENAME, false);
+    var conf = new RouterConfig(json, BUILD_CONFIG_FILENAME, false);
     return conf.asNodeAdapter();
   }
 

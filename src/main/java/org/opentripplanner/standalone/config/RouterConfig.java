@@ -154,6 +154,10 @@ public class RouterConfig implements Serializable {
     return flexConfig.toFlexParameters(preferences);
   }
 
+  public NodeAdapter asNodeAdapter() {
+    return root;
+  }
+
   /**
    * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
    */
