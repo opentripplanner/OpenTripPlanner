@@ -328,14 +328,14 @@ public class Timetable implements Serializable {
       }
     }
 
-    var maybeError = newTimes.validateNonIncreasingTimes();
-    if (maybeError.isFailure()) {
+    var result = newTimes.validateNonIncreasingTimes();
+    if (result.isFailure()) {
       LOG.debug(
         "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
         tripId,
-        maybeError.failureValue().stopIndex()
+        result.failureValue().stopIndex()
       );
-      return (Result<TripTimesPatch, UpdateError>) maybeError;
+      return Result.failure(result.failureValue());
     }
 
     if (tripUpdate.hasVehicle()) {
