@@ -21,6 +21,8 @@ public class DigitransitVehicleRentalStationPropertyMapper
       // to the response somehow.
       new T2<>("name", station.getName().toString()),
       new T2<>("network", station.getNetwork()),
+      new T2<>("vehiclesAvailable", station.getVehiclesAvailable()),
+      new T2<>("spacesAvailable", station.getSpacesAvailable()),
       // a station can potentially have multiple form factors that's why this is plural
       new T2<>(
         "formFactors",
