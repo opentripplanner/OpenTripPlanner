@@ -123,18 +123,8 @@ public class AreaEdgeList implements Serializable {
 
       double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
-      AreaEdge forward = new AreaEdge(
-        from,
-        to,
-        line,
-        area.getName(),
-        length,
-        area.getPermission(),
-        false,
-        this
-      );
-      forward.setStreetClass(area.getStreetClass());
-      AreaEdge backward = new AreaEdge(
+      new AreaEdge(from, to, line, area.getName(), length, area.getPermission(), false, this);
+      new AreaEdge(
         to,
         from,
         line.reverse(),
@@ -144,7 +134,6 @@ public class AreaEdgeList implements Serializable {
         true,
         this
       );
-      backward.setStreetClass(area.getStreetClass());
     }
   }
 }

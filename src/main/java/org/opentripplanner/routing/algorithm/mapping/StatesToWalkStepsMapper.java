@@ -139,10 +139,7 @@ public class StatesToWalkStepsMapper {
   }
 
   private static boolean isLink(Edge edge) {
-    return (
-      edge instanceof StreetEdge &&
-      (((StreetEdge) edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK
-    );
+    return (edge instanceof StreetEdge streetEdge && streetEdge.isLink());
   }
 
   private static List<P2<Double>> encodeElevationProfile(

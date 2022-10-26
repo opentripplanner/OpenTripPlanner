@@ -33,7 +33,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.NamedArea;
@@ -487,9 +486,6 @@ public class WalkableAreaBuilder {
         endEndpoint.getCoordinate()
       );
 
-      int cls = StreetEdge.CLASS_OTHERPATH;
-      cls |= OSMFilter.getStreetClasses(areaEntity);
-
       String label =
         "way (area) " +
         areaEntity.getId() +
@@ -519,7 +515,7 @@ public class WalkableAreaBuilder {
         street.setWheelchairAccessible(false);
       }
 
-      street.setStreetClass(cls);
+      street.setLink(OSMFilter.isLink(areaEntity));
 
       label =
         "way (area) " +
@@ -550,7 +546,7 @@ public class WalkableAreaBuilder {
         backStreet.setWheelchairAccessible(false);
       }
 
-      backStreet.setStreetClass(cls);
+      backStreet.setLink(OSMFilter.isLink(areaEntity));
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
@@ -633,9 +629,6 @@ public class WalkableAreaBuilder {
       }
       NamedArea namedArea = new NamedArea();
       OSMWithTags areaEntity = area.parent;
-      int cls = StreetEdge.CLASS_OTHERPATH;
-      cls |= OSMFilter.getStreetClasses(areaEntity);
-      namedArea.setStreetClass(cls);
 
       String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
       I18NString name = handler.getNameForWay(areaEntity, id);
