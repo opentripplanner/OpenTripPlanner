@@ -66,13 +66,13 @@ public class NodeAdapterTest {
     assertEquals(
       "[" +
       "bool : boolean Required Since 2.0, " +
-      "em : enum map of string Optional Since 2.1, " +
-      "en : enum = \"SECONDS\" Since 2.1" +
+      "en : enum = \"SECONDS\" Since 2.1, " +
+      "em : enum map of string Optional Since 2.1" +
       "]",
       infos.toString()
     );
     assertEquals("bool", infos.get(0).name());
-    assertEquals(null, infos.get(0).defaultValue());
+    assertNull(infos.get(0).defaultValue());
     assertEquals("B Summary", infos.get(0).summary());
     assertEquals("Ddd", infos.get(0).description());
     assertEquals(BOOLEAN, infos.get(0).type());
@@ -204,13 +204,8 @@ public class NodeAdapterTest {
       () -> subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
 
-    var subjectWithExtraNode = newNodeAdapterForTest(
-      "{ key : { A: true, b: false, a_B_c: true, extra: true } }"
-    );
-    assertThrows(
-      OtpAppException.class,
-      () -> subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
-    );
+    // Any extra keys should be ignored for forward/backward compatibility
+    newNodeAdapterForTest("{ key : { A: true, b: false, a_B_c: true, extra: true } }");
   }
 
   @Test

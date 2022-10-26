@@ -1,7 +1,5 @@
 package org.opentripplanner.standalone.config.framework.json;
 
-import static java.util.Comparator.comparing;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,7 +84,7 @@ public class NodeAdapter {
   }
 
   public List<NodeInfo> parametersSorted() {
-    return parameters.values().stream().sorted(comparing(NodeInfo::name)).toList();
+    return parameters.values().stream().sorted().toList();
   }
 
   /** Get a child by name. The child must exist. */
@@ -122,6 +120,28 @@ public class NodeAdapter {
   }
 
   /**
+   * List all children present in the JSON document.
+   */
+  public Iterator<String> listExistingChildNodes() {
+    return json.fieldNames();
+  }
+
+  /**
+   * List all children parsed - this includes arrays elements.
+   */
+  public Iterable<String> listChildrenByName() {
+    return childrenByName.keySet().stream().sorted().toList();
+  }
+
+  /**
+   * Take a peek at a parameter in the JSON node. This might be necessary when more than one type
+   * with its own set of parameters are accepted.
+   */
+  public JsonNode peek(String parameterName) {
+    return json.path(parameterName);
+  }
+
+  /**
    * Log unused parameters for the entire configuration file/node tree. Only call this method for the
    * root adapter, once for each config file read.
    */
@@ -148,10 +168,6 @@ public class NodeAdapter {
   /** Return the node as a pretty JSON string. */
   public String toPrettyString() {
     return json.toPrettyString();
-  }
-
-  public Iterator<String> listExistingChildNodes() {
-    return json.fieldNames();
   }
 
   /* private methods */

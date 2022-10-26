@@ -35,7 +35,7 @@ public class MarkdownFormatter {
    * "id" attribute equals to the given anchor.
    */
   public static String linkToAnchor(String text, String anchor) {
-    return "[%s](#%s)".formatted(text, anchor);
+    return "[%s](#%s)".formatted(text, normalizeAnchor(anchor));
   }
 
   /**
@@ -68,5 +68,9 @@ public class MarkdownFormatter {
   /** Return whitespace witch can be used to indent inside a table cell. */
   public static String indentInTable() {
     return INDENT_NBSP;
+  }
+
+  public static String normalizeAnchor(String anchor) {
+    return anchor.replaceAll("[-!\"#$%&/.=?+\\[\\]]", "_");
   }
 }

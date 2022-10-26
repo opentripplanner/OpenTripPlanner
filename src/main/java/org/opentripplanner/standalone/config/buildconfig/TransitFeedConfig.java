@@ -20,8 +20,18 @@ public class TransitFeedConfig {
     List<DataSourceConfig> list = root
       .of(parameterName)
       .since(NA)
-      .summary("TODO")
-      .description(/*TODO DOC*/"TODO")
+      .summary("Scan for transit data files")
+      .description(
+        """
+        The transitFeeds section of `build-config.json` allows you to override the default behavior
+        of scanning for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+        You can specify data located outside the local filesystem (including cloud storage services)
+        or at various different locations around the local filesystem.
+        
+        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds 
+        section, auto-scanning in the base directory for this feed type will be disabled.
+        """
+      )
       .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
 
     return new TransitFeeds(
