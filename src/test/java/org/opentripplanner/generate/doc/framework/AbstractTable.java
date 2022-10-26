@@ -128,6 +128,6 @@ abstract class AbstractTable {
     if (path == null) {
       return 0;
     }
-    return (int)path.chars().filter(c -> c == '.').count() + 1;
+    return (int) path.chars().filter(c -> c == '.').count() + 1;
   }
 }

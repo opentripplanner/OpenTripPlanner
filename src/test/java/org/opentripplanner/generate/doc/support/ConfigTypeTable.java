@@ -1,4 +1,4 @@
-package org.opentripplanner.generate.doc.framework;
+package org.opentripplanner.generate.doc.support;
 
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.framework.text.Table;

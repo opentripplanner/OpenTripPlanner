@@ -3,9 +3,9 @@ package org.opentripplanner.generate.doc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.ConfigTypeTable.configTypeTable;
-import static org.opentripplanner.generate.doc.framework.OTPFeatureTable.otpFeaturesTable;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
+import static org.opentripplanner.generate.doc.support.ConfigTypeTable.configTypeTable;
+import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;

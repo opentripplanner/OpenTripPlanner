@@ -1,4 +1,4 @@
-package org.opentripplanner.generate.doc.framework;
+package org.opentripplanner.generate.doc.support;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.checkMark;
 import static org.opentripplanner.framework.text.Table.Align.Center;

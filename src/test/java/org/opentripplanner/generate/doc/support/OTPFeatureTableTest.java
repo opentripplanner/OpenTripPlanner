@@ -1,7 +1,7 @@
-package org.opentripplanner.generate.doc.framework;
+package org.opentripplanner.generate.doc.support;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.generate.doc.framework.OTPFeatureTable.otpFeaturesTable;
+import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.util.OTPFeature;
