@@ -123,8 +123,12 @@ public class SpeedTestTimer {
   }
 
   public void uploadGlobalCount(String meterName, Number count) {
-    var counter = uploadRegistry.counter(meterName);
-    counter.increment(count.doubleValue());
+    if (uploadRegistry != null) {
+      registry.add(uploadRegistry);
+      var counter = registry.counter(meterName);
+      counter.increment(count.doubleValue());
+      registry.remove(uploadRegistry);
+    }
   }
 
   public int totalTimerMean(String timerName) {
