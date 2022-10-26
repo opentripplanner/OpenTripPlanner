@@ -1,12 +1,10 @@
 package org.opentripplanner.standalone.config;
 
-import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner.standalone.config.framework.JsonSupport;
@@ -15,12 +13,6 @@ import org.opentripplanner.standalone.config.framework.project.EnvironmentVariab
 import org.opentripplanner.test.support.FilePatternSource;
 
 public class ExampleConfigTest {
-
-  Map<String, String> env = Map.ofEntries(
-    entry("OTP_GCS_WORK_DIR", "/var/entur"),
-    entry("OTP_GCS_BASE_GRAPH_PATH", "/var/entur"),
-    entry("OTP_GCS_BUCKET", "/var/entur")
-  );
 
   @FilePatternSource(pattern = "docs/examples/**/router-config.json")
   @ParameterizedTest(name = "Check validity of {0}")
@@ -39,7 +31,11 @@ public class ExampleConfigTest {
   private void testConfig(Path path, Consumer<NodeAdapter> buildConfig) {
     try {
       var json = Files.readString(path);
-      var replaced = EnvironmentVariableReplacer.insertEnvironmentVariables(json, json, env);
+      var replaced = EnvironmentVariableReplacer.insertVariables(
+        json,
+        json,
+        ignored -> "some-value"
+      );
       var node = JsonSupport.jsonNodeFromString(replaced);
       var a = new NodeAdapter(node, getClass().getSimpleName());
       buildConfig.accept(a);

@@ -5,6 +5,7 @@ import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.util.OtpAppException;
@@ -63,13 +64,13 @@ public class EnvironmentVariableReplacer {
    *                                  environment variable do not exist.
    */
   public static String insertEnvironmentVariables(String text, String source) {
-    return insertEnvironmentVariables(text, source, System.getenv());
+    return insertVariables(text, source, System::getenv);
   }
 
-  public static String insertEnvironmentVariables(
+  public static String insertVariables(
     String text,
     String source,
-    Map<String, String> variables
+    Function<String, String> getEnvVar
   ) {
     Map<String, String> environmentVariables = new HashMap<>();
     Matcher matcher = PATTERN.matcher(text);
@@ -78,7 +79,7 @@ public class EnvironmentVariableReplacer {
       String envVar = matcher.group(0);
       String nameOnly = matcher.group(1);
       if (!environmentVariables.containsKey(nameOnly)) {
-        String value = variables.get(nameOnly);
+        String value = getEnvVar.apply(nameOnly);
         if (value != null) {
           environmentVariables.put(envVar, value);
         } else if (PROJECT_INFO.containsKey(nameOnly)) {
