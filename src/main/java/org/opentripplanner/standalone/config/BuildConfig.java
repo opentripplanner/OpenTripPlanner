@@ -164,15 +164,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DataOverlayConfig dataOverlay;
   public final double maxStopToShapeSnapDistance;
   public final Set<String> boardingLocationTags;
-  /**
-   * Specify parameters for DEM extracts. If not specified OTP will fall back to auto-detection
-   * based on the directory provided on the command line.
-   */
   public final DemExtractParametersList dem;
-  /**
-   * Specify parameters for OpensStreetMap extracts. If not specified OTP will fall back to
-   * auto-detection based on the directory provided on the command line..
-   */
   public final OsmExtractParametersList osm;
   /**
    * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
@@ -560,7 +552,10 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("boardingLocationTags")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "What OSM tags should be looked on for the source of matching stops to platforms and stops."
+        )
+        .description("[Detailed documentation](docs/BoardingLocations.md)")
         .asStringSet(List.copyOf(Set.of("ref")));
     discardMinTransferTimes =
       root

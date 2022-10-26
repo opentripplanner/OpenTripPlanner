@@ -50,9 +50,9 @@ Sections follow that describe particular settings in more depth.
 | transitServiceEnd                                                                    |  `duration` | TODO                                                                                                                                                 | *Optional* | `"P3Y"`                           |   na  |
 | transitServiceStart                                                                  |  `duration` | TODO                                                                                                                                                 | *Optional* | `"-P1Y"`                          |   na  |
 | writeCachedElevations                                                                |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `false`                           |   na  |
-| [boardingLocationTags](#boardingLocationTags)                                        |  `string[]` | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
+| [boardingLocationTags](#boardingLocationTags)                                        |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                           | *Optional* |                                   |   na  |
 | [dataOverlay](/docs/sandbox/DataOverlay.md)                                          |   `object`  | Config for the DataOverlay Sandbox module                                                                                                            | *Optional* |                                   |  2.2  |
-| [dem](#dem)                                                                          |  `object[]` | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
+| [dem](#dem)                                                                          |  `object[]` | Specify parameters for DEM extracts.                                                                                                                 | *Optional* |                                   |   na  |
 |       elevationUnitMultiplier                                                        |   `double`  | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
 |       source                                                                         |    `uri`    | TODO                                                                                                                                                 | *Required* |                                   |   na  |
 | elevationBucket                                                                      |   `object`  | If specified, download NED elevation tiles from the given AWS S3 bucket.                                                                             | *Optional* |                                   |   na  |
@@ -776,16 +776,18 @@ This is used to store the timetables in the transit model, and to interpret time
 
 *Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `Root`*
 
-TODO
+What OSM tags should be looked on for the source of matching stops to platforms and stops.
+
+[Detailed documentation](docs/BoardingLocations.md)
 
 
 <h3 id="dem">dem</h3>
 
 *Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
 
-TODO
+Specify parameters for DEM extracts.
 
-TODO
+If not specified OTP will fall back to auto-detection based on the directory provided on the command line.
 
 
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>

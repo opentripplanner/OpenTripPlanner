@@ -17,8 +17,10 @@ public class DemConfig {
       root
         .of(parameterName)
         .since(NA)
-        .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
+        .summary("Specify parameters for DEM extracts.")
+        .description(
+          "If not specified OTP will fall back to auto-detection based on the directory provided on the command line."
+        )
         .asObjects(DemConfig::mapDemExtract)
     );
   }
