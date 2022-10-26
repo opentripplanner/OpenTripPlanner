@@ -59,36 +59,45 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion = root.of("configVersion").since(NA).summary("TODO").asString(null);
-    this.requestLogFile = root.of("requestLogFile").since(NA).summary("TODO").asString(null);
+    this.configVersion =
+      root.of("configVersion").since(NA).summary("Version of the configuration.").asString(null);
+    this.requestLogFile =
+      root
+        .of("requestLogFile")
+        .since(NA)
+        .summary("The path of the log file for the requests.")
+        .asString(null);
     this.transmodelApi =
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
           .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
+          .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
     this.transitConfig =
       new TransitRoutingConfig(
-        root.of("transit").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
+        root
+          .of("transit")
+          .since(NA)
+          .summary("Configuration for transit searches with RAPTOR.")
+          .asObject()
       );
     this.routingRequestDefaults =
       mapRoutingRequest(
         root
           .of("routingDefaults")
           .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
+          .summary("The default parameters for the routing query.")
+          .description("Most of these are overridable through the various API endpoints.")
           .asObject()
       );
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig =
       new FlexConfig(
-        root.of("flex").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
+        root.of("flex").since(NA).summary("Configuration for flex routing.").asObject()
       );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -177,13 +186,16 @@ public class RouterConfig implements Serializable {
   /**
    * This method is needed, because we want to support the old format for the "streetRoutingTimeout"
    * parameter. We will keep it for some time, to let OTP deployments update the config.
+   *
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
     return adapter
       .of("streetRoutingTimeout")
       .since(NA)
-      .summary("TODO")
+      .summary(
+        "The maximimg time a street routing request is allowed to take before returning a timeout."
+      )
       .asDuration2(DEFAULT_STREET_ROUTING_TIMEOUT, ChronoUnit.SECONDS);
   }
 }
