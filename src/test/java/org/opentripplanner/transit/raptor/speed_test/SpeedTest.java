@@ -166,16 +166,16 @@ public class SpeedTest {
     printProfileStatistics();
 
     final var transitService = serverContext.transitService();
-    timer.recordCount("transitdata_stops", transitService.listStopLocations().size());
-    timer.recordCount("transitdata_patterns", transitService.getAllTripPatterns().size());
-    timer.recordCount("transitdata_trips", transitService.getAllTrips().size());
+    timer.globalUploadCount("transitdata_stops", transitService.listStopLocations().size());
+    timer.globalUploadCount("transitdata_patterns", transitService.getAllTripPatterns().size());
+    timer.globalUploadCount("transitdata_trips", transitService.getAllTrips().size());
 
     forceGCToAvoidGCLater();
 
     final var runtime = Runtime.getRuntime();
-    timer.recordCount("jvm_free_memory", runtime.freeMemory());
-    timer.recordCount("jvm_max_memory", runtime.maxMemory());
-    timer.recordCount("jvm_total_memory", runtime.totalMemory());
+    timer.globalUploadCount("jvm_free_memory", runtime.freeMemory());
+    timer.globalUploadCount("jvm_max_memory", runtime.maxMemory());
+    timer.globalUploadCount("jvm_total_memory", runtime.totalMemory());
 
     timer.finishUp();
 
