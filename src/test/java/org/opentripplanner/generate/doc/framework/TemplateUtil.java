@@ -48,8 +48,29 @@ public class TemplateUtil {
     );
   }
 
+  public static String replaceSection2(String doc, String token, String replacement) {
+    var replaceToken = replaceToken(token);
+
+    if (!doc.contains(replaceToken)) {
+      throw new IllegalStateException("Doc did not contain token: " + replaceToken);
+    }
+    var replacementText = """
+    <!-- %s BEGIN -->
+    <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+    
+    %s
+    <!-- %s END -->
+    """.formatted(token, replacement, token);
+
+    return doc.replace(replaceToken, replacementText);
+  }
+
   private static String air(String section) {
     return NEW_LINE + section + NEW_LINE;
+  }
+
+  private static String replaceToken(String token) {
+    return COMMENT_OPEN + "INSERT: " + token + COMMENT_CLOSE;
   }
 
   private static String start(String token) {

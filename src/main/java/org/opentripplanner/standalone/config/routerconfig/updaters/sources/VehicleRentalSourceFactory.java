@@ -70,7 +70,11 @@ public class VehicleRentalSourceFactory {
   }
 
   private Map<String, String> headers() {
-    return c.of("headers").since(NA).summary("HTTP headers to add to the request.").asStringMap();
+    return c
+      .of("headers")
+      .since(NA)
+      .summary("HTTP headers to add to the request. Any header key, value can be inserted.")
+      .asStringMap();
   }
 
   private String url() {
@@ -83,7 +87,8 @@ public class VehicleRentalSourceFactory {
       .since(NA)
       .summary("The name of the network to override the one derived from the source data.")
       .description(
-        "GBFS feeds must include a system_id which will be used as the default `network`. These ids are sometimes not helpful so setting this property will override it."
+        "GBFS feeds must include a system_id which will be used as the default `network`. These " +
+        "ids are sometimes not helpful so setting this property will override it."
       )
       .asString(null);
   }
@@ -94,7 +99,8 @@ public class VehicleRentalSourceFactory {
       .since(NA)
       .summary("If a vehicle should be allowed to be kept at the end of a station-based rental.")
       .description(
-        "This behaviour is useful in towns that have only a single rental station. Without it you would need see any results as you would have to always bring it back to the station."
+        "This behaviour is useful in towns that have only a single rental station. Without it you " +
+        "would need see any results as you would have to always bring it back to the station."
       )
       .asBoolean(false);
   }

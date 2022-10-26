@@ -19,7 +19,8 @@ public class ParameterSummaryTable extends AbstractTable {
   public static void createParametersTable(
     NodeAdapter root,
     MarkDownDocWriter out,
-    SkipFunction skipFunction
+    SkipFunction skipFunction,
+    int rootLevel
   ) {
     var table = new ParameterSummaryTable(skipFunction).createTable(root);
     out.printTable(table);

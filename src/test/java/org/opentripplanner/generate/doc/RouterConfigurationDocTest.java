@@ -3,6 +3,7 @@ package org.opentripplanner.generate.doc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
+import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
@@ -28,7 +29,9 @@ public class RouterConfigurationDocTest {
     "vectorTileLayers",
     "/docs/sandbox/MapboxVectorTilesApi.md",
     "routingDefaults",
-    "/docs/RouteRequest.md"
+    "/docs/RouteRequest.md",
+    "updaters",
+    "/docs/UpdaterConfig.md"
   );
 
   /**
@@ -67,7 +70,7 @@ public class RouterConfigurationDocTest {
   private String getParameterDetailsTable(NodeAdapter node) {
     var stream = new ByteArrayOutputStream();
     var out = new MarkDownDocWriter(new PrintStream(stream));
-    ParameterDetailsList.listParametersWithDetails(node, out, SKIP_NODES);
+    ParameterDetailsList.listParametersWithDetails(node, out, SKIP_NODES, HEADER_3);
     return stream.toString(StandardCharsets.UTF_8);
   }
 }

@@ -52,6 +52,10 @@ class MarkdownFormatterTest {
 
   @Test
   void indentInTable() {
-    assertEquals("\u00A0\u00A0\u00A0\u00A0", MarkdownFormatter.indentInTable());
+    String EXP_INDENT = "\u00A0\u00A0\u00A0";
+    assertEquals("", MarkdownFormatter.indentInTable(-1));
+    assertEquals("", MarkdownFormatter.indentInTable(0));
+    assertEquals(EXP_INDENT, MarkdownFormatter.indentInTable(1));
+    assertEquals(EXP_INDENT + EXP_INDENT, MarkdownFormatter.indentInTable(2));
   }
 }

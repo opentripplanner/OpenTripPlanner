@@ -12,19 +12,22 @@ public class ParameterDetailsList {
   private static final Logger LOG = LoggerFactory.getLogger(ParameterDetailsList.class);
 
   private final SkipFunction skipNodeOp;
+  private final int headerLevel;
   private final MarkDownDocWriter writer;
 
-  private ParameterDetailsList(MarkDownDocWriter writer, SkipFunction skipNodeOp) {
+  private ParameterDetailsList(MarkDownDocWriter writer, SkipFunction skipNodeOp, int headerLevel) {
     this.writer = writer;
     this.skipNodeOp = skipNodeOp;
+    this.headerLevel = headerLevel;
   }
 
   public static void listParametersWithDetails(
     NodeAdapter root,
     MarkDownDocWriter out,
-    SkipFunction skipNodeOp
+    SkipFunction skipNodeOp,
+    int headerLevel
   ) {
-    new ParameterDetailsList(out, skipNodeOp).addParametersList(root);
+    new ParameterDetailsList(out, skipNodeOp, headerLevel).addParametersList(root);
   }
 
   private void addParametersList(NodeAdapter node) {
@@ -52,7 +55,7 @@ public class ParameterDetailsList {
     if (!it.printDetails()) {
       return;
     }
-    writer.printHeader2(it.name(), node.fullPath(it.name()));
+    writer.printHeader(headerLevel, it.name(), node.fullPath(it.name()));
     writer.printSection(MarkdownFormatter.em(parameterSummaryLine(it, node.contextPath())));
     writer.printSection(it.summary());
     writer.printSection(it.description());

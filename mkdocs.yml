@@ -34,6 +34,7 @@ pages:
         - Router: 'RouterConfiguration.md'
         - Accessibility: 'Accessibility.md'
         - "Route Request": 'RouteRequest.md'
+        - "Realtime Updaters" : 'UpdaterConfig.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'

@@ -1,5 +1,8 @@
 package org.opentripplanner.generate.doc.framework;
 
+import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_1;
+import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_2;
+import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
 import static org.opentripplanner.framework.text.MarkdownFormatter.normalizeAnchor;
 
 import java.io.File;
@@ -34,11 +37,15 @@ public class MarkDownDocWriter {
     }
   }
 
-  static String contextIndented(String contextPath) {
+  static String contextIndented(String contextPath, int baseLevel) {
     if (contextPath == null) {
       return "";
     }
-    int count = (int) contextPath.chars().filter(c -> c == '.').count() + 1;
+    int count = Math.max(
+      0,
+      (int) contextPath.chars().filter(c -> c == '.').count() + 1 - baseLevel
+    );
+
     return StringUtils.fill(NBSP, 3 * count);
   }
 
@@ -54,21 +61,16 @@ public class MarkDownDocWriter {
     printNewLine();
   }
 
-  public void printDocTitle(String title) {
-    header(1, title, null);
-    printNewLine();
-  }
-
   public void printHeader1(String header) {
-    header(2, header, header);
+    printHeader(HEADER_1, header, header);
   }
 
   public void printHeader2(String header, @Nullable String anchor) {
-    header(3, header, anchor);
+    printHeader(HEADER_2, header, anchor);
   }
 
   public void printHeader3(String header, String anchor) {
-    header(4, header, anchor);
+    printHeader(HEADER_3, header, anchor);
   }
 
   public void printTable(Table table) {
@@ -78,7 +80,7 @@ public class MarkDownDocWriter {
     printNewLine();
   }
 
-  private void header(int level, String header, @Nullable String anchor) {
+  public void printHeader(int level, String header, @Nullable String anchor) {
     printNewLine();
     if (anchor != null && !anchor.isBlank()) {
       out.printf("<h%d id=\"%s\">%s</h%d>%n", level, normalizeAnchor(anchor), header, level);
