@@ -19,7 +19,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class UpdaterConfigDocTest {
 
   private static final File TEMPLATE = new File("doc-templates", "UpdaterConfig.md");
-  private static final File FILE = new File("docs", "UpdaterConfig.md");
+  private static final File OUT_FILE = new File("docs", "UpdaterConfig.md");
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final Set<String> SKIP_UPDATERS = Set.of("siri-azure-sx-updater");
@@ -39,6 +39,7 @@ public class UpdaterConfigDocTest {
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
+    String original = readFile(OUT_FILE);
 
     for (String childName : node.listChildrenByName()) {
       var child = node.child(childName);
@@ -49,8 +50,8 @@ public class UpdaterConfigDocTest {
       }
     }
 
-    writeFile(FILE, doc);
-    assertEquals(doc, readFile(FILE));
+    writeFile(OUT_FILE, doc);
+    assertEquals(original, readFile(OUT_FILE));
   }
 
   private NodeAdapter readBuildConfig() {

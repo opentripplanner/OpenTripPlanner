@@ -18,7 +18,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class RouterConfigurationDocTest {
 
-  private static final File FILE = new File("docs", "RouterConfiguration-poc.md");
+  private static final File TEMPLATE = new File("doc-templates", "RouterConfiguration.md");
+  private static final File OUT_FILE = new File("docs", "RouterConfiguration-poc.md");
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes.of(
@@ -43,14 +44,15 @@ public class RouterConfigurationDocTest {
     NodeAdapter node = readBuildConfig();
 
     // Read and close inout file (same as output file)
-    String doc = readFile(FILE);
+    String doc = readFile(TEMPLATE);
+    String original = readFile(OUT_FILE);
 
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
     doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
 
-    writeFile(FILE, doc);
+    writeFile(OUT_FILE, doc);
 
-    assertEquals(doc, readFile(FILE));
+    assertEquals(original, readFile(OUT_FILE));
   }
 
   private NodeAdapter readBuildConfig() {

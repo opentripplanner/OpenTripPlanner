@@ -22,11 +22,11 @@ public class TemplateUtil {
     "\n<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->\n";
 
   public static String replaceParametersTable(String doc, String replacement) {
-    return replaceSection(doc, PARAMETERS_TABLE, replacement);
+    return replaceSection2(doc, PARAMETERS_TABLE, replacement);
   }
 
   public static String replaceParametersDetails(String doc, String replacement) {
-    return replaceSection(doc, PARAMETERS_DETAILS, replacement);
+    return replaceSection2(doc, PARAMETERS_DETAILS, replacement);
   }
 
   public static String replaceSection(String doc, String token, String replacement) {
@@ -56,16 +56,13 @@ public class TemplateUtil {
     }
     var replacementText =
       """
-    <!-- %s BEGIN -->
-    <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-    
-    %s
-    <!-- %s END -->
-    """.formatted(
-          token,
-          replacement,
-          token
-        );
+      <!-- %s BEGIN -->
+      <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+      
+      %s
+      <!-- %s END -->
+      """.trim()
+        .formatted(token, replacement, token);
 
     return doc.replace(replaceToken, replacementText);
   }

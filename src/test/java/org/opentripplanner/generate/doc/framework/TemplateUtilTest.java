@@ -1,7 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection2;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,23 +12,24 @@ import org.junit.jupiter.api.Test;
 public class TemplateUtilTest {
 
   @Test
-  public void test() {
+  public void replaceSection() {
     var body = """
       Expected line 1.
       Expected line 2.
       """;
-    var text = """
-      <!-- TEST BEGIN -->
-      %s
-      <!-- TEST END -->
-      """;
+    var doc = "<!-- INSERT: TEST -->";
 
-    var expected = text.formatted(
-      "<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->\n\n" +
-      body
+    assertEquals(
+      """
+          <!-- TEST BEGIN -->
+          <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+                  
+          Expected line 1.
+          Expected line 2.
+                  
+          <!-- TEST END -->
+          """.trim(),
+      replaceSection2(doc, "TEST", body)
     );
-    var doc = text.formatted("^ANY TEXT $1 - With special chars...");
-
-    assertEquals(expected, replaceSection(doc, "TEST", body));
   }
 }

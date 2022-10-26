@@ -5,7 +5,6 @@
    - Generated directory is: /docs 
 -->
 
-
 # Updater configuration
 
 This section covers all options that can be set for each [updaters](/docs/RouterConfiguration.md) 
@@ -74,7 +73,6 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 <!-- real-time-alerts END -->
 
 
-
 ### TripUpdates
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
@@ -136,7 +134,6 @@ How backwards propagation should be handled.
 <!-- stop-time-updater END -->
 
 
-
 ### TripUpdates Websocket GTFS RT
 
 <!-- websocket-gtfs-rt-updater BEGIN -->
@@ -174,7 +171,6 @@ TODO
 <!-- websocket-gtfs-rt-updater END -->
 
 
-
 ### Vehicle Positions
 
 VehiclePositions give the location of some or all vehicles currently in service, in terms of 
@@ -205,7 +201,6 @@ geographic coordinates or position relative to their scheduled stops.
 ```
 
 <!-- vehicle-positions END -->
-
 
 
 ### Vehicle rental systems using GBFS
@@ -313,7 +308,6 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 <!-- vehicle-rental END -->
 
 
-
 ### Vehicle parking (sandbox feature)
 
 Vehicle parking options and configuration is documented in
@@ -372,7 +366,6 @@ Used for converting abstract opening hours into concrete points in time.
 ```
 
 <!-- vehicle-parking END -->
-
 
 
 

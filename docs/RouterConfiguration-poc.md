@@ -47,10 +47,6 @@ These options can be applied by the OTP server without rebuilding the graph.
 <!-- PARAMETERS-TABLE END -->
 
 
-
-
-
-
 | config key             | description                                                        | value type             | value default | notes                                                                 |
 |------------------------|--------------------------------------------------------------------|------------------------|---------------|-----------------------------------------------------------------------|
 | `routingDefaults`      | Default routing parameters, which will be applied to every request | object                 |               | see [routing defaults](#routing-defaults)                             |
@@ -456,4 +452,3 @@ Configuration of the individual layers for the Mapbox vector tiles.
 
 
 <!-- PARAMETERS-DETAILS END -->
-
