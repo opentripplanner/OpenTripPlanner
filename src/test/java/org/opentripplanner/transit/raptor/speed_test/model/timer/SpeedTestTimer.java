@@ -122,11 +122,11 @@ public class SpeedTestTimer {
     }
   }
 
-  public void uploadGlobalCount(String meterName, Number count) {
+  public void globalCount(String meterName, long count) {
     if (uploadRegistry != null) {
       registry.add(uploadRegistry);
       var counter = registry.counter(meterName);
-      counter.increment(count.doubleValue());
+      counter.increment(count);
       registry.remove(uploadRegistry);
     }
   }
