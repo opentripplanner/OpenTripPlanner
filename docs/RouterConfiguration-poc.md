@@ -1,3 +1,10 @@
+<!--
+  NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
+
+   - Template directory is:  /doc-templates
+   - Generated directory is: /docs 
+-->
+
 # Router configuration
 
 This section covers all options that can be set for each router using the `router-config.json` file.
@@ -47,37 +54,14 @@ These options can be applied by the OTP server without rebuilding the graph.
 <!-- PARAMETERS-TABLE END -->
 
 
-| config key             | description                                                        | value type             | value default | notes                                                                 |
-|------------------------|--------------------------------------------------------------------|------------------------|---------------|-----------------------------------------------------------------------|
-| `routingDefaults`      | Default routing parameters, which will be applied to every request | object                 |               | see [routing defaults](#routing-defaults)                             |
-| `streetRoutingTimeout` | maximum time limit for street route queries                        | string                 | 5s            | see [timeout](#timeout)                                               |
-| `requestLogFile`       | Path to a plain-text file where requests will be logged            | string                 | null          | see [logging incoming requests](#logging-incoming-requests)           |
-| `transit`              | Transit tuning parameters                                          | `TransitRoutingConfig` |               | see [Tuning transit routing](#Tuning-transit-routing)                 |
-| `updaters`             | configure real-time updaters, such as GTFS-realtime feeds          | object                 | null          | see [configuring real-time updaters](#configuring-real-time-updaters) |
-| `transmodelApi`        | configure Entur Transmodel API (**Sandbox**)                       | object                 | null          | See the code for parameters, no doc provided.                         |
-
 ## Routing defaults
 
 There are many trip planning options used in the OTP web API, and more exist internally that are not
 exposed via the API. You may want to change the default value for some of these parameters, i.e. the
 value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in
-the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
-. Any public field or setter method in this class can be given a default value using the
-routingDefaults section of
-`router-config.json` as follows:
+A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 
-```JSON
-// router-config.json
-{
-    "routingDefaults": {
-        "walkSpeed": 2.0,
-        "stairsReluctance": 4.0,
-        "carDropoffTime": 240
-    }
-}
-```
 
 ### Tuning transfer optimization
 

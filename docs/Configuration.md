@@ -1,3 +1,10 @@
+<!--
+  NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
+
+   - Template directory is:  /doc-templates
+   - Generated directory is: /docs 
+-->
+
 # Configuring OpenTripPlanner
 
 _Note: if you are familiar with OTP1 configuration and are migrating to OTP2, please read the

@@ -5,6 +5,7 @@
    - Generated directory is: /docs 
 -->
 
+
 # Updater configuration
 
 This section covers all options that can be set for each [updaters](/docs/RouterConfiguration.md) 
