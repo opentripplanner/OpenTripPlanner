@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
-
+      - speed-test-numbers
 jobs:
   perf-test:
     if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for')
