@@ -26,7 +26,10 @@ public class RouterConfigurationDocTest {
   private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
-  private static final SkipNodes SKIP_NODES = SkipNodes.of();
+  private static final SkipNodes SKIP_NODES = SkipNodes.of(
+    "vectorTileLayers",
+    "/docs/sandbox/MapboxVectorTilesApi.md"
+  );
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
