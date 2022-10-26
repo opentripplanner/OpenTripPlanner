@@ -14,10 +14,13 @@ import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
  */
 public class OsmExtractParameters implements DataSourceConfig {
 
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.OsmConfig}. */
   private final URI source;
 
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.OsmConfig}. */
   private final OsmTagMapper osmTagMapper;
 
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.OsmConfig}. */
   private final ZoneId timeZone;
 
   OsmExtractParameters(OsmExtractParametersBuilder builder) {

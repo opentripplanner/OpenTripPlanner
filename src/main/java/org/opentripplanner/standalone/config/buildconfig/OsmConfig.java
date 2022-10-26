@@ -20,8 +20,7 @@ public class OsmConfig {
     var osmDefaults = root
       .of(parameterName)
       .since(NA)
-      .summary("TODO")
-      .description(/*TODO DOC*/"TODO")
+      .summary("Default properties for OpenStreetMap feeds.")
       .asObject();
 
     return new OsmDefaultParameters(mapTagMapping(osmDefaults), mapTimeZone(osmDefaults));
@@ -32,8 +31,7 @@ public class OsmConfig {
       root
         .of(parameterName)
         .since(NA)
-        .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
+        .summary("Configure properties for a given OpenStreetMap feed.")
         .asObjects(OsmConfig::mapOsmExtractConfig)
     );
   }
@@ -47,18 +45,30 @@ public class OsmConfig {
   }
 
   private static URI mapSource(NodeAdapter config) {
-    return config.of("source").since(NA).summary("TODO").asUri();
+    return config
+      .of("source")
+      .since(NA)
+      .summary("The unique URI pointing to the data file.")
+      .asUri();
   }
 
   private static ZoneId mapTimeZone(NodeAdapter config) {
-    return config.of("timeZone").since(NA).summary("TODO").asZoneId(null);
+    return config
+      .of("timeZone")
+      .since(NA)
+      .summary(
+        "The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults."
+      )
+      .asZoneId(null);
   }
 
   private static OsmTagMapper mapTagMapping(NodeAdapter node) {
     return node
       .of("osmTagMapping")
       .since(NA)
-      .summary("TODO")
+      .summary(
+        "The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults."
+      )
       .asEnum(OsmTagMapper.Source.DEFAULT)
       .getInstance();
   }
