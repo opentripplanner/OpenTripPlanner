@@ -121,9 +121,9 @@ public record NodeInfo(
   }
 
   /**
-   * A type qualifier is a field in an JASON object witch determin witch type it is.
-   * Usually the mapping is split in two diffrent paths - creating diffrent types.
-   * For example we have both NETEX and GTFS config types in the same list/JSON array.
+   * A type qualifier is a field in an JSON object witch determine witch type it is.
+   * Usually the mapping is split in two different paths - creating different types.
+   * For example, we have both NETEX and GTFS config types in the same list/JSON array.
    */
   public boolean isTypeQualifier() {
     return enumType != null && TYPE_QUALIFIER.equalsIgnoreCase(name);
