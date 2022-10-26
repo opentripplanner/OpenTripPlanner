@@ -157,7 +157,7 @@ public class BuildConfig implements OtpDataStoreConfig {
    */
   public final boolean matchBusRoutesToStreets;
 
-  /** If specified, download NED elevation tiles from the given AWS S3 bucket. */
+  /** See {@link S3BucketConfig}. */
   public final S3BucketConfig elevationBucket;
 
   /**

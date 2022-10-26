@@ -100,9 +100,7 @@ public class NetexConfig {
             """
             This field is used to match *group files* in the module file(zip file entries).
             *group files* are loaded right the after *shared group files* are loaded.
-
             Files are grouped together by the first group pattern in the regular expression.
-
             The pattern `'(\\w{3})-.*\\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
             with group `'RUT'`.
             """

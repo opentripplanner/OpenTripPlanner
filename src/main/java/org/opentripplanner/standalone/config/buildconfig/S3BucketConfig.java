@@ -24,7 +24,7 @@ public class S3BucketConfig {
       root
         .of(elevationBucketName)
         .since(NA)
-        .summary("If specified, download NED elevation tiles from the given AWS S3 bucket")
+        .summary("If specified, download NED elevation tiles from the given AWS S3 bucket.")
         .asObject()
     );
   }

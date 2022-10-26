@@ -10,6 +10,94 @@ Sections follow that describe particular settings in more depth.
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
+
+| Config Parameter                                                                     |     Type    | Summary                                                                                                                     |  Req./Opt. | Default Value                     | Since |
+|--------------------------------------------------------------------------------------|:-----------:|-----------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
+| [areaVisibility](#areaVisibility)                                                    |  `boolean`  | Perform visibility calculations.                                                                                            | *Optional* | `false`                           |   na  |
+| banDiscouragedBiking                                                                 |  `boolean`  | Should biking be allowed on OSM ways tagged with `bicycle=discouraged`                                                      | *Optional* | `false`                           |   na  |
+| banDiscouragedWalking                                                                |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                        | *Optional* | `false`                           |   na  |
+| blockBasedInterlining                                                                |  `boolean`  | TODO                                                                                                                        | *Optional* | `true`                            |   na  |
+| buildReportDir                                                                       |    `uri`    | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| [configVersion](#configVersion)                                                      |   `string`  | Deployment version of the *build-config.json*.                                                                              | *Optional* |                                   |   na  |
+| [dataImportReport](#dataImportReport)                                                |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |   na  |
+| discardMinTransferTimes                                                              |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| distanceBetweenElevationSamples                                                      |   `double`  | TODO                                                                                                                        | *Optional* | `10.0`                            |   na  |
+| elevationUnitMultiplier                                                              |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |   na  |
+| embedRouterConfig                                                                    |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                | *Optional* | `true`                            |   na  |
+| extraEdgesStopPlatformLink                                                           |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                              | *Optional* | `false`                           |   na  |
+| graph                                                                                |    `uri`    | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| gsCredentials                                                                        |   `string`  | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| includeEllipsoidToGeoidDifference                                                    |  `boolean`  | Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.           | *Optional* | `false`                           |   na  |
+| islandWithStopsMaxSize                                                               |  `integer`  | TODO                                                                                                                        | *Optional* | `5`                               |   na  |
+| islandWithoutStopsMaxSize                                                            |  `integer`  | TODO                                                                                                                        | *Optional* | `40`                              |   na  |
+| matchBusRoutesToStreets                                                              |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| maxAreaNodes                                                                         |  `integer`  | TODO                                                                                                                        | *Optional* | `500`                             |   na  |
+| maxDataImportIssuesPerFile                                                           |  `integer`  | TODO                                                                                                                        | *Optional* | `1000`                            |   na  |
+| maxElevationPropagationMeters                                                        |  `integer`  | TODO                                                                                                                        | *Optional* | `2000`                            |   na  |
+| maxInterlineDistance                                                                 |  `integer`  | TODO                                                                                                                        | *Optional* | `200`                             |   na  |
+| maxStopToShapeSnapDistance                                                           |   `double`  | TODO                                                                                                                        | *Optional* | `150.0`                           |   na  |
+| maxTransferDurationSeconds                                                           |   `double`  | TODO                                                                                                                        | *Optional* | `1800.0`                          |   na  |
+| multiThreadElevationCalculations                                                     |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| osmCacheDataInMem                                                                    |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| platformEntriesLinking                                                               |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| readCachedElevations                                                                 |  `boolean`  | TODO                                                                                                                        | *Optional* | `true`                            |   na  |
+| staticBikeParkAndRide                                                                |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| staticParkAndRide                                                                    |  `boolean`  | TODO                                                                                                                        | *Optional* | `true`                            |   na  |
+| streetGraph                                                                          |    `uri`    | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| streets                                                                              |  `boolean`  | TODO                                                                                                                        | *Optional* | `true`                            |   na  |
+| subwayAccessTime                                                                     |   `double`  | TODO                                                                                                                        | *Optional* | `2.0`                             |   na  |
+| transit                                                                              |  `boolean`  | TODO                                                                                                                        | *Optional* | `true`                            |   na  |
+| transitModelTimeZone                                                                 | `time-zone` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| transitServiceEnd                                                                    |  `duration` | TODO                                                                                                                        | *Optional* | `"P3Y"`                           |   na  |
+| transitServiceStart                                                                  |  `duration` | TODO                                                                                                                        | *Optional* | `"-P1Y"`                          |   na  |
+| writeCachedElevations                                                                |  `boolean`  | TODO                                                                                                                        | *Optional* | `false`                           |   na  |
+| [boardingLocationTags](#boardingLocationTags)                                        |  `string[]` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| [dataOverlay](/docs/sandbox/DataOverlay.md)                                          |   `object`  | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| [dem](#dem)                                                                          |  `object[]` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+|    [ ]                                                                               |   `object`  |                                                                                                                             | *Optional* |                                   |   na  |
+|       elevationUnitMultiplier                                                        |   `double`  | TODO                                                                                                                        | *Optional* |                                   |   na  |
+|       source                                                                         |    `uri`    | TODO                                                                                                                        | *Required* |                                   |   na  |
+| elevationBucket                                                                      |   `object`  | If specified, download NED elevation tiles from the given AWS S3 bucket.                                                    | *Optional* |                                   |   na  |
+| fares                                                                                |   `object`  | No doc, parent contains doc.                                                                                                | *Optional* |                                   |   na  |
+| [localFileNamePatterns](#localFileNamePatterns)                                      |   `object`  | TODO                                                                                                                        | *Optional* |                                   |   na  |
+|    dem                                                                               |   `regexp`  | TODO                                                                                                                        | *Optional* | `"(?i)\.tiff?$"`                  |   na  |
+|    gtfs                                                                              |   `regexp`  | TODO                                                                                                                        | *Optional* | `"(?i)gtfs"`                      |   na  |
+|    netex                                                                             |   `regexp`  | TODO                                                                                                                        | *Optional* | `"(?i)netex"`                     |   na  |
+|    osm                                                                               |   `regexp`  | TODO                                                                                                                        | *Optional* | `"(?i)(\.pbf¦\.osm¦\.osm\.xml)$"` |   na  |
+| netexDefaults                                                                        |   `object`  | The netexDefaults section allows you to specify default properties for NeTEx files.                                         | *Optional* |                                   |  2.2  |
+|    feedId                                                                            |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Optional* | `"NETEX"`                         |  2.2  |
+|    [groupFilePattern](#netexDefaults_groupFilePattern)                               |   `regexp`  | Pattern for matching group NeTEx files.                                                                                     | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
+|    [ignoreFilePattern](#netexDefaults_ignoreFilePattern)                             |   `regexp`  | Pattern for matching ignored files in a NeTEx bundle.                                                                       | *Optional* | `"$^"`                            |  2.0  |
+|    noTransfersOnIsolatedStops                                                        |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                    | *Optional* | `false`                           |  2.2  |
+|    [sharedFilePattern](#netexDefaults_sharedFilePattern)                             |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"shared-data\.xml"`              |  2.0  |
+|    [sharedGroupFilePattern](#netexDefaults_sharedGroupFilePattern)                   |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
+|    [ferryIdsNotAllowedForBicycle](#netexDefaults_ferryIdsNotAllowedForBicycle)       |  `string[]` | List ferries witch do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
+| [osm](#osm)                                                                          |  `object[]` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+|    [ ]                                                                               |   `object`  |                                                                                                                             | *Optional* |                                   |   na  |
+|       [osmTagMapping](#osm__0__osmTagMapping)                                        |    `enum`   | TODO                                                                                                                        | *Optional* | `"DEFAULT"`                       |   na  |
+|       source                                                                         |    `uri`    | TODO                                                                                                                        | *Required* |                                   |   na  |
+|       timeZone                                                                       | `time-zone` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| [osmDefaults](#osmDefaults)                                                          |   `object`  | TODO                                                                                                                        | *Optional* |                                   |   na  |
+|    [osmTagMapping](#osmDefaults_osmTagMapping)                                       |    `enum`   | TODO                                                                                                                        | *Optional* | `"DEFAULT"`                       |   na  |
+|    timeZone                                                                          | `time-zone` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| osmNaming                                                                            |   `object`  | No doc, parent contains doc.                                                                                                | *Optional* |                                   |   na  |
+| [transferRequests](/docs/RoutingRequest.md)                                          |  `object[]` | TODO                                                                                                                        | *Optional* |                                   |   na  |
+| [transitFeeds](#transitFeeds)                                                        |  `object[]` | Scan for transit data files                                                                                                 | *Optional* |                                   |   na  |
+|    [ ]                                                                               |   `object`  |                                                                                                                             | *Optional* |                                   |   na  |
+|       type = "GTFS"                                                                  |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
+|       feedId                                                                         |   `string`  | TODO                                                                                                                        | *Optional* |                                   |   na  |
+|       source                                                                         |    `uri`    | TODO                                                                                                                        | *Required* |                                   |   na  |
+|    [ ]                                                                               |   `object`  |                                                                                                                             | *Optional* |                                   |   na  |
+|       type = "NETEX"                                                                 |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
+|       feedId                                                                         |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Required* |                                   |  2.2  |
+|       [groupFilePattern](#transitFeeds__1__groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                     | *Optional* | `"(\w{3})_.*\.xml"`               |  2.0  |
+|       [ignoreFilePattern](#transitFeeds__1__ignoreFilePattern)                       |   `regexp`  | Pattern for matching ignored files in a NeTEx bundle.                                                                       | *Optional* | `"(temp¦tmp)"`                    |  2.0  |
+|       noTransfersOnIsolatedStops                                                     |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                    | *Optional* | `false`                           |  2.2  |
+|       [sharedFilePattern](#transitFeeds__1__sharedFilePattern)                       |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"_stops.xml"`                    |  2.0  |
+|       [sharedGroupFilePattern](#transitFeeds__1__sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"_(\w{3})_shared_data.xml"`      |  2.0  |
+|       source                                                                         |    `uri`    | TODO                                                                                                                        | *Required* |                                   |   na  |
+|       [ferryIdsNotAllowedForBicycle](#transitFeeds__1__ferryIdsNotAllowedForBicycle) |  `string[]` | List ferries witch do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
+
 <!-- PARAMETERS-TABLE END -->
 
 ## OSM 
@@ -535,5 +623,279 @@ There is currently only one custom naming module called `portland` (which has no
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+
+
+<h3 id="areaVisibility">areaVisibility</h3>
+
+*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
+
+Perform visibility calculations.
+
+If this is `true` OTP attempts to calculate a path straight through an OSM area using the
+shortest way rather than around the edge of it. (These calculations can be time consuming).
+
+
+<h3 id="configVersion">configVersion</h3>
+
+*Since version: `na` ∙ Type: `string` ∙ `Optional` ∙ Path: `Root`*
+
+Deployment version of the *build-config.json*.
+
+The config-version is a parameter which each OTP deployment may set to be able to query
+the OTP server and verify that it uses the correct version of the config. The version
+must be injected into the config in the operation deployment pipeline. How this is done
+is up to the deployment.
+<p>
+The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+or format check on the version and it can be any string.
+<p>
+Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+
+
+<h3 id="dataImportReport">dataImportReport</h3>
+
+*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
+
+Generate nice HTML report of Graph errors/warnings
+
+The reports are stored in the same location as the graph.
+
+
+<h3 id="boardingLocationTags">boardingLocationTags</h3>
+
+*Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+
+<h3 id="dataOverlay">dataOverlay</h3>
+
+*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+TODO
+
+
+<h3 id="dem">dem</h3>
+
+*Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+TODO
+
+
+<h3 id="localFileNamePatterns">localFileNamePatterns</h3>
+
+*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+TODO
+
+
+<h3 id="netexDefaults_groupFilePattern">groupFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"(\w{3})-.*\.xml"` ∙ Path: `netexDefaults`*
+
+Pattern for matching group NeTEx files.
+
+This field is used to match *group files* in the module file(zip file entries).
+*group files* are loaded right the after *shared group files* are loaded.
+Files are grouped together by the first group pattern in the regular expression.
+The pattern `'(\w{3})-.*\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
+with group `'RUT'`.
+
+
+<h3 id="netexDefaults_ignoreFilePattern">ignoreFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"$^"` ∙ Path: `netexDefaults`*
+
+Pattern for matching ignored files in a NeTEx bundle.
+
+This field is used to exclude matching *files* in the module file(zip file entries).
+The *ignored* files are *not* loaded.
+
+
+<h3 id="netexDefaults_sharedFilePattern">sharedFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"shared-data\.xml"` ∙ Path: `netexDefaults`*
+
+Pattern for matching shared NeTEx files in a NeTEx bundle.
+
+This field is used to match *shared files*(zip file entries) in the module file. Shared
+files are loaded first. Then the rest of the files are grouped and loaded.
+
+The pattern `'shared-data\.xml'` matches `'shared-data.xml'`
+
+File names are matched in the following order - and treated accordingly to the first match:
+<ol>
+    <li><code>ignoreFilePattern</code></li>
+    <li><code>sharedFilePattern</code></li>
+    <li><code>sharedGroupFilePattern</code></li>
+    <li><code>groupFilePattern</code></li>
+</ol>
+
+
+<h3 id="netexDefaults_sharedGroupFilePattern">sharedGroupFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"(\w{3})-.*-shared\.xml"` ∙ Path: `netexDefaults`*
+
+Pattern for matching shared group NeTEx files in a NeTEx bundle.
+
+This field is used to match *shared group files* in the module file(zip file entries).
+Typically this is used to group all files from one agency together.
+
+*Shared group files* are loaded after shared files, but before the matching group
+files. Each *group* of files are loaded as a unit, followed by next group.
+
+Files are grouped together by the first group pattern in the regular expression.
+
+The pattern `'(\w{3})-.*-shared\.xml'` matches `'RUT-shared.xml'` with group `'RUT'`.
+
+
+<h3 id="netexDefaults_ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
+
+*Since version: `2.0` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `netexDefaults`*
+
+List ferries witch do not allow bikes.
+
+Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
+where bicycle conveyance can be defined.
+<p>
+For this reason we allow bicycles on ferries by default and allow to override the rare
+case where this is not the case.
+
+
+<h3 id="osm">osm</h3>
+
+*Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+TODO
+
+
+<h3 id="osm__0__osmTagMapping">osmTagMapping</h3>
+
+*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"DEFAULT"` ∙ Path: `osm.[0]`*
+
+TODO
+
+
+<h3 id="osmDefaults">osmDefaults</h3>
+
+*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+TODO
+
+
+<h3 id="osmDefaults_osmTagMapping">osmTagMapping</h3>
+
+*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"DEFAULT"` ∙ Path: `osmDefaults`*
+
+TODO
+
+
+<h3 id="transferRequests">transferRequests</h3>
+
+*Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
+
+TODO
+
+TODO
+
+
+<h3 id="transitFeeds">transitFeeds</h3>
+
+*Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
+
+Scan for transit data files
+
+The transitFeeds section of `build-config.json` allows you to override the default behavior
+of scanning for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+You can specify data located outside the local filesystem (including cloud storage services)
+or at various different locations around the local filesystem.
+
+When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds
+section, auto-scanning in the base directory for this feed type will be disabled.
+
+
+<h3 id="transitFeeds__1__groupFilePattern">groupFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"(\w{3})_.*\.xml"` ∙ Path: `transitFeeds.[1]`*
+
+Pattern for matching group NeTEx files.
+
+This field is used to match *group files* in the module file(zip file entries).
+*group files* are loaded right the after *shared group files* are loaded.
+Files are grouped together by the first group pattern in the regular expression.
+The pattern `'(\w{3})-.*\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
+with group `'RUT'`.
+
+
+<h3 id="transitFeeds__1__ignoreFilePattern">ignoreFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"(temp|tmp)"` ∙ Path: `transitFeeds.[1]`*
+
+Pattern for matching ignored files in a NeTEx bundle.
+
+This field is used to exclude matching *files* in the module file(zip file entries).
+The *ignored* files are *not* loaded.
+
+
+<h3 id="transitFeeds__1__sharedFilePattern">sharedFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"_stops.xml"` ∙ Path: `transitFeeds.[1]`*
+
+Pattern for matching shared NeTEx files in a NeTEx bundle.
+
+This field is used to match *shared files*(zip file entries) in the module file. Shared
+files are loaded first. Then the rest of the files are grouped and loaded.
+
+The pattern `'shared-data\.xml'` matches `'shared-data.xml'`
+
+File names are matched in the following order - and treated accordingly to the first match:
+<ol>
+    <li><code>ignoreFilePattern</code></li>
+    <li><code>sharedFilePattern</code></li>
+    <li><code>sharedGroupFilePattern</code></li>
+    <li><code>groupFilePattern</code></li>
+</ol>
+
+
+<h3 id="transitFeeds__1__sharedGroupFilePattern">sharedGroupFilePattern</h3>
+
+*Since version: `2.0` ∙ Type: `regexp` ∙ `Optional` ∙ Default value: `"_(\w{3})_shared_data.xml"` ∙ Path: `transitFeeds.[1]`*
+
+Pattern for matching shared group NeTEx files in a NeTEx bundle.
+
+This field is used to match *shared group files* in the module file(zip file entries).
+Typically this is used to group all files from one agency together.
+
+*Shared group files* are loaded after shared files, but before the matching group
+files. Each *group* of files are loaded as a unit, followed by next group.
+
+Files are grouped together by the first group pattern in the regular expression.
+
+The pattern `'(\w{3})-.*-shared\.xml'` matches `'RUT-shared.xml'` with group `'RUT'`.
+
+
+<h3 id="transitFeeds__1__ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
+
+*Since version: `2.0` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `transitFeeds.[1]`*
+
+List ferries witch do not allow bikes.
+
+Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
+where bicycle conveyance can be defined.
+<p>
+For this reason we allow bicycles on ferries by default and allow to override the rare
+case where this is not the case.
+
 
 <!-- PARAMETERS-DETAILS END -->
