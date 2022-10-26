@@ -81,26 +81,12 @@ public final class StreetPreferences implements Serializable {
     return intersectionTraversalModel;
   }
 
-  /**
-   * This is the maximum duration for access/egress per street mode for street searches. This is a
-   * performance limit and should therefore be set high. Results close to the limit are not
-   * guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client.
-   * <p>
-   * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others. A default value is applied if the mode specific value do not exist.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   public DurationForEnum<StreetMode> maxAccessEgressDuration() {
     return maxAccessEgressDuration;
   }
 
-  /**
-   * This is the maximum duration for a direct street search for each mode. This is a performance
-   * limit and should therefore be set high. Results close to the limit are not guaranteed to be
-   * optimal. Use itinerary-filters to limit what is presented to the client.
-   * <p>
-   * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others. A default value is applied if the mode specific value do not exist.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   public DurationForEnum<StreetMode> maxDirectDuration() {
     return maxDirectDuration;
   }

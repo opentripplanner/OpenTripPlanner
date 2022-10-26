@@ -147,7 +147,7 @@ public abstract class RoutingResource {
   public Boolean timetableView;
 
   /**
-   * Whether the trip should depart or arrive at the specified date and time.
+   * see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper}
    *
    * @see #timetableView for usage.
    */
@@ -184,17 +184,11 @@ public abstract class RoutingResource {
   @QueryParam("bikeWalkingReluctance")
   protected Double bikeWalkingReluctance;
 
-  /**
-   * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-   * Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to
-   * walk too much without asking for totally ridiculous itineraries, but this observation should in
-   * no way be taken as scientific or definitive. Your mileage may vary. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
-   * high values. Default value: 2.0
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("walkReluctance")
   protected Double walkReluctance;
 
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeReluctance")
   protected Double bikeReluctance;
 
@@ -216,42 +210,35 @@ public abstract class RoutingResource {
   @QueryParam("waitReluctance")
   protected Double waitReluctance;
 
-  /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("walkSpeed")
   protected Double walkSpeed;
 
-  /**
-   * The user's biking speed in meters/second. Defaults to approximately 11 MPH, or 9.5 for
-   * bikeshare.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeSpeed")
   protected Double bikeSpeed;
 
-  /** The user's bike walking speed in meters/second. Defaults to approximately 3 MPH. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeWalkingSpeed")
   protected Double bikeWalkingSpeed;
 
-  /**
-   * The time it takes the user to fetch their bike and park it again in seconds. Defaults to 0.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeSwitchTime")
   protected Integer bikeSwitchTime;
 
-  /**
-   * The cost of the user fetching their bike and parking it again. Defaults to 0.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeSwitchCost")
   protected Integer bikeSwitchCost;
 
-  /** For bike triangle routing, how much safety matters (range 0-1). */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("triangleSafetyFactor")
   protected Double triangleSafetyFactor;
 
-  /** For bike triangle routing, how much slope matters (range 0-1). */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("triangleSlopeFactor")
   protected Double triangleSlopeFactor;
 
-  /** For bike triangle routing, how much time matters (range 0-1). */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("triangleTimeFactor")
   protected Double triangleTimeFactor;
 
@@ -353,24 +340,15 @@ public abstract class RoutingResource {
   @DefaultValue("false")
   protected Boolean showIntermediateStops;
 
-  /**
-   * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
-   * is used when boarding while walking.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("walkBoardCost")
   protected Integer walkBoardCost;
 
-  /**
-   * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
-   * is used when boarding while cycling. This is usually higher that walkBoardCost.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeBoardCost")
   protected Integer bikeBoardCost;
 
-  /**
-   * Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
-   * If the value is set to be 0, safety is ignored. Default is 1.0.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("walkSafetyFactor")
   protected Double walkSafetyFactor;
 
@@ -380,35 +358,35 @@ public abstract class RoutingResource {
   @QueryParam("keepingRentedBicycleAtDestinationCost")
   protected Double keepingRentedBicycleAtDestinationCost;
 
-  /** The vehicle rental networks which may be used. If empty all networks may be used. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("allowedVehicleRentalNetworks")
   protected Set<String> allowedVehicleRentalNetworks;
 
-  /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bannedVehicleRentalNetworks")
   protected Set<String> bannedVehicleRentalNetworks;
 
-  /** Time to park a bike */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeParkTime")
   protected Integer bikeParkTime;
 
-  /** Cost of parking a bike. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bikeParkCost")
   protected Integer bikeParkCost;
 
-  /** Time to park a car */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("carParkTime")
   protected Integer carParkTime = 60;
 
-  /** Cost of parking a car. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("carParkCost")
   protected Integer carParkCost = 120;
 
-  /** Tags which are required to use a vehicle parking. If empty, no tags are required. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("requiredVehicleParkingTags")
   protected Set<String> requiredVehicleParkingTags = Set.of();
 
-  /** Tags with which a vehicle parking will not be used. If empty, no tags are banned. */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("bannedVehicleParkingTags")
   protected Set<String> bannedVehicleParkingTags = Set.of();
 
@@ -490,9 +468,7 @@ public abstract class RoutingResource {
   protected String bannedStopsHard;
 
   /**
-   * An additional penalty added to boardings after the first. The value is in OTP's internal weight
-   * units, which are roughly equivalent to seconds.  Set this to a high value to discourage
-   * transfers.  Of course, transfers that save significant time or walking will still be taken.
+   * see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper}
    */
   @QueryParam("transferPenalty")
   protected Integer transferPenalty;
@@ -668,10 +644,7 @@ public abstract class RoutingResource {
   @QueryParam("debugItineraryFilter")
   protected Boolean debugItineraryFilter;
 
-  /**
-   * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this
-   * query.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   @QueryParam("geoidElevation")
   protected Boolean geoidElevation;
 

@@ -89,13 +89,7 @@ public final class WalkPreferences implements Serializable {
     return stairsReluctance;
   }
 
-  /**
-   * How much more time does it take to walk a flight of stairs compared to walking a similar
-   * horizontal length
-   * <p>
-   * Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking speed of
-   * pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   public double stairsTimeFactor() {
     return stairsTimeFactor;
   }

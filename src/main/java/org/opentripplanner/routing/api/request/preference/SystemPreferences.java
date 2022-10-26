@@ -60,9 +60,7 @@ public class SystemPreferences implements Serializable {
     return tags;
   }
 
-  /**
-   * The filled request parameters for penalties and thresholds values
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   public DataOverlayParameters dataOverlay() {
     return dataOverlay;
   }
@@ -72,18 +70,7 @@ public class SystemPreferences implements Serializable {
     return geoidElevation;
   }
 
-  /**
-   * The expected maximum time a journey can last across all possible journeys for the current
-   * deployment. Normally you would just do an estimate and add enough slack, so you are sure that
-   * there is no journeys that falls outside this window. The parameter is used find all possible
-   * dates for the journey and then search only the services which run on those dates. The duration
-   * must include access, egress, wait-time and transit time for the whole journey. It should also
-   * take low frequency days/periods like holidays into account. In other words, pick the two points
-   * within your area that has the worst connection and then try to travel on the worst possible
-   * day, and find the maximum journey duration. Using a value that is too high has the effect of
-   * including more patterns in the search, hence, making it a bit slower. Recommended values would
-   * be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway).
-   */
+  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
   }
