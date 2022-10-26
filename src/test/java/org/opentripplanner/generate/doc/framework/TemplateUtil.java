@@ -8,6 +8,9 @@ import java.util.regex.Pattern;
 @SuppressWarnings("NewClassNamingConvention")
 public class TemplateUtil {
 
+  private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
+  private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
+
   private static final String NEW_LINE = "\n";
   private static final String COMMENT_OPEN = "<!-- ";
   private static final String COMMENT_CLOSE = " -->";
@@ -17,6 +20,14 @@ public class TemplateUtil {
   private static final String ANY_TEXT = "(.*)";
   private static final String AUTO_GENERATION_INFO =
     "\n<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->\n";
+
+  public static String replaceParametersTable(String doc, String replacement) {
+    return replaceSection(doc, PARAMETERS_TABLE, replacement);
+  }
+
+  public static String replaceParametersDetails(String doc, String replacement) {
+    return replaceSection(doc, PARAMETERS_DETAILS, replacement);
+  }
 
   public static String replaceSection(String doc, String token, String replacement) {
     var start = start(token);
@@ -48,5 +59,4 @@ public class TemplateUtil {
   private static String end(String token) {
     return COMMENT_OPEN + token + END + COMMENT_CLOSE;
   }
-
 }

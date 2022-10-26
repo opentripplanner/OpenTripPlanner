@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
  */
 @SuppressWarnings("NewClassNamingConvention")
 public class TemplateUtilTest {
+
   @Test
   public void test() {
     var body = """

@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -85,7 +85,7 @@ public class RouterConfig implements Serializable {
           .asObject()
       );
     this.routingRequestDefaults =
-      mapRoutingRequest(
+      mapRouteRequest(
         root
           .of("routingDefaults")
           .since(NA)

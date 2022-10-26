@@ -35,7 +35,7 @@ public class RoutingRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
 
-  public static RouteRequest mapRoutingRequest(NodeAdapter c) {
+  public static RouteRequest mapRouteRequest(NodeAdapter c) {
     RouteRequest dft = new RouteRequest();
 
     if (c.isEmpty()) {

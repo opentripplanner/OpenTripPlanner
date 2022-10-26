@@ -33,6 +33,7 @@ pages:
         - "Boarding locations": 'BoardingLocations.md'
         - Router: 'RouterConfiguration.md'
         - Accessibility: 'Accessibility.md'
+        - "Route Request": 'RouteRequest.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'

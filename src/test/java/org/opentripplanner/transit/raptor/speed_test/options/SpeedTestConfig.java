@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
@@ -56,7 +56,7 @@ public class SpeedTestConfig {
           .asObject()
       );
     request =
-      mapRoutingRequest(
+      mapRouteRequest(
         adapter
           .of("routingDefaults")
           .since(NA)

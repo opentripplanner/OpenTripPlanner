@@ -3,7 +3,8 @@ package org.opentripplanner.generate.doc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.ByteArrayOutputStream;
@@ -22,13 +23,12 @@ public class RouterConfigurationDocTest {
 
   private static final File FILE = new File("docs", "RouterConfiguration-poc.md");
 
-  private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
-  private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
-
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes.of(
     "vectorTileLayers",
-    "/docs/sandbox/MapboxVectorTilesApi.md"
+    "/docs/sandbox/MapboxVectorTilesApi.md",
+    "routingDefaults",
+    "/docs/RouteRequest.md"
   );
 
   /**
@@ -46,8 +46,8 @@ public class RouterConfigurationDocTest {
     // Read and close inout file (same as output file)
     String doc = readFile(FILE);
 
-    doc = replaceSection(doc, PARAMETERS_TABLE, getParameterSummaryTable(node));
-    doc = replaceSection(doc, PARAMETERS_DETAILS, getParameterDetailsTable(node));
+    doc = replaceParametersTable(doc, getParameterSummaryTable(node));
+    doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
 
     writeFile(FILE, doc);
 

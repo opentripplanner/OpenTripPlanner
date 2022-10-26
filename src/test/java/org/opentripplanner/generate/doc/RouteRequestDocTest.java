@@ -16,19 +16,16 @@ import org.opentripplanner.generate.doc.framework.MarkDownDocWriter;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
-import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class BuildConfigurationDocTest {
+public class RouteRequestDocTest {
 
-  private static final File FILE = new File("docs", "BuildConfiguration-poc.md");
-
-  private static final String BUILD_CONFIG_FILENAME = "standalone/config/build-config.json";
+  private static final File FILE = new File("docs", "RouteRequest.md");
+  private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes.of(
-    "dataOverlay",
-    "/docs/sandbox/DataOverlay.md",
-    "transferRequests",
-    "/docs/RouteRequest.md"
+    "vectorTileLayers",
+    "/docs/sandbox/MapboxVectorTilesApi.md"
   );
 
   /**
@@ -56,8 +53,8 @@ public class BuildConfigurationDocTest {
 
   private NodeAdapter readBuildConfig() {
     var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
-    var conf = new BuildConfig(json, BUILD_CONFIG_FILENAME, false);
-    return conf.asNodeAdapter();
+    var conf = new RouterConfig(json, BUILD_CONFIG_FILENAME, false);
+    return conf.asNodeAdapter().child("routingDefaults");
   }
 
   private String getParameterSummaryTable(NodeAdapter node) {

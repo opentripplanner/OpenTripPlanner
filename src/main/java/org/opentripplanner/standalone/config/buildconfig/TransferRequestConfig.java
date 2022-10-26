@@ -15,6 +15,6 @@ public class TransferRequestConfig {
       .since(NA)
       .summary("TODO")
       .description(/*TODO DOC*/"TODO")
-      .asObjects(List.of(new RouteRequest()), RoutingRequestMapper::mapRoutingRequest);
+      .asObjects(List.of(new RouteRequest()), RoutingRequestMapper::mapRouteRequest);
   }
 }
