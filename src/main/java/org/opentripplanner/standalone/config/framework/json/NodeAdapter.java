@@ -137,7 +137,7 @@ public class NodeAdapter {
    * Take a peek at a parameter in the JSON node. This might be necessary when more than one type
    * with its own set of parameters are accepted.
    */
-  public JsonNode peak(String parameterName) {
+  public JsonNode peek(String parameterName) {
     return json.path(parameterName);
   }
 

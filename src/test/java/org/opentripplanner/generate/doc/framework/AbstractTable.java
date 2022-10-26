@@ -69,7 +69,7 @@ abstract class AbstractTable {
     // This is a hack, the "type" should be build in as a separate type qualifier,
     // not matched by the magic name "type"
     if ("type".equalsIgnoreCase(parameter) && info.type() == ConfigType.ENUM) {
-      var upperCaseValue = node.peak(parameter).asText().toUpperCase().replace('-', '_');
+      var upperCaseValue = node.peek(parameter).asText().toUpperCase().replace('-', '_');
       @SuppressWarnings("ConstantConditions")
       Enum<?> qualifier = Stream
         .of(info.enumType().getEnumConstants())
