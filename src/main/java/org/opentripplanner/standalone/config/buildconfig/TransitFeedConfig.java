@@ -57,8 +57,18 @@ public class TransitFeedConfig {
 
   private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
     return new GtfsFeedParametersBuilder()
-      .withFeedId(node.of("feedId").since(NA).summary("TODO").asString(null))
-      .withSource(node.of("source").since(NA).summary("TODO").asUri())
+      .withFeedId(
+        node
+          .of("feedId")
+          .since(NA)
+          .summary(
+            "The unique ID for this feed. This overrides any feed ID defined within the feed itself."
+          )
+          .asString(null)
+      )
+      .withSource(
+        node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+      )
       .build();
   }
 

@@ -86,36 +86,37 @@ public class NetexFeedParameters implements DataSourceConfig {
     return source;
   }
 
-  /** Se configuration documentation. */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public String feedId() {
     return feedId;
   }
 
-  /** See Configuration mapping for description */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public Pattern sharedFilePattern() {
     return Pattern.compile(sharedFilePattern);
   }
 
-  /** See Configuration mapping for description */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public Pattern sharedGroupFilePattern() {
     return Pattern.compile(sharedGroupFilePattern);
   }
 
-  /** See Configuration mapping for description */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public Pattern groupFilePattern() {
     return Pattern.compile(groupFilePattern);
   }
 
-  /** See Configuration mapping for description */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public Pattern ignoreFilePattern() {
     return Pattern.compile(ignoreFilePattern);
   }
 
-  /** See Configuration mapping for description */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public Set<String> ferryIdsNotAllowedForBicycle() {
     return ferryIdsNotAllowedForBicycle;
   }
 
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.NetexConfig}. */
   public boolean noTransfersOnIsolatedStops() {
     return noTransfersOnIsolatedStops;
   }
