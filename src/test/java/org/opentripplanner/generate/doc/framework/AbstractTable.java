@@ -3,6 +3,8 @@ package org.opentripplanner.generate.doc.framework;
 import static org.opentripplanner.framework.text.MarkdownFormatter.code;
 import static org.opentripplanner.framework.text.MarkdownFormatter.escapeInTable;
 import static org.opentripplanner.generate.doc.framework.MarkDownDocWriter.contextIndented;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,6 +44,13 @@ abstract class AbstractTable {
       addRow(node, table, it);
 
       if (it.type().isComplex() && !skip(it)) {
+        if(it.type() == ENUM_SET) {
+          continue;
+        }
+        //noinspection ConstantConditions
+        if(it.type() == ENUM_MAP && it.elementType().isSimple()) {
+          continue;
+        }
         var child = node.child(it.name());
 
         if (child == null || child.isEmpty()) {
