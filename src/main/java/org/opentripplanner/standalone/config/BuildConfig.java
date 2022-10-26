@@ -166,103 +166,21 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Set<String> boardingLocationTags;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
-  /**
-   * Specify parameters for transit feeds. If not specified OTP will fall back to auto-detection
-   * based on the directory provided on the command line..
-   */
   public final TransitFeeds transitFeeds;
-  /**
-   * Whether we should create car P+R stations from OSM data.
-   */
   public boolean staticParkAndRide;
-  /**
-   * Whether we should create bike P+R stations from OSM data.
-   */
   public boolean staticBikeParkAndRide;
-  /**
-   *
-   */
   public int maxInterlineDistance;
-  /**
-   * The distance between elevation samples in meters. Defaults to 10m, the approximate resolution
-   * of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the
-   * height data used.
-   */
   public double distanceBetweenElevationSamples;
-  /**
-   * The maximum distance to propagate elevation to vertices which have no elevation. By default,
-   * this is 2000 meters.
-   */
   public double maxElevationPropagationMeters;
-  /**
-   * When set to true (it is by default), the elevation module will attempt to read this file in
-   * order to reuse calculations of elevation data for various coordinate sequences instead of
-   * recalculating them all over again.
-   */
   public boolean readCachedElevations;
-  /**
-   * When set to true (it is false by default), the elevation module will create a file of a lookup
-   * map of the LineStrings and the corresponding calculated elevation data for those coordinates.
-   * Subsequent graph builds can reuse the data in this file to avoid recalculating all the
-   * elevation data again.
-   */
   public boolean writeCachedElevations;
-  /**
-   * When set to true (it is false by default), the elevation module will include the Ellipsoid to
-   * Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
-   * graph.
-   * <p>
-   * NOTE: if this is set to true for graph building, make sure to not set the value of
-   * {@link RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to
-   * all of the elevation values in the street edges.
-   */
+
   public boolean includeEllipsoidToGeoidDifference;
-  /**
-   * Whether or not to multi-thread the elevation calculations in the elevation module. The default
-   * is set to false. For unknown reasons that seem to depend on data and machine settings, it might
-   * be faster to use a single processor. If multi-threading is activated, parallel streams will be
-   * used to calculate the elevations.
-   */
+
   public boolean multiThreadElevationCalculations;
-  /**
-   * Limit the import of transit services to the given START date. Inclusive. If set, any transit
-   * service on a day BEFORE the given date is dropped and will not be part of the graph. Use an
-   * absolute date or a period relative to the date the graph is build(BUILD_DAY).
-   * <p>
-   * Optional, defaults to "-P1Y" (BUILD_DAY minus 1 year). Use an empty string to make it
-   * unbounded.
-   * <p>
-   * Examples:
-   * <ul>
-   *     <li>{@code "2019-11-24"} - 24. November 2019.</li>
-   *     <li>{@code "-P3W"} - BUILD_DAY minus 3 weeks.</li>
-   *     <li>{@code "-P1Y2M"} - BUILD_DAY minus 1 year and 2 months.</li>
-   *     <li>{@code ""} - Unlimited, no upper bound.</li>
-   * </ul>
-   *
-   * @see LocalDate#parse(CharSequence) for date format accepted.
-   * @see Period#parse(CharSequence) for period format accepted.
-   */
+
   public LocalDate transitServiceStart;
-  /**
-   * Limit the import of transit services to the given END date. Inclusive. If set, any transit
-   * service on a day AFTER the given date is dropped and will not be part of the graph. Use an
-   * absolute date or a period relative to the date the graph is build(BUILD_DAY).
-   * <p>
-   * Optional, defaults to "P3Y" (BUILD_DAY plus 3 years). Use an empty string to make it
-   * unbounded.
-   * <p>
-   * Examples:
-   * <ul>
-   *     <li>{@code "2021-12-31"} - 31. December 2021.</li>
-   *     <li>{@code "P24W"} - BUILD_DAY plus 24 weeks.</li>
-   *     <li>{@code "P1Y6M5D"} - BUILD_DAY plus 1 year, 6 months and 5 days.</li>
-   *     <li>{@code ""} - Unlimited, no lower bound.</li>
-   * </ul>
-   *
-   * @see LocalDate#parse(CharSequence) for date format accepted.
-   * @see Period#parse(CharSequence) for period format accepted.
-   */
+
   public LocalDate transitServiceEnd;
   public boolean discardMinTransferTimes;
   public ZoneId transitModelTimeZone;
@@ -338,7 +256,10 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("distanceBetweenElevationSamples")
         .since(NA)
-        .summary("TODO")
+        .summary("The distance between elevation samples in meters.")
+        .description(
+          "The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used."
+        )
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
     elevationUnitMultiplier =
@@ -376,6 +297,17 @@ public class BuildConfig implements OtpDataStoreConfig {
         .since(NA)
         .summary(
           "Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge."
+        )
+        .description(
+          """
+   When set to true (it is false by default), the elevation module will include the Ellipsoid to
+   Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+   graph.
+   <p>
+   NOTE: if this is set to true for graph building, make sure to not set the value of
+   `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
+   all of the elevation values in the street edges.
+  """
         )
         .asBoolean(false);
     pruningThresholdIslandWithStops =
@@ -460,7 +392,20 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .asDouble(150);
     multiThreadElevationCalculations =
-      root.of("multiThreadElevationCalculations").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("multiThreadElevationCalculations")
+        .since(NA)
+        .summary(
+          "Whether or not to multi-thread the elevation calculations in the elevation module."
+        )
+        .description(
+          """
+   For unknown reasons that seem to depend on data and machine settings, it might
+   be faster to use a single processor. If multi-threading is activated, parallel streams will be
+   used to calculate the elevations.
+        """
+        )
+        .asBoolean(false);
     osmCacheDataInMem =
       root
         .of("osmCacheDataInMem")
@@ -484,10 +429,30 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("Link unconnected entries to public transport platforms.")
         .asBoolean(false);
     readCachedElevations =
-      root.of("readCachedElevations").since(NA).summary("TODO").asBoolean(true);
+      root
+        .of("readCachedElevations")
+        .since(NA)
+        .summary("Whether to read cached elevation data.")
+        .description(
+          """
+        When set to true, the elevation module will attempt to read this file in
+        order to reuse calculations of elevation data for various coordinate sequences instead of
+        recalculating them all over again.
+        """
+        )
+        .asBoolean(true);
     staticBikeParkAndRide =
-      root.of("staticBikeParkAndRide").since(NA).summary("TODO").asBoolean(false);
-    staticParkAndRide = root.of("staticParkAndRide").since(NA).summary("TODO").asBoolean(true);
+      root
+        .of("staticBikeParkAndRide")
+        .since(NA)
+        .summary("Whether we should create bike P+R stations from OSM data.")
+        .asBoolean(false);
+    staticParkAndRide =
+      root
+        .of("staticParkAndRide")
+        .since(NA)
+        .summary("Whether we should create car P+R stations from OSM data.")
+        .asBoolean(true);
     streets =
       root.of("streets").since(NA).summary("Include street input files (OSM/PBF).").asBoolean(true);
     subwayAccessTime =
@@ -526,18 +491,65 @@ public class BuildConfig implements OtpDataStoreConfig {
         root
           .of("transitServiceStart")
           .since(NA)
-          .summary("TODO")
+          .summary("Limit the import of transit services to the given START date.")
+          .description(
+            """
+   The date is inclusive. If set, any transit
+   service on a day BEFORE the given date is dropped and will not be part of the graph. Use an
+   absolute date or a period relative to the date the graph is build(BUILD_DAY).
+   <p>
+   Use an empty string to make unbounded.
+   <p>
+   Examples:
+    <ul>
+        <li>"2019-11-24" - 24. November 2019.</li>
+        <li>"-P3W" - BUILD_DAY minus 3 weeks.</li>
+        <li>"-P1Y2M" - BUILD_DAY minus 1 year and 2 months.</li>
+        <li>"" - Unlimited, no upper bound.</li>
+    </ul>
+            """
+          )
           .asDateOrRelativePeriod("-P1Y", confZone);
       transitServiceEnd =
         root
           .of("transitServiceEnd")
           .since(NA)
-          .summary("TODO")
+          .summary("Limit the import of transit services to the given end date.")
+          .description(
+            """
+    The date is inclusive. If set, any transit
+    service on a day AFTER the given date is dropped and will not be part of the graph. Use an
+    absolute date or a period relative to the date the graph is build(BUILD_DAY).
+    <p>
+    Optional, defaults to "P3Y" (BUILD_DAY plus 3 years). Use an empty string to make it
+    unbounded.
+    <p>
+    Examples:
+    <ul>
+        <li>"2021-12-31" - 31. December 2021.</li>
+        <li>"P24W" - BUILD_DAY plus 24 weeks.</li>
+        <li>"P1Y6M5D" - BUILD_DAY plus 1 year, 6 months and 5 days.</li>
+        <li>"" - Unlimited, no lower bound.</li>
+    </ul>
+            """
+          )
           .asDateOrRelativePeriod("P3Y", confZone);
     }
 
     writeCachedElevations =
-      root.of("writeCachedElevations").since(NA).summary("TODO").asBoolean(false);
+      root
+        .of("writeCachedElevations")
+        .since(NA)
+        .summary("TODO")
+        .description(
+          """
+        When set to true (it is false by default), the elevation module will create a file of a lookup
+        map of the LineStrings and the corresponding calculated elevation data for those coordinates.
+        Subsequent graph builds can reuse the data in this file to avoid recalculating all the
+        elevation data again.
+        """
+        )
+        .asBoolean(false);
     maxAreaNodes =
       root
         .of("maxAreaNodes")
@@ -547,7 +559,11 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .asInt(500);
     maxElevationPropagationMeters =
-      root.of("maxElevationPropagationMeters").since(NA).summary("TODO").asInt(2000);
+      root
+        .of("maxElevationPropagationMeters")
+        .since(NA)
+        .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
+        .asInt(2000);
     boardingLocationTags =
       root
         .of("boardingLocationTags")

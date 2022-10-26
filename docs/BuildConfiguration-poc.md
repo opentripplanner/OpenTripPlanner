@@ -20,36 +20,36 @@ Sections follow that describe particular settings in more depth.
 | [configVersion](#configVersion)                                                      |   `string`  | Deployment version of the *build-config.json*.                                                                                                       | *Optional* |                                   |   na  |
 | [dataImportReport](#dataImportReport)                                                |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                                                   | *Optional* | `false`                           |   na  |
 | [discardMinTransferTimes](#discardMinTransferTimes)                                  |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                                            | *Optional* | `false`                           |   na  |
-| distanceBetweenElevationSamples                                                      |   `double`  | TODO                                                                                                                                                 | *Optional* | `10.0`                            |   na  |
+| [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)                  |   `double`  | The distance between elevation samples in meters.                                                                                                    | *Optional* | `10.0`                            |   na  |
 | [elevationUnitMultiplier](#elevationUnitMultiplier)                                  |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                               | *Optional* | `1.0`                             |   na  |
 | embedRouterConfig                                                                    |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                         | *Optional* | `true`                            |   na  |
 | extraEdgesStopPlatformLink                                                           |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                                                       | *Optional* | `false`                           |   na  |
 | [graph](#graph)                                                                      |    `uri`    | URI to the graph object file for reading and writing.                                                                                                | *Optional* |                                   |   na  |
 | [gsCredentials](#gsCredentials)                                                      |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                                                   | *Optional* |                                   |   na  |
-| includeEllipsoidToGeoidDifference                                                    |  `boolean`  | Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.                                    | *Optional* | `false`                           |   na  |
+| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)              |  `boolean`  | Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.                                    | *Optional* | `false`                           |   na  |
 | [islandWithStopsMaxSize](#islandWithStopsMaxSize)                                    |  `integer`  | When a graph island with stops in it should be pruned.                                                                                               | *Optional* | `5`                               |   na  |
 | [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                              |  `integer`  | When a graph island without stops should be pruned.                                                                                                  | *Optional* | `40`                              |   na  |
 | matchBusRoutesToStreets                                                              |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                                          | *Optional* | `false`                           |   na  |
 | maxAreaNodes                                                                         |  `integer`  | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                        | *Optional* | `500`                             |   na  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                            |  `integer`  | When to split the import report.                                                                                                                     | *Optional* | `1000`                            |   na  |
-| maxElevationPropagationMeters                                                        |  `integer`  | TODO                                                                                                                                                 | *Optional* | `2000`                            |   na  |
+| maxElevationPropagationMeters                                                        |  `integer`  | The maximum distance to propagate elevation to vertices which have no elevation.                                                                     | *Optional* | `2000`                            |   na  |
 | maxInterlineDistance                                                                 |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                        | *Optional* | `200`                             |   na  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                            |   `double`  | Maximum distance between route shapes and their stops.                                                                                               | *Optional* | `150.0`                           |   na  |
 | maxTransferDurationSeconds                                                           |   `double`  | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.                                    | *Optional* | `1800.0`                          |   na  |
-| multiThreadElevationCalculations                                                     |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `false`                           |   na  |
+| [multiThreadElevationCalculations](#multiThreadElevationCalculations)                |  `boolean`  | Whether or not to multi-thread the elevation calculations in the elevation module.                                                                   | *Optional* | `false`                           |   na  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                              |  `boolean`  | If OSM data should be cached in memory during processing.                                                                                            | *Optional* | `false`                           |   na  |
 | platformEntriesLinking                                                               |  `boolean`  | Link unconnected entries to public transport platforms.                                                                                              | *Optional* | `false`                           |   na  |
-| readCachedElevations                                                                 |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `true`                            |   na  |
-| staticBikeParkAndRide                                                                |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `false`                           |   na  |
-| staticParkAndRide                                                                    |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `true`                            |   na  |
+| [readCachedElevations](#readCachedElevations)                                        |  `boolean`  | Whether to read cached elevation data.                                                                                                               | *Optional* | `true`                            |   na  |
+| staticBikeParkAndRide                                                                |  `boolean`  | Whether we should create bike P+R stations from OSM data.                                                                                            | *Optional* | `false`                           |   na  |
+| staticParkAndRide                                                                    |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                                             | *Optional* | `true`                            |   na  |
 | [streetGraph](#streetGraph)                                                          |    `uri`    | URI to the street graph object file for reading and writing.                                                                                         | *Optional* |                                   |   na  |
 | streets                                                                              |  `boolean`  | Include street input files (OSM/PBF).                                                                                                                | *Optional* | `true`                            |   na  |
 | [subwayAccessTime](#subwayAccessTime)                                                |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                 | *Optional* | `2.0`                             |   na  |
 | transit                                                                              |  `boolean`  | Include all transit input files (GTFS) from scanned directory.                                                                                       | *Optional* | `true`                            |   na  |
 | [transitModelTimeZone](#transitModelTimeZone)                                        | `time-zone` | Time zone for the graph.                                                                                                                             | *Optional* |                                   |   na  |
-| transitServiceEnd                                                                    |  `duration` | TODO                                                                                                                                                 | *Optional* | `"P3Y"`                           |   na  |
-| transitServiceStart                                                                  |  `duration` | TODO                                                                                                                                                 | *Optional* | `"-P1Y"`                          |   na  |
-| writeCachedElevations                                                                |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `false`                           |   na  |
+| [transitServiceEnd](#transitServiceEnd)                                              |  `duration` | Limit the import of transit services to the given end date.                                                                                          | *Optional* | `"P3Y"`                           |   na  |
+| [transitServiceStart](#transitServiceStart)                                          |  `duration` | Limit the import of transit services to the given START date.                                                                                        | *Optional* | `"-P1Y"`                          |   na  |
+| [writeCachedElevations](#writeCachedElevations)                                      |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `false`                           |   na  |
 | [boardingLocationTags](#boardingLocationTags)                                        |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                           | *Optional* |                                   |   na  |
 | [dataOverlay](/docs/sandbox/DataOverlay.md)                                          |   `object`  | Config for the DataOverlay Sandbox module                                                                                                            | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                                          |  `object[]` | Specify parameters for DEM extracts.                                                                                                                 | *Optional* |                                   |   na  |
@@ -657,6 +657,15 @@ This is useful eg. when the minimum transfer time is only set for ticketing purp
 but we want to calculate the transfers always from OSM data.
 
 
+<h3 id="distanceBetweenElevationSamples">distanceBetweenElevationSamples</h3>
+
+*Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `10.0` ∙ Path: `Root`*
+
+The distance between elevation samples in meters.
+
+The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
+
+
 <h3 id="elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
 *Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `1.0` ∙ Path: `Root`*
@@ -688,6 +697,21 @@ need to provide a path the the service credentials. Environment variables in the
 resolved.
 
 This is a path to a file on the local file system, not an URI.
+
+
+<h3 id="includeEllipsoidToGeoidDifference">includeEllipsoidToGeoidDifference</h3>
+
+*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
+
+Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.
+
+When set to true (it is false by default), the elevation module will include the Ellipsoid to
+ Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+ graph.
+ <p>
+ NOTE: if this is set to true for graph building, make sure to not set the value of
+ `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
+ all of the elevation values in the street edges.
 
 
 <h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
@@ -731,6 +755,17 @@ points and their stop sequence. If mapper can not find any stops within this rad
 default to simple stop-to-stop geometry instead.
 
 
+<h3 id="multiThreadElevationCalculations">multiThreadElevationCalculations</h3>
+
+*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
+
+Whether or not to multi-thread the elevation calculations in the elevation module.
+
+For unknown reasons that seem to depend on data and machine settings, it might
+be faster to use a single processor. If multi-threading is activated, parallel streams will be
+used to calculate the elevations.
+
+
 <h3 id="osmCacheDataInMem">osmCacheDataInMem</h3>
 
 *Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
@@ -743,6 +778,17 @@ to cache the entire osm file im memory. The trade off is of cause that OTP might
 memory while loading osm data. You can use this parameter to choose what is best for your
 deployment depending on your infrastructure. Set the parameter to `true` to cache the
 data, and to `false` to read the stream from the source each time.
+
+
+<h3 id="readCachedElevations">readCachedElevations</h3>
+
+*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `true` ∙ Path: `Root`*
+
+Whether to read cached elevation data.
+
+When set to true, the elevation module will attempt to read this file in
+order to reuse calculations of elevation data for various coordinate sequences instead of
+recalculating them all over again.
 
 
 <h3 id="streetGraph">streetGraph</h3>
@@ -770,6 +816,61 @@ Perhaps this should be a runtime router parameter rather than a graph build para
 Time zone for the graph.
 
 This is used to store the timetables in the transit model, and to interpret times in incoming requests.
+
+
+<h3 id="transitServiceEnd">transitServiceEnd</h3>
+
+*Since version: `na` ∙ Type: `duration` ∙ `Optional` ∙ Default value: `"P3Y"` ∙ Path: `Root`*
+
+Limit the import of transit services to the given end date.
+
+The date is inclusive. If set, any transit
+service on a day AFTER the given date is dropped and will not be part of the graph. Use an
+absolute date or a period relative to the date the graph is build(BUILD_DAY).
+<p>
+Optional, defaults to "P3Y" (BUILD_DAY plus 3 years). Use an empty string to make it
+unbounded.
+<p>
+Examples:
+<ul>
+    <li>"2021-12-31" - 31. December 2021.</li>
+    <li>"P24W" - BUILD_DAY plus 24 weeks.</li>
+    <li>"P1Y6M5D" - BUILD_DAY plus 1 year, 6 months and 5 days.</li>
+    <li>"" - Unlimited, no lower bound.</li>
+</ul>
+
+
+<h3 id="transitServiceStart">transitServiceStart</h3>
+
+*Since version: `na` ∙ Type: `duration` ∙ `Optional` ∙ Default value: `"-P1Y"` ∙ Path: `Root`*
+
+Limit the import of transit services to the given START date.
+
+The date is inclusive. If set, any transit
+service on a day BEFORE the given date is dropped and will not be part of the graph. Use an
+absolute date or a period relative to the date the graph is build(BUILD_DAY).
+<p>
+Use an empty string to make unbounded.
+<p>
+Examples:
+ <ul>
+     <li>"2019-11-24" - 24. November 2019.</li>
+     <li>"-P3W" - BUILD_DAY minus 3 weeks.</li>
+     <li>"-P1Y2M" - BUILD_DAY minus 1 year and 2 months.</li>
+     <li>"" - Unlimited, no upper bound.</li>
+ </ul>
+
+
+<h3 id="writeCachedElevations">writeCachedElevations</h3>
+
+*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
+
+TODO
+
+When set to true (it is false by default), the elevation module will create a file of a lookup
+map of the LineStrings and the corresponding calculated elevation data for those coordinates.
+Subsequent graph builds can reuse the data in this file to avoid recalculating all the
+elevation data again.
 
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
