@@ -30,35 +30,81 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
     RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
     this.maxNumberOfTransfers =
-      c.of("maxNumberOfTransfers").since(NA).summary("TODO").asInt(dft.maxNumberOfTransfers());
+      c
+        .of("maxNumberOfTransfers")
+        .since(NA)
+        .summary(
+          "This parameter is used to allocate enough memory space for Raptor." +
+          " Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network." +
+          " The memory overhead of setting this higher than the maximum number of transfers is very little so it is better to set it too high then to low."
+        )
+        .asInt(dft.maxNumberOfTransfers());
     this.scheduledTripBinarySearchThreshold =
       c
         .of("scheduledTripBinarySearchThreshold")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "This threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons." +
+          " When testing with data from Entur and all of Norway as a Graph, the optimal value was about 50." +
+          " If you calculate the departure time every time or want to fine tune the performance, changing this may improve the performance a few percent."
+        )
         .asInt(dft.scheduledTripBinarySearchThreshold());
     this.iterationDepartureStepInSeconds =
       c
         .of("iterationDepartureStepInSeconds")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "Step for departure times between each RangeRaptor iterations. This is a performance optimization parameter." +
+          " A transit network usually uses minute resolution for the timetables, so to match that, set this variable to 60 seconds." +
+          " Setting it to less than 60 will not give better result, but degrade performance. Setting it to 120 seconds will improve performance," +
+          " but you might get a slack of 60 seconds somewhere in the result."
+        )
         .asInt(dft.iterationDepartureStepInSeconds());
     this.searchThreadPoolSize =
-      c.of("searchThreadPoolSize").since(NA).summary("TODO").asInt(dft.searchThreadPoolSize());
+      c
+        .of("searchThreadPoolSize")
+        .since(NA)
+        .summary(
+          "Split a travel search in smaller jobs and run them in parallel to improve performance." +
+          " Use this parameter to set the total number of executable threads available across all searches." +
+          " Multiple searches can run in parallel - this parameter have no effect with regard to that." +
+          " If 0, no extra threads are stated and the search is done in one thread."
+        )
+        .asInt(dft.searchThreadPoolSize());
     // Dynamic Search Window
     this.stopTransferCost =
       c
         .of("stopTransferCost")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "Use this to set a stop transfer cost for the given " +
+          "[TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/model/TransferPriority.java)." +
+          " The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`." +
+          " The `stopTransferCost` parameter is optional, but if listed all values must be set."
+        )
         .asEnumMapAllKeysRequired(StopTransferPriority.class, Integer.class);
-    this.transferCacheMaxSize = c.of("transferCacheMaxSize").since(NA).summary("TODO").asInt(25);
+    this.transferCacheMaxSize =
+      c
+        .of("transferCacheMaxSize")
+        .since(NA)
+        .summary(
+          "The maximum number of distinct transfers parameters (`RoutingRequest`s) to cache pre-calculated transfers for." +
+          " If too low, requests may be slower. If too high, more memory may be used then required. "
+        )
+        .asInt(25);
 
     this.pagingSearchWindowAdjustments =
       c
         .of("pagingSearchWindowAdjustments")
         .since(NA)
-        .summary("TODO")
+        .summary(
+          "The provided array of durations is used to increase the search-window for the next/previous page when the current page return few options." +
+          " If ZERO results is returned the first duration in the list is used, if ONE result is returned then the second duration is used and so on." +
+          " The duration is added to the existing search-window and inserted into the next and previous page cursor." +
+          " See JavaDoc for" +
+          " [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java)" +
+          " for more info."
+        )
         .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
     this.dynamicSearchWindowCoefficients =
@@ -66,8 +112,9 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
         c
           .of("dynamicSearchWindow")
           .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
+          .summary(
+            "The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics."
+          )
           .asObject()
       );
   }
