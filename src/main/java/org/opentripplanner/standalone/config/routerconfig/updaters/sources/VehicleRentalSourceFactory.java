@@ -70,26 +70,40 @@ public class VehicleRentalSourceFactory {
   }
 
   private Map<String, String> headers() {
-    return c.of("headers").since(NA).summary("TODO").asStringMap();
+    return c.of("headers").since(NA).summary("HTTP headers to add to the request.").asStringMap();
   }
 
   private String url() {
-    return c.of("url").since(NA).summary("TODO").asString();
+    return c.of("url").since(NA).summary("The URL to download the data from.").asString();
   }
 
   private String network() {
-    return c.of("network").since(NA).summary("TODO").asString(null);
+    return c
+      .of("network")
+      .since(NA)
+      .summary("The name of the network to override the one derived from the source data.")
+      .description(
+        "GBFS feeds must include a system_id which will be used as the default `network`. These ids are sometimes not helpful so setting this property will override it."
+      )
+      .asString(null);
   }
 
   private boolean allowKeepingRentedVehicleAtDestination() {
     return c
       .of("allowKeepingRentedBicycleAtDestination")
       .since(NA)
-      .summary("TODO")
+      .summary("If a vehicle should be allowed to be kept at the end of a station-based rental.")
+      .description(
+        "This behaviour is useful in towns that have only a single rental station. Without it you would need see any results as you would have to always bring it back to the station."
+      )
       .asBoolean(false);
   }
 
   private boolean allowOverloading() {
-    return c.of("allowOverloading").since(NA).summary("TODO").asBoolean(false);
+    return c
+      .of("allowOverloading")
+      .since(NA)
+      .summary("Allow leaving vehicles at a station even though there are no free slots.")
+      .asBoolean(false);
   }
 }
