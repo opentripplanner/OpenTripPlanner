@@ -1,5 +1,8 @@
 package org.opentripplanner.generate.doc.framework;
 
+import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
+import static org.opentripplanner.framework.text.MarkdownFormatter.header;
+
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -11,23 +14,23 @@ public class ParameterDetailsList {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParameterDetailsList.class);
 
+  private final StringBuilder buffer = new StringBuilder();
   private final SkipFunction skipNodeOp;
   private final int headerLevel;
-  private final MarkDownDocWriter writer;
 
-  private ParameterDetailsList(MarkDownDocWriter writer, SkipFunction skipNodeOp, int headerLevel) {
-    this.writer = writer;
+  private ParameterDetailsList(SkipFunction skipNodeOp, int headerLevel) {
     this.skipNodeOp = skipNodeOp;
     this.headerLevel = headerLevel;
   }
 
-  public static void listParametersWithDetails(
+  public static String listParametersWithDetails(
     NodeAdapter root,
-    MarkDownDocWriter out,
     SkipFunction skipNodeOp,
     int headerLevel
   ) {
-    new ParameterDetailsList(out, skipNodeOp, headerLevel).addParametersList(root);
+    var details = new ParameterDetailsList(skipNodeOp, headerLevel);
+    details.addParametersList(root);
+    return details.buffer.toString();
   }
 
   private void addParametersList(NodeAdapter node) {
@@ -55,10 +58,10 @@ public class ParameterDetailsList {
     if (!it.printDetails()) {
       return;
     }
-    writer.printHeader(headerLevel, it.name(), node.fullPath(it.name()));
-    writer.printSection(MarkdownFormatter.em(parameterSummaryLine(it, node.contextPath())));
-    writer.printSection(it.summary());
-    writer.printSection(it.description());
+    addSection(header(headerLevel, it.name(), node.fullPath(it.name())))
+      .addSection(MarkdownFormatter.em(parameterSummaryLine(it, node.contextPath())))
+      .addSection(it.summary())
+      .addSection(it.description());
   }
 
   String parameterSummaryLine(NodeInfo info, String path) {
@@ -83,7 +86,15 @@ public class ParameterDetailsList {
   }
 
   String defaultValue(NodeInfo info) {
-    var defautlValue = info.defaultValue();
-    return defautlValue == null ? "" : MarkdownFormatter.code(info.type().quote(defautlValue));
+    var defaultValue = info.defaultValue();
+    return defaultValue == null ? "" : MarkdownFormatter.code(info.type().quote(defaultValue));
+  }
+
+  private ParameterDetailsList addSection(String text) {
+    if (text == null || text.isBlank()) {
+      return this;
+    }
+    buffer.append(text).append(NEW_LINE).append(NEW_LINE);
+    return this;
   }
 }

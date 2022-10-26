@@ -14,7 +14,7 @@ public class MarkdownFormatter {
   public static int HEADER_4 = 4;
 
   public static final char NBSP = '\u00A0';
-  private static final String INDENT_NBSP = "" + NBSP + NBSP + NBSP + NBSP;
+  public static final String NEW_LINE = "\n";
 
   /** Return the given input as emphasise text. */
   public static String em(String text) {
@@ -50,6 +50,14 @@ public class MarkdownFormatter {
    */
   public static String linkToDoc(String text, String url) {
     return "[%s](%s)".formatted(text, url);
+  }
+
+  public static String header(int level, String header, @Nullable String anchor) {
+    if (anchor != null && !anchor.isBlank()) {
+      return "<h%d id=\"%s\">%s</h%d>".formatted(level, normalizeAnchor(anchor), header, level);
+    } else {
+      return StringUtils.fill('#', level) + " " + header;
+    }
   }
 
   /** Return a check mark if true, or unchecked id false. */

@@ -600,7 +600,6 @@ There is currently only one custom naming module called `portland` (which has no
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-
 <h3 id="areaVisibility">areaVisibility</h3>
 
 *Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
@@ -646,7 +645,6 @@ Generate nice HTML report of Graph errors/warnings
 
 The reports are stored in the same location as the graph.
 
-
 <h3 id="discardMinTransferTimes">discardMinTransferTimes</h3>
 
 *Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
@@ -664,7 +662,6 @@ but we want to calculate the transfers always from OSM data.
 The distance between elevation samples in meters.
 
 The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used.
-
 
 <h3 id="elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
@@ -685,7 +682,6 @@ URI to the graph object file for reading and writing.
 
 The file is created or overwritten if OTP saves the graph to the file.
 
-
 <h3 id="gsCredentials">gsCredentials</h3>
 
 *Since version: `na` ∙ Type: `string` ∙ `Optional` ∙ Path: `Root`*
@@ -705,7 +701,7 @@ This is a path to a file on the local file system, not an URI.
 
 Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.
 
-When set to true (it is false by default), the elevation module will include the Ellipsoid to
+ When set to true (it is false by default), the elevation module will include the Ellipsoid to
  Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
  graph.
  <p>
@@ -740,7 +736,7 @@ this size will be pruned.
 
 When to split the import report.
 
-If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
+  If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
   be split in multiple files. Since browsers have problems opening large HTML files.
 
 
@@ -799,7 +795,6 @@ URI to the street graph object file for reading and writing.
 
 The file is created or overwritten if OTP saves the graph to the file
 
-
 <h3 id="subwayAccessTime">subwayAccessTime</h3>
 
 *Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `2.0` ∙ Path: `Root`*
@@ -808,7 +803,6 @@ Minutes necessary to reach stops served by trips on routes of route_type=1 (subw
 
 Perhaps this should be a runtime router parameter rather than a graph build parameter.
 
-
 <h3 id="transitModelTimeZone">transitModelTimeZone</h3>
 
 *Since version: `na` ∙ Type: `time-zone` ∙ `Optional` ∙ Path: `Root`*
@@ -816,7 +810,6 @@ Perhaps this should be a runtime router parameter rather than a graph build para
 Time zone for the graph.
 
 This is used to store the timetables in the transit model, and to interpret times in incoming requests.
-
 
 <h3 id="transitServiceEnd">transitServiceEnd</h3>
 
@@ -881,7 +874,6 @@ What OSM tags should be looked on for the source of matching stops to platforms 
 
 [Detailed documentation](docs/BoardingLocations.md)
 
-
 <h3 id="dem">dem</h3>
 
 *Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
@@ -890,7 +882,6 @@ Specify parameters for DEM extracts.
 
 If not specified OTP will fall back to auto-detection based on the directory provided on the command line.
 
-
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
 *Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `Root`*
@@ -898,7 +889,6 @@ If not specified OTP will fall back to auto-detection based on the directory pro
 TODO
 
 TODO
-
 
 <h3 id="localFileNamePatterns_dem">dem</h3>
 
@@ -1031,13 +1021,11 @@ the local filesystem.
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
 
-
 <h3 id="osmDefaults_osmTagMapping">osmTagMapping</h3>
 
 *Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"DEFAULT"` ∙ Path: `osmDefaults`*
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
-
 
 <h3 id="transferRequests">transferRequests</h3>
 
@@ -1046,7 +1034,6 @@ The named set of mapping rules applied when parsing OSM tags. Example: `default`
 TODO
 
 TODO
-
 
 <h3 id="transitFeeds">transitFeeds</h3>
 
@@ -1134,6 +1121,7 @@ where bicycle conveyance can be defined.
 <p>
 For this reason we allow bicycles on ferries by default and allow to override the rare
 case where this is not the case.
+
 
 
 <!-- PARAMETERS-DETAILS END -->

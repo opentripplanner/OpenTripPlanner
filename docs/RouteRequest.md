@@ -121,13 +121,11 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-
 <h3 id="routingDefaults_drivingDirection">drivingDirection</h3>
 
 *Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"RIGHT"` ∙ Path: `routingDefaults`*
 
 The driving direction to use in the intersection traversal calculation
-
 
 <h3 id="routingDefaults_intersectionTraversalModel">intersectionTraversalModel</h3>
 
@@ -135,13 +133,11 @@ The driving direction to use in the intersection traversal calculation
 
 The model that computes the costs of turns.
 
-
 <h3 id="routingDefaults_optimize">optimize</h3>
 
 *Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"SAFE"` ∙ Path: `routingDefaults`*
 
 The set of characteristics that the user wants to optimize for.
-
 
 <h3 id="routingDefaults_unpreferredCost">unpreferredCost</h3>
 
@@ -159,13 +155,11 @@ or for an unpreferred agency's departure. For example, 600 + 2.0 x
 
 How much time alighting a vehicle takes for each given mode.
 
-
 <h3 id="routingDefaults_allowedVehicleRentalNetworks">allowedVehicleRentalNetworks</h3>
 
 *Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
 
 The vehicle rental networks which may be used. If empty all networks may be used.
-
 
 <h3 id="routingDefaults_bannedVehicleParkingTags">bannedVehicleParkingTags</h3>
 
@@ -173,20 +167,17 @@ The vehicle rental networks which may be used. If empty all networks may be used
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned
 
-
 <h3 id="routingDefaults_bannedVehicleRentalNetworks">bannedVehicleRentalNetworks</h3>
 
 *Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
 
 he vehicle rental networks which may not be used. If empty, no networks are banned.
 
-
 <h3 id="routingDefaults_boardSlackForMode">boardSlackForMode</h3>
 
 *Since version: `2.0` ∙ Type: `enum map of duration` ∙ `Optional` ∙ Path: `routingDefaults`*
 
 How much time ride a vehicle takes for each given mode.
-
 
 <h3 id="routingDefaults_itineraryFilters">itineraryFilters</h3>
 
@@ -196,7 +187,6 @@ Configure itinerary filters that may modify itineraries, sort them, and filter a
 
 TODO
 
-
 <h3 id="routingDefaults_itineraryFilters_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
 
 *Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults.itineraryFilters`*
@@ -205,13 +195,11 @@ TODO
 
 TODO
 
-
 <h3 id="routingDefaults_maxAccessEgressDurationForMode">maxAccessEgressDurationForMode</h3>
 
 *Since version: `na` ∙ Type: `enum map of duration` ∙ `Optional` ∙ Path: `routingDefaults`*
 
 Limit access/egress per street mode.
-
 
 <h3 id="routingDefaults_maxDirectStreetDurationForMode">maxDirectStreetDurationForMode</h3>
 
@@ -219,13 +207,11 @@ Limit access/egress per street mode.
 
 Limit direct route duration per street mode.
 
-
 <h3 id="routingDefaults_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
 *Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
 
 Tags which are required to use a vehicle parking. If empty, no tags are required.
-
 
 <h3 id="routingDefaults_transferOptimization">transferOptimization</h3>
 
@@ -235,13 +221,11 @@ TODO
 
 TODO
 
-
 <h3 id="routingDefaults_transitReluctanceForMode">transitReluctanceForMode</h3>
 
 *Since version: `na` ∙ Type: `enum map of double` ∙ `Optional` ∙ Path: `routingDefaults`*
 
 Transit reluctance for a given transport mode
-
 
 <h3 id="routingDefaults_unpreferred">unpreferred</h3>
 
@@ -251,7 +235,6 @@ Parameters for indicating authorities or lines that preferably should not be use
 
 TODO
 
-
 <h3 id="routingDefaults_wheelchairAccessibility">wheelchairAccessibility</h3>
 
 *Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults`*
@@ -260,7 +243,6 @@ TODO
 
 TODO
 
-
 <h3 id="routingDefaults_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
 *Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `0.083` ∙ Path: `routingDefaults.wheelchairAccessibility`*
@@ -268,7 +250,6 @@ TODO
 The maximum slope as a fraction of 1.
 
 9 percent would be `0.09`
-
 
 <h3 id="routingDefaults_wheelchairAccessibility_slopeExceededReluctance">slopeExceededReluctance</h3>
 

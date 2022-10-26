@@ -7,13 +7,9 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection2;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.MarkDownDocWriter;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
@@ -95,9 +91,6 @@ public class UpdaterConfigDocTest {
   }
 
   private String getParameterDetailsTable(NodeAdapter node) {
-    var stream = new ByteArrayOutputStream();
-    var out = new MarkDownDocWriter(new PrintStream(stream));
-    ParameterDetailsList.listParametersWithDetails(node, out, SKIP_NODES, HEADER_4);
-    return stream.toString(StandardCharsets.UTF_8);
+    return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_4);
   }
 }

@@ -97,14 +97,13 @@ predicted arrival and departure times for the remainder of the trip.
 
 #### Details
 
-
 <h4 id="updaters__3__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
 *Since version: `2.2` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"REQUIRED_NO_DATA"` ∙ Path: `updaters.[3]`*
 
 How backwards propagation should be handled.
 
-REQUIRED_NO_DATA:
+  REQUIRED_NO_DATA:
   Default value. Only propagates delays backwards when it is required to ensure that the times
   are increasing, and it sets the NO_DATA flag on the stops so these automatically updated times
   are not exposed through APIs.
@@ -116,6 +115,7 @@ REQUIRED_NO_DATA:
   ALWAYS
   Propagates delays backwards on stops with no estimates regardless if it's required or not.
   The updated times are exposed through APIs.
+
 
 
 ```JSON
@@ -152,7 +152,6 @@ REQUIRED_NO_DATA:
 
 
 #### Details
-
 
 <h4 id="updaters__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
@@ -261,7 +260,6 @@ can be configured as a json. Any header key, value can be inserted.
 
 #### Details
 
-
 <h4 id="updaters__1__allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
 *Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `updaters.[1]`*
@@ -269,7 +267,6 @@ can be configured as a json. Any header key, value can be inserted.
 If a vehicle should be allowed to be kept at the end of a station-based rental.
 
 This behaviour is useful in towns that have only a single rental station. Without it you would need see any results as you would have to always bring it back to the station.
-
 
 <h4 id="updaters__1__network">network</h4>
 
@@ -279,13 +276,11 @@ The name of the network to override the one derived from the source data.
 
 GBFS feeds must include a system_id which will be used as the default `network`. These ids are sometimes not helpful so setting this property will override it.
 
-
 <h4 id="updaters__1__sourceType">sourceType</h4>
 
 *Since version: `na` ∙ Type: `enum` ∙ `Required` ∙ Path: `updaters.[1]`*
 
 What source of vehicle rental updater to use.
-
 
 <h4 id="updaters__1__headers">headers</h4>
 
@@ -341,7 +336,6 @@ its [sandbox documentation](../docs/sandbox/VehicleParking.md).
 
 #### Details
 
-
 <h4 id="updaters__2__feedId">feedId</h4>
 
 *Since version: `na` ∙ Type: `string` ∙ `Optional` ∙ Path: `updaters.[2]`*
@@ -350,13 +344,11 @@ The name of the data source.
 
 This will end up in the API responses as the feed id of of the parking lot.
 
-
 <h4 id="updaters__2__sourceType">sourceType</h4>
 
 *Since version: `na` ∙ Type: `enum` ∙ `Required` ∙ Path: `updaters.[2]`*
 
 The source of the vehicle updates.
-
 
 <h4 id="updaters__2__timeZone">timeZone</h4>
 
