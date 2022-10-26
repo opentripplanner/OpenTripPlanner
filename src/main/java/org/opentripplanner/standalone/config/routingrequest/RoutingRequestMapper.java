@@ -323,8 +323,7 @@ public class RoutingRequestMapper {
           .of("bikeReluctance")
           .since(NA)
           .summary(
-            "A multiplier for how bad biking is, compared to being in transit for equal\n" +
-            "        lengths of time"
+            "A multiplier for how bad biking is, compared to being in transit for equal lengths of time."
           )
           .asDouble(dft.reluctance())
       )
