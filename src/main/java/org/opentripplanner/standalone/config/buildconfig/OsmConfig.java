@@ -32,6 +32,14 @@ public class OsmConfig {
         .of(parameterName)
         .since(NA)
         .summary("Configure properties for a given OpenStreetMap feed.")
+        .description(
+          """
+          The osm section of build-config.json allows you to override the default behavior of scanning
+          for OpenStreetMap files in the base directory. You can specify data located outside the 
+          local filesystem (including cloud storage services) or at various different locations around 
+          the local filesystem.
+          """
+        )
         .asObjects(OsmConfig::mapOsmExtractConfig)
     );
   }

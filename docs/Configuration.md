@@ -61,7 +61,6 @@ documentation below we will refer to the following types:
 <!-- CONFIGURATION-TYPES-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-
 | Type              | Description                                                                                                                                                                                                                                               | Examples                                                             |
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
 | `boolean`         | This is the Boolean JSON type                                                                                                                                                                                                                             | `true`, `false`                                                      |
@@ -227,7 +226,6 @@ Here is a list of all features which can be toggled on/off.
 
 <!-- OTP-FEATURE-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
 
 | Feature                              | Description                                                                                                                                                                                       | Enabled by default | Sandbox |
 |--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------:|:-------:|

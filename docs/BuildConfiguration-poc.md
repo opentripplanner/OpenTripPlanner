@@ -10,7 +10,6 @@ Sections follow that describe particular settings in more depth.
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-
 | Config Parameter                                                                     |     Type    | Summary                                                                                                                                              |  Req./Opt. | Default Value                     | Since |
 |--------------------------------------------------------------------------------------|:-----------:|------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
 | [areaVisibility](#areaVisibility)                                                    |  `boolean`  | Perform visibility calculations.                                                                                                                     | *Optional* | `false`                           |   na  |
@@ -98,27 +97,6 @@ Sections follow that describe particular settings in more depth.
 
 <!-- PARAMETERS-TABLE END -->
 
-## OSM 
-
-The osm section of `build-config.json` allows you to override the default behavior of scanning
-for OpenStreetMap files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
-located outside the local filesystem (including cloud storage services) or at various
-different locations around the local filesystem.
-
-| config key       | description                                                                                                                                         | value type                                                     | value default |
-|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------|
-| `source`         | The unique URI pointing to the data file.                                                                                                           | uri                                                            | mandatory     |
-| `timeZone`       | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                                               | The value can be given either as a zone id, or an UTC offset.  | `null`        |
-| `osmTagMapping`  | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults | string                                                         | `null`        |
-
-## OSM Defaults
-
-The osmDefaults section of `build-config.json` allows you to specify default properties for OpenStreetMap files. 
-
-| config key          | description                                                                                                                      | value type                                                     | value default |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------|
-| `timeZone`          | The timezone used to resolve opening hours in OSM data. If the parameter is not specified, the opening hours will not be parsed. | The value can be given either as a zone id, or an UTC offset.  | `null`        |
-| `osmTagMapping`     | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`                            | string                                                         | `default`     |
 
 ## DEM
 
@@ -623,7 +601,6 @@ There is currently only one custom naming module called `portland` (which has no
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
 
-
 <h3 id="areaVisibility">areaVisibility</h3>
 
 *Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
@@ -772,6 +749,11 @@ case where this is not the case.
 *Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
 
 Configure properties for a given OpenStreetMap feed.
+
+The osm section of build-config.json allows you to override the default behavior of scanning
+for OpenStreetMap files in the base directory. You can specify data located outside the
+local filesystem (including cloud storage services) or at various different locations around
+the local filesystem.
 
 
 <h3 id="osm__0__osmTagMapping">osmTagMapping</h3>

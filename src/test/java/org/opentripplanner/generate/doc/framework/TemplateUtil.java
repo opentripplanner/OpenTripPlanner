@@ -1,9 +1,6 @@
 package org.opentripplanner.generate.doc.framework;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.regex.Pattern;
-import org.junit.jupiter.api.Test;
 
 /**
  * Replace a text in a file wrapped using HTML comments
@@ -41,7 +38,7 @@ public class TemplateUtil {
   }
 
   private static String air(String section) {
-    return NEW_LINE + NEW_LINE + section + NEW_LINE;
+    return NEW_LINE + section + NEW_LINE;
   }
 
   private static String start(String token) {
@@ -52,22 +49,4 @@ public class TemplateUtil {
     return COMMENT_OPEN + token + END + COMMENT_CLOSE;
   }
 
-  @Test
-  public void test() {
-    var body = """
-      Expected line 1.
-      Expected line 2.
-      """;
-    var text = """
-      <!-- TEST BEGIN -->%s<!-- TEST END -->
-      """;
-
-    var expected = text.formatted(
-      "\n<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->\n" +
-      body
-    );
-    var doc = text.formatted("^ANY TEXT $1 - With special chars...");
-
-    assertEquals(expected, replaceSection(doc, "TEST", body));
-  }
 }
