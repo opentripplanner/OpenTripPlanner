@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.BIKE_RENTAL;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.MQTT_GTFS_RT_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.REAL_TIME_ALERTS;
@@ -78,15 +80,13 @@ public class UpdatersConfig implements UpdatersParameters {
         rootAdapter.exist("vehicleRentalServiceDirectory")
           ? rootAdapter
             .of("vehicleRentalServiceDirectory")
-            .since(NA)
-            .summary("TODO")
-            .description(/*TODO DOC*/"TODO")
+            .since(V2_0)
+            .summary("Configuration for the vehicle rental service directory.")
             .asObject()
           : rootAdapter
             .of("bikeRentalServiceDirectory")
-            .since(NA)
-            .summary("TODO")
-            .description(/*TODO DOC*/"TODO")
+            .since(V2_0)
+            .summary("Deprecated. Use bikeRentalServiceDirectory.")
             .asObject() // TODO: deprecated, remove in next major version
       );
 
@@ -94,19 +94,17 @@ public class UpdatersConfig implements UpdatersParameters {
       timetableUpdates(
         rootAdapter
           .of("timetableUpdates")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
+          .since(V2_2)
+          .summary("Global configuration for timetable updaters.")
           .asObject()
       );
 
     rootAdapter
       .of("updaters")
       .since(NA)
-      .summary("TODO")
-      .description(/*TODO DOC*/"TODO")
+      .summary("Configuration for the updaters that import various types of data into OTP.")
       .asObjects(it -> {
-        Type type = it.of("type").since(NA).summary("TODO").asEnum(Type.class);
+        Type type = it.of("type").since(NA).summary("The type of the updater.").asEnum(Type.class);
         var config = type.parseConfig(it);
         configList.put(type, config);
         // We do not care what we return here
@@ -124,11 +122,24 @@ public class UpdatersConfig implements UpdatersParameters {
       return dflt;
     }
 
-    // TODO DOC - Deprecate c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(dflt.logFrequency())
-
     return new TimetableSnapshotSourceParameters(
-      c.of("maxSnapshotFrequency").since(NA).summary("TODO").asInt(dflt.maxSnapshotFrequencyMs()),
-      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(dflt.purgeExpiredData())
+      c
+        .of("maxSnapshotFrequency")
+        .since(V2_2)
+        .summary("How long a snapshot should be cached.")
+        .description(
+          "If a timetable snapshot is requested less than this number of milliseconds after the previous snapshot, then return the same instance. " +
+          "Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. " +
+          "Applies to GTFS-RT and Siri updates."
+        )
+        .asInt(dflt.maxSnapshotFrequencyMs()),
+      c
+        .of("purgeExpiredData")
+        .since(V2_2)
+        .summary(
+          "Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates."
+        )
+        .asBoolean(dflt.purgeExpiredData())
     );
   }
 
@@ -245,11 +256,11 @@ public class UpdatersConfig implements UpdatersParameters {
     SIRI_AZURE_ET_UPDATER(SiriAzureETUpdaterConfig::create),
     SIRI_AZURE_SX_UPDATER(SiriAzureSXUpdaterConfig::create);
 
+    private final BiFunction<String, NodeAdapter, ?> factory;
+
     Type(BiFunction<String, NodeAdapter, ?> factory) {
       this.factory = factory;
     }
-
-    private final BiFunction<String, NodeAdapter, ?> factory;
 
     Object parseConfig(NodeAdapter nodeAdapter) {
       return factory.apply(this.name(), nodeAdapter);
