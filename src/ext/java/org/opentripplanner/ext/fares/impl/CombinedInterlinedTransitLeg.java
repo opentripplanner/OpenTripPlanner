@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.impl;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.plan.Place;
@@ -9,6 +10,8 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.util.lang.ListUtils;
 
@@ -27,6 +30,8 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     this.second = second;
   }
 
+
+  public Agency getAgency() { return first.getAgency(); }
   @Nonnull
   @Override
   public TransitMode getMode() {
@@ -83,5 +88,13 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   @Override
   public int getGeneralizedCost() {
     return first.getGeneralizedCost() + second.getGeneralizedCost();
+  }
+
+  @Override
+  public Set<FareZone> getFareZones() {
+    Set<FareZone> fareZones = first.getFareZones();
+    fareZones.addAll(second.getFareZones());
+
+  return fareZones;
   }
 }

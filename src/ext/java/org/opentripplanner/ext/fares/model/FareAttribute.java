@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public final class FareAttribute
   extends AbstractTransitEntity<FareAttribute, FareAttributeBuilder> {
 
-  private String agency;
+  private FeedScopedId agency;
   private final float price;
 
   private final String currencyType;
@@ -50,11 +50,11 @@ public final class FareAttribute
     return agency != null;
   }
 
-  public String getAgency() {
+  public FeedScopedId getAgency() {
     return agency;
   }
 
-  public void setAgency(String agency) {
+  public void setAgency(FeedScopedId agency) {
     this.agency = agency;
   }
 

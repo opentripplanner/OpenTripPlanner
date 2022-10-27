@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class FareAttributeBuilder
   extends AbstractEntityBuilder<FareAttribute, FareAttributeBuilder> {
 
-  private String agency;
+  private FeedScopedId agency;
   private float price;
 
   private String currencyType;
@@ -40,11 +40,11 @@ public class FareAttributeBuilder
     this.journeyDuration = original.getJourneyDuration();
   }
 
-  public String agency() {
+  public FeedScopedId agency() {
     return agency;
   }
 
-  public FareAttributeBuilder setAgency(String agency) {
+  public FareAttributeBuilder setAgency(FeedScopedId agency) {
     this.agency = agency;
     return this;
   }

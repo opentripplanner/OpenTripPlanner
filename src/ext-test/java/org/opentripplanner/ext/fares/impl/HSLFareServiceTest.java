@@ -135,7 +135,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     FareAttribute fareAttributeD2 = FareAttribute
       .of(new FeedScopedId(FEED_ID, "D2"))
-      .setAgency(agency2.getId().getId())
+      .setAgency(agency2.getId())
       .build();
 
     // Fare rule sets
@@ -172,7 +172,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     FareRuleSet ruleSetD2 = new FareRuleSet(fareAttributeD2);
     ruleSetD2.addContains("D");
-    ruleSetD2.setAgency(agency2.getId().getId());
+    ruleSetD2.setAgency(agency2.getId());
 
     hslFareService.addFareRules(
       FareType.regular,

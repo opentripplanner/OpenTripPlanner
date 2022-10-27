@@ -10,10 +10,9 @@ import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +27,9 @@ public class HSLFareServiceImpl extends DefaultFareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
 
-  public ItineraryFares getCost(Itinerary itinerary) {
-    ItineraryFares fare = super.getCost(itinerary);
-    if (fare == null) {
-      itinerary.setFare(null);
-    }
-    return fare;
+  @Override
+  protected boolean shouldCombineInterlinedLegs(ScheduledTransitLeg previousLeg, ScheduledTransitLeg currentLeg) {
+    return false;
   }
 
   @Override
@@ -65,7 +61,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
       Set<String> ruleZones = null;
 
       for (FareRuleSet ruleSet : fareRules) {
-        if (ruleSet.hasAgencyDefined() && leg.getAgency().getId().getId() != ruleSet.getAgency()) {
+        if (ruleSet.hasAgencyDefined() && leg.getAgency().getId().getId() != ruleSet.getAgency().getId()) {
           continue;
         }
         RouteOriginDestination routeOriginDestination = new RouteOriginDestination(
@@ -133,7 +129,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
       for (FareRuleSet ruleSet : fareRules) {
         // make sure the rule is applicable by agency requirements
         if (
-          ruleSet.hasAgencyDefined() && (singleAgency == false || agency != ruleSet.getAgency())
+          ruleSet.hasAgencyDefined() && (singleAgency == false || agency != ruleSet.getAgency().getId())
         ) {
           continue;
         }

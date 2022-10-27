@@ -10,7 +10,7 @@ public class FareRuleSet implements Serializable {
 
   private static final long serialVersionUID = 7218355718876553028L;
 
-  private String agency = null;
+  private FeedScopedId agency = null;
   private final Set<FeedScopedId> routes;
   private final Set<P2<String>> originDestinations;
 
@@ -125,11 +125,11 @@ public class FareRuleSet implements Serializable {
     return this.agency != null;
   }
 
-  public String getAgency() {
+  public FeedScopedId getAgency() {
     return this.agency;
   }
 
-  public void setAgency(String agency) {
+  public void setAgency(FeedScopedId agency) {
     this.agency = agency;
   }
 }
