@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.time.Duration;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -19,6 +21,8 @@ import org.opentripplanner.util.HttpUtils;
  */
 record HttpsFileDataSource(URI uri, FileType type, HttpsDataSourceMetadata httpsDataSourceMetadata)
   implements DataSource {
+  private static final Duration HTTP_GET_REQUEST_TIMEOUT = Duration.ofSeconds(20);
+
   /**
    * Create a data source wrapper around an HTTPS resource. This wrapper handles GZIP(.gz)
    * compressed files as well as normal files. It does not handle
@@ -51,7 +55,7 @@ record HttpsFileDataSource(URI uri, FileType type, HttpsDataSourceMetadata https
     InputStream in;
 
     try {
-      in = HttpUtils.getData(uri);
+      in = HttpUtils.getData(uri, HTTP_GET_REQUEST_TIMEOUT, Map.of());
     } catch (IOException e) {
       throw new IllegalStateException(e.getLocalizedMessage(), e);
     }
