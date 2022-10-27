@@ -11,6 +11,8 @@ public class KmlBikeParkSourceTest {
 
   private static final String TEST_FEED_ID = "testFeed";
 
+  private static final double EPSILON = 0.0001;
+
   @Test
   public void testKML() {
     var parameters = new KmlUpdaterParameters(
@@ -31,19 +33,11 @@ public class KmlBikeParkSourceTest {
     assertEquals("Station Alkmaar", alkmaar.getName().toString());
     assertEquals("Station Zwolle", zwolle.getName().toString());
     var alkmaarCoordinate = alkmaar.getCoordinate();
-    assertTrue(
-      alkmaarCoordinate.longitude() >= 4.739850 && alkmaarCoordinate.longitude() <= 4.739851
-    );
-    assertTrue(
-      alkmaarCoordinate.latitude() >= 52.637531 && alkmaarCoordinate.latitude() <= 52.637532
-    );
+    assertEquals(4.739850, alkmaarCoordinate.longitude(), EPSILON);
+    assertEquals(52.637531, alkmaarCoordinate.latitude(), EPSILON);
     var zwolleCoordinate = zwolle.getCoordinate();
-    assertTrue(
-      zwolleCoordinate.longitude() >= 6.091060 && zwolleCoordinate.longitude() <= 6.091061
-    );
-    assertTrue(
-      zwolleCoordinate.latitude() >= 52.504990 && zwolleCoordinate.latitude() <= 52.504991
-    );
+    assertEquals(6.091060, zwolleCoordinate.longitude(), EPSILON);
+    assertEquals(52.504990, zwolleCoordinate.latitude(), EPSILON);
   }
 
   @Test
@@ -66,16 +60,10 @@ public class KmlBikeParkSourceTest {
     assertEquals("Station Alkmaar", alkmaar.getName().toString());
     assertEquals("Station Almere Centrum", almere.getName().toString());
     var alkmaarCoordinate = alkmaar.getCoordinate();
-    assertTrue(
-      alkmaarCoordinate.longitude() >= 4.739850 && alkmaarCoordinate.longitude() <= 4.739851
-    );
-    assertTrue(
-      alkmaarCoordinate.latitude() >= 52.637531 && alkmaarCoordinate.latitude() <= 52.637532
-    );
+    assertEquals(4.739850, alkmaarCoordinate.longitude(), EPSILON);
+    assertEquals(52.637531, alkmaarCoordinate.latitude(), EPSILON);
     var almereCoordinate = almere.getCoordinate();
-    assertTrue(almereCoordinate.longitude() >= 5.21780 && almereCoordinate.longitude() <= 5.21782);
-    assertTrue(
-      almereCoordinate.latitude() >= 52.3746190 && almereCoordinate.latitude() <= 52.3746191
-    );
+    assertEquals(5.21780, almereCoordinate.longitude(), EPSILON);
+    assertEquals(52.3746190, almereCoordinate.latitude(), EPSILON);
   }
 }

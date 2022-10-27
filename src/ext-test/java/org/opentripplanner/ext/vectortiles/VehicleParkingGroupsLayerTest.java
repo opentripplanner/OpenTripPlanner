@@ -2,12 +2,9 @@ package org.opentripplanner.ext.vectortiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableListMultimap;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +31,6 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitService;
 
 public class VehicleParkingGroupsLayerTest {
 
@@ -97,13 +93,9 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void vehicleParkingGroupGeometryTest() {
-    VehicleParkingService service = mock(VehicleParkingService.class);
-    when(service.getVehicleParkingGroups())
-      .thenReturn(ImmutableListMultimap.of(vehicleParkingGroup, vehicleParking));
-
-    Graph graph = mock(Graph.class);
-    TransitService transitService = mock(TransitService.class);
-    when(graph.getVehicleParkingService()).thenReturn(service);
+    Graph graph = new Graph();
+    VehicleParkingService service = graph.getVehicleParkingService();
+    service.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
       """
@@ -131,7 +123,6 @@ public class VehicleParkingGroupsLayerTest {
       assertEquals(1, tiles.layers().size());
       VehicleParkingGroupsLayerBuilderWithPublicGeometry builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
         graph,
-        transitService,
         tiles.layers().get(0)
       );
 
@@ -169,10 +160,9 @@ public class VehicleParkingGroupsLayerTest {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       Graph graph,
-      TransitService transitService,
       VectorTilesResource.LayerParameters layerParameters
     ) {
-      super(graph, transitService, layerParameters);
+      super(graph, null, layerParameters);
     }
 
     @Override

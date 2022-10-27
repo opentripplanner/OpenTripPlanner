@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +12,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
@@ -34,7 +31,6 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitService;
 
 public class VehicleParkingsLayerTest {
 
@@ -71,12 +67,9 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void vehicleParkingGeometryTest() {
-    VehicleParkingService service = mock(VehicleParkingService.class);
-    when(service.getVehicleParkings()).thenReturn(Stream.of(vehicleParking));
-
-    Graph graph = mock(Graph.class);
-    TransitService transitService = mock(TransitService.class);
-    when(graph.getVehicleParkingService()).thenReturn(service);
+    Graph graph = new Graph();
+    VehicleParkingService service = graph.getVehicleParkingService();
+    service.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
       """
@@ -104,7 +97,6 @@ public class VehicleParkingsLayerTest {
       assertEquals(1, tiles.layers().size());
       VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
         graph,
-        transitService,
         tiles.layers().get(0)
       );
 
@@ -166,10 +158,9 @@ public class VehicleParkingsLayerTest {
 
     public VehicleParkingsLayerBuilderWithPublicGeometry(
       Graph graph,
-      TransitService transitService,
       VectorTilesResource.LayerParameters layerParameters
     ) {
-      super(graph, transitService, layerParameters);
+      super(graph, null, layerParameters);
     }
 
     @Override
