@@ -58,19 +58,19 @@
     }
   },
   "transit": {
-  "maxNumberOfTransfers" : 12,
-  "dynamicSearchWindow" : {
-    "minTransitTimeCoefficient" : 0.5,
-    "minWaitTimeCoefficient" : 0.5,
-    "minWinTimeMinutes" : 60,
-    "maxWinTimeMinutes" : 300
-  },
-  "stopTransferCost" : {
-    "DISCOURAGED" : 1500,
-    "ALLOWED" : 75,
-    "RECOMMENDED" : 30,
-    "PREFERRED" : 0
-  }
+    "maxNumberOfTransfers" : 12,
+    "dynamicSearchWindow" : {
+      "minTransitTimeCoefficient" : 0.5,
+      "minWaitTimeCoefficient" : 0.5,
+      "minWinTimeMinutes" : 60,
+      "maxWinTimeMinutes" : 300
+    },
+    "stopTransferCost" : {
+      "DISCOURAGED" : 1500,
+      "ALLOWED" : 75,
+      "RECOMMENDED" : 30,
+      "PREFERRED" : 0
+    }
   },
   "bikeRentalServiceDirectory": {
     "url": "https://example.com",
