@@ -18,7 +18,7 @@ import org.opentripplanner.util.HttpUtils;
  */
 public class HttpsDataSourceRepository implements DataSourceRepository {
 
-  private static final Duration HTTP_HEADERS_REQUEST_TIMEOUT = Duration.ofSeconds(20);
+  private static final Duration HTTP_HEAD_REQUEST_TIMEOUT = Duration.ofSeconds(20);
 
   @Override
   public String description() {
