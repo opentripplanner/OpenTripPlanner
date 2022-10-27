@@ -73,6 +73,6 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   protected List<Header> getHttpHeaders(URI uri) {
-    return HttpUtils.getHeaders(uri, HTTP_HEADERS_REQUEST_TIMEOUT, Map.of());
+    return HttpUtils.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
   }
 }
