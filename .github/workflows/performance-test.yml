@@ -12,9 +12,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - location: skanetrafiken
-            iterations: 1
-            jfr-delay: "50s"
 
           - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
             iterations: 1
@@ -28,6 +25,9 @@ jobs:
             iterations: 4
             jfr-delay: "50s"
 
+          - location: skanetrafiken
+            iterations: 1
+            jfr-delay: "50s"
     steps:
       - uses: actions/checkout@v2.3.2
         with:
