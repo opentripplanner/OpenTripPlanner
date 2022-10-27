@@ -1,6 +1,6 @@
 package org.opentripplanner.generate.doc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
@@ -50,7 +50,7 @@ public class BuildConfigurationDocTest {
 
     writeFile(OUT_FILE, doc);
 
-    assertEquals(original, readFile(OUT_FILE));
+    assertFileEquals(original, OUT_FILE);
   }
 
   private NodeAdapter readBuildConfig() {
