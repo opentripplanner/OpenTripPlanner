@@ -12,6 +12,10 @@ import java.util.regex.Pattern;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
+/**
+ * Parameters to configure the NETEX import. Se the generated build-config documentation or
+ * the config mapping for documentation.
+ */
 public class NetexFeedParameters implements DataSourceConfig {
 
   /**
@@ -87,84 +91,27 @@ public class NetexFeedParameters implements DataSourceConfig {
     return feedId;
   }
 
-  /**
-   * This field is used to exclude matching <em>files</em> in the module file(zip file entries). The
-   * <em>ignored</em> files are <em>not</em> loaded.
-   * <p>
-   * Default value is <code>'$^'</code> which matches empty stings (not a valid file name).
-   *
-   * @see #sharedFilePattern
-   */
-  public Pattern ignoreFilePattern() {
-    return Pattern.compile(ignoreFilePattern);
-  }
-
-  /**
-   * This field is used to match <em>shared files</em>(zip file entries) in the module file. Shared
-   * files are loaded first. Then the rest of the files are grouped and loaded.
-   * <p>
-   * The pattern <code>'shared-data\.xml'</code> matches <code>'shared-data.xml'</code>
-   * <p>
-   * File names are matched in the following order - and treated accordingly to the first match:
-   * <ol>
-   *     <li>{@link #ignoreFilePattern}</li>
-   *     <li>Shared file pattern (this)</li>
-   *     <li>{@link #sharedGroupFilePattern}.</li>
-   *     <li>{@link #groupFilePattern}.</li>
-   * </ol>
-   * <p>
-   * Default value is <code>'shared-data\.xml'</code>
-   */
+  /** See Configuration mapping for description */
   public Pattern sharedFilePattern() {
     return Pattern.compile(sharedFilePattern);
   }
 
-  /**
-   * This field is used to match <em>shared group files</em> in the module file(zip file entries).
-   * Typically this is used to group all files from one agency together.
-   * <p>
-   * <em>Shared group files</em> are loaded after shared files, but before the matching group
-   * files. Each <em>group</em> of files are loaded as a unit, followed by next group.
-   * <p>
-   * Files are grouped together by the first group pattern in the regular expression.
-   * <p>
-   * The pattern <code>'(\w{3})-.*-shared\.xml'</code> matches <code>'RUT-shared.xml'</code> with
-   * group <code>'RUT'</code>.
-   * <p>
-   * Default value is <code>'(\w{3})-.*-shared\.xml'</code>
-   *
-   * @see #sharedFilePattern
-   * @see #groupFilePattern
-   */
+  /** See Configuration mapping for description */
   public Pattern sharedGroupFilePattern() {
     return Pattern.compile(sharedGroupFilePattern);
   }
 
-  /**
-   * This field is used to match <em>group files</em> in the module file(zip file entries).
-   * <em>group files</em> are loaded right the after <em>shared group files</em> are loaded.
-   * <p>
-   * Files are grouped together by the first group pattern in the regular expression.
-   * <p>
-   * The pattern <code>'(\w{3})-.*\.xml'</code> matches <code>'RUT-Line-208-Hagalia-Nevlunghavn.xml'</code>
-   * with group <code>'RUT'</code>.
-   * <p>
-   * Default value is <code>'(\w{3})-.*\.xml'</code>
-   *
-   * @see #sharedFilePattern
-   * @see #sharedGroupFilePattern
-   */
+  /** See Configuration mapping for description */
   public Pattern groupFilePattern() {
     return Pattern.compile(groupFilePattern);
   }
 
-  /**
-   * Bicycles are allowed on most ferries however Nordic profile doesn't contain a place where
-   * bicycle conveyance can be defined.
-   * <p>
-   * For this reason we allow bicycles on ferries by default and allow to override the rare case
-   * where this is not the case.
-   */
+  /** See Configuration mapping for description */
+  public Pattern ignoreFilePattern() {
+    return Pattern.compile(ignoreFilePattern);
+  }
+
+  /** See Configuration mapping for description */
   public Set<String> ferryIdsNotAllowedForBicycle() {
     return ferryIdsNotAllowedForBicycle;
   }

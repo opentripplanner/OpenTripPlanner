@@ -4,8 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 
 /**
  * This serializer is needed because there is no default constructor on the {@link RouterConfig}.
@@ -29,6 +29,10 @@ public class RouterConfigSerializer extends Serializer<RouterConfig> {
 
   @Override
   public RouterConfig read(Kryo kryo, Input input, Class<? extends RouterConfig> type) {
-    return new RouterConfig(ConfigLoader.nodeFromString(input.readString(), SOURCE), SOURCE, false);
+    return new RouterConfig(
+      ConfigFileLoader.nodeFromString(input.readString(), SOURCE),
+      SOURCE,
+      false
+    );
   }
 }

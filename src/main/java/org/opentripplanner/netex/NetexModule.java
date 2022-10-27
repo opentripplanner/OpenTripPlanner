@@ -5,7 +5,6 @@ import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -26,7 +25,6 @@ import org.opentripplanner.util.OTPFeature;
 public class NetexModule implements GraphBuilderModule {
 
   private final int subwayAccessTime;
-  private final String feedId;
 
   private final Graph graph;
   private final TransitModel transitModel;
@@ -41,7 +39,6 @@ public class NetexModule implements GraphBuilderModule {
   private final List<NetexBundle> netexBundles;
 
   public NetexModule(
-    String feedId,
     Graph graph,
     TransitModel transitModel,
     DataImportIssueStore issueStore,
@@ -49,7 +46,6 @@ public class NetexModule implements GraphBuilderModule {
     ServiceDateInterval transitPeriodLimit,
     List<NetexBundle> netexBundles
   ) {
-    this.feedId = feedId;
     this.graph = graph;
     this.transitModel = transitModel;
     this.issueStore = issueStore;
@@ -96,10 +92,7 @@ public class NetexModule implements GraphBuilderModule {
         transitModel.getOperators().addAll(otpService.getAllOperators());
         transitModel.addNoticeAssignments(otpService.getNoticeAssignments());
 
-        GtfsFeedId feedId = new GtfsFeedId.Builder().id(this.feedId).build();
-
         AddTransitModelEntitiesToGraph.addToGraph(
-          feedId,
           otpService,
           subwayAccessTime,
           graph,

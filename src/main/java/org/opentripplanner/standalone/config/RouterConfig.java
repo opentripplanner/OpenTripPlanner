@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRoutingRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -14,6 +14,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -56,56 +59,36 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion =
-      root
-        .of("configVersion")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
-    this.requestLogFile =
-      root
-        .of("requestLogFile")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
+    this.configVersion = root.of("configVersion").since(NA).summary("TODO").asString(null);
+    this.requestLogFile = root.of("requestLogFile").since(NA).summary("TODO").asString(null);
     this.transmodelApi =
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
     this.transitConfig =
       new TransitRoutingConfig(
-        root
-          .of("transit")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
+        root.of("transit").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
       );
     this.routingRequestDefaults =
       mapRoutingRequest(
         root
           .of("routingDefaults")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
+          .since(NA)
+          .summary("TODO")
+          .description(/*TODO DOC*/"TODO")
           .asObject()
       );
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig =
       new FlexConfig(
-        root
-          .of("flex")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .withDescription(/*TODO DOC*/"TODO")
-          .asObject()
+        root.of("flex").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
       );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -195,7 +178,8 @@ public class RouterConfig implements Serializable {
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
     return adapter
       .of("streetRoutingTimeout")
-      .withDoc(NA, /*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("TODO")
       .asDuration2(DEFAULT_STREET_ROUTING_TIMEOUT, ChronoUnit.SECONDS);
   }
 }

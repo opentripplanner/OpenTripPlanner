@@ -13,13 +13,12 @@ class NodeInfoBuilder {
 
   private String name;
   private ConfigType type;
-  private Class<Enum<?>> enumType;
+  private Class<? extends Enum<?>> enumType;
   private ConfigType elementType;
   private OtpVersion since = OtpVersion.NA;
   private String summary = "TODO: Add short summary.";
   private String description = null;
   private String defaultValue = null;
-  private Object exampleValue = null;
   private boolean required = true;
 
   private boolean skipChildren = false;
@@ -64,11 +63,6 @@ class NodeInfoBuilder {
     return this;
   }
 
-  NodeInfoBuilder withExample(Object exampleValue) {
-    this.exampleValue = exampleValue;
-    return this;
-  }
-
   NodeInfoBuilder withOptional(String defaultValue) {
     this.defaultValue = defaultValue;
     return withOptional();
@@ -84,7 +78,7 @@ class NodeInfoBuilder {
     return this;
   }
 
-  NodeInfoBuilder withEnum(Class<Enum<?>> enumType) {
+  NodeInfoBuilder withEnum(Class<? extends Enum<?>> enumType) {
     this.type = ENUM;
     this.enumType = enumType;
     return this;
@@ -102,14 +96,14 @@ class NodeInfoBuilder {
     return this;
   }
 
-  NodeInfoBuilder withEnumMap(Class<Enum<?>> enumType, ConfigType elementType) {
+  NodeInfoBuilder withEnumMap(Class<? extends Enum<?>> enumType, ConfigType elementType) {
     this.type = ENUM_MAP;
     this.enumType = enumType;
     this.elementType = elementType;
     return this;
   }
 
-  NodeInfoBuilder withEnumSet(Class<Enum<?>> enumType) {
+  NodeInfoBuilder withEnumSet(Class<? extends Enum<?>> enumType) {
     this.type = ENUM_SET;
     this.elementType = ENUM;
     this.enumType = enumType;
@@ -122,11 +116,6 @@ class NodeInfoBuilder {
   }
 
   NodeInfo build() {
-    // Use the first enum as an example value, if not set
-    if (exampleValue == null && enumType != null) {
-      exampleValue = enumType.getEnumConstants()[0];
-    }
-
     return new NodeInfo(
       name,
       summary,
@@ -136,7 +125,6 @@ class NodeInfoBuilder {
       elementType,
       since,
       defaultValue,
-      exampleValue,
       required,
       skipChildren,
       deprecated

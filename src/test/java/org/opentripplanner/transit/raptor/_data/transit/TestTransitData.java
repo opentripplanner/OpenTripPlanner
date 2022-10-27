@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParametersBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
@@ -30,7 +31,6 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
-import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransitData
@@ -212,7 +212,7 @@ public class TestTransitData
   public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersFromStop.get(fromStop).add(transfer);
-    transfersToStop.get(transfer.stop()).add(new ReversedRaptorTransfer(fromStop, transfer));
+    transfersToStop.get(transfer.stop()).add(DefaultRaptorTransfer.reverseOf(fromStop, transfer));
     return this;
   }
 

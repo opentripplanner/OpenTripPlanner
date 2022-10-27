@@ -19,7 +19,7 @@ class RouterConfigTest {
    * Test that the build-config.json example used in documentation is valid.
    */
   @Test
-  void validateRouterConfigExample() {
+  void validateExample() {
     var node = jsonNodeFromResource("standalone/config/router-config.json");
 
     // Setup so we get access to the NodeAdapter

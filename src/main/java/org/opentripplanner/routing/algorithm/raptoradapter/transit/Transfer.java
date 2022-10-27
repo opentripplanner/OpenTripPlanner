@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TransferWithDuration;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.core.AStarRequest;
 import org.opentripplanner.routing.core.State;
@@ -64,10 +63,11 @@ public class Transfer {
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();
       return Optional.of(
-        new TransferWithDuration(
-          this,
+        new DefaultRaptorTransfer(
+          this.toStop,
           (int) Math.ceil(durationSeconds),
-          RaptorCostConverter.toRaptorCost(durationSeconds * walkPreferences.reluctance())
+          RaptorCostConverter.toRaptorCost(durationSeconds * walkPreferences.reluctance()),
+          this
         )
       );
     }
@@ -84,10 +84,11 @@ public class Transfer {
     }
 
     return Optional.of(
-      new TransferWithDuration(
-        this,
+      new DefaultRaptorTransfer(
+        this.toStop,
         (int) s.getElapsedTimeSeconds(),
-        RaptorCostConverter.toRaptorCost(s.getWeight())
+        RaptorCostConverter.toRaptorCost(s.getWeight()),
+        this
       )
     );
   }

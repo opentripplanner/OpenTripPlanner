@@ -258,7 +258,6 @@ public class GtfsModule implements GraphBuilderModule {
     OtpTransitService otpTransitService
   ) {
     AddTransitModelEntitiesToGraph.addToGraph(
-      gtfsBundle.getFeedId(),
       otpTransitService,
       gtfsBundle.subwayAccessTime,
       graph,

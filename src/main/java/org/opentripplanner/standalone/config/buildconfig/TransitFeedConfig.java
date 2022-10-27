@@ -19,9 +19,19 @@ public class TransitFeedConfig {
   ) {
     List<DataSourceConfig> list = root
       .of(parameterName)
-      .withDoc(NA, /*TODO DOC*/"TODO")
-      .withExample(/*TODO DOC*/"TODO")
-      .withDescription(/*TODO DOC*/"TODO")
+      .since(NA)
+      .summary("Scan for transit data files")
+      .description(
+        """
+        The transitFeeds section of `build-config.json` allows you to override the default behavior
+        of scanning for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+        You can specify data located outside the local filesystem (including cloud storage services)
+        or at various different locations around the local filesystem.
+        
+        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds 
+        section, auto-scanning in the base directory for this feed type will be disabled.
+        """
+      )
       .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
 
     return new TransitFeeds(
@@ -36,7 +46,8 @@ public class TransitFeedConfig {
   ) {
     var type = feedNode
       .of("type")
-      .withDoc(V2_2, "The feed input format.")
+      .since(V2_2)
+      .summary("The feed input format.")
       .asEnum(TransitFeedType.class);
     return switch (type) {
       case GTFS -> mapGtfsFeed(feedNode);
@@ -46,16 +57,8 @@ public class TransitFeedConfig {
 
   private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
     return new GtfsFeedParametersBuilder()
-      .withFeedId(
-        node
-          .of("feedId")
-          .withDoc(NA, /*TODO DOC*/"TODO")
-          .withExample(/*TODO DOC*/"TODO")
-          .asString(null)
-      )
-      .withSource(
-        node.of("source").withDoc(NA, /*TODO DOC*/"TODO").withExample(/*TODO DOC*/"TODO").asUri()
-      )
+      .withFeedId(node.of("feedId").since(NA).summary("TODO").asString(null))
+      .withSource(node.of("source").since(NA).summary("TODO").asUri())
       .build();
   }
 

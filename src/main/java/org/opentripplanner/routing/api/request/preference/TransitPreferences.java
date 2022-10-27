@@ -120,10 +120,6 @@ public final class TransitPreferences implements Serializable {
     return otherThanPreferredRoutesPenalty;
   }
 
-  /**
-   * A cost function used to calculate penalty for an unpreferred route. Function should return
-   * number of seconds that we are willing to wait for preferred route.
-   */
   public DoubleAlgorithmFunction unpreferredCost() {
     return unpreferredCost;
   }

@@ -433,10 +433,10 @@ directory. By default, this file is not written during graph builds. There is al
 parameter called `readCachedElevations` which is set to `true` by default.
 
 In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from the
-cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overriden via the
-CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, the
-time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly 9
-minutes).
+cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden via 
+the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, 
+the time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly
+9 minutes).
 
 The cached data is a lookup table where the coordinate sequences of respective street edges are used
 as keys for calculated data. It is assumed that all of the other input data except for the
