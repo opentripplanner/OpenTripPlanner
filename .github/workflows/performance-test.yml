@@ -12,6 +12,9 @@ jobs:
     strategy:
       matrix:
         include:
+          - location: skanetrafiken
+            iterations: 1
+            jfr-delay: "50s"
 
           - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
             iterations: 1
@@ -23,10 +26,6 @@ jobs:
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 4
-            jfr-delay: "50s"
-
-          - location: skanetrafiken
-            iteration: 1
             jfr-delay: "50s"
 
     steps:
