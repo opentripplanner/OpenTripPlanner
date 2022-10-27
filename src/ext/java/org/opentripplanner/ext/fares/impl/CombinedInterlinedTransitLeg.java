@@ -30,8 +30,10 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     this.second = second;
   }
 
+  public Agency getAgency() {
+    return first.getAgency();
+  }
 
-  public Agency getAgency() { return first.getAgency(); }
   @Nonnull
   @Override
   public TransitMode getMode() {
@@ -95,6 +97,6 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     Set<FareZone> fareZones = first.getFareZones();
     fareZones.addAll(second.getFareZones());
 
-  return fareZones;
+    return fareZones;
   }
 }

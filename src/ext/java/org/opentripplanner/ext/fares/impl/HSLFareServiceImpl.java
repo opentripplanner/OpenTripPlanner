@@ -28,8 +28,11 @@ public class HSLFareServiceImpl extends DefaultFareService {
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
 
   @Override
-  protected boolean shouldCombineInterlinedLegs(ScheduledTransitLeg previousLeg, ScheduledTransitLeg currentLeg) {
-    return false;
+  protected boolean shouldCombineInterlinedLegs(
+    ScheduledTransitLeg previousLeg,
+    ScheduledTransitLeg currentLeg
+  ) {
+    return true;
   }
 
   @Override
@@ -61,7 +64,10 @@ public class HSLFareServiceImpl extends DefaultFareService {
       Set<String> ruleZones = null;
 
       for (FareRuleSet ruleSet : fareRules) {
-        if (ruleSet.hasAgencyDefined() && leg.getAgency().getId().getId() != ruleSet.getAgency().getId()) {
+        if (
+          ruleSet.hasAgencyDefined() &&
+          leg.getAgency().getId().getId() != ruleSet.getAgency().getId()
+        ) {
           continue;
         }
         RouteOriginDestination routeOriginDestination = new RouteOriginDestination(
@@ -129,7 +135,8 @@ public class HSLFareServiceImpl extends DefaultFareService {
       for (FareRuleSet ruleSet : fareRules) {
         // make sure the rule is applicable by agency requirements
         if (
-          ruleSet.hasAgencyDefined() && (singleAgency == false || agency != ruleSet.getAgency().getId())
+          ruleSet.hasAgencyDefined() &&
+          (singleAgency == false || agency != ruleSet.getAgency().getId())
         ) {
           continue;
         }
