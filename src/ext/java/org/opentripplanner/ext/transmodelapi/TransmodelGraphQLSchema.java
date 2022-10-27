@@ -740,8 +740,10 @@ public class TransmodelGraphQLSchema {
                 GqlUtil
                   .getRoutingService(environment)
                   .findClosestStops(
-                    environment.getArgument("latitude"),
-                    environment.getArgument("longitude"),
+                    new Coordinate(
+                      environment.getArgument("longitude"),
+                      environment.getArgument("latitude")
+                    ),
                     environment.getArgument("radius")
                   )
                   .stream()

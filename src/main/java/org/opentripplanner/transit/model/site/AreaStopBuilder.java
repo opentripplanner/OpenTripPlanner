@@ -65,7 +65,7 @@ public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBui
 
   public AreaStopBuilder withGeometry(Geometry geometry) {
     this.geometry = geometry;
-    this.centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
+    this.centroid = new WgsCoordinate(geometry.getCentroid());
     return this;
   }
 

@@ -75,8 +75,7 @@ public class KmlBikeParkDataSource implements DataSource<VehicleParking> {
           builder
             .entranceId(new FeedScopedId(this.feedId, id))
             .name(localizedName)
-            .x(x)
-            .y(y)
+            .coordinate(new WgsCoordinate(y, x))
             .walkAccessible(true)
         )
         .build();

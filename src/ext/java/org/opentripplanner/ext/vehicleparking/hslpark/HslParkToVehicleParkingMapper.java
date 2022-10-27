@@ -92,8 +92,6 @@ public class HslParkToVehicleParkingMapper {
         ? new NonLocalizedString(vehicleParkId.getId())
         : TranslatedString.getI18NString(translations, true, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
-      double x = geometry.getCentroid().getX();
-      double y = geometry.getCentroid().getY();
 
       var stateText = jsonNode.path("status").asText();
       var state = stateMapper(stateText);
@@ -116,7 +114,7 @@ public class HslParkToVehicleParkingMapper {
         .id(vehicleParkId)
         .name(name)
         .state(state)
-        .coordinate(new WgsCoordinate(y, x))
+        .coordinate(new WgsCoordinate(geometry.getCentroid()))
         .capacity(capacity)
         .bicyclePlaces(bicyclePlaces)
         .carPlaces(carPlaces)
@@ -127,8 +125,7 @@ public class HslParkToVehicleParkingMapper {
           builder
             .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
             .name(name)
-            .x(x)
-            .y(y)
+            .coordinate(new WgsCoordinate(geometry.getCentroid()))
             .walkAccessible(true)
             .carAccessible(carPlaces || wheelChairAccessiblePlaces)
         )

@@ -481,15 +481,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               )
             )
             .name(creativeName)
-            .x(node.lon)
-            .y(node.lat)
+            .coordinate(new WgsCoordinate(node.getCoordinate()))
             .walkAccessible(true)
             .carAccessible(isCarParkAndRide);
 
         var vehicleParking = createVehicleParkingObjectFromOsmEntity(
           isCarParkAndRide,
-          node.lon,
-          node.lat,
+          node.getCoordinate(),
           node,
           creativeName,
           List.of(entrance)
@@ -630,8 +628,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       var vehicleParking = createVehicleParkingObjectFromOsmEntity(
         isCarParkAndRide,
-        (envelope.getMinX() + envelope.getMaxX()) / 2,
-        (envelope.getMinY() + envelope.getMaxY()) / 2,
+        envelope.centre(),
         entity,
         creativeName,
         entrances
@@ -644,8 +641,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private VehicleParking createVehicleParkingObjectFromOsmEntity(
       boolean isCarParkAndRide,
-      double lon,
-      double lat,
+      Coordinate coordinate,
       OSMWithTags entity,
       I18NString creativeName,
       List<VehicleParking.VehicleParkingEntranceCreator> entrances
@@ -714,7 +710,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         .builder()
         .id(id)
         .name(creativeName)
-        .coordinate(new WgsCoordinate(lat, lon))
+        .coordinate(new WgsCoordinate(coordinate))
         .tags(tags)
         .detailsUrl(entity.getTag("website"))
         .openingHoursCalendar(openingHours)
@@ -840,8 +836,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               )
             )
             .name(entranceName)
-            .x(access.getVertex().getX())
-            .y(access.getVertex().getY())
+            .coordinate(new WgsCoordinate(access.getVertex().getCoordinate()))
             .vertex(access.getVertex())
             .walkAccessible(access.getVertex().isConnectedToWalkingEdge())
             .carAccessible(access.getVertex().isConnectedToDriveableEdge())

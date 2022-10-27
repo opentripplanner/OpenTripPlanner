@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
@@ -21,6 +22,18 @@ public final class WgsCoordinate implements Serializable {
     // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
     this.latitude = DoubleUtils.roundTo7Decimals(latitude);
     this.longitude = DoubleUtils.roundTo7Decimals(longitude);
+  }
+
+  public WgsCoordinate(Point point) {
+    Objects.requireNonNull(point);
+    this.latitude = DoubleUtils.roundTo7Decimals(point.getY());
+    this.longitude = DoubleUtils.roundTo7Decimals(point.getX());
+  }
+
+  public WgsCoordinate(Coordinate coordinate) {
+    Objects.requireNonNull(coordinate);
+    this.latitude = DoubleUtils.roundTo7Decimals(coordinate.getY());
+    this.longitude = DoubleUtils.roundTo7Decimals(coordinate.getX());
   }
 
   /**

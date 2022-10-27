@@ -54,12 +54,10 @@ public class HslHubToVehicleParkingGroupMapper {
         ? new NonLocalizedString(hubId.getId())
         : TranslatedString.getI18NString(translations, true, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
-      double x = geometry.getCentroid().getX();
-      double y = geometry.getCentroid().getY();
       var vehicleParkingGroup = VehicleParkingGroup
         .of(hubId)
         .withName(name)
-        .withCoordinate(new WgsCoordinate(y, x))
+        .withCoordinate(new WgsCoordinate(geometry.getCentroid()))
         .build();
       var vehicleParkingIds = getVehicleParkingIds((ArrayNode) jsonNode.get("facilityIds"), hubId);
       if (vehicleParkingIds == null) {

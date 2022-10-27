@@ -53,8 +53,8 @@ public class HslParkUpdaterTest {
     assertEquals(24.804713, first.getCoordinate().longitude());
     assertEquals(60.1760189, first.getCoordinate().latitude());
     var entrance = first.getEntrances().get(0);
-    assertEquals(24.804713028552346, entrance.getX());
-    assertEquals(60.176018858575354, entrance.getY());
+    assertEquals(24.804713, entrance.getCoordinate().longitude());
+    assertEquals(60.1760189, entrance.getCoordinate().latitude());
     assertTrue(entrance.isCarAccessible());
     assertTrue(entrance.isWalkAccessible());
     assertTrue(first.hasAnyCarPlaces());

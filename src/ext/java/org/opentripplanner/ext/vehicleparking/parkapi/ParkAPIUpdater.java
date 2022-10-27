@@ -72,8 +72,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       builder
         .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
         .name(new NonLocalizedString(jsonNode.path("name").asText()))
-        .x(x)
-        .y(y)
+        .coordinate(new WgsCoordinate(y, x))
         .walkAccessible(true)
         .carAccessible(true);
 

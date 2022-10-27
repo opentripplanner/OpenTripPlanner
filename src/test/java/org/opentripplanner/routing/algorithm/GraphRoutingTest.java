@@ -415,8 +415,7 @@ public abstract class GraphRoutingTest {
         builder
           .entranceId(TransitModelForTest.id(id))
           .name(new NonLocalizedString(id))
-          .x(streetVertex.getX())
-          .y(streetVertex.getY())
+          .coordinate(new WgsCoordinate(streetVertex.getCoordinate()))
           .vertex(streetVertex)
           .carAccessible(carAccessible)
           .walkAccessible(walkAccessible);
