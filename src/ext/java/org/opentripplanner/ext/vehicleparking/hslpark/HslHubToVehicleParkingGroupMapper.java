@@ -57,8 +57,7 @@ public class HslHubToVehicleParkingGroupMapper {
       double x = geometry.getCentroid().getX();
       double y = geometry.getCentroid().getY();
       var vehicleParkingGroup = VehicleParkingGroup
-        .builder()
-        .withId(hubId)
+        .of(hubId)
         .withName(name)
         .withCoordinate(new WgsCoordinate(y, x))
         .build();

@@ -10,14 +10,8 @@ public class VehicleParkingGroupBuilder {
   I18NString name;
   WgsCoordinate coordinate;
 
-  VehicleParkingGroupBuilder() {}
-
-  /**
-   * The id of this vehicle parking group, prefixed by the source(=feedId) so that it is unique.
-   */
-  public VehicleParkingGroupBuilder withId(FeedScopedId id) {
+  VehicleParkingGroupBuilder(FeedScopedId id) {
     this.id = id;
-    return this;
   }
 
   /**

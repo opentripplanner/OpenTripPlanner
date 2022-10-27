@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -14,6 +13,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
@@ -322,13 +322,11 @@ public class VehicleParking implements Serializable {
   }
 
   public String toString() {
-    return String.format(
-      Locale.ROOT,
-      "VehicleParking(%s at %.6f, %.6f)",
-      name,
-      coordinate.latitude(),
-      coordinate.longitude()
-    );
+    return ToStringBuilder
+      .of(VehicleParking.class)
+      .addStr("name", name.toString())
+      .addObj("coordinate", coordinate)
+      .toString();
   }
 
   private void addEntrance(VehicleParkingEntranceCreator creator) {
