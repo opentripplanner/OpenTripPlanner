@@ -988,14 +988,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       Trip trip = tripTimes.getTrip();
       for (TripPattern pattern : patterns) {
         if (tripTimes.getNumStops() == pattern.numberOfStops()) {
+          // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
+          // previously created trip
+          removePreviousRealtimeUpdate(trip, serviceDate);
           if (!tripTimes.isCanceled()) {
             // UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest
             // realtime-update to replace previous update regardless of realtimestate
             cancelScheduledTrip(trip, serviceDate);
-
-            // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
-            // previously created trip
-            removePreviousRealtimeUpdate(trip, serviceDate);
 
             // Calculate modified stop-pattern
             var modifiedStops = createModifiedStops(
@@ -1027,7 +1026,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 .ifFailure(errors::add);
             }
           } else {
-            removePreviousRealtimeUpdate(trip, serviceDate);
             buffer.update(pattern, tripTimes, serviceDate).ifFailure(errors::add);
           }
 
