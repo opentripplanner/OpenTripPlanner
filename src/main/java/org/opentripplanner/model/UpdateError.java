@@ -1,8 +1,8 @@
 package org.opentripplanner.model;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 
 public record UpdateError(
   @Nullable FeedScopedId tripId,

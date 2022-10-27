@@ -1,7 +1,6 @@
-package org.opentripplanner.common.model;
+package org.opentripplanner.transit.model.framework;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 
