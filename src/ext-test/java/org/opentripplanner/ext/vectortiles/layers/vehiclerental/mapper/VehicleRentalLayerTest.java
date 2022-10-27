@@ -98,6 +98,7 @@ public class VehicleRentalLayerTest {
     station.isRenting = false;
     station.isReturning = false;
     station.vehiclesAvailable = 8;
+    station.spacesAvailable = 3;
 
     Map<String, Object> map = new HashMap<>();
     mapper.map(station).forEach(o -> map.put(o.first, o.second));
@@ -108,6 +109,7 @@ public class VehicleRentalLayerTest {
     assertEquals("A", map.get("network"));
     assertEquals(false, map.get("operative"));
     assertEquals(8, map.get("vehiclesAvailable"));
+    assertEquals(3, map.get("spacesAvailable"));
   }
 
   @Nonnull

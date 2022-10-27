@@ -25,6 +25,7 @@ public class DigitransitRealtimeVehicleRentalStationPropertyMapper
       new T2<>("name", i18NStringMapper.mapToApi(station.getName())),
       new T2<>("network", station.getNetwork()),
       new T2<>("vehiclesAvailable", station.getVehiclesAvailable()),
+      new T2<>("spacesAvailable", station.getSpacesAvailable()),
       new T2<>("operative", station.isAllowPickup() && station.isAllowDropoff()),
       // a station can potentially have multiple form factors that's why this is plural
       new T2<>(
