@@ -3,7 +3,6 @@ package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -12,20 +11,19 @@ import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
-public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
+public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkingAndGroup> {
 
-  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Graph, PropertyMapper<VehicleParking>>> mappers = Map.of(
-    VehicleParkingsLayerBuilder.MapperType.Digitransit,
-    g -> DigitransitVehicleParkingPropertyMapper.create()
+  static Map<VehicleParkingGroupsLayerBuilder.MapperType, Function<Graph, PropertyMapper<VehicleParkingAndGroup>>> mappers = Map.of(
+    VehicleParkingGroupsLayerBuilder.MapperType.Digitransit,
+    g -> DigitransitVehicleParkingGroupPropertyMapper.create()
   );
   private final Graph graph;
 
-  public VehicleParkingsLayerBuilder(
+  public VehicleParkingGroupsLayerBuilder(
     Graph graph,
     TransitService transitService,
     VectorTilesResource.LayerParameters layerParameters
@@ -33,7 +31,7 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
     super(
       layerParameters.name(),
       mappers
-        .get(VehicleParkingsLayerBuilder.MapperType.valueOf(layerParameters.mapper()))
+        .get(VehicleParkingGroupsLayerBuilder.MapperType.valueOf(layerParameters.mapper()))
         .apply(graph)
     );
     this.graph = graph;
@@ -46,14 +44,20 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
       return List.of();
     }
     return service
-      .getVehicleParkings()
-      .map(vehicleParking -> {
-        Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
+      .getVehicleParkingGroups()
+      .asMap()
+      .entrySet()
+      .stream()
+      .map(vehicleParkingGroupEntry -> {
+        var group = vehicleParkingGroupEntry.getKey();
+        Coordinate coordinate = group.coordinate().asJtsCoordinate();
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        point.setUserData(vehicleParking);
-        return point;
+        var parking = vehicleParkingGroupEntry.getValue();
+        var parkingAndGroup = new VehicleParkingAndGroup(group, parking);
+        point.setUserData(parkingAndGroup);
+        return (Geometry) point;
       })
-      .collect(Collectors.toList());
+      .toList();
   }
 
   enum MapperType {

@@ -13,6 +13,7 @@ public class HslParkUpdaterParameters extends VehicleParkingUpdaterParameters {
   private final int facilitiesFrequencySec;
   private final String facilitiesUrl;
   private final String feedId;
+  private final String hubsUrl;
   private final String utilizationsUrl;
   private final ZoneId timeZone;
 
@@ -24,12 +25,14 @@ public class HslParkUpdaterParameters extends VehicleParkingUpdaterParameters {
     DataSourceType sourceType,
     int utilizationsFrequencySec,
     String utilizationsUrl,
-    ZoneId timeZone
+    ZoneId timeZone,
+    String hubsUrl
   ) {
     super(configRef, utilizationsFrequencySec, sourceType);
     this.facilitiesFrequencySec = facilitiesFrequencySec;
     this.facilitiesUrl = facilitiesUrl;
     this.feedId = feedId;
+    this.hubsUrl = hubsUrl;
     this.utilizationsUrl = utilizationsUrl;
     this.timeZone = timeZone;
   }
@@ -44,6 +47,10 @@ public class HslParkUpdaterParameters extends VehicleParkingUpdaterParameters {
 
   public String getFacilitiesUrl() {
     return facilitiesUrl;
+  }
+
+  public String getHubsUrl() {
+    return hubsUrl;
   }
 
   public String getUtilizationsUrl() {

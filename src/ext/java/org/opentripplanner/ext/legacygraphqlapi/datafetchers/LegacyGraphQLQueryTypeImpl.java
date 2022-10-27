@@ -1062,8 +1062,7 @@ public class LegacyGraphQLQueryTypeImpl
         stops =
           getRoutingService(environment)
             .findClosestStops(
-              args.getLegacyGraphQLLat(),
-              args.getLegacyGraphQLLon(),
+              new Coordinate(args.getLegacyGraphQLLon(), args.getLegacyGraphQLLat()),
               args.getLegacyGraphQLRadius()
             );
       } catch (RoutingValidationException e) {

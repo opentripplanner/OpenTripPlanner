@@ -11,6 +11,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VehicleParkingHelperTest {
@@ -50,8 +51,7 @@ class VehicleParkingHelperTest {
               builder
                 .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
                 .name(new NonLocalizedString("Entrance " + id))
-                .x(id)
-                .y(id)
+                .coordinate(new WgsCoordinate(id, id))
                 .carAccessible(id == 1 || id == 3)
                 .walkAccessible(id == 2 || id == 3)
           )
@@ -78,8 +78,7 @@ class VehicleParkingHelperTest {
               builder
                 .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
                 .name(new NonLocalizedString("Entrance " + id))
-                .x(id)
-                .y(id)
+                .coordinate(new WgsCoordinate(id, id))
                 .walkAccessible(true)
           )
           .collect(Collectors.toList())

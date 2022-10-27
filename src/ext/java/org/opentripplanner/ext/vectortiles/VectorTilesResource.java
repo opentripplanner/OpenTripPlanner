@@ -24,6 +24,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPlacesLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
@@ -66,6 +67,7 @@ public class VectorTilesResource {
         )
     );
     layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
+    layers.put(LayerType.VehicleParkingGroup, VehicleParkingGroupsLayerBuilder::new);
   }
 
   public VectorTilesResource(
@@ -173,6 +175,7 @@ public class VectorTilesResource {
     VehicleRentalVehicle,
     VehicleRentalStation,
     VehicleParking,
+    VehicleParkingGroup,
   }
 
   public interface LayersParameters {
