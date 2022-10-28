@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.opentest4j.AssertionFailedError;
 import org.opentripplanner.standalone.config.framework.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
@@ -26,6 +28,15 @@ public class ExampleConfigTest {
   @ParameterizedTest(name = "Check validity of {0}")
   void buildConfig(Path filename) {
     testConfig(filename, a -> new BuildConfig(a, true));
+  }
+
+  @FilePatternSource(pattern = { "src/test/resources/standalone/config/invalid-config.json" })
+  @ParameterizedTest(name = "Fail when parsing an invalid config from {0}")
+  void failInvalidConfig(Path filename) {
+    Assertions.assertThrows(
+      AssertionFailedError.class,
+      () -> testConfig(filename, a -> new BuildConfig(a, true))
+    );
   }
 
   private void testConfig(Path path, Consumer<NodeAdapter> buildConfig) {
