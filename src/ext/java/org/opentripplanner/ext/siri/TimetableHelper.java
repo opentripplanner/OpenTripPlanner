@@ -886,7 +886,7 @@ public class TimetableHelper {
       var dataFrame = journey.getFramedVehicleJourneyRef().getDataFrameRef();
       if (dataFrame != null) {
         try {
-          return LocalDate.parse(dataFrame.getValue()).atStartOfDay(zoneId);
+          return LocalDate.parse(dataFrame.getValue());
         } catch (DateTimeParseException ignored) {
           LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
         }
