@@ -103,14 +103,7 @@ number of transit vehicles used in that itinerary.
           .asObject()
       );
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
-    this.transitConfig =
-      new TransitRoutingConfig(
-        root
-          .of("transit")
-          .since(NA)
-          .summary("Configuration for transit searches with RAPTOR.")
-          .asObject()
-      );
+    this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
       mapRouteRequest(
         root

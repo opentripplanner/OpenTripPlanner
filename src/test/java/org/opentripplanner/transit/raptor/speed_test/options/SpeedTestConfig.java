@@ -46,15 +46,7 @@ public class SpeedTestConfig {
         .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
     graph = adapter.of("graph").since(NA).summary("TODO").asUri(null);
     feedId = adapter.of("feedId").since(NA).summary("TODO").asString();
-    transitRoutingParams =
-      new TransitRoutingConfig(
-        adapter
-          .of("tuningParameters")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter);
     request =
       mapRouteRequest(
         adapter
