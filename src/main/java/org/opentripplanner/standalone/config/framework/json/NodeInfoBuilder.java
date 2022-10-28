@@ -20,9 +20,7 @@ class NodeInfoBuilder {
   private String description = null;
   private String defaultValue = null;
   private boolean required = true;
-
   private boolean skipChildren = false;
-  private DeprecatedInfo deprecated = null;
 
   public String name() {
     return name;
@@ -55,11 +53,6 @@ class NodeInfoBuilder {
 
   NodeInfoBuilder withDescription(String description) {
     this.description = description;
-    return this;
-  }
-
-  NodeInfoBuilder withDeprecated(OtpVersion deprecatedSince, String description) {
-    this.deprecated = new DeprecatedInfo(deprecatedSince, description);
     return this;
   }
 
@@ -126,8 +119,7 @@ class NodeInfoBuilder {
       since,
       defaultValue,
       required,
-      skipChildren,
-      deprecated
+      skipChildren
     );
   }
 }

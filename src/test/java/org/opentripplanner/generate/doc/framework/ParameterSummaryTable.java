@@ -28,9 +28,6 @@ public class ParameterSummaryTable extends AbstractTable {
 
   @Override
   void addRow(NodeAdapter node, TableBuilder table, NodeInfo info) {
-    if (info.isDeprecated()) {
-      return;
-    }
     table.addRow(
       parameterNameIndented(node, info),
       MarkdownFormatter.code(info.typeDescription()),

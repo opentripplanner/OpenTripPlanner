@@ -22,8 +22,6 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  *                 set.
  * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
  *                  node.
- * @param deprecated This parameter is no longer in use in OTP, we keep it here to be able to
- *                   generate documentation.
  *
  *
  * TODO DOC - Add Unit tests on this class using the builder
@@ -38,8 +36,7 @@ public record NodeInfo(
   OtpVersion since,
   @Nullable String defaultValue,
   boolean required,
-  boolean skipChild,
-  @Nullable DeprecatedInfo deprecated
+  boolean skipChild
 )
   implements Comparable<NodeInfo> {
   private static final String TYPE_QUALIFIER = "type";
@@ -99,10 +96,6 @@ public record NodeInfo(
    */
   public boolean printDetails() {
     return (description != null || enumType != null || elementType != null) && !isTypeQualifier();
-  }
-
-  public boolean isDeprecated() {
-    return deprecated != null;
   }
 
   static NodeInfoBuilder of() {
