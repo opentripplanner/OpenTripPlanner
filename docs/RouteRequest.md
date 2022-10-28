@@ -129,7 +129,8 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 
 <h3 id="routingDefaults_alightSlack">alightSlack</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`  \
+**Path:** /routingDefaults 
 
 The minimum extra time after exiting a public transport vehicle.
 
@@ -137,7 +138,8 @@ The slack is added to the time when going from the transit vehicle to the stop.
 
 <h3 id="routingDefaults_boardSlack">boardSlack</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`  \
+**Path:** /routingDefaults 
 
 The boardSlack is the minimum extra time to board a public transport vehicle.
 
@@ -150,21 +152,24 @@ transit leg in the trip. This is the default value used, if not overridden by th
 
 <h3 id="routingDefaults_drivingDirection">drivingDirection</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"right"` ∙ **Path:** `routingDefaults`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"right"`  \
+**Path:** /routingDefaults  \
 **Enum values:** `right` | `left`
 
 The driving direction to use in the intersection traversal calculation
 
 <h3 id="routingDefaults_intersectionTraversalModel">intersectionTraversalModel</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"simple"` ∙ **Path:** `routingDefaults`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"simple"`  \
+**Path:** /routingDefaults  \
 **Enum values:** `norway` | `simple`
 
 The model that computes the costs of turns.
 
 <h3 id="routingDefaults_maxAccessEgressDuration">maxAccessEgressDuration</h3>
 
-**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"` ∙ **Path:** `routingDefaults` 
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`  \
+**Path:** /routingDefaults 
 
 This is the maximum duration for access/egress for street searches.
 
@@ -177,7 +182,8 @@ do not exist.
 
 <h3 id="routingDefaults_maxDirectStreetDuration">maxDirectStreetDuration</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT4H"` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT4H"`  \
+**Path:** /routingDefaults 
 
 This is the maximum duration for a direct street search for each mode.
 
@@ -190,14 +196,16 @@ do not exist."
 
 <h3 id="routingDefaults_optimize">optimize</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe"` ∙ **Path:** `routingDefaults`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe"`  \
+**Path:** /routingDefaults  \
 **Enum values:** `quick` | `safe` | `flat` | `greenways` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
 
 <h3 id="routingDefaults_stairsTimeFactor">stairsTimeFactor</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `3.0` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `3.0`  \
+**Path:** /routingDefaults 
 
 How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.
 
@@ -207,7 +215,8 @@ speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 1
 
 <h3 id="routingDefaults_unpreferredCost">unpreferredCost</h3>
 
-**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 0 + 1.0 x"` ∙ **Path:** `routingDefaults` 
+**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 0 + 1.0 x"`  \
+**Path:** /routingDefaults 
 
 A cost function used to calculate penalty for an unpreferred route.
 
@@ -217,7 +226,8 @@ or for an unpreferred agency's departure. For example, 600 + 2.0 x
 
 <h3 id="routingDefaults_alightSlackForMode">alightSlackForMode</h3>
 
-**Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults  \
 **Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail`
 
 How much time alighting a vehicle takes for each given mode.
@@ -226,25 +236,29 @@ Sometimes there is a need to configure a longer alighting times for specific mod
 
 <h3 id="routingDefaults_allowedVehicleRentalNetworks">allowedVehicleRentalNetworks</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 The vehicle rental networks which may be used. If empty all networks may be used.
 
 <h3 id="routingDefaults_bannedVehicleParkingTags">bannedVehicleParkingTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned
 
 <h3 id="routingDefaults_bannedVehicleRentalNetworks">bannedVehicleRentalNetworks</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 he vehicle rental networks which may not be used. If empty, no networks are banned.
 
 <h3 id="routingDefaults_boardSlackForMode">boardSlackForMode</h3>
 
-**Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults  \
 **Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail`
 
 How much time ride a vehicle takes for each given mode.
@@ -255,7 +269,8 @@ ferries, where the check-in process needs to be done in good time before ride.
 
 <h3 id="routingDefaults_itineraryFilters">itineraryFilters</h3>
 
-**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.
 
@@ -292,7 +307,8 @@ itineraries that are at least double in cost for the non-grouped legs.
 
 <h3 id="routingDefaults_itineraryFilters_accessibilityScore">accessibilityScore</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.
 
@@ -300,7 +316,8 @@ This can be used by by frontend developers to implement a simple traffic light U
 
 <h3 id="routingDefaults_itineraryFilters_bikeRentalDistanceRatio">bikeRentalDistanceRatio</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.
 
@@ -311,7 +328,8 @@ for the result to be included.
 
 <h3 id="routingDefaults_itineraryFilters_filterItinerariesWithSameFirstOrLastTrip">filterItinerariesWithSameFirstOrLastTrip</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.
 
@@ -323,7 +341,8 @@ removed from list.
 
 <h3 id="routingDefaults_itineraryFilters_groupedOtherThanSameLegsMaxCostMultiplier">groupedOtherThanSameLegsMaxCostMultiplier</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.
 
@@ -334,7 +353,8 @@ having a higher cost will be filtered.
 
 <h3 id="routingDefaults_itineraryFilters_nonTransitGeneralizedCostLimit">nonTransitGeneralizedCostLimit</h3>
 
-**Since version:** `na` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 3,600 + 2.0 x"` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 3,600 + 2.0 x"`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 The function define a max-limit for generalized-cost for non-transit itineraries.
 
@@ -351,7 +371,8 @@ then all non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 
 
 <h3 id="routingDefaults_itineraryFilters_parkAndRideDurationRatio">parkAndRideDurationRatio</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.
 
@@ -362,7 +383,8 @@ result to be included. However, if there is only a single result, it is never fi
 
 <h3 id="routingDefaults_itineraryFilters_removeItinerariesWithSameRoutesAndStops">removeItinerariesWithSameRoutesAndStops</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 Set to true if you want to list only the first itinerary  which goes through the same stops and routes.
 
@@ -370,7 +392,8 @@ Itineraries visiting the same set of stops and riding the exact same routes, dep
 
 <h3 id="routingDefaults_itineraryFilters_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults.itineraryFilters` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults/itineraryFilters 
 
 A relative limit for the generalized-cost for transit itineraries.
 
@@ -384,7 +407,8 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) 
 
 <h3 id="routingDefaults_maxAccessEgressDurationForMode">maxAccessEgressDurationForMode</h3>
 
-**Since version:** `na` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Since version:** `na` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults  \
 **Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `flexible`
 
 Limit access/egress per street mode.
@@ -395,7 +419,8 @@ done because some street modes searches are much more resource intensive than ot
 
 <h3 id="routingDefaults_maxDirectStreetDurationForMode">maxDirectStreetDurationForMode</h3>
 
-**Since version:** `2.2` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Since version:** `2.2` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults  \
 **Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `flexible`
 
 Limit direct route duration per street mode.
@@ -406,13 +431,15 @@ done because some street modes searches are much more resource intensive than ot
 
 <h3 id="routingDefaults_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 Tags which are required to use a vehicle parking. If empty, no tags are required.
 
 <h3 id="routingDefaults_transferOptimization">transferOptimization</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 Optimize where a transfer between to trip happens. This is a separate step *after* the routing is done. 
 
@@ -446,7 +473,8 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
 
 <h3 id="routingDefaults_transferOptimization_extraStopBoardAlightCostsFactor">extraStopBoardAlightCostsFactor</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0` ∙ **Path:** `routingDefaults.transferOptimization` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
+**Path:** /routingDefaults/transferOptimization 
 
 Add an extra board- and alight-cost for prioritized stops.
 
@@ -462,14 +490,16 @@ doubled. Stop priority is only supported by the NeTEx import, not GTFS.
 
 <h3 id="routingDefaults_transitReluctanceForMode">transitReluctanceForMode</h3>
 
-**Since version:** `na` ∙ **Type:** `enum map of double` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Since version:** `na` ∙ **Type:** `enum map of double` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults  \
 **Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail`
 
 Transit reluctance for a given transport mode
 
 <h3 id="routingDefaults_unpreferred">unpreferred</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 Parameters listing authorities or lines that preferably should not be used in trip patters.
 
@@ -483,7 +513,8 @@ travel time `x` (in seconds).
 
 <h3 id="routingDefaults_wheelchairAccessibility">wheelchairAccessibility</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** /routingDefaults 
 
 TODO
 
@@ -491,7 +522,8 @@ TODO
 
 <h3 id="routingDefaults_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.083` ∙ **Path:** `routingDefaults.wheelchairAccessibility` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.083`  \
+**Path:** /routingDefaults/wheelchairAccessibility 
 
 The maximum slope as a fraction of 1.
 
@@ -499,7 +531,8 @@ The maximum slope as a fraction of 1.
 
 <h3 id="routingDefaults_wheelchairAccessibility_slopeExceededReluctance">slopeExceededReluctance</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0` ∙ **Path:** `routingDefaults.wheelchairAccessibility` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
+**Path:** /routingDefaults/wheelchairAccessibility 
 
 How much streets with high slope should be avoided.
 
@@ -511,7 +544,8 @@ too steep edges.
 
 <h3 id="routingDefaults_wheelchairAccessibility_stairsReluctance">stairsReluctance</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `100.0` ∙ **Path:** `routingDefaults.wheelchairAccessibility` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `100.0`  \
+**Path:** /routingDefaults/wheelchairAccessibility 
 
 How much stairs should be avoided.
 

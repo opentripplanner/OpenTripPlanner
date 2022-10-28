@@ -609,7 +609,8 @@ There is currently only one custom naming module called `portland` (which has no
 
 <h3 id="areaVisibility">areaVisibility</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 Perform visibility calculations.
 
@@ -619,7 +620,8 @@ shortest way rather than around the edge of it. (These calculations can be time 
 
 <h3 id="buildReportDir">buildReportDir</h3>
 
-**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 URI to the directory where the graph build report should be written to.
 
@@ -629,7 +631,8 @@ If it does not exist, it is created.
 
 <h3 id="configVersion">configVersion</h3>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Deployment version of the *build-config.json*.
 
@@ -646,7 +649,8 @@ Be aware that OTP uses the config embedded in the loaded graph if no new config 
 
 <h3 id="dataImportReport">dataImportReport</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 Generate nice HTML report of Graph errors/warnings
 
@@ -654,7 +658,8 @@ The reports are stored in the same location as the graph.
 
 <h3 id="discardMinTransferTimes">discardMinTransferTimes</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 Should minimum transfer times in GTFS files be discarded.
 
@@ -664,7 +669,8 @@ but we want to calculate the transfers always from OSM data.
 
 <h3 id="distanceBetweenElevationSamples">distanceBetweenElevationSamples</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0`  \
+**Path:** / 
 
 The distance between elevation samples in meters.
 
@@ -672,7 +678,8 @@ The default is the approximate resolution of 1/3 arc-second NED data. This shoul
 
 <h3 id="elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
+**Path:** / 
 
 Specify a multiplier to convert elevation units from source to meters.
 
@@ -683,7 +690,8 @@ data, this should be set to 0.1.
 
 <h3 id="graph">graph</h3>
 
-**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 URI to the graph object file for reading and writing.
 
@@ -691,7 +699,8 @@ The file is created or overwritten if OTP saves the graph to the file.
 
 <h3 id="gsCredentials">gsCredentials</h3>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Local file system path to Google Cloud Platform service accounts credentials file.
 
@@ -704,7 +713,8 @@ This is a path to a file on the local file system, not an URI.
 
 <h3 id="includeEllipsoidToGeoidDifference">includeEllipsoidToGeoidDifference</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.
 
@@ -719,7 +729,8 @@ Include the Ellipsoid to Geiod difference in the calculations of every point alo
 
 <h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`  \
+**Path:** / 
 
 When a graph island with stops in it should be pruned.
 
@@ -729,7 +740,8 @@ size will be pruned.
 
 <h3 id="islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`  \
+**Path:** / 
 
 When a graph island without stops should be pruned.
 
@@ -739,7 +751,8 @@ this size will be pruned.
 
 <h3 id="maxDataImportIssuesPerFile">maxDataImportIssuesPerFile</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`  \
+**Path:** / 
 
 When to split the import report.
 
@@ -749,7 +762,8 @@ When to split the import report.
 
 <h3 id="maxStopToShapeSnapDistance">maxStopToShapeSnapDistance</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0`  \
+**Path:** / 
 
 Maximum distance between route shapes and their stops.
 
@@ -760,7 +774,8 @@ default to simple stop-to-stop geometry instead.
 
 <h3 id="multiThreadElevationCalculations">multiThreadElevationCalculations</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 Whether or not to multi-thread the elevation calculations in the elevation module.
 
@@ -771,7 +786,8 @@ used to calculate the elevations.
 
 <h3 id="osmCacheDataInMem">osmCacheDataInMem</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 If OSM data should be cached in memory during processing.
 
@@ -785,7 +801,8 @@ data, and to `false` to read the stream from the source each time.
 
 <h3 id="readCachedElevations">readCachedElevations</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
+**Path:** / 
 
 Whether to read cached elevation data.
 
@@ -796,7 +813,8 @@ recalculating them all over again.
 
 <h3 id="streetGraph">streetGraph</h3>
 
-**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 URI to the street graph object file for reading and writing.
 
@@ -804,7 +822,8 @@ The file is created or overwritten if OTP saves the graph to the file
 
 <h3 id="subwayAccessTime">subwayAccessTime</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
+**Path:** / 
 
 Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
 
@@ -812,7 +831,8 @@ Perhaps this should be a runtime router parameter rather than a graph build para
 
 <h3 id="transitModelTimeZone">transitModelTimeZone</h3>
 
-**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Time zone for the graph.
 
@@ -820,7 +840,8 @@ This is used to store the timetables in the transit model, and to interpret time
 
 <h3 id="transitServiceEnd">transitServiceEnd</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"P3Y"` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"P3Y"`  \
+**Path:** / 
 
 Limit the import of transit services to the given end date.
 
@@ -842,7 +863,8 @@ Examples:
 
 <h3 id="transitServiceStart">transitServiceStart</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"-P1Y"` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"-P1Y"`  \
+**Path:** / 
 
 Limit the import of transit services to the given START date.
 
@@ -863,7 +885,8 @@ Examples:
 
 <h3 id="writeCachedElevations">writeCachedElevations</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** / 
 
 Whether elevation data should be cached.
 
@@ -875,7 +898,8 @@ Whether elevation data should be cached.
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 What OSM tags should be looked on for the source of matching stops to platforms and stops.
 
@@ -883,7 +907,8 @@ What OSM tags should be looked on for the source of matching stops to platforms 
 
 <h3 id="dem">dem</h3>
 
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Specify parameters for DEM extracts.
 
@@ -891,7 +916,8 @@ If not specified OTP will fall back to auto-detection based on the directory pro
 
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 TODO
 
@@ -899,7 +925,8 @@ TODO
 
 <h3 id="localFileNamePatterns_dem">dem</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)\.tiff?$"` ∙ **Path:** `localFileNamePatterns` 
+**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)\.tiff?$"`  \
+**Path:** /localFileNamePatterns 
 
 Pattern for matching elevation DEM files.
 
@@ -909,7 +936,8 @@ considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="localFileNamePatterns_gtfs">gtfs</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)gtfs"` ∙ **Path:** `localFileNamePatterns` 
+**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)gtfs"`  \
+**Path:** /localFileNamePatterns 
 
 Patterns for matching GTFS zip-files or directories.
 
@@ -919,7 +947,8 @@ Any legal Java Regular expression is allowed.
 
 <h3 id="localFileNamePatterns_netex">netex</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)netex"` ∙ **Path:** `localFileNamePatterns` 
+**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)netex"`  \
+**Path:** /localFileNamePatterns 
 
 Patterns for matching NeTEx zip files or directories.
 
@@ -929,7 +958,8 @@ pattern it is considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="localFileNamePatterns_osm">osm</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)(\.pbf|\.osm|\.osm\.xml)$"` ∙ **Path:** `localFileNamePatterns` 
+**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)(\.pbf|\.osm|\.osm\.xml)$"`  \
+**Path:** /localFileNamePatterns 
 
 Pattern for matching Open Street Map input files.
 
@@ -939,7 +969,8 @@ it is considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="netexDefaults_groupFilePattern">groupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*\.xml"` ∙ **Path:** `netexDefaults` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*\.xml"`  \
+**Path:** /netexDefaults 
 
 Pattern for matching group NeTEx files.
 
@@ -952,7 +983,8 @@ with group `'RUT'`.
 
 <h3 id="netexDefaults_ignoreFilePattern">ignoreFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"$^"` ∙ **Path:** `netexDefaults` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"$^"`  \
+**Path:** /netexDefaults 
 
 Pattern for matching ignored files in a NeTEx bundle.
 
@@ -962,7 +994,8 @@ The *ignored* files are *not* loaded.
 
 <h3 id="netexDefaults_sharedFilePattern">sharedFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"shared-data\.xml"` ∙ **Path:** `netexDefaults` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"shared-data\.xml"`  \
+**Path:** /netexDefaults 
 
 Pattern for matching shared NeTEx files in a NeTEx bundle.
 
@@ -982,7 +1015,8 @@ File names are matched in the following order - and treated accordingly to the f
 
 <h3 id="netexDefaults_sharedGroupFilePattern">sharedGroupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*-shared\.xml"` ∙ **Path:** `netexDefaults` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})-.*-shared\.xml"`  \
+**Path:** /netexDefaults 
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
 
@@ -999,7 +1033,8 @@ The pattern `'(\w{3})-.*-shared\.xml'` matches `'RUT-shared.xml'` with group `'R
 
 <h3 id="netexDefaults_ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `netexDefaults` 
+**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /netexDefaults 
 
 List ferries witch do not allow bikes.
 
@@ -1012,7 +1047,8 @@ case where this is not the case.
 
 <h3 id="osm">osm</h3>
 
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Configure properties for a given OpenStreetMap feed.
 
@@ -1024,21 +1060,24 @@ the local filesystem.
 
 <h3 id="osm__0__osmTagMapping">osmTagMapping</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"` ∙ **Path:** `osm.[0]`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
+**Path:** /osm/[0]  \
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
 
 <h3 id="osmDefaults_osmTagMapping">osmTagMapping</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"` ∙ **Path:** `osmDefaults`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
+**Path:** /osmDefaults  \
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
 
 <h3 id="transitFeeds">transitFeeds</h3>
 
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Scan for transit data files
 
@@ -1053,7 +1092,8 @@ section, auto-scanning in the base directory for this feed type will be disabled
 
 <h3 id="transitFeeds__1__groupFilePattern">groupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})_.*\.xml"` ∙ **Path:** `transitFeeds.[1]` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(\w{3})_.*\.xml"`  \
+**Path:** /transitFeeds/[1] 
 
 Pattern for matching group NeTEx files.
 
@@ -1066,7 +1106,8 @@ with group `'RUT'`.
 
 <h3 id="transitFeeds__1__ignoreFilePattern">ignoreFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(temp|tmp)"` ∙ **Path:** `transitFeeds.[1]` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(temp|tmp)"`  \
+**Path:** /transitFeeds/[1] 
 
 Pattern for matching ignored files in a NeTEx bundle.
 
@@ -1076,7 +1117,8 @@ The *ignored* files are *not* loaded.
 
 <h3 id="transitFeeds__1__sharedFilePattern">sharedFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"_stops.xml"` ∙ **Path:** `transitFeeds.[1]` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"_stops.xml"`  \
+**Path:** /transitFeeds/[1] 
 
 Pattern for matching shared NeTEx files in a NeTEx bundle.
 
@@ -1096,7 +1138,8 @@ File names are matched in the following order - and treated accordingly to the f
 
 <h3 id="transitFeeds__1__sharedGroupFilePattern">sharedGroupFilePattern</h3>
 
-**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"_(\w{3})_shared_data.xml"` ∙ **Path:** `transitFeeds.[1]` 
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"_(\w{3})_shared_data.xml"`  \
+**Path:** /transitFeeds/[1] 
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
 
@@ -1113,7 +1156,8 @@ The pattern `'(\w{3})-.*-shared\.xml'` matches `'RUT-shared.xml'` with group `'R
 
 <h3 id="transitFeeds__1__ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `transitFeeds.[1]` 
+**Since version:** `2.0` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /transitFeeds/[1] 
 
 List ferries witch do not allow bikes.
 

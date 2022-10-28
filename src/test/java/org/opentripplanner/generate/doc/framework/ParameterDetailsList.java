@@ -74,12 +74,12 @@ public class ParameterDetailsList {
   void addMetaInfo(NodeInfo info, String path) {
     doc.label("Since version:").code(info.since()).dotSeparator();
     doc.label("Type:").code(info.typeDescription()).dotSeparator();
-    doc.label("Cardinality:").code(info.required() ? "Required" : "Optional").dotSeparator();
+    doc.label("Cardinality:").code(info.required() ? "Required" : "Optional");
 
     if (info.type().isSimple() && info.defaultValue() != null) {
-      doc.label("Default value:").code(info.type().quote(info.defaultValue())).dotSeparator();
+      doc.dotSeparator().label("Default value:").code(info.type().quote(info.defaultValue()));
     }
-    doc.label("Path:").code(path == null ? "Root" : path);
+    doc.lineBreak().label("Path:").path(path == null ? "/" : "/" + path.replace('.', '/'));
 
     // Document enums
     if (EnumSet.of(ConfigType.ENUM, ConfigType.ENUM_SET).contains(info.type())) {

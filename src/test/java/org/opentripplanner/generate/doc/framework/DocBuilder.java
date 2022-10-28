@@ -63,6 +63,14 @@ public class DocBuilder {
   }
 
   /**
+   * Add the text as inline code fragment followed by a SPACE.
+   */
+  public DocBuilder path(String path) {
+    buffer.append(path).append(ParameterDetailsList.SPACE);
+    return this;
+  }
+
+  /**
    * Add plain text to document followed by a SPACE.
    */
   public DocBuilder text(Object value) {

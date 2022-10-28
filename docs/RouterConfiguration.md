@@ -78,7 +78,8 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 
 <h3 id="requestLogFile">requestLogFile</h3>
 
-**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 The path of the log file for the requests.
 
@@ -109,7 +110,8 @@ number of transit vehicles used in that itinerary.
 
 <h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`  \
+**Path:** / 
 
 The maximimg time a street routing request is allowed to take before returning a timeout.
 
@@ -127,13 +129,15 @@ The search abort after this duration and any paths found are returned to the cli
 
 <h3 id="bikeRentalServiceDirectory_headers">headers</h3>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional` ∙ **Path:** `bikeRentalServiceDirectory` 
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Path:** /bikeRentalServiceDirectory 
 
 TODO
 
 <h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
 
-**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300` ∙ **Path:** `flex` 
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300`  \
+**Path:** /flex 
 
 How long should you be allowed to walk from a flex vehicle to a transit one.
 
@@ -141,7 +145,8 @@ How long should a passenger be allowed to walk after getting out of a flex vehic
 
 <h3 id="transit">transit</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
 
 Configuration for transit searches with RAPTOR.
 
@@ -152,7 +157,8 @@ request and the actual routing request.
 
 <h3 id="transit_iterationDepartureStepInSeconds">iterationDepartureStepInSeconds</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `60` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `60`  \
+**Path:** /transit 
 
 Step for departure times between each RangeRaptor iterations.
 
@@ -164,7 +170,8 @@ but you might get a slack of 60 seconds somewhere in the result.
 
 <h3 id="transit_maxNumberOfTransfers">maxNumberOfTransfers</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `12` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `12`  \
+**Path:** /transit 
 
 This parameter is used to allocate enough memory space for Raptor.
 
@@ -175,7 +182,8 @@ transfers is very little so it is better to set it too high then to low.
 
 <h3 id="transit_scheduledTripBinarySearchThreshold">scheduledTripBinarySearchThreshold</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `50`  \
+**Path:** /transit 
 
 This threshold is used to determine when to perform a binary trip schedule search.
 
@@ -187,7 +195,8 @@ few percent.
 
 <h3 id="transit_searchThreadPoolSize">searchThreadPoolSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`  \
+**Path:** /transit 
 
 Split a travel search in smaller jobs and run them in parallel to improve performance.
 
@@ -198,7 +207,8 @@ no extra threads are stated and the search is done in one thread.
 
 <h3 id="transit_transferCacheMaxSize">transferCacheMaxSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `25` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `25`  \
+**Path:** /transit 
 
 The maximum number of distinct transfers parameters to cache pre-calculated transfers for.
 
@@ -206,7 +216,8 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 <h3 id="transit_dynamicSearchWindow">dynamicSearchWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** /transit 
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
 
@@ -214,7 +225,8 @@ EDT is earliest-departure-time, LAT is latest-arrival-time and SW is raptor-sear
 
 <h3 id="transit_pagingSearchWindowAdjustments">pagingSearchWindowAdjustments</h3>
 
-**Since version:** `na` ∙ **Type:** `duration[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `transit` 
+**Since version:** `na` ∙ **Type:** `duration[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /transit 
 
 The provided array of durations is used to increase the search-window for the next/previous page.
 
@@ -227,7 +239,8 @@ for more info."
 
 <h3 id="transit_stopTransferCost">stopTransferCost</h3>
 
-**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional` ∙ **Path:** `transit`  \
+**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`  \
+**Path:** /transit  \
 **Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
 
 Use this to set a stop transfer cost for the given transfer priority
@@ -253,7 +266,8 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
 
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `transmodelApi` 
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Path:** /transmodelApi 
 
 TODO
 

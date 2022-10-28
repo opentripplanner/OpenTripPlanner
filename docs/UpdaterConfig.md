@@ -100,7 +100,8 @@ predicted arrival and departure times for the remainder of the trip.
 
 <h4 id="updaters__3__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"` ∙ **Path:** `updaters.[3]`  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
+**Path:** /updaters/[3]  \
 **Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
@@ -158,7 +159,8 @@ How backwards propagation should be handled.
 
 <h4 id="updaters__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"` ∙ **Path:** `updaters.[5]`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`  \
+**Path:** /updaters/[5]  \
 **Enum values:** `required-no-data` | `required` | `always`
 
 TODO
@@ -268,7 +270,8 @@ can be configured as a json. Any header key, value can be inserted.
 
 <h4 id="updaters__1__allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `updaters.[1]` 
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /updaters/[1] 
 
 If a vehicle should be allowed to be kept at the end of a station-based rental.
 
@@ -276,7 +279,8 @@ This behaviour is useful in towns that have only a single rental station. Withou
 
 <h4 id="updaters__1__network">network</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[1]` 
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[1] 
 
 The name of the network to override the one derived from the source data.
 
@@ -284,14 +288,16 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 <h4 id="updaters__1__sourceType">sourceType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required` ∙ **Path:** `updaters.[1]`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Path:** /updaters/[1]  \
 **Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
 
 What source of vehicle rental updater to use.
 
 <h4 id="updaters__1__headers">headers</h4>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[1]` 
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[1] 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
 
@@ -346,7 +352,8 @@ its [sandbox documentation](../docs/sandbox/VehicleParking.md).
 
 <h4 id="updaters__2__feedId">feedId</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[2]` 
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[2] 
 
 The name of the data source.
 
@@ -354,14 +361,16 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="updaters__2__sourceType">sourceType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required` ∙ **Path:** `updaters.[2]`  \
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Path:** /updaters/[2]  \
 **Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
 
 The source of the vehicle updates.
 
 <h4 id="updaters__2__timeZone">timeZone</h4>
 
-**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[2]` 
+**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Path:** /updaters/[2] 
 
 The time zone of the feed.
 
