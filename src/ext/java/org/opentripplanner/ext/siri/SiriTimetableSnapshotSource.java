@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -35,6 +34,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -784,12 +784,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     pattern.add(tripTimes);
 
     tripTimes
-      .findFirstNoneIncreasingStopTime()
-      .ifPresent(invalidStopIndex -> {
+      .validateNonIncreasingTimes()
+      .ifFailure(error -> {
         throw new IllegalStateException(
           String.format(
-            "Non-increasing triptimes for added trip at stop index %d",
-            invalidStopIndex
+            "Non-increasing triptimes for added trip at stop index %d, error %s",
+            error.stopIndex(),
+            error.errorType()
           )
         );
       });
@@ -1121,12 +1122,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Add new trip times to the buffer and return success
-    var maybeError = buffer.update(pattern, updatedTripTimes, serviceDate);
+    var result = buffer.update(pattern, updatedTripTimes, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
     addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
 
-    return maybeError;
+    return result;
   }
 
   private void addTripOnServiceDateToBuffer(
