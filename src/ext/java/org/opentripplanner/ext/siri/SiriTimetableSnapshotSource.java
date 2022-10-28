@@ -991,6 +991,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
           // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
           // previously created trip
           removePreviousRealtimeUpdate(trip, serviceDate);
+          cancelScheduledTrip(trip, serviceDate);
           if (!tripTimes.isCanceled()) {
             // UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest
             // realtime-update to replace previous update regardless of realtimestate
@@ -1025,8 +1026,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               )
                 .ifFailure(errors::add);
             }
-          } else {
-            cancelScheduledTrip(trip, serviceDate);
           }
 
           LOG.debug("Applied realtime data for trip {}", trip.getId().getId());
