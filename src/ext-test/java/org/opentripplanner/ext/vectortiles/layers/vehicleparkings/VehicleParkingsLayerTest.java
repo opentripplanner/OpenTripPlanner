@@ -95,7 +95,7 @@ public class VehicleParkingsLayerTest {
       VehicleParkingsLayerBuilder builder = new VehicleParkingsLayerBuilder(
         graph,
         tiles.layers().get(0),
-        new Locale("en-US")
+        Locale.US
       );
 
       List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
@@ -154,7 +154,7 @@ public class VehicleParkingsLayerTest {
   @Test
   public void digitransitVehicleParkingPropertyMapperTest() {
     DigitransitVehicleParkingPropertyMapper mapper = DigitransitVehicleParkingPropertyMapper.create(
-      new Locale("en-US")
+      Locale.US
     );
     Map<String, Object> map = new HashMap<>();
     mapper.map(vehicleParking).forEach(o -> map.put(o.first, o.second));

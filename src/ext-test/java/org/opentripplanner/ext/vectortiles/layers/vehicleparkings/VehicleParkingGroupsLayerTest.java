@@ -123,7 +123,7 @@ public class VehicleParkingGroupsLayerTest {
       VehicleParkingGroupsLayerBuilderWithPublicGeometry builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
         graph,
         tiles.layers().get(0),
-        new Locale("en-US")
+        Locale.US
       );
 
       List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
@@ -141,7 +141,7 @@ public class VehicleParkingGroupsLayerTest {
   @Test
   public void digitransitVehicleParkingGroupPropertyMapperTest() {
     VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
-      new Locale("en-US")
+      Locale.US
     );
     Map<String, Object> map = new HashMap<>();
     mapper
