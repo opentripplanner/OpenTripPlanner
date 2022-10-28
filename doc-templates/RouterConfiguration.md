@@ -46,26 +46,6 @@ travel time `x` (in seconds). Example configuration:
 }
 ```
 
-## Timeout
-
-In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not
-the case anymore. The street part of the routing may still take a long time if searching very long
-distances. You can set the street routing timeout to avoid tying up server resources on pointless
-searches and ensure that your users receive a timely response. You can also limit the max distance
-to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
-information that can help identify problematic searches and improve our routing methods. There are
-no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
-search-window. To set the street routing timeout use the following config:
-
-```JSON
-// router-config.json
-{
-  "streetRoutingTimeout": "5.5s"
-}
-```
-
-This specifies a timeout as duration which has the amount and the unit. The search abort after this duration and any paths found are returned to the client.
-
 ## maxAccessEgressDurationForMode
 
 Override the settings in maxAccessEgressDuration for specific street modes. This is done because 

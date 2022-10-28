@@ -1,6 +1,6 @@
 {
   "configVersion" : "v2.2.0-EN000121",
-  "streetRoutingTimeout": 5,
+  "streetRoutingTimeout": "5s",
   "routingDefaults": {
     "walkSpeed": 1.3,
     "bikeSpeed": 5,

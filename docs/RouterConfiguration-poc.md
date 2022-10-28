@@ -18,7 +18,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 |----------------------------------------------------------------------------|:---------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | configVersion                                                              |        `string`       | Version of the configuration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | *Optional* |               |   na  |
 | requestLogFile                                                             |        `string`       | The path of the log file for the requests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | *Optional* |               |   na  |
-| streetRoutingTimeout                                                       |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | *Optional* | `"PT5S"`      |   na  |
+| [streetRoutingTimeout](#streetRoutingTimeout)                              |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | *Optional* | `"PT5S"`      |   na  |
 | bikeRentalServiceDirectory                                                 |        `object`       | Deprecated. Use bikeRentalServiceDirectory.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | *Optional* |               |  2.0  |
 |    language                                                                |        `string`       | TODO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | *Optional* |               |   na  |
 |    sourcesName                                                             |        `string`       | TODO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | *Optional* | `"systems"`   |   na  |
@@ -85,26 +85,6 @@ travel time `x` (in seconds). Example configuration:
   }
 }
 ```
-
-## Timeout
-
-In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not
-the case anymore. The street part of the routing may still take a long time if searching very long
-distances. You can set the street routing timeout to avoid tying up server resources on pointless
-searches and ensure that your users receive a timely response. You can also limit the max distance
-to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
-information that can help identify problematic searches and improve our routing methods. There are
-no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
-search-window. To set the street routing timeout use the following config:
-
-```JSON
-// router-config.json
-{
-  "streetRoutingTimeout": "5.5s"
-}
-```
-
-This specifies a timeout as duration which has the amount and the unit. The search abort after this duration and any paths found are returned to the client.
 
 ## maxAccessEgressDurationForMode
 
@@ -260,6 +240,24 @@ for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanne
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
+
+**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"` ∙ **Path:** `Root` 
+
+The maximimg time a street routing request is allowed to take before returning a timeout.
+
+In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not
+the case anymore. The street part of the routing may still take a long time if searching very long
+distances. You can set the street routing timeout to avoid tying up server resources on pointless
+searches and ensure that your users receive a timely response. You can also limit the max distance
+to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
+information that can help identify problematic searches and improve our routing methods. There are
+no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
+search-window.
+
+The search abort after this duration and any paths found are returned to the client.
+
 
 <h3 id="bikeRentalServiceDirectory_headers">headers</h3>
 
