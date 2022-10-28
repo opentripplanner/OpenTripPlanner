@@ -214,17 +214,7 @@ public class RoutingRequestMapper {
       )
     );
     preferences.withItineraryFilter(it -> {
-      mapItineraryFilterParams(
-        c
-          .of("itineraryFilters")
-          .since(V2_0)
-          .summary(
-            "Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results."
-          )
-          .description(/*TODO DOC*/"TODO")
-          .asObject(),
-        it
-      );
+      mapItineraryFilterParams("itineraryFilters", c, it);
     });
   }
 

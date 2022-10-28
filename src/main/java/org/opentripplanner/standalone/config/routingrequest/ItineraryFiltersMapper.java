@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routingrequest;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -14,35 +15,99 @@ public class ItineraryFiltersMapper {
   private static final Logger LOG = LoggerFactory.getLogger(ItineraryFiltersMapper.class);
 
   public static void mapItineraryFilterParams(
-    NodeAdapter c,
+    String parameterName,
+    NodeAdapter root,
     ItineraryFilterPreferences.Builder builder
   ) {
+    NodeAdapter c = root
+      .of(parameterName)
+      .since(V2_0)
+      .summary(
+        "Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results."
+      )
+      .description(
+        """
+The purpose of the itinerary filter chain is to post process the result returned by the routing
+search. The filters may modify itineraries, sort them, and filter away less preferable results.
+        
+OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and
+`generalized-cost` as criteria. Use the parameters listed here to reduce/filter the itineraries
+return by the search engine before returning the results to client. There is also a few mandatory
+none configurable filters removing none optimal results. You may see these filters pop-up in the
+filter debugging.
+
+#### Group by similarity filters
+
+The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
+with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
+`groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
+
+The group-by-filter work by grouping itineraries together and then reducing the number of
+itineraries in each group, keeping the itinerary/itineraries with the best itinerary
+_generalized-cost_. The group-by function first pick all transit legs that account for more than N%
+of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
+legs in one of the keys also exist in the other. Note, one key may have a larger set of legs than the
+other, but they can still be the same. When comparing two legs we compare the `tripId` and make sure
+the legs overlap in place and time. Two legs are the same if both legs ride at least a common
+subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The
+`keepThree` keeps 3 itineraries for each group.
+
+The grouped itineraries can be further reduced by using `groupedOtherThanSameLegsMaxCostMultiplier`.
+This parameter filters out itineraries, where the legs that are not common for all the grouped
+itineraries have a much higher cost, than the lowest in the group. By default, it filters out
+itineraries that are at least double in cost for the non-grouped legs.
+"""
+      )
+      .asObject();
+
     if (c.isEmpty()) {
       return;
     }
     var dft = builder.original();
 
     builder
-      .withDebug(c.of("debug").since(NA).summary("TODO").asBoolean(dft.debug()))
+      .withDebug(
+        c
+          .of("debug")
+          .since(NA)
+          .summary(
+            "Enable this to attach a system notice to itineraries instead of removing them. This " +
+            "is very convenient when tuning the filters."
+          )
+          .asBoolean(dft.debug())
+      )
       .withGroupSimilarityKeepOne(
         c
           .of("groupSimilarityKeepOne")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
+          )
           .asDouble(dft.groupSimilarityKeepOne())
       )
       .withGroupSimilarityKeepThree(
         c
           .of("groupSimilarityKeepThree")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity."
+          )
           .asDouble(dft.groupSimilarityKeepThree())
       )
       .withGroupedOtherThanSameLegsMaxCostMultiplier(
         c
           .of("groupedOtherThanSameLegsMaxCostMultiplier")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one."
+          )
+          .description(
+            """
+Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs
+be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries 
+having a higher cost will be filtered.
+"""
+          )
           .asDouble(dft.groupedOtherThanSameLegsMaxCostMultiplier())
       )
       .withTransitGeneralizedCostLimit(
@@ -50,8 +115,17 @@ public class ItineraryFiltersMapper {
           c
             .of("transitGeneralizedCostLimit")
             .since(NA)
-            .summary("TODO")
-            .description(/*TODO DOC*/"TODO")
+            .summary("A relative limit for the generalized-cost for transit itineraries.")
+            .description(
+              """
+The filter compares all itineraries against every other itinerary. If the generalized-cost plus a 
+`transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is 
+dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a 
+*relative cost* for the distance in time between the itineraries. The *relative cost* is the 
+`intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be 
+_1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
+"""
+            )
             .asObject(),
           dft.transitGeneralizedCostLimit()
         )
@@ -60,39 +134,102 @@ public class ItineraryFiltersMapper {
         c
           .of("nonTransitGeneralizedCostLimit")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "The function define a max-limit for generalized-cost for non-transit itineraries."
+          )
+          .description(
+            """
+The max-limit is applied to itineraries with *no transit legs*, however *all* itineraries
+(including those with transit legs) are considered when calculating the minimum cost. The smallest
+generalized-cost value is used as input to the function. Then function is used to calculate a
+*max-limit*. The max-limit is then used to to filter *non-transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit is dropped from the result
+set.
+
+For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, 
+then all non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+"""
+          )
           .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
       .withBikeRentalDistanceRatio(
         c
           .of("bikeRentalDistanceRatio")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "Filter routes that consist of bike-rental and walking by the minimum fraction " +
+            "of the bike-rental leg using _distance_."
+          )
+          .description(
+            """
+This filters out results that consist of a long walk plus a relatively short bike rental leg. A 
+value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order
+for the result to be included.
+"""
+          )
           .asDouble(dft.bikeRentalDistanceRatio())
       )
       .withParkAndRideDurationRatio(
         c
           .of("parkAndRideDurationRatio")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "Filter P+R routes that consist of driving and walking by the minimum fraction " +
+            "of the driving using of _time_."
+          )
+          .description(
+            """
+This filters out results that consist of driving plus a very long walk leg at the end. A value of 
+`0.3` means that a minimum of 30% of the total time must be spent in the car in order for the 
+result to be included. However, if there is only a single result, it is never filtered.
+            """
+          )
           .asDouble(dft.parkAndRideDurationRatio())
       )
       .withFilterItinerariesWithSameFirstOrLastTrip(
         c
           .of("filterItinerariesWithSameFirstOrLastTrip")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "If more than one itinerary begins or ends with same trip, filter out one of those " +
+            "itineraries so that only one remains."
+          )
+          .description(
+            """
+Trips are considered equal if they have same id and same service day. Non-transit legs are skipped
+during comparison. Before filtering, trips are sorted by their generalized cost. Algorithm loops
+through list from top to bottom. If itinerary matches from any other itinerary from above, it is
+removed from list.
+              """
+          )
           .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip())
-      )
-      .withAccessibilityScore(
-        c.of("accessibilityScore").since(NA).summary("TODO").asBoolean(dft.useAccessibilityScore())
       )
       .withRemoveItinerariesWithSameRoutesAndStops(
         c
           .of("removeItinerariesWithSameRoutesAndStops")
           .since(NA)
-          .summary("TODO")
+          .summary(
+            "Set to true if you want to list only the first itinerary  which goes through the " +
+            "same stops and routes."
+          )
+          .description(
+            "Itineraries visiting the same set of stops and riding the exact same routes, " +
+            "departing later are removed from the result."
+          )
           .asBoolean(dft.removeItinerariesWithSameRoutesAndStops())
+      )
+      .withAccessibilityScore(
+        c
+          .of("accessibilityScore")
+          .since(NA)
+          .summary(
+            "A experimental feature contributed by IBI which adds an sandbox accessibility " +
+            "*score* between 0 and 1 for each leg and itinerary."
+          )
+          .description(
+            "This can be used by by frontend developers to implement a simple traffic light UI."
+          )
+          .asBoolean(dft.useAccessibilityScore())
       )
       .build();
   }
@@ -121,8 +258,10 @@ public class ItineraryFiltersMapper {
     }
 
     LOG.warn(
-      "The format of transitGeneralizedCostLimit has changed, please see the documentation for new " +
-      "configuration format. The existing format will cease to work after OTP v2.2"
+      """
+      The format of transitGeneralizedCostLimit has changed, please see the documentation for
+      new configuration format. The existing format will cease to work after OTP v2.2
+      """
     );
 
     return new TransitGeneralizedCostFilterParams(RequestFunctions.parse(node.asText()), 0);
