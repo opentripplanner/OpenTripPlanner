@@ -124,7 +124,7 @@ public class TimetableHelper {
 
     int callCounter = 0;
 
-    ZonedDateTime serviceDate = getServiceDate(journey, zoneId, oldTimes);
+    LocalDate serviceDate = getServiceDate(journey, zoneId, oldTimes);
     Set<Object> alreadyVisited = new HashSet<>();
 
     boolean isJourneyPredictionInaccurate =
@@ -154,10 +154,7 @@ public class TimetableHelper {
         }
 
         if (foundMatch) {
-          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-            serviceDate.toLocalDate(),
-            zoneId
-          );
+          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
 
           int arrivalTime = newTimes.getArrivalTime(callCounter);
 
@@ -280,10 +277,7 @@ public class TimetableHelper {
               modifiedStopTimes.get(callCounter).cancelPickup();
             }
 
-            ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-              serviceDate.toLocalDate(),
-              zoneId
-            );
+            ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
 
             int arrivalTime = newTimes.getArrivalTime(callCounter);
 
@@ -874,7 +868,7 @@ public class TimetableHelper {
     };
   }
 
-  private static ZonedDateTime getServiceDate(
+  private static LocalDate getServiceDate(
     EstimatedVehicleJourney journey,
     ZoneId zoneId,
     TripTimes oldTimes
@@ -902,6 +896,9 @@ public class TimetableHelper {
       firstDeparture = recordedCalls.getRecordedCalls().get(0).getAimedDepartureTime();
     }
 
-    return firstDeparture.minusDays(calculateDayOffset(oldTimes)).withZoneSameInstant(zoneId);
+    return firstDeparture
+      .minusDays(calculateDayOffset(oldTimes))
+      .withZoneSameInstant(zoneId)
+      .toLocalDate();
   }
 }
