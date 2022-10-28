@@ -78,11 +78,11 @@ Sections follow that describe particular settings in more depth.
 |    [sharedGroupFilePattern](#netexDefaults_sharedGroupFilePattern)                   |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                     | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |    [ferryIdsNotAllowedForBicycle](#netexDefaults_ferryIdsNotAllowedForBicycle)       |  `string[]` | List ferries witch do not allow bikes.                                                                                                               | *Optional* |                                   |  2.0  |
 | [osm](#osm)                                                                          |  `object[]` | Configure properties for a given OpenStreetMap feed.                                                                                                 | *Optional* |                                   |   na  |
-|       [osmTagMapping](#osm__0__osmTagMapping)                                        |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults. | *Optional* | `"DEFAULT"`                       |   na  |
+|       [osmTagMapping](#osm__0__osmTagMapping)                                        |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults. | *Optional* | `"default"`                       |   na  |
 |       source                                                                         |    `uri`    | The unique URI pointing to the data file.                                                                                                            | *Required* |                                   |   na  |
 |       timeZone                                                                       | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                                                | *Optional* |                                   |   na  |
 | osmDefaults                                                                          |   `object`  | Default properties for OpenStreetMap feeds.                                                                                                          | *Optional* |                                   |   na  |
-|    [osmTagMapping](#osmDefaults_osmTagMapping)                                       |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults. | *Optional* | `"DEFAULT"`                       |   na  |
+|    [osmTagMapping](#osmDefaults_osmTagMapping)                                       |    `enum`   | The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults. | *Optional* | `"default"`                       |   na  |
 |    timeZone                                                                          | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                                                | *Optional* |                                   |   na  |
 | osmNaming                                                                            |   `object`  | No doc, parent contains doc.                                                                                                                         | *Optional* |                                   |   na  |
 | [transferRequests](/docs/RouteRequest.md)                                            |  `object[]` | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
@@ -1024,13 +1024,13 @@ the local filesystem.
 
 <h3 id="osm__0__osmTagMapping">osmTagMapping</h3>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"DEFAULT"` ∙ Path: `osm.[0]`*
+*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"default"` ∙ Path: `osm.[0]`*
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
 
 <h3 id="osmDefaults_osmTagMapping">osmTagMapping</h3>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"DEFAULT"` ∙ Path: `osmDefaults`*
+*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"default"` ∙ Path: `osmDefaults`*
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
 

@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config.framework.json;
 
+import static org.opentripplanner.standalone.config.framework.json.NodeInfo.TYPE_QUALIFIER;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,11 +136,11 @@ public class NodeAdapter {
   }
 
   /**
-   * Take a peek at a parameter in the JSON node. This might be necessary when more than one type
-   * with its own set of parameters are accepted.
+   * Return the value of the type qualifier or throws an exception if it does not exist.
    */
-  public JsonNode peek(String parameterName) {
-    return json.path(parameterName);
+  public String typeQualifier() {
+    assertRequiredFieldExist(TYPE_QUALIFIER);
+    return json.path(TYPE_QUALIFIER).asText();
   }
 
   /**

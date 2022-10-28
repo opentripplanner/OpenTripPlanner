@@ -66,7 +66,7 @@ public class NodeAdapterTest {
     assertEquals(
       "[" +
       "bool : boolean Required Since 2.0, " +
-      "en : enum = \"SECONDS\" Since 2.1, " +
+      "en : enum = \"seconds\" Since 2.1, " +
       "em : enum map of string Optional Since 2.1" +
       "]",
       infos.toString()

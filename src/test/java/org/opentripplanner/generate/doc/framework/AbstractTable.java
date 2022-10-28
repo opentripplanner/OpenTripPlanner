@@ -6,7 +6,6 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.EN
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
 import java.util.List;
-import java.util.stream.Stream;
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.framework.text.TableBuilder;
@@ -81,17 +80,8 @@ abstract class AbstractTable {
   String parameterNameIndented(NodeAdapter node, NodeInfo info) {
     String parameter = info.name();
 
-    // This is a hack, the "type" should be build in as a separate type qualifier,
-    // not matched by the magic name "type"
-    if ("type".equalsIgnoreCase(parameter) && info.type() == ConfigType.ENUM) {
-      var upperCaseValue = node.peek(parameter).asText().toUpperCase().replace('-', '_');
-      @SuppressWarnings("ConstantConditions")
-      Enum<?> qualifier = Stream
-        .of(info.enumType().getEnumConstants())
-        .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
-        .findFirst()
-        .orElseThrow();
-      parameter += " = " + info.type().quote(qualifier.name());
+    if (info.isTypeQualifier()) {
+      parameter += " = " + info.toMarkdownString(node.typeQualifier());
     }
     if (skipFunction.skip(info)) {
       parameter =

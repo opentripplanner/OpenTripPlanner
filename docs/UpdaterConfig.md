@@ -85,7 +85,7 @@ predicted arrival and departure times for the remainder of the trip.
 | Config Parameter                                                             |    Type   | Summary                                             |  Req./Opt. | Default Value        | Since |
 |------------------------------------------------------------------------------|:---------:|-----------------------------------------------------|:----------:|----------------------|:-----:|
 | type = "STOP_TIME_UPDATER"                                                   |   `enum`  | The type of the updater.                            | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#updaters__3__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"REQUIRED_NO_DATA"` |  2.2  |
+| [backwardsDelayPropagationType](#updaters__3__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled.        | *Optional* | `"required-no-data"` |  2.2  |
 | feedId                                                                       |  `string` | Which feed the updates apply to.                    | *Optional* |                      |   na  |
 | frequencySec                                                                 | `integer` | How often the data should be downloaded in seconds. | *Optional* | `60`                 |   na  |
 | fuzzyTripMatching                                                            | `boolean` | If the trips should be matched fuzzily.             | *Optional* | `false`              |   na  |
@@ -98,7 +98,7 @@ predicted arrival and departure times for the remainder of the trip.
 
 <h4 id="updaters__3__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-*Since version: `2.2` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"REQUIRED_NO_DATA"` ∙ Path: `updaters.[3]`*
+*Since version: `2.2` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"required-no-data"` ∙ Path: `updaters.[3]`*
 
 How backwards propagation should be handled.
 
@@ -143,7 +143,7 @@ How backwards propagation should be handled.
 | Config Parameter                                                             |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
 |------------------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
 | type = "WEBSOCKET_GTFS_RT_UPDATER"                                           |   `enum`  | The type of the updater. | *Required* |                      |   na  |
-| [backwardsDelayPropagationType](#updaters__5__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"REQUIRED_NO_DATA"` |   na  |
+| [backwardsDelayPropagationType](#updaters__5__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |   na  |
 | feedId                                                                       |  `string` | TODO                     | *Optional* |                      |   na  |
 | reconnectPeriodSec                                                           | `integer` | TODO                     | *Optional* | `60`                 |   na  |
 | url                                                                          |  `string` | TODO                     | *Optional* |                      |   na  |
@@ -153,7 +153,7 @@ How backwards propagation should be handled.
 
 <h4 id="updaters__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"REQUIRED_NO_DATA"` ∙ Path: `updaters.[5]`*
+*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"required-no-data"` ∙ Path: `updaters.[5]`*
 
 TODO
 

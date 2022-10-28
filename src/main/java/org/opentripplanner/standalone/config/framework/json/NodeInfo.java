@@ -2,6 +2,8 @@ package org.opentripplanner.standalone.config.framework.json;
 
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,7 +41,7 @@ public record NodeInfo(
   boolean skipChild
 )
   implements Comparable<NodeInfo> {
-  private static final String TYPE_QUALIFIER = "type";
+  static final String TYPE_QUALIFIER = "type";
 
   public NodeInfo {
     Objects.requireNonNull(name);
@@ -120,6 +122,20 @@ public record NodeInfo(
    */
   public boolean isTypeQualifier() {
     return enumType != null && TYPE_QUALIFIER.equalsIgnoreCase(name);
+  }
+
+  public List<? extends Enum<?>> enumTypeValues() {
+    return enumType == null ? List.of() : Arrays.stream(enumType.getEnumConstants()).toList();
+  }
+
+  /**
+   * Format the given value (read from JSON file) to a Markdown formatted string.
+   */
+  public String toMarkdownString(Object value) {
+    if (enumType != null) {
+      value = EnumMapper.mapToEnum2((String) value, enumType).orElseThrow();
+    }
+    return type.quote(value);
   }
 
   @Override

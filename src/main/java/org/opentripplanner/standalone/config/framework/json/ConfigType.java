@@ -116,7 +116,7 @@ public enum ConfigType {
   }
 
   public String docName() {
-    return name().toLowerCase().replace('_', '-');
+    return EnumMapper.toString(this);
   }
 
   /**

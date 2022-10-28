@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -181,7 +180,7 @@ public class ParameterBuilder {
   public <T extends Enum<T>> T asEnum(T defaultValue) {
     info
       .withEnum((Class<? extends Enum<?>>) defaultValue.getClass())
-      .withOptional(defaultValue.name());
+      .withOptional(EnumMapper.toString(defaultValue));
     // Do not inline the node, calling the build is required.
     var node = build();
     return exist() ? parseEnum(node.asText(), (Class<T>) defaultValue.getClass()) : defaultValue;
@@ -506,11 +505,8 @@ public class ParameterBuilder {
   }
 
   private <E extends Enum<E>> E parseEnum(String value, Class<E> ofType) {
-    var upperCaseValue = value.toUpperCase().replace('-', '_');
-    return Stream
-      .of(ofType.getEnumConstants())
-      .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
-      .findFirst()
+    return EnumMapper
+      .mapToEnum(value, ofType)
       .orElseThrow(() -> {
         throw error(
           "The parameter value '%s' is not legal. Expected one of %s.".formatted(

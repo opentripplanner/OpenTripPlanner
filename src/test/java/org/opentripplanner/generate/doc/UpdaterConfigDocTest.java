@@ -43,7 +43,7 @@ public class UpdaterConfigDocTest {
 
     for (String childName : node.listChildrenByName()) {
       var child = node.child(childName);
-      var type = child.peek("type").asText();
+      var type = child.typeQualifier();
 
       if (!SKIP_UPDATERS.contains(type)) {
         doc = replaceSection2(doc, type, updaterDoc(child));
