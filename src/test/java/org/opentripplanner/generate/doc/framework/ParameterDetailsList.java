@@ -1,10 +1,8 @@
 package org.opentripplanner.generate.doc.framework;
 
-import static org.opentripplanner.framework.text.MarkdownFormatter.NEW_LINE;
-import static org.opentripplanner.framework.text.MarkdownFormatter.header;
-
-import org.opentripplanner.framework.text.MarkdownFormatter;
+import java.util.EnumSet;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
+import org.opentripplanner.standalone.config.framework.json.EnumMapper;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.NodeInfo;
 import org.slf4j.Logger;
@@ -13,8 +11,9 @@ import org.slf4j.LoggerFactory;
 public class ParameterDetailsList {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParameterDetailsList.class);
+  public static final char SPACE = ' ';
 
-  private final StringBuilder buffer = new StringBuilder();
+  private final DocBuilder doc = new DocBuilder();
   private final SkipFunction skipNodeOp;
   private final int headerLevel;
 
@@ -30,7 +29,7 @@ public class ParameterDetailsList {
   ) {
     var details = new ParameterDetailsList(skipNodeOp, headerLevel);
     details.addParametersList(root);
-    return details.buffer.toString();
+    return details.doc.toDoc();
   }
 
   private void addParametersList(NodeAdapter node) {
@@ -53,48 +52,38 @@ public class ParameterDetailsList {
     }
   }
 
-  private void printNode(NodeAdapter node, NodeInfo it) {
+  private void printNode(NodeAdapter node, NodeInfo info) {
     // Skip node if there is no more info to print
-    if (!it.printDetails()) {
+    if (!info.printDetails()) {
       return;
     }
-    addSection(header(headerLevel, it.name(), node.fullPath(it.name())))
-      .addSection(MarkdownFormatter.em(parameterSummaryLine(it, node.contextPath())))
-      .addSection(it.summary())
-      .addSection(it.description());
+    var paramName = info.name();
+    doc.header(headerLevel, paramName, node.fullPath(paramName));
+    addMetaInfo(info, node.contextPath());
+    doc.addSection(info.summary());
+    doc.addSection(info.description());
   }
 
-  String parameterSummaryLine(NodeInfo info, String path) {
-    var buf = new StringBuilder();
-    var delimiter = " ∙ ";
-    buf
-      .append("Since version: ")
-      .append(MarkdownFormatter.code(info.since()))
-      .append(delimiter)
-      .append("Type: ")
-      .append(MarkdownFormatter.code(info.typeDescription()))
-      .append(delimiter)
-      .append(MarkdownFormatter.code(info.required() ? "Required" : "Optional"))
-      .append(delimiter);
+  private String enumValueToString(Enum<?> en) {
+    return EnumMapper.toString(en);
+  }
+
+  void addMetaInfo(NodeInfo info, String path) {
+    doc.label("Since version:").code(info.since()).dotSeparator();
+    doc.label("Type:").code(info.typeDescription()).dotSeparator();
+    doc.label("Cardinality:").code(info.required() ? "Required" : "Optional").dotSeparator();
 
     if (info.type().isSimple() && info.defaultValue() != null) {
-      buf.append("Default value: ").append(defaultValue(info)).append(delimiter);
+      doc.label("Default value:").code(info.type().quote(info.defaultValue())).dotSeparator();
     }
-    buf.append("Path: ").append(MarkdownFormatter.code(path == null ? "Root" : path));
+    doc.label("Path:").code(path == null ? "Root" : path);
 
-    return buf.toString();
-  }
-
-  String defaultValue(NodeInfo info) {
-    var defaultValue = info.defaultValue();
-    return defaultValue == null ? "" : MarkdownFormatter.code(info.type().quote(defaultValue));
-  }
-
-  private ParameterDetailsList addSection(String text) {
-    if (text == null || text.isBlank()) {
-      return this;
+    // Document enums
+    if (EnumSet.of(ConfigType.ENUM, ConfigType.ENUM_SET).contains(info.type())) {
+      doc.lineBreak().label("Enum values:").addEnums(info.enumTypeValues());
+    } else if (info.type() == ConfigType.ENUM_MAP) {
+      doc.lineBreak().label("Enum keys:").addEnums(info.enumTypeValues());
     }
-    buffer.append(text).append(NEW_LINE).append(NEW_LINE);
-    return this;
+    doc.endParagraph();
   }
 }

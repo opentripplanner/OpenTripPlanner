@@ -384,13 +384,13 @@ for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanne
 
 <h3 id="bikeRentalServiceDirectory_headers">headers</h3>
 
-*Since version: `na` ∙ Type: `map of string` ∙ `Optional` ∙ Path: `bikeRentalServiceDirectory`*
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional` ∙ **Path:** `bikeRentalServiceDirectory` 
 
 TODO
 
 <h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
 
-*Since version: `2.1` ∙ Type: `integer` ∙ `Optional` ∙ Default value: `300` ∙ Path: `flex`*
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300` ∙ **Path:** `flex` 
 
 How long should you be allowed to walk from a flex vehicle to a transit one.
 
@@ -398,7 +398,7 @@ How long should a passenger be allowed to walk after getting out of a flex vehic
 
 <h3 id="routingDefaults">routingDefaults</h3>
 
-*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `Root`*
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
 
 The default parameters for the routing query.
 
@@ -406,31 +406,32 @@ Most of these are overridable through the various API endpoints.
 
 <h3 id="transit_pagingSearchWindowAdjustments">pagingSearchWindowAdjustments</h3>
 
-*Since version: `na` ∙ Type: `duration[]` ∙ `Optional` ∙ Path: `transit`*
+**Since version:** `na` ∙ **Type:** `duration[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `transit` 
 
 The provided array of durations is used to increase the search-window for the next/previous page when the current page return few options. If ZERO results is returned the first duration in the list is used, if ONE result is returned then the second duration is used and so on. The duration is added to the existing search-window and inserted into the next and previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java) for more info.
 
 <h3 id="transit_stopTransferCost">stopTransferCost</h3>
 
-*Since version: `na` ∙ Type: `enum map of integer` ∙ `Optional` ∙ Path: `transit`*
+**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional` ∙ **Path:** `transit`  \
+**Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
 
 Use this to set a stop transfer cost for the given [TransferPriority](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/model/TransferPriority.java). The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set.
 
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
-*Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `transmodelApi`*
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `transmodelApi` 
 
 TODO
 
 <h3 id="updaters">updaters</h3>
 
-*Since version: `na` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
+**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
 
 Configuration for the updaters that import various types of data into OTP.
 
 <h3 id="vectorTileLayers">vectorTileLayers</h3>
 
-*Since version: `2.0` ∙ Type: `object[]` ∙ `Optional` ∙ Path: `Root`*
+**Since version:** `2.0` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
 
 Configuration of the individual layers for the Mapbox vector tiles.
 

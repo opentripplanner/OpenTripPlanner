@@ -129,25 +129,28 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 
 <h3 id="routingDefaults_drivingDirection">drivingDirection</h3>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"right"` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"right"` ∙ **Path:** `routingDefaults`  \
+**Enum values:** `right` | `left`
 
 The driving direction to use in the intersection traversal calculation
 
 <h3 id="routingDefaults_intersectionTraversalModel">intersectionTraversalModel</h3>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"simple"` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"simple"` ∙ **Path:** `routingDefaults`  \
+**Enum values:** `norway` | `simple`
 
 The model that computes the costs of turns.
 
 <h3 id="routingDefaults_optimize">optimize</h3>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"safe"` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe"` ∙ **Path:** `routingDefaults`  \
+**Enum values:** `quick` | `safe` | `flat` | `greenways` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
 
 <h3 id="routingDefaults_unpreferredCost">unpreferredCost</h3>
 
-*Since version: `2.2` ∙ Type: `linear-function` ∙ `Optional` ∙ Default value: `"f(x) = 0 + 1.0 x"` ∙ Path: `routingDefaults`*
+**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 0 + 1.0 x"` ∙ **Path:** `routingDefaults` 
 
 A cost function used to calculate penalty for an unpreferred route.
 
@@ -157,37 +160,39 @@ or for an unpreferred agency's departure. For example, 600 + 2.0 x
 
 <h3 id="routingDefaults_alightSlackForMode">alightSlackForMode</h3>
 
-*Since version: `2.0` ∙ Type: `enum map of duration` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail`
 
 How much time alighting a vehicle takes for each given mode.
 
 <h3 id="routingDefaults_allowedVehicleRentalNetworks">allowedVehicleRentalNetworks</h3>
 
-*Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 The vehicle rental networks which may be used. If empty all networks may be used.
 
 <h3 id="routingDefaults_bannedVehicleParkingTags">bannedVehicleParkingTags</h3>
 
-*Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned
 
 <h3 id="routingDefaults_bannedVehicleRentalNetworks">bannedVehicleRentalNetworks</h3>
 
-*Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 he vehicle rental networks which may not be used. If empty, no networks are banned.
 
 <h3 id="routingDefaults_boardSlackForMode">boardSlackForMode</h3>
 
-*Since version: `2.0` ∙ Type: `enum map of duration` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail`
 
 How much time ride a vehicle takes for each given mode.
 
 <h3 id="routingDefaults_itineraryFilters">itineraryFilters</h3>
 
-*Since version: `2.0` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.
 
@@ -195,7 +200,7 @@ TODO
 
 <h3 id="routingDefaults_itineraryFilters_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
 
-*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults.itineraryFilters`*
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults.itineraryFilters` 
 
 TODO
 
@@ -203,25 +208,27 @@ TODO
 
 <h3 id="routingDefaults_maxAccessEgressDurationForMode">maxAccessEgressDurationForMode</h3>
 
-*Since version: `na` ∙ Type: `enum map of duration` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `flexible`
 
 Limit access/egress per street mode.
 
 <h3 id="routingDefaults_maxDirectStreetDurationForMode">maxDirectStreetDurationForMode</h3>
 
-*Since version: `2.2` ∙ Type: `enum map of duration` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `2.2` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `flexible`
 
 Limit direct route duration per street mode.
 
 <h3 id="routingDefaults_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
-*Since version: `na` ∙ Type: `string[]` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 Tags which are required to use a vehicle parking. If empty, no tags are required.
 
 <h3 id="routingDefaults_transferOptimization">transferOptimization</h3>
 
-*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 TODO
 
@@ -229,13 +236,14 @@ TODO
 
 <h3 id="routingDefaults_transitReluctanceForMode">transitReluctanceForMode</h3>
 
-*Since version: `na` ∙ Type: `enum map of double` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `enum map of double` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults`  \
+**Enum keys:** `rail` | `coach` | `subway` | `bus` | `tram` | `ferry` | `airplane` | `cable-car` | `gondola` | `funicular` | `trolleybus` | `monorail`
 
 Transit reluctance for a given transport mode
 
 <h3 id="routingDefaults_unpreferred">unpreferred</h3>
 
-*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 Parameters for indicating authorities or lines that preferably should not be used in trip patters.A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty).
 
@@ -243,7 +251,7 @@ TODO
 
 <h3 id="routingDefaults_wheelchairAccessibility">wheelchairAccessibility</h3>
 
-*Since version: `na` ∙ Type: `object` ∙ `Optional` ∙ Path: `routingDefaults`*
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional` ∙ **Path:** `routingDefaults` 
 
 TODO
 
@@ -251,7 +259,7 @@ TODO
 
 <h3 id="routingDefaults_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
-*Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `0.083` ∙ Path: `routingDefaults.wheelchairAccessibility`*
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.083` ∙ **Path:** `routingDefaults.wheelchairAccessibility` 
 
 The maximum slope as a fraction of 1.
 
@@ -259,7 +267,7 @@ The maximum slope as a fraction of 1.
 
 <h3 id="routingDefaults_wheelchairAccessibility_slopeExceededReluctance">slopeExceededReluctance</h3>
 
-*Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `1.0` ∙ Path: `routingDefaults.wheelchairAccessibility`*
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0` ∙ **Path:** `routingDefaults.wheelchairAccessibility` 
 
 How much streets with high slope should be avoided.
 
@@ -271,7 +279,7 @@ too steep edges.
 
 <h3 id="routingDefaults_wheelchairAccessibility_stairsReluctance">stairsReluctance</h3>
 
-*Since version: `na` ∙ Type: `double` ∙ `Optional` ∙ Default value: `100.0` ∙ Path: `routingDefaults.wheelchairAccessibility`*
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `100.0` ∙ **Path:** `routingDefaults.wheelchairAccessibility` 
 
 How much stairs should be avoided.
 

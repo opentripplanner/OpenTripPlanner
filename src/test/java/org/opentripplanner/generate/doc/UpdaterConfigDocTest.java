@@ -10,6 +10,7 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNo
 import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.generate.doc.framework.DocBuilder;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
@@ -61,37 +62,39 @@ public class UpdaterConfigDocTest {
   }
 
   private String updaterDoc(NodeAdapter node) {
-    StringBuilder buf = new StringBuilder();
-    buf.append(getParameterSummaryTable(node));
-    String details = getParameterDetailsTable(node);
-
-    if (!details.isBlank()) {
-      buf.append("\n\n#### Details\n\n").append(details);
-    }
-    buf.append("\n");
-    buf.append(
-      """
-      ```JSON
-      // router-config.json
-      {
-        "updaters": [
-          %s
-          ]
-        }
-      ```
-        """.formatted(
-          node.toPrettyString().indent(4).trim()
-        )
-    );
-
+    DocBuilder buf = new DocBuilder();
+    addParameterSummaryTable(buf, node);
+    addDetailsSection(buf, node);
+    addExample(buf, node);
     return buf.toString();
   }
 
-  private String getParameterSummaryTable(NodeAdapter node) {
-    return new ParameterSummaryTable(SKIP_NODES).createTable(node).toMarkdownTable();
+  private void addParameterSummaryTable(DocBuilder buf, NodeAdapter node) {
+    buf.addSection(new ParameterSummaryTable(SKIP_NODES).createTable(node).toMarkdownTable());
+  }
+
+  private void addDetailsSection(DocBuilder buf, NodeAdapter node) {
+    String details = getParameterDetailsTable(node);
+
+    if (!details.isBlank()) {
+      buf.header(4, "Details", null).addSection(details);
+    }
   }
 
   private String getParameterDetailsTable(NodeAdapter node) {
     return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_4);
+  }
+
+  private void addExample(DocBuilder buf, NodeAdapter node) {
+    buf.addExample(
+      "router-config.json",
+      """
+      "updaters": [
+        %s
+      ]
+      """.formatted(
+          node.toPrettyString().indent(2).trim()
+        )
+    );
   }
 }

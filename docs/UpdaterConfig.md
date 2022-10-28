@@ -57,18 +57,20 @@ Alerts are text messages attached to GTFS objects, informing riders of disruptio
 | fuzzyTripMatching         | `boolean` | TODO                     | *Optional* | `false`       |   na  |
 | url                       |  `string` | TODO                     | *Required* |               |   na  |
 
+
 ```JSON
 // router-config.json
 {
-  "updaters": [
+    "updaters": [
     {
       "type" : "real-time-alerts",
       "frequencySec" : 30,
       "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
       "feedId" : "TriMet"
     }
-    ]
-  }
+  ]
+
+}
 ```
 
 <!-- real-time-alerts END -->
@@ -98,7 +100,8 @@ predicted arrival and departure times for the remainder of the trip.
 
 <h4 id="updaters__3__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-*Since version: `2.2` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"required-no-data"` ∙ Path: `updaters.[3]`*
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"` ∙ **Path:** `updaters.[3]`  \
+**Enum values:** `required-no-data` | `required` | `always`
 
 How backwards propagation should be handled.
 
@@ -117,10 +120,11 @@ How backwards propagation should be handled.
 
 
 
+
 ```JSON
 // router-config.json
 {
-  "updaters": [
+    "updaters": [
     {
       "type" : "stop-time-updater",
       "frequencySec" : 60,
@@ -128,8 +132,9 @@ How backwards propagation should be handled.
       "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
       "feedId" : "TriMet"
     }
-    ]
-  }
+  ]
+
+}
 ```
 
 <!-- stop-time-updater END -->
@@ -153,20 +158,23 @@ How backwards propagation should be handled.
 
 <h4 id="updaters__5__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Optional` ∙ Default value: `"required-no-data"` ∙ Path: `updaters.[5]`*
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"` ∙ **Path:** `updaters.[5]`  \
+**Enum values:** `required-no-data` | `required` | `always`
 
 TODO
+
 
 
 ```JSON
 // router-config.json
 {
-  "updaters": [
+    "updaters": [
     {
       "type" : "websocket-gtfs-rt-updater"
     }
-    ]
-  }
+  ]
+
+}
 ```
 
 <!-- websocket-gtfs-rt-updater END -->
@@ -187,18 +195,20 @@ geographic coordinates or position relative to their scheduled stops.
 | frequencySec               | `integer` | How often the positions should be updated.                                | *Optional* | `60`          |  2.2  |
 | url                        |   `uri`   | The URL of GTFS-RT protobuf HTTP resource to download the positions from. | *Required* |               |  2.2  |
 
+
 ```JSON
 // router-config.json
 {
-  "updaters": [
+    "updaters": [
     {
       "type" : "vehicle-positions",
       "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId" : "1",
       "frequencySec" : 60
     }
-    ]
-  }
+  ]
+
+}
 ```
 
 <!-- vehicle-positions END -->
@@ -258,7 +268,7 @@ can be configured as a json. Any header key, value can be inserted.
 
 <h4 id="updaters__1__allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
 
-*Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `updaters.[1]`*
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false` ∙ **Path:** `updaters.[1]` 
 
 If a vehicle should be allowed to be kept at the end of a station-based rental.
 
@@ -266,7 +276,7 @@ This behaviour is useful in towns that have only a single rental station. Withou
 
 <h4 id="updaters__1__network">network</h4>
 
-*Since version: `na` ∙ Type: `string` ∙ `Optional` ∙ Path: `updaters.[1]`*
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[1]` 
 
 The name of the network to override the one derived from the source data.
 
@@ -274,21 +284,23 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 <h4 id="updaters__1__sourceType">sourceType</h4>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Required` ∙ Path: `updaters.[1]`*
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required` ∙ **Path:** `updaters.[1]`  \
+**Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
 
 What source of vehicle rental updater to use.
 
 <h4 id="updaters__1__headers">headers</h4>
 
-*Since version: `na` ∙ Type: `map of string` ∙ `Optional` ∙ Path: `updaters.[1]`*
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[1]` 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
+
 
 
 ```JSON
 // router-config.json
 {
-  "updaters": [
+    "updaters": [
     {
       "type" : "vehicle-rental",
       "network" : "socialbicycles_coast",
@@ -302,8 +314,9 @@ HTTP headers to add to the request. Any header key, value can be inserted.
         "<key>" : "<value>"
       }
     }
-    ]
-  }
+  ]
+
+}
 ```
 
 <!-- vehicle-rental END -->
@@ -333,7 +346,7 @@ its [sandbox documentation](../docs/sandbox/VehicleParking.md).
 
 <h4 id="updaters__2__feedId">feedId</h4>
 
-*Since version: `na` ∙ Type: `string` ∙ `Optional` ∙ Path: `updaters.[2]`*
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[2]` 
 
 The name of the data source.
 
@@ -341,29 +354,32 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="updaters__2__sourceType">sourceType</h4>
 
-*Since version: `na` ∙ Type: `enum` ∙ `Required` ∙ Path: `updaters.[2]`*
+**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required` ∙ **Path:** `updaters.[2]`  \
+**Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
 
 The source of the vehicle updates.
 
 <h4 id="updaters__2__timeZone">timeZone</h4>
 
-*Since version: `na` ∙ Type: `time-zone` ∙ `Optional` ∙ Path: `updaters.[2]`*
+**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional` ∙ **Path:** `updaters.[2]` 
 
 The time zone of the feed.
 
 Used for converting abstract opening hours into concrete points in time.
 
 
+
 ```JSON
 // router-config.json
 {
-  "updaters": [
+    "updaters": [
     {
       "type" : "vehicle-parking",
       "sourceType" : "hsl-park"
     }
-    ]
-  }
+  ]
+
+}
 ```
 
 <!-- vehicle-parking END -->
