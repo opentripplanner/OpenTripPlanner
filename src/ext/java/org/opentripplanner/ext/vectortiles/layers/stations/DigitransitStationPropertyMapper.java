@@ -35,8 +35,6 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
   public Collection<T2<String, Object>> map(Station station) {
     var childStops = station.getChildStops();
 
-    var name = station.getName().toString(locale);
-
     return List.of(
       new T2<>("gtfsId", station.getId().toString()),
       new T2<>("name", station.getName().toString(locale)),

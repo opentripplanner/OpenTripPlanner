@@ -73,13 +73,17 @@ The feature must be configured in `router-config.json` as follows
     },
     // Contains just stations and realtime information for them
     {
-      "name": "rentalStations",
+      "name": "realtimeRentalStations",
       "type": "VehicleRentalStation",
       "mapper": "DigitransitRealtime",
       "maxZoom": 20,
       "minZoom": 14,
       "cacheMaxSeconds": 60
     },
+    // note this has the same name as the example with the Digitransit mapper,
+    // at some point we might want to do some clean up and rename this to
+    // realtimeVehicleParking but for now this remains like this for backwards
+    // compatibility.
     {
       "name": "vehicleParking",
       "type": "VehicleParking",
