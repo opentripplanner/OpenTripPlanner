@@ -159,10 +159,18 @@ public class RoutingRequestMapper {
       .of("unpreferred")
       .since(NA)
       .summary(
-        "Parameters for indicating authorities or lines that preferably should not be used in trip patters." +
-        "A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty)."
+        "Parameters listing authorities or lines that preferably should not be used in trip patters."
       )
-      .description(/*TODO DOC*/"TODO")
+      .description(
+        """
+A cost is applied to boarding nonpreferred authorities or lines.
+                    
+The routing engine will add extra penalty - on the *unpreferred* routes and/or agencies using a 
+cost function. The cost function (`unpreferredCost`) is defined as a linear function of the form 
+`A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg
+travel time `x` (in seconds).
+"""
+      )
       .asObject();
     request
       .journey()
@@ -273,7 +281,7 @@ transit leg in the trip. This is the default value used, if not overridden by th
                 """
 Sometimes there is a need to configure a board times for specific modes, such as airplanes or 
 ferries, where the check-in process needs to be done in good time before ride. 
-                """
+"""
               )
               .asEnumMap(TransitMode.class, Duration.class)
           )
