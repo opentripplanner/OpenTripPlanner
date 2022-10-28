@@ -24,27 +24,6 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 
 
 
-### Boarding and alighting times
-
-Sometimes there is a need to configure a longer ride or alighting times for specific modes, such as
-airplanes or ferries, where the check-in process needs to be done in good time before ride. The ride
-time is added to the time when going from the stop (offboard) vertex to the onboard vertex, and the
-alight time is added vice versa. The times are configured as seconds needed for the ride and
-alighting processes in `router-config.json` as follows:
-
-```JSON
-// router-config.json
-{
-  "routingDefaults": {
-    "boardSlackForMode": {
-      "AIRPLANE": 2700
-    },
-    "alightSlackForMode": {
-      "AIRPLANE": 1200
-    }
-  }
-}
-```
 
 ### Defining unpreferred routes or agencies
 

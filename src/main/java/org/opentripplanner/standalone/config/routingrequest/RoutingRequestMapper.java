@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.routingrequest;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
@@ -228,13 +227,20 @@ public class RoutingRequestMapper {
               .of("alightSlack")
               .since(NA)
               .summary("The minimum extra time after exiting a public transport vehicle.")
-              .asDuration2(dft.alightSlack().defaultValue(), SECONDS)
+              .description(
+                "The slack is added to the time when going from the transit vehicle to the stop."
+              )
+              .asDuration(dft.alightSlack().defaultValue())
           )
           .withValues(
             c
               .of("alightSlackForMode")
               .since(V2_0)
               .summary("How much time alighting a vehicle takes for each given mode.")
+              .description(
+                "Sometimes there is a need to configure a longer alighting times for specific " +
+                "modes, such as airplanes or ferries."
+              )
               .asEnumMap(TransitMode.class, Duration.class)
           )
       )
@@ -245,17 +251,30 @@ public class RoutingRequestMapper {
               .of("boardSlack")
               .since(NA)
               .summary(
-                "The boardSlack is the minimum extra time to board a public transport vehicle." +
-                " This is the same as the 'minimumTransferTime', except that this also apply to to the first transit leg in the trip." +
-                " This is the default value used, if not overridden by the 'boardSlackList'."
+                "The boardSlack is the minimum extra time to board a public transport vehicle."
               )
-              .asDuration2(dft.boardSlack().defaultValue(), SECONDS)
+              .description(
+                """
+The board time is added to the time when going from the stop (offboard) to onboard a transit 
+vehicle.
+
+This is the same as the `minimumTransferTime`, except that this also apply to to the first 
+transit leg in the trip. This is the default value used, if not overridden by the `boardSlackList`.
+"""
+              )
+              .asDuration(dft.boardSlack().defaultValue())
           )
           .withValues(
             c
               .of("boardSlackForMode")
               .since(V2_0)
               .summary("How much time ride a vehicle takes for each given mode.")
+              .description(
+                """
+Sometimes there is a need to configure a board times for specific modes, such as airplanes or 
+ferries, where the check-in process needs to be done in good time before ride. 
+                """
+              )
               .asEnumMap(TransitMode.class, Duration.class)
           )
       )
