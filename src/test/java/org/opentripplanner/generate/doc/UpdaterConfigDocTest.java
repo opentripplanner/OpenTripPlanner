@@ -4,7 +4,7 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection2;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
@@ -46,7 +46,7 @@ public class UpdaterConfigDocTest {
       var type = child.typeQualifier();
 
       if (!SKIP_UPDATERS.contains(type)) {
-        doc = replaceSection2(doc, type, updaterDoc(child));
+        doc = replaceSection(doc, type, updaterDoc(child));
       }
     }
 

@@ -3,7 +3,7 @@ package org.opentripplanner.generate.doc;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection2;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.generate.doc.support.ConfigTypeTable.configTypeTable;
 import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
 
@@ -36,8 +36,8 @@ public class ConfigurationDocTest {
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 
-    doc = replaceSection2(doc, CONFIG_TYPE_PLACEHOLDER, configTypeTable());
-    doc = replaceSection2(doc, OTP_FEATURE_PLACEHOLDER, otpFeaturesTable());
+    doc = replaceSection(doc, CONFIG_TYPE_PLACEHOLDER, configTypeTable());
+    doc = replaceSection(doc, OTP_FEATURE_PLACEHOLDER, otpFeaturesTable());
     writeFile(OUT_FILE, doc);
 
     assertFileEquals(original, OUT_FILE);

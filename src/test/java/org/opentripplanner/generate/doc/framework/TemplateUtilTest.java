@@ -1,7 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection2;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 public class TemplateUtilTest {
 
   @Test
-  public void replaceSection() {
+  public void replaceSectionTest() {
     var body = """
       Expected line 1.
       Expected line 2.
@@ -29,7 +29,7 @@ public class TemplateUtilTest {
                   
           <!-- TEST END -->
           """.trim(),
-      replaceSection2(doc, "TEST", body)
+      replaceSection(doc, "TEST", body)
     );
   }
 }
