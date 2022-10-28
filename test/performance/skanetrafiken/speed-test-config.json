@@ -20,7 +20,10 @@
       "transferSlack": 180,
       "waitReluctance": 0.175,
       "walkReluctance": 5,
-      "maxDirectStreetDurationSeconds": 3700
+      "maxDirectStreetDurationSeconds": 3700,
+      "boardSlackForMode": {
+        "RAIL": "PT720S"
+      }
     }
   }
 }
