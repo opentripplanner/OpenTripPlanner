@@ -20,9 +20,7 @@
       "transferSlack": 180,
       "waitReluctance": 0.175,
       "walkReluctance": 5,
-      "maxDirectStreetDurationSeconds": 3700,
-      "unpreferredModeCost": "720 + 0.0 x",
-      "unpreferredModes": ["RAIL"]
+      "maxDirectStreetDurationSeconds": 3700
     }
   }
 }
