@@ -17,7 +17,6 @@
   "islandWithStopsMaxSize": 5,
   "banDiscouragedWalking": false,
   "banDiscouragedBiking": false,
-  "maxTransferDistance": 2000,
   "extraEdgesStopPlatformLink": true,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,

@@ -6,7 +6,7 @@
     "transferSlack": 180,
     "waitReluctance": 0.175,
     "walkReluctance": 5,
-    "maxDirectStreetDurationSeconds": 3700
+    "maxDirectStreetDuration": "3700s"
   },
   "transit": {
     "pagingSearchWindowAdjustments": [
