@@ -704,8 +704,39 @@ public class RoutingRequestMapper {
           c
             .of("transferOptimization")
             .since(NA)
-            .summary("TODO")
-            .description(/*TODO DOC*/"TODO")
+            .summary(
+              "Optimize where a transfer between to trip happens. This is a separate step *after* the routing is done. "
+            )
+            .description(
+              """
+The main purpose of transfer optimization is to handle cases where it is possible to transfer
+between two routes at more than one point (pair of stops). The transfer optimization ensures that
+transfers occur at the best possible location. By post-processing all paths returned by the router,
+OTP can apply sophisticated calculations that are too slow or not algorithmically valid within 
+Raptor. Transfers are optimized before the paths are passed to the itinerary-filter-chain.
+
+To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on). 
+You should leave this on unless there is a critical issue with it. The OTPFeature 
+`GuaranteedTransfers` will toggle on and off the priority optimization 
+(part of OptimizeTransfers).
+              
+The optimized transfer service will try to, in order:
+              
+1. Use transfer priority. This includes stay-seated and guaranteed transfers.
+2. Use the transfers with the best distribution of the wait-time, and avoid very short transfers.
+3. Avoid back-travel
+4. Boost stop-priority to select preferred and recommended stops.
+              
+If two paths have the same transfer priority level, then we break the tie by looking at waiting 
+times. The goal is to maximize the wait-time for each stop, avoiding situations where there is 
+little time available to make the transfer. This is balanced with the generalized-cost. The cost
+is adjusted with a new cost for wait-time (optimized-wait-time-cost).
+              
+The defaults should work fine, but if you have results with short wait-times dominating a better 
+option or "back-travel", then try to increase the `minSafeWaitTimeFactor`, 
+`backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
+"""
+            )
             .asObject()
         )
       );
@@ -737,10 +768,14 @@ public class RoutingRequestMapper {
           .of("walkReluctance")
           .since(NA)
           .summary(
-            "A multiplier for how bad walking is, compared to being in transit for equal lengths of time." +
-            " Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to walk too much without asking for totally ridiculous itineraries," +
-            " but this observation should in no way be taken as scientific or definitive. Your mileage may vary." +
-            " See https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with high values."
+            """
+A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to walk
+too much without asking for totally ridiculous itineraries, but this observation should in no way
+be taken as scientific or definitive. Your mileage may vary.
+See https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
+high values.
+"""
           )
           .asDouble(dft.reluctance())
       )
@@ -749,8 +784,10 @@ public class RoutingRequestMapper {
           .of("walkBoardCost")
           .since(NA)
           .summary(
-            "Prevents unnecessary transfers by adding a cost for boarding a vehicle." +
-            " This is the cost that is used when boarding while walking."
+            """
+            Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the 
+            cost that is used when boarding while walking.
+            """
           )
           .asInt(dft.boardCost())
       )
@@ -766,9 +803,13 @@ public class RoutingRequestMapper {
           .of("stairsTimeFactor")
           .since(NA)
           .summary(
-            "How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length." +
-            " Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking speed of pedestrians on stairs." +
-            " Transportation Planning and Technology, 33(2), 177–202."
+            "How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length."
+          )
+          .description(
+            """
+            Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking
+            speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
+            """
           )
           .asDouble(dft.stairsTimeFactor())
       )
@@ -803,8 +844,8 @@ public class RoutingRequestMapper {
           .of("minSafeWaitTimeFactor")
           .since(NA)
           .summary(
-            "This defines the maximum cost for the logarithmic function relative to the min-safe-transfer-time (t0) when wait time goes towards zero(0)." +
-            " f(0) = n * t0"
+            "This defines the maximum cost for the logarithmic function relative to the " +
+            "min-safe-transfer-time (t0) when wait time goes towards zero(0). f(0) = n * t0"
           )
           .asDouble(dft.minSafeWaitTimeFactor())
       )
@@ -813,8 +854,8 @@ public class RoutingRequestMapper {
           .of("backTravelWaitTimeFactor")
           .since(NA)
           .summary(
-            "The wait time is used to prevent \"back-travel\"," +
-            " the backTravelWaitTimeFactor is multiplied with the wait-time and subtracted from the optimized-transfer-cost."
+            "The wait time is used to prevent *back-travel*, the backTravelWaitTimeFactor is " +
+            "multiplied with the wait-time and subtracted from the optimized-transfer-cost."
           )
           .asDouble(dft.backTravelWaitTimeFactor())
       )
@@ -822,14 +863,18 @@ public class RoutingRequestMapper {
         c
           .of("extraStopBoardAlightCostsFactor")
           .since(NA)
-          .summary(
-            "Use this to add an extra board- and alight-cost for (none) prioritized stops." +
-            " A  stopBoardAlightCosts is added to the generalized-cost during routing." +
-            " But this cost cannot be too high, because that would add extra cost to the transfer, and favor other alternative paths." +
-            " But, when optimizing transfers, we do not have to take other paths into consideration and can \"boost\" the stop-priority-cost to allow transfers to take place at a preferred stop." +
-            " The cost added during routing is already added to the generalized-cost used as a base in the optimized transfer calculation." +
-            " By setting this parameter to 0, no extra cost is added, by setting it to {@code 1.0} the stop-cost is doubled." +
-            " Stop priority is only supported by the NeTEx import, not GTFS."
+          .summary("Add an extra board- and alight-cost for prioritized stops.")
+          .description(
+            """
+            A stopBoardAlightCosts is added to the generalized-cost during routing. But this cost
+            cannot be too high, because that would add extra cost to the transfer, and favor other 
+            alternative paths. But, when optimizing transfers, we do not have to take other paths 
+            into consideration and can *boost* the stop-priority-cost to allow transfers to 
+            take place at a preferred stop. The cost added during routing is already added to the 
+            generalized-cost used as a base in the optimized transfer calculation. By setting this 
+            parameter to 0, no extra cost is added, by setting it to {@code 1.0} the stop-cost is
+            doubled. Stop priority is only supported by the NeTEx import, not GTFS.
+            """
           )
           .asDouble(dft.extraStopBoardAlightCostsFactor())
       )

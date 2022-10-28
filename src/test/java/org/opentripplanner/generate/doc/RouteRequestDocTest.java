@@ -43,7 +43,7 @@ public class RouteRequestDocTest {
     String original = readFile(OUT_FILE);
 
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
-    doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
+    doc = replaceParametersDetails(doc, getParameterDetailsList(node));
 
     writeFile(OUT_FILE, doc);
 
@@ -60,7 +60,7 @@ public class RouteRequestDocTest {
     return new ParameterSummaryTable(SKIP_NODES).createTable(node).toMarkdownTable();
   }
 
-  private String getParameterDetailsTable(NodeAdapter node) {
+  private String getParameterDetailsList(NodeAdapter node) {
     return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_3);
   }
 }

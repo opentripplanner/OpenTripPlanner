@@ -87,11 +87,11 @@ Sections follow that describe particular settings in more depth.
 | osmNaming                                                                            |   `object`  | No doc, parent contains doc.                                                                                                                         | *Optional* |                                   |   na  |
 | [transferRequests](/docs/RouteRequest.md)                                            |  `object[]` | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
 | [transitFeeds](#transitFeeds)                                                        |  `object[]` | Scan for transit data files                                                                                                                          | *Optional* |                                   |   na  |
-|    [ array object ]                                                                  |   `object`  | Nested object in array. The type is determined by the parameters.                                                                                    | *Optional* |                                   |   na  |
+|    { object }                                                                        |   `object`  | Nested object in array. The object type is determined by the parameters.                                                                             | *Optional* |                                   |   na  |
 |       type = "GTFS"                                                                  |    `enum`   | The feed input format.                                                                                                                               | *Required* |                                   |  2.2  |
 |       feedId                                                                         |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                              | *Optional* |                                   |   na  |
 |       source                                                                         |    `uri`    | The unique URI pointing to the data file.                                                                                                            | *Required* |                                   |   na  |
-|    [ array object ]                                                                  |   `object`  | Nested object in array. The type is determined by the parameters.                                                                                    | *Optional* |                                   |   na  |
+|    { object }                                                                        |   `object`  | Nested object in array. The object type is determined by the parameters.                                                                             | *Optional* |                                   |   na  |
 |       type = "NETEX"                                                                 |    `enum`   | The feed input format.                                                                                                                               | *Required* |                                   |  2.2  |
 |       feedId                                                                         |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt.                          | *Required* |                                   |  2.2  |
 |       [groupFilePattern](#transitFeeds__1__groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                                              | *Optional* | `"(\w{3})_.*\.xml"`               |  2.0  |
@@ -1035,14 +1035,6 @@ The named set of mapping rules applied when parsing OSM tags. Example: `default`
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
 The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults.
-
-<h3 id="transferRequests">transferRequests</h3>
-
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
-
-TODO
-
-TODO
 
 <h3 id="transitFeeds">transitFeeds</h3>
 
