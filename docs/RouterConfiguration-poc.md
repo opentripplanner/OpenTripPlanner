@@ -17,7 +17,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 | Config Parameter                                                           |          Type         | Summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |  Req./Opt. | Default Value | Since |
 |----------------------------------------------------------------------------|:---------------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | configVersion                                                              |        `string`       | Version of the configuration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | *Optional* |               |   na  |
-| requestLogFile                                                             |        `string`       | The path of the log file for the requests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | *Optional* |               |   na  |
+| [requestLogFile](#requestLogFile)                                          |        `string`       | The path of the log file for the requests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                              |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | *Optional* | `"PT5S"`      |   na  |
 | bikeRentalServiceDirectory                                                 |        `object`       | Deprecated. Use bikeRentalServiceDirectory.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | *Optional* |               |  2.0  |
 |    language                                                                |        `string`       | TODO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | *Optional* |               |   na  |
@@ -63,36 +63,6 @@ value which will be applied unless it is overridden in a web API request.
 A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 
 
-## Logging incoming requests
-
-You can log some characteristics of trip planning requests in a file for later analysis. Some
-transit agencies and operators find this information useful for identifying existing or unmet
-transportation demand. Logging will be performed only if you specify a log file name in the router
-config:
-
-```JSON
-// router-config.json
-{
-  "requestLogFile": "/var/otp/request.log"
-}
-```
-
-Each line in the resulting log file will look like this:
-
-`2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3`
-
-The fields separated by whitespace are (in order):
-
-1. Date and time the request was received
-2. IP address of the user
-3. Arrive or depart search
-4. The arrival or departure time
-5. A comma-separated list of all transport modes selected
-6. Origin latitude and longitude
-7. Destination latitude and longitude
-
-Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
-number of transit vehicles used in that itinerary.
 
 ## Tuning transit routing
 
@@ -187,6 +157,37 @@ for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanne
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h3 id="requestLogFile">requestLogFile</h3>
+
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Path:** `Root` 
+
+The path of the log file for the requests.
+
+You can log some characteristics of trip planning requests in a file for later analysis. Some
+transit agencies and operators find this information useful for identifying existing or unmet
+transportation demand. Logging will be performed only if you specify a log file name in the router
+config.
+
+Each line in the resulting log file will look like this:
+
+```
+2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3
+```
+
+The fields separated by whitespace are (in order):
+
+1. Date and time the request was received
+2. IP address of the user
+3. Arrive or depart search
+4. The arrival or departure time
+5. A comma-separated list of all transport modes selected
+6. Origin latitude and longitude
+7. Destination latitude and longitude
+
+Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
+number of transit vehicles used in that itinerary.
+
 
 <h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
 
