@@ -125,6 +125,7 @@ public class TimetableHelper {
     int callCounter = 0;
 
     LocalDate serviceDate = getServiceDate(journey, zoneId, oldTimes);
+    ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<Object> alreadyVisited = new HashSet<>();
 
     boolean isJourneyPredictionInaccurate =
@@ -154,8 +155,6 @@ public class TimetableHelper {
         }
 
         if (foundMatch) {
-          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
-
           int arrivalTime = newTimes.getArrivalTime(callCounter);
 
           Integer realtimeArrivalTime = getAvailableTime(
@@ -276,8 +275,6 @@ public class TimetableHelper {
             if (departureStatus == CallStatusEnumeration.CANCELLED) {
               modifiedStopTimes.get(callCounter).cancelPickup();
             }
-
-            ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
 
             int arrivalTime = newTimes.getArrivalTime(callCounter);
 
