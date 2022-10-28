@@ -388,9 +388,9 @@ public class TimetableHelper {
       newTimes.cancelTrip();
     }
 
-    var maybeError = newTimes.validateNonIncreasingTimes();
-    if (maybeError.isFailure()) {
-      var updateError = maybeError.failureValue();
+    var result = newTimes.validateNonIncreasingTimes();
+    if (result.isFailure()) {
+      var updateError = result.failureValue();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         journey.getLineRef().getValue(),
@@ -781,9 +781,9 @@ public class TimetableHelper {
       }
     }
 
-    var maybeError = newTimes.validateNonIncreasingTimes();
-    if (maybeError.isFailure()) {
-      var error = maybeError.failureValue();
+    var result = newTimes.validateNonIncreasingTimes();
+    if (result.isFailure()) {
+      var error = result.failureValue();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         timetable.getPattern().getRoute().getId(),

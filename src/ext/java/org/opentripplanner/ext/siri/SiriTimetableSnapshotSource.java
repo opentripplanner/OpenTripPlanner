@@ -1122,12 +1122,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Add new trip times to the buffer and return success
-    var maybeError = buffer.update(pattern, updatedTripTimes, serviceDate);
+    var result = buffer.update(pattern, updatedTripTimes, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
     addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
 
-    return maybeError;
+    return result;
   }
 
   private void addTripOnServiceDateToBuffer(
