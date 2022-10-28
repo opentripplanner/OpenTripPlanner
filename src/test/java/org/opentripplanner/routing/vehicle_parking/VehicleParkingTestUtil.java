@@ -4,6 +4,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
@@ -25,8 +26,7 @@ public class VehicleParkingTestUtil {
       builder
         .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
         .name(new NonLocalizedString("Entrance " + id))
-        .x(x)
-        .y(y)
+        .coordinate(new WgsCoordinate(y, x))
         .walkAccessible(true);
 
     return VehicleParking

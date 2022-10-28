@@ -15,7 +15,8 @@ public class FlexConfig {
     maxTransferSeconds =
       json
         .of("maxTransferDurationSeconds")
-        .withDoc(NA, /*TODO DOC*/"TODO")
+        .since(NA)
+        .summary("TODO")
         .asInt(DEFAULT_MAX_TRANSFER_SECONDS);
   }
 

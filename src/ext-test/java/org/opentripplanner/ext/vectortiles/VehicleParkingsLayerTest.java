@@ -4,14 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
@@ -24,11 +24,13 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.TransitService;
 
 public class VehicleParkingsLayerTest {
 
@@ -43,8 +45,7 @@ public class VehicleParkingsLayerTest {
         .builder()
         .id(ID)
         .name(TranslatedString.getI18NString(Map.of("", "name", "de", "DE"), false, false))
-        .x(1)
-        .y(2)
+        .coordinate(new WgsCoordinate(2, 1))
         .bicyclePlaces(true)
         .carPlaces(true)
         .wheelchairAccessibleCarPlaces(false)
@@ -66,61 +67,49 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void vehicleParkingGeometryTest() {
-    VehicleParkingService service = mock(VehicleParkingService.class);
-    when(service.getVehicleParkings()).thenReturn(Stream.of(vehicleParking));
+    Graph graph = new Graph();
+    VehicleParkingService service = graph.getVehicleParkingService();
+    service.updateVehicleParking(List.of(vehicleParking), List.of());
 
-    Graph graph = mock(Graph.class);
-    TransitService transitService = mock(TransitService.class);
-    when(graph.getVehicleParkingService()).thenReturn(service);
-
-    VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
-      graph,
-      transitService,
-      new VectorTilesResource.LayerParameters() {
-        @Override
-        public String name() {
-          return "vehicleparkings";
-        }
-
-        @Override
-        public VectorTilesResource.LayerType type() {
-          return VectorTilesResource.LayerType.VehicleParking;
-        }
-
-        @Override
-        public String mapper() {
-          return "Digitransit";
-        }
-
-        @Override
-        public int maxZoom() {
-          return 20;
-        }
-
-        @Override
-        public int minZoom() {
-          return 14;
-        }
-
-        @Override
-        public int cacheMaxSeconds() {
-          return 60;
-        }
-
-        @Override
-        public double expansionFactor() {
-          return 0;
-        }
+    var config =
+      """
+      {
+        "vectorTileLayers": [
+          {
+            "name": "vehicleParking",
+            "type": "VehicleParking",
+            "mapper": "Digitransit",
+            "maxZoom": 20,
+            "minZoom": 14,
+            "cacheMaxSeconds": 60,
+            "expansionFactor": 0
+          }
+        ]
       }
-    );
+      """;
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      mapper.readTree(config);
+      var tiles = VectorTileConfig.mapVectorTilesParameters(
+        new NodeAdapter(mapper.readTree(config), "vectorTiles"),
+        "vectorTileLayers"
+      );
+      assertEquals(1, tiles.layers().size());
+      VehicleParkingsLayerBuilderWithPublicGeometry builder = new VehicleParkingsLayerBuilderWithPublicGeometry(
+        graph,
+        tiles.layers().get(0)
+      );
 
-    List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
+      List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 
-    assertEquals("[POINT (1 2)]", geometries.toString());
-    assertEquals(
-      "VehicleParking(name at 2.000000, 1.000000)",
-      geometries.get(0).getUserData().toString()
-    );
+      assertEquals("[POINT (1 2)]", geometries.toString());
+      assertEquals(
+        "VehicleParking{name: 'name', coordinate: (2.0, 1.0)}",
+        geometries.get(0).getUserData().toString()
+      );
+    } catch (JacksonException exception) {
+      fail(exception.toString());
+    }
   }
 
   @Test
@@ -169,10 +158,9 @@ public class VehicleParkingsLayerTest {
 
     public VehicleParkingsLayerBuilderWithPublicGeometry(
       Graph graph,
-      TransitService transitService,
       VectorTilesResource.LayerParameters layerParameters
     ) {
-      super(graph, transitService, layerParameters);
+      super(graph, null, layerParameters);
     }
 
     @Override

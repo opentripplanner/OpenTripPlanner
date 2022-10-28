@@ -681,7 +681,7 @@ public class LegacyGraphQLQueryTypeImpl
                 RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
               )
           );
-          callWith.argument("unpreferred.unpreferredRouteCost", tr::setUnpreferredCostString);
+          callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
           callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
           callWith.argument(
             "modeWeight",
@@ -1062,8 +1062,7 @@ public class LegacyGraphQLQueryTypeImpl
         stops =
           getRoutingService(environment)
             .findClosestStops(
-              args.getLegacyGraphQLLat(),
-              args.getLegacyGraphQLLon(),
+              new Coordinate(args.getLegacyGraphQLLon(), args.getLegacyGraphQLLat()),
               args.getLegacyGraphQLRadius()
             );
       } catch (RoutingValidationException e) {

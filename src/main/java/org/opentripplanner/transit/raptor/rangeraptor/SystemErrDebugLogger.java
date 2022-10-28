@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
-import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
+import static org.opentripplanner.framework.text.Table.Align.Center;
+import static org.opentripplanner.framework.text.Table.Align.Left;
+import static org.opentripplanner.framework.text.Table.Align.Right;
 import static org.opentripplanner.util.time.TimeUtils.timeToStrCompact;
 
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
@@ -22,7 +22,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 import org.opentripplanner.util.lang.IntUtils;
 import org.opentripplanner.util.lang.OtpNumberFormat;
 import org.opentripplanner.util.lang.StringUtils;
-import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -38,31 +37,18 @@ public class SystemErrDebugLogger implements DebugLogger {
 
   private final boolean enableDebugLogging;
   private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
-  private final TableFormatter arrivalTableFormatter = new TableFormatter(
-    List.of(Center, Center, Right, Right, Right, Right, Left, Left),
-    List.of("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "COST", "TRIP", "DETAILS"),
-    9,
-    7,
-    3,
-    5,
-    8,
-    9,
-    24,
-    0
-  );
-  private final TableFormatter pathTableFormatter = new TableFormatter(
-    List.of(Center, Center, Right, Right, Right, Right, Right, Right, Left),
-    List.of(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "COST", "DETAILS"),
-    9,
-    2,
-    5,
-    5,
-    8,
-    8,
-    8,
-    6,
-    0
-  );
+  private final Table arrivalTable = Table
+    .of()
+    .withAlights(Center, Center, Right, Right, Right, Right, Left, Left)
+    .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "COST", "TRIP", "DETAILS")
+    .withMinWidths(9, 7, 3, 5, 8, 9, 24, 0)
+    .build();
+  private final Table pathTable = Table
+    .of()
+    .withAlights(Center, Center, Right, Right, Right, Right, Right, Right, Left)
+    .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "COST", "DETAILS")
+    .withMinWidths(9, 2, 5, 5, 8, 8, 8, 6, 0)
+    .build();
   private boolean forwardSearch = true;
   private int lastIterationTime = NOT_SET;
   private int lastRound = NOT_SET;
@@ -109,13 +95,13 @@ public class SystemErrDebugLogger implements DebugLogger {
   public void pathFilteringListener(DebugEvent<Path<?>> e) {
     if (printPathHeader) {
       System.err.println();
-      System.err.println(pathTableFormatter.printHeader());
+      System.err.println(pathTable.headerRow());
       printPathHeader = false;
     }
 
     Path<?> p = e.element();
     System.err.println(
-      pathTableFormatter.printRow(
+      pathTable.rowAsText(
         e.action().toString(),
         p.numberOfTransfers(),
         p.accessLeg().toStop(),
@@ -196,7 +182,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     printPathHeader = true;
     String pattern = a.arrivedByTransit() ? a.transitPath().trip().pattern().debugInfo() : "";
     System.err.println(
-      arrivalTableFormatter.printRow(
+      arrivalTable.rowAsText(
         action,
         legType(a),
         a.round(),
@@ -211,7 +197,7 @@ public class SystemErrDebugLogger implements DebugLogger {
 
   private void print(PatternRideView<?> p, String action) {
     System.err.println(
-      arrivalTableFormatter.printRow(
+      arrivalTable.rowAsText(
         action,
         "OnRide",
         p.prevArrival().round() + 1,
@@ -271,7 +257,7 @@ public class SystemErrDebugLogger implements DebugLogger {
     lastRound = round;
 
     System.err.println();
-    System.err.println(arrivalTableFormatter.printHeader());
+    System.err.println(arrivalTable.headerRow());
   }
 
   private String legType(ArrivalView<?> a) {

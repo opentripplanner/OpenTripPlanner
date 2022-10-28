@@ -72,7 +72,7 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
       throw new RuntimeException("Unknown location type");
     }
     geometry = new GeometryCollection(newGeometries, GeometryUtils.getGeometryFactory());
-    centroid = new WgsCoordinate(geometry.getCentroid().getY(), geometry.getCentroid().getX());
+    centroid = new WgsCoordinate(geometry.getCentroid());
 
     return this;
   }

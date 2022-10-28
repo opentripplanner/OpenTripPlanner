@@ -5,12 +5,12 @@ import static org.opentripplanner.util.time.DurationUtils.msToSecondsStr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.transit.raptor.speed_test.model.SpeedTestProfile;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.model.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.util.lang.IntUtils;
-import org.opentripplanner.util.lang.TableFormatter;
 
 /**
  * Printing stuff clutters up the code, so it is convenient to put printing and formatting output
@@ -68,16 +68,15 @@ class ResultPrinter {
   ) {
     int tcSize = testCases.size();
     String totalTimeSec = msToSecondsStr(testCases.stream().mapToInt(TestCase::totalTimeMs).sum());
-    var summary = TableFormatter.formatTableAsTextLines(
-      List.of(
-        testCases.stream().map(TestCase::id).toList(),
-        testCases.stream().map(TestCase::numberOfResults).toList(),
-        testCases.stream().map(TestCase::transitTimeMs).toList(),
-        testCases.stream().map(TestCase::totalTimeMs).toList()
-      ),
-      " ",
-      false
-    );
+    var summary = Table
+      .of()
+      .withHeaders(testCases.stream().map(TestCase::id).toList())
+      .addRow(testCases.stream().map(TestCase::numberOfResults).toList())
+      .addRow(testCases.stream().map(TestCase::transitTimeMs).toList())
+      .addRow(testCases.stream().map(TestCase::totalTimeMs).toList())
+      .build()
+      .toTextRows();
+
     System.err.println(
       "\n" +
       headerLine("SUMMARY " + profile) +

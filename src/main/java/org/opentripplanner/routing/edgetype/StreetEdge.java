@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -275,19 +274,11 @@ public class StreetEdge
   }
 
   public boolean isNoThruTraffic(TraverseMode traverseMode) {
-    if (traverseMode.isCycling()) {
-      return isBicycleNoThruTraffic();
-    }
-
-    if (traverseMode.isDriving()) {
-      return isMotorVehicleNoThruTraffic();
-    }
-
-    if (traverseMode.isWalking()) {
-      return isWalkNoThruTraffic();
-    }
-
-    return false;
+    return switch (traverseMode) {
+      case WALK -> isWalkNoThruTraffic();
+      case BICYCLE, SCOOTER -> isBicycleNoThruTraffic();
+      case CAR, FLEX -> isMotorVehicleNoThruTraffic();
+    };
   }
 
   /**
@@ -1157,13 +1148,6 @@ public class StreetEdge
     boolean walkingBike,
     boolean wheelchair
   ) {
-    Supplier<Double> nonWheelchairReluctance = () ->
-      StreetEdgeReluctanceCalculator.computeReluctance(
-        preferences,
-        traverseMode,
-        walkingBike,
-        isStairs()
-      );
     double time, weight;
     if (wheelchair) {
       time = getEffectiveWalkDistance() / speed;
@@ -1175,21 +1159,29 @@ public class StreetEdge
           isWheelchairAccessible(),
           isStairs()
         );
-    } else if (walkingBike) {
-      // take slopes into account when walking bikes
-      time = weight = (getEffectiveBikeDistance() / speed);
-      weight *= nonWheelchairReluctance.get();
     } else {
-      // take slopes into account when walking
-      time = getEffectiveWalkDistance() / speed;
-      weight =
-        getEffectiveWalkSafetyDistance() *
-        preferences.walk().safetyFactor() +
-        getEffectiveWalkDistance() *
-        (1 - preferences.walk().safetyFactor());
-      weight /= speed;
-      weight *= nonWheelchairReluctance.get();
+      if (walkingBike) {
+        // take slopes into account when walking bikes
+        time = weight = (getEffectiveBikeDistance() / speed);
+      } else {
+        // take slopes into account when walking
+        time = getEffectiveWalkDistance() / speed;
+        weight =
+          getEffectiveWalkSafetyDistance() *
+          preferences.walk().safetyFactor() +
+          getEffectiveWalkDistance() *
+          (1 - preferences.walk().safetyFactor());
+        weight /= speed;
+      }
+      weight *=
+        StreetEdgeReluctanceCalculator.computeReluctance(
+          preferences,
+          traverseMode,
+          walkingBike,
+          isStairs()
+        );
     }
+
     return new TraversalCosts(time, weight);
   }
 
@@ -1209,9 +1201,7 @@ public class StreetEdge
   ) {
     if (isNoThruTraffic(traverseMode)) {
       // Record transition into no-through-traffic area.
-      if (
-        backEdge instanceof StreetEdge && !((StreetEdge) backEdge).isNoThruTraffic(traverseMode)
-      ) {
+      if (backEdge instanceof StreetEdge sbe && !sbe.isNoThruTraffic(traverseMode)) {
         s1.setEnteredNoThroughTrafficArea();
       }
     } else if (s0.hasEnteredNoThruTrafficArea()) {

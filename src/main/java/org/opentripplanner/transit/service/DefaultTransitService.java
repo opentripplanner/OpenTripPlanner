@@ -87,8 +87,8 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public void addAgency(String feedId, Agency agency) {
-    this.transitModel.addAgency(feedId, agency);
+  public void addAgency(Agency agency) {
+    this.transitModel.addAgency(agency);
   }
 
   @Override

@@ -64,22 +64,31 @@ public class HttpUtils {
     Map<String, String> requestHeaderValues
   ) {
     HttpResponse response;
+    //
     try {
       response = getResponse(new HttpHead(uri), timeout, requestHeaderValues);
     } catch (IOException e) {
-      throw new RuntimeException(e.getLocalizedMessage(), e);
+      throw new RuntimeException(
+        "Network error while querying headers for resource " + sanitizeUri(uri),
+        e
+      );
     }
     if (response.getStatusLine().getStatusCode() != 200) {
-      // remove the query part from the URI
-      String sanitizedUri = uri.toString().replace('?' + uri.getQuery(), "");
       throw new RuntimeException(
         "Resource " +
-        sanitizedUri +
+        sanitizeUri(uri) +
         " unavailable. HTTP error code " +
         response.getStatusLine().getStatusCode()
       );
     }
     return Arrays.stream(response.getAllHeaders()).toList();
+  }
+
+  /**
+   * Remove the query part from the URI.
+   */
+  private static String sanitizeUri(URI uri) {
+    return uri.toString().replace('?' + uri.getQuery(), "");
   }
 
   public static InputStream openInputStream(String url, Map<String, String> headers)

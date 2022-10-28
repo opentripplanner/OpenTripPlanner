@@ -16,6 +16,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 
 class VehicleParkingEdgeTest extends GraphRoutingTest {
 
@@ -186,7 +187,10 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   private VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance() {
     String id = "Entrance";
     return builder ->
-      builder.entranceId(TransitModelForTest.id(id)).name(new NonLocalizedString(id)).x(0).y(0);
+      builder
+        .entranceId(TransitModelForTest.id(id))
+        .name(new NonLocalizedString(id))
+        .coordinate(new WgsCoordinate(0, 0));
   }
 
   private State traverse() {

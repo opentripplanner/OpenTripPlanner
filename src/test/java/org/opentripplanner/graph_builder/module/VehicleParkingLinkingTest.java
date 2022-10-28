@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -16,6 +17,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class VehicleParkingLinkingTest {
@@ -39,7 +41,9 @@ public class VehicleParkingLinkingTest {
   public void entranceWithVertexLinkingTest() {
     var parking = VehicleParking
       .builder()
-      .entrance(builder -> builder.entranceId(id("1")).vertex(A))
+      .entrance(builder ->
+        builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
+      )
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
 
@@ -57,7 +61,11 @@ public class VehicleParkingLinkingTest {
     var parking = VehicleParking
       .builder()
       .entrance(builder ->
-        builder.entranceId(id("1")).x(0.0001).y(0).carAccessible(true).walkAccessible(true)
+        builder
+          .entranceId(id("1"))
+          .coordinate(new WgsCoordinate(0, 0.0001))
+          .carAccessible(true)
+          .walkAccessible(true)
       )
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
@@ -83,7 +91,11 @@ public class VehicleParkingLinkingTest {
     var parking = VehicleParking
       .builder()
       .entrance(builder ->
-        builder.entranceId(id("1")).x(0.0001).y(0).carAccessible(true).walkAccessible(true)
+        builder
+          .entranceId(id("1"))
+          .coordinate(new WgsCoordinate(0, 0.0001))
+          .carAccessible(true)
+          .walkAccessible(true)
       )
       .build();
     var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
@@ -104,8 +116,20 @@ public class VehicleParkingLinkingTest {
       .builder()
       .id(id("VP"))
       .bicyclePlaces(true)
-      .entrance(builder -> builder.entranceId(id("Entrance-1")).vertex(A).walkAccessible(true))
-      .entrance(builder -> builder.entranceId(id("Entrance-2")).vertex(B).walkAccessible(true))
+      .entrance(builder ->
+        builder
+          .entranceId(id("Entrance-1"))
+          .coordinate(new WgsCoordinate(A.getCoordinate()))
+          .vertex(A)
+          .walkAccessible(true)
+      )
+      .entrance(builder ->
+        builder
+          .entranceId(id("Entrance-2"))
+          .coordinate(new WgsCoordinate(B.getCoordinate()))
+          .vertex(B)
+          .walkAccessible(true)
+      )
       .build();
 
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
@@ -128,11 +152,17 @@ public class VehicleParkingLinkingTest {
       .builder()
       .id(id("VP"))
       .bicyclePlaces(true)
-      .entrance(builder -> builder.entranceId(id("Entrance-1")).vertex(A).walkAccessible(true))
+      .entrance(builder ->
+        builder
+          .entranceId(id("Entrance-1"))
+          .coordinate(new WgsCoordinate(A.getCoordinate()))
+          .vertex(A)
+          .walkAccessible(true)
+      )
       .build();
 
     var vehicleParkingService = graph.getVehicleParkingService();
-    vehicleParkingService.addVehicleParking(vehicleParking);
+    vehicleParkingService.updateVehicleParking(List.of(vehicleParking), List.of());
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
     graph.remove(A);

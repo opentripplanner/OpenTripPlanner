@@ -40,4 +40,10 @@ class ObjectUtilsTest {
       () -> ObjectUtils.requireNotInitialized("old", "new")
     );
   }
+
+  @Test
+  void toStringTest() {
+    assertEquals("1", ObjectUtils.toString(1));
+    assertEquals("", ObjectUtils.toString(null));
+  }
 }
