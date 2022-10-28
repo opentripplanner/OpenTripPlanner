@@ -532,37 +532,54 @@ ferries, where the check-in process needs to be done in good time before ride.
         c
           .of("maxAccessEgressDuration")
           .since(V2_2)
-          .summary(
-            "This is the maximum duration for access/egress per street mode for street searches." +
-            " This is a performance limit and should therefore be set high. Results close to the limit are not guaranteed to be optimal." +
-            " Use itinerary-filters to limit what is presented to the client." +
-            " The duration can be set per mode, because some street modes searches are much more resource intensive than others." +
-            " A default value is applied if the mode specific value do not exist."
+          .summary("This is the maximum duration for access/egress for street searches.")
+          .description(
+            """
+This is a performance limit and should therefore be set high. Results close to the limit are not
+guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The 
+duration can be set per mode(`maxAccessEgressDurationForMode`), because some street modes searches
+are much more resource intensive than others. A default value is applied if the mode specific value
+do not exist.
+"""
           )
           .asDuration(dft.maxAccessEgressDuration().defaultValue()),
         c
           .of("maxAccessEgressDurationForMode")
           .since(NA)
           .summary("Limit access/egress per street mode.")
+          .description(
+            """
+            Override the settings in `maxAccessEgressDuration` for specific street modes. This is 
+            done because some street modes searches are much more resource intensive than others.
+            """
+          )
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withMaxDirectDuration(
         c
           .of("maxDirectStreetDuration")
           .since(NA)
-          .summary(
-            "This is the maximum duration for a direct street search for each mode." +
-            " This is a performance limit and should therefore be set high." +
-            " Results close to the limit are not guaranteed to be optimal." +
-            " Use itinerary-filters to limit what is presented to the client." +
-            " The duration can be set per mode, because some street modes searches are much more resource intensive than others." +
-            " A default value is applied if the mode specific value do not exist."
+          .summary("This is the maximum duration for a direct street search for each mode.")
+          .description(
+            """
+This is a performance limit and should therefore be set high. Results close to the limit are not
+guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
+duration can be set per mode(`maxDirectStreetDurationForMode`), because some street modes searches
+are much more resource intensive than others. A default value is applied if the mode specific value
+do not exist."
+"""
           )
           .asDuration(dft.maxDirectDuration().defaultValue()),
         c
           .of("maxDirectStreetDurationForMode")
           .since(V2_2)
           .summary("Limit direct route duration per street mode.")
+          .description(
+            """
+            Override the settings in `maxDirectStreetDuration` for specific street modes. This is 
+            done because some street modes searches are much more resource intensive than others.
+            """
+          )
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withIntersectionTraversalModel(
