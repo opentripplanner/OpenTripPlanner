@@ -681,7 +681,7 @@ public class LegacyGraphQLQueryTypeImpl
                 RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
               )
           );
-          callWith.argument("unpreferred.unpreferredRouteCost", tr::setUnpreferredCostString);
+          callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
           callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
           callWith.argument(
             "modeWeight",

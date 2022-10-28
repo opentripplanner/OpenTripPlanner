@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -18,9 +19,10 @@ public class NetexConfig {
   ) {
     var node = root
       .of(parameterName)
-      .since(NA)
-      .summary("TODO")
-      .description(/*TODO DOC*/"TODO")
+      .since(V2_2)
+      .summary(
+        "The netexDefaults section allows you to specify default properties for NeTEx files."
+      )
       .asObject();
 
     return mapDefaultParameters(node);
@@ -49,29 +51,75 @@ public class NetexConfig {
       .withSharedFilePattern(
         config
           .of("sharedFilePattern")
-          .since(NA)
-          .summary("TODO")
+          .since(V2_0)
+          .summary("Pattern for matching shared NeTEx files in a NeTEx bundle.")
+          .description(
+            """
+              This field is used to match *shared files*(zip file entries) in the module file. Shared
+              files are loaded first. Then the rest of the files are grouped and loaded.
+
+              The pattern `'shared-data\\.xml'` matches `'shared-data.xml'`
+
+              File names are matched in the following order - and treated accordingly to the first match:
+              <ol>
+                  <li><code>ignoreFilePattern</code></li>
+                  <li><code>sharedFilePattern</code></li>
+                  <li><code>sharedGroupFilePattern</code></li>
+                  <li><code>groupFilePattern</code></li>
+              </ol>
+              """
+          )
           .asPattern(original.sharedFilePattern().pattern())
       )
       .withSharedGroupFilePattern(
         config
           .of("sharedGroupFilePattern")
-          .since(NA)
-          .summary("TODO")
+          .since(V2_0)
+          .summary("Pattern for matching shared group NeTEx files in a NeTEx bundle.")
+          .description(
+            """
+            This field is used to match *shared group files* in the module file(zip file entries).
+            Typically this is used to group all files from one agency together.
+
+            *Shared group files* are loaded after shared files, but before the matching group
+            files. Each *group* of files are loaded as a unit, followed by next group.
+
+            Files are grouped together by the first group pattern in the regular expression.
+
+            The pattern `'(\\w{3})-.*-shared\\.xml'` matches `'RUT-shared.xml'` with group `'RUT'`.
+            """
+          )
           .asPattern(original.sharedGroupFilePattern().pattern())
       )
       .withGroupFilePattern(
         config
           .of("groupFilePattern")
-          .since(NA)
-          .summary("TODO")
+          .since(V2_0)
+          .summary("Pattern for matching group NeTEx files.")
+          .description(
+            """
+            This field is used to match *group files* in the module file(zip file entries).
+            *group files* are loaded right the after *shared group files* are loaded.
+
+            Files are grouped together by the first group pattern in the regular expression.
+
+            The pattern `'(\\w{3})-.*\\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
+            with group `'RUT'`.
+            """
+          )
           .asPattern(original.groupFilePattern().pattern())
       )
       .withIgnoreFilePattern(
         config
           .of("ignoreFilePattern")
-          .since(NA)
-          .summary("TODO")
+          .since(V2_0)
+          .summary("Pattern for matching ignored files in a NeTEx bundle.")
+          .description(
+            """
+              This field is used to exclude matching *files* in the module file(zip file entries). 
+              The *ignored* files are *not* loaded.
+              """
+          )
           .asPattern(original.ignoreFilePattern().pattern())
       )
       .withNoTransfersOnIsolatedStops(
@@ -86,8 +134,17 @@ public class NetexConfig {
       .addFerryIdsNotAllowedForBicycle(
         config
           .of("ferryIdsNotAllowedForBicycle")
-          .since(NA)
-          .summary("TODO")
+          .since(V2_0)
+          .summary("List ferries witch do not allow bikes.")
+          .description(
+            """
+            Bicycles are allowed on most ferries however Nordic profile doesn't contain a place 
+            where bicycle conveyance can be defined.
+            <p>
+            For this reason we allow bicycles on ferries by default and allow to override the rare
+            case where this is not the case.
+            """
+          )
           .asStringSet(original.ferryIdsNotAllowedForBicycle())
       );
   }
