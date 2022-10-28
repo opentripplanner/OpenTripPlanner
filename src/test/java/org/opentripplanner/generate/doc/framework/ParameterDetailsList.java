@@ -34,9 +34,12 @@ public class ParameterDetailsList {
 
   private void addParametersList(NodeAdapter node) {
     for (NodeInfo it : node.parametersSorted()) {
+      if (skipNodeOp.skip(it)) {
+        continue;
+      }
       printNode(node, it);
 
-      if (it.type().isComplex() && !skipNodeOp.skip(it)) {
+      if (it.type().isComplex()) {
         var child = node.child(it.name());
 
         if (child == null || child.isEmpty()) {
