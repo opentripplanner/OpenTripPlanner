@@ -31,11 +31,6 @@ public class MarkdownFormatter {
     return text == null ? "" : "`" + text + "`";
   }
 
-  /** Return the given input formatted as an inline code fragment. */
-  public static String quote(@Nullable Object text) {
-    return text == null ? "" : "\"" + text + "\"";
-  }
-
   /**
    * Link to a header in the same document. The "other" element need to be tagged with an
    * "id" attribute equals to the given anchor.

@@ -22,12 +22,6 @@ class MarkdownFormatterTest {
   }
 
   @Test
-  void quote() {
-    assertEquals("\"text\"", MarkdownFormatter.quote("text"));
-    assertEquals("", MarkdownFormatter.quote(null));
-  }
-
-  @Test
   void linkToAnchor() {
     assertEquals("[text](#anchor)", MarkdownFormatter.linkToAnchor("text", "anchor"));
   }
