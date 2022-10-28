@@ -38,7 +38,7 @@ jobs:
       # https://github.com/actions/virtual-environments/issues/785
       - name: Configure Windows Pagefile
         if: matrix.os == 'windows-latest'
-        uses: al-cheb/configure-pagefile-action@v1.2
+        uses: al-cheb/configure-pagefile-action@v1.3
 
       - name: Prepare coverage agent, build and test
         run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
