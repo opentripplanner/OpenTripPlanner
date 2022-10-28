@@ -19,7 +19,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class RouterConfigurationDocTest {
 
   private static final File TEMPLATE = new File("doc-templates", "RouterConfiguration.md");
-  private static final File OUT_FILE = new File("docs", "RouterConfiguration-poc.md");
+  private static final File OUT_FILE = new File("docs", "RouterConfiguration.md");
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes.of(
