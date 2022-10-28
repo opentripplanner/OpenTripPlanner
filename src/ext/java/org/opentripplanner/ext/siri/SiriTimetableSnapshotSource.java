@@ -988,9 +988,14 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       Trip trip = tripTimes.getTrip();
       for (TripPattern pattern : patterns) {
         if (tripTimes.getNumStops() == pattern.numberOfStops()) {
-          // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
-          // previously created trip
+          // All tripTimes should be handled the same way to always allow latest realtime-update to
+          // replace previous update regardless of realtimestate
+          cancelScheduledTrip(trip, serviceDate);
+
+          // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
+          // remove the previously created trip
           removePreviousRealtimeUpdate(trip, serviceDate);
+
           cancelScheduledTrip(trip, serviceDate);
           if (!tripTimes.isCanceled()) {
             // UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest
