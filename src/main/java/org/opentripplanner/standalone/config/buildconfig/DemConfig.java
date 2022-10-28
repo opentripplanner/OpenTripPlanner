@@ -27,12 +27,14 @@ public class DemConfig {
 
   private static DemExtractParameters mapDemExtract(NodeAdapter config) {
     return new DemExtractParametersBuilder()
-      .withSource(config.of("source").since(NA).summary("TODO").asUri())
+      .withSource(
+        config.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+      )
       .withElevationUnitMultiplier(
         config
           .of("elevationUnitMultiplier")
           .since(NA)
-          .summary("TODO")
+          .summary("Specify a multiplier to convert elevation units from source to meters.")
           .asDoubleOptional()
           .orElse(null)
       )

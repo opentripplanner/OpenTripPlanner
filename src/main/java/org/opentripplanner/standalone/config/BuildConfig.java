@@ -540,14 +540,14 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("writeCachedElevations")
         .since(NA)
-        .summary("TODO")
+        .summary("Whether elevation data should be cached.")
         .description(
           """
-        When set to true (it is false by default), the elevation module will create a file of a lookup
-        map of the LineStrings and the corresponding calculated elevation data for those coordinates.
-        Subsequent graph builds can reuse the data in this file to avoid recalculating all the
-        elevation data again.
-        """
+            When set to true, the elevation module will create a file of a lookup
+            map of the LineStrings and the corresponding calculated elevation data for those coordinates.
+            Subsequent graph builds can reuse the data in this file to avoid recalculating all the
+            elevation data again.
+          """
         )
         .asBoolean(false);
     maxAreaNodes =

@@ -56,12 +56,12 @@ Sections follow that describe particular settings in more depth.
 | [transitModelTimeZone](#transitModelTimeZone)                                        | `time-zone` | Time zone for the graph.                                                                                                                             | *Optional* |                                   |   na  |
 | [transitServiceEnd](#transitServiceEnd)                                              |  `duration` | Limit the import of transit services to the given end date.                                                                                          | *Optional* | `"P3Y"`                           |   na  |
 | [transitServiceStart](#transitServiceStart)                                          |  `duration` | Limit the import of transit services to the given START date.                                                                                        | *Optional* | `"-P1Y"`                          |   na  |
-| [writeCachedElevations](#writeCachedElevations)                                      |  `boolean`  | TODO                                                                                                                                                 | *Optional* | `false`                           |   na  |
+| [writeCachedElevations](#writeCachedElevations)                                      |  `boolean`  | Whether elevation data should be cached.                                                                                                             | *Optional* | `false`                           |   na  |
 | [boardingLocationTags](#boardingLocationTags)                                        |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                           | *Optional* |                                   |   na  |
 | [dataOverlay](/docs/sandbox/DataOverlay.md)                                          |   `object`  | Config for the DataOverlay Sandbox module                                                                                                            | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                                          |  `object[]` | Specify parameters for DEM extracts.                                                                                                                 | *Optional* |                                   |   na  |
-|       elevationUnitMultiplier                                                        |   `double`  | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
-|       source                                                                         |    `uri`    | TODO                                                                                                                                                 | *Required* |                                   |   na  |
+|       elevationUnitMultiplier                                                        |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                               | *Optional* |                                   |   na  |
+|       source                                                                         |    `uri`    | The unique URI pointing to the data file.                                                                                                            | *Required* |                                   |   na  |
 | elevationBucket                                                                      |   `object`  | If specified, download NED elevation tiles from the given AWS S3 bucket.                                                                             | *Optional* |                                   |   na  |
 | fares                                                                                |   `object`  | No doc, parent contains doc.                                                                                                                         | *Optional* |                                   |   na  |
 | [localFileNamePatterns](#localFileNamePatterns)                                      |   `object`  | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
@@ -865,12 +865,12 @@ Examples:
 
 *Since version: `na` ∙ Type: `boolean` ∙ `Optional` ∙ Default value: `false` ∙ Path: `Root`*
 
-TODO
+Whether elevation data should be cached.
 
-When set to true (it is false by default), the elevation module will create a file of a lookup
-map of the LineStrings and the corresponding calculated elevation data for those coordinates.
-Subsequent graph builds can reuse the data in this file to avoid recalculating all the
-elevation data again.
+  When set to true, the elevation module will create a file of a lookup
+  map of the LineStrings and the corresponding calculated elevation data for those coordinates.
+  Subsequent graph builds can reuse the data in this file to avoid recalculating all the
+  elevation data again.
 
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
