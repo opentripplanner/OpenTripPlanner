@@ -81,9 +81,12 @@ The feature must be configured in `router-config.json` as follows
       "cacheMaxSeconds": 60
     },
     // note this has the same name as the example with the Digitransit mapper,
-    // at some point we might want to do some clean up and rename this to
-    // realtimeVehicleParking but for now this remains like this for backwards
-    // compatibility.
+    // and two layers should not have the same name in practice. At some point,
+    // we might want to do some clean up and rename this to realtimeVehicleParking
+    // in this example but in order to have no client code changes required,
+    // this has the old layer name in this example but it's possible to name
+    // this anything in an OTP deployment that doesn't have strict backwards
+    // compatibility needs.
     {
       "name": "vehicleParking",
       "type": "VehicleParking",
