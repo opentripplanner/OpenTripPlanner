@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
-import static org.opentripplanner.standalone.config.routerequest.RouteRequestMapper.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -17,6 +16,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -110,14 +110,7 @@ number of transit vehicles used in that itinerary.
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
     this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
-      mapRouteRequest(
-        root
-          .of("routingDefaults")
-          .since(NA)
-          .summary("The default parameters for the routing query.")
-          .description("Most of these are overridable through the various API endpoints.")
-          .asObject()
-      );
+      RouteRequestMapper.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig =

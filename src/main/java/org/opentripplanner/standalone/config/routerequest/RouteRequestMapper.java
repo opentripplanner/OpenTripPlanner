@@ -36,6 +36,16 @@ public class RouteRequestMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequestMapper.class);
 
+  public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
+    var c = root
+      .of(parameterName)
+      .since(V2_0)
+      .summary("The default parameters for the routing query.")
+      .description("Most of these are overridable through the various API endpoints.")
+      .asObject();
+    return mapRouteRequest(c);
+  }
+
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
     RouteRequest dft = new RouteRequest();
 
@@ -105,7 +115,7 @@ public class RouteRequestMapper {
         c
           .of("modes")
           .since(NA)
-          .summary("TODO")
+          .summary("The set of access/egress/direct/transit modes to be used for the route search.")
           .asCustomStringType(
             RequestModes.defaultRequestModes(),
             s -> new QualifiedModeSet(s).getRequestModes()
