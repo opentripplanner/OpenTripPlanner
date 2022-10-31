@@ -281,7 +281,7 @@ In addition there this an upper bound on the calculation of the search window:
           .of("minWinTimeMinutes")
           .since(NA)
           .summary("The constant minimum number of minutes for a raptor-search-window. ")
-          .description("Use a value between 20 to 180 minutes in a normal deployment.")
+          .description("Use a value between 20 and 180 minutes in a normal deployment.")
           .asInt(dsWinDft.minWinTimeMinutes());
       this.maxWinTimeMinutes =
         dsWin
