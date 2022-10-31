@@ -41,7 +41,7 @@ jobs:
           cache: maven
 
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
+        uses: stCarolas/setup-maven@v.4.5
         with:
           maven-version: 3.8.2
 
