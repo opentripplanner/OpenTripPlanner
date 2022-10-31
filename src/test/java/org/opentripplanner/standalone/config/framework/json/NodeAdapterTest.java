@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +33,21 @@ public class NodeAdapterTest {
 
   @Test
   public void testAsRawNode() {
-    NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
-    assertFalse(subject.rawNode("anObject").has("withText"));
+    NodeAdapter subject = newNodeAdapterForTest("{ child : { foo : 'bar' } }");
+
+    // Define child
+    var child = subject.of("child").asObject();
+
+    // Retrieve child as raw node
+    assertEquals("{\"foo\":\"bar\"}", child.rawNode().toString());
+
+    // Both the root(subject) and the child should report an empty list of unused parameters
+    var up = new ArrayList<>();
+    subject.logAllUnusedParameters(up::add);
+    assertEquals(List.of(), up);
+
+    child.logAllUnusedParameters(up::add);
+    assertEquals(List.of(), up);
   }
 
   @Test

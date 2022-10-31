@@ -51,6 +51,8 @@ public class NodeAdapter {
    */
   private final Map<String, NodeInfo> parameters = new HashMap<>();
 
+  private boolean usedAsRaw = false;
+
   private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath) {
     this.json = node;
     this.source = source;
@@ -155,9 +157,20 @@ public class NodeAdapter {
 
   /**
    * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
-   * track of unused parameters and can not generate documentation for this parameter.
+   * track of unused parameters and can not generate documentation for the children.
+   * <p>
+   * OTP will no longer WARN about unused parameters for this node.
    */
-  public JsonNode rawNode(String paramName) {
+  public JsonNode rawNode() {
+    this.usedAsRaw = true;
+    return json;
+  }
+
+  /**
+   * Used by {@link ParameterBuilder} to skip one node in the node three. This method
+   * does work with the unused parameters
+   */
+  JsonNode rawNode(String paramName) {
     parameters.put(paramName, NodeInfo.ofSkipChild(paramName));
     return json.path(paramName);
   }
@@ -186,6 +199,10 @@ public class NodeAdapter {
    * child nodes.
    */
   private List<String> unusedParams() {
+    if (usedAsRaw) {
+      return List.of();
+    }
+
     List<String> unusedParams = new ArrayList<>();
     Iterator<String> it = json.fieldNames();
     Set<String> parameterNames = parameters.keySet();

@@ -709,8 +709,8 @@ Netex data is also often supplied in a ZIP file.
     transitFeeds = TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults);
 
     // List of complex parameters
-    fareServiceFactory = FaresConfiguration.fromConfig(root.rawNode("fares"));
-    customNamer = CustomNamer.CustomNamerFactory.fromConfig(root.rawNode("osmNaming"));
+    fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");
+    customNamer = CustomNamer.CustomNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");

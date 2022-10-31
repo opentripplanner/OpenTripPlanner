@@ -25,6 +25,7 @@ public class BuildConfigurationDocTest {
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
     .add("dataOverlay", "/docs/sandbox/DataOverlay.md")
+    .add("fares", "/docs/sandbox/Fares.md")
     .add("transferRequests", "/docs/RouteRequest.md")
     .build();
 
