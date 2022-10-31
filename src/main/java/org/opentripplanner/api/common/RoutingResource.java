@@ -38,8 +38,9 @@ import org.slf4j.LoggerFactory;
  * fields of the resulting prototype routing request for which query parameters are found are
  * overwritten here. This establishes a priority chain: RouteRequest field initializers, then JSON
  * router config, then query parameters.
- *
- * @author abyrd
+ *<p>
+ * For documentation of parameters see the
+ * {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper}.
  */
 @SuppressWarnings({ "FieldMayBeFinal", "unused" })
 public abstract class RoutingResource {
@@ -147,11 +148,6 @@ public abstract class RoutingResource {
   @QueryParam("timetableView")
   public Boolean timetableView;
 
-  /**
-   * see {@link RouteRequestMapper}
-   *
-   * @see #timetableView for usage.
-   */
   @Deprecated
   @QueryParam("arriveBy")
   protected Boolean arriveBy;
@@ -185,11 +181,9 @@ public abstract class RoutingResource {
   @QueryParam("bikeWalkingReluctance")
   protected Double bikeWalkingReluctance;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkReluctance")
   protected Double walkReluctance;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeReluctance")
   protected Double bikeReluctance;
 
@@ -211,35 +205,27 @@ public abstract class RoutingResource {
   @QueryParam("waitReluctance")
   protected Double waitReluctance;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkSpeed")
   protected Double walkSpeed;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeSpeed")
   protected Double bikeSpeed;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeWalkingSpeed")
   protected Double bikeWalkingSpeed;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeSwitchTime")
   protected Integer bikeSwitchTime;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeSwitchCost")
   protected Integer bikeSwitchCost;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("triangleSafetyFactor")
   protected Double triangleSafetyFactor;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("triangleSlopeFactor")
   protected Double triangleSlopeFactor;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("triangleTimeFactor")
   protected Double triangleTimeFactor;
 
@@ -341,15 +327,12 @@ public abstract class RoutingResource {
   @DefaultValue("false")
   protected Boolean showIntermediateStops;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkBoardCost")
   protected Integer walkBoardCost;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeBoardCost")
   protected Integer bikeBoardCost;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkSafetyFactor")
   protected Double walkSafetyFactor;
 
@@ -359,35 +342,27 @@ public abstract class RoutingResource {
   @QueryParam("keepingRentedBicycleAtDestinationCost")
   protected Double keepingRentedBicycleAtDestinationCost;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("allowedVehicleRentalNetworks")
   protected Set<String> allowedVehicleRentalNetworks;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bannedVehicleRentalNetworks")
   protected Set<String> bannedVehicleRentalNetworks;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeParkTime")
   protected Integer bikeParkTime;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeParkCost")
   protected Integer bikeParkCost;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("carParkTime")
   protected Integer carParkTime = 60;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("carParkCost")
   protected Integer carParkCost = 120;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("requiredVehicleParkingTags")
   protected Set<String> requiredVehicleParkingTags = Set.of();
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("bannedVehicleParkingTags")
   protected Set<String> bannedVehicleParkingTags = Set.of();
 
@@ -645,7 +620,6 @@ public abstract class RoutingResource {
   @QueryParam("debugItineraryFilter")
   protected Boolean debugItineraryFilter;
 
-  /** see {@link RouteRequestMapper} **/
   @QueryParam("geoidElevation")
   protected Boolean geoidElevation;
 
