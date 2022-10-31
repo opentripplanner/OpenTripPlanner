@@ -60,7 +60,7 @@ public class SystemPreferences implements Serializable {
     return tags;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
   public DataOverlayParameters dataOverlay() {
     return dataOverlay;
   }
@@ -70,7 +70,7 @@ public class SystemPreferences implements Serializable {
     return geoidElevation;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
   }

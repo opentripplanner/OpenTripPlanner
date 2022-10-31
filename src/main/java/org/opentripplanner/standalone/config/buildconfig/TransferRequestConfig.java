@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import java.util.List;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper;
+import org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper;
 
 public class TransferRequestConfig {
 

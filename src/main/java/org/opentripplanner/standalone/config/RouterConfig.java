@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
-import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRouteRequest;
+import static org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;

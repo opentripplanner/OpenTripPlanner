@@ -1,11 +1,11 @@
-package org.opentripplanner.standalone.config.routingrequest;
+package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.routingrequest.ItineraryFiltersMapper.mapItineraryFilterParams;
-import static org.opentripplanner.standalone.config.routingrequest.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
+import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersMapper.mapItineraryFilterParams;
+import static org.opentripplanner.standalone.config.routerequest.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
 
 import java.time.Duration;
 import org.opentripplanner.api.parameter.QualifiedModeSet;

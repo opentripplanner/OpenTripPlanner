@@ -81,12 +81,12 @@ public final class StreetPreferences implements Serializable {
     return intersectionTraversalModel;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
   public DurationForEnum<StreetMode> maxAccessEgressDuration() {
     return maxAccessEgressDuration;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
   public DurationForEnum<StreetMode> maxDirectDuration() {
     return maxDirectDuration;
   }

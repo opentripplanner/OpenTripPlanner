@@ -4,7 +4,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
- * {@link org.opentripplanner.standalone.config.routingrequest.WheelchairAccessibilityRequestMapper}
+ * {@link org.opentripplanner.standalone.config.routerequest.WheelchairAccessibilityRequestMapper}
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public record WheelchairPreferences(

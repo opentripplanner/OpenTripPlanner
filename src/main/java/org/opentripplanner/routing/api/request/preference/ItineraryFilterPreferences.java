@@ -9,7 +9,7 @@ import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * Group by Similarity filter parameters. See
- * {@link org.opentripplanner.standalone.config.routingrequest.ItineraryFiltersMapper}
+ * {@link org.opentripplanner.standalone.config.routerequest.ItineraryFiltersMapper}
  * for documentation of each field.
  *
  * <p>

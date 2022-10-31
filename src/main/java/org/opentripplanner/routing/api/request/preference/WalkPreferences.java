@@ -89,7 +89,7 @@ public final class WalkPreferences implements Serializable {
     return stairsReluctance;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
   public double stairsTimeFactor() {
     return stairsTimeFactor;
   }

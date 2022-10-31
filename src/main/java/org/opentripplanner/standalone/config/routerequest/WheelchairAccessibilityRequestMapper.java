@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone.config.routingrequest;
+package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
