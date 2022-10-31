@@ -14,7 +14,6 @@ import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.core.intersection_model.DrivingDirection;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalModel;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
 import org.opentripplanner.util.lang.DoubleUtils;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -82,12 +81,12 @@ public final class StreetPreferences implements Serializable {
     return intersectionTraversalModel;
   }
 
-  /** see {@link RouteRequestMapper} **/
+  /** See {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public DurationForEnum<StreetMode> maxAccessEgressDuration() {
     return maxAccessEgressDuration;
   }
 
-  /** see {@link RouteRequestMapper} **/
+  /** See {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public DurationForEnum<StreetMode> maxDirectDuration() {
     return maxDirectDuration;
   }

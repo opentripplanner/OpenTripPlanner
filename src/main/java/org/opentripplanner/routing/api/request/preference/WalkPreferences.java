@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.framework.Units;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -90,7 +89,7 @@ public final class WalkPreferences implements Serializable {
     return stairsReluctance;
   }
 
-  /** see {@link RouteRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public double stairsTimeFactor() {
     return stairsTimeFactor;
   }

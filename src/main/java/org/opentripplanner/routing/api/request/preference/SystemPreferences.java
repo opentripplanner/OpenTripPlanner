@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RoutingTag;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -61,7 +60,7 @@ public class SystemPreferences implements Serializable {
     return tags;
   }
 
-  /** see {@link RouteRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public DataOverlayParameters dataOverlay() {
     return dataOverlay;
   }
@@ -71,7 +70,7 @@ public class SystemPreferences implements Serializable {
     return geoidElevation;
   }
 
-  /** see {@link RouteRequestMapper} **/
+  /** see {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
   }
