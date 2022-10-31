@@ -24,7 +24,7 @@ public class UpdaterConfigDocTest {
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final Set<String> SKIP_UPDATERS = Set.of("siri-azure-sx-updater");
-  private static final SkipNodes SKIP_NODES = SkipNodes.of();
+  private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest

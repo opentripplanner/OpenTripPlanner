@@ -21,10 +21,10 @@ public class RouteRequestDocTest {
   private static final File TEMPLATE = new File("doc-templates", "RouteRequest.md");
   private static final File OUT_FILE = new File("docs", "RouteRequest.md");
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
-  private static final SkipNodes SKIP_NODES = SkipNodes.of(
-    "vectorTileLayers",
-    "/docs/sandbox/MapboxVectorTilesApi.md"
-  );
+  private static final SkipNodes SKIP_NODES = SkipNodes
+    .of()
+    .add("vectorTileLayers", "/docs/sandbox/MapboxVectorTilesApi.md")
+    .build();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest

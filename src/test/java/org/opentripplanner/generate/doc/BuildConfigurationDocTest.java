@@ -22,12 +22,11 @@ public class BuildConfigurationDocTest {
   private static final File OUT_FILE = new File("docs", "BuildConfiguration-poc.md");
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/build-config.json";
-  private static final SkipNodes SKIP_NODES = SkipNodes.of(
-    "dataOverlay",
-    "/docs/sandbox/DataOverlay.md",
-    "transferRequests",
-    "/docs/RouteRequest.md"
-  );
+  private static final SkipNodes SKIP_NODES = SkipNodes
+    .of()
+    .add("dataOverlay", "/docs/sandbox/DataOverlay.md")
+    .add("transferRequests", "/docs/RouteRequest.md")
+    .build();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest

@@ -22,14 +22,12 @@ public class RouterConfigurationDocTest {
   private static final File OUT_FILE = new File("docs", "RouterConfiguration.md");
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
-  private static final SkipNodes SKIP_NODES = SkipNodes.of(
-    "vectorTileLayers",
-    "/docs/sandbox/MapboxVectorTilesApi.md",
-    "routingDefaults",
-    "/docs/RouteRequest.md",
-    "updaters",
-    "/docs/UpdaterConfig.md"
-  );
+  private static final SkipNodes SKIP_NODES = SkipNodes
+    .of()
+    .add("vectorTileLayers", "/docs/sandbox/MapboxVectorTilesApi.md")
+    .add("routingDefaults", "/docs/RouteRequest.md")
+    .add("updaters", "/docs/UpdaterConfig.md")
+    .build();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
