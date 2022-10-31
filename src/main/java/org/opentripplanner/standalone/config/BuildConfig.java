@@ -7,13 +7,11 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
@@ -231,19 +229,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("configVersion")
         .since(NA)
         .summary("Deployment version of the *build-config.json*.")
-        .description(
-          """
-            The config-version is a parameter which each OTP deployment may set to be able to query
-            the OTP server and verify that it uses the correct version of the config. The version
-            must be injected into the config in the operation deployment pipeline. How this is done
-            is up to the deployment.
-            <p>
-            The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
-            or format check on the version and it can be any string.
-            <p>
-            Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
-            """
-        )
+        .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
         .asString(null);
     dataImportReport =
       root

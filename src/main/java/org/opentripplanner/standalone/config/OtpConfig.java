@@ -14,6 +14,22 @@ import org.slf4j.LoggerFactory;
  */
 public class OtpConfig {
 
+  /**
+   * This description is shared for otp-config, build-config and router-config.
+   */
+  public static final String CONFIG_VERSION_DESCRIPTION =
+    """
+    The config-version is a parameter which each OTP deployment may set to be able to query the
+    OTP server and verify that it uses the correct version of the config. The version should be
+    injected into the config in the (continuous) deployment pipeline. How this is done, is up to
+    the deployment.
+
+    The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+    or format check on the version and it can be any string.
+
+    Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+    """;
+
   private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
 
   public final NodeAdapter root;
@@ -36,7 +52,13 @@ public class OtpConfig {
   public OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
     this.root = new NodeAdapter(otpConfig, source);
 
-    this.configVersion = root.of("configVersion").since(NA).summary("TODO").asString(null);
+    this.configVersion =
+      root
+        .of("configVersion")
+        .since(NA)
+        .summary("Deployment version of the *otp-config.json*.")
+        .description(CONFIG_VERSION_DESCRIPTION)
+        .asString(null);
     this.otpFeatures =
       root.of("otpFeatures").since(NA).summary("TODO").asEnumMap(OTPFeature.class, Boolean.class);
 

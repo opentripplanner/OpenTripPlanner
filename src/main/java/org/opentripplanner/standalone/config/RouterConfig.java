@@ -60,7 +60,12 @@ public class RouterConfig implements Serializable {
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
     this.configVersion =
-      root.of("configVersion").since(NA).summary("Version of the configuration.").asString(null);
+      root
+        .of("configVersion")
+        .since(NA)
+        .summary("Deployment version of the *router-config.json*.")
+        .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
+        .asString(null);
     this.requestLogFile =
       root
         .of("requestLogFile")
