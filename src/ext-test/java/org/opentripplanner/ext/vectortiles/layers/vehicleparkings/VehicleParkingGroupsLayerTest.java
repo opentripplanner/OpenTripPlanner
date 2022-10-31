@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vectortiles;
+package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.DigitransitVehicleParkingGroupPropertyMapper;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingAndGroup;
-import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
@@ -123,7 +122,8 @@ public class VehicleParkingGroupsLayerTest {
       assertEquals(1, tiles.layers().size());
       VehicleParkingGroupsLayerBuilderWithPublicGeometry builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
         graph,
-        tiles.layers().get(0)
+        tiles.layers().get(0),
+        Locale.US
       );
 
       List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
@@ -140,7 +140,9 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void digitransitVehicleParkingGroupPropertyMapperTest() {
-    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap();
+    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
+      Locale.US
+    );
     Map<String, Object> map = new HashMap<>();
     mapper
       .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
@@ -155,14 +157,33 @@ public class VehicleParkingGroupsLayerTest {
     );
   }
 
+  @Test
+  public void digitransitVehicleParkingGroupPropertyMapperTranslationTest() {
+    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
+      new Locale("de")
+    );
+    Map<String, Object> map = new HashMap<>();
+    mapper
+      .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
+      .forEach(o -> map.put(o.first, o.second));
+
+    assertEquals("groupDE", map.get("name").toString());
+
+    assertEquals(
+      "[{\"bicyclePlaces\":false,\"carPlaces\":true,\"name\":\"DE\",\"id\":\"F:id\"}]",
+      map.get("vehicleParking")
+    );
+  }
+
   private static class VehicleParkingGroupsLayerBuilderWithPublicGeometry
     extends VehicleParkingGroupsLayerBuilder {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
       Graph graph,
-      VectorTilesResource.LayerParameters layerParameters
+      VectorTilesResource.LayerParameters layerParameters,
+      Locale locale
     ) {
-      super(graph, null, layerParameters);
+      super(graph, layerParameters, locale);
     }
 
     @Override
@@ -174,8 +195,8 @@ public class VehicleParkingGroupsLayerTest {
   private static class VehicleParkingGroupPropertyMapperWithPublicMap
     extends DigitransitVehicleParkingGroupPropertyMapper {
 
-    public VehicleParkingGroupPropertyMapperWithPublicMap() {
-      super();
+    public VehicleParkingGroupPropertyMapperWithPublicMap(Locale locale) {
+      super(locale);
     }
 
     @Override

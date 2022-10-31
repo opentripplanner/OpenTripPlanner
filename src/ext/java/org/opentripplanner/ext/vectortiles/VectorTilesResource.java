@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
+import org.glassfish.grizzly.http.server.Request;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
@@ -41,43 +43,67 @@ public class VectorTilesResource {
   private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
   private final OtpServerRequestContext serverContext;
   private final String ignoreRouterId;
+  private final Locale locale;
 
   static {
-    layers.put(LayerType.Stop, StopsLayerBuilder::new);
-    layers.put(LayerType.Station, StationsLayerBuilder::new);
+    layers.put(
+      LayerType.Stop,
+      (graph, transitService, layerParameters, locale) ->
+        new StopsLayerBuilder(transitService, layerParameters, locale)
+    );
+    layers.put(
+      LayerType.Station,
+      (graph, transitService, layerParameters, locale) ->
+        new StationsLayerBuilder(transitService, layerParameters, locale)
+    );
     layers.put(
       LayerType.VehicleRental,
-      (graph, transitService, layerParameters) ->
-        new VehicleRentalPlacesLayerBuilder(graph.getVehicleRentalStationService(), layerParameters)
+      (graph, transitService, layerParameters, locale) ->
+        new VehicleRentalPlacesLayerBuilder(
+          graph.getVehicleRentalStationService(),
+          layerParameters,
+          locale
+        )
     );
     layers.put(
       LayerType.VehicleRentalStation,
-      (graph, transitService, layerParameters) ->
+      (graph, transitService, layerParameters, locale) ->
         new VehicleRentalStationsLayerBuilder(
           graph.getVehicleRentalStationService(),
-          layerParameters
+          layerParameters,
+          locale
         )
     );
     layers.put(
       LayerType.VehicleRentalVehicle,
-      (graph, transitService, layerParameters) ->
+      (graph, transitService, layerParameters, locale) ->
         new VehicleRentalVehiclesLayerBuilder(
           graph.getVehicleRentalStationService(),
           layerParameters
         )
     );
-    layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
-    layers.put(LayerType.VehicleParkingGroup, VehicleParkingGroupsLayerBuilder::new);
+    layers.put(
+      LayerType.VehicleParking,
+      (graph, transitService, layerParameters, locale) ->
+        new VehicleParkingsLayerBuilder(graph, layerParameters, locale)
+    );
+    layers.put(
+      LayerType.VehicleParkingGroup,
+      (graph, transitService, layerParameters, locale) ->
+        new VehicleParkingGroupsLayerBuilder(graph, layerParameters, locale)
+    );
   }
 
   public VectorTilesResource(
     @Context OtpServerRequestContext serverContext,
+    @Context Request grizzlyRequest,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
+    this.locale = grizzlyRequest.getLocale();
     this.serverContext = serverContext;
     this.ignoreRouterId = ignoreRouterId;
   }
@@ -117,7 +143,7 @@ public class VectorTilesResource {
         mvtBuilder.addLayers(
           VectorTilesResource.layers
             .get(layerParameters.type())
-            .create(serverContext.graph(), serverContext.transitService(), layerParameters)
+            .create(serverContext.graph(), serverContext.transitService(), layerParameters, locale)
             .build(envelope, layerParameters)
         );
       }

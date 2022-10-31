@@ -1,8 +1,12 @@
 package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
 
+import static java.util.Map.entry;
+
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitRealtimeVehicleRentalStationPropertyMapper;
 import org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.DigitransitVehicleRentalStationPropertyMapper;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
@@ -12,11 +16,18 @@ public class VehicleRentalStationsLayerBuilder
 
   public VehicleRentalStationsLayerBuilder(
     VehicleRentalStationService service,
-    VectorTilesResource.LayerParameters layerParameters
+    VectorTilesResource.LayerParameters layerParameters,
+    Locale locale
   ) {
     super(
       service,
-      Map.of(MapperType.Digitransit, new DigitransitVehicleRentalStationPropertyMapper()),
+      Map.ofEntries(
+        entry(MapperType.Digitransit, new DigitransitVehicleRentalStationPropertyMapper(locale)),
+        entry(
+          MapperType.DigitransitRealtime,
+          new DigitransitRealtimeVehicleRentalStationPropertyMapper(locale)
+        )
+      ),
       layerParameters
     );
   }

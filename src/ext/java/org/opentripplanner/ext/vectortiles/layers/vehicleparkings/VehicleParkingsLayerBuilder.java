@@ -1,6 +1,9 @@
 package org.opentripplanner.ext.vectortiles.layers.vehicleparkings;
 
+import static java.util.Map.entry;
+
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,27 +17,29 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
-  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Graph, PropertyMapper<VehicleParking>>> mappers = Map.of(
-    VehicleParkingsLayerBuilder.MapperType.Digitransit,
-    g -> DigitransitVehicleParkingPropertyMapper.create()
+  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParking>>> mappers = Map.ofEntries(
+    entry(
+      VehicleParkingsLayerBuilder.MapperType.Stadtnavi,
+      StadtnaviVehicleParkingPropertyMapper::create
+    ),
+    entry(MapperType.Digitransit, DigitransitVehicleParkingPropertyMapper::create)
   );
   private final Graph graph;
 
   public VehicleParkingsLayerBuilder(
     Graph graph,
-    TransitService transitService,
-    VectorTilesResource.LayerParameters layerParameters
+    VectorTilesResource.LayerParameters layerParameters,
+    Locale locale
   ) {
     super(
       layerParameters.name(),
       mappers
         .get(VehicleParkingsLayerBuilder.MapperType.valueOf(layerParameters.mapper()))
-        .apply(graph)
+        .apply(locale)
     );
     this.graph = graph;
   }
@@ -58,5 +63,6 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
   enum MapperType {
     Digitransit,
+    Stadtnavi,
   }
 }
