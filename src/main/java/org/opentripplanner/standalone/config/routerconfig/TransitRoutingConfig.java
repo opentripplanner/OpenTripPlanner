@@ -109,7 +109,7 @@ no extra threads are stated and the search is done in one thread.
         .description(
           """
 The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority
-set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all 
+set, the default is `allowed`. The `stopTransferCost` parameter is optional, but if listed all 
 values must be set.
           
 If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
@@ -118,10 +118,10 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
           
 | Config key    | Description                                                                                   | Type |
 |---------------|-----------------------------------------------------------------------------------------------|:----:|
-| `DISCOURAGED` | Use a very high cost like `72 000` to eliminate transfers at the stop if not the only option. | int  |
-| `ALLOWED`     | Allowed, but not recommended. Use something like `150`.                                       | int  |
-| `RECOMMENDED` | Use a small cost penalty like `60`.                                                           | int  |
-| `PREFERRED`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
+| `discouraged` | Use a very high cost like `72 000` to eliminate transfers at the stop if not the only option. | int  |
+| `allowed`     | Allowed, but not recommended. Use something like `150`.                                       | int  |
+| `recommended` | Use a small cost penalty like `60`.                                                           | int  |
+| `preferred`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
           
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the 
 `stopTransferCost` is listed.**
