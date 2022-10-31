@@ -19,6 +19,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * Some parameters in this class are related to functional-features, but does not have a clear
  * place where they belong. We should refactor and move these.
  * <p>
+ * See the configuration for documentation of each field.
+ * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
 public class SystemPreferences implements Serializable {
@@ -60,7 +62,6 @@ public class SystemPreferences implements Serializable {
     return tags;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public DataOverlayParameters dataOverlay() {
     return dataOverlay;
   }
@@ -70,7 +71,6 @@ public class SystemPreferences implements Serializable {
     return geoidElevation;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public Duration maxJourneyDuration() {
     return maxJourneyDuration;
   }

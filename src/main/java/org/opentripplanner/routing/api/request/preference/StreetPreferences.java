@@ -20,6 +20,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 /**
  * This class holds preferences for street routing in general, not mode specific.
  * <p>
+ * See the configuration for documentation of each field.
+ * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 @SuppressWarnings("UnusedReturnValue")
@@ -81,12 +83,10 @@ public final class StreetPreferences implements Serializable {
     return intersectionTraversalModel;
   }
 
-  /** See {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public DurationForEnum<StreetMode> maxAccessEgressDuration() {
     return maxAccessEgressDuration;
   }
 
-  /** See {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public DurationForEnum<StreetMode> maxDirectDuration() {
     return maxDirectDuration;
   }

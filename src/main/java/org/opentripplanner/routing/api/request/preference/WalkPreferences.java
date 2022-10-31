@@ -13,6 +13,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * related to street and transit routing. The values are normalized(rounded) so the class
  * can used as a cache key.
  * <p>
+ * See the configuration for documentation of each field.
+ * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class WalkPreferences implements Serializable {
@@ -89,7 +91,6 @@ public final class WalkPreferences implements Serializable {
     return stairsReluctance;
   }
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper} **/
   public double stairsTimeFactor() {
     return stairsTimeFactor;
   }

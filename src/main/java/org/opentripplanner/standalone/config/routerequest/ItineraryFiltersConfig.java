@@ -10,9 +10,9 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItineraryFiltersMapper {
+public class ItineraryFiltersConfig {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ItineraryFiltersMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ItineraryFiltersConfig.class);
 
   public static void mapItineraryFilterParams(
     String parameterName,

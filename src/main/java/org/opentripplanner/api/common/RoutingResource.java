@@ -22,7 +22,6 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,7 @@ import org.slf4j.LoggerFactory;
  * overwritten here. This establishes a priority chain: RouteRequest field initializers, then JSON
  * router config, then query parameters.
  *<p>
- * For documentation of parameters see the
- * {@link org.opentripplanner.standalone.config.routerequest.RouteRequestMapper}.
+ * See the configuration for documentation of each field.
  */
 @SuppressWarnings({ "FieldMayBeFinal", "unused" })
 public abstract class RoutingResource {
@@ -443,9 +441,6 @@ public abstract class RoutingResource {
   @QueryParam("bannedStopsHard")
   protected String bannedStopsHard;
 
-  /**
-   * see {@link RouteRequestMapper}
-   */
   @QueryParam("transferPenalty")
   protected Integer transferPenalty;
 

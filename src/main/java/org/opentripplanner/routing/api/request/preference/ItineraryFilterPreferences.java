@@ -8,9 +8,7 @@ import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
- * Group by Similarity filter parameters. See
- * {@link org.opentripplanner.standalone.config.routerequest.ItineraryFiltersMapper}
- * for documentation of each field.
+ * Group by Similarity filter parameters. See the configuration for documentation of each field.
  *
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.

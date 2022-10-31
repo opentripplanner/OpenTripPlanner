@@ -7,7 +7,7 @@ import org.opentripplanner.routing.api.request.preference.AccessibilityPreferenc
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class WheelchairAccessibilityRequestMapper {
+public class WheelchairAccessibilityRequestConfig {
 
   static WheelchairPreferences mapAccessibilityRequest(NodeAdapter a) {
     return new WheelchairPreferences(

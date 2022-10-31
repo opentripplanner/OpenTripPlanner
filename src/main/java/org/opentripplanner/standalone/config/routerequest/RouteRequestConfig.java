@@ -4,8 +4,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersMapper.mapItineraryFilterParams;
-import static org.opentripplanner.standalone.config.routerequest.WheelchairAccessibilityRequestMapper.mapAccessibilityRequest;
+import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
+import static org.opentripplanner.standalone.config.routerequest.WheelchairAccessibilityRequestConfig.mapAccessibilityRequest;
 
 import java.time.Duration;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -32,9 +32,9 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RouteRequestMapper {
+public class RouteRequestConfig {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestConfig.class);
 
   public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
     var c = root

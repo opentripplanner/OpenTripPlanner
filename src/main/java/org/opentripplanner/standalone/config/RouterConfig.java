@@ -16,7 +16,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -110,7 +110,7 @@ number of transit vehicles used in that itinerary.
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
     this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
-      RouteRequestMapper.mapDefaultRouteRequest(root, "routingDefaults");
+      RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig =
