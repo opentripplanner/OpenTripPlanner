@@ -17,11 +17,11 @@ import org.opentripplanner.transit.service.TransitService;
 public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
   private final TransitService transitService;
-  private final Locale locale;
+  private final I18NStringMapper i18NStringMapper;
 
   private DigitransitStationPropertyMapper(TransitService transitService, Locale locale) {
     this.transitService = transitService;
-    this.locale = locale;
+    this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
   public static DigitransitStationPropertyMapper create(
@@ -37,7 +37,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
     return List.of(
       new T2<>("gtfsId", station.getId().toString()),
-      new T2<>("name", station.getName().toString(locale)),
+      new T2<>("name", i18NStringMapper.mapNonnullToApi(station.getName())),
       new T2<>(
         "type",
         childStops

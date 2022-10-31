@@ -60,7 +60,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
     );
     return List.of(
       new T2<>("gtfsId", stop.getId().toString()),
-      new T2<>("name", i18NStringMapper.mapToApi(stop.getName())),
+      new T2<>("name", i18NStringMapper.mapNonnullToApi(stop.getName())),
       new T2<>("code", stop.getCode()),
       new T2<>("platform", stop.getPlatformCode()),
       new T2<>("desc", i18NStringMapper.mapToApi(stop.getDescription())),
