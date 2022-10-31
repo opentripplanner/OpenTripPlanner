@@ -43,7 +43,7 @@ Sections follow that describe particular settings in more depth.
 | maxInterlineDistance                                                                 |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                        | *Optional* | `200`                             |   na  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                            |   `double`  | Maximum distance between route shapes and their stops.                                                                                               | *Optional* | `150.0`                           |   na  |
 | maxTransferDurationSeconds                                                           |   `double`  | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.                                    | *Optional* | `1800.0`                          |   na  |
-| [multiThreadElevationCalculations](#multiThreadElevationCalculations)                |  `boolean`  | Whether or not to multi-thread the elevation calculations in the elevation module.                                                                   | *Optional* | `false`                           |   na  |
+| [multiThreadElevationCalculations](#multiThreadElevationCalculations)                |  `boolean`  | Configuring multi-threading during elevation calculations.                                                                                           | *Optional* | `false`                           |   na  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                              |  `boolean`  | If OSM data should be cached in memory during processing.                                                                                            | *Optional* | `false`                           |   na  |
 | platformEntriesLinking                                                               |  `boolean`  | Link unconnected entries to public transport platforms.                                                                                              | *Optional* | `false`                           |   na  |
 | [readCachedElevations](#readCachedElevations)                                        |  `boolean`  | Whether to read cached elevation data.                                                                                                               | *Optional* | `true`                            |   na  |
@@ -56,15 +56,15 @@ Sections follow that describe particular settings in more depth.
 | [transitModelTimeZone](#transitModelTimeZone)                                        | `time-zone` | Time zone for the graph.                                                                                                                             | *Optional* |                                   |   na  |
 | [transitServiceEnd](#transitServiceEnd)                                              |  `duration` | Limit the import of transit services to the given end date.                                                                                          | *Optional* | `"P3Y"`                           |   na  |
 | [transitServiceStart](#transitServiceStart)                                          |  `duration` | Limit the import of transit services to the given START date.                                                                                        | *Optional* | `"-P1Y"`                          |   na  |
-| [writeCachedElevations](#writeCachedElevations)                                      |  `boolean`  | Whether elevation data should be cached.                                                                                                             | *Optional* | `false`                           |   na  |
+| [writeCachedElevations](#writeCachedElevations)                                      |  `boolean`  | Reusing elevation data from previous builds                                                                                                          | *Optional* | `false`                           |   na  |
 | [boardingLocationTags](#boardingLocationTags)                                        |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                                           | *Optional* |                                   |   na  |
 | [dataOverlay](/docs/sandbox/DataOverlay.md)                                          |   `object`  | Config for the DataOverlay Sandbox module                                                                                                            | *Optional* |                                   |  2.2  |
 | [dem](#dem)                                                                          |  `object[]` | Specify parameters for DEM extracts.                                                                                                                 | *Optional* |                                   |   na  |
-|       elevationUnitMultiplier                                                        |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                               | *Optional* |                                   |   na  |
+|       [elevationUnitMultiplier](#dem__0__elevationUnitMultiplier)                    |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                               | *Optional* |                                   |   na  |
 |       source                                                                         |    `uri`    | The unique URI pointing to the data file.                                                                                                            | *Required* |                                   |   na  |
-| elevationBucket                                                                      |   `object`  | If specified, download NED elevation tiles from the given AWS S3 bucket.                                                                             | *Optional* |                                   |   na  |
+| [elevationBucket](#elevationBucket)                                                  |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                   | *Optional* |                                   |   na  |
 | fares                                                                                |   `object`  | No doc, parent contains doc.                                                                                                                         | *Optional* |                                   |   na  |
-| [localFileNamePatterns](#localFileNamePatterns)                                      |   `object`  | TODO                                                                                                                                                 | *Optional* |                                   |   na  |
+| [localFileNamePatterns](#localFileNamePatterns)                                      |   `object`  | Patterns for matching OTP file types in the base directory                                                                                           | *Optional* |                                   |   na  |
 |    [dem](#localFileNamePatterns_dem)                                                 |   `regexp`  | Pattern for matching elevation DEM files.                                                                                                            | *Optional* | `"(?i)\.tiff?$"`                  |   na  |
 |    [gtfs](#localFileNamePatterns_gtfs)                                               |   `regexp`  | Patterns for matching GTFS zip-files or directories.                                                                                                 | *Optional* | `"(?i)gtfs"`                      |   na  |
 |    [netex](#localFileNamePatterns_netex)                                             |   `regexp`  | Patterns for matching NeTEx zip files or directories.                                                                                                | *Optional* | `"(?i)netex"`                     |   na  |
@@ -105,22 +105,14 @@ Sections follow that describe particular settings in more depth.
 <!-- PARAMETERS-TABLE END -->
 
 
-## DEM
-
-The dem section of `build-config.json` allows you to override the default behavior of scanning
-for elevation files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory). You can specify data
-located outside the local filesystem (including cloud storage services) or at various
-different locations around the local filesystem.
-
-| config key                 | description                                                                                                                                                                                                                                               | value type | value default |
-|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|---------------|
-| `source`                   | The unique URI pointing to the data file.                                                                                                                                                                                                                 | uri        | mandatory     |
-| `elevationUnitMultiplier`  | The multiplier applied to elevation values. Use 0.1 if values are given in decimeters. See [Elevation unit conversion](#elevation-unit-conversion). Overrides the value specified in `elevationUnitMultiplier` at the top-level of the configuration file | double     | 1.0           |
-
 ## Specifying URIs
 
-As a general rule, references to data files are specified as absolute URIs and must start with the protocol name.   
-Example:   
+As a general rule, references to data files are specified as absolute URIs and must start with the 
+protocol name.   
+
+
+**Example:**
+
 Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`  
 HTTPS resources: `"https://download.geofabrik.de/europe/norway-latest.osm.pbf"`  
 Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`  
@@ -145,7 +137,7 @@ For example, this configuration could be used to load GTFS and OSM inputs from G
   ],
   "transitFeeds": [
     {
-      "type": "gtfs",
+      "type": "netex",
       "source": "gs://bucket-name/transit1.zip"
     },
     {
@@ -169,43 +161,8 @@ OTP2 will still scan the base directory for all other types such as DEM files. S
 array for a particular file type will ensure that no inputs of that type are loaded, including by
 local directory scanning.
 
-See the comments in the source code of
-class [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
-for an up-to-date detailed description of each config parameter.
 
-### Local Filename Patterns
-
-When scanning the base directory for inputs, each file's name is checked against patterns to detect
-what kind of file it is. These patterns can be overridden in the config, by nesting a
-`localFileNamePatterns` property in the build configuration file. Here are the
-keys you can place inside `localFileNamePatterns`:
-
-| config key | description                                               | value type     | value default  |
-|------------|-----------------------------------------------------------|----------------|----------------|
-| `osm`      | Pattern used to match Open Street Map files on local disk | regexp pattern | `(?i)(\.pbf)`  |
-| `dem`      | Pattern used to match Elevation DEM files on local disk   | regexp pattern | `(?i)\.tiff?$` |
-| `gtfs`     | Pattern used to match GTFS files on local disk            | regexp pattern | `(?i)gtfs`     |
-| `netex`    | Pattern used to match NeTEx files on local disk           | regexp pattern | `(?i)netex`    |
-
-OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
-that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
-seeking within files to guess what they are. Therefore, like all other file types GTFS is now
-detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
-Netex data is also often supplied in a ZIP file.
-
-### Configuration example
-
-```JSON
-// build-config.json 
-{
-  "localFileNamePatterns": {
-    // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
-    "gtfs" : "^g-.*\\.zip$"
-  }
-}
-```
-
-## Limit the transit service period
+<h2 id="limit-transit-service-period">Limit the transit service period</h2>
 
 The properties `transitServiceStart` and `transitServiceEnd` can be used to limit the service dates.
 This affects both GTFS service calendars and dates. The service calendar is reduced and dates
@@ -225,30 +182,20 @@ time-zone. Also, remember that the service day might be more than 24 hours. So b
 enough slack to account for the this. Setting the limits too wide have very little impact and is in
 general better than trying to be exact. The period and date format follow the ISO 8601 standard.
 
-## Reaching a subway platform
-
-The ride locations for some modes of transport such as subways and airplanes can be slow to reach
-from the street. When planning a trip, we need to allow additional time to reach these locations to
-properly inform the passenger. For example, this helps avoid suggesting short bus rides between two
-subway rides as a way to improve travel time. You can specify how long it takes to reach a subway
-platform
+**Example:**
 
 ```JSON
 // build-config.json
 {
-  "subwayAccessTime": 2.5
+  // Include 3 months of history
+  "transitServiceStart" : "-P3M",
+  // Include 1 year 6 month and 5 days of scheduled data in the future 
+  "transitServiceEnd" : "P1Y6M5D"
 }
 ```
 
-Stops in GTFS do not necessarily serve a single transit mode, but in practice this is usually the
-case. This additional access time will be added to any stop that is visited by trips on subway
-routes (GTFS route_type = 1).
 
-This setting does not generalize well to airplanes because you often need much longer to check in to
-a flight (2-3 hours for international flights) than to alight and exit the airport (perhaps 1 hour).
-Therefore there is currently no per-mode access time, it is subway-specific.
-
-## Transferring within stations
+<h2 id="transferring-within-stations">Transferring within stations</h2>
 
 Subway systems tend to exist in their own layer of the city separate from the surface, though there
 are exceptions where tracks lie right below the street and transfers happen via the surface. In
@@ -260,48 +207,19 @@ stop, then micro-mapping stations in OSM. When OSM data contains a detailed desc
 stairs, and platforms within a station, GTFS stops can be linked to the nearest platform and
 transfers will happen via the OSM ways, which should yield very realistic transfer time
 expectations. This works particularly well in above-ground train stations where the layering of
-non-intersecting ways is less prevalent. See [BoardingLocations](BoardingLocations.md) for more details.
+non-intersecting ways is less prevalent. See [BoardingLocations](BoardingLocations.md) for more 
+details.
 
 An alternative approach is to use GTFS pathways to model entrances and platforms within stations.
+
 
 ## Elevation data
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM). This allows
 OTP to draw an elevation profile for the on-street portion of itineraries, and helps provide better
 routing for bicyclists. It even helps avoid hills for walking itineraries. DEMs are usually supplied
-as rasters
-(regular grids of numbers) stored in image formats such as GeoTIFF.
+as rasters (regular grids of numbers) stored in image formats such as GeoTIFF.
 
-### U.S. National Elevation Dataset
-
-In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is
-available for the entire territory. It used to be possible for OTP to download NED tiles on the fly
-from a rather complex USGS SOAP service. This process was somewhat unreliable and would greatly slow
-down the graph building process. In any case the service has since been replaced. But the USGS would
-also deliver the whole dataset in bulk if
-you [sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA)
-. We did this many years back and uploaded the entire data set to Amazon AWS S3. OpenTripPlanner
-contains another module that can automatically fetch data in this format from any Amazon S3 copy of
-the bulk data. You can configure it as follows in `build-config.json`:
-
-```JSON
-// router-config.json
-{
-    "elevationBucket": {
-        "accessKey": "your-aws-access-key",
-        "secretKey": "corresponding-aws-secret-key",
-        "bucketName": "ned13"
-    }
-}
-```
-
-This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify
-valid AWS account credentials you should be able to download tiles, and any bandwidth costs will be
-billed to your AWS account.
-
-Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache
-for the next graph build operation. You should add the `--cache <directory>` command line parameter
-to specify your NED tile cache location.
 
 ### Geoid Difference
 
@@ -356,8 +274,7 @@ elevation values in the relevant street edges in responses.
 For other parts of the world you will need a GeoTIFF file containing the elevation data. These are
 often available from national geographic surveys, or you can always fall back on the worldwide
 [Space Shuttle Radar Topography Mission](http://www2.jpl.nasa.gov/srtm/) (SRTM) data. This not
-particularly high resolution
-(roughly 30 meters horizontally) but it can give acceptable results.
+particularly high resolution (roughly 30 meters horizontally) but it can give acceptable results.
 
 Simply place the elevation data file in the directory with the other graph builder inputs, alongside
 the GTFS and OSM data. Make sure the file has a `.tiff` or `.tif` extension, and the graph builder
@@ -366,23 +283,23 @@ should detect its presence and apply the elevation data to the streets.
 OTP should automatically handle DEM GeoTIFFs in most common projections. You may want to check for
 elevation-related error messages during the graph build process to make sure OTP has properly
 discovered the projection. If you are using a DEM in unprojected coordinates make sure that the axis
-order is (longitude, latitude) rather than
-(latitude, longitude). Unfortunately there is no reliable standard for WGS84 axis order, so OTP uses
-the same axis order as the above-mentioned SRTM data, which is also the default for the popular
-Proj4 library.
+order is (longitude, latitude) rather than (latitude, longitude). Unfortunately there is no reliable
+standard for WGS84 axis order, so OTP uses the same axis order as the above-mentioned SRTM data, 
+which is also the default for the popular Proj4 library.
 
 DEM files(USGS DEM) is not supported by OTP, but can be converted to GeoTIFF with tools
 like [GDAL](http://www.gdal.org/). Use `gdal_merge.py -o merged.tiff *.dem` to merge a set of `dem`
 files into one `tif` file.
 
 See Interline [PlanetUtils](https://github.com/interline-io/planetutils) for a set of scripts to
-download, merge, and
-resample [Mapzen/Amazon Terrain Tiles](https://registry.opendata.aws/terrain-tiles/).
+download, merge, and resample 
+[Mapzen/Amazon Terrain Tiles](https://registry.opendata.aws/terrain-tiles/).
+
 
 ### Elevation unit conversion
 
-By default, OTP expects the elevation data to use metres. However, by
-setting `elevationUnitMultiplier` in `build-config.json`, it is possible to define a multiplier that
+By default, OTP expects the elevation data to use metres. However, by setting 
+`elevationUnitMultiplier` in `build-config.json`, it is possible to define a multiplier that 
 converts the elevation values from some other unit to metres.
 
 ```JSON
@@ -402,15 +319,16 @@ converts the elevation values from some other unit to metres.
 
 Calculating elevations on all StreetEdges can take a dramatically long time. In a very large graph
 build for multiple Northeast US states, the time it took to download the elevation data and
-calculate all of the elevations took 5,509 seconds (roughly 1.5 hours).
+calculate all the elevations took roughly 1.5 hours.
 
 If you are using cloud computing for your OTP instances, it is recommended to create prebuilt images
-that contain the elevation data you need. This will save time because all of the data won't need to
-be downloaded.
+that contain the elevation data you need. This will save time because all the data won't need to be
+downloaded.
 
-However, the bulk of the time will still be spent calculating elevations for all of the street
-edges. Therefore, a further optimization can be done to calculate and save the elevation data during
-a graph build and then save it for future use.
+However, the bulk of the time will still be spent calculating elevations for the street edges.
+Therefore, a further optimization can be done to calculate and save the elevation data during  a 
+graph build and then save it for future use.
+
 
 #### Reusing elevation data from previous builds
 
@@ -422,39 +340,8 @@ In order to write out the precalculated elevation data, add this to your `build-
   "writeCachedElevations": true
 }
 ```
+See [writeCachedElevations](#writeCachedElevations) for details.
 
-After building the graph, a file called `cached_elevations.obj` will be written to the cache
-directory. By default, this file is not written during graph builds. There is also a graph build
-parameter called `readCachedElevations` which is set to `true` by default.
-
-In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from the
-cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overriden via the
-CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, the
-time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly 9
-minutes).
-
-The cached data is a lookup table where the coordinate sequences of respective street edges are used
-as keys for calculated data. It is assumed that all of the other input data except for the
-OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation
-data is changed, or different configuration values for `elevationUnitMultiplier`
-or `includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation
-data should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data
-to become stale and not include new OSM ways. Therefore, periodic update of this cached data is
-recommended.
-
-#### Configuring multi-threading during elevation calculations
-
-For unknown reasons that seem to depend on data and machine settings, it might be faster to use a
-single processor. For this reason, multi-threading of elevation calculations is only done
-if `multiThreadElevationCalculations` is set to true. To enable multi-threading in the elevation
-module, add the following to the `build-config.json` file:
-
-```JSON
-// build-config.json
-{  
-  "multiThreadElevationCalculations": true
-}
-```
 
 ## Fares configuration
 
@@ -683,9 +570,9 @@ The default is the approximate resolution of 1/3 arc-second NED data. This shoul
 
 Specify a multiplier to convert elevation units from source to meters.
 
-Unit conversion multiplier for elevation values. No conversion needed if the elevation values
-are defined in meters in the source data. If, for example, decimetres are used in the source
-data, this should be set to 0.1.
+Unit conversion multiplier for elevation values. No conversion needed if the elevation
+values are defined in meters in the source data. If, for example, decimetres are used
+in the source data, this should be set to 0.1.
 
 
 <h3 id="graph">graph</h3>
@@ -718,13 +605,13 @@ This is a path to a file on the local file system, not an URI.
 
 Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.
 
- When set to true (it is false by default), the elevation module will include the Ellipsoid to
- Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
- graph.
- <p>
- NOTE: if this is set to true for graph building, make sure to not set the value of
- `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
- all of the elevation values in the street edges.
+When set to true (it is false by default), the elevation module will include the Ellipsoid to
+Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+graph.
+
+NOTE: if this is set to true for graph building, make sure to not set the value of
+`RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
+all of the elevation values in the street edges.
 
 
 <h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
@@ -777,11 +664,11 @@ default to simple stop-to-stop geometry instead.
 **Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
-Whether or not to multi-thread the elevation calculations in the elevation module.
+Configuring multi-threading during elevation calculations.
 
-For unknown reasons that seem to depend on data and machine settings, it might
-be faster to use a single processor. If multi-threading is activated, parallel streams will be
-used to calculate the elevations.
+  For unknown reasons that seem to depend on data and machine settings, it might be faster
+  to use a single processor. If multi-threading is activated, parallel streams will be used
+  to calculate the elevations.
 
 
 <h3 id="osmCacheDataInMem">osmCacheDataInMem</h3>
@@ -827,7 +714,19 @@ The file is created or overwritten if OTP saves the graph to the file
 
 Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
 
-Perhaps this should be a runtime router parameter rather than a graph build parameter.
+Note! The preferred way to do this is to update the OSM data.
+See [Transferring within stations](#transferring-within-stations).
+
+The ride locations for some modes of transport such as subways can be slow to reach from the street.
+When planning a trip, we need to allow additional time to reach these locations to properly inform
+the passenger. For example, this helps avoid suggesting short bus rides between two subway rides as
+a way to improve travel time. You can specify how long it takes to reach a subway platform.
+
+This setting does not generalize to other modes like airplanes because you often need much longer
+to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
+(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#routingDefaults_alightSlackForMode) and
+[`alightSlackForMode`](RouteRequest.md#routingDefaults_alightSlackForMode) for this.
+
 
 <h3 id="transitModelTimeZone">transitModelTimeZone</h3>
 
@@ -845,20 +744,13 @@ This is used to store the timetables in the transit model, and to interpret time
 
 Limit the import of transit services to the given end date.
 
-The date is inclusive. If set, any transit
-service on a day AFTER the given date is dropped and will not be part of the graph. Use an
-absolute date or a period relative to the date the graph is build(BUILD_DAY).
-<p>
-Optional, defaults to "P3Y" (BUILD_DAY plus 3 years). Use an empty string to make it
-unbounded.
-<p>
-Examples:
-<ul>
-    <li>"2021-12-31" - 31. December 2021.</li>
-    <li>"P24W" - BUILD_DAY plus 24 weeks.</li>
-    <li>"P1Y6M5D" - BUILD_DAY plus 1 year, 6 months and 5 days.</li>
-    <li>"" - Unlimited, no lower bound.</li>
-</ul>
+See [Limit the transit service period](#limit-transit-service-period) for an introduction.
+
+The date is inclusive. If set, any transit service on a day AFTER the given date is dropped and
+will not be part of the graph. Use an absolute date or a period relative to the date the graph is
+build(BUILD_DAY).
+
+Use an empty string to make it unbounded.
 
 
 <h3 id="transitServiceStart">transitServiceStart</h3>
@@ -868,19 +760,13 @@ Examples:
 
 Limit the import of transit services to the given START date.
 
-The date is inclusive. If set, any transit
-service on a day BEFORE the given date is dropped and will not be part of the graph. Use an
-absolute date or a period relative to the date the graph is build(BUILD_DAY).
-<p>
+See [Limit the transit service period](#limit-transit-service-period) for an introduction.
+
+The date is inclusive. If set, any transit service on a day BEFORE the given date is dropped and
+will not be part of the graph. Use an absolute date or a period relative to the date the graph is
+build(BUILD_DAY).
+
 Use an empty string to make unbounded.
-<p>
-Examples:
- <ul>
-     <li>"2019-11-24" - 24. November 2019.</li>
-     <li>"-P3W" - BUILD_DAY minus 3 weeks.</li>
-     <li>"-P1Y2M" - BUILD_DAY minus 1 year and 2 months.</li>
-     <li>"" - Unlimited, no upper bound.</li>
- </ul>
 
 
 <h3 id="writeCachedElevations">writeCachedElevations</h3>
@@ -888,12 +774,29 @@ Examples:
 **Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
-Whether elevation data should be cached.
+Reusing elevation data from previous builds
 
-  When set to true, the elevation module will create a file of a lookup
-  map of the LineStrings and the corresponding calculated elevation data for those coordinates.
-  Subsequent graph builds can reuse the data in this file to avoid recalculating all the
-  elevation data again.
+When set to true, the elevation module will create a file cache for calculated elevation data.
+Subsequent graph builds can reuse the data in this file.
+
+After building the graph, a file called `cached_elevations.obj` will be written to the cache
+directory. By default, this file is not written during graph builds. There is also a graph build
+parameter called `readCachedElevations` which is set to `true` by default.
+
+In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from
+the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden
+via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US
+states, the time it took with using this pre-downloaded and precalculated data became roughly 9
+minutes.
+
+The cached data is a lookup table where the coordinate sequences of respective street edges are
+used as keys for calculated data. It is assumed that all of the other input data except for the
+OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation
+data is changed, or different configuration values for `elevationUnitMultiplier` or
+`includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation data
+should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to
+become stale and not include new OSM ways. Therefore, periodic update of this cached data is
+recommended.
 
 
 <h3 id="boardingLocationTags">boardingLocationTags</h3>
@@ -912,16 +815,69 @@ What OSM tags should be looked on for the source of matching stops to platforms 
 
 Specify parameters for DEM extracts.
 
-If not specified OTP will fall back to auto-detection based on the directory provided on the command line.
+The dem section allows you to override the default behavior of scanning for elevation
+files in the *[base directory](Configuration.md#Base-Directory). You can specify data
+located outside the local filesystem (including cloud storage services) or at various
+different locations around the local filesystem.
+
+If not specified OTP will fall back to auto-detection based on the directory provided on
+the command line.
+
+
+<h3 id="dem__0__elevationUnitMultiplier">elevationUnitMultiplier</h3>
+
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`  \
+**Path:** /dem/[0] 
+
+Specify a multiplier to convert elevation units from source to meters.
+
+Sse 0.1 if values are given in decimeters. Overrides the value specified in
+[`elevationUnitMultiplier`](#elevationUnitMultiplier) at the top-level of the
+configuration file.
+
+
+<h3 id="elevationBucket">elevationBucket</h3>
+
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
+
+Used to download NED elevation tiles from the given AWS S3 bucket.
+
+In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is
+available for the entire territory. It used to be possible for OTP to download NED tiles on the fly
+from a rather complex USGS SOAP service. This process was somewhat unreliable and would greatly slow
+down the graph building process. In any case the service has since been replaced. But the USGS would
+also deliver the whole dataset in bulk if you
+[sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA).
+We did this many years back and uploaded the entire data set to Amazon AWS S3. OpenTripPlanner
+contains another module that can automatically fetch data in this format from any Amazon S3 copy of
+the bulk data.
+
+This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify
+valid AWS account credentials you should be able to download tiles, and any bandwidth costs will be
+billed to your AWS account.
+
+Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache
+for the next graph build operation. You should add the `--cache <directory>` command line parameter
+to specify your NED tile cache location.
+
 
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
 **Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
-TODO
+Patterns for matching OTP file types in the base directory
 
-TODO
+When scanning the base directory for inputs, each file's name is checked against patterns to
+detect what kind of file it is.
+
+OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
+that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
+seeking within files to guess what they are. Therefore, like all other file types GTFS is now
+detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
+Netex data is also often supplied in a ZIP file.
+
 
 <h3 id="localFileNamePatterns_dem">dem</h3>
 

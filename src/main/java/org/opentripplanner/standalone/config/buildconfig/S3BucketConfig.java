@@ -24,7 +24,28 @@ public class S3BucketConfig {
       root
         .of(elevationBucketName)
         .since(NA)
-        .summary("If specified, download NED elevation tiles from the given AWS S3 bucket.")
+        .summary("Used to download NED elevation tiles from the given AWS S3 bucket.")
+        .description(
+          """
+In the United States, a high resolution [National Elevation Dataset](http://ned.usgs.gov/) is
+available for the entire territory. It used to be possible for OTP to download NED tiles on the fly
+from a rather complex USGS SOAP service. This process was somewhat unreliable and would greatly slow
+down the graph building process. In any case the service has since been replaced. But the USGS would
+also deliver the whole dataset in bulk if you 
+[sent them a hard drive](https://web.archive.org/web/20150811051917/http://ned.usgs.gov:80/faq.html#DATA).
+We did this many years back and uploaded the entire data set to Amazon AWS S3. OpenTripPlanner
+contains another module that can automatically fetch data in this format from any Amazon S3 copy of
+the bulk data.
+
+This `ned13` bucket is still available on S3 under a "requester pays" policy. As long as you specify
+valid AWS account credentials you should be able to download tiles, and any bandwidth costs will be
+billed to your AWS account.
+
+Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache
+for the next graph build operation. You should add the `--cache <directory>` command line parameter
+to specify your NED tile cache location.
+"""
+        )
         .asObject()
     );
   }

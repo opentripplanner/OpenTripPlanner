@@ -245,7 +245,7 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("The distance between elevation samples in meters.")
         .description(
           "The default is the approximate resolution of 1/3 arc-second NED data. This should not " +
-            "be smaller than the horizontal resolution of the height data used."
+          "be smaller than the horizontal resolution of the height data used."
         )
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
@@ -290,14 +290,14 @@ public class BuildConfig implements OtpDataStoreConfig {
         )
         .description(
           """
-   When set to true (it is false by default), the elevation module will include the Ellipsoid to
-   Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
-   graph.
-   <p>
-   NOTE: if this is set to true for graph building, make sure to not set the value of
-   `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
-   all of the elevation values in the street edges.
-  """
+When set to true (it is false by default), the elevation module will include the Ellipsoid to
+Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+graph.
+  
+NOTE: if this is set to true for graph building, make sure to not set the value of
+`RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
+all of the elevation values in the street edges.
+"""
         )
         .asBoolean(false);
     pruningThresholdIslandWithStops =
@@ -385,14 +385,12 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("multiThreadElevationCalculations")
         .since(NA)
-        .summary(
-          "Whether or not to multi-thread the elevation calculations in the elevation module."
-        )
+        .summary("Configuring multi-threading during elevation calculations.")
         .description(
           """
-   For unknown reasons that seem to depend on data and machine settings, it might
-   be faster to use a single processor. If multi-threading is activated, parallel streams will be
-   used to calculate the elevations.
+          For unknown reasons that seem to depend on data and machine settings, it might be faster
+          to use a single processor. If multi-threading is activated, parallel streams will be used
+          to calculate the elevations.
         """
         )
         .asBoolean(false);
@@ -453,7 +451,20 @@ public class BuildConfig implements OtpDataStoreConfig {
           "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
         )
         .description(
-          "Perhaps this should be a runtime router parameter rather than a graph build parameter."
+          """
+Note! The preferred way to do this is to update the OSM data.
+See [Transferring within stations](#transferring-within-stations).
+
+The ride locations for some modes of transport such as subways can be slow to reach from the street.
+When planning a trip, we need to allow additional time to reach these locations to properly inform
+the passenger. For example, this helps avoid suggesting short bus rides between two subway rides as
+a way to improve travel time. You can specify how long it takes to reach a subway platform.
+
+This setting does not generalize to other modes like airplanes because you often need much longer
+to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
+(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#routingDefaults_alightSlackForMode) and 
+[`alightSlackForMode`](RouteRequest.md#routingDefaults_alightSlackForMode) for this.
+"""
         )
         .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
     transit =
@@ -484,20 +495,14 @@ public class BuildConfig implements OtpDataStoreConfig {
           .summary("Limit the import of transit services to the given START date.")
           .description(
             """
-   The date is inclusive. If set, any transit
-   service on a day BEFORE the given date is dropped and will not be part of the graph. Use an
-   absolute date or a period relative to the date the graph is build(BUILD_DAY).
-   <p>
-   Use an empty string to make unbounded.
-   <p>
-   Examples:
-    <ul>
-        <li>"2019-11-24" - 24. November 2019.</li>
-        <li>"-P3W" - BUILD_DAY minus 3 weeks.</li>
-        <li>"-P1Y2M" - BUILD_DAY minus 1 year and 2 months.</li>
-        <li>"" - Unlimited, no upper bound.</li>
-    </ul>
-            """
+See [Limit the transit service period](#limit-transit-service-period) for an introduction.
+
+The date is inclusive. If set, any transit service on a day BEFORE the given date is dropped and
+will not be part of the graph. Use an absolute date or a period relative to the date the graph is
+build(BUILD_DAY).
+
+Use an empty string to make unbounded.
+"""
           )
           .asDateOrRelativePeriod("-P1Y", confZone);
       transitServiceEnd =
@@ -507,21 +512,14 @@ public class BuildConfig implements OtpDataStoreConfig {
           .summary("Limit the import of transit services to the given end date.")
           .description(
             """
-    The date is inclusive. If set, any transit
-    service on a day AFTER the given date is dropped and will not be part of the graph. Use an
-    absolute date or a period relative to the date the graph is build(BUILD_DAY).
-    <p>
-    Optional, defaults to "P3Y" (BUILD_DAY plus 3 years). Use an empty string to make it
-    unbounded.
-    <p>
-    Examples:
-    <ul>
-        <li>"2021-12-31" - 31. December 2021.</li>
-        <li>"P24W" - BUILD_DAY plus 24 weeks.</li>
-        <li>"P1Y6M5D" - BUILD_DAY plus 1 year, 6 months and 5 days.</li>
-        <li>"" - Unlimited, no lower bound.</li>
-    </ul>
-            """
+See [Limit the transit service period](#limit-transit-service-period) for an introduction.
+
+The date is inclusive. If set, any transit service on a day AFTER the given date is dropped and
+will not be part of the graph. Use an absolute date or a period relative to the date the graph is
+build(BUILD_DAY).
+
+Use an empty string to make it unbounded.
+"""
           )
           .asDateOrRelativePeriod("P3Y", confZone);
     }
@@ -530,14 +528,31 @@ public class BuildConfig implements OtpDataStoreConfig {
       root
         .of("writeCachedElevations")
         .since(NA)
-        .summary("Whether elevation data should be cached.")
+        .summary("Reusing elevation data from previous builds")
         .description(
           """
-            When set to true, the elevation module will create a file of a lookup
-            map of the LineStrings and the corresponding calculated elevation data for those coordinates.
-            Subsequent graph builds can reuse the data in this file to avoid recalculating all the
-            elevation data again.
-          """
+When set to true, the elevation module will create a file cache for calculated elevation data.
+Subsequent graph builds can reuse the data in this file.
+  
+After building the graph, a file called `cached_elevations.obj` will be written to the cache
+directory. By default, this file is not written during graph builds. There is also a graph build
+parameter called `readCachedElevations` which is set to `true` by default.
+
+In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from
+the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden
+via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US
+states, the time it took with using this pre-downloaded and precalculated data became roughly 9
+minutes.
+
+The cached data is a lookup table where the coordinate sequences of respective street edges are
+used as keys for calculated data. It is assumed that all of the other input data except for the
+OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation
+data is changed, or different configuration values for `elevationUnitMultiplier` or
+`includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation data
+should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to
+become stale and not include new OSM ways. Therefore, periodic update of this cached data is
+recommended.
+"""
         )
         .asBoolean(false);
     maxAreaNodes =
@@ -570,17 +585,28 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("Should minimum transfer times in GTFS files be discarded.")
         .description(
           """
-        This is useful eg. when the minimum transfer time is only set for ticketing purposes, 
-        but we want to calculate the transfers always from OSM data.
-        """
+          This is useful eg. when the minimum transfer time is only set for ticketing purposes,
+          but we want to calculate the transfers always from OSM data.
+          """
         )
         .asBoolean(false);
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
       .since(NA)
-      .summary("TODO")
-      .description(/*TODO DOC*/"TODO")
+      .summary("Patterns for matching OTP file types in the base directory")
+      .description(
+        """
+When scanning the base directory for inputs, each file's name is checked against patterns to
+detect what kind of file it is.
+
+OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
+that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
+seeking within files to guess what they are. Therefore, like all other file types GTFS is now
+detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
+Netex data is also often supplied in a ZIP file.        
+"""
+      )
       .asObject();
     gtfsLocalFilePattern =
       localFileNamePatternsConfig

@@ -19,7 +19,15 @@ public class DemConfig {
         .since(NA)
         .summary("Specify parameters for DEM extracts.")
         .description(
-          "If not specified OTP will fall back to auto-detection based on the directory provided on the command line."
+          """
+          The dem section allows you to override the default behavior of scanning for elevation
+          files in the *[base directory](Configuration.md#Base-Directory). You can specify data
+          located outside the local filesystem (including cloud storage services) or at various
+          different locations around the local filesystem.
+
+          If not specified OTP will fall back to auto-detection based on the directory provided on
+          the command line.
+          """
         )
         .asObjects(DemConfig::mapDemExtract)
     );
@@ -35,6 +43,13 @@ public class DemConfig {
           .of("elevationUnitMultiplier")
           .since(NA)
           .summary("Specify a multiplier to convert elevation units from source to meters.")
+          .description(
+            """
+          Sse 0.1 if values are given in decimeters. Overrides the value specified in
+          [`elevationUnitMultiplier`](#elevationUnitMultiplier) at the top-level of the 
+          configuration file.
+          """
+          )
           .asDoubleOptional()
           .orElse(null)
       )
