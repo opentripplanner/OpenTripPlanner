@@ -66,6 +66,7 @@ public class SiriTripPatternCache {
       TripPatternBuilder tripPatternBuilder = TripPattern
         .of(id)
         .withRoute(trip.getRoute())
+        .withMode(trip.getMode())
         .withStopPattern(stopPattern);
 
       // TODO - SIRI: Add pattern to transitModel index?
