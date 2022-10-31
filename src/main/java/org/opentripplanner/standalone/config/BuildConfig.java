@@ -244,7 +244,8 @@ public class BuildConfig implements OtpDataStoreConfig {
         .since(NA)
         .summary("The distance between elevation samples in meters.")
         .description(
-          "The default is the approximate resolution of 1/3 arc-second NED data. This should not be smaller than the horizontal resolution of the height data used."
+          "The default is the approximate resolution of 1/3 arc-second NED data. This should not " +
+            "be smaller than the horizontal resolution of the height data used."
         )
         .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
@@ -255,9 +256,9 @@ public class BuildConfig implements OtpDataStoreConfig {
         .summary("Specify a multiplier to convert elevation units from source to meters.")
         .description(
           """
-            Unit conversion multiplier for elevation values. No conversion needed if the elevation values
-            are defined in meters in the source data. If, for example, decimetres are used in the source
-            data, this should be set to 0.1.
+            Unit conversion multiplier for elevation values. No conversion needed if the elevation
+            values are defined in meters in the source data. If, for example, decimetres are used
+            in the source data, this should be set to 0.1.
             """
         )
         .asDouble(1);
@@ -266,7 +267,8 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("embedRouterConfig")
         .since(NA)
         .summary(
-          "Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire."
+          "Embed the Router config in the graph, which allows it to be sent to a server fully " +
+          "configured over the wire."
         )
         .asBoolean(true);
     extraEdgesStopPlatformLink =
@@ -274,7 +276,8 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("extraEdgesStopPlatformLink")
         .since(NA)
         .summary(
-          "Add extra edges when linking a stop to a platform, to prevent detours along the platform edge."
+          "Add extra edges when linking a stop to a platform, to prevent detours along the " +
+          "platform edge."
         )
         .asBoolean(false);
     includeEllipsoidToGeoidDifference =
@@ -282,7 +285,8 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("includeEllipsoidToGeoidDifference")
         .since(NA)
         .summary(
-          "Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge."
+          "Include the Ellipsoid to Geiod difference in the calculations of every point along " +
+          "every StreetWithElevationEdge."
         )
         .description(
           """

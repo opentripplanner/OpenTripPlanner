@@ -33,7 +33,7 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 
 | Config Parameter                                                                          |          Type         | Summary                                                                                           |  Req./Opt. | Default Value | Since |
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| configVersion                                                                             |        `string`       | Version of the configuration.                                                                     | *Optional* |               |   na  |
+| [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |   na  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.         | *Optional* | `"PT5S"`      |   na  |
 | flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
@@ -60,6 +60,13 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 | [updaters](/docs/UpdaterConfig.md)                                                        |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
 | [vectorTileLayers](/docs/sandbox/MapboxVectorTilesApi.md)                                 |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
 | vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                           | *Optional* |               |  2.0  |
+|    language                                                                               |        `string`       | Language code.                                                                                    | *Optional* |               |   na  |
+|    sourcesName                                                                            |        `string`       | Json tag name for updater sources.                                                                | *Optional* | `"systems"`   |   na  |
+|    updaterNetworkName                                                                     |        `string`       | Json tag name for the network name for each source.                                               | *Optional* | `"id"`        |   na  |
+|    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                  | *Optional* | `"url"`       |   na  |
+|    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                    | *Required* |               |   na  |
+|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | Http headers.                                                                                     | *Optional* |               |   na  |
+|       ET-Client-Name                                                                      |        `object`       | No doc, parent contains doc.                                                                      | *Optional* |               |   na  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -68,6 +75,24 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 
 <!-- PARAMETERS-DETAILS BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h3 id="configVersion">configVersion</h3>
+
+**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Path:** / 
+
+Deployment version of the *router-config.json*.
+
+The config-version is a parameter which each OTP deployment may set to be able to query the
+OTP server and verify that it uses the correct version of the config. The version should be
+injected into the config in the (continuous) deployment pipeline. How this is done, is up to
+the deployment.
+
+The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+or format check on the version and it can be any string.
+
+Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+
 
 <h3 id="requestLogFile">requestLogFile</h3>
 
@@ -279,7 +304,7 @@ Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime
 
 The constant minimum number of minutes for a raptor-search-window. 
 
-Use a value between 20 to 180 minutes in a normal deployment.
+Use a value between 20 and 180 minutes in a normal deployment.
 
 <h3 id="transit_dynamicSearchWindow_stepMinutes">stepMinutes</h3>
 
@@ -352,6 +377,13 @@ Only turn this feature on if you have unique ids accross all feeds, without the 
 **Path:** /transmodelApi 
 
 Used to group requests when monitoring OTP.
+
+<h3 id="vehicleRentalServiceDirectory_headers">headers</h3>
+
+**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Path:** /vehicleRentalServiceDirectory 
+
+Http headers.
 
 
 <!-- PARAMETERS-DETAILS END -->
