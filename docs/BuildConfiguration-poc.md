@@ -213,6 +213,64 @@ details.
 An alternative approach is to use GTFS pathways to model entrances and platforms within stations.
 
 
+## OpenStreetMap(OSM) configuration
+
+It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part
+of the routing graph.
+
+### OSM tag mapping
+
+OSM tags have different meanings in different countries, and how the roads in a particular country
+or region are tagged affects routing. As an example roads tagged with `highway=trunk are (mainly)
+walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to
+snap stops to these roads, or by giving you poor routing results for walking and biking. You can
+adjust which road types that are accessible by foot, car & bicycle as well as speed limits,
+suitability for biking and walking. It's possible to define "safety" values for cycling and walking which are used in routing.
+
+There are currently following OSM tag mapping defined;
+
+- `default` which is based on California/US mapping standard
+- `finland` which is adjusted to rules and speeds in Finland
+- `norway` which is adjusted to rules and speeds in Norway
+- `uk` which is adjusted to rules and speed in the UK
+- `germany` which is adjusted to rules and speed in Germany
+- `atlanta` which is adjusted to rules in Atlanta
+- `houston` which is adjusted to rules in Houston
+
+To add your own OSM tag mapping have a look
+at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
+and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly
+rely on the default rules, make sure you add your own rules first before applying the default ones.
+The mechanism is that for any two identical tags, OTP will use the first one.
+
+```JSON
+// build-config.json
+{
+  "osm": [
+    {
+      "source": "gs://marduk-dev/osm/oslo_norway.osm-160816.pbf",
+      "osmTagMapping": "norway"
+    }
+  ]
+}
+```
+
+### Custom naming
+
+You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field
+in `build-config.json`, such as:
+
+```JSON
+// build-config.json
+{
+  "osmNaming": "portland"
+}
+```
+
+There is currently only one custom naming module called `portland` (which has no parameters).
+
+
+
 ## Elevation data
 
 OpenTripPlanner can "drape" the OSM street network over a digital elevation model (DEM). This allows
@@ -433,61 +491,6 @@ The current list of `combinationStrategy` is:
 
 - `additive` - simply adds all sub-fares.
 
-## OSM / OpenStreetMap configuration
-
-It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part
-of the routing graph.
-
-### OSM tag mapping
-
-OSM tags have different meanings in different countries, and how the roads in a particular country
-or region are tagged affects routing. As an example roads tagged with `highway=trunk are (mainly)
-walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to
-snap stops to these roads, or by giving you poor routing results for walking and biking. You can
-adjust which road types that are accessible by foot, car & bicycle as well as speed limits,
-suitability for biking and walking. It's possible to define "safety" values for cycling and walking which are used in routing.
-
-There are currently following OSM tag mapping defined;
-
-- `default` which is based on California/US mapping standard
-- `finland` which is adjusted to rules and speeds in Finland
-- `norway` which is adjusted to rules and speeds in Norway
-- `uk` which is adjusted to rules and speed in the UK
-- `germany` which is adjusted to rules and speed in Germany
-- `atlanta` which is adjusted to rules in Atlanta
-- `houston` which is adjusted to rules in Houston
-
-To add your own OSM tag mapping have a look
-at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet`
-and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly
-rely on the default rules, make sure you add your own rules first before applying the default ones.
-The mechanism is that for any two identical tags, OTP will use the first one.
-
-```JSON
-// build-config.json
-{
-  "osm": [
-    {
-      "source": "gs://marduk-dev/osm/oslo_norway.osm-160816.pbf",
-      "osmTagMapping": "norway"
-    }
-  ]
-}
-```
-
-### Custom naming
-
-You can define a custom naming scheme for elements drawn from OSM by defining an `osmNaming` field
-in `build-config.json`, such as:
-
-```JSON
-// build-config.json
-{
-  "osmNaming": "portland"
-}
-```
-
-There is currently only one custom naming module called `portland` (which has no parameters).
 
 ## Parameter Details
 
