@@ -683,13 +683,20 @@ do not exist."
           .of("maxJourneyDuration")
           .since(NA)
           .summary(
-            "The expected maximum time a journey can last across all possible journeys for the current deployment." +
-            " Normally you would just do an estimate and add enough slack, so you are sure that there is no journeys that falls outside this window." +
-            " The parameter is used find all possible dates for the journey and then search only the services which run on those dates." +
-            " The duration must include access, egress, wait-time and transit time for the whole journey. It should also take low frequency days/periods like holidays into account." +
-            " In other words, pick the two points within your area that has the worst connection and then try to travel on the worst possible day, and find the maximum journey duration." +
-            " Using a value that is too high has the effect of including more patterns in the search, hence, making it a bit slower." +
-            " Recommended values would be from 12 hours(small town/city), 1 day (region) to 2 days (country like Norway)."
+            "The expected maximum time a journey can last across all possible journeys for the current deployment."
+          )
+          .description(
+            """
+Normally you would just do an estimate and add enough slack, so you are sure that there is no
+journeys that falls outside this window. The parameter is used find all possible dates for the
+journey and then search only the services which run on those dates. The duration must include
+access, egress, wait-time and transit time for the whole journey. It should also take low frequency
+days/periods like holidays into account. In other words, pick the two points within your area that
+has the worst connection and then try to travel on the worst possible day, and find the maximum
+journey duration. Using a value that is too high has the effect of including more patterns in the
+search, hence, making it a bit slower. Recommended values would be from 12 hours(small town/city),
+1 day (region) to 2 days (country like Norway)."
+"""
           )
           .asDuration(dft.maxJourneyDuration())
       );
@@ -717,11 +724,13 @@ do not exist."
         c
           .of("transferPenalty")
           .since(NA)
-          .summary(
-            "An additional penalty added to boardings after the first." +
-            " The value is in OTP's internal weight units, which are roughly equivalent to seconds." +
-            " Set this to a high value to discourage transfers." +
-            " Of course, transfers that save significant time or walking will still be taken."
+          .summary("An additional penalty added to boardings after the first.")
+          .description(
+            """
+            The value is in OTP's internal weight units, which are roughly equivalent to seconds.
+            Set this to a high value to discourage transfers. Of course, transfers that save
+            significant time or walking will still be taken.
+            """
           )
           .asInt(dft.cost())
       )
@@ -729,9 +738,14 @@ do not exist."
         c
           .of("transferSlack")
           .since(NA)
-          .summary(
-            "An expected transfer time (in seconds) that specifies the amount of time that must pass between exiting one public transport vehicle and boarding another." +
-            " This time is in addition to time it might take to walk between stops."
+          .summary("The extra time needed to make a safe transfer in seconds.")
+          .description(
+            """
+            An expected transfer time in seconds that specifies the amount of time that must pass
+            between exiting one public transport vehicle and boarding another. This time is in
+            addition to time it might take to walk between stops, the board-slack, and the
+            alight-slack."
+            """
           )
           .asInt(dft.slack())
       )
@@ -749,21 +763,19 @@ do not exist."
           c
             .of("transferOptimization")
             .since(NA)
-            .summary(
-              "Optimize where a transfer between to trip happens. This is a separate step *after* the routing is done. "
-            )
+            .summary("Optimize where a transfer between to trip happens. ")
             .description(
               """
 The main purpose of transfer optimization is to handle cases where it is possible to transfer
 between two routes at more than one point (pair of stops). The transfer optimization ensures that
 transfers occur at the best possible location. By post-processing all paths returned by the router,
-OTP can apply sophisticated calculations that are too slow or not algorithmically valid within 
-Raptor. Transfers are optimized before the paths are passed to the itinerary-filter-chain.
+OTP can apply sophisticated calculations that are too slow or not algorithmically valid within
+Raptor. Transfers are optimized is done after the Raptor search and before the paths are passed
+to the itinerary-filter-chain.
 
-To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on). 
-You should leave this on unless there is a critical issue with it. The OTPFeature 
-`GuaranteedTransfers` will toggle on and off the priority optimization 
-(part of OptimizeTransfers).
+To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on).
+You should leave this on unless there is a critical issue with it. The OTPFeature
+`GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
               
 The optimized transfer service will try to, in order:
               
