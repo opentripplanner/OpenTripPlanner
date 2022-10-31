@@ -283,28 +283,6 @@ public class ParameterBuilder {
     return ofRequired(DURATION, node -> parseDuration(node.asText()));
   }
 
-  /**
-   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
-   * This version can be used to be backwards compatible when moving from an integer value
-   * to a duration.
-   * @deprecated This will be removed in version 2.2, change to {@link #asDuration(Duration)}
-   */
-  @Deprecated
-  public Duration asDuration2(Duration defaultValue, ChronoUnit unit) {
-    return ofOptional(DURATION, defaultValue, node -> parseDuration(node.asText(), unit));
-  }
-
-  /**
-   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
-   * This version can be used to be backwards compatible when moving from an integer value
-   * to a duration.
-   * @deprecated This will be removed in version 2.2, change to {@link #asDuration(Duration)}
-   */
-  @Deprecated
-  public Duration asDuration2(ChronoUnit unit) {
-    return ofRequired(DURATION, node -> parseDuration(node.asText(), unit));
-  }
-
   public List<Duration> asDurations(List<Duration> defaultValues) {
     return ofArrayAsList(DURATION, defaultValues, node -> parseDuration(node.asText()));
   }

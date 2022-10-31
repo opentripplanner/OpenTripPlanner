@@ -316,12 +316,6 @@ public class NodeAdapterTest {
 
     // as required duration v2 (with unit)
     assertEquals("PT1S", subject.of("k1").asDuration().toString());
-    assertEquals("PT7S", subject.of("k3").asDuration2(SECONDS).toString());
-
-    // as optional duration v2 (with unit)
-    assertEquals("PT1S", subject.of("k1").asDuration2(null, SECONDS).toString());
-    assertEquals("PT7S", subject.of("k3").asDuration2(null, SECONDS).toString());
-    assertEquals("PT3H", subject.of("missing-key").asDuration2(D3h, SECONDS).toString());
   }
 
   @Test
