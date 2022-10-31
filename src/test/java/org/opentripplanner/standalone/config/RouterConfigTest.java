@@ -16,7 +16,7 @@ class RouterConfigTest {
   private static final String SOURCE = "RouterConfigTest";
 
   /**
-   * Test that the build-config.json example used in documentation is valid.
+   * Test that the router-config.json example used in documentation is valid.
    */
   @Test
   void validateExample() {

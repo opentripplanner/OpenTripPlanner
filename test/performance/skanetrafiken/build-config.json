@@ -1,0 +1,43 @@
+{
+  "transitServiceStart" : "2022-05-01",
+  "transitServiceEnd": "2022-12-30",
+  "transitModelTimeZone": "Europe/Oslo",
+  "areaVisibility": true,
+  "platformEntriesLinking": true,
+  "islandWithoutStopsMaxSize": 5,
+  "islandWithStopsMaxSize": 5,
+  "dataImportReport": true,
+  "maxTransferDurationSeconds": 3600,
+  "maxStopToShapeSnapDistance": 500,
+  "osmDefaults": {
+    "osmTagMapping": "norway",
+    "timeZone": "Europe/Oslo"
+  },
+  "netexDefaults" : {
+    "sharedFilePattern" : "ST_stops.xml",
+    "sharedGroupFilePattern" : "(\\w{2})_shared_data.xml",
+    "groupFilePattern" : "(\\w{2})_line.*\\.xml",
+    "feedId": "ST",
+    "noTransfersOnIsolatedStops": true
+  },
+  "transitFeeds": [
+    {
+      "type": "netex",
+      "source": "https://ressapublic.blob.core.windows.net/ressapub/ST_netex.zip",
+      "feedId": "ST"
+    },
+    {
+      "type": "gtfs",
+      "source": "https://ressapublic.blob.core.windows.net/ressapub/GTFS-filtered.zip",
+      "feedId": "DK"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://ressapublic.blob.core.windows.net/ressapub/denmark-oresund.osm.pbf"
+    },
+    {
+      "source": "https://ressapublic.blob.core.windows.net/ressapub/sweden-filtered.osm.pbf"
+    }
+  ]
+}

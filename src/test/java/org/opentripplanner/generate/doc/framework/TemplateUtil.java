@@ -66,8 +66,8 @@ public class TemplateUtil {
       %s
       ```
       """.formatted(
-      source,
-      nodeAdapter.toPrettyString()
-    );
+        source,
+        nodeAdapter.toPrettyString()
+      );
   }
 }

@@ -340,6 +340,7 @@ its [sandbox documentation](../docs/sandbox/VehicleParking.md).
 | facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |   na  |
 | facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |   na  |
 | [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |   na  |
+| hubsUrl                         |   `string`  | Hubs URL                                     | *Optional* |               |   na  |
 | [sourceType](#u__2__sourceType) |    `enum`   | The source of the vehicle updates.           | *Required* |               |   na  |
 | [timeZone](#u__2__timeZone)     | `time-zone` | The time zone of the feed.                   | *Optional* |               |   na  |
 | utilizationsFrequencySec        |  `integer`  | How often the utilization should be updated. | *Optional* | `600`         |   na  |

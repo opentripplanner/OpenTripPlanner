@@ -20,7 +20,9 @@ public class NodeAdapterHelper {
   public static final char NEW_LINE = '\n';
 
   /** Private to prevent instantiation. */
-  private NodeAdapterHelper() { /* empty */ }
+  private NodeAdapterHelper() {
+    /* empty */
+  }
 
   /**
    * Generate a anchor for the given node and child parameter.

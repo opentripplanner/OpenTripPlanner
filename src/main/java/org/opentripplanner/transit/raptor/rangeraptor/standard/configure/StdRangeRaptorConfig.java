@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
 import java.util.function.BiFunction;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicSearch;
@@ -56,10 +57,11 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
    * not be added to the worker lifecycle and fails.
    */
   public HeuristicSearch<T> createHeuristicSearch(
-    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
+    BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker,
+    CostCalculator<T> costCalculator
   ) {
     StdRangeRaptorWorkerState<T> state = createState();
-    Heuristics heuristics = createHeuristicsAdapter();
+    Heuristics heuristics = createHeuristicsAdapter(costCalculator);
     return new HeuristicSearch<>(
       createWorker.apply(state, createWorkerStrategy(state)),
       heuristics
@@ -100,13 +102,14 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     throw new IllegalArgumentException(ctx.profile().toString());
   }
 
-  private Heuristics createHeuristicsAdapter() {
+  private Heuristics createHeuristicsAdapter(CostCalculator<T> costCalculator) {
     assertNotNull(bestNumberOfTransfers);
     return new HeuristicsAdapter(
       bestTimes(),
       this.bestNumberOfTransfers,
       ctx.egressPaths(),
       ctx.calculator(),
+      costCalculator,
       ctx.lifeCycle()
     );
   }

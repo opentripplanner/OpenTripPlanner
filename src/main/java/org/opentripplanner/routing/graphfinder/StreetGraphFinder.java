@@ -4,15 +4,14 @@ import static java.lang.Integer.min;
 
 import java.util.Comparator;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -32,9 +31,14 @@ public class StreetGraphFinder implements GraphFinder {
   }
 
   @Override
-  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
+  public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
     StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
-    findClosestUsingStreets(lat, lon, visitor, visitor.getSkipEdgeStrategy());
+    findClosestUsingStreets(
+      coordinate.getY(),
+      coordinate.getX(),
+      visitor,
+      visitor.getSkipEdgeStrategy()
+    );
     return visitor.stopsFound;
   }
 

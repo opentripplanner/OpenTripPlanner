@@ -4,8 +4,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.List;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.transit.model.framework.Result;
 
 public record UpdateResult(
   int successful,

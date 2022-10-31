@@ -29,9 +29,8 @@ public class DirectGraphFinder implements GraphFinder {
    * independent of streets. If the origin vertex is a StopVertex, the result will include it.
    */
   @Override
-  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
+  public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
     List<NearbyStop> stopsFound = new ArrayList<>();
-    Coordinate coordinate = new Coordinate(lon, lat);
     Envelope envelope = new Envelope(coordinate);
     envelope.expandBy(
       SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),

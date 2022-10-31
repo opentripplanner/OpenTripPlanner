@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
@@ -64,11 +65,12 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
 
   public HeuristicSearch<T> createHeuristicSearch(
     RaptorTransitDataProvider<T> transitData,
+    CostCalculator<T> costCalculator,
     RaptorRequest<T> request
   ) {
     SearchContext<T> context = context(transitData, request);
     return new StdRangeRaptorConfig<>(context)
-      .createHeuristicSearch((s, w) -> createWorker(context, s, w));
+      .createHeuristicSearch((s, w) -> createWorker(context, s, w), costCalculator);
   }
 
   public boolean isMultiThreaded() {

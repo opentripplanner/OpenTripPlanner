@@ -12,6 +12,7 @@ import org.opentripplanner.standalone.config.framework.json.EnumMapper;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
+
   private final StringBuilder buffer = new StringBuilder();
 
   /**

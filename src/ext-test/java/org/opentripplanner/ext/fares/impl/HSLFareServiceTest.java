@@ -16,7 +16,11 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.FareZone;
 
 public class HSLFareServiceTest implements PlanTestConstants {
@@ -37,6 +41,17 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
   private static List<Arguments> createTestCases() {
     List<Arguments> args = new LinkedList<>();
+
+    Agency agency1 = Agency
+      .of(new FeedScopedId(FEED_ID, "AG1"))
+      .withName("Agency 1")
+      .withTimezone("Europe/Helsinki")
+      .build();
+    Agency agency2 = Agency
+      .of(new FeedScopedId(FEED_ID, "AG2"))
+      .withName("Agency 2")
+      .withTimezone("Europe/Helsinki")
+      .build();
 
     FareZone A = FareZone.of(new FeedScopedId(FEED_ID, "A")).build();
     FareZone B = FareZone.of(new FeedScopedId(FEED_ID, "B")).build();
@@ -94,6 +109,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .setCurrencyType("EUR")
       .setPrice(D_PRICE)
       .setTransferDuration(fiveMinutes)
+      //.setAgency(agency1.getId().getId())
       .build();
 
     FareAttribute fareAttributeABC = FareAttribute
@@ -115,6 +131,11 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .setCurrencyType("EUR")
       .setPrice(ABCD_PRICE)
       .setTransferDuration(fiveMinutes)
+      .build();
+
+    FareAttribute fareAttributeD2 = FareAttribute
+      .of(new FeedScopedId(FEED_ID, "D2"))
+      .setAgency(agency2.getId())
       .build();
 
     // Fare rule sets
@@ -149,10 +170,37 @@ public class HSLFareServiceTest implements PlanTestConstants {
     FareRuleSet ruleSetD = new FareRuleSet(fareAttributeD);
     ruleSetD.addContains("D");
 
+    FareRuleSet ruleSetD2 = new FareRuleSet(fareAttributeD2);
+    ruleSetD2.addContains("D");
+    ruleSetD2.setAgency(agency2.getId());
+
     hslFareService.addFareRules(
       FareType.regular,
-      List.of(ruleSetAB, ruleSetBC, ruleSetCD, ruleSetABC, ruleSetBCD, ruleSetABCD, ruleSetD)
+      List.of(
+        ruleSetAB,
+        ruleSetBC,
+        ruleSetCD,
+        ruleSetABC,
+        ruleSetBCD,
+        ruleSetABCD,
+        ruleSetD,
+        ruleSetD2
+      )
     );
+
+    Route routeAgency1 = Route
+      .of(new FeedScopedId(FEED_ID, "R1"))
+      .withAgency(agency1)
+      .withLongName(new NonLocalizedString("Route agency 1"))
+      .withMode(TransitMode.BUS)
+      .build();
+
+    Route routeAgency2 = Route
+      .of(new FeedScopedId(FEED_ID, "R2"))
+      .withAgency(agency2)
+      .withLongName(new NonLocalizedString("Route agency 2"))
+      .withMode(TransitMode.BUS)
+      .build();
 
     // Itineraries within zone A
     Itinerary A1_A2 = newItinerary(A1, T11_06).bus(1, T11_06, T11_12, A2).build();
@@ -281,6 +329,17 @@ public class HSLFareServiceTest implements PlanTestConstants {
         twoTicketsItinerary,
         List.of(fareAttributeAB.getId(), fareAttributeBC.getId())
       )
+    );
+
+    // Itineraries with agency specific fare
+    Itinerary d1 = newItinerary(D1, T11_06).bus(routeAgency1, 1, T11_20, T11_30, D2).build();
+    args.add(
+      Arguments.of("Ride with agency 1", hslFareService, d1, List.of(fareAttributeD.getId()))
+    );
+
+    Itinerary d2 = newItinerary(D1, T11_06).bus(routeAgency2, 1, T11_20, T11_30, D2).build();
+    args.add(
+      Arguments.of("Ride with agency 2", hslFareService, d2, List.of(fareAttributeD2.getId()))
     );
 
     return args;

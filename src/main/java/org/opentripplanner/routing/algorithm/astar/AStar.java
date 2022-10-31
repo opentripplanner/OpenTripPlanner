@@ -182,9 +182,10 @@ public class AStar {
     /* the core of the A* algorithm */
     while (!pq.empty()) { // Until the priority queue is empty:
       /*
-       * Terminate based on timeout?
+       * Terminate based on timeout. We don't check the termination on every round, as it is
+       * expensive to fetch the current time, compared to just running one more round.
        */
-      if (timeout != null && System.currentTimeMillis() > abortTime) {
+      if (timeout != null && nVisited % 100 == 0 && System.currentTimeMillis() > abortTime) {
         LOG.warn("Search timeout. origin={} target={}", fromVertices, toVertices);
         // Rather than returning null to indicate that the search was aborted/timed out, we instead
         // set a flag in the SPT and return it anyway. This allows returning a partial list results

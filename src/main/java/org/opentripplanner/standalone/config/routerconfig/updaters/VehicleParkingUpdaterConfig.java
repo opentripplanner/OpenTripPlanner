@@ -61,7 +61,8 @@ public class VehicleParkingUpdaterConfig {
             .summary("How often the utilization should be updated.")
             .asInt(600),
           c.of("utilizationsUrl").since(NA).summary("URL of the utilization data.").asString(null),
-          timeZone
+          timeZone,
+          c.of("hubsUrl").since(NA).summary("Hubs URL").asString(null)
         );
       case KML:
         return new KmlUpdaterParameters(
