@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper.mapRouteRequest;
+import static org.opentripplanner.standalone.config.routerequest.RouteRequestMapper.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;

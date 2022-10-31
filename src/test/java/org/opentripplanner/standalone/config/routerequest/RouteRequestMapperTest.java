@@ -7,7 +7,7 @@ import static org.opentripplanner.standalone.config.framework.JsonSupport.newNod
 
 import org.junit.jupiter.api.Test;
 
-class RoutingRequestMapperTest {
+class RouteRequestMapperTest {
 
   @Test
   public void loadFromJson() {
@@ -40,7 +40,7 @@ class RoutingRequestMapperTest {
       """
     );
 
-    var subject = RoutingRequestMapper.mapRouteRequest(nodeAdapter);
+    var subject = RouteRequestMapper.mapRouteRequest(nodeAdapter);
 
     var accessibility = subject.preferences().wheelchair();
     assertTrue(subject.wheelchair());

@@ -32,9 +32,9 @@ import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RoutingRequestMapper {
+public class RouteRequestMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RoutingRequestMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestMapper.class);
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
     RouteRequest dft = new RouteRequest();

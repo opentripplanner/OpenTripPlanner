@@ -22,6 +22,7 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestMapper;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,7 @@ public abstract class RoutingResource {
   public Boolean timetableView;
 
   /**
-   * see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper}
+   * see {@link RouteRequestMapper}
    *
    * @see #timetableView for usage.
    */
@@ -184,11 +185,11 @@ public abstract class RoutingResource {
   @QueryParam("bikeWalkingReluctance")
   protected Double bikeWalkingReluctance;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkReluctance")
   protected Double walkReluctance;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeReluctance")
   protected Double bikeReluctance;
 
@@ -210,35 +211,35 @@ public abstract class RoutingResource {
   @QueryParam("waitReluctance")
   protected Double waitReluctance;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkSpeed")
   protected Double walkSpeed;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeSpeed")
   protected Double bikeSpeed;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeWalkingSpeed")
   protected Double bikeWalkingSpeed;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeSwitchTime")
   protected Integer bikeSwitchTime;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeSwitchCost")
   protected Integer bikeSwitchCost;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("triangleSafetyFactor")
   protected Double triangleSafetyFactor;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("triangleSlopeFactor")
   protected Double triangleSlopeFactor;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("triangleTimeFactor")
   protected Double triangleTimeFactor;
 
@@ -340,15 +341,15 @@ public abstract class RoutingResource {
   @DefaultValue("false")
   protected Boolean showIntermediateStops;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkBoardCost")
   protected Integer walkBoardCost;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeBoardCost")
   protected Integer bikeBoardCost;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("walkSafetyFactor")
   protected Double walkSafetyFactor;
 
@@ -358,35 +359,35 @@ public abstract class RoutingResource {
   @QueryParam("keepingRentedBicycleAtDestinationCost")
   protected Double keepingRentedBicycleAtDestinationCost;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("allowedVehicleRentalNetworks")
   protected Set<String> allowedVehicleRentalNetworks;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bannedVehicleRentalNetworks")
   protected Set<String> bannedVehicleRentalNetworks;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeParkTime")
   protected Integer bikeParkTime;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bikeParkCost")
   protected Integer bikeParkCost;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("carParkTime")
   protected Integer carParkTime = 60;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("carParkCost")
   protected Integer carParkCost = 120;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("requiredVehicleParkingTags")
   protected Set<String> requiredVehicleParkingTags = Set.of();
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("bannedVehicleParkingTags")
   protected Set<String> bannedVehicleParkingTags = Set.of();
 
@@ -468,7 +469,7 @@ public abstract class RoutingResource {
   protected String bannedStopsHard;
 
   /**
-   * see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper}
+   * see {@link RouteRequestMapper}
    */
   @QueryParam("transferPenalty")
   protected Integer transferPenalty;
@@ -644,7 +645,7 @@ public abstract class RoutingResource {
   @QueryParam("debugItineraryFilter")
   protected Boolean debugItineraryFilter;
 
-  /** see {@link org.opentripplanner.standalone.config.routerequest.RoutingRequestMapper} **/
+  /** see {@link RouteRequestMapper} **/
   @QueryParam("geoidElevation")
   protected Boolean geoidElevation;
 
