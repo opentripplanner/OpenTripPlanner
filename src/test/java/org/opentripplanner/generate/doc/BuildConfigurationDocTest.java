@@ -19,7 +19,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class BuildConfigurationDocTest {
 
   private static final File TEMPLATE = new File("doc-templates", "BuildConfiguration.md");
-  private static final File OUT_FILE = new File("docs", "BuildConfiguration-poc.md");
+  private static final File OUT_FILE = new File("docs", "BuildConfiguration.md");
 
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/build-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes
