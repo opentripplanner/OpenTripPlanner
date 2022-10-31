@@ -34,3 +34,8 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 ## Parameter Details
 
 <!-- INSERT: PARAMETERS-DETAILS -->
+
+
+## Example
+
+<!-- INSERT: JSON-EXAMPLE -->

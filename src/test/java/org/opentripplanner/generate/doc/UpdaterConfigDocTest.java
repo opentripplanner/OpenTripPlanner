@@ -93,7 +93,7 @@ public class UpdaterConfigDocTest {
         %s
       ]
       """.formatted(
-          node.toPrettyString().indent(2).trim()
+          node.toPrettyString().indent(node.level()).trim()
         )
     );
   }

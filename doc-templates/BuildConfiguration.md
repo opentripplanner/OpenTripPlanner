@@ -318,3 +318,8 @@ See [writeCachedElevations](#writeCachedElevations) for details.
 ## Parameter Details
 
 <!-- INSERT: PARAMETERS-DETAILS -->
+
+
+## Example
+
+<!-- INSERT: JSON-EXAMPLE -->

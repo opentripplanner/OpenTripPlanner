@@ -1,6 +1,6 @@
 package org.opentripplanner.generate.doc.framework;
 
-import static org.opentripplanner.generate.doc.framework.DocBuilder.anchor;
+import static org.opentripplanner.generate.doc.framework.NodeAdapterHelper.anchor;
 
 import java.util.EnumSet;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;

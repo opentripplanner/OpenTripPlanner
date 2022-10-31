@@ -6,27 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
-import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
  * Builder for creating a new document
  */
 @SuppressWarnings("UnusedReturnValue")
 public class DocBuilder {
-
-  private static final List<AnchorAbbreviation> ANCHOR_ABBREVIATIONS = List.of(
-    new AnchorAbbreviation("rd.", "routingDefaults."),
-    new AnchorAbbreviation("toO.", "transferOptimization."),
-    new AnchorAbbreviation("if.", "itineraryFilters."),
-    new AnchorAbbreviation("nd.", "netexDefaults."),
-    new AnchorAbbreviation("tf.", "transitFeeds."),
-    new AnchorAbbreviation("od.", "osmDefaults."),
-    new AnchorAbbreviation("lfp.", "localFileNamePatterns."),
-    new AnchorAbbreviation("u.", "updaters."),
-    new AnchorAbbreviation("0.", "[0]."),
-    new AnchorAbbreviation("1.", "[1].")
-  );
-
   private final StringBuilder buffer = new StringBuilder();
 
   /**
@@ -58,14 +43,6 @@ public class DocBuilder {
    */
   public DocBuilder header(int level, String header, String anchor) {
     return addSection(MarkdownFormatter.header(level, header, anchor));
-  }
-
-  public static String anchor(NodeAdapter node, String parameterName) {
-    String anchor = node.fullPath(parameterName);
-    for (AnchorAbbreviation it : ANCHOR_ABBREVIATIONS) {
-      anchor = anchor.replace(it.name, it.abbreviation);
-    }
-    return anchor;
   }
 
   /**
@@ -158,6 +135,4 @@ public class DocBuilder {
   public String toString() {
     return buffer.toString();
   }
-
-  private record AnchorAbbreviation(String abbreviation, String name) {}
 }

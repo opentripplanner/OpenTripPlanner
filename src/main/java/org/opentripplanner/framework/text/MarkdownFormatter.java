@@ -79,11 +79,11 @@ public class MarkdownFormatter {
     return level <= 0 ? "" : StringUtils.fill(NBSP, 3 * level);
   }
 
-  public static String normalizeAnchor(String anchor) {
-    return anchor.replaceAll("[-!\"#$%&/.=?+\\[\\]]", "_");
-  }
-
   public static String lineBreak() {
     return " \\";
+  }
+
+  private static String normalizeAnchor(String anchor) {
+    return anchor.replaceAll("[-!\"#$%&/.=?+\\[\\]]", "_");
   }
 }

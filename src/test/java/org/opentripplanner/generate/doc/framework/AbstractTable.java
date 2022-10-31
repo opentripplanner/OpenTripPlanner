@@ -2,7 +2,7 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.code;
 import static org.opentripplanner.framework.text.MarkdownFormatter.escapeInTable;
-import static org.opentripplanner.generate.doc.framework.DocBuilder.anchor;
+import static org.opentripplanner.generate.doc.framework.NodeAdapterHelper.anchor;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
@@ -34,7 +34,7 @@ abstract class AbstractTable {
   abstract void addRow(NodeAdapter node, TableBuilder table, NodeInfo it);
 
   public Table createTable(NodeAdapter root) {
-    this.rootLevel = indentLevel(root);
+    this.rootLevel = root.level();
     var table = Table.of().withHeaders(headers()).withAlights(alignment());
     addParametersToTable(root, table);
 
@@ -97,7 +97,7 @@ abstract class AbstractTable {
     } else if (info.printDetails()) {
       parameter = MarkdownFormatter.linkToAnchor(parameter, anchor(node, parameter));
     }
-    int indentLevel = indentLevel(node) - rootLevel;
+    int indentLevel = node.level() - rootLevel;
     return MarkdownFormatter.indentInTable(indentLevel) + parameter;
   }
 
@@ -116,13 +116,5 @@ abstract class AbstractTable {
 
   private boolean skip(NodeInfo info) {
     return skipFunction.skip(info);
-  }
-
-  static int indentLevel(NodeAdapter node) {
-    String path = node.contextPath();
-    if (path == null) {
-      return 0;
-    }
-    return (int) path.chars().filter(c -> c == '.').count() + 1;
   }
 }

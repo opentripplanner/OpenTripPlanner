@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
@@ -18,10 +19,12 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class RouterConfigurationDocTest {
 
+  private static final String CONFIG_JSON = "router-config.json";
+
   private static final File TEMPLATE = new File("doc-templates", "RouterConfiguration.md");
   private static final File OUT_FILE = new File("docs", "RouterConfiguration.md");
 
-  private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final String CONFIG_PATH = "standalone/config/" + CONFIG_JSON;
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
     .add("vectorTileLayers", "/docs/sandbox/MapboxVectorTilesApi.md")
@@ -47,6 +50,7 @@ public class RouterConfigurationDocTest {
 
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
     doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
+    doc = replaceJsonExample(doc, node, CONFIG_JSON);
 
     writeFile(OUT_FILE, doc);
 
@@ -54,8 +58,8 @@ public class RouterConfigurationDocTest {
   }
 
   private NodeAdapter readBuildConfig() {
-    var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, BUILD_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(CONFIG_PATH);
+    var conf = new RouterConfig(json, CONFIG_PATH, false);
     return conf.asNodeAdapter();
   }
 

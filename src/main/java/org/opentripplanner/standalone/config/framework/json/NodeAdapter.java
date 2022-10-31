@@ -53,21 +53,24 @@ public class NodeAdapter {
 
   private boolean usedAsRaw = false;
 
-  private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath) {
+  private final int level;
+
+  private NodeAdapter(@Nonnull JsonNode node, String source, String contextPath, int level) {
     this.json = node;
     this.source = source;
     this.contextPath = contextPath;
+    this.level = level;
   }
 
   public NodeAdapter(@Nonnull JsonNode node, String source) {
-    this(node, source, null);
+    this(node, source, null, 0);
   }
 
   /**
    * Constructor for nested configuration nodes.
    */
   private NodeAdapter(@Nonnull JsonNode node, @Nonnull NodeAdapter parent, String paramName) {
-    this(node, parent.source, parent.fullPath(paramName));
+    this(node, parent.source, parent.fullPath(paramName), parent.level + 1);
     parent.childrenByName.put(paramName, this);
   }
 
@@ -164,6 +167,14 @@ public class NodeAdapter {
   public JsonNode rawNode() {
     this.usedAsRaw = true;
     return json;
+  }
+
+  /**
+   * Return the level for this node, relative to root of the document. Root is at level zero,
+   * roots children are at level one, and so on.
+   */
+  public int level() {
+    return level;
   }
 
   /**
