@@ -1,56 +1,67 @@
 package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class WheelchairAccessibilityRequestConfig {
+public class WheelchairConfig {
 
-  static WheelchairPreferences mapAccessibilityRequest(NodeAdapter a) {
+  static boolean wheelchairEnabled(NodeAdapter root, String parameterName) {
+    return WheelchairConfig
+      .wheelchairRoot(root, parameterName)
+      .of("enabled")
+      .since(V2_2)
+      .summary("Enable wheelchair accessibility.")
+      .asBoolean(false);
+  }
+
+  static WheelchairPreferences mapWheelchairPreferences(NodeAdapter root, String parameterName) {
+    var a = wheelchairRoot(root, parameterName);
+
     return new WheelchairPreferences(
-      mapAccessibilityFeature(
+      mapAccessibilityPreferences(
         a
           .of("trip")
-          .since(NA)
+          .since(V2_2)
           .summary("Configuration for when to use inaccessible trips.")
           .asObject(),
         DEFAULT.trip()
       ),
-      mapAccessibilityFeature(
+      mapAccessibilityPreferences(
         a
           .of("stop")
-          .since(NA)
+          .since(V2_2)
           .summary("Configuration for when to use inaccessible stops.")
           .asObject(),
         DEFAULT.stop()
       ),
-      mapAccessibilityFeature(
+      mapAccessibilityPreferences(
         a
           .of("elevator")
-          .since(NA)
+          .since(V2_2)
           .summary("Configuration for when to use inaccessible elevators.")
           .asObject(),
         DEFAULT.elevator()
       ),
       a
         .of("inaccessibleStreetReluctance")
-        .since(NA)
+        .since(V2_2)
         .summary(
           "The factor to to multiply the cost of traversing a street edge that is not wheelchair-accessible."
         )
         .asDouble(DEFAULT.inaccessibleStreetReluctance()),
       a
         .of("maxSlope")
-        .since(NA)
+        .since(V2_2)
         .summary("The maximum slope as a fraction of 1.")
         .description("9 percent would be `0.09`")
         .asDouble(DEFAULT.maxSlope()),
       a
         .of("slopeExceededReluctance")
-        .since(NA)
+        .since(V2_2)
         .summary("How much streets with high slope should be avoided.")
         .description(
           """
@@ -63,7 +74,7 @@ public class WheelchairAccessibilityRequestConfig {
         .asDouble(DEFAULT.slopeExceededReluctance()),
       a
         .of("stairsReluctance")
-        .since(NA)
+        .since(V2_2)
         .summary("How much stairs should be avoided.")
         .description(
           """
@@ -76,13 +87,22 @@ public class WheelchairAccessibilityRequestConfig {
     );
   }
 
-  private static AccessibilityPreferences mapAccessibilityFeature(
+  static NodeAdapter wheelchairRoot(NodeAdapter root, String parameterName) {
+    var a = root
+      .of(parameterName)
+      .since(V2_2)
+      .summary("See [Wheelchair Accessibility](Accessibility.md)")
+      .asObject();
+    return a;
+  }
+
+  private static AccessibilityPreferences mapAccessibilityPreferences(
     NodeAdapter adapter,
     AccessibilityPreferences defaultValue
   ) {
     var onlyAccessible = adapter
       .of("onlyConsiderAccessible")
-      .since(NA)
+      .since(V2_2)
       .summary(
         "Wheter to only use this entity if it is explicitly marked as wheelchair accessible."
       )
@@ -90,12 +110,12 @@ public class WheelchairAccessibilityRequestConfig {
 
     var unknownCost = adapter
       .of("unknownCost")
-      .since(NA)
+      .since(V2_2)
       .summary("The cost to add when traversing an entity with unknown accessibility information.")
       .asInt(60 * 10);
     var inaccessibleCost = adapter
       .of("inaccessibleCost")
-      .since(NA)
+      .since(V2_2)
       .summary("The cost to add when traversing an entity which is know to be inaccessible.")
       .asInt(60 * 60);
     if (onlyAccessible) {

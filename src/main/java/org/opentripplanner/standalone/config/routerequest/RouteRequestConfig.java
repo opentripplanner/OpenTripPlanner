@@ -5,7 +5,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
-import static org.opentripplanner.standalone.config.routerequest.WheelchairAccessibilityRequestConfig.mapAccessibilityRequest;
+import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
+import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -17,8 +18,6 @@ import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
-import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
-import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
@@ -35,6 +34,7 @@ import org.slf4j.LoggerFactory;
 public class RouteRequestConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequestConfig.class);
+  private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
   public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
     var c = root
@@ -134,12 +134,29 @@ public class RouteRequestConfig {
       c
         .of("searchWindow")
         .since(NA)
-        .summary(
-          "The length of the search-window in minutes." +
-          " This is normally dynamically calculated by the server, but you may override this by setting it." +
-          " The search-window used in a request is returned in the response metadata." +
-          " To get the \"next page\" of trips use the metadata(searchWindowUsed and nextWindowDateTime) to create a new request." +
-          " If not provided the value is resolved depending on the other input parameters, available transit options and realtime changes."
+        .summary("The duration of the search-window.")
+        .description(
+          """
+  This is the time/duration in seconds from the earliest-departure-time(EDT) to the
+  latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+  latest arrival time (LAT - EAT).
+
+  All optimal travels that depart within the search window is guarantied to be found.
+
+  This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
+  Transit search as well; Hence this is named search-window and not raptor-search-window. 
+
+
+  This is normally dynamically calculated by the server. Use {@code null} to unset, and 
+  {@link Duration#ZERO} to do one Raptor iteration. The value is dynamically  assigned a suitable
+  value, if not set. In a small to medium size operation you may use a fixed value, like 60 minutes.
+  If you have a mixture of high frequency cities routes and  infrequent long distant journeys, the
+  best option is normally to use the dynamic auto assignment. If not provided the value is resolved
+  depending on the other input parameters, available transit options and realtime changes.
+
+  There is no need to set this when going to the next/previous page. The OTP Server will 
+  increase/decrease the search-window when paging to match the requested number of itineraries. 
+  """
         )
         .asDuration(dft.searchWindow())
     );
@@ -153,18 +170,7 @@ public class RouteRequestConfig {
         .asStringSet(vehicleParking.requiredTags())
     );
 
-    request.setWheelchair(
-      c
-        .of("wheelchairAccessibility")
-        .since(NA)
-        .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
-        .asObject()
-        .of("enabled")
-        .since(NA)
-        .summary("TODO")
-        .asBoolean(false)
-    );
+    request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
 
     NodeAdapter unpreferred = c
       .of("unpreferred")
@@ -221,16 +227,7 @@ travel time `x` (in seconds).
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withParking(mapParkingPreferences(c, preferences));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
-    preferences.withWheelchair(
-      mapAccessibilityRequest(
-        c
-          .of("wheelchairAccessibility")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
-          .asObject()
-      )
-    );
+    preferences.withWheelchair(mapWheelchairPreferences(c, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> {
       mapItineraryFilterParams("itineraryFilters", c, it);
     });
@@ -309,8 +306,10 @@ ferries, where the check-in process needs to be done in good time before ride.
           .of("otherThanPreferredRoutesPenalty")
           .since(NA)
           .summary(
-            "Penalty added for using every route that is not preferred if user set any route as preferred." +
-            " We return number of seconds that we are willing to wait for preferred route."
+            "Penalty added for using every route that is not preferred if user set any route as preferred."
+          )
+          .description(
+            "We return number of seconds that we are willing to wait for preferred route."
           )
           .asInt(dft.otherThanPreferredRoutesPenalty())
       )
@@ -359,9 +358,10 @@ ferries, where the check-in process needs to be done in good time before ride.
         c
           .of("bikeBoardCost")
           .since(NA)
-          .summary(
-            "Prevents unnecessary transfers by adding a cost for boarding a vehicle." +
-            " This is the cost that is used when boarding while cycling. This is usually higher that walkBoardCost."
+          .summary("Prevents unnecessary transfers by adding a cost for boarding a vehicle.")
+          .description(
+            "This is the cost that is used when boarding while cycling." +
+            "This is usually higher that walkBoardCost."
           )
           .asInt(dft.boardCost())
       )
@@ -714,91 +714,6 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
     }
   }
 
-  private static void mapTransferPreferences(NodeAdapter c, TransferPreferences.Builder tx) {
-    var dft = tx.original();
-    tx
-      .withNonpreferredCost(
-        c.of("nonpreferredTransferPenalty").since(NA).summary("TODO").asInt(dft.nonpreferredCost())
-      )
-      .withCost(
-        c
-          .of("transferPenalty")
-          .since(NA)
-          .summary("An additional penalty added to boardings after the first.")
-          .description(
-            """
-            The value is in OTP's internal weight units, which are roughly equivalent to seconds.
-            Set this to a high value to discourage transfers. Of course, transfers that save
-            significant time or walking will still be taken.
-            """
-          )
-          .asInt(dft.cost())
-      )
-      .withSlack(
-        c
-          .of("transferSlack")
-          .since(NA)
-          .summary("The extra time needed to make a safe transfer in seconds.")
-          .description(
-            """
-            An expected transfer time in seconds that specifies the amount of time that must pass
-            between exiting one public transport vehicle and boarding another. This time is in
-            addition to time it might take to walk between stops, the board-slack, and the
-            alight-slack."
-            """
-          )
-          .asInt(dft.slack())
-      )
-      .withWaitReluctance(
-        c
-          .of("waitReluctance")
-          .since(NA)
-          .summary(
-            "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
-          )
-          .asDouble(dft.waitReluctance())
-      )
-      .withOptimization(
-        mapTransferOptimization(
-          c
-            .of("transferOptimization")
-            .since(NA)
-            .summary("Optimize where a transfer between to trip happens. ")
-            .description(
-              """
-The main purpose of transfer optimization is to handle cases where it is possible to transfer
-between two routes at more than one point (pair of stops). The transfer optimization ensures that
-transfers occur at the best possible location. By post-processing all paths returned by the router,
-OTP can apply sophisticated calculations that are too slow or not algorithmically valid within
-Raptor. Transfers are optimized is done after the Raptor search and before the paths are passed
-to the itinerary-filter-chain.
-
-To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on).
-You should leave this on unless there is a critical issue with it. The OTPFeature
-`GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
-              
-The optimized transfer service will try to, in order:
-              
-1. Use transfer priority. This includes stay-seated and guaranteed transfers.
-2. Use the transfers with the best distribution of the wait-time, and avoid very short transfers.
-3. Avoid back-travel
-4. Boost stop-priority to select preferred and recommended stops.
-              
-If two paths have the same transfer priority level, then we break the tie by looking at waiting 
-times. The goal is to maximize the wait-time for each stop, avoiding situations where there is 
-little time available to make the transfer. This is balanced with the generalized-cost. The cost
-is adjusted with a new cost for wait-time (optimized-wait-time-cost).
-              
-The defaults should work fine, but if you have results with short wait-times dominating a better 
-option or "back-travel", then try to increase the `minSafeWaitTimeFactor`, 
-`backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
-"""
-            )
-            .asObject()
-        )
-      );
-  }
-
   private static VehicleParkingPreferences mapParkingPreferences(
     NodeAdapter c,
     RoutingPreferences.Builder preferences
@@ -825,8 +740,10 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
           .of("walkReluctance")
           .since(NA)
           .summary(
+            "A multiplier for how bad walking is, compared to being in transit for equal lengths of time."
+          )
+          .description(
             """
-A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
 Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to walk
 too much without asking for totally ridiculous itineraries, but this observation should in no way
 be taken as scientific or definitive. Your mileage may vary.
@@ -874,67 +791,11 @@ high values.
         c
           .of("walkSafetyFactor")
           .since(NA)
-          .summary(
-            "Factor for how much the walk safety is considered in routing. Value should be between 0 and 1." +
-            " If the value is set to be 0, safety is ignored"
+          .summary("Factor for how much the walk safety is considered in routing.")
+          .description(
+            "Value should be between 0 and 1." + " If the value is set to be 0, safety is ignored."
           )
           .asDouble(dft.safetyFactor())
       );
-  }
-
-  private static TransferOptimizationPreferences mapTransferOptimization(NodeAdapter c) {
-    var dft = TransferOptimizationPreferences.DEFAULT;
-    return TransferOptimizationPreferences
-      .of()
-      .withOptimizeTransferWaitTime(
-        c
-          .of("optimizeTransferWaitTime")
-          .since(NA)
-          .summary(
-            "This enables the transfer wait time optimization." +
-            " If not enabled generalizedCost function is used to pick the optimal transfer point"
-          )
-          .asBoolean(dft.optimizeTransferWaitTime())
-      )
-      .withMinSafeWaitTimeFactor(
-        c
-          .of("minSafeWaitTimeFactor")
-          .since(NA)
-          .summary(
-            "This defines the maximum cost for the logarithmic function relative to the " +
-            "min-safe-transfer-time (t0) when wait time goes towards zero(0). f(0) = n * t0"
-          )
-          .asDouble(dft.minSafeWaitTimeFactor())
-      )
-      .withBackTravelWaitTimeFactor(
-        c
-          .of("backTravelWaitTimeFactor")
-          .since(NA)
-          .summary(
-            "The wait time is used to prevent *back-travel*, the backTravelWaitTimeFactor is " +
-            "multiplied with the wait-time and subtracted from the optimized-transfer-cost."
-          )
-          .asDouble(dft.backTravelWaitTimeFactor())
-      )
-      .withExtraStopBoardAlightCostsFactor(
-        c
-          .of("extraStopBoardAlightCostsFactor")
-          .since(NA)
-          .summary("Add an extra board- and alight-cost for prioritized stops.")
-          .description(
-            """
-            A stopBoardAlightCosts is added to the generalized-cost during routing. But this cost
-            cannot be too high, because that would add extra cost to the transfer, and favor other 
-            alternative paths. But, when optimizing transfers, we do not have to take other paths 
-            into consideration and can *boost* the stop-priority-cost to allow transfers to 
-            take place at a preferred stop. The cost added during routing is already added to the 
-            generalized-cost used as a base in the optimized transfer calculation. By setting this 
-            parameter to 0, no extra cost is added, by setting it to {@code 1.0} the stop-cost is
-            doubled. Stop priority is only supported by the NeTEx import, not GTFS.
-            """
-          )
-          .asDouble(dft.extraStopBoardAlightCostsFactor())
-      )
-      .build();
   }
 }
