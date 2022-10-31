@@ -48,7 +48,7 @@ public class ExampleConfigTest {
         ignored -> "some-value"
       );
       var node = JsonSupport.jsonNodeFromString(replaced);
-      var a = new NodeAdapter(node, getClass().getSimpleName());
+      var a = new NodeAdapter(node, path.toString());
       buildConfig.accept(a);
 
       // Test for unused parameters
