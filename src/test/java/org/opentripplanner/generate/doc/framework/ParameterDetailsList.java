@@ -1,5 +1,7 @@
 package org.opentripplanner.generate.doc.framework;
 
+import static org.opentripplanner.generate.doc.framework.DocBuilder.anchor;
+
 import java.util.EnumSet;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
 import org.opentripplanner.standalone.config.framework.json.EnumMapper;
@@ -61,7 +63,7 @@ public class ParameterDetailsList {
       return;
     }
     var paramName = info.name();
-    doc.header(headerLevel, paramName, node.fullPath(paramName));
+    doc.header(headerLevel, paramName, anchor(node, paramName));
     addMetaInfo(info, node.contextPath());
     doc.addSection(info.summary());
     doc.addSection(info.description());

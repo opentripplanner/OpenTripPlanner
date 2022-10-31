@@ -2,6 +2,7 @@ package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.framework.text.MarkdownFormatter.code;
 import static org.opentripplanner.framework.text.MarkdownFormatter.escapeInTable;
+import static org.opentripplanner.generate.doc.framework.DocBuilder.anchor;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
@@ -94,7 +95,7 @@ abstract class AbstractTable {
           .map(link -> MarkdownFormatter.linkToDoc(info.name(), link))
           .orElse(info.name());
     } else if (info.printDetails()) {
-      parameter = MarkdownFormatter.linkToAnchor(parameter, node.fullPath(parameter));
+      parameter = MarkdownFormatter.linkToAnchor(parameter, anchor(node, parameter));
     }
     int indentLevel = indentLevel(node) - rootLevel;
     return MarkdownFormatter.indentInTable(indentLevel) + parameter;
