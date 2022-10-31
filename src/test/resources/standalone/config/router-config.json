@@ -89,7 +89,7 @@
       "PREFERRED" : 0
     }
   },
-  "bikeRentalServiceDirectory": {
+  "vehicleRentalServiceDirectory": {
     "url": "https://entur.no/bikeRentalServiceDirectory",
     "sourcesName": "systems",
     "updaterUrlName": "url",

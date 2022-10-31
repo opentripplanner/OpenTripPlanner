@@ -31,42 +31,35 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                                     |          Type         | Summary                                                                                           |  Req./Opt. | Default Value | Since |
-|--------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| configVersion                                                                        |        `string`       | Version of the configuration.                                                                     | *Optional* |               |   na  |
-| [requestLogFile](#requestLogFile)                                                    |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
-| [streetRoutingTimeout](#streetRoutingTimeout)                                        |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.         | *Optional* | `"PT5S"`      |   na  |
-| bikeRentalServiceDirectory                                                           |        `object`       | Deprecated. Use bikeRentalServiceDirectory.                                                       | *Optional* |               |  2.0  |
-|    language                                                                          |        `string`       | TODO                                                                                              | *Optional* |               |   na  |
-|    sourcesName                                                                       |        `string`       | TODO                                                                                              | *Optional* | `"systems"`   |   na  |
-|    updaterNetworkName                                                                |        `string`       | TODO                                                                                              | *Optional* | `"id"`        |   na  |
-|    updaterUrlName                                                                    |        `string`       | TODO                                                                                              | *Optional* | `"url"`       |   na  |
-|    url                                                                               |         `uri`         | TODO                                                                                              | *Required* |               |   na  |
-|    [headers](#bikeRentalServiceDirectory_headers)                                    |    `map of string`    | TODO                                                                                              | *Optional* |               |   na  |
-|       ET-Client-Name                                                                 |        `object`       | No doc, parent contains doc.                                                                      | *Optional* |               |   na  |
-| flex                                                                                 |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
-|    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                    |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
-| [routingDefaults](/docs/RouteRequest.md)                                             |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |   na  |
-| timetableUpdates                                                                     |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
-| [transit](#transit)                                                                  |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
-|    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)       |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
-|    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                             |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                | *Optional* | `12`          |   na  |
-|    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold) |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                | *Optional* | `50`          |   na  |
-|    [searchThreadPoolSize](#transit_searchThreadPoolSize)                             |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.            | *Optional* | `0`           |   na  |
-|    [transferCacheMaxSize](#transit_transferCacheMaxSize)                             |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.        | *Optional* | `25`          |   na  |
-|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                               |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                     | *Optional* |               |   na  |
-|       maxWinTimeMinutes                                                              |       `integer`       | TODO                                                                                              | *Optional* | `180`         |   na  |
-|       minTransitTimeCoefficient                                                      |        `double`       | TODO                                                                                              | *Optional* | `0.5`         |   na  |
-|       minWaitTimeCoefficient                                                         |        `double`       | TODO                                                                                              | *Optional* | `0.5`         |   na  |
-|       minWinTimeMinutes                                                              |       `integer`       | TODO                                                                                              | *Optional* | `40`          |   na  |
-|       stepMinutes                                                                    |       `integer`       | TODO                                                                                              | *Optional* | `10`          |   na  |
-|    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)           |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page. | *Optional* |               |   na  |
-|    [stopTransferCost](#transit_stopTransferCost)                                     | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |   na  |
-| transmodelApi                                                                        |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
-|    hideFeedId                                                                        |       `boolean`       | TODO                                                                                              | *Optional* | `false`       |   na  |
-|    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                             |       `string[]`      | TODO                                                                                              | *Optional* |               |   na  |
-| [updaters](/docs/UpdaterConfig.md)                                                   |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
-| [vectorTileLayers](/docs/sandbox/MapboxVectorTilesApi.md)                            |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
+| Config Parameter                                                                          |          Type         | Summary                                                                                           |  Req./Opt. | Default Value | Since |
+|-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| configVersion                                                                             |        `string`       | Version of the configuration.                                                                     | *Optional* |               |   na  |
+| [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
+| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.         | *Optional* | `"PT5S"`      |   na  |
+| flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
+|    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                         |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
+| [routingDefaults](/docs/RouteRequest.md)                                                  |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |   na  |
+| timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
+| [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
+|    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
+|    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                | *Optional* | `12`          |   na  |
+|    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold)      |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                | *Optional* | `50`          |   na  |
+|    [searchThreadPoolSize](#transit_searchThreadPoolSize)                                  |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.            | *Optional* | `0`           |   na  |
+|    [transferCacheMaxSize](#transit_transferCacheMaxSize)                                  |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.        | *Optional* | `25`          |   na  |
+|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                     | *Optional* |               |   na  |
+|       [maxWinTimeMinutes](#transit_dynamicSearchWindow_maxWinTimeMinutes)                 |       `integer`       | Upper limit for the search-window calculation.                                                    | *Optional* | `180`         |   na  |
+|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                | *Optional* | `0.5`         |   na  |
+|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                   | *Optional* | `0.5`         |   na  |
+|       [minWinTimeMinutes](#transit_dynamicSearchWindow_minWinTimeMinutes)                 |       `integer`       | The constant minimum number of minutes for a raptor-search-window.                                | *Optional* | `40`          |   na  |
+|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |   na  |
+|    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page. | *Optional* |               |   na  |
+|    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |   na  |
+| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
+|    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
+|    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
+| [updaters](/docs/UpdaterConfig.md)                                                        |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
+| [vectorTileLayers](/docs/sandbox/MapboxVectorTilesApi.md)                                 |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
+| vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                           | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -126,13 +119,6 @@ search-window.
 
 The search abort after this duration and any paths found are returned to the client.
 
-
-<h3 id="bikeRentalServiceDirectory_headers">headers</h3>
-
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
-**Path:** /bikeRentalServiceDirectory 
-
-TODO
 
 <h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
 
@@ -221,7 +207,94 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
 
-EDT is earliest-departure-time, LAT is latest-arrival-time and SW is raptor-search-window using heuristics.
+The dynamic search window coefficients is used to calculate EDT(*earliest-departure-time*),
+LAT(*latest-arrival-time*) and SW(*raptor-search-window*) request parameters using heuristics. The
+heuristics perform a Raptor search (one-iteration) to find a trip which we use to find a lower
+bound for the travel duration time - the "minTransitTime". The heuristic search is used for other
+purposes too, and is very fast.
+
+At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
+unknown/missing the parameters(EDT, LAT, DW) is dynamically calculated. The dynamic coefficients
+affect the performance and should be tuned to match the deployment.
+
+The request parameters are calculated like this:
+
+```
+    DW  = round_N(C + T * minTransitTime + W * minWaitTime)
+    LAT = EDT + DW + minTransitTime
+    EDT = LAT - (DW + minTransitTime)
+```
+
+The `round_N(...)` method is will round the input to the closest multiplication of N.
+
+The 3 coefficients above are:
+
+ - `C` is parameter: `minWinTimeMinutes`
+ - `T` is parameter: `minTransitTimeCoefficient`
+ - `W` is parameter: `minWaitTimeCoefficient`
+ - `N` is parameter: `stepMinutes`
+
+In addition there this an upper bound on the calculation of the search window:
+`maxWinTimeMinutes`.
+
+
+<h3 id="transit_dynamicSearchWindow_maxWinTimeMinutes">maxWinTimeMinutes</h3>
+
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `180`  \
+**Path:** /transit/dynamicSearchWindow 
+
+Upper limit for the search-window calculation.
+
+Long search windows consumes a lot of resources and may take a long time. Use this parameter to
+tune the desired maximum search time.
+
+This is the parameter that affect the response time most, the downside is that a search is only
+guarantied to be pareto-optimal within a search-window.
+
+The default is 3 hours. The unit is minutes.
+
+
+<h3 id="transit_dynamicSearchWindow_minTransitTimeCoefficient">minTransitTimeCoefficient</h3>
+
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`  \
+**Path:** /transit/dynamicSearchWindow 
+
+The coefficient to multiply with `minTransitTime`.
+
+Use a value between `0.0` and `3.0`. Using `0.0` will eliminate the `minTransitTime` from the dynamic raptor-search-window calculation.
+
+<h3 id="transit_dynamicSearchWindow_minWaitTimeCoefficient">minWaitTimeCoefficient</h3>
+
+**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`  \
+**Path:** /transit/dynamicSearchWindow 
+
+The coefficient to multiply with `minWaitTime`.
+
+Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime` from the dynamic raptor-search-window calculation.
+
+<h3 id="transit_dynamicSearchWindow_minWinTimeMinutes">minWinTimeMinutes</h3>
+
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`  \
+**Path:** /transit/dynamicSearchWindow 
+
+The constant minimum number of minutes for a raptor-search-window. 
+
+Use a value between 20 to 180 minutes in a normal deployment.
+
+<h3 id="transit_dynamicSearchWindow_stepMinutes">stepMinutes</h3>
+
+**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`  \
+**Path:** /transit/dynamicSearchWindow 
+
+Used to set the steps the search-window is rounded to.
+
+The search window is rounded of to the closest multiplication of `stepMinutes`. If `stepMinutes` =
+10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5
+minutes and 17 seconds it will be rounded up to 10 minutes.
+
+Use a value between `1` and `60`. This should be less than the `min-raptor-search-window`
+coefficient.
+
 
 <h3 id="transit_pagingSearchWindowAdjustments">pagingSearchWindowAdjustments</h3>
 
@@ -264,12 +337,21 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
 `stopTransferCost` is listed.**
 
 
+<h3 id="transmodelApi_hideFeedId">hideFeedId</h3>
+
+**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Path:** /transmodelApi 
+
+Hide the FeedId in all API output, and add it to input.
+
+Only turn this feature on if you have unique ids accross all feeds, without the feedId prefix.
+
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 
 **Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
 **Path:** /transmodelApi 
 
-TODO
+Used to group requests when monitoring OTP.
 
 
 <!-- PARAMETERS-DETAILS END -->

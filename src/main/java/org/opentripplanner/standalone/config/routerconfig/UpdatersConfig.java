@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.BIKE_RENTAL;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.MQTT_GTFS_RT_UPDATER;
@@ -77,17 +76,8 @@ public class UpdatersConfig implements UpdatersParameters {
   public UpdatersConfig(NodeAdapter rootAdapter) {
     this.vehicleRentalServiceDirectoryFetcherParameters =
       VehicleRentalServiceDirectoryFetcherConfig.create(
-        rootAdapter.exist("vehicleRentalServiceDirectory")
-          ? rootAdapter
-            .of("vehicleRentalServiceDirectory")
-            .since(V2_0)
-            .summary("Configuration for the vehicle rental service directory.")
-            .asObject()
-          : rootAdapter
-            .of("bikeRentalServiceDirectory")
-            .since(V2_0)
-            .summary("Deprecated. Use bikeRentalServiceDirectory.")
-            .asObject() // TODO: deprecated, remove in next major version
+        "vehicleRentalServiceDirectory",
+        rootAdapter
       );
 
     timetableUpdates =
