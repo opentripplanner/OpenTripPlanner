@@ -73,5 +73,17 @@ public class DebugHeuristics {
         direction.isForward() ? comparingInt(i -> i) : (l, r) -> r - l
       )
     );
+    log(
+      CompareIntArrays.compareTime(
+        "GENERALIZED COST",
+        aName,
+        fwdHeur.bestGeneralizedCostToIntArray(UNREACHED),
+        bName,
+        revHeur.bestGeneralizedCostToIntArray(UNREACHED),
+        UNREACHED,
+        stops,
+        direction.isForward() ? comparingInt(i -> i) : (l, r) -> r - l
+      )
+    );
   }
 }

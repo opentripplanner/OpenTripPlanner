@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.MapUtils;
 
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
@@ -32,6 +33,9 @@ class FareAttributeMapper {
       .setYouthPrice(rhs.getYouthPrice())
       .setSeniorPrice(rhs.getSeniorPrice());
 
+    if (rhs.getId().getAgencyId() != null && rhs.getAgencyId() != null) {
+      builder.setAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));
+    }
     if (rhs.isTransfersSet()) {
       builder.setTransfers(rhs.getTransfers());
     }

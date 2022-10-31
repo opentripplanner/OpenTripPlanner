@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
 
+import static java.util.Map.entry;
+
 import java.util.Collection;
 import java.util.Map;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
@@ -18,7 +20,10 @@ public class VehicleRentalVehiclesLayerBuilder
   ) {
     super(
       service,
-      Map.of(MapperType.Digitransit, new DigitransitRentalVehiclePropertyMapper()),
+      Map.ofEntries(
+        entry(MapperType.Digitransit, new DigitransitRentalVehiclePropertyMapper()),
+        entry(MapperType.DigitransitRealtime, new DigitransitRentalVehiclePropertyMapper())
+      ),
       layerParameters
     );
   }

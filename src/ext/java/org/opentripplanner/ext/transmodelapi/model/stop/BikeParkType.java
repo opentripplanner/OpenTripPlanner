@@ -66,7 +66,9 @@ public class BikeParkType {
           .newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> ((VehicleParking) environment.getSource()).getX())
+          .dataFetcher(environment ->
+            ((VehicleParking) environment.getSource()).getCoordinate().longitude()
+          )
           .build()
       )
       .field(
@@ -74,7 +76,9 @@ public class BikeParkType {
           .newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> ((VehicleParking) environment.getSource()).getY())
+          .dataFetcher(environment ->
+            ((VehicleParking) environment.getSource()).getCoordinate().latitude()
+          )
           .build()
       )
       .build();

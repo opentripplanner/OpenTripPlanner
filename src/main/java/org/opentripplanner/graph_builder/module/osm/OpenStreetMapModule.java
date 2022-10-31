@@ -77,6 +77,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.LocalizedStringFormat;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.GeometryUtils;
 import org.opentripplanner.util.logging.ProgressTracker;
@@ -464,6 +465,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       int n = 0;
       VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
+      List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
+
       for (OSMNode node : nodes) {
         n++;
 
@@ -478,21 +481,19 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               )
             )
             .name(creativeName)
-            .x(node.lon)
-            .y(node.lat)
+            .coordinate(new WgsCoordinate(node.getCoordinate()))
             .walkAccessible(true)
             .carAccessible(isCarParkAndRide);
 
         var vehicleParking = createVehicleParkingObjectFromOsmEntity(
           isCarParkAndRide,
-          node.lon,
-          node.lat,
+          node.getCoordinate(),
           node,
           creativeName,
           List.of(entrance)
         );
 
-        vehicleParkingService.addVehicleParking(vehicleParking);
+        vehicleParkingToAdd.add(vehicleParking);
 
         VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(
           graph,
@@ -501,80 +502,55 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         new VehicleParkingEdge(parkVertex);
       }
 
+      if (!vehicleParkingToAdd.isEmpty()) {
+        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
+      }
+
       LOG.info("Created {} {} P+R nodes.", n, isCarParkAndRide ? "car" : "bike");
     }
 
     private void buildBikeParkAndRideAreas() {
       LOG.info("Building bike P+R areas");
       List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
-      int n = 0;
-      for (AreaGroup group : areaGroups) {
-        if (buildParkAndRideAreasForGroup(group, false)) n++;
-      }
-      if (n > 0) {
+      List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, false);
+      if (!vehicleParkingToAdd.isEmpty()) {
         graph.hasBikeRide = true;
+        VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
+        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
       }
-      LOG.info("Created {} bike P+R areas.", n);
-    }
-
-    private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
-      if (skipVisibility) {
-        LOG.info(
-          "Skipping visibility graph construction for walkable areas and using just area rings for edges."
-        );
-      } else {
-        LOG.info("Building visibility graphs for walkable areas.");
-      }
-      List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
-      WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
-        graph,
-        osmdb,
-        this,
-        issueStore,
-        maxAreaNodes,
-        platformEntriesLinking,
-        boardingAreaRefTags
-      );
-      if (skipVisibility) {
-        for (AreaGroup group : areaGroups) {
-          walkableAreaBuilder.buildWithoutVisibility(group);
-        }
-      } else {
-        ProgressTracker progress = ProgressTracker.track(
-          "Build visibility graph for areas",
-          50,
-          areaGroups.size()
-        );
-        for (AreaGroup group : areaGroups) {
-          walkableAreaBuilder.buildWithVisibility(group);
-          //Keep lambda! A method-ref would log incorrect class and line number
-          //noinspection Convert2MethodRef
-          progress.step(m -> LOG.info(m));
-        }
-        LOG.info(progress.completeMessage());
-      }
-
-      if (skipVisibility) {
-        LOG.info("Done building rings for walkable areas.");
-      } else {
-        LOG.info("Done building visibility graphs for walkable areas.");
-      }
+      LOG.info("Created {} bike P+R areas.", vehicleParkingToAdd.size());
     }
 
     private void buildParkAndRideAreas() {
       LOG.info("Building car P+R areas");
       List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
-      int n = 0;
-      for (AreaGroup group : areaGroups) {
-        if (buildParkAndRideAreasForGroup(group, true)) n++;
-      }
-      if (n > 0) {
+      List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, true);
+      if (!vehicleParkingToAdd.isEmpty()) {
         graph.hasParkRide = true;
+        VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
+        vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
       }
-      LOG.info("Created {} car P+R areas.", n);
+      LOG.info("Created {} car P+R areas.", vehicleParkingToAdd.size());
     }
 
-    private boolean buildParkAndRideAreasForGroup(AreaGroup group, boolean isCarParkAndRide) {
+    private List<VehicleParking> buildParkAndRideAreasForGroups(
+      List<AreaGroup> areaGroups,
+      boolean isCarParkAndRide
+    ) {
+      List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
+      for (AreaGroup group : areaGroups) {
+        var vehicleParking = buildParkAndRideAreasForGroup(group, isCarParkAndRide);
+        if (vehicleParking != null) {
+          vehicleParkingToAdd.add(vehicleParking);
+        }
+      }
+      return vehicleParkingToAdd;
+    }
+
+    private VehicleParking buildParkAndRideAreasForGroup(
+      AreaGroup group,
+      boolean isCarParkAndRide
+    ) {
       Envelope envelope = new Envelope();
       Set<VertexAndName> accessVertices = new HashSet<>();
 
@@ -590,7 +566,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       }
 
       if (entity == null) {
-        return false;
+        return null;
       }
 
       var creativeName = nameParkAndRideEntity(entity);
@@ -634,13 +610,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         if (!walkAccessibleOut || !carAccessibleIn || !walkAccessibleIn || !carAccessibleOut) {
           // This will prevent the P+R to be useful.
           issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-          return false;
+          return null;
         }
       } else {
         if (!walkAccessibleOut || !walkAccessibleIn) {
           // This will prevent the P+R to be useful.
           issueStore.add(new ParkAndRideUnlinked(creativeName.toString(), entity));
-          return false;
+          return null;
         }
       }
 
@@ -652,25 +628,20 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       var vehicleParking = createVehicleParkingObjectFromOsmEntity(
         isCarParkAndRide,
-        (envelope.getMinX() + envelope.getMaxX()) / 2,
-        (envelope.getMinY() + envelope.getMaxY()) / 2,
+        envelope.centre(),
         entity,
         creativeName,
         entrances
       );
 
-      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-      vehicleParkingService.addVehicleParking(vehicleParking);
-
       VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
-      return true;
+      return vehicleParking;
     }
 
     private VehicleParking createVehicleParkingObjectFromOsmEntity(
       boolean isCarParkAndRide,
-      double lon,
-      double lat,
+      Coordinate coordinate,
       OSMWithTags entity,
       I18NString creativeName,
       List<VehicleParking.VehicleParkingEntranceCreator> entrances
@@ -739,8 +710,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         .builder()
         .id(id)
         .name(creativeName)
-        .x(lon)
-        .y(lat)
+        .coordinate(new WgsCoordinate(coordinate))
         .tags(tags)
         .detailsUrl(entity.getTag("website"))
         .openingHoursCalendar(openingHours)
@@ -866,8 +836,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
               )
             )
             .name(entranceName)
-            .x(access.getVertex().getX())
-            .y(access.getVertex().getY())
+            .coordinate(new WgsCoordinate(access.getVertex().getCoordinate()))
             .vertex(access.getVertex())
             .walkAccessible(access.getVertex().isConnectedToWalkingEdge())
             .carAccessible(access.getVertex().isConnectedToDriveableEdge())
@@ -883,6 +852,50 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         areasLevels.put(area, osmdb.getLevelForWay(area.parent));
       }
       return AreaGroup.groupAreas(areasLevels);
+    }
+
+    private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
+      if (skipVisibility) {
+        LOG.info(
+          "Skipping visibility graph construction for walkable areas and using just area rings for edges."
+        );
+      } else {
+        LOG.info("Building visibility graphs for walkable areas.");
+      }
+      List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
+      WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
+        graph,
+        osmdb,
+        this,
+        issueStore,
+        maxAreaNodes,
+        platformEntriesLinking,
+        boardingAreaRefTags
+      );
+      if (skipVisibility) {
+        for (AreaGroup group : areaGroups) {
+          walkableAreaBuilder.buildWithoutVisibility(group);
+        }
+      } else {
+        ProgressTracker progress = ProgressTracker.track(
+          "Build visibility graph for areas",
+          50,
+          areaGroups.size()
+        );
+        for (AreaGroup group : areaGroups) {
+          walkableAreaBuilder.buildWithVisibility(group);
+          //Keep lambda! A method-ref would log incorrect class and line number
+          //noinspection Convert2MethodRef
+          progress.step(m -> LOG.info(m));
+        }
+        LOG.info(progress.completeMessage());
+      }
+
+      if (skipVisibility) {
+        LOG.info("Done building rings for walkable areas.");
+      } else {
+        LOG.info("Done building visibility graphs for walkable areas.");
+      }
     }
 
     private void buildBasicGraph() {

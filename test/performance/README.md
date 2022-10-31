@@ -33,19 +33,34 @@ that shows bottlenecks in the code.
 All data input files are located at https://otp-performance.leonard.io/data/
 
 #### Norway
+Data used:
+- Norwegian NeTEx data
+- Norway OSM data
 
-- [Norwegian NeTEx data](https://otp-performance.leonard.io/data/norway/rb_norway-aggregated-netex-2021-12-11.zip)
-- [Norway OSM data](https://otp-performance.leonard.io/data/norway/norway-210101.osm.pbf)
+[build-config](norway/build-config.json)
 
 If the link above do not work you should be able to find it on the ENTUR web:
 
 - https://www.entur.org/
 
 #### Baden-Württemberg, Germany
+Data used:
+- Tidied GTFS data
+- BW OSM data
 
-- [Tidied GTFS data](https://otp-performance.leonard.io/data/baden-wuerttemberg/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip)
-- [BW OSM data](https://otp-performance.leonard.io/data/baden-wuerttemberg/baden-wuerttemberg-220101.osm.pbf)
+[build-config](baden-wuerttemberg/build-config.json)
  
 #### Germany
+Data used:
+- Tidied GTFS data
 
-- [Tidied GTFS data](https://otp-performance.leonard.io/data/germany/germany-2022-08-23.tidy.gtfs.zip)
+[build-config](germany/build-config.json)
+
+#### Skånetrafiken
+Data used:
+- Skånetrafiken NeTEx data
+- Sweden OSM data
+- Denmark GTFS data
+- Denmark OSM data
+
+[build-config](skanetrafiken/build-config.json)

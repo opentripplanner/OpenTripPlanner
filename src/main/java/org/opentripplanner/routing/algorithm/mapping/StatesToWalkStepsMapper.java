@@ -514,7 +514,7 @@ public class StatesToWalkStepsMapper {
     step =
       new WalkStep(
         en.getName(),
-        new WgsCoordinate(backState.getVertex().getLat(), backState.getVertex().getLon()),
+        new WgsCoordinate(backState.getVertex().getCoordinate()),
         en.hasBogusName(),
         DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry()),
         forwardState.isBackWalkingBike(),

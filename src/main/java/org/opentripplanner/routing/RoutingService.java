@@ -3,6 +3,7 @@ package org.opentripplanner.routing;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
@@ -143,9 +144,9 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
     return this.graph.getVehicleParkingService();
   }
 
-  /** {@link GraphFinder#findClosestStops(double, double, double)} */
-  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-    return this.graphFinder.findClosestStops(lat, lon, radiusMeters);
+  /** {@link GraphFinder#findClosestStops(Coordinate, double)} */
+  public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
+    return this.graphFinder.findClosestStops(coordinate, radiusMeters);
   }
 
   /**

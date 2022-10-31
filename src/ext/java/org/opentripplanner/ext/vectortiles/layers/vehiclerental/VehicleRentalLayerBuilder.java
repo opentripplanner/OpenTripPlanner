@@ -3,7 +3,6 @@ package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -48,5 +47,6 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
 
   enum MapperType {
     Digitransit,
+    DigitransitRealtime,
   }
 }

@@ -10,10 +10,9 @@ import java.util.Set;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +27,12 @@ public class HSLFareServiceImpl extends DefaultFareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
 
-  public ItineraryFares getCost(Itinerary itinerary) {
-    ItineraryFares fare = super.getCost(itinerary);
-    if (fare == null) {
-      itinerary.setFare(null);
-    }
-    return fare;
+  @Override
+  protected boolean shouldCombineInterlinedLegs(
+    ScheduledTransitLeg previousLeg,
+    ScheduledTransitLeg currentLeg
+  ) {
+    return true;
   }
 
   @Override
@@ -49,14 +48,28 @@ public class HSLFareServiceImpl extends DefaultFareService {
     float specialRouteFare = Float.POSITIVE_INFINITY;
     FareAttribute specialFareAttribute = null;
 
+    String agency = null;
+    boolean singleAgency = true;
+
     for (Leg leg : legs) {
       lastRideStartTime = leg.getStartTime();
-
+      if (agency == null) {
+        agency = leg.getAgency().getId().getId().toString();
+      } else if (agency != leg.getAgency().getId().getId().toString()) {
+        singleAgency = false;
+      }
       /* HSL specific logic: all exception routes start and end from the defined zone set,
                but visit temporarily (maybe 1 stop only) an 'external' zone */
       float bestSpecialFare = Float.POSITIVE_INFINITY;
       Set<String> ruleZones = null;
+
       for (FareRuleSet ruleSet : fareRules) {
+        if (
+          ruleSet.hasAgencyDefined() &&
+          leg.getAgency().getId().getId() != ruleSet.getAgency().getId()
+        ) {
+          continue;
+        }
         RouteOriginDestination routeOriginDestination = new RouteOriginDestination(
           leg.getRoute().getId().toString(),
           leg.getFrom().stop.getFirstZoneAsString(),
@@ -120,6 +133,13 @@ public class HSLFareServiceImpl extends DefaultFareService {
     if (zones.size() > 0) {
       // find the best fare that matches this set of rides
       for (FareRuleSet ruleSet : fareRules) {
+        // make sure the rule is applicable by agency requirements
+        if (
+          ruleSet.hasAgencyDefined() &&
+          (singleAgency == false || agency != ruleSet.getAgency().getId())
+        ) {
+          continue;
+        }
         /* another HSL specific change: We do not set rules for every possible zone combination,
                 but for the largest zone set allowed for a certain ticket type.
                 This way we need only a few rules instead of hundreds of rules. Good for speed!

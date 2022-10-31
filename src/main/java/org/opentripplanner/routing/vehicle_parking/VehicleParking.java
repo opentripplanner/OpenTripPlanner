@@ -5,14 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Vehicle parking locations, which may allow bicycle and/or car parking.
@@ -33,9 +34,10 @@ public class VehicleParking implements Serializable {
   private final I18NString name;
 
   /**
-   * Note: x = Longitude, y = Latitude
+   * The coordinate of the vehicle parking. It can be different than the coordinates for its
+   * entrances.
    */
-  private final double x, y;
+  private final WgsCoordinate coordinate;
 
   /**
    * URL which contains details of this vehicle parking.
@@ -97,12 +99,15 @@ public class VehicleParking implements Serializable {
    * The currently available spaces at this vehicle parking.
    */
   private VehicleParkingSpaces availability;
+  /**
+   * The vehicle parking group this parking belongs to.
+   */
+  private final VehicleParkingGroup vehicleParkingGroup;
 
   VehicleParking(
     FeedScopedId id,
     I18NString name,
-    double x,
-    double y,
+    WgsCoordinate coordinate,
     String detailsUrl,
     String imageUrl,
     Set<String> tags,
@@ -113,12 +118,12 @@ public class VehicleParking implements Serializable {
     boolean carPlaces,
     boolean wheelchairAccessibleCarPlaces,
     VehicleParkingSpaces capacity,
-    VehicleParkingSpaces availability
+    VehicleParkingSpaces availability,
+    VehicleParkingGroup vehicleParkingGroup
   ) {
     this.id = id;
     this.name = name;
-    this.x = x;
-    this.y = y;
+    this.coordinate = coordinate;
     this.detailsUrl = detailsUrl;
     this.imageUrl = imageUrl;
     this.tags = tags;
@@ -130,6 +135,7 @@ public class VehicleParking implements Serializable {
     this.wheelchairAccessibleCarPlaces = wheelchairAccessibleCarPlaces;
     this.capacity = capacity;
     this.availability = availability;
+    this.vehicleParkingGroup = vehicleParkingGroup;
   }
 
   public static VehicleParkingBuilder builder() {
@@ -145,12 +151,8 @@ public class VehicleParking implements Serializable {
     return name;
   }
 
-  public double getX() {
-    return x;
-  }
-
-  public double getY() {
-    return y;
+  public WgsCoordinate getCoordinate() {
+    return coordinate;
   }
 
   public String getDetailsUrl() {
@@ -187,6 +189,11 @@ public class VehicleParking implements Serializable {
 
   public List<VehicleParkingEntrance> getEntrances() {
     return entrances;
+  }
+
+  @Nullable
+  public VehicleParkingGroup getVehicleParkingGroup() {
+    return vehicleParkingGroup;
   }
 
   public boolean hasBicyclePlaces() {
@@ -270,8 +277,7 @@ public class VehicleParking implements Serializable {
     return Objects.hash(
       id,
       name,
-      x,
-      y,
+      coordinate,
       detailsUrl,
       imageUrl,
       tags,
@@ -282,7 +288,8 @@ public class VehicleParking implements Serializable {
       carPlaces,
       wheelchairAccessibleCarPlaces,
       capacity,
-      entrances
+      entrances,
+      vehicleParkingGroup
     );
   }
 
@@ -296,8 +303,7 @@ public class VehicleParking implements Serializable {
     }
     final VehicleParking that = (VehicleParking) o;
     return (
-      Double.compare(that.x, x) == 0 &&
-      Double.compare(that.y, y) == 0 &&
+      Objects.equals(coordinate, that.coordinate) &&
       bicyclePlaces == that.bicyclePlaces &&
       carPlaces == that.carPlaces &&
       wheelchairAccessibleCarPlaces == that.wheelchairAccessibleCarPlaces &&
@@ -310,12 +316,17 @@ public class VehicleParking implements Serializable {
       Objects.equals(openingHoursCalendar, that.openingHoursCalendar) &&
       Objects.equals(note, that.note) &&
       Objects.equals(capacity, that.capacity) &&
-      Objects.equals(entrances, that.entrances)
+      Objects.equals(entrances, that.entrances) &&
+      Objects.equals(vehicleParkingGroup, that.vehicleParkingGroup)
     );
   }
 
   public String toString() {
-    return String.format(Locale.ROOT, "VehicleParking(%s at %.6f, %.6f)", name, y, x);
+    return ToStringBuilder
+      .of(VehicleParking.class)
+      .addStr("name", name.toString())
+      .addObj("coordinate", coordinate)
+      .toString();
   }
 
   private void addEntrance(VehicleParkingEntranceCreator creator) {
@@ -341,8 +352,7 @@ public class VehicleParking implements Serializable {
     private OHCalendar openingHoursCalendar;
     private FeedScopedId id;
     private I18NString name;
-    private double x;
-    private double y;
+    private WgsCoordinate coordinate;
     private String detailsUrl;
     private String imageUrl;
     private I18NString note;
@@ -353,6 +363,7 @@ public class VehicleParking implements Serializable {
     private boolean wheelchairAccessibleCarPlaces;
     private VehicleParkingSpaces capacity;
     private VehicleParkingSpaces availability;
+    private VehicleParkingGroup vehicleParkingGroup;
 
     VehicleParkingBuilder() {}
 
@@ -386,13 +397,8 @@ public class VehicleParking implements Serializable {
       return this;
     }
 
-    public VehicleParkingBuilder x(double x) {
-      this.x = x;
-      return this;
-    }
-
-    public VehicleParkingBuilder y(double y) {
-      this.y = y;
+    public VehicleParkingBuilder coordinate(WgsCoordinate coordinate) {
+      this.coordinate = coordinate;
       return this;
     }
 
@@ -444,6 +450,11 @@ public class VehicleParking implements Serializable {
       return this;
     }
 
+    public VehicleParkingBuilder vehicleParkingGroup(VehicleParkingGroup vehicleParkingGroup) {
+      this.vehicleParkingGroup = vehicleParkingGroup;
+      return this;
+    }
+
     public VehicleParking build() {
       VehicleParkingState state$value = this.state$value;
       if (!this.state$set) {
@@ -453,8 +464,7 @@ public class VehicleParking implements Serializable {
       var vehicleParking = new VehicleParking(
         id,
         name,
-        x,
-        y,
+        coordinate,
         detailsUrl,
         imageUrl,
         tags,
@@ -465,7 +475,8 @@ public class VehicleParking implements Serializable {
         carPlaces,
         wheelchairAccessibleCarPlaces,
         capacity,
-        availability
+        availability,
+        vehicleParkingGroup
       );
       this.entranceCreators.forEach(vehicleParking::addEntrance);
       return vehicleParking;
