@@ -22,15 +22,17 @@ Sections follow that describe particular settings in more depth.
 As a general rule, references to data files are specified as absolute URIs and must start with the 
 protocol name.   
 
-
-**Example:**
+**Example**
 
 Local files: `"file:///Users/kelvin/otp/streetGraph.obj"`  
 HTTPS resources: `"https://download.geofabrik.de/europe/norway-latest.osm.pbf"`  
 Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`  
 
-Alternatively if a relative URI can be provided, it is interpreted as a path relative to the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
-Example:   
+Alternatively if a relative URI can be provided, it is interpreted as a path relative to the
+[base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+
+**Example**
+
 File relative to the base directory (inside the base directory): `streetGraph.obj`   
 File relative to the base directory (outside the base directory): `../street-graphs/streetGraph.obj`
 
@@ -94,7 +96,7 @@ time-zone. Also, remember that the service day might be more than 24 hours. So b
 enough slack to account for the this. Setting the limits too wide have very little impact and is in
 general better than trying to be exact. The period and date format follow the ISO 8601 standard.
 
-**Example:**
+**Example**
 
 ```JSON
 // build-config.json
@@ -311,8 +313,6 @@ In order to write out the precalculated elevation data, add this to your `build-
 }
 ```
 See [writeCachedElevations](#writeCachedElevations) for details.
-
-
 
 
 ## Parameter Details
