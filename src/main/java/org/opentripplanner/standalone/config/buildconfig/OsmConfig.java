@@ -74,9 +74,7 @@ public class OsmConfig {
     return node
       .of("osmTagMapping")
       .since(NA)
-      .summary(
-        "The named set of mapping rules applied when parsing OSM tags. Example: `default`, `norway`, `finland`. Overrides the value specified in osmDefaults."
-      )
+      .summary("The named set of mapping rules applied when parsing OSM tags.")
       .asEnum(OsmTagMapper.Source.DEFAULT)
       .getInstance();
   }

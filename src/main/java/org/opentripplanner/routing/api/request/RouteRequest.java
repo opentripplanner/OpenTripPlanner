@@ -95,9 +95,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.preferences = preferences.copyOf().apply(body).build();
   }
 
-  /**
-   * Whether the trip must be wheelchair-accessible
-   */
   public boolean wheelchair() {
     return wheelchair;
   }
