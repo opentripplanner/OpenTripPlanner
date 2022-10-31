@@ -80,15 +80,11 @@ The feature must be configured in `router-config.json` as follows
       "minZoom": 14,
       "cacheMaxSeconds": 60
     },
-    // note this has the same name as the example with the Digitransit mapper,
-    // and two layers should not have the same name in practice. At some point,
-    // we might want to do some clean up and rename this to realtimeVehicleParking
-    // in this example but in order to have no client code changes required,
-    // this has the old layer name in this example but it's possible to name
-    // this anything in an OTP deployment that doesn't have strict backwards
-    // compatibility needs.
+    // This exists for backwards compatibility. At some point, we might want
+    // to add a new realtime parking mapper with better translation support
+    // and less unnecessary fields.
     {
-      "name": "vehicleParking",
+      "name": "stadtnaviVehicleParking",
       "type": "VehicleParking",
       "mapper": "Stadtnavi",
       "maxZoom": 20,
