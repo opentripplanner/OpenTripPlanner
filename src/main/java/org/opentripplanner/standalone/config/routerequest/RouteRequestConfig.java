@@ -118,6 +118,7 @@ public class RouteRequestConfig {
           .summary("The set of access/egress/direct/transit modes to be used for the route search.")
           .asCustomStringType(
             RequestModes.defaultRequestModes(),
+            "TRANSIT,WALK",
             s -> new QualifiedModeSet(s).getRequestModes()
           )
       );

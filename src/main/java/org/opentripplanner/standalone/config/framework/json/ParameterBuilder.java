@@ -261,8 +261,17 @@ public class ParameterBuilder {
    * the type section in the configuration documents. Also, providing user-friendly messages
    * is left to the caller.
    */
-  public <T> T asCustomStringType(T defaultValue, Function<String, T> mapper) {
-    return ofOptional(STRING, defaultValue, node -> mapper.apply(node.asText()));
+  public <T> T asCustomStringType(
+    T defaultValue,
+    String defaultValueAsString,
+    Function<String, T> mapper
+  ) {
+    return ofOptional(
+      STRING,
+      defaultValue,
+      node -> mapper.apply(node.asText()),
+      it -> defaultValueAsString
+    );
   }
 
   /* Java util/time types */
@@ -357,11 +366,20 @@ public class ParameterBuilder {
     return ofType(type, body);
   }
 
-  private <T> T ofOptional(ConfigType type, T defaultValue, Function<JsonNode, T> body) {
-    info.withType(type).withOptional(defaultValue == null ? null : defaultValue.toString());
+  private <T> T ofOptional(
+    ConfigType type,
+    T defaultValue,
+    Function<JsonNode, T> body,
+    Function<T, String> toText
+  ) {
+    info.withType(type).withOptional(defaultValue == null ? null : toText.apply(defaultValue));
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
     return exist() ? body.apply(node) : defaultValue;
+  }
+
+  private <T> T ofOptional(ConfigType type, T defaultValue, Function<JsonNode, T> body) {
+    return ofOptional(type, defaultValue, body, String::valueOf);
   }
 
   private <T> T ofOptionalString(
