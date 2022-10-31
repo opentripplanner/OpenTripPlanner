@@ -23,7 +23,7 @@ There are many trip planning options used in the OTP web API, and more exist int
 exposed via the API. You may want to change the default value for some of these parameters, i.e. the
 value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
+A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 
 
 ## Parameter Summary

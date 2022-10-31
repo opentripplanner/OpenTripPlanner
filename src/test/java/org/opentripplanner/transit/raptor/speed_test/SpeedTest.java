@@ -226,7 +226,7 @@ public class SpeedTest {
         routeProfile,
         getTimeZoneId()
       );
-      var routingRequest = speedTestRequest.toRoutingRequest();
+      var routingRequest = speedTestRequest.toRouteRequest();
       RoutingResponse routingResponse = serverContext.routingService().route(routingRequest);
 
       var times = routingResponse.getDebugTimingAggregator().finishedRendering();

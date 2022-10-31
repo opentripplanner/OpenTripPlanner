@@ -15,7 +15,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
-public class RoutingRequestToFilterChainMapper {
+public class RouteRequestToFilterChainMapper {
 
   /** Filter itineraries down to this limit, but not below. */
   private static final int KEEP_THREE = 3;

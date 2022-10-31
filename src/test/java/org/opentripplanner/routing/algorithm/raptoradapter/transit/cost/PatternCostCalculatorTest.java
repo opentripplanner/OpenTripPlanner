@@ -199,7 +199,7 @@ public class PatternCostCalculatorTest {
 
     CostCalculator<TestTripSchedule> createCostCalculator(TestTripSchedule schedule) {
       GeneralizedCostParameters costParams = GeneralizedCostParametersMapper.map(
-        createRoutingRequest(),
+        createRouteRequest(),
         List.of(schedule.pattern())
       );
 
@@ -219,7 +219,7 @@ public class PatternCostCalculatorTest {
         .build();
     }
 
-    RouteRequest createRoutingRequest() {
+    RouteRequest createRouteRequest() {
       var request = new RouteRequest();
 
       request.withPreferences(preferences -> {

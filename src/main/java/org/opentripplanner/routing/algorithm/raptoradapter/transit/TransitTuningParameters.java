@@ -65,7 +65,7 @@ public interface TransitTuningParameters {
   Integer stopTransferCost(StopTransferPriority key);
 
   /**
-   * The maximum number of transfer RoutingRequests for which the pre-calculated transfers should be
+   * The maximum number of transfer RouteRequests for which the pre-calculated transfers should be
    * cached. If too small, the average request may be slower due to the required re-calculating. If
    * too large, more memory may be used than needed.
    */

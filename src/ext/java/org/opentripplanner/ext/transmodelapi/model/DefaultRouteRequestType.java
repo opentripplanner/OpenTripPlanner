@@ -5,12 +5,12 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
-public class DefaultRoutingRequestType {
+public class DefaultRouteRequestType {
 
   public final RouteRequest request;
   public final GraphQLObjectType graphQLType;
 
-  public DefaultRoutingRequestType(RouteRequest request) {
+  public DefaultRouteRequestType(RouteRequest request) {
     this.request = request;
     this.graphQLType = createGraphQLType();
   }
