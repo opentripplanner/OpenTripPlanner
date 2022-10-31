@@ -42,6 +42,10 @@ abstract class AbstractTable {
 
   private void addParametersToTable(NodeAdapter node, TableBuilder table) {
     for (NodeInfo it : node.parametersSorted()) {
+      if (it.skipChild()) {
+        continue;
+      }
+
       addRow(node, table, it);
 
       if (it.type().isComplex() && !skip(it)) {

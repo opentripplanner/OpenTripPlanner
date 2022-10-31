@@ -37,6 +37,7 @@ public class SkipNodes implements SkipFunction {
   }
 
   public static class Builder {
+
     Map<String, String> map = new HashMap<>();
 
     public Builder add(String parameterName, String link) {

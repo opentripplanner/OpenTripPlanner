@@ -262,8 +262,6 @@ can be configured as a json. Any header key, value can be inserted.
 | [sourceType](#updaters__1__sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |   na  |
 | url                                                                                            |     `string`    | The URL to download the data from.                                              | *Required* |               |   na  |
 | [headers](#updaters__1__headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |   na  |
-|    <key>                                                                                       |     `object`    | No doc, parent contains doc.                                                    | *Optional* |               |   na  |
-|    Auth                                                                                        |     `object`    | No doc, parent contains doc.                                                    | *Optional* |               |   na  |
 
 
 #### Details

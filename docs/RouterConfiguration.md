@@ -66,7 +66,6 @@ A full list of them can be found in the [RoutingRequest](/docs/RouteRequest.md).
 |    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                  | *Optional* | `"url"`       |   na  |
 |    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                    | *Required* |               |   na  |
 |    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | Http headers.                                                                                     | *Optional* |               |   na  |
-|       ET-Client-Name                                                                      |        `object`       | No doc, parent contains doc.                                                                      | *Optional* |               |   na  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -344,7 +343,7 @@ for more info."
 Use this to set a stop transfer cost for the given transfer priority
 
 The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority
-set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all
+set, the default is `allowed`. The `stopTransferCost` parameter is optional, but if listed all
 values must be set.
 
 If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
@@ -353,10 +352,10 @@ The cost is a scalar, but is equivalent to the felt cost of riding a transit tri
 
 | Config key    | Description                                                                                   | Type |
 |---------------|-----------------------------------------------------------------------------------------------|:----:|
-| `DISCOURAGED` | Use a very high cost like `72 000` to eliminate transfers at the stop if not the only option. | int  |
-| `ALLOWED`     | Allowed, but not recommended. Use something like `150`.                                       | int  |
-| `RECOMMENDED` | Use a small cost penalty like `60`.                                                           | int  |
-| `PREFERRED`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
+| `discouraged` | Use a very high cost like `72 000` to eliminate transfers at the stop if not the only option. | int  |
+| `allowed`     | Allowed, but not recommended. Use something like `150`.                                       | int  |
+| `recommended` | Use a small cost penalty like `60`.                                                           | int  |
+| `preferred`   | The best place to do transfers. Should be set to `0`(zero).                                   | int  |
 
 Use values in a range from `0` to `100 000`. **All key/value pairs are required if the
 `stopTransferCost` is listed.**
