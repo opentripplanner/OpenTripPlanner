@@ -23,8 +23,8 @@ public class RouteRequestDocTest {
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
-    .add("modes", "/docs/RoutingModes.md")
-    .add("vectorTileLayers", "/docs/sandbox/MapboxVectorTilesApi.md")
+    .add("modes", "RoutingModes.md")
+    .add("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
     .build();
 
   /**

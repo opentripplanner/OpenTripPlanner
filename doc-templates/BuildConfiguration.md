@@ -29,7 +29,7 @@ HTTPS resources: `"https://download.geofabrik.de/europe/norway-latest.osm.pbf"`
 Google Cloud Storage files: `"gs://otp-test-bucket/a/b/graph.obj"`  
 
 Alternatively if a relative URI can be provided, it is interpreted as a path relative to the
-[base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+[base directory](Configuration.md#Base-Directory).
 
 **Example**
 
