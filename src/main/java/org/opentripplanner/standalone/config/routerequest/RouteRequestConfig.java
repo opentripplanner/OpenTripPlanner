@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.routerequest;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
@@ -144,18 +143,17 @@ public class RouteRequestConfig {
   All optimal travels that depart within the search window is guarantied to be found.
 
   This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
-  Transit search as well; Hence this is named search-window and not raptor-search-window. 
+  Transit search as well; Hence this is named search-window and not raptor-search-window.
 
-
-  This is normally dynamically calculated by the server. Use {@code null} to unset, and 
+  This is normally dynamically calculated by the server. Use {@code null} to unset, and
   {@link Duration#ZERO} to do one Raptor iteration. The value is dynamically  assigned a suitable
   value, if not set. In a small to medium size operation you may use a fixed value, like 60 minutes.
   If you have a mixture of high frequency cities routes and  infrequent long distant journeys, the
   best option is normally to use the dynamic auto assignment. If not provided the value is resolved
   depending on the other input parameters, available transit options and realtime changes.
 
-  There is no need to set this when going to the next/previous page. The OTP Server will 
-  increase/decrease the search-window when paging to match the requested number of itineraries. 
+  There is no need to set this when going to the next/previous page. The OTP Server will
+  increase/decrease the search-window when paging to match the requested number of itineraries.
   """
         )
         .asDuration(dft.searchWindow())
@@ -174,7 +172,7 @@ public class RouteRequestConfig {
 
     NodeAdapter unpreferred = c
       .of("unpreferred")
-      .since(NA)
+      .since(V2_2)
       .summary(
         "Parameters listing authorities or lines that preferably should not be used in trip patters."
       )
@@ -195,7 +193,7 @@ travel time `x` (in seconds).
       .setUnpreferredRoutes(
         unpreferred
           .of("routes")
-          .since(NA)
+          .since(V2_0)
           .summary("TODO")
           .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
       );
@@ -206,7 +204,7 @@ travel time `x` (in seconds).
       .setUnpreferredAgencies(
         unpreferred
           .of("agencies")
-          .since(NA)
+          .since(V2_0)
           .summary("TODO")
           .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
@@ -228,9 +226,7 @@ travel time `x` (in seconds).
     preferences.withParking(mapParkingPreferences(c, preferences));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(mapWheelchairPreferences(c, WHEELCHAIR_ACCESSIBILITY));
-    preferences.withItineraryFilter(it -> {
-      mapItineraryFilterParams("itineraryFilters", c, it);
-    });
+    preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {
@@ -271,10 +267,10 @@ travel time `x` (in seconds).
               )
               .description(
                 """
-The board time is added to the time when going from the stop (offboard) to onboard a transit 
+The board time is added to the time when going from the stop (offboard) to onboard a transit
 vehicle.
 
-This is the same as the `minimumTransferTime`, except that this also apply to to the first 
+This is the same as the `minimumTransferTime`, except that this also apply to to the first
 transit leg in the trip. This is the default value used, if not overridden by the `boardSlackList`.
 """
               )
@@ -287,8 +283,8 @@ transit leg in the trip. This is the default value used, if not overridden by th
               .summary("How much time ride a vehicle takes for each given mode.")
               .description(
                 """
-Sometimes there is a need to configure a board times for specific modes, such as airplanes or 
-ferries, where the check-in process needs to be done in good time before ride. 
+Sometimes there is a need to configure a board times for specific modes, such as airplanes or
+ferries, where the check-in process needs to be done in good time before ride.
 """
               )
               .asEnumMap(TransitMode.class, Duration.class)
@@ -297,14 +293,14 @@ ferries, where the check-in process needs to be done in good time before ride.
       .setIgnoreRealtimeUpdates(
         c
           .of("ignoreRealtimeUpdates")
-          .since(NA)
+          .since(V2_0)
           .summary("When true, realtime updates are ignored during this search.")
           .asBoolean(dft.ignoreRealtimeUpdates())
       )
       .setOtherThanPreferredRoutesPenalty(
         c
           .of("otherThanPreferredRoutesPenalty")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "Penalty added for using every route that is not preferred if user set any route as preferred."
           )
@@ -316,7 +312,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .setReluctanceForMode(
         c
           .of("transitReluctanceForMode")
-          .since(NA)
+          .since(V2_1)
           .summary("Transit reluctance for a given transport mode")
           .asEnumMap(TransitMode.class, Double.class)
       )
@@ -348,7 +344,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withReluctance(
         c
           .of("bikeReluctance")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "A multiplier for how bad biking is, compared to being in transit for equal lengths of time."
           )
@@ -357,7 +353,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withBoardCost(
         c
           .of("bikeBoardCost")
-          .since(NA)
+          .since(V2_0)
           .summary("Prevents unnecessary transfers by adding a cost for boarding a vehicle.")
           .description(
             "This is the cost that is used when boarding while cycling." +
@@ -366,15 +362,15 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asInt(dft.boardCost())
       )
       .withParkTime(
-        c.of("bikeParkTime").since(NA).summary("Time to park a bike.").asInt(dft.parkTime())
+        c.of("bikeParkTime").since(V2_0).summary("Time to park a bike.").asInt(dft.parkTime())
       )
       .withParkCost(
-        c.of("bikeParkCost").since(NA).summary("Cost to park a bike.").asInt(dft.parkCost())
+        c.of("bikeParkCost").since(V2_0).summary("Cost to park a bike.").asInt(dft.parkCost())
       )
       .withWalkingSpeed(
         c
           .of("bikeWalkingSpeed")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "The user's bike walking speed in meters/second. Defaults to approximately 3 MPH."
           )
@@ -383,7 +379,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withWalkingReluctance(
         c
           .of("bikeWalkingReluctance")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "A multiplier for how bad walking with a bike is, compared to being in transit for equal lengths of time."
           )
@@ -392,14 +388,14 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withSwitchTime(
         c
           .of("bikeSwitchTime")
-          .since(NA)
+          .since(V2_0)
           .summary("The time it takes the user to fetch their bike and park it again in seconds.")
           .asInt(dft.switchTime())
       )
       .withSwitchCost(
         c
           .of("bikeSwitchCost")
-          .since(NA)
+          .since(V2_0)
           .summary("The cost of the user fetching their bike and parking it again.")
           .asInt(dft.switchCost())
       )
@@ -445,35 +441,35 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withDropoffCost(
         c
           .of("bikeRentalDropoffCost")
-          .since(NA)
+          .since(V2_0)
           .summary("Cost to drop-off a rented bike.")
           .asInt(dft.dropoffCost())
       )
       .withDropoffTime(
         c
           .of("bikeRentalDropoffTime")
-          .since(NA)
+          .since(V2_0)
           .summary("Time to drop-off a rented bike.")
           .asInt(dft.dropoffTime())
       )
       .withPickupCost(
         c
           .of("bikeRentalPickupCost")
-          .since(NA)
+          .since(V2_0)
           .summary("Cost to rent a bike.")
           .asInt(dft.pickupCost())
       )
       .withPickupTime(
         c
           .of("bikeRentalPickupTime")
-          .since(NA)
+          .since(V2_0)
           .summary("Time to rent a bike.")
           .asInt(dft.pickupTime())
       )
       .withUseAvailabilityInformation(
         c
           .of("useBikeRentalAvailabilityInformation")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "Whether or not bike rental availability information will be used to plan bike rental trips."
           )
@@ -482,7 +478,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withArrivingInRentalVehicleAtDestinationCost(
         c
           .of("keepingRentedBicycleAtDestinationCost")
-          .since(NA)
+          .since(V2_2)
           .summary(
             "The cost of arriving at the destination with the rented bicycle, to discourage doing so."
           )
@@ -496,14 +492,14 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withTurnReluctance(
         c
           .of("turnReluctance")
-          .since(NA)
+          .since(V2_0)
           .summary("Multiplicative factor on expected turning time.")
           .asDouble(dft.turnReluctance())
       )
       .withDrivingDirection(
         c
           .of("drivingDirection")
-          .since(NA)
+          .since(V2_2)
           .summary("The driving direction to use in the intersection traversal calculation")
           .asEnum(dft.drivingDirection())
       )
@@ -513,28 +509,28 @@ ferries, where the check-in process needs to be done in good time before ride.
           .withBoardCost(
             c
               .of("elevatorBoardCost")
-              .since(NA)
+              .since(V2_0)
               .summary("What is the cost of boarding a elevator?")
               .asInt(dftElevator.boardCost())
           )
           .withBoardTime(
             c
               .of("elevatorBoardTime")
-              .since(NA)
+              .since(V2_0)
               .summary("How long does it take to get on an elevator, on average.")
               .asInt(dftElevator.boardTime())
           )
           .withHopCost(
             c
               .of("elevatorHopCost")
-              .since(NA)
+              .since(V2_0)
               .summary("What is the cost of travelling one floor on an elevator?")
               .asInt(dftElevator.hopCost())
           )
           .withHopTime(
             c
               .of("elevatorHopTime")
-              .since(NA)
+              .since(V2_0)
               .summary("How long does it take to advance one floor on an elevator?")
               .asInt(dftElevator.hopTime())
           );
@@ -542,12 +538,12 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withMaxAccessEgressDuration(
         c
           .of("maxAccessEgressDuration")
-          .since(V2_2)
+          .since(V2_1)
           .summary("This is the maximum duration for access/egress for street searches.")
           .description(
             """
 This is a performance limit and should therefore be set high. Results close to the limit are not
-guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The 
+guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
 duration can be set per mode(`maxAccessEgressDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
 do not exist.
@@ -556,11 +552,11 @@ do not exist.
           .asDuration(dft.maxAccessEgressDuration().defaultValue()),
         c
           .of("maxAccessEgressDurationForMode")
-          .since(NA)
+          .since(V2_1)
           .summary("Limit access/egress per street mode.")
           .description(
             """
-            Override the settings in `maxAccessEgressDuration` for specific street modes. This is 
+            Override the settings in `maxAccessEgressDuration` for specific street modes. This is
             done because some street modes searches are much more resource intensive than others.
             """
           )
@@ -569,7 +565,7 @@ do not exist.
       .withMaxDirectDuration(
         c
           .of("maxDirectStreetDuration")
-          .since(NA)
+          .since(V2_1)
           .summary("This is the maximum duration for a direct street search for each mode.")
           .description(
             """
@@ -587,7 +583,7 @@ do not exist."
           .summary("Limit direct route duration per street mode.")
           .description(
             """
-            Override the settings in `maxDirectStreetDuration` for specific street modes. This is 
+            Override the settings in `maxDirectStreetDuration` for specific street modes. This is
             done because some street modes searches are much more resource intensive than others.
             """
           )
@@ -596,7 +592,7 @@ do not exist."
       .withIntersectionTraversalModel(
         c
           .of("intersectionTraversalModel")
-          .since(NA)
+          .since(V2_2)
           .summary("The model that computes the costs of turns.")
           .asEnum(dft.intersectionTraversalModel())
       );
@@ -624,17 +620,17 @@ do not exist."
       .withDropoffTime(
         c
           .of("carDropoffTime")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
           )
           .asInt(dft.dropoffTime())
       )
       .withParkCost(
-        c.of("carParkCost").since(NA).summary("Cost of parking a car.").asInt(dft.parkCost())
+        c.of("carParkCost").since(V2_1).summary("Cost of parking a car.").asInt(dft.parkCost())
       )
       .withParkTime(
-        c.of("carParkTime").since(NA).summary("Time to park a car").asInt(dft.parkTime())
+        c.of("carParkTime").since(V2_1).summary("Time to park a car").asInt(dft.parkTime())
       )
       .withPickupCost(
         c
@@ -653,14 +649,14 @@ do not exist."
       .withAccelerationSpeed(
         c
           .of("carAccelerationSpeed")
-          .since(NA)
+          .since(V2_0)
           .summary("The acceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.accelerationSpeed())
       )
       .withDecelerationSpeed(
         c
           .of("carDecelerationSpeed")
-          .since(NA)
+          .since(V2_0)
           .summary("The deceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.decelerationSpeed())
       );
@@ -672,7 +668,7 @@ do not exist."
       .withGeoidElevation(
         c
           .of("geoidElevation")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query."
           )
@@ -738,7 +734,7 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
       .withReluctance(
         c
           .of("walkReluctance")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "A multiplier for how bad walking is, compared to being in transit for equal lengths of time."
           )
@@ -756,10 +752,10 @@ high values.
       .withBoardCost(
         c
           .of("walkBoardCost")
-          .since(NA)
+          .since(V2_0)
           .summary(
             """
-            Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the 
+            Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the
             cost that is used when boarding while walking.
             """
           )
@@ -768,14 +764,14 @@ high values.
       .withStairsReluctance(
         c
           .of("stairsReluctance")
-          .since(NA)
+          .since(V2_0)
           .summary("Used instead of walkReluctance for stairs.")
           .asDouble(dft.stairsReluctance())
       )
       .withStairsTimeFactor(
         c
           .of("stairsTimeFactor")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length."
           )
@@ -790,7 +786,7 @@ high values.
       .withSafetyFactor(
         c
           .of("walkSafetyFactor")
-          .since(NA)
+          .since(V2_2)
           .summary("Factor for how much the walk safety is considered in routing.")
           .description(
             "Value should be between 0 and 1." + " If the value is set to be 0, safety is ignored."
