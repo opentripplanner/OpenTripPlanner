@@ -9,6 +9,7 @@ on:
       - master
       - dev-1.x
       - dev-2.x
+      - gh-pages-docs
   pull_request:
     branches:
       - master
@@ -54,6 +55,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
+
+  docs:
+    #iif: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    runs-on: ubuntu-latest
+    #needs: build
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - name: Install Python dependencies
+        run: pip install mkdocs mkdocs-material
+      - name: Deploy docs to Github pages
+        run: |
+          mkdocs build
+          mkdocs gh-deploy
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
