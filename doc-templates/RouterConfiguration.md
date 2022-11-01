@@ -36,6 +36,6 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 <!-- INSERT: PARAMETERS-DETAILS -->
 
 
-## Example
+## Router Config Example
 
 <!-- INSERT: JSON-EXAMPLE -->

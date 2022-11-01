@@ -97,7 +97,7 @@ Sections follow that describe particular settings in more depth.
 |       noTransfersOnIsolatedStops                                         |  `boolean`  | Whether we should allow transfers to and from StopPlaces marked with LimitedUse.ISOLATED                                    | *Optional* | `false`                           |  2.2  |
 |       [sharedFilePattern](#tf_1_sharedFilePattern)                       |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"_stops.xml"`                    |  2.0  |
 |       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"_(\w{3})_shared_data.xml"`      |  2.0  |
-|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |   na  |
+|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |  `string[]` | List ferries witch do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -636,8 +636,8 @@ a way to improve travel time. You can specify how long it takes to reach a subwa
 
 This setting does not generalize to other modes like airplanes because you often need much longer
 to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
-(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#routingDefaults_alightSlackForMode) and
-[`alightSlackForMode`](RouteRequest.md#routingDefaults_alightSlackForMode) for this.
+(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#rd_alightSlackForMode) and
+[`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.
 
 
 <h3 id="transitModelTimeZone">transitModelTimeZone</h3>
@@ -846,8 +846,8 @@ Pattern for matching group NeTEx files.
 This field is used to match *group files* in the module file(zip file entries).
 *group files* are loaded right the after *shared group files* are loaded.
 Files are grouped together by the first group pattern in the regular expression.
-The pattern `'(\w{3})-.*\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
-with group `'RUT'`.
+The pattern `"(\w{3})-.*\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
+with group `"RUT"`.
 
 
 <h3 id="nd_ignoreFilePattern">ignoreFilePattern</h3>
@@ -871,15 +871,14 @@ Pattern for matching shared NeTEx files in a NeTEx bundle.
 This field is used to match *shared files*(zip file entries) in the module file. Shared
 files are loaded first. Then the rest of the files are grouped and loaded.
 
-The pattern `'shared-data\.xml'` matches `'shared-data.xml'`
+The pattern `"shared-data.xml"` matches `"shared-data.xml"`
 
 File names are matched in the following order - and treated accordingly to the first match:
-<ol>
-    <li><code>ignoreFilePattern</code></li>
-    <li><code>sharedFilePattern</code></li>
-    <li><code>sharedGroupFilePattern</code></li>
-    <li><code>groupFilePattern</code></li>
-</ol>
+
+ - `ignoreFilePattern`
+ - `sharedFilePattern`
+ - `sharedGroupFilePattern`
+ - `groupFilePattern`
 
 
 <h3 id="nd_sharedGroupFilePattern">sharedGroupFilePattern</h3>
@@ -897,7 +896,7 @@ files. Each *group* of files are loaded as a unit, followed by next group.
 
 Files are grouped together by the first group pattern in the regular expression.
 
-The pattern `'(\w{3})-.*-shared\.xml'` matches `'RUT-shared.xml'` with group `'RUT'`.
+The pattern `"(\w{3})-.*-shared\.xml"` matches `"RUT-shared.xml"` with group `"RUT"`.
 
 
 <h3 id="nd_ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
@@ -909,7 +908,7 @@ List ferries witch do not allow bikes.
 
 Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
 where bicycle conveyance can be defined.
-<p>
+
 For this reason we allow bicycles on ferries by default and allow to override the rare
 case where this is not the case.
 
@@ -969,8 +968,8 @@ Pattern for matching group NeTEx files.
 This field is used to match *group files* in the module file(zip file entries).
 *group files* are loaded right the after *shared group files* are loaded.
 Files are grouped together by the first group pattern in the regular expression.
-The pattern `'(\w{3})-.*\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
-with group `'RUT'`.
+The pattern `"(\w{3})-.*\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
+with group `"RUT"`.
 
 
 <h3 id="tf_1_ignoreFilePattern">ignoreFilePattern</h3>
@@ -994,15 +993,14 @@ Pattern for matching shared NeTEx files in a NeTEx bundle.
 This field is used to match *shared files*(zip file entries) in the module file. Shared
 files are loaded first. Then the rest of the files are grouped and loaded.
 
-The pattern `'shared-data\.xml'` matches `'shared-data.xml'`
+The pattern `"shared-data.xml"` matches `"shared-data.xml"`
 
 File names are matched in the following order - and treated accordingly to the first match:
-<ol>
-    <li><code>ignoreFilePattern</code></li>
-    <li><code>sharedFilePattern</code></li>
-    <li><code>sharedGroupFilePattern</code></li>
-    <li><code>groupFilePattern</code></li>
-</ol>
+
+ - `ignoreFilePattern`
+ - `sharedFilePattern`
+ - `sharedGroupFilePattern`
+ - `groupFilePattern`
 
 
 <h3 id="tf_1_sharedGroupFilePattern">sharedGroupFilePattern</h3>
@@ -1020,7 +1018,7 @@ files. Each *group* of files are loaded as a unit, followed by next group.
 
 Files are grouped together by the first group pattern in the regular expression.
 
-The pattern `'(\w{3})-.*-shared\.xml'` matches `'RUT-shared.xml'` with group `'RUT'`.
+The pattern `"(\w{3})-.*-shared\.xml"` matches `"RUT-shared.xml"` with group `"RUT"`.
 
 
 <h3 id="tf_1_ferryIdsNotAllowedForBicycle">ferryIdsNotAllowedForBicycle</h3>
@@ -1032,7 +1030,7 @@ List ferries witch do not allow bikes.
 
 Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
 where bicycle conveyance can be defined.
-<p>
+
 For this reason we allow bicycles on ferries by default and allow to override the rare
 case where this is not the case.
 
@@ -1041,7 +1039,7 @@ case where this is not the case.
 <!-- PARAMETERS-DETAILS END -->
 
 
-## Example
+## Build Config Example
 
 <!-- JSON-EXAMPLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->

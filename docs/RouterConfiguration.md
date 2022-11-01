@@ -388,7 +388,7 @@ Http headers.
 <!-- PARAMETERS-DETAILS END -->
 
 
-## Example
+## Router Config Example
 
 <!-- JSON-EXAMPLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->

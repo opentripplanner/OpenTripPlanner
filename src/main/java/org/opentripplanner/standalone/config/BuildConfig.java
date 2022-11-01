@@ -459,8 +459,8 @@ a way to improve travel time. You can specify how long it takes to reach a subwa
 
 This setting does not generalize to other modes like airplanes because you often need much longer
 to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
-(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#routingDefaults_alightSlackForMode) and 
-[`alightSlackForMode`](RouteRequest.md#routingDefaults_alightSlackForMode) for this.
+(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#rd_alightSlackForMode) and
+[`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.
 """
         )
         .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);

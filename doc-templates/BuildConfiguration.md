@@ -320,6 +320,6 @@ See [writeCachedElevations](#writeCachedElevations) for details.
 <!-- INSERT: PARAMETERS-DETAILS -->
 
 
-## Example
+## Build Config Example
 
 <!-- INSERT: JSON-EXAMPLE -->

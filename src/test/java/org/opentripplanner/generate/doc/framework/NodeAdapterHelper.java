@@ -7,7 +7,7 @@ public class NodeAdapterHelper {
 
   private static final List<AnchorAbbreviation> ANCHOR_ABBREVIATIONS = List.of(
     new AnchorAbbreviation("rd.", "routingDefaults."),
-    new AnchorAbbreviation("toO.", "transferOptimization."),
+    new AnchorAbbreviation("to.", "transferOptimization."),
     new AnchorAbbreviation("if.", "itineraryFilters."),
     new AnchorAbbreviation("nd.", "netexDefaults."),
     new AnchorAbbreviation("tf.", "transitFeeds."),

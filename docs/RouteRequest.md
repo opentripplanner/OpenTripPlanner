@@ -97,10 +97,10 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                             | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
 | [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                     |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |  2.1  |
 | [transferOptimization](#rd_transferOptimization)                                                 |        `object`        | Optimize where a transfer between to trip happens.                                                                                 | *Optional* |                          |  2.1  |
-|    [backTravelWaitTimeFactor](#rd_toO_backTravelWaitTimeFactor)                                  |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |  2.1  |
-|    [extraStopBoardAlightCostsFactor](#rd_toO_extraStopBoardAlightCostsFactor)                    |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |  2.1  |
-|    [minSafeWaitTimeFactor](#rd_toO_minSafeWaitTimeFactor)                                        |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                              | *Optional* | `5.0`                    |  2.1  |
-|    [optimizeTransferWaitTime](#rd_toO_optimizeTransferWaitTime)                                  |        `boolean`       | This enables the transfer wait time optimization. See []()                                                                         | *Optional* | `true`                   |  2.1  |
+|    [backTravelWaitTimeFactor](#rd_to_backTravelWaitTimeFactor)                                   |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |  2.1  |
+|    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                     |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |  2.1  |
+|    [minSafeWaitTimeFactor](#rd_to_minSafeWaitTimeFactor)                                         |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                              | *Optional* | `5.0`                    |  2.1  |
+|    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                   |        `boolean`       | This enables the transfer wait time optimization. See []()                                                                         | *Optional* | `true`                   |  2.1  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                         |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                      | *Optional* |                          |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                   |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |  2.2  |
 | wheelchairAccessibility                                                                          |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
@@ -582,7 +582,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
 `backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
 
 
-<h3 id="rd_toO_backTravelWaitTimeFactor">backTravelWaitTimeFactor</h3>
+<h3 id="rd_to_backTravelWaitTimeFactor">backTravelWaitTimeFactor</h3>
 
 **Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
 **Path:** /routingDefaults/transferOptimization 
@@ -591,7 +591,7 @@ To reduce back-travel we favor waiting, this reduces the cost of waiting.
 
 The wait time is used to prevent *back-travel*, the `backTravelWaitTimeFactor` is multiplied with the wait-time and subtracted from the optimized-transfer-cost.
 
-<h3 id="rd_toO_extraStopBoardAlightCostsFactor">extraStopBoardAlightCostsFactor</h3>
+<h3 id="rd_to_extraStopBoardAlightCostsFactor">extraStopBoardAlightCostsFactor</h3>
 
 **Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
 **Path:** /routingDefaults/transferOptimization 
@@ -608,7 +608,7 @@ parameter to 0, no extra cost is added, by setting it to `1.0` the stop-cost is
 doubled. Stop priority is only supported by the NeTEx import, not GTFS.
 
 
-<h3 id="rd_toO_minSafeWaitTimeFactor">minSafeWaitTimeFactor</h3>
+<h3 id="rd_to_minSafeWaitTimeFactor">minSafeWaitTimeFactor</h3>
 
 **Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5.0`  \
 **Path:** /routingDefaults/transferOptimization 
@@ -617,7 +617,7 @@ Used to set a maximum wait-time cost, base on min-safe-transfer-time.
 
 This defines the maximum cost for the logarithmic function relative to the min-safe-transfer-time (t0) when wait time goes towards zero(0). f(0) = n * t0
 
-<h3 id="rd_toO_optimizeTransferWaitTime">optimizeTransferWaitTime</h3>
+<h3 id="rd_to_optimizeTransferWaitTime">optimizeTransferWaitTime</h3>
 
 **Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
 **Path:** /routingDefaults/transferOptimization 
