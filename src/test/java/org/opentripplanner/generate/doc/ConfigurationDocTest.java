@@ -1,18 +1,20 @@
 package org.opentripplanner.generate.doc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.ConfigTypeTable.configTypeTable;
-import static org.opentripplanner.generate.doc.framework.OTPFeatureTable.otpFeaturesTable;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
+import static org.opentripplanner.generate.doc.support.ConfigTypeTable.configTypeTable;
+import static org.opentripplanner.generate.doc.support.OTPFeatureTable.otpFeaturesTable;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
 
 public class ConfigurationDocTest {
 
-  private static final File FILE = new File("docs", "Configuration.md");
+  private static final File TEMPLATE = new File("doc-templates", "Configuration.md");
+
+  private static final File OUT_FILE = new File("docs", "Configuration.md");
 
   private static final String CONFIG_TYPE_PLACEHOLDER = "CONFIGURATION-TYPES-TABLE";
   private static final String OTP_FEATURE_PLACEHOLDER = "OTP-FEATURE-TABLE";
@@ -31,11 +33,13 @@ public class ConfigurationDocTest {
   @Test
   public void updateConfigurationDoc() {
     // Read and close inout file (same as output file)
-    String doc = readFile(FILE);
+    String doc = readFile(TEMPLATE);
+    String original = readFile(OUT_FILE);
+
     doc = replaceSection(doc, CONFIG_TYPE_PLACEHOLDER, configTypeTable());
     doc = replaceSection(doc, OTP_FEATURE_PLACEHOLDER, otpFeaturesTable());
-    writeFile(FILE, doc);
+    writeFile(OUT_FILE, doc);
 
-    assertEquals(doc, readFile(FILE));
+    assertFileEquals(original, OUT_FILE);
   }
 }

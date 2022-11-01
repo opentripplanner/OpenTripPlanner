@@ -282,7 +282,7 @@ public class StreetEdge
   }
 
   /**
-   * Calculate the speed appropriately given the RoutingRequest and traverseMode.
+   * Calculate the speed appropriately given the RouteRequest and traverseMode.
    */
   public double calculateSpeed(
     RoutingPreferences preferences,

@@ -16,15 +16,6 @@ public class ParameterSummaryTable extends AbstractTable {
     super(skipFunction);
   }
 
-  public static void createParametersTable(
-    NodeAdapter root,
-    MarkDownDocWriter out,
-    SkipFunction skipFunction
-  ) {
-    var table = new ParameterSummaryTable(skipFunction).createTable(root);
-    out.printTable(table);
-  }
-
   @Override
   List<String> headers() {
     return List.of("Config Parameter", "Type", "Summary", "Req./Opt.", "Default Value", "Since");
@@ -37,9 +28,6 @@ public class ParameterSummaryTable extends AbstractTable {
 
   @Override
   void addRow(NodeAdapter node, TableBuilder table, NodeInfo info) {
-    if (info.isDeprecated()) {
-      return;
-    }
     table.addRow(
       parameterNameIndented(node, info),
       MarkdownFormatter.code(info.typeDescription()),

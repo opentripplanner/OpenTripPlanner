@@ -42,7 +42,7 @@ of this type:
 - `maxAreaNodes` Visibility calculations will not be done for areas with more nodes than this limit.
   Since v2.1
 - `maxJourneyDuration` This limits the patterns we consider in the transit search.
-  See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
+  See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.1/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
   . Since v2.1
 - `maxStopToShapeSnapDistance` Used for mapping route geometry shapes. Since v2.1
 - `transferRequests` Pre-calculate transfers. Since v2.1
@@ -125,9 +125,9 @@ these parameters may only be available as `defaultRequest` configuration paramet
 #### Query parameter changes
 
 A lot of the query parameters in the REST API are ignored/deprecated, see
-the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
+the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.1/src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java)
 and
-the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.1/src/main/java/org/opentripplanner/api/common/RouteResource.java)
 class for the documentation on what is now supported in OTP2.
 
 #### Parameters missing in OTP2 but intended to be reintroduced
@@ -175,7 +175,7 @@ permanently from OTP2, but may require some development to support valid importa
   pareto-optimal itineraries when paging. Also, a large search-window and a small `numItineraries`
   waste computer CPU calculation time. Consider tuning the `searchWindow` instead of setting this to
   a small value. Since 2.0
-- `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. This
+- `modes` The REST API is unchanged, but is mapped into a new structure in the RouteRequest. This
   means not all combinations of non-transit modes that was available in OTP1 is available in OTP2.
   Since 2.0
 - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use

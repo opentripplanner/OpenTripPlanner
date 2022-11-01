@@ -5,6 +5,8 @@ import org.opentripplanner.graph_builder.module.osm.PortlandCustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
 /**
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
@@ -21,6 +23,18 @@ public interface CustomNamer {
   void configure();
 
   class CustomNamerFactory {
+
+    /**
+     * Create a custom namer if needed, return null if not found / by default.
+     */
+    public static CustomNamer fromConfig(NodeAdapter root, String parameterName) {
+      var osmNaming = root
+        .of(parameterName)
+        .summary("A custom OSM namer to use.")
+        .since(OtpVersion.V2_0)
+        .asObject();
+      return fromConfig(osmNaming.rawNode());
+    }
 
     /**
      * Create a custom namer if needed, return null if not found / by default.

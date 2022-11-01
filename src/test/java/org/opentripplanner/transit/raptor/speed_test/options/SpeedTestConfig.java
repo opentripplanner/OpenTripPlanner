@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.routerequest.RouteRequestConfig.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
@@ -38,32 +37,11 @@ public class SpeedTestConfig {
   public SpeedTestConfig(JsonNode node) {
     NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
     this.rawNode = node;
-    testDate =
-      adapter
-        .of("testDate")
-        .since(NA)
-        .summary("TODO")
-        .asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
-    graph = adapter.of("graph").since(NA).summary("TODO").asUri(null);
-    feedId = adapter.of("feedId").since(NA).summary("TODO").asString();
-    transitRoutingParams =
-      new TransitRoutingConfig(
-        adapter
-          .of("tuningParameters")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
-          .asObject()
-      );
-    request =
-      mapRoutingRequest(
-        adapter
-          .of("routingDefaults")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+    testDate = adapter.of("testDate").asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
+    graph = adapter.of("graph").asUri(null);
+    feedId = adapter.of("feedId").asString();
+    transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter);
+    request = mapRouteRequest(adapter.of("routingDefaults").asObject());
   }
 
   public static SpeedTestConfig config(File dir) {

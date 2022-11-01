@@ -8,14 +8,10 @@ import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
  */
 public class OsmDefaultParameters {
 
-  /**
-   * The default set of rules for mapping OSM tags.
-   */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.OsmConfig}. */
   public final OsmTagMapper osmOsmTagMapper;
 
-  /**
-   * The default time zone for parsing opening hours.
-   */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.OsmConfig}. */
   public final ZoneId timeZone;
 
   public OsmDefaultParameters() {

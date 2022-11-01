@@ -1,9 +1,6 @@
 ## Routing modes
 
-TODO OTP2 - Where in the documentation does this belong? This is currently not part of the menu or -
-any linked to by any of the other documents.
-
-The routing request parameter `mode` determines which transport modalities should be considered when
+The routing request parameter `modes` determines which transport modalities should be considered when
 calculating the list of routes.
 
 Some modes (mostly bicycle and car) also have optional qualifiers `RENT` and `PARK` to specify if

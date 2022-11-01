@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.request.TransitRequest;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 
 /**
- * Test the banning and whitelisting functionality in the RoutingRequest.
+ * Test the banning and whitelisting functionality in the RouteRequest.
  * TODO This does not test the that banning/whitelisting affects the routing correctly.
  */
 public class TestBanning {
@@ -30,7 +30,7 @@ public class TestBanning {
     transit.setBannedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
     transit.setBannedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
 
-    Collection<FeedScopedId> bannedRoutes = RoutingRequestTransitDataProviderFilter.bannedRoutes(
+    Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
       Set.copyOf(transit.bannedAgencies()),
       transit.bannedRoutes(),
       Set.copyOf(transit.whiteListedAgencies()),
@@ -51,7 +51,7 @@ public class TestBanning {
     transit.setWhiteListedRoutes(RouteMatcher.parse("F__RUT:Route:1"));
     transit.setWhiteListedAgencies(List.of(FeedScopedId.parseId("F:RUT:Agency:2")));
 
-    Collection<FeedScopedId> bannedRoutes = RoutingRequestTransitDataProviderFilter.bannedRoutes(
+    Collection<FeedScopedId> bannedRoutes = RouteRequestTransitDataProviderFilter.bannedRoutes(
       Set.copyOf(transit.bannedAgencies()),
       transit.bannedRoutes(),
       Set.copyOf(transit.whiteListedAgencies()),

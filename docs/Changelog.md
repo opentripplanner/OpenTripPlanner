@@ -516,8 +516,6 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 
 ## 0.19.0 (2016-05-25)
 
-- TODO
-
 ## 0.18.0 (2015-05-29)
 
 - Ability to load elevation from projected GeoTIFF

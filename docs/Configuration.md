@@ -1,3 +1,10 @@
+<!--
+  NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
+
+   - Template directory is:  /doc-templates
+   - Generated directory is: /docs 
+-->
+
 # Configuring OpenTripPlanner
 
 _Note: if you are familiar with OTP1 configuration and are migrating to OTP2, please read the
@@ -60,7 +67,6 @@ documentation below we will refer to the following types:
 
 <!-- CONFIGURATION-TYPES-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
 
 | Type              | Description                                                                                                                                                                                                                                               | Examples                                                             |
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
@@ -227,7 +233,6 @@ Here is a list of all features which can be toggled on/off.
 
 <!-- OTP-FEATURE-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
 
 | Feature                              | Description                                                                                                                                                                                       | Enabled by default | Sandbox |
 |--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------:|:-------:|
