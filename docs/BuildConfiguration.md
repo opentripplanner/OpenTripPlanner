@@ -19,54 +19,54 @@ Sections follow that describe particular settings in more depth.
 
 | Config Parameter                                                         |     Type    | Summary                                                                                                                     |  Req./Opt. | Default Value                     | Since |
 |--------------------------------------------------------------------------|:-----------:|-----------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
-| [areaVisibility](#areaVisibility)                                        |  `boolean`  | Perform visibility calculations.                                                                                            | *Optional* | `false`                           |   na  |
-| banDiscouragedBiking                                                     |  `boolean`  | Should biking be allowed on OSM ways tagged with `bicycle=discouraged`                                                      | *Optional* | `false`                           |   na  |
-| banDiscouragedWalking                                                    |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                        | *Optional* | `false`                           |   na  |
+| [areaVisibility](#areaVisibility)                                        |  `boolean`  | Perform visibility calculations.                                                                                            | *Optional* | `false`                           |  2.0  |
+| banDiscouragedBiking                                                     |  `boolean`  | Should biking be allowed on OSM ways tagged with `bicycle=discouraged`                                                      | *Optional* | `false`                           |  2.0  |
+| banDiscouragedWalking                                                    |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                        | *Optional* | `false`                           |  2.0  |
 | blockBasedInterlining                                                    |  `boolean`  | Whether to create stay-seated transfers in between two trips with the same block id.                                        | *Optional* | `true`                            |   na  |
-| [buildReportDir](#buildReportDir)                                        |    `uri`    | URI to the directory where the graph build report should be written to.                                                     | *Optional* |                                   |   na  |
+| [buildReportDir](#buildReportDir)                                        |    `uri`    | URI to the directory where the graph build report should be written to.                                                     | *Optional* |                                   |  2.0  |
 | [configVersion](#configVersion)                                          |   `string`  | Deployment version of the *build-config.json*.                                                                              | *Optional* |                                   |  2.1  |
-| [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |   na  |
+| [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |  2.0  |
 | [discardMinTransferTimes](#discardMinTransferTimes)                      |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |   na  |
-| [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                           | *Optional* | `10.0`                            |   na  |
-| [elevationUnitMultiplier](#elevationUnitMultiplier)                      |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |   na  |
-| embedRouterConfig                                                        |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                | *Optional* | `true`                            |   na  |
-| extraEdgesStopPlatformLink                                               |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                              | *Optional* | `false`                           |   na  |
-| [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                       | *Optional* |                                   |   na  |
-| [gsCredentials](#gsCredentials)                                          |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                          | *Optional* |                                   |   na  |
-| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.           | *Optional* | `false`                           |   na  |
-| [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                      | *Optional* | `5`                               |   na  |
-| [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                         | *Optional* | `40`                              |   na  |
-| matchBusRoutesToStreets                                                  |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                 | *Optional* | `false`                           |   na  |
+| [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                           | *Optional* | `10.0`                            |  2.0  |
+| [elevationUnitMultiplier](#elevationUnitMultiplier)                      |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* | `1.0`                             |  2.0  |
+| embedRouterConfig                                                        |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                | *Optional* | `true`                            |  2.0  |
+| extraEdgesStopPlatformLink                                               |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                              | *Optional* | `false`                           |  2.0  |
+| [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                       | *Optional* |                                   |  2.0  |
+| [gsCredentials](#gsCredentials)                                          |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                          | *Optional* |                                   |  2.0  |
+| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.           | *Optional* | `false`                           |  2.0  |
+| [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                      | *Optional* | `5`                               |  2.0  |
+| [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                         | *Optional* | `40`                              |  2.0  |
+| matchBusRoutesToStreets                                                  |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                 | *Optional* | `false`                           |  2.0  |
 | maxAreaNodes                                                             |  `integer`  | Visibility calculations for an area will not be done if there are more nodes than this limit.                               | *Optional* | `500`                             |  2.1  |
-| [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |  `integer`  | When to split the import report.                                                                                            | *Optional* | `1000`                            |   na  |
+| [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |  `integer`  | When to split the import report.                                                                                            | *Optional* | `1000`                            |  2.0  |
 | maxElevationPropagationMeters                                            |  `integer`  | The maximum distance to propagate elevation to vertices which have no elevation.                                            | *Optional* | `2000`                            |   na  |
-| maxInterlineDistance                                                     |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.               | *Optional* | `200`                             |   na  |
+| maxInterlineDistance                                                     |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.               | *Optional* | `200`                             |  2.0  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                |   `double`  | Maximum distance between route shapes and their stops.                                                                      | *Optional* | `150.0`                           |  2.1  |
-| maxTransferDurationSeconds                                               |   `double`  | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.           | *Optional* | `1800.0`                          |   na  |
-| [multiThreadElevationCalculations](#multiThreadElevationCalculations)    |  `boolean`  | Configuring multi-threading during elevation calculations.                                                                  | *Optional* | `false`                           |   na  |
-| [osmCacheDataInMem](#osmCacheDataInMem)                                  |  `boolean`  | If OSM data should be cached in memory during processing.                                                                   | *Optional* | `false`                           |   na  |
-| platformEntriesLinking                                                   |  `boolean`  | Link unconnected entries to public transport platforms.                                                                     | *Optional* | `false`                           |   na  |
-| [readCachedElevations](#readCachedElevations)                            |  `boolean`  | Whether to read cached elevation data.                                                                                      | *Optional* | `true`                            |   na  |
-| staticBikeParkAndRide                                                    |  `boolean`  | Whether we should create bike P+R stations from OSM data.                                                                   | *Optional* | `false`                           |   na  |
-| staticParkAndRide                                                        |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                    | *Optional* | `true`                            |   na  |
-| [streetGraph](#streetGraph)                                              |    `uri`    | URI to the street graph object file for reading and writing.                                                                | *Optional* |                                   |   na  |
-| [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                        | *Optional* | `2.0`                             |   na  |
-| [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                    | *Optional* |                                   |   na  |
+| maxTransferDurationSeconds                                               |   `double`  | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.           | *Optional* | `1800.0`                          |  2.1  |
+| [multiThreadElevationCalculations](#multiThreadElevationCalculations)    |  `boolean`  | Configuring multi-threading during elevation calculations.                                                                  | *Optional* | `false`                           |  2.0  |
+| [osmCacheDataInMem](#osmCacheDataInMem)                                  |  `boolean`  | If OSM data should be cached in memory during processing.                                                                   | *Optional* | `false`                           |  2.0  |
+| platformEntriesLinking                                                   |  `boolean`  | Link unconnected entries to public transport platforms.                                                                     | *Optional* | `false`                           |  2.0  |
+| [readCachedElevations](#readCachedElevations)                            |  `boolean`  | Whether to read cached elevation data.                                                                                      | *Optional* | `true`                            |  2.0  |
+| staticBikeParkAndRide                                                    |  `boolean`  | Whether we should create bike P+R stations from OSM data.                                                                   | *Optional* | `false`                           |  2.0  |
+| staticParkAndRide                                                        |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                    | *Optional* | `true`                            |  2.0  |
+| [streetGraph](#streetGraph)                                              |    `uri`    | URI to the street graph object file for reading and writing.                                                                | *Optional* |                                   |  2.0  |
+| [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                        | *Optional* | `2.0`                             |  2.0  |
+| [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                    | *Optional* |                                   |  2.2  |
 | [transitServiceEnd](#transitServiceEnd)                                  |  `duration` | Limit the import of transit services to the given end date.                                                                 | *Optional* | `"P3Y"`                           |  2.0  |
 | [transitServiceStart](#transitServiceStart)                              |  `duration` | Limit the import of transit services to the given START date.                                                               | *Optional* | `"-P1Y"`                          |  2.0  |
-| [writeCachedElevations](#writeCachedElevations)                          |  `boolean`  | Reusing elevation data from previous builds                                                                                 | *Optional* | `false`                           |   na  |
+| [writeCachedElevations](#writeCachedElevations)                          |  `boolean`  | Reusing elevation data from previous builds                                                                                 | *Optional* | `false`                           |  2.0  |
 | [boardingLocationTags](#boardingLocationTags)                            |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                  | *Optional* |                                   |   na  |
 | [dataOverlay](/docs/sandbox/DataOverlay.md)                              |   `object`  | Config for the DataOverlay Sandbox module                                                                                   | *Optional* |                                   |  2.2  |
-| [dem](#dem)                                                              |  `object[]` | Specify parameters for DEM extracts.                                                                                        | *Optional* |                                   |   na  |
-|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* |                                   |   na  |
-|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |   na  |
+| [dem](#dem)                                                              |  `object[]` | Specify parameters for DEM extracts.                                                                                        | *Optional* |                                   |  2.2  |
+|       [elevationUnitMultiplier](#dem_0_elevationUnitMultiplier)          |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                      | *Optional* |                                   |  2.2  |
+|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                          | *Optional* |                                   |   na  |
 | [fares](/docs/sandbox/Fares.md)                                          |   `object`  | Fare configuration.                                                                                                         | *Optional* |                                   |  2.0  |
-| [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                  | *Optional* |                                   |   na  |
-|    [dem](#lfp_dem)                                                       |   `regexp`  | Pattern for matching elevation DEM files.                                                                                   | *Optional* | `"(?i)\.tiff?$"`                  |   na  |
-|    [gtfs](#lfp_gtfs)                                                     |   `regexp`  | Patterns for matching GTFS zip-files or directories.                                                                        | *Optional* | `"(?i)gtfs"`                      |   na  |
-|    [netex](#lfp_netex)                                                   |   `regexp`  | Patterns for matching NeTEx zip files or directories.                                                                       | *Optional* | `"(?i)netex"`                     |   na  |
-|    [osm](#lfp_osm)                                                       |   `regexp`  | Pattern for matching Open Street Map input files.                                                                           | *Optional* | `"(?i)(\.pbf¦\.osm¦\.osm\.xml)$"` |   na  |
+| [localFileNamePatterns](#localFileNamePatterns)                          |   `object`  | Patterns for matching OTP file types in the base directory                                                                  | *Optional* |                                   |  2.0  |
+|    [dem](#lfp_dem)                                                       |   `regexp`  | Pattern for matching elevation DEM files.                                                                                   | *Optional* | `"(?i)\.tiff?$"`                  |  2.0  |
+|    [gtfs](#lfp_gtfs)                                                     |   `regexp`  | Patterns for matching GTFS zip-files or directories.                                                                        | *Optional* | `"(?i)gtfs"`                      |  2.0  |
+|    [netex](#lfp_netex)                                                   |   `regexp`  | Patterns for matching NeTEx zip files or directories.                                                                       | *Optional* | `"(?i)netex"`                     |  2.0  |
+|    [osm](#lfp_osm)                                                       |   `regexp`  | Pattern for matching Open Street Map input files.                                                                           | *Optional* | `"(?i)(\.pbf¦\.osm¦\.osm\.xml)$"` |  2.0  |
 | netexDefaults                                                            |   `object`  | The netexDefaults section allows you to specify default properties for NeTEx files.                                         | *Optional* |                                   |  2.2  |
 |    feedId                                                                |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Optional* | `"NETEX"`                         |  2.2  |
 |    [groupFilePattern](#nd_groupFilePattern)                              |   `regexp`  | Pattern for matching group NeTEx files.                                                                                     | *Optional* | `"(\w{3})-.*\.xml"`               |  2.0  |
@@ -408,7 +408,7 @@ See [writeCachedElevations](#writeCachedElevations) for details.
 
 <h3 id="areaVisibility">areaVisibility</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
 Perform visibility calculations.
@@ -419,7 +419,7 @@ shortest way rather than around the edge of it. (These calculations can be time 
 
 <h3 id="buildReportDir">buildReportDir</h3>
 
-**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 URI to the directory where the graph build report should be written to.
@@ -448,7 +448,7 @@ Be aware that OTP uses the config embedded in the loaded graph if no new config 
 
 <h3 id="dataImportReport">dataImportReport</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
 Generate nice HTML report of Graph errors/warnings
@@ -468,7 +468,7 @@ but we want to calculate the transfers always from OSM data.
 
 <h3 id="distanceBetweenElevationSamples">distanceBetweenElevationSamples</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0`  \
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10.0`  \
 **Path:** / 
 
 The distance between elevation samples in meters.
@@ -477,7 +477,7 @@ The default is the approximate resolution of 1/3 arc-second NED data. This shoul
 
 <h3 id="elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
 **Path:** / 
 
 Specify a multiplier to convert elevation units from source to meters.
@@ -489,7 +489,7 @@ in the source data, this should be set to 0.1.
 
 <h3 id="graph">graph</h3>
 
-**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 URI to the graph object file for reading and writing.
@@ -498,7 +498,7 @@ The file is created or overwritten if OTP saves the graph to the file.
 
 <h3 id="gsCredentials">gsCredentials</h3>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Local file system path to Google Cloud Platform service accounts credentials file.
@@ -512,7 +512,7 @@ This is a path to a file on the local file system, not an URI.
 
 <h3 id="includeEllipsoidToGeoidDifference">includeEllipsoidToGeoidDifference</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
 Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.
@@ -528,7 +528,7 @@ all of the elevation values in the street edges.
 
 <h3 id="islandWithStopsMaxSize">islandWithStopsMaxSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`  \
+**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5`  \
 **Path:** / 
 
 When a graph island with stops in it should be pruned.
@@ -539,7 +539,7 @@ size will be pruned.
 
 <h3 id="islandWithoutStopsMaxSize">islandWithoutStopsMaxSize</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`  \
+**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`  \
 **Path:** / 
 
 When a graph island without stops should be pruned.
@@ -550,7 +550,7 @@ this size will be pruned.
 
 <h3 id="maxDataImportIssuesPerFile">maxDataImportIssuesPerFile</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`  \
+**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1000`  \
 **Path:** / 
 
 When to split the import report.
@@ -573,7 +573,7 @@ default to simple stop-to-stop geometry instead.
 
 <h3 id="multiThreadElevationCalculations">multiThreadElevationCalculations</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
 Configuring multi-threading during elevation calculations.
@@ -585,7 +585,7 @@ Configuring multi-threading during elevation calculations.
 
 <h3 id="osmCacheDataInMem">osmCacheDataInMem</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
 If OSM data should be cached in memory during processing.
@@ -600,7 +600,7 @@ data, and to `false` to read the stream from the source each time.
 
 <h3 id="readCachedElevations">readCachedElevations</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
 **Path:** / 
 
 Whether to read cached elevation data.
@@ -612,7 +612,7 @@ recalculating them all over again.
 
 <h3 id="streetGraph">streetGraph</h3>
 
-**Since version:** `na` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 URI to the street graph object file for reading and writing.
@@ -621,7 +621,7 @@ The file is created or overwritten if OTP saves the graph to the file
 
 <h3 id="subwayAccessTime">subwayAccessTime</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
 **Path:** / 
 
 Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
@@ -642,7 +642,7 @@ to check in to a flight (2-3 hours for international flights) than to alight and
 
 <h3 id="transitModelTimeZone">transitModelTimeZone</h3>
 
-**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Time zone for the graph.
@@ -683,7 +683,7 @@ Use an empty string to make unbounded.
 
 <h3 id="writeCachedElevations">writeCachedElevations</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
 Reusing elevation data from previous builds
@@ -722,7 +722,7 @@ What OSM tags should be looked on for the source of matching stops to platforms 
 
 <h3 id="dem">dem</h3>
 
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Specify parameters for DEM extracts.
@@ -738,14 +738,15 @@ the command line.
 
 <h3 id="dem_0_elevationUnitMultiplier">elevationUnitMultiplier</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional`  \
 **Path:** /dem/[0] 
 
 Specify a multiplier to convert elevation units from source to meters.
 
-Sse 0.1 if values are given in decimeters. Overrides the value specified in
-[`elevationUnitMultiplier`](#elevationUnitMultiplier) at the top-level of the
-configuration file.
+  Unit conversion multiplier for elevation values. No conversion needed if the elevation
+  values are defined in meters in the source data. If, for example, decimetres are used
+  in the source data, this should be set to 0.1. This overrides the value specified in
+  [`elevationUnitMultiplier`](#elevationUnitMultiplier) in the build config at root level.
 
 
 <h3 id="elevationBucket">elevationBucket</h3>
@@ -776,7 +777,7 @@ to specify your NED tile cache location.
 
 <h3 id="localFileNamePatterns">localFileNamePatterns</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Patterns for matching OTP file types in the base directory
@@ -793,7 +794,7 @@ Netex data is also often supplied in a ZIP file.
 
 <h3 id="lfp_dem">dem</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)\.tiff?$"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)\.tiff?$"`  \
 **Path:** /localFileNamePatterns 
 
 Pattern for matching elevation DEM files.
@@ -804,7 +805,7 @@ considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="lfp_gtfs">gtfs</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)gtfs"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)gtfs"`  \
 **Path:** /localFileNamePatterns 
 
 Patterns for matching GTFS zip-files or directories.
@@ -815,7 +816,7 @@ Any legal Java Regular expression is allowed.
 
 <h3 id="lfp_netex">netex</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)netex"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)netex"`  \
 **Path:** /localFileNamePatterns 
 
 Patterns for matching NeTEx zip files or directories.
@@ -826,7 +827,7 @@ pattern it is considered a match. Any legal Java Regular expression is allowed.
 
 <h3 id="lfp_osm">osm</h3>
 
-**Since version:** `na` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)(\.pbf|\.osm|\.osm\.xml)$"`  \
+**Since version:** `2.0` ∙ **Type:** `regexp` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"(?i)(\.pbf|\.osm|\.osm\.xml)$"`  \
 **Path:** /localFileNamePatterns 
 
 Pattern for matching Open Street Map input files.

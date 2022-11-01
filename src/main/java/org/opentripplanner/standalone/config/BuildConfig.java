@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -201,7 +202,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     areaVisibility =
       root
         .of("areaVisibility")
-        .since(NA)
+        .since(V2_0)
         .summary("Perform visibility calculations.")
         .description(
           """
@@ -213,13 +214,13 @@ public class BuildConfig implements OtpDataStoreConfig {
     banDiscouragedWalking =
       root
         .of("banDiscouragedWalking")
-        .since(NA)
+        .since(V2_0)
         .summary("Should walking be allowed on OSM ways tagged with `foot=discouraged`")
         .asBoolean(false);
     banDiscouragedBiking =
       root
         .of("banDiscouragedBiking")
-        .since(NA)
+        .since(V2_0)
         .summary("Should biking be allowed on OSM ways tagged with `bicycle=discouraged`")
         .asBoolean(false);
     configVersion =
@@ -232,14 +233,14 @@ public class BuildConfig implements OtpDataStoreConfig {
     dataImportReport =
       root
         .of("dataImportReport")
-        .since(NA)
+        .since(V2_0)
         .summary("Generate nice HTML report of Graph errors/warnings")
         .description("The reports are stored in the same location as the graph.")
         .asBoolean(false);
     distanceBetweenElevationSamples =
       root
         .of("distanceBetweenElevationSamples")
-        .since(NA)
+        .since(V2_0)
         .summary("The distance between elevation samples in meters.")
         .description(
           "The default is the approximate resolution of 1/3 arc-second NED data. This should not " +
@@ -250,7 +251,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     elevationUnitMultiplier =
       root
         .of("elevationUnitMultiplier")
-        .since(NA)
+        .since(V2_0)
         .summary("Specify a multiplier to convert elevation units from source to meters.")
         .description(
           """
@@ -263,7 +264,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     embedRouterConfig =
       root
         .of("embedRouterConfig")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Embed the Router config in the graph, which allows it to be sent to a server fully " +
           "configured over the wire."
@@ -272,7 +273,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     extraEdgesStopPlatformLink =
       root
         .of("extraEdgesStopPlatformLink")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Add extra edges when linking a stop to a platform, to prevent detours along the " +
           "platform edge."
@@ -281,7 +282,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     includeEllipsoidToGeoidDifference =
       root
         .of("includeEllipsoidToGeoidDifference")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Include the Ellipsoid to Geiod difference in the calculations of every point along " +
           "every StreetWithElevationEdge."
@@ -301,7 +302,7 @@ all of the elevation values in the street edges.
     pruningThresholdIslandWithStops =
       root
         .of("islandWithStopsMaxSize")
-        .since(NA)
+        .since(V2_0)
         .summary("When a graph island with stops in it should be pruned.")
         .description(
           """
@@ -313,7 +314,7 @@ all of the elevation values in the street edges.
     pruningThresholdIslandWithoutStops =
       root
         .of("islandWithoutStopsMaxSize")
-        .since(NA)
+        .since(V2_0)
         .summary("When a graph island without stops should be pruned.")
         .description(
           """
@@ -325,7 +326,7 @@ all of the elevation values in the street edges.
     matchBusRoutesToStreets =
       root
         .of("matchBusRoutesToStreets")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking."
         )
@@ -333,7 +334,7 @@ all of the elevation values in the street edges.
     maxDataImportIssuesPerFile =
       root
         .of("maxDataImportIssuesPerFile")
-        .since(NA)
+        .since(V2_0)
         .summary("When to split the import report.")
         .description(
           """
@@ -345,7 +346,7 @@ all of the elevation values in the street edges.
     maxInterlineDistance =
       root
         .of("maxInterlineDistance")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
         )
@@ -361,7 +362,7 @@ all of the elevation values in the street edges.
     maxTransferDurationSeconds =
       root
         .of("maxTransferDurationSeconds")
-        .since(NA)
+        .since(V2_1)
         .summary(
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
@@ -382,7 +383,7 @@ all of the elevation values in the street edges.
     multiThreadElevationCalculations =
       root
         .of("multiThreadElevationCalculations")
-        .since(NA)
+        .since(V2_0)
         .summary("Configuring multi-threading during elevation calculations.")
         .description(
           """
@@ -395,7 +396,7 @@ all of the elevation values in the street edges.
     osmCacheDataInMem =
       root
         .of("osmCacheDataInMem")
-        .since(NA)
+        .since(V2_0)
         .summary("If OSM data should be cached in memory during processing.")
         .description(
           """
@@ -411,13 +412,13 @@ all of the elevation values in the street edges.
     platformEntriesLinking =
       root
         .of("platformEntriesLinking")
-        .since(NA)
+        .since(V2_0)
         .summary("Link unconnected entries to public transport platforms.")
         .asBoolean(false);
     readCachedElevations =
       root
         .of("readCachedElevations")
-        .since(NA)
+        .since(V2_0)
         .summary("Whether to read cached elevation data.")
         .description(
           """
@@ -430,19 +431,19 @@ all of the elevation values in the street edges.
     staticBikeParkAndRide =
       root
         .of("staticBikeParkAndRide")
-        .since(NA)
+        .since(V2_0)
         .summary("Whether we should create bike P+R stations from OSM data.")
         .asBoolean(false);
     staticParkAndRide =
       root
         .of("staticParkAndRide")
-        .since(NA)
+        .since(V2_0)
         .summary("Whether we should create car P+R stations from OSM data.")
         .asBoolean(true);
     subwayAccessTime =
       root
         .of("subwayAccessTime")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
         )
@@ -471,7 +472,7 @@ to check in to a flight (2-3 hours for international flights) than to alight and
       transitModelTimeZone =
         root
           .of("transitModelTimeZone")
-          .since(NA)
+          .since(V2_2)
           .summary("Time zone for the graph.")
           .description(
             "This is used to store the timetables in the transit model, and to interpret times in incoming requests."
@@ -517,7 +518,7 @@ Use an empty string to make it unbounded.
     writeCachedElevations =
       root
         .of("writeCachedElevations")
-        .since(NA)
+        .since(V2_0)
         .summary("Reusing elevation data from previous builds")
         .description(
           """
@@ -583,7 +584,7 @@ recommended.
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
-      .since(NA)
+      .since(V2_0)
       .summary("Patterns for matching OTP file types in the base directory")
       .description(
         """
@@ -601,7 +602,7 @@ Netex data is also often supplied in a ZIP file.
     gtfsLocalFilePattern =
       localFileNamePatternsConfig
         .of("gtfs")
-        .since(NA)
+        .since(V2_0)
         .summary("Patterns for matching GTFS zip-files or directories.")
         .description(
           """
@@ -613,7 +614,7 @@ Netex data is also often supplied in a ZIP file.
     netexLocalFilePattern =
       localFileNamePatternsConfig
         .of("netex")
-        .since(NA)
+        .since(V2_0)
         .summary("Patterns for matching NeTEx zip files or directories.")
         .description(
           """
@@ -625,7 +626,7 @@ Netex data is also often supplied in a ZIP file.
     osmLocalFilePattern =
       localFileNamePatternsConfig
         .of("osm")
-        .since(NA)
+        .since(V2_0)
         .summary("Pattern for matching Open Street Map input files.")
         .description(
           """
@@ -637,7 +638,7 @@ Netex data is also often supplied in a ZIP file.
     demLocalFilePattern =
       localFileNamePatternsConfig
         .of("dem")
-        .since(NA)
+        .since(V2_0)
         .summary("Pattern for matching elevation DEM files.")
         .description(
           """
@@ -650,7 +651,7 @@ Netex data is also often supplied in a ZIP file.
     gsCredentials =
       root
         .of("gsCredentials")
-        .since(NA)
+        .since(V2_0)
         .summary(
           "Local file system path to Google Cloud Platform service accounts credentials file."
         )
@@ -667,21 +668,21 @@ Netex data is also often supplied in a ZIP file.
     graph =
       root
         .of("graph")
-        .since(NA)
+        .since(V2_0)
         .summary("URI to the graph object file for reading and writing.")
         .description("The file is created or overwritten if OTP saves the graph to the file.")
         .asUri(null);
     streetGraph =
       root
         .of("streetGraph")
-        .since(NA)
+        .since(V2_0)
         .summary("URI to the street graph object file for reading and writing.")
         .description("The file is created or overwritten if OTP saves the graph to the file")
         .asUri(null);
     buildReportDir =
       root
         .of("buildReportDir")
-        .since(NA)
+        .since(V2_0)
         .summary("URI to the directory where the graph build report should be written to.")
         .description(
           """
