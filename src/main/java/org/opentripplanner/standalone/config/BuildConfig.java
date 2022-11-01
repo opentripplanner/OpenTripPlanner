@@ -101,11 +101,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final int maxDataImportIssuesPerFile;
 
-  public final boolean transit;
-
   public final double subwayAccessTime;
-
-  public final boolean streets;
 
   public final boolean embedRouterConfig;
 
@@ -443,8 +439,6 @@ all of the elevation values in the street edges.
         .since(NA)
         .summary("Whether we should create car P+R stations from OSM data.")
         .asBoolean(true);
-    streets =
-      root.of("streets").since(NA).summary("Include street input files (OSM/PBF).").asBoolean(true);
     subwayAccessTime =
       root
         .of("subwayAccessTime")
@@ -469,12 +463,6 @@ to check in to a flight (2-3 hours for international flights) than to alight and
 """
         )
         .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    transit =
-      root
-        .of("transit")
-        .since(NA)
-        .summary("Include all transit input files (GTFS) from scanned directory.")
-        .asBoolean(true);
 
     // Time Zone dependent config
     {
