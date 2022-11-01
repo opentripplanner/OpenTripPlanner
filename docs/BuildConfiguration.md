@@ -33,7 +33,7 @@ Sections follow that describe particular settings in more depth.
 | extraEdgesStopPlatformLink                                               |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                              | *Optional* | `false`                           |  2.0  |
 | [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                       | *Optional* |                                   |  2.0  |
 | [gsCredentials](#gsCredentials)                                          |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                          | *Optional* |                                   |  2.0  |
-| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.           | *Optional* | `false`                           |  2.0  |
+| [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.           | *Optional* | `false`                           |  2.0  |
 | [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                      | *Optional* | `5`                               |  2.0  |
 | [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                         | *Optional* | `40`                              |  2.0  |
 | matchBusRoutesToStreets                                                  |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                 | *Optional* | `false`                           |  2.0  |
@@ -440,7 +440,7 @@ OTP server and verify that it uses the correct version of the config. The versio
 injected into the config in the (continuous) deployment pipeline. How this is done, is up to
 the deployment.
 
-The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+The config-version has no effect on OTP, and is provided as is on the API. There is no syntax
 or format check on the version and it can be any string.
 
 Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
@@ -503,8 +503,8 @@ The file is created or overwritten if OTP saves the graph to the file.
 
 Local file system path to Google Cloud Platform service accounts credentials file.
 
-The credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
-need to provide a path the the service credentials. Environment variables in the path is
+The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
+need to provide a path the the service credentials. Environment variables in the path are
 resolved.
 
 This is a path to a file on the local file system, not an URI.
@@ -515,10 +515,10 @@ This is a path to a file on the local file system, not an URI.
 **Since version:** `2.0` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** / 
 
-Include the Ellipsoid to Geiod difference in the calculations of every point along every StreetWithElevationEdge.
+Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.
 
 When set to true (it is false by default), the elevation module will include the Ellipsoid to
-Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+Geoid difference in the calculations of every point along every StreetWithElevationEdge in the
 graph.
 
 NOTE: if this is set to true for graph building, make sure to not set the value of
@@ -567,7 +567,7 @@ When to split the import report.
 Maximum distance between route shapes and their stops.
 
 This field is used for mapping routes geometry shapes. It determines max distance between shape
-points and their stop sequence. If mapper can not find any stops within this radius it will
+points and their stop sequence. If mapper cannot find any stops within this radius it will
 default to simple stop-to-stop geometry instead.
 
 
@@ -592,7 +592,7 @@ If OSM data should be cached in memory during processing.
 
 When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
 for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
-to cache the entire osm file im memory. The trade off is of cause that OTP might use more
+to cache the entire osm file im memory. The trade off is of course that OTP might use more
 memory while loading osm data. You can use this parameter to choose what is best for your
 deployment depending on your infrastructure. Set the parameter to `true` to cache the
 data, and to `false` to read the stream from the source each time.
@@ -634,7 +634,7 @@ When planning a trip, we need to allow additional time to reach these locations 
 the passenger. For example, this helps avoid suggesting short bus rides between two subway rides as
 a way to improve travel time. You can specify how long it takes to reach a subway platform.
 
-This setting does not generalize to other modes like airplanes because you often need much longer
+This setting does not generalize to other modes like airplanes because you often need much longer time
 to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
 (perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#rd_alightSlackForMode) and
 [`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.

@@ -35,7 +35,7 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
-| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.         | *Optional* | `"PT5S"`      |   na  |
+| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
 | flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
 |    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                         |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
 | [routingDefaults](/docs/RouteRequest.md)                                                  |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
@@ -87,7 +87,7 @@ OTP server and verify that it uses the correct version of the config. The versio
 injected into the config in the (continuous) deployment pipeline. How this is done, is up to
 the deployment.
 
-The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+The config-version has no effect on OTP, and is provided as is on the API. There is no syntax
 or format check on the version and it can be any string.
 
 Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
@@ -130,9 +130,9 @@ number of transit vehicles used in that itinerary.
 **Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`  \
 **Path:** / 
 
-The maximimg time a street routing request is allowed to take before returning a timeout.
+The maximum time a street routing request is allowed to take before returning a timeout.
 
-In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not
+In OTP1 path searches sometimes took a long time to complete. With the new Raptor algorithm this is not
 the case anymore. The street part of the routing may still take a long time if searching very long
 distances. You can set the street routing timeout to avoid tying up server resources on pointless
 searches and ensure that your users receive a timely response. You can also limit the max distance
@@ -141,7 +141,7 @@ information that can help identify problematic searches and improve our routing 
 no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
 search-window.
 
-The search abort after this duration and any paths found are returned to the client.
+The search aborts after this duration and any paths found are returned to the client.
 
 
 <h3 id="flex_maxTransferDurationSeconds">maxTransferDurationSeconds</h3>
@@ -160,7 +160,7 @@ How long should a passenger be allowed to walk after getting out of a flex vehic
 
 Configuration for transit searches with RAPTOR.
 
-Some of these parameters for tuning transit routing is only available through configuration and
+Some of these parameters for tuning transit routing are only available through configuration and
 cannot be set in the routing request. These parameters work together with the default routing
 request and the actual routing request.
 
@@ -187,7 +187,7 @@ This parameter is used to allocate enough memory space for Raptor.
 
 Set it to the maximum number of transfers for any given itinerary expected to be found within the
 entire transit network. The memory overhead of setting this higher than the maximum number of
-transfers is very little so it is better to set it too high then to low.
+transfers is very little so it is better to set it too high than to low.
 
 
 <h3 id="transit_scheduledTripBinarySearchThreshold">scheduledTripBinarySearchThreshold</h3>
@@ -200,7 +200,7 @@ This threshold is used to determine when to perform a binary trip schedule searc
 This reduce the number of trips departure time lookups and comparisons. When testing with data from
 Entur and all of Norway as a Graph, the optimal value was about 50. If you calculate the departure
 time every time or want to fine tune the performance, changing this may improve the performance a
-few percent.
+few percents.
 
 
 <h3 id="transit_searchThreadPoolSize">searchThreadPoolSize</h3>
@@ -212,7 +212,7 @@ Split a travel search in smaller jobs and run them in parallel to improve perfor
 
 Use this parameter to set the total number of executable threads available across all searches.
 Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0,
-no extra threads are stated and the search is done in one thread.
+no extra threads are started and the search is done in one thread.
 
 
 <h3 id="transit_transferCacheMaxSize">transferCacheMaxSize</h3>
@@ -238,7 +238,7 @@ bound for the travel duration time - the "minTransitTime". The heuristic search 
 purposes too, and is very fast.
 
 At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
-unknown/missing the parameters(EDT, LAT, DW) is dynamically calculated. The dynamic coefficients
+unknown/missing the parameters(EDT, LAT, DW) are dynamically calculated. The dynamic coefficients
 affect the performance and should be tuned to match the deployment.
 
 The request parameters are calculated like this:
@@ -249,7 +249,7 @@ The request parameters are calculated like this:
     EDT = LAT - (DW + minTransitTime)
 ```
 
-The `round_N(...)` method is will round the input to the closest multiplication of N.
+The `round_N(...)` method rounds the input to the closest multiplication of N.
 
 The 3 coefficients above are:
 
@@ -258,7 +258,7 @@ The 3 coefficients above are:
  - `W` is parameter: `minWaitTimeCoefficient`
  - `N` is parameter: `stepMinutes`
 
-In addition there this an upper bound on the calculation of the search window:
+In addition there is an upper bound on the calculation of the search window:
 `maxWinTimeMinutes`.
 
 
@@ -273,7 +273,7 @@ Long search windows consumes a lot of resources and may take a long time. Use th
 tune the desired maximum search time.
 
 This is the parameter that affect the response time most, the downside is that a search is only
-guarantied to be pareto-optimal within a search-window.
+guaranteed to be pareto-optimal within a search-window.
 
 The default is 3 hours. The unit is minutes.
 
@@ -312,9 +312,10 @@ Use a value between 20 and 180 minutes in a normal deployment.
 
 Used to set the steps the search-window is rounded to.
 
-The search window is rounded of to the closest multiplication of `stepMinutes`. If `stepMinutes` =
+The search window is rounded off to the closest multiplication of `stepMinutes`. If `stepMinutes` =
 10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5
 minutes and 17 seconds it will be rounded up to 10 minutes.
+
 
 Use a value between `1` and `60`. This should be less than the `min-raptor-search-window`
 coefficient.
@@ -327,7 +328,7 @@ coefficient.
 
 The provided array of durations is used to increase the search-window for the next/previous page.
 
-The search window is expanded when the current page return few options. If ZERO results is returned
+The search window is expanded when the current page return few options. If ZERO result is returned
 the first duration in the list is used, if ONE result is returned then the second duration is used
 and so on. The duration is added to the existing search-window and inserted into the next and
 previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java)" +
@@ -368,7 +369,7 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
 
 Hide the FeedId in all API output, and add it to input.
 
-Only turn this feature on if you have unique ids accross all feeds, without the feedId prefix.
+Only turn this feature on if you have unique ids across all feeds, without the feedId prefix.
 
 <h3 id="transmodelApi_tracingHeaderTags">tracingHeaderTags</h3>
 

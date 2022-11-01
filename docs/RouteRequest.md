@@ -82,11 +82,11 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                   |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                       | `enum map of duration` | How much time ride a vehicle takes for each given mode.                                                                            | *Optional* |                          |  2.0  |
 | [itineraryFilters](#rd_itineraryFilters)                                                         |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                       | *Optional* |                          |  2.0  |
-|    [accessibilityScore](#rd_if_accessibilityScore)                                               |        `boolean`       | A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.  | *Optional* | `false`                  |  2.2  |
+|    [accessibilityScore](#rd_if_accessibilityScore)                                               |        `boolean`       | An experimental feature contributed by IBI which adds a sandbox accessibility *score* between 0 and 1 for each leg and itinerary.  | *Optional* | `false`                  |  2.2  |
 |    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                     |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.             | *Optional* | `0.0`                    |  2.1  |
 |    debug                                                                                         |        `boolean`       | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters.    | *Optional* | `false`                  |  2.0  |
 |    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)   |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.            | *Optional* | `false`                  |  2.2  |
-|    groupSimilarityKeepOne                                                                        |        `double`        | Pick ONE itinerary from each group after putting itineraries that is 85% similar together.                                         | *Optional* | `0.85`                   |  2.1  |
+|    groupSimilarityKeepOne                                                                        |        `double`        | Pick ONE itinerary from each group after putting itineraries that are 85% similar together.                                        | *Optional* | `0.85`                   |  2.1  |
 |    groupSimilarityKeepThree                                                                      |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.             | *Optional* | `0.68`                   |  2.1  |
 |    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier) |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                             | *Optional* | `2.0`                    |  2.1  |
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                       |    `linear-function`   | The function define a max-limit for generalized-cost for non-transit itineraries.                                                  | *Optional* | `"f(x) = 3,600 + 2.0 x"` |  2.1  |
@@ -105,18 +105,18 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | [unpreferred](#rd_unpreferred)                                                                   |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |  2.2  |
 | wheelchairAccessibility                                                                          |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
 |    enabled                                                                                       |        `boolean`       | Enable wheelchair accessibility.                                                                                                   | *Optional* | `false`                  |  2.0  |
-|    inaccessibleStreetReluctance                                                                  |        `double`        | The factor to to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                  | *Optional* | `25.0`                   |  2.2  |
+|    inaccessibleStreetReluctance                                                                  |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                     | *Optional* | `25.0`                   |  2.2  |
 |    [maxSlope](#rd_wheelchairAccessibility_maxSlope)                                              |        `double`        | The maximum slope as a fraction of 1.                                                                                              | *Optional* | `0.083`                  |  2.0  |
 |    [slopeExceededReluctance](#rd_wheelchairAccessibility_slopeExceededReluctance)                |        `double`        | How much streets with high slope should be avoided.                                                                                | *Optional* | `1.0`                    |  2.2  |
 |    [stairsReluctance](#rd_wheelchairAccessibility_stairsReluctance)                              |        `double`        | How much stairs should be avoided.                                                                                                 | *Optional* | `100.0`                  |  2.2  |
 |    elevator                                                                                      |        `object`        | Configuration for when to use inaccessible elevators.                                                                              | *Optional* |                          |  2.2  |
 |    stop                                                                                          |        `object`        | Configuration for when to use inaccessible stops.                                                                                  | *Optional* |                          |  2.2  |
 |       inaccessibleCost                                                                           |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                        | *Optional* | `3600`                   |  2.2  |
-|       onlyConsiderAccessible                                                                     |        `boolean`       | Wheter to only use this entity if it is explicitly marked as wheelchair accessible.                                                | *Optional* | `true`                   |  2.2  |
+|       onlyConsiderAccessible                                                                     |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                               | *Optional* | `true`                   |  2.2  |
 |       unknownCost                                                                                |        `integer`       | The cost to add when traversing an entity with unknown accessibility information.                                                  | *Optional* | `600`                    |  2.2  |
 |    trip                                                                                          |        `object`        | Configuration for when to use inaccessible trips.                                                                                  | *Optional* |                          |  2.2  |
 |       inaccessibleCost                                                                           |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                        | *Optional* | `3600`                   |  2.2  |
-|       onlyConsiderAccessible                                                                     |        `boolean`       | Wheter to only use this entity if it is explicitly marked as wheelchair accessible.                                                | *Optional* | `true`                   |  2.2  |
+|       onlyConsiderAccessible                                                                     |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                               | *Optional* | `true`                   |  2.2  |
 |       unknownCost                                                                                |        `integer`       | The cost to add when traversing an entity with unknown accessibility information.                                                  | *Optional* | `600`                    |  2.2  |
 
 <!-- PARAMETERS-TABLE END -->
@@ -391,7 +391,7 @@ search. The filters may modify itineraries, sort them, and filter away less pref
 OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and
 `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the itineraries
 return by the search engine before returning the results to client. There is also a few mandatory
-none configurable filters removing none optimal results. You may see these filters pop-up in the
+non-configurable filters removing none optimal results. You may see these filters pop-up in the
 filter debugging.
 
 #### Group by similarity filters
@@ -421,9 +421,9 @@ itineraries that are at least double in cost for the non-grouped legs.
 **Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** /routingDefaults/itineraryFilters 
 
-A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.
+An experimental feature contributed by IBI which adds a sandbox accessibility *score* between 0 and 1 for each leg and itinerary.
 
-This can be used by by frontend developers to implement a simple traffic light UI.
+This can be used by frontend developers to implement a simple traffic light UI.
 
 <h3 id="rd_if_bikeRentalDistanceRatio">bikeRentalDistanceRatio</h3>
 
@@ -445,8 +445,8 @@ for the result to be included.
 If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.
 
 Trips are considered equal if they have same id and same service day. Non-transit legs are skipped
-during comparison. Before filtering, trips are sorted by their generalized cost. Algorithm loops
-through list from top to bottom. If itinerary matches from any other itinerary from above, it is
+during comparison. Before filtering, trips are sorted by their generalized cost. The algorithm loops
+through the list from top to bottom. If an itinerary matches from any other itinerary from above, it is
 removed from list.
 
 
@@ -471,13 +471,13 @@ The function define a max-limit for generalized-cost for non-transit itineraries
 
 The max-limit is applied to itineraries with *no transit legs*, however *all* itineraries
 (including those with transit legs) are considered when calculating the minimum cost. The smallest
-generalized-cost value is used as input to the function. Then function is used to calculate a
-*max-limit*. The max-limit is then used to to filter *non-transit* itineraries by
-*generalized-cost*. Itineraries with a cost higher than the max-limit is dropped from the result
+generalized-cost value is used as input to the function. The function is used to calculate a
+*max-limit*. The max-limit is then used to filter *non-transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
 set.
 
 For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
-non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` is dropped.
+non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 
 
 <h3 id="rd_if_parkAndRideDurationRatio">parkAndRideDurationRatio</h3>
@@ -581,7 +581,7 @@ The defaults should work fine, but if you have results with short wait-times dom
 option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
 `backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
 
-For details on the logic/design see [transferoptimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+For details on the logic/design see [transfer optimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
 package documentation.
 
 
