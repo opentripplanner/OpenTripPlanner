@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
@@ -199,7 +199,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     areaVisibility =
       root
         .of("areaVisibility")
-        .since(V2_0)
+        .since(V1_5)
         .summary("Perform visibility calculations.")
         .description(
           """
@@ -299,7 +299,7 @@ all of the elevation values in the street edges.
     pruningThresholdIslandWithStops =
       root
         .of("islandWithStopsMaxSize")
-        .since(V2_0)
+        .since(V2_1)
         .summary("When a graph island with stops in it should be pruned.")
         .description(
           """
@@ -311,7 +311,7 @@ all of the elevation values in the street edges.
     pruningThresholdIslandWithoutStops =
       root
         .of("islandWithoutStopsMaxSize")
-        .since(V2_0)
+        .since(V2_1)
         .summary("When a graph island without stops should be pruned.")
         .description(
           """
@@ -323,7 +323,7 @@ all of the elevation values in the street edges.
     matchBusRoutesToStreets =
       root
         .of("matchBusRoutesToStreets")
-        .since(V2_0)
+        .since(V1_5)
         .summary(
           "Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking."
         )
@@ -343,7 +343,7 @@ all of the elevation values in the street edges.
     maxInterlineDistance =
       root
         .of("maxInterlineDistance")
-        .since(V2_0)
+        .since(V1_5)
         .summary(
           "Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle."
         )
@@ -351,7 +351,7 @@ all of the elevation values in the street edges.
     blockBasedInterlining =
       root
         .of("blockBasedInterlining")
-        .since(NA)
+        .since(V2_2)
         .summary(
           "Whether to create stay-seated transfers in between two trips with the same block id."
         )
@@ -428,19 +428,19 @@ all of the elevation values in the street edges.
     staticBikeParkAndRide =
       root
         .of("staticBikeParkAndRide")
-        .since(V2_0)
+        .since(V1_5)
         .summary("Whether we should create bike P+R stations from OSM data.")
         .asBoolean(false);
     staticParkAndRide =
       root
         .of("staticParkAndRide")
-        .since(V2_0)
+        .since(V1_5)
         .summary("Whether we should create car P+R stations from OSM data.")
         .asBoolean(true);
     subwayAccessTime =
       root
         .of("subwayAccessTime")
-        .since(V2_0)
+        .since(V1_5)
         .summary(
           "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
         )
@@ -554,13 +554,13 @@ recommended.
     maxElevationPropagationMeters =
       root
         .of("maxElevationPropagationMeters")
-        .since(NA)
+        .since(V1_5)
         .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
         .asInt(2000);
     boardingLocationTags =
       root
         .of("boardingLocationTags")
-        .since(NA)
+        .since(V2_2)
         .summary(
           "What OSM tags should be looked on for the source of matching stops to platforms and stops."
         )
@@ -569,7 +569,7 @@ recommended.
     discardMinTransferTimes =
       root
         .of("discardMinTransferTimes")
-        .since(NA)
+        .since(V2_2)
         .summary("Should minimum transfer times in GTFS files be discarded.")
         .description(
           """
