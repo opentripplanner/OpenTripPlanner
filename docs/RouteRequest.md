@@ -70,7 +70,7 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | turnReluctance                                                                                   |        `double`        | Multiplicative factor on expected turning time.                                                                                    | *Optional* | `1.0`                    |  2.0  |
 | [unpreferredCost](#rd_unpreferredCost)                                                           |    `linear-function`   | A cost function used to calculate penalty for an unpreferred route.                                                                | *Optional* | `"f(x) = 0 + 1.0 x"`     |  2.2  |
 | useBikeRentalAvailabilityInformation                                                             |        `boolean`       | Whether or not bike rental availability information will be used to plan bike rental trips.                                        | *Optional* | `false`                  |  2.0  |
-| useVehicleParkingAvailabilityInformation                                                         |        `boolean`       | TODO: Add short summary.                                                                                                           | *Optional* | `false`                  |   na  |
+| useVehicleParkingAvailabilityInformation                                                         |        `boolean`       | TODO: Add short summary.                                                                                                           | *Optional* | `false`                  |  2.1  |
 | waitReluctance                                                                                   |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                  | *Optional* | `1.0`                    |  2.0  |
 | walkBoardCost                                                                                    |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking. | *Optional* | `600`                    |  2.0  |
 | [walkReluctance](#rd_walkReluctance)                                                             |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |  2.0  |
@@ -82,17 +82,17 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                   |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                       | `enum map of duration` | How much time ride a vehicle takes for each given mode.                                                                            | *Optional* |                          |  2.0  |
 | [itineraryFilters](#rd_itineraryFilters)                                                         |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                       | *Optional* |                          |  2.0  |
-|    [accessibilityScore](#rd_if_accessibilityScore)                                               |        `boolean`       | A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.  | *Optional* | `false`                  |   na  |
-|    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                     |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.             | *Optional* | `0.0`                    |   na  |
-|    debug                                                                                         |        `boolean`       | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters.    | *Optional* | `false`                  |   na  |
-|    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)   |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.            | *Optional* | `false`                  |   na  |
-|    groupSimilarityKeepOne                                                                        |        `double`        | Pick ONE itinerary from each group after putting itineraries that is 85% similar together.                                         | *Optional* | `0.85`                   |   na  |
-|    groupSimilarityKeepThree                                                                      |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.             | *Optional* | `0.68`                   |   na  |
-|    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier) |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                             | *Optional* | `2.0`                    |   na  |
-|    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                       |    `linear-function`   | The function define a max-limit for generalized-cost for non-transit itineraries.                                                  | *Optional* | `"f(x) = 3,600 + 2.0 x"` |   na  |
-|    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                   |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                      | *Optional* | `0.0`                    |   na  |
-|    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)     |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                            | *Optional* | `false`                  |   na  |
-|    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                             |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                 | *Optional* |                          |   na  |
+|    [accessibilityScore](#rd_if_accessibilityScore)                                               |        `boolean`       | A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.  | *Optional* | `false`                  |  2.2  |
+|    [bikeRentalDistanceRatio](#rd_if_bikeRentalDistanceRatio)                                     |        `double`        | Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.             | *Optional* | `0.0`                    |  2.1  |
+|    debug                                                                                         |        `boolean`       | Enable this to attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters.    | *Optional* | `false`                  |  2.0  |
+|    [filterItinerariesWithSameFirstOrLastTrip](#rd_if_filterItinerariesWithSameFirstOrLastTrip)   |        `boolean`       | If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.            | *Optional* | `false`                  |  2.2  |
+|    groupSimilarityKeepOne                                                                        |        `double`        | Pick ONE itinerary from each group after putting itineraries that is 85% similar together.                                         | *Optional* | `0.85`                   |  2.1  |
+|    groupSimilarityKeepThree                                                                      |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.             | *Optional* | `0.68`                   |  2.1  |
+|    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier) |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                             | *Optional* | `2.0`                    |  2.1  |
+|    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                       |    `linear-function`   | The function define a max-limit for generalized-cost for non-transit itineraries.                                                  | *Optional* | `"f(x) = 3,600 + 2.0 x"` |  2.1  |
+|    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                   |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                      | *Optional* | `0.0`                    |  2.1  |
+|    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)     |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                            | *Optional* | `false`                  |  2.2  |
+|    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                             |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                 | *Optional* |                          |  2.1  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                             | `enum map of duration` | Limit access/egress per street mode.                                                                                               | *Optional* |                          |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                             | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
 | [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                     |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |  2.1  |
@@ -418,7 +418,7 @@ itineraries that are at least double in cost for the non-grouped legs.
 
 <h3 id="rd_if_accessibilityScore">accessibilityScore</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.
@@ -427,7 +427,7 @@ This can be used by by frontend developers to implement a simple traffic light U
 
 <h3 id="rd_if_bikeRentalDistanceRatio">bikeRentalDistanceRatio</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 Filter routes that consist of bike-rental and walking by the minimum fraction of the bike-rental leg using _distance_.
@@ -439,7 +439,7 @@ for the result to be included.
 
 <h3 id="rd_if_filterItinerariesWithSameFirstOrLastTrip">filterItinerariesWithSameFirstOrLastTrip</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 If more than one itinerary begins or ends with same trip, filter out one of those itineraries so that only one remains.
@@ -452,7 +452,7 @@ removed from list.
 
 <h3 id="rd_if_groupedOtherThanSameLegsMaxCostMultiplier">groupedOtherThanSameLegsMaxCostMultiplier</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.
@@ -464,7 +464,7 @@ having a higher cost will be filtered.
 
 <h3 id="rd_if_nonTransitGeneralizedCostLimit">nonTransitGeneralizedCostLimit</h3>
 
-**Since version:** `na` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 3,600 + 2.0 x"`  \
+**Since version:** `2.1` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"f(x) = 3,600 + 2.0 x"`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 The function define a max-limit for generalized-cost for non-transit itineraries.
@@ -482,7 +482,7 @@ then all non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 
 
 <h3 id="rd_if_parkAndRideDurationRatio">parkAndRideDurationRatio</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.
@@ -494,7 +494,7 @@ result to be included. However, if there is only a single result, it is never fi
 
 <h3 id="rd_if_removeItinerariesWithSameRoutesAndStops">removeItinerariesWithSameRoutesAndStops</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
+**Since version:** `2.2` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 Set to true if you want to list only the first itinerary  which goes through the same stops and routes.
@@ -503,7 +503,7 @@ Itineraries visiting the same set of stops and riding the exact same routes, dep
 
 <h3 id="rd_if_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults/itineraryFilters 
 
 A relative limit for the generalized-cost for transit itineraries.

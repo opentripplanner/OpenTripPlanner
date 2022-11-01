@@ -717,6 +717,7 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
     return VehicleParkingPreferences.of(
       c
         .of("useVehicleParkingAvailabilityInformation")
+        .since(V2_1)
         .asBoolean(preferences.parking().useAvailabilityInformation())
     );
   }

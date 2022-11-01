@@ -1,7 +1,8 @@
 package org.opentripplanner.standalone.config.routerequest;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
@@ -69,7 +70,7 @@ itineraries that are at least double in cost for the non-grouped legs.
       .withDebug(
         c
           .of("debug")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "Enable this to attach a system notice to itineraries instead of removing them. This " +
             "is very convenient when tuning the filters."
@@ -79,7 +80,7 @@ itineraries that are at least double in cost for the non-grouped legs.
       .withGroupSimilarityKeepOne(
         c
           .of("groupSimilarityKeepOne")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
           )
@@ -88,7 +89,7 @@ itineraries that are at least double in cost for the non-grouped legs.
       .withGroupSimilarityKeepThree(
         c
           .of("groupSimilarityKeepThree")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity."
           )
@@ -97,7 +98,7 @@ itineraries that are at least double in cost for the non-grouped legs.
       .withGroupedOtherThanSameLegsMaxCostMultiplier(
         c
           .of("groupedOtherThanSameLegsMaxCostMultiplier")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one."
           )
@@ -114,7 +115,7 @@ having a higher cost will be filtered.
         parseTransitGeneralizedCostLimit(
           c
             .of("transitGeneralizedCostLimit")
-            .since(NA)
+            .since(V2_1)
             .summary("A relative limit for the generalized-cost for transit itineraries.")
             .description(
               """
@@ -133,7 +134,7 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) 
       .withNonTransitGeneralizedCostLimit(
         c
           .of("nonTransitGeneralizedCostLimit")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "The function define a max-limit for generalized-cost for non-transit itineraries."
           )
@@ -155,7 +156,7 @@ then all non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 
       .withBikeRentalDistanceRatio(
         c
           .of("bikeRentalDistanceRatio")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "Filter routes that consist of bike-rental and walking by the minimum fraction " +
             "of the bike-rental leg using _distance_."
@@ -172,7 +173,7 @@ for the result to be included.
       .withParkAndRideDurationRatio(
         c
           .of("parkAndRideDurationRatio")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "Filter P+R routes that consist of driving and walking by the minimum fraction " +
             "of the driving using of _time_."
@@ -189,7 +190,7 @@ result to be included. However, if there is only a single result, it is never fi
       .withFilterItinerariesWithSameFirstOrLastTrip(
         c
           .of("filterItinerariesWithSameFirstOrLastTrip")
-          .since(NA)
+          .since(V2_2)
           .summary(
             "If more than one itinerary begins or ends with same trip, filter out one of those " +
             "itineraries so that only one remains."
@@ -207,7 +208,7 @@ removed from list.
       .withRemoveItinerariesWithSameRoutesAndStops(
         c
           .of("removeItinerariesWithSameRoutesAndStops")
-          .since(NA)
+          .since(V2_2)
           .summary(
             "Set to true if you want to list only the first itinerary  which goes through the " +
             "same stops and routes."
@@ -221,7 +222,7 @@ removed from list.
       .withAccessibilityScore(
         c
           .of("accessibilityScore")
-          .since(NA)
+          .since(V2_2)
           .summary(
             "A experimental feature contributed by IBI which adds an sandbox accessibility " +
             "*score* between 0 and 1 for each leg and itinerary."
@@ -246,12 +247,12 @@ removed from list.
       return new TransitGeneralizedCostFilterParams(
         node
           .of("costLimitFunction")
-          .since(NA)
+          .since(V2_2)
           .summary("TODO")
           .asLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
         node
           .of("intervalRelaxFactor")
-          .since(NA)
+          .since(V2_2)
           .summary("TODO")
           .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
       );
