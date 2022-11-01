@@ -8,8 +8,8 @@
 
 # Updater configuration
 
-This section covers all options that can be set for each [updaters](/docs/RouterConfiguration.md) 
-in the `router-config.json` file.
+This section covers all options that can be set in the *router-config.json* in the 
+[updaters](RouterConfiguration.md) section.
 
 
 ## Real-time data
@@ -108,7 +108,7 @@ can be configured as a json. Any header key, value can be inserted.
 ### Vehicle parking (sandbox feature)
 
 Vehicle parking options and configuration is documented in
-its [sandbox documentation](../docs/sandbox/VehicleParking.md).
+its [sandbox documentation](sandbox/VehicleParking.md).
 
 <!-- INSERT: vehicle-parking -->
 
@@ -116,7 +116,7 @@ its [sandbox documentation](../docs/sandbox/VehicleParking.md).
 
 ### SIRI SX updater for Azure Service Bus (sandbox feature)
 
-This is a Sandbox updater se [sandbox documentation](/docs/sandbox/SiriAzureUpdater.md).
+This is a Sandbox updater se [sandbox documentation](sandbox/SiriAzureUpdater.md).
 
 <!-- INSERT: siri-azure-sx-updater -->
 
@@ -124,5 +124,5 @@ This is a Sandbox updater se [sandbox documentation](/docs/sandbox/SiriAzureUpda
 ### Vehicle Rental Service Directory configuration (sandbox feature)
 
 To configure and url for
-the [VehicleRentalServiceDirectory](../docs/sandbox/VehicleRentalServiceDirectory.md).
+the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
 

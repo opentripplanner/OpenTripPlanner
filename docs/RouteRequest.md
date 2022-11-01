@@ -7,8 +7,8 @@
 
 # Route Request
 
-The RouteRequest is the type for the [routingDefaults in router-config.json](/docs/RouterConfiguration.md#routingDefaults) 
-and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#transferRequests).
+The RouteRequest is the type for the [routingDefaults in router-config.json](RouterConfiguration.md#routingDefaults) 
+and in the [transferRequests in build-config.json](BuildConfiguration.md#transferRequests).
 
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->

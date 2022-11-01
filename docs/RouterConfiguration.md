@@ -23,7 +23,7 @@ There are many trip planning options used in the OTP web API, and more exist int
 exposed via the API. You may want to change the default value for some of these parameters, i.e. the
 value which will be applied unless it is overridden in a web API request.
 
-A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
+A full list of them can be found in the [RouteRequest](RouteRequest.md).
 
 
 ## Parameter Summary
@@ -38,7 +38,7 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
 | flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
 |    [maxTransferDurationSeconds](#flex_maxTransferDurationSeconds)                         |       `integer`       | How long should you be allowed to walk from a flex vehicle to a transit one.                      | *Optional* | `300`         |  2.1  |
-| [routingDefaults](/docs/RouteRequest.md)                                                  |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
+| [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
@@ -57,8 +57,8 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 | transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
-| [updaters](/docs/UpdaterConfig.md)                                                        |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
-| [vectorTileLayers](/docs/sandbox/MapboxVectorTilesApi.md)                                 |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
+| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |   na  |
+| [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                               | *Optional* |               |  2.0  |
 | vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                           | *Optional* |               |  2.0  |
 |    language                                                                               |        `string`       | Language code.                                                                                    | *Optional* |               |   na  |
 |    sourcesName                                                                            |        `string`       | Json tag name for updater sources.                                                                | *Optional* | `"systems"`   |   na  |
