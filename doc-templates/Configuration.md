@@ -186,10 +186,16 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
 Features that can be toggled in this file are generally only affect the routing phase of OTP2 usage,
 but for consistency all such "feature flags", even those that would affect graph building, are
-managed in this one file. See
-the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/util/OTPFeature.java)
-Java class for an enumeration of all available features and their default settings. Here is an
-example:
+managed in this one file. 
+
+## OTP Features
+
+Here is a list of all features which can be toggled on/off and their default values.
+
+<!-- INSERT: OTP-FEATURE-TABLE -->
+
+
+**Example**
 
 ```JSON
 // otp-config.json
@@ -201,28 +207,29 @@ example:
 }
 ```
 
-## OTP Features
-
-Here is a list of all features which can be toggled on/off.
-
-<!-- INSERT: OTP-FEATURE-TABLE -->
-
 
 # JVM configuration
+
 This section contains general recommendations for tuning the JVM in a production environment.  
 It focuses mainly on garbage collection configuration and memory settings.  
 See [Garbage Collector Tuning](https://docs.oracle.com/en/java/javase/17/gctuning/introduction-garbage-collection-tuning.html) for general information on garbage collection.  
 See [Large Pages in Java](https://kstefanj.github.io/2021/05/19/large-pages-and-java.html) and  [Transparent Huge Pages](https://shipilev.net/jvm/anatomy-quarks/2-transparent-huge-pages) for general information on large memory pages.
 
+
 ## OTP server
+
 The OTP server processes concurrent routing requests in real time.  
 The main optimization goal for the OTP server is minimizing response time.
 
+
 ### Garbage collector
+- 
 - The G1 garbage collector (default since Java 9) offers a good compromise between low latency (i.e. low GC pause time) and GC overhead.
 - If latency spikes are an issue, the ZGC garbage collector is an alternative. It produces in general more overhead than G1.  
 
+
 ### Memory settings 
+- 
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - It is in general not recommended to use large memory page in _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) for latency-sensitive applications, since memory is allocated on-demand and this can induce latency spikes if the memory is fragmented.  
   Thus _TLBFS_ mode (`-XX:+UseHugeTLBFS`) should be the first choice.
@@ -230,15 +237,21 @@ The main optimization goal for the OTP server is minimizing response time.
 The physical memory can be committed upfront, at JVM startup time. This can be done by forcing a fixed heap size and pre-touching the memory.  
 Example: `-Xms18g -Xmx18g -XX:+UseTransparentHugePages -XX:+AlwaysPreTouch`  
 
+
 ## Graph Builder
+
 The Graph Builder is the non-interactive mode used to build street graphs and transit graphs.     
 The main optimization goal for the Graph Builder is minimizing total build time.  
 
+
 ### Garbage collector
+- 
 - In theory, the Parallel garbage collector offers the best throughput.  
 In practice, it can be challenging to optimize the Parallel GC to build both a street graph and a transit graph, the memory usage patterns being different. 
 - The G1 garbage collector provides in general a good compromise.  
 
+
 ### Memory settings 
+- 
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - Since latency is not an issue, Large Memory Pages can be used indifferently in _TLBFS_ mode (`-XX:+UseHugeTLBFS`) or _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`)
