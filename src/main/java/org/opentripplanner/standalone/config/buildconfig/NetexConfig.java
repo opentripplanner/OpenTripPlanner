@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
@@ -32,7 +31,7 @@ public class NetexConfig {
     return mapFilePatternParameters(feedNode, original)
       .withFeedId(readFeedId(feedNode).asString())
       .withSource(
-        feedNode.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+        feedNode.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
       )
       .build();
   }
@@ -60,15 +59,14 @@ public class NetexConfig {
               This field is used to match *shared files*(zip file entries) in the module file. Shared
               files are loaded first. Then the rest of the files are grouped and loaded.
 
-              The pattern `'shared-data\\.xml'` matches `'shared-data.xml'`
+              The pattern `"shared-data.xml"` matches `"shared-data.xml"`
 
               File names are matched in the following order - and treated accordingly to the first match:
-              <ol>
-                  <li><code>ignoreFilePattern</code></li>
-                  <li><code>sharedFilePattern</code></li>
-                  <li><code>sharedGroupFilePattern</code></li>
-                  <li><code>groupFilePattern</code></li>
-              </ol>
+              
+               - `ignoreFilePattern`
+               - `sharedFilePattern`
+               - `sharedGroupFilePattern`
+               - `groupFilePattern`
               """
           )
           .asPattern(original.sharedFilePattern().pattern())
@@ -88,7 +86,7 @@ public class NetexConfig {
 
             Files are grouped together by the first group pattern in the regular expression.
 
-            The pattern `'(\\w{3})-.*-shared\\.xml'` matches `'RUT-shared.xml'` with group `'RUT'`.
+            The pattern `"(\\w{3})-.*-shared\\.xml"` matches `"RUT-shared.xml"` with group `"RUT"`.
             """
           )
           .asPattern(original.sharedGroupFilePattern().pattern())
@@ -103,8 +101,8 @@ public class NetexConfig {
             This field is used to match *group files* in the module file(zip file entries).
             *group files* are loaded right the after *shared group files* are loaded.
             Files are grouped together by the first group pattern in the regular expression.
-            The pattern `'(\\w{3})-.*\\.xml'` matches `'RUT-Line-208-Hagalia-Nevlunghavn.xml'`
-            with group `'RUT'`.
+            The pattern `"(\\w{3})-.*\\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
+            with group `"RUT"`.
             """
           )
           .asPattern(original.groupFilePattern().pattern())
@@ -116,7 +114,7 @@ public class NetexConfig {
           .summary("Pattern for matching ignored files in a NeTEx bundle.")
           .description(
             """
-              This field is used to exclude matching *files* in the module file(zip file entries). 
+              This field is used to exclude matching *files* in the module file(zip file entries).
               The *ignored* files are *not* loaded.
               """
           )
@@ -138,9 +136,9 @@ public class NetexConfig {
           .summary("List ferries witch do not allow bikes.")
           .description(
             """
-            Bicycles are allowed on most ferries however Nordic profile doesn't contain a place 
+            Bicycles are allowed on most ferries however Nordic profile doesn't contain a place
             where bicycle conveyance can be defined.
-            <p>
+            
             For this reason we allow bicycles on ferries by default and allow to override the rare
             case where this is not the case.
             """
