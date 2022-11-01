@@ -213,11 +213,11 @@ number of transit vehicles used in that itinerary.
       .of("streetRoutingTimeout")
       .since(NA)
       .summary(
-        "The maximimg time a street routing request is allowed to take before returning a timeout."
+        "The maximum time a street routing request is allowed to take before returning a timeout."
       )
       .description(
         """
-In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not
+In OTP1 path searches sometimes took a long time to complete. With the new Raptor algorithm this is not
 the case anymore. The street part of the routing may still take a long time if searching very long
 distances. You can set the street routing timeout to avoid tying up server resources on pointless
 searches and ensure that your users receive a timely response. You can also limit the max distance
@@ -226,7 +226,7 @@ information that can help identify problematic searches and improve our routing 
 no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
 search-window.
 
-The search abort after this duration and any paths found are returned to the client.
+The search aborts after this duration and any paths found are returned to the client.
 """
       )
       .asDuration(DEFAULT_STREET_ROUTING_TIMEOUT);

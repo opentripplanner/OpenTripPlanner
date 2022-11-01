@@ -160,7 +160,7 @@ public class NodeAdapter {
 
   /**
    * Be careful when using this method - this bypasses the NodeAdaptor, and we loose
-   * track of unused parameters and can not generate documentation for the children.
+   * track of unused parameters and cannot generate documentation for the children.
    * <p>
    * OTP will no longer WARN about unused parameters for this node.
    */
@@ -178,8 +178,8 @@ public class NodeAdapter {
   }
 
   /**
-   * Used by {@link ParameterBuilder} to skip one node in the node three. This method
-   * does work with the unused parameters
+   * Used by {@link ParameterBuilder} to skip one node in the node tree. This method
+   * does work with the unused parameters.
    */
   JsonNode rawNode(String paramName) {
     parameters.put(paramName, NodeInfo.ofSkipChild(paramName));

@@ -51,11 +51,8 @@ import org.slf4j.LoggerFactory;
  * These used to be command line parameters, but there were getting to be too many of them and
  * besides, we want to allow different graph build configuration for each Graph.
  * <p>
- * TODO maybe have only one giant config file and just annotate the parameters to indicate which
  * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
  * is the build configuration and the other is the router configuration.
- * <p>
- * The individual fields are documented in their mapping form the JSON node.
  */
 public class BuildConfig implements OtpDataStoreConfig {
 
@@ -284,13 +281,13 @@ public class BuildConfig implements OtpDataStoreConfig {
         .of("includeEllipsoidToGeoidDifference")
         .since(V2_0)
         .summary(
-          "Include the Ellipsoid to Geiod difference in the calculations of every point along " +
+          "Include the Ellipsoid to Geoid difference in the calculations of every point along " +
           "every StreetWithElevationEdge."
         )
         .description(
           """
 When set to true (it is false by default), the elevation module will include the Ellipsoid to
-Geiod difference in the calculations of every point along every StreetWithElevationEdge in the
+Geoid difference in the calculations of every point along every StreetWithElevationEdge in the
 graph.
   
 NOTE: if this is set to true for graph building, make sure to not set the value of
@@ -375,7 +372,7 @@ all of the elevation values in the street edges.
         .description(
           """
         This field is used for mapping routes geometry shapes. It determines max distance between shape
-        points and their stop sequence. If mapper can not find any stops within this radius it will
+        points and their stop sequence. If mapper cannot find any stops within this radius it will
         default to simple stop-to-stop geometry instead.
         """
         )
@@ -402,7 +399,7 @@ all of the elevation values in the street edges.
           """
       When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
       for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
-      to cache the entire osm file im memory. The trade off is of cause that OTP might use more
+      to cache the entire osm file im memory. The trade off is of course that OTP might use more
       memory while loading osm data. You can use this parameter to choose what is best for your
       deployment depending on your infrastructure. Set the parameter to `true` to cache the
       data, and to `false` to read the stream from the source each time.
@@ -457,7 +454,7 @@ When planning a trip, we need to allow additional time to reach these locations 
 the passenger. For example, this helps avoid suggesting short bus rides between two subway rides as
 a way to improve travel time. You can specify how long it takes to reach a subway platform.
 
-This setting does not generalize to other modes like airplanes because you often need much longer
+This setting does not generalize to other modes like airplanes because you often need much longer time
 to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
 (perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#rd_alightSlackForMode) and
 [`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.
@@ -657,8 +654,8 @@ Netex data is also often supplied in a ZIP file.
         )
         .description(
           """
-            The credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
-            need to provide a path the the service credentials. Environment variables in the path is
+            The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
+            need to provide a path the the service credentials. Environment variables in the path are
             resolved.
                   
             This is a path to a file on the local file system, not an URI.

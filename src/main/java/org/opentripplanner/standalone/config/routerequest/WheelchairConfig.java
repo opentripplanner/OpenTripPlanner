@@ -51,7 +51,7 @@ public class WheelchairConfig {
         .of("inaccessibleStreetReluctance")
         .since(V2_2)
         .summary(
-          "The factor to to multiply the cost of traversing a street edge that is not wheelchair-accessible."
+          "The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible."
         )
         .asDouble(DEFAULT.inaccessibleStreetReluctance()),
       a
@@ -105,7 +105,7 @@ public class WheelchairConfig {
       .of("onlyConsiderAccessible")
       .since(V2_2)
       .summary(
-        "Wheter to only use this entity if it is explicitly marked as wheelchair accessible."
+        "Whether to only use this entity if it is explicitly marked as wheelchair accessible."
       )
       .asBoolean(defaultValue.onlyConsiderAccessible());
 

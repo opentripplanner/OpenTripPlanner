@@ -22,7 +22,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
         .since(NA)
         .summary("Hide the FeedId in all API output, and add it to input.")
         .description(
-          "Only turn this feature on if you have unique ids accross all feeds, without the " +
+          "Only turn this feature on if you have unique ids across all feeds, without the " +
           "feedId prefix."
         )
         .asBoolean(false);

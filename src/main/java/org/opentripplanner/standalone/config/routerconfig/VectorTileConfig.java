@@ -77,7 +77,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
         .of("expansionFactor")
         .since(V2_0)
         .summary(
-          "How far outside its boundaries should the tile contain information. The value is a fraction of the tile size. If you are having problem with icons and shapes being clippedat tile edges, then increase this number."
+          "How far outside its boundaries should the tile contain information. The value is a fraction of the tile size. If you are having problem with icons and shapes being clipped at tile edges, then increase this number."
         )
         .asDouble(EXPANSION_FACTOR)
     );

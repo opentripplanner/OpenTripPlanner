@@ -33,7 +33,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
       .summary("Configuration for transit searches with RAPTOR.")
       .description(
         """
-Some of these parameters for tuning transit routing is only available through configuration and
+Some of these parameters for tuning transit routing are only available through configuration and
 cannot be set in the routing request. These parameters work together with the default routing
 request and the actual routing request.
         """
@@ -51,7 +51,7 @@ request and the actual routing request.
           """
 Set it to the maximum number of transfers for any given itinerary expected to be found within the 
 entire transit network. The memory overhead of setting this higher than the maximum number of 
-transfers is very little so it is better to set it too high then to low.
+transfers is very little so it is better to set it too high than to low.
 """
         )
         .asInt(dft.maxNumberOfTransfers());
@@ -67,7 +67,7 @@ transfers is very little so it is better to set it too high then to low.
 This reduce the number of trips departure time lookups and comparisons. When testing with data from
 Entur and all of Norway as a Graph, the optimal value was about 50. If you calculate the departure 
 time every time or want to fine tune the performance, changing this may improve the performance a 
-few percent.
+few percents.
 """
         )
         .asInt(dft.scheduledTripBinarySearchThreshold());
@@ -96,7 +96,7 @@ but you might get a slack of 60 seconds somewhere in the result.
           """
 Use this parameter to set the total number of executable threads available across all searches.
 Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, 
-no extra threads are stated and the search is done in one thread.
+no extra threads are started and the search is done in one thread.
 """
         )
         .asInt(dft.searchThreadPoolSize());
@@ -150,7 +150,7 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
         )
         .description(
           """
-The search window is expanded when the current page return few options. If ZERO results is returned
+The search window is expanded when the current page return few options. If ZERO result is returned
 the first duration in the list is used, if ONE result is returned then the second duration is used
 and so on. The duration is added to the existing search-window and inserted into the next and 
 previous page cursor. See JavaDoc for [TransitTuningParameters#pagingSearchWindowAdjustments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/raptor/transit/TransitTuningParameters.java)" +
@@ -229,7 +229,7 @@ bound for the travel duration time - the "minTransitTime". The heuristic search 
 purposes too, and is very fast.
 
 At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
-unknown/missing the parameters(EDT, LAT, DW) is dynamically calculated. The dynamic coefficients
+unknown/missing the parameters(EDT, LAT, DW) are dynamically calculated. The dynamic coefficients
 affect the performance and should be tuned to match the deployment.
 
 The request parameters are calculated like this:
@@ -240,7 +240,7 @@ The request parameters are calculated like this:
     EDT = LAT - (DW + minTransitTime)
 ```
 
-The `round_N(...)` method is will round the input to the closest multiplication of N.
+The `round_N(...)` method rounds the input to the closest multiplication of N.
 
 The 3 coefficients above are:
 
@@ -249,7 +249,7 @@ The 3 coefficients above are:
  - `W` is parameter: `minWaitTimeCoefficient`
  - `N` is parameter: `stepMinutes`
 
-In addition there this an upper bound on the calculation of the search window:
+In addition there is an upper bound on the calculation of the search window:
 `maxWinTimeMinutes`.
 """
         )
@@ -294,7 +294,7 @@ Long search windows consumes a lot of resources and may take a long time. Use th
 tune the desired maximum search time.
 
 This is the parameter that affect the response time most, the downside is that a search is only
-guarantied to be pareto-optimal within a search-window.
+guaranteed to be pareto-optimal within a search-window.
 
 The default is 3 hours. The unit is minutes.
 """
@@ -307,9 +307,10 @@ The default is 3 hours. The unit is minutes.
           .summary("Used to set the steps the search-window is rounded to.")
           .description(
             """
-The search window is rounded of to the closest multiplication of `stepMinutes`. If `stepMinutes` = 
+The search window is rounded off to the closest multiplication of `stepMinutes`. If `stepMinutes` = 
 10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5
 minutes and 17 seconds it will be rounded up to 10 minutes.
+
 
 Use a value between `1` and `60`. This should be less than the `min-raptor-search-window` 
 coefficient.

@@ -25,7 +25,7 @@ public class OtpConfig {
     injected into the config in the (continuous) deployment pipeline. How this is done, is up to
     the deployment.
 
-    The config-version have no effect on OTP, and is provided as is on the API. There is no syntax
+    The config-version has no effect on OTP, and is provided as is on the API. There is no syntax
     or format check on the version and it can be any string.
 
     Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.

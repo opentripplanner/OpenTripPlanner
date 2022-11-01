@@ -34,7 +34,7 @@ search. The filters may modify itineraries, sort them, and filter away less pref
 OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and
 `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the itineraries
 return by the search engine before returning the results to client. There is also a few mandatory
-none configurable filters removing none optimal results. You may see these filters pop-up in the
+non-configurable filters removing none optimal results. You may see these filters pop-up in the
 filter debugging.
 
 #### Group by similarity filters
@@ -82,7 +82,7 @@ itineraries that are at least double in cost for the non-grouped legs.
           .of("groupSimilarityKeepOne")
           .since(V2_1)
           .summary(
-            "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
+            "Pick ONE itinerary from each group after putting itineraries that are 85% similar together."
           )
           .asDouble(dft.groupSimilarityKeepOne())
       )
@@ -142,13 +142,13 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) 
             """
 The max-limit is applied to itineraries with *no transit legs*, however *all* itineraries
 (including those with transit legs) are considered when calculating the minimum cost. The smallest
-generalized-cost value is used as input to the function. Then function is used to calculate a
-*max-limit*. The max-limit is then used to to filter *non-transit* itineraries by
-*generalized-cost*. Itineraries with a cost higher than the max-limit is dropped from the result
+generalized-cost value is used as input to the function. The function is used to calculate a
+*max-limit*. The max-limit is then used to filter *non-transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
 set.
 
 For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
-non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` is dropped.
+non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 """
           )
           .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
@@ -198,8 +198,8 @@ result to be included. However, if there is only a single result, it is never fi
           .description(
             """
 Trips are considered equal if they have same id and same service day. Non-transit legs are skipped
-during comparison. Before filtering, trips are sorted by their generalized cost. Algorithm loops
-through list from top to bottom. If itinerary matches from any other itinerary from above, it is
+during comparison. Before filtering, trips are sorted by their generalized cost. The algorithm loops
+through the list from top to bottom. If an itinerary matches from any other itinerary from above, it is
 removed from list.
               """
           )
@@ -224,11 +224,11 @@ removed from list.
           .of("accessibilityScore")
           .since(V2_2)
           .summary(
-            "A experimental feature contributed by IBI which adds an sandbox accessibility " +
+            "An experimental feature contributed by IBI which adds a sandbox accessibility " +
             "*score* between 0 and 1 for each leg and itinerary."
           )
           .description(
-            "This can be used by by frontend developers to implement a simple traffic light UI."
+            "This can be used by frontend developers to implement a simple traffic light UI."
           )
           .asBoolean(dft.useAccessibilityScore())
       )
