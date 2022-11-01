@@ -1,15 +1,14 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
 public final class StationTransferPoint implements TransferPoint, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   private final Station station;
-
 
   public StationTransferPoint(Station station) {
     this.station = station;
@@ -30,13 +29,16 @@ public final class StationTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
-  public boolean isStationTransferPoint() { return true; }
+  public boolean isStationTransferPoint() {
+    return true;
+  }
 
   public String toString() {
-    return ValueObjectToStringBuilder.of()
-            .addText("<Station ")
-            .addObj(station.getId())
-            .addText(">")
-            .toString();
+    return ValueObjectToStringBuilder
+      .of()
+      .addText("StationTP{")
+      .addObj(station.getId())
+      .addText("}")
+      .toString();
   }
 }

@@ -4,23 +4,28 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
 import static org.opentripplanner.routing.core.TraverseMode.CAR;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.TimeUtils;
 
 /**
@@ -35,22 +40,22 @@ import org.opentripplanner.util.time.TimeUtils;
  * service day (effectively midnight except for days on which daylight savings time changes occur).
  */
 public class TestItineraryBuilder implements PlanTestConstants {
+
   public static final LocalDate SERVICE_DAY = LocalDate.of(2020, Month.FEBRUARY, 2);
-  public static final Route BUS_ROUTE = route(TransitMode.BUS);
-  public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
+  public static final Route BUS_ROUTE = route("1").withMode(TransitMode.BUS).build();
+  public static final Route RAIL_ROUTE = route("2").withMode(TransitMode.RAIL).build();
 
   /**
-   * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup
-   * the pattern or trip in the unit tests using this, so the index is fiction. Some of the
-   * Itinerary filters rely on it to make sure to trips overlap.
+   * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup the
+   * pattern or trip in the unit tests using this, so the index is fiction. Some of the Itinerary
+   * filters rely on it to make sure to trips overlap.
    */
   private static final int TRIP_FROM_STOP_INDEX = 5;
   private static final int TRIP_TO_STOP_INDEX = 7;
-
+  private final List<Leg> legs = new ArrayList<>();
   private Place lastPlace;
   private int lastEndTime;
   private int cost = 0;
-  private final List<Leg> legs = new ArrayList<>();
 
   private TestItineraryBuilder(Place origin, int startTime) {
     this.lastPlace = origin;
@@ -72,11 +77,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   /**
+   * Convert a seconds since midnight to a ZonedDateTime
+   */
+  public static ZonedDateTime newTime(int seconds) {
+    return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);
+  }
+
+  /**
    * Add a walking leg to the itinerary
+   *
    * @param duration number of seconds to walk
    */
   public TestItineraryBuilder walk(int duration, Place to) {
-    if(lastEndTime == NOT_SET) { throw new IllegalStateException("Start time unknown!"); }
+    if (lastEndTime == NOT_SET) {
+      throw new IllegalStateException("Start time unknown!");
+    }
     int legCost = cost(WALK_RELUCTANCE_FACTOR, duration);
     streetLeg(WALK, lastEndTime, lastEndTime + duration, to, legCost);
     return this;
@@ -103,27 +118,120 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost);
-    ((StreetLeg) this.legs.get(0)).setRentedVehicle(true);
+    var leg = ((StreetLeg) this.legs.get(0));
+    var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
+    this.legs.add(0, updatedLeg);
     return this;
   }
 
   /**
    * Add a bus leg to the itinerary.
    */
-  public TestItineraryBuilder bus(int tripId, int startTime, int endTime, int fromStopIndex, int toStopIndex, Place to, LocalDate serviceDate
+  public TestItineraryBuilder bus(
+    int tripId,
+    int startTime,
+    int endTime,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to,
+    LocalDate serviceDate
   ) {
-    return transit(BUS_ROUTE, tripId, startTime, endTime, fromStopIndex, toStopIndex, to, serviceDate);
+    return transit(
+      BUS_ROUTE.copy().withShortName(Integer.toString(tripId)).build(),
+      tripId,
+      startTime,
+      endTime,
+      fromStopIndex,
+      toStopIndex,
+      to,
+      serviceDate,
+      null,
+      null
+    );
   }
 
   public TestItineraryBuilder bus(int tripId, int startTime, int endTime, Place to) {
     return bus(tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
   }
 
+  public TestItineraryBuilder bus(Route route, int tripId, int startTime, int endTime, Place to) {
+    return transit(
+      route,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      null,
+      null
+    );
+  }
+
+  public TestItineraryBuilder bus(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    LocalDate serviceDay
+  ) {
+    return bus(
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      serviceDay
+    );
+  }
+
   /**
    * Add a rail/train leg to the itinerary
    */
   public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
-    return transit(RAIL_ROUTE, tripId, startTime, endTime, TRIP_FROM_STOP_INDEX, TRIP_TO_STOP_INDEX, to, null);
+    return transit(
+      RAIL_ROUTE,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      null,
+      null
+    );
+  }
+
+  public TestItineraryBuilder faresV2Rail(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    String networkId
+  ) {
+    Route route = RAIL_ROUTE;
+    if (networkId != null) {
+      var builder = RAIL_ROUTE.copy();
+      var group = GroupOfRoutes.of(new FeedScopedId(FEED_ID, networkId)).build();
+      builder.getGroupsOfRoutes().add(group);
+      route = builder.build();
+    }
+
+    return transit(
+      route,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      null,
+      null
+    );
   }
 
   public Itinerary egress(int walkDuration) {
@@ -133,24 +241,72 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   public Itinerary build() {
     Itinerary itinerary = new Itinerary(legs);
-    itinerary.generalizedCost = cost;
+    itinerary.setGeneralizedCost(cost);
     return itinerary;
   }
 
-  /**
-   * The itinerary uses the old Java Calendar, but we would like to migrate to the new java.time
-   * library; Hence this method is already changed. To convert into the legacy Calendar use
-   * {@link GregorianCalendar#from(ZonedDateTime)} method.
-   */
-  public static ZonedDateTime newTime(int seconds) {
-    return TimeUtils.zonedDateTime(SERVICE_DAY, seconds, UTC);
+  public TestItineraryBuilder frequencyBus(int tripId, int startTime, int endTime, Place to) {
+    return transit(
+      RAIL_ROUTE,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      600,
+      null
+    );
   }
 
+  public TestItineraryBuilder staySeatedBus(
+    Route route,
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to
+  ) {
+    return transit(
+      route,
+      tripId,
+      startTime,
+      endTime,
+      TRIP_FROM_STOP_INDEX,
+      TRIP_TO_STOP_INDEX,
+      to,
+      null,
+      null,
+      new ConstrainedTransfer(null, null, null, TransferConstraint.create().staySeated().build())
+    );
+  }
 
   /* private methods */
 
-  private TestItineraryBuilder transit(Route route, int tripId, int start, int end, int fromStopIndex, int toStopIndex, Place to, LocalDate serviceDate) {
-    if(lastPlace == null) { throw new IllegalStateException("Trip from place is unknown!"); }
+  /** Create a dummy trip */
+  private static Trip trip(int id, Route route) {
+    return TransitModelForTest.trip(Integer.toString(id)).withRoute(route).build();
+  }
+
+  private static Place stop(Place source) {
+    return Place.forStop(source.stop);
+  }
+
+  private TestItineraryBuilder transit(
+    Route route,
+    int tripId,
+    int start,
+    int end,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to,
+    LocalDate serviceDate,
+    Integer headwaySecs,
+    ConstrainedTransfer transferFromPreviousLeg
+  ) {
+    if (lastPlace == null) {
+      throw new IllegalStateException("Trip from place is unknown!");
+    }
     int waitTime = start - lastEndTime(start);
     int legCost = 0;
     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
@@ -166,7 +322,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     fromStopTime.setTrip(trip);
 
     // Duplicate stop time for all stops prior to the last.
-    for (int i = 0 ; i < toStopIndex; i++) {
+    for (int i = 0; i < toStopIndex; i++) {
       stopTimes.add(fromStopTime);
     }
 
@@ -179,23 +335,50 @@ public class TestItineraryBuilder implements PlanTestConstants {
     stopTimes.add(toStopTime);
 
     StopPattern stopPattern = new StopPattern(stopTimes);
-    TripPattern tripPattern = new TripPattern(route.getId(), route, stopPattern);
+    TripPattern tripPattern = TripPattern
+      .of(route.getId())
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build();
     final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
-    ScheduledTransitLeg leg = new ScheduledTransitLeg(
-            tripTimes,
-            tripPattern,
-            fromStopIndex,
-            toStopIndex,
-            GregorianCalendar.from(newTime(start)),
-            GregorianCalendar.from(newTime(end)),
-            serviceDate != null ? serviceDate : SERVICE_DAY,
-            UTC,
-            null,
-            null,
-            legCost
-    );
+    ScheduledTransitLeg leg;
+
+    if (headwaySecs != null) {
+      leg =
+        new FrequencyTransitLeg(
+          tripTimes,
+          tripPattern,
+          fromStopIndex,
+          toStopIndex,
+          newTime(start),
+          newTime(end),
+          serviceDate != null ? serviceDate : SERVICE_DAY,
+          UTC,
+          transferFromPreviousLeg,
+          null,
+          legCost,
+          headwaySecs,
+          null
+        );
+    } else {
+      leg =
+        new ScheduledTransitLeg(
+          tripTimes,
+          tripPattern,
+          fromStopIndex,
+          toStopIndex,
+          newTime(start),
+          newTime(end),
+          serviceDate != null ? serviceDate : SERVICE_DAY,
+          UTC,
+          transferFromPreviousLeg,
+          null,
+          legCost,
+          null
+        );
+    }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
 
@@ -210,17 +393,17 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to, int legCost) {
-    StreetLeg leg = new StreetLeg(
-            mode,
-            GregorianCalendar.from(newTime(startTime)),
-            GregorianCalendar.from(newTime(endTime)),
-            stop(lastPlace),
-            stop(to),
-            speed(mode) * (endTime - startTime),
-            legCost,
-            null,
-            List.of()
-    );
+    StreetLeg leg = StreetLeg
+      .create()
+      .withMode(mode)
+      .withStartTime(newTime(startTime))
+      .withEndTime(newTime(endTime))
+      .withFrom(stop(lastPlace))
+      .withTo(stop(to))
+      .withDistanceMeters(speed(mode) * (endTime - startTime))
+      .withGeneralizedCost(legCost)
+      .withWalkSteps(List.of())
+      .build();
 
     legs.add(leg);
     cost += legCost;
@@ -232,15 +415,21 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return leg;
   }
 
+  private double speed(TransitMode mode) {
+    return switch (mode) {
+      case BUS -> BUS_SPEED;
+      case RAIL -> RAIL_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
+  }
+
   private double speed(TraverseMode mode) {
-    switch (mode) {
-      case WALK: return WALK_SPEED;
-      case BICYCLE: return BICYCLE_SPEED;
-      case BUS: return BUS_SPEED;
-      case RAIL: return RAIL_SPEED;
-      case CAR: return CAR_SPEED;
-      default: throw new IllegalStateException("Unsupported mode: " + mode);
-    }
+    return switch (mode) {
+      case WALK -> WALK_SPEED;
+      case BICYCLE -> BICYCLE_SPEED;
+      case CAR -> CAR_SPEED;
+      default -> throw new IllegalStateException("Unsupported mode: " + mode);
+    };
   }
 
   private int cost(float reluctance, int durationSeconds) {
@@ -249,23 +438,5 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   private int lastEndTime(int fallbackTime) {
     return lastEndTime == NOT_SET ? fallbackTime : lastEndTime;
-  }
-
-  /** Create a dummy trip */
-  private  static Trip trip(int id, Route route) {
-    Trip trip = new Trip(new FeedScopedId(FEED_ID, Integer.toString(id)));
-    trip.setRoute(route);
-    return trip;
-  }
-
-  /** Create a dummy route */
-  private  static Route route(TransitMode mode) {
-    Route route = new Route(new FeedScopedId(FEED_ID, mode.name()));
-    route.setMode(mode);
-    return route;
-  }
-
-  private static Place stop(Place source) {
-    return Place.forStop(source.stop);
   }
 }

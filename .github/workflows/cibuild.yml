@@ -9,13 +9,11 @@ on:
       - master
       - dev-1.x
       - dev-2.x
-      - 2.1-rc
   pull_request:
     branches:
       - master
       - dev-1.x
       - dev-2.x
-      - 2.1-rc
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -24,27 +22,30 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
-      - uses: actions/checkout@v2.3.2
+      - uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
+          
       # Java setup step completes very fast, no need to run in a preconfigured docker container
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: 11
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          java-version: 17
+          distribution: temurin
+          cache: maven
+
+      # on windows there are frequent failures caused by page files being too small
+      # https://github.com/actions/virtual-environments/issues/785
+      - name: Configure Windows Pagefile
+        if: matrix.os == 'windows-latest'
+        uses: al-cheb/configure-pagefile-action@v1.3
+
       - name: Prepare coverage agent, build and test
-        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report
+        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner' && matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: target/site/jacoco/jacoco.xml
 
@@ -52,4 +53,25 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x') && matrix.os == 'ubuntu-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY
+        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck
+
+  container-image:
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
+      CONTAINER_REGISTRY_USER: otpbot
+      CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+      - name: Build container image with Jib, push to Dockerhub
+        run: mvn --batch-mode compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,${{ github.sha }}

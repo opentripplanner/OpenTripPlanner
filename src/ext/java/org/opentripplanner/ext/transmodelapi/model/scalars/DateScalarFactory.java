@@ -2,53 +2,62 @@ package org.opentripplanner.ext.transmodelapi.model.scalars;
 
 import graphql.language.StringValue;
 import graphql.schema.Coercing;
+import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
+import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
-
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.TimeZone;
 
 public class DateScalarFactory {
-    private static final String DOCUMENTATION =
-        "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+  private static final String DOCUMENTATION =
+    "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
-    private DateScalarFactory() {
-    }
+  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
-    public static GraphQLScalarType createSecondsSinceEpochAsDateStringScalar(TimeZone timeZone) {
-        return GraphQLScalarType.newScalar().name("Date").description(DOCUMENTATION).coercing(new Coercing<>() {
-            @Override
-            public String serialize(Object input) {
-                if (input instanceof Long) {
-                    // Add 1 hour before converting to date, to account for daylight savings time. This is done because
-                    // in for example TripTimeShort, only epoch time 12 hours before noon is stored instead of
-                    // the original service date.
-                    return ((Instant.ofEpochSecond((Long) input))).atZone(timeZone.toZoneId()).toLocalDateTime().plusHours(1).toLocalDate().format(FORMATTER);
-                }
-                return null;
+  private DateScalarFactory() {}
+
+  public static GraphQLScalarType createDateScalar() {
+    return GraphQLScalarType
+      .newScalar()
+      .name("Date")
+      .description(DOCUMENTATION)
+      .coercing(
+        new Coercing<LocalDate, String>() {
+          @Override
+          public String serialize(Object input) throws CoercingSerializeException {
+            if (input instanceof LocalDate) {
+              return ((LocalDate) input).toString();
             }
 
-            @Override
-            public Long parseValue(Object input) {
-                try {
-                    return LocalDate.from(FORMATTER.parse((CharSequence) input)).atStartOfDay(timeZone.toZoneId()).toEpochSecond();
-                } catch (DateTimeParseException dtpe) {
-                    throw new CoercingParseValueException("Expected type 'Date' but was '" + input + "'.");
-                }
+            throw new CoercingSerializeException(
+              "Only LocalDate is supported to serialize but found " + input
+            );
+          }
+
+          @Override
+          public LocalDate parseValue(Object input) throws CoercingParseValueException {
+            try {
+              return LocalDate.from(FORMATTER.parse((String) input));
+            } catch (DateTimeParseException e) {
+              throw new CoercingParseValueException(
+                "Expected type 'Date' but was '" + input + "'."
+              );
+            }
+          }
+
+          @Override
+          public LocalDate parseLiteral(Object input) throws CoercingParseLiteralException {
+            if (input instanceof StringValue) {
+              return parseValue(((StringValue) input).getValue());
             }
 
-            @Override
-            public Long parseLiteral(Object input) {
-                if (input instanceof StringValue) {
-                    return parseValue(((StringValue) input).getValue());
-                }
-                return null;
-            }
-        }).build();
-    }
+            throw new CoercingParseLiteralException("Expected String type but found " + input);
+          }
+        }
+      )
+      .build();
+  }
 }

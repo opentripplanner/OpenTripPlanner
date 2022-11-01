@@ -1,14 +1,13 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class StopTransferPoint implements TransferPoint, Serializable {
 
   private static final long serialVersionUID = 1L;
 
   private final StopLocation stop;
-
 
   public StopTransferPoint(StopLocation stop) {
     this.stop = stop;
@@ -29,9 +28,11 @@ public class StopTransferPoint implements TransferPoint, Serializable {
   }
 
   @Override
-  public boolean isStopTransferPoint() { return true; }
+  public boolean isStopTransferPoint() {
+    return true;
+  }
 
   public String toString() {
-    return "<Stop " + stop.getId() + ">";
+    return "StopTP{" + stop.getId() + "}";
   }
 }

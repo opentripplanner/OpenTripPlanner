@@ -10,24 +10,22 @@ import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
 public class TripStopTimeTest {
+
   private static final int STOP_1 = 2;
   private static final int STOP_2 = 5;
   private static final int STOP_3 = 7;
 
-
   TestTripSchedule trip = TestTripSchedule
-      .schedule(TestTripPattern.pattern("L31", STOP_1, STOP_2, STOP_3))
-      .arrivals("10:00 10:05 10:20")
-      .departures("10:01 10:06 10:21")
-      .build();
-
+    .schedule(TestTripPattern.pattern("L31", STOP_1, STOP_2, STOP_3))
+    .arrivals("10:00 10:05 10:20")
+    .departures("10:01 10:06 10:21")
+    .build();
 
   private final TripStopTime<TestTripSchedule> arrivalStop2 = TripStopTime.arrival(trip, 1);
   private final TripStopTime<TestTripSchedule> arrivalStop3 = TripStopTime.arrival(trip, 2);
 
   private final TripStopTime<TestTripSchedule> departureStop1 = TripStopTime.departure(trip, 0);
   private final TripStopTime<TestTripSchedule> departureStop2 = TripStopTime.departure(trip, 1);
-
 
   @Test
   public void stopPosition() {
@@ -53,7 +51,8 @@ public class TripStopTimeTest {
 
   @Test
   public void trip() {
-    String expected = "TestTripSchedule{arrivals: [10:00 10:05 10:20], departures: [10:01 10:06 10:21]}";
+    String expected =
+      "TestTripSchedule{arrivals: [10:00 10:05 10:20], departures: [10:01 10:06 10:21]}";
     assertEquals(expected, departureStop1.trip().toString());
     assertEquals(expected, arrivalStop3.trip().toString());
   }
@@ -67,32 +66,32 @@ public class TripStopTimeTest {
   @Test
   public void createArrival() {
     assertEquals(
-        "[2 10:00 BUS L31]",
-        TripStopTime.arrival(trip, stopTime(STOP_1, time("10:00"))).toString()
+      "[2 10:00 BUS L31]",
+      TripStopTime.arrival(trip, stopTime(STOP_1, time("10:00"))).toString()
     );
     assertEquals(
-        "[5 10:05 BUS L31]",
-        TripStopTime.arrival(trip, stopTime(STOP_2, time("10:05"))).toString()
+      "[5 10:05 BUS L31]",
+      TripStopTime.arrival(trip, stopTime(STOP_2, time("10:05"))).toString()
     );
     assertEquals(
-        "[7 10:20 BUS L31]",
-        TripStopTime.arrival(trip, stopTime(STOP_3, time("10:20"))).toString()
+      "[7 10:20 BUS L31]",
+      TripStopTime.arrival(trip, stopTime(STOP_3, time("10:20"))).toString()
     );
   }
 
   @Test
   public void createDeparture() {
     assertEquals(
-        "[2 10:01 BUS L31]",
-        TripStopTime.departure(trip, stopTime(STOP_1, time("10:01"))).toString()
+      "[2 10:01 BUS L31]",
+      TripStopTime.departure(trip, stopTime(STOP_1, time("10:01"))).toString()
     );
     assertEquals(
-        "[5 10:06 BUS L31]",
-        TripStopTime.departure(trip, stopTime(STOP_2, time("10:06"))).toString()
+      "[5 10:06 BUS L31]",
+      TripStopTime.departure(trip, stopTime(STOP_2, time("10:06"))).toString()
     );
     assertEquals(
-        "[7 10:21 BUS L31]",
-        TripStopTime.departure(trip, stopTime(STOP_3, time("10:21"))).toString()
+      "[7 10:21 BUS L31]",
+      TripStopTime.departure(trip, stopTime(STOP_3, time("10:21"))).toString()
     );
   }
 

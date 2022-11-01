@@ -5,7 +5,7 @@ package org.opentripplanner.routing.vehicle_parking;
  * may be represented differently to the user.
  */
 public enum VehicleParkingState {
-    OPERATIONAL,
-    TEMPORARILY_CLOSED,
-    CLOSED
+  OPERATIONAL,
+  TEMPORARILY_CLOSED,
+  CLOSED,
 }

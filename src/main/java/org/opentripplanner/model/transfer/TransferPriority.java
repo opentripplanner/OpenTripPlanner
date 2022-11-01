@@ -1,9 +1,9 @@
 package org.opentripplanner.model.transfer;
 
 /**
- * Prioritize transfers between to trips. The priority goes from the lowest value NOT_ALLOWED to
- * the highest priority PREFERRED. This follow the NeTEx/Transmodel naming and functionality. In
- * GTFS the priority is mapped using {@code transfer_type}:
+ * Prioritize transfers between to trips. The priority goes from the lowest value NOT_ALLOWED to the
+ * highest priority PREFERRED. This follow the NeTEx/Transmodel naming and functionality. In GTFS
+ * the priority is mapped using {@code transfer_type}:
  * <ol>
  *     <li>
  *         {@code 0 or empty -> PREFERRED}. Recommended transfer point between routes.
@@ -53,7 +53,6 @@ public enum TransferPriority {
    */
   PREFERRED(1_00);
 
-
   private final int cost;
 
   TransferPriority(int cost) {
@@ -61,8 +60,8 @@ public enum TransferPriority {
   }
 
   /**
-   * The default priority is ALLOWED. All transfers are ALLOWED unless they have the priority
-   * set to something else.
+   * The default priority is ALLOWED. All transfers are ALLOWED unless they have the priority set to
+   * something else.
    */
   public boolean isConstrained() {
     return this != ALLOWED;

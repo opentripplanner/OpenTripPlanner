@@ -3,32 +3,44 @@ package org.opentripplanner.routing.vehicle_parking;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 public class VehicleParkingTestGraphData {
 
-    protected IntersectionVertex A, B;
+  protected IntersectionVertex A, B;
 
-    protected Graph graph;
+  protected Graph graph;
 
-    public void initGraph() {
-        graph = new Graph();
-        graph.hasStreets = true;
+  protected TransitModel transitModel;
 
-        A = new IntersectionVertex(graph, "A", 0, 0);
-        B = new IntersectionVertex(graph, "B", 0.01, 0);
+  public void initGraph() {
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    graph = new Graph(deduplicator);
+    transitModel = new TransitModel(stopModel, deduplicator);
+    graph.hasStreets = true;
 
-        VehicleParkingTestUtil.createStreet(A, B, StreetTraversalPermission.PEDESTRIAN);
-    }
+    A = new IntersectionVertex(graph, "A", 0, 0);
+    B = new IntersectionVertex(graph, "B", 0.01, 0);
 
-    public Graph getGraph() {
-        return graph;
-    }
+    VehicleParkingTestUtil.createStreet(A, B, StreetTraversalPermission.PEDESTRIAN);
+  }
 
-    public IntersectionVertex getAVertex() {
-        return A;
-    }
+  public Graph getGraph() {
+    return graph;
+  }
 
-    public IntersectionVertex getBVertex() {
-        return B;
-    }
+  public TransitModel getTransitModel() {
+    return transitModel;
+  }
+
+  public IntersectionVertex getAVertex() {
+    return A;
+  }
+
+  public IntersectionVertex getBVertex() {
+    return B;
+  }
 }

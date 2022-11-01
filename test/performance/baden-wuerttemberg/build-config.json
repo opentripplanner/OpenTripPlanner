@@ -1,0 +1,21 @@
+{
+  "osmDefaults": {
+    "osmTagMapping": "germany",
+    "timeZone": "Europe/Berlin"
+  },
+  "staticBikeParkAndRide": true,
+  "discardMinTransferTimes": true,
+  "transitModelTimeZone": "Europe/Berlin",
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/baden-wuerttemberg/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip",
+      "feedId": "1"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://otp-performance.leonard.io/data/baden-wuerttemberg/baden-wuerttemberg-220101.osm.pbf"
+    }
+  ]
+}

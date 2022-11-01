@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
@@ -12,34 +13,38 @@ import org.opentripplanner.model.plan.Itinerary;
  */
 public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletionFlagger {
 
-    private final double bikeRentalDistanceRatio;
+  private final double bikeRentalDistanceRatio;
 
-    public RemoveBikerentalWithMostlyWalkingFilter(double bikeRentalDistanceRatio) {
-        this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
-    }
+  public RemoveBikerentalWithMostlyWalkingFilter(double bikeRentalDistanceRatio) {
+    this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
+  }
 
-    @Override
-    public String name() {
-        return "bikerental-vs-walk-filter";
-    }
+  @Override
+  public String name() {
+    return "bikerental-vs-walk-filter";
+  }
 
-    @Override
-    public Predicate<Itinerary> predicate() {
-        return itinerary -> {
-            var containsTransit =
-                    itinerary.legs.stream().anyMatch(l -> l != null && l.getMode().isTransit());
+  @Override
+  public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
+    return itinerary -> {
+      var containsTransit = itinerary
+        .getLegs()
+        .stream()
+        .anyMatch(l -> l != null && l.isTransitLeg());
 
-            double bikeRentalDistance = itinerary.legs
-                    .stream()
-                    .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
-                    .mapToDouble(l -> l.getDistanceMeters())
-                    .sum();
-            double totalDistance = itinerary.distanceMeters();
+      double bikeRentalDistance = itinerary
+        .getLegs()
+        .stream()
+        .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
+        .mapToDouble(Leg::getDistanceMeters)
+        .sum();
+      double totalDistance = itinerary.distanceMeters();
 
-            return bikeRentalDistance != 0
-                    && !containsTransit
-                    && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio;
-        };
-    }
+      return (
+        bikeRentalDistance != 0 &&
+        !containsTransit &&
+        (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio
+      );
+    };
+  }
 }
-

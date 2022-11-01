@@ -1,0 +1,10 @@
+{
+  "discardMinTransferTimes": true,
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "https://otp-performance.leonard.io/data/germany/germany-2022-08-23.tidy.gtfs.zip",
+      "feedId": "1"
+    }
+  ]
+}

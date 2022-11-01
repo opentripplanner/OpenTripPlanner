@@ -1,59 +1,87 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import com.google.common.collect.Iterables;
+import java.util.Set;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.VehicleRentalState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
- * A Euclidean remaining weight strategy that takes into account transit boarding costs where applicable.
- * 
+ * A Euclidean remaining weight strategy.
  */
 public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
-    private static final long serialVersionUID = -5172878150967231550L;
+  private double lat;
+  private double lon;
+  private double maxStreetSpeed;
+  private double walkingSpeed;
+  private boolean arriveBy;
 
-    private double lat;
-    private double lon;
-    private double maxStreetSpeed;
+  // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
+  //      not work correctly.
+  @Override
+  public void initialize(
+    RouteRequest request,
+    StreetMode streetMode,
+    Set<Vertex> fromVertices,
+    Set<Vertex> toVertices
+  ) {
+    Vertex target = toVertices.iterator().next();
+    maxStreetSpeed = getStreetSpeedUpperBound(request.preferences(), streetMode);
+    walkingSpeed = request.preferences().walk().speed();
+    arriveBy = request.arriveBy();
 
-    // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
-    //      not work correctly.
-    @Override
-    public void initialize(RoutingRequest options, long abortTime) {
-        RoutingRequest req = options;
-        Vertex target = req.rctx.toVertices.iterator().next();
-        maxStreetSpeed = req.getStreetSpeedUpperBound();
-
-        if (target.getDegreeIn() == 1) {
-            Edge edge = Iterables.getOnlyElement(target.getIncoming());
-            if (edge instanceof FreeEdge) {
-                target = edge.getFromVertex();
-            }
-        }
-
-        lat = target.getLat();
-        lon = target.getLon();
+    if (target.getDegreeIn() == 1) {
+      Edge edge = target.getIncoming().iterator().next();
+      if (edge instanceof FreeEdge) {
+        target = edge.getFromVertex();
+      }
     }
 
-    /**
-     * On a non-transit trip, the remaining weight is simply distance / street speed.
-     */
-    @Override
-    public double estimateRemainingWeight (State s) {
-        Vertex sv = s.getVertex();
-        double euclideanDistance = SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
-        // all travel is on-street, no transit involved
-        return euclideanDistance / maxStreetSpeed;
+    lat = target.getLat();
+    lon = target.getLon();
+  }
+
+  /** @return The highest speed for all possible road-modes. */
+  private double getStreetSpeedUpperBound(RoutingPreferences preferences, StreetMode streetMode) {
+    // Assume carSpeed > bikeSpeed > walkSpeed
+    if (streetMode.includesDriving()) {
+      return preferences.car().speed();
+    }
+    if (streetMode.includesBiking()) {
+      return preferences.bike().speed();
+    }
+    return preferences.walk().speed();
+  }
+
+  /**
+   * On a non-transit trip, the remaining weight is simply distance / street speed.
+   */
+  @Override
+  public double estimateRemainingWeight(State s) {
+    Vertex sv = s.getVertex();
+    double euclideanDistance = SphericalDistanceLibrary.fastDistance(
+      sv.getLat(),
+      sv.getLon(),
+      lat,
+      lon
+    );
+
+    // After parking or finishing the rental of a vehicle, you can't ever move faster than walking speed.
+    boolean useWalkSpeed;
+    if (arriveBy) {
+      useWalkSpeed = s.getVehicleRentalState() == VehicleRentalState.BEFORE_RENTING;
+    } else {
+      useWalkSpeed =
+        s.isVehicleParked() || s.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED;
     }
 
-    @Override
-    public void reset() {}
-
-    @Override
-    public void doSomeWork() {}
-
+    final double streetSpeed = useWalkSpeed ? walkingSpeed : maxStreetSpeed;
+    return euclideanDistance / streetSpeed;
+  }
 }

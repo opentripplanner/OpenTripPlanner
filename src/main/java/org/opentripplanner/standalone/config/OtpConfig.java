@@ -1,48 +1,70 @@
 package org.opentripplanner.standalone.config;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Map;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-
 
 /**
  * This class is an object representation of the 'otp-config.json'.
  */
 public class OtpConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
 
-    public final JsonNode rawConfig;
+  /**
+   * This description is shared for otp-config, build-config and router-config.
+   */
+  public static final String CONFIG_VERSION_DESCRIPTION =
+    """
+    The config-version is a parameter which each OTP deployment may set to be able to query the
+    OTP server and verify that it uses the correct version of the config. The version should be
+    injected into the config in the (continuous) deployment pipeline. How this is done, is up to
+    the deployment.
 
-    public final Map<OTPFeature, Boolean> otpFeatures;
+    The config-version has no effect on OTP, and is provided as is on the API. There is no syntax
+    or format check on the version and it can be any string.
 
-    /**
-     * The config-version is a parameter which each OTP deployment may set to be able to
-     * query the OTP server and verify that it uses the correct version of the config. The
-     * version must be injected into the config in the operation deployment pipeline. How this
-     * is done is up to the deployment.
-     * <p>
-     * The config-version have no effect on OTP, and is provided as is on the API. There is
-     * not syntax or format check on the version and it can be any string.
-     * <p>
-     * This parameter is optional, and the default is {@code null}.
-     */
-    public final String configVersion;
+    Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+    """;
 
-    OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
-        this.rawConfig = otpConfig;
-        NodeAdapter adapter = new NodeAdapter(otpConfig, source);
+  private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
 
-        this.configVersion = adapter.asText("configVersion", null);
-        this.otpFeatures = adapter.asEnumMap(
-                "otpFeatures",
-                OTPFeature.class,
-                NodeAdapter::asBoolean
-        );
-        if(logUnusedParams) {
-            adapter.logAllUnusedParameters(LOG);
-        }
+  public final NodeAdapter root;
+
+  public final Map<OTPFeature, Boolean> otpFeatures;
+
+  /**
+   * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
+   * server and verify that it uses the correct version of the config. The version must be injected
+   * into the config in the operation deployment pipeline. How this is done is up to the
+   * deployment.
+   * <p>
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
+   * or format check on the version and it can be any string.
+   * <p>
+   * This parameter is optional, and the default is {@code null}.
+   */
+  public final String configVersion;
+
+  public OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
+    this.root = new NodeAdapter(otpConfig, source);
+
+    this.configVersion =
+      root
+        .of("configVersion")
+        .since(V2_1)
+        .summary("Deployment version of the *otp-config.json*.")
+        .description(CONFIG_VERSION_DESCRIPTION)
+        .asString(null);
+    this.otpFeatures =
+      root.of("otpFeatures").since(NA).summary("TODO").asEnumMap(OTPFeature.class, Boolean.class);
+
+    if (logUnusedParams && LOG.isWarnEnabled()) {
+      root.logAllUnusedParameters(LOG::warn);
     }
+  }
 }

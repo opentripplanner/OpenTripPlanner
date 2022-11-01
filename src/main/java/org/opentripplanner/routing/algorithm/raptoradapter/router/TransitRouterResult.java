@@ -6,22 +6,19 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 
 public class TransitRouterResult {
 
-    private final List<Itinerary> itineraries;
-    private final SearchParams searchParams;
+  private final List<Itinerary> itineraries;
+  private final SearchParams searchParams;
 
-    public TransitRouterResult(
-            List<Itinerary> itineraries,
-            SearchParams searchParams
-    ) {
-        this.itineraries = itineraries;
-        this.searchParams = searchParams;
-    }
+  public TransitRouterResult(List<Itinerary> itineraries, SearchParams searchParams) {
+    this.itineraries = itineraries;
+    this.searchParams = searchParams;
+  }
 
-    public List<Itinerary> getItineraries() {
-        return itineraries;
-    }
+  public List<Itinerary> getItineraries() {
+    return itineraries;
+  }
 
-    public SearchParams getSearchParams() {
-        return searchParams;
-    }
+  public SearchParams getSearchParams() {
+    return searchParams;
+  }
 }

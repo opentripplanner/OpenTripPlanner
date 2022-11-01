@@ -7,6 +7,7 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import org.junit.jupiter.api.Test;
 
 public class TransferWaitTimeCostCalculatorTest {
+
   private static final double EPSILON = 0.005;
   private static final double ANY = Double.NaN;
 
@@ -22,7 +23,6 @@ public class TransferWaitTimeCostCalculatorTest {
   final int d5d = 5 * durationInSeconds("24h");
 
   private TransferWaitTimeCostCalculator subject;
-
 
   /**
    * verify initial condition with a few typical values:
@@ -44,11 +44,13 @@ public class TransferWaitTimeCostCalculatorTest {
         subject.setMinSafeTransferTime(t0);
         String testCase = String.format("t0=%d, n=%.1f", t0, n);
 
-        assertEquals(n * t0, subject.avoidShortWaitTimeCost(zero), EPSILON, "f(0) with " + testCase);
         assertEquals(
-                t0,
-                subject.avoidShortWaitTimeCost(t0), EPSILON, "f(t0) with " + testCase
+          n * t0,
+          subject.avoidShortWaitTimeCost(zero),
+          EPSILON,
+          "f(0) with " + testCase
         );
+        assertEquals(t0, subject.avoidShortWaitTimeCost(t0), EPSILON, "f(t0) with " + testCase);
       }
     }
   }
@@ -63,8 +65,8 @@ public class TransferWaitTimeCostCalculatorTest {
     assertEquals(185.27, subject.avoidShortWaitTimeCost(d24s), EPSILON);
     assertEquals(148.14, subject.avoidShortWaitTimeCost(d1m), EPSILON);
     assertEquals(96.39, subject.avoidShortWaitTimeCost(d4m), EPSILON);
-    assertEquals( 73.60, subject.avoidShortWaitTimeCost(d10m), EPSILON);
-    assertEquals( 24.67, subject.avoidShortWaitTimeCost(d5d), EPSILON);
+    assertEquals(73.60, subject.avoidShortWaitTimeCost(d10m), EPSILON);
+    assertEquals(24.67, subject.avoidShortWaitTimeCost(d5d), EPSILON);
   }
 
   @Test
@@ -102,10 +104,13 @@ public class TransferWaitTimeCostCalculatorTest {
 
   @Test
   public void calculateTxCostWithNoMinSafeTxTimeThrowsException() {
-    assertThrows(IllegalStateException.class, () -> {
-      var subject = new TransferWaitTimeCostCalculator(1.0, 2.0);
-      subject.calculateOptimizedWaitCost(d20m);
-    });
+    assertThrows(
+      IllegalStateException.class,
+      () -> {
+        var subject = new TransferWaitTimeCostCalculator(1.0, 2.0);
+        subject.calculateOptimizedWaitCost(d20m);
+      }
+    );
   }
 
   @Test

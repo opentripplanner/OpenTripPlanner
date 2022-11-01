@@ -6,7 +6,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
 public class LegacyGraphQLelevationProfileComponentImpl
-    implements LegacyGraphQLDataFetchers.LegacyGraphQLElevationProfileComponent {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLElevationProfileComponent {
 
   @Override
   public DataFetcher<Double> distance() {

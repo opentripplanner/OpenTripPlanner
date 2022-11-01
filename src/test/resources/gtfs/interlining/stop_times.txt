@@ -7,3 +7,9 @@ route1-trip1,00:10:00,00:10:00,stop0,1
 route1-trip1,00:20:00,00:20:00,stop2,2
 route1-trip2,00:30:00,00:30:00,stop2,1
 route1-trip2,00:40:00,00:40:00,stop3,2
+route2-trip1,00:30:00,00:30:00,stop0,1
+route2-trip1,00:40:00,00:40:00,stop4,2
+route2-trip2,00:45:00,00:45:00,stop4,1
+route2-trip2,00:55:00,00:55:00,stop5,2
+route3-trip1,00:25:00,00:25:00,stop1,1
+route3-trip1,00:35:00,00:35:00,stop6,2

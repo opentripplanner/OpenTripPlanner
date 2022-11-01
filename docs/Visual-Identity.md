@@ -1,10 +1,11 @@
-#OpenTripPlanner Visual Identity
+# OpenTripPlanner Visual Identity
 
 This is the OpenTripPlanner logo in scalable vector format, with knockout transparency:
 
 ![OTP Logo](images/otp-logo.svg)
 
-Here is a link to this SVG logo as a [downloadable file](images/otp-logo.svg). This is the raw SVG XML source code:
+Here is a link to this SVG logo as a [downloadable file](images/otp-logo.svg). This is the raw SVG
+XML source code:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -22,10 +23,19 @@ Here is a link to this SVG logo as a [downloadable file](images/otp-logo.svg). T
 </svg>
 ```
 
-This concept behind this logo design was "infinite roads". Besides the clear references to movement and wayfinding through a transportation network, it (somewhat subliminally) contains the letters O T and P. This design is more geometric and austere than our previous logo, which makes it readily recognizable in a crowd of small app icons, bookmarks, or favicons. It also channels the high modern logos and 1970s supergraphics that were the visual style of public transport for a generation.
+This concept behind this logo design was "infinite roads". Besides the clear references to movement
+and wayfinding through a transportation network, it (somewhat subliminally) contains the letters O T
+and P. This design is more geometric and austere than our previous logo, which makes it readily
+recognizable in a crowd of small app icons, bookmarks, or favicons. It also channels the high modern
+logos and 1970s supergraphics that were the visual style of public transport for a generation.
 
 The color of the logo in the RGB colorspace is `#2179BF`.
 
-The name of the OpenTripPlanner project is written in CamelCase: capital letters at the beginning of each word, with no spaces between the words. For the logotype we do not strictly adhere to a standard typeface. The OTP website just uses the CSS declarations `font: 30pt helvetica, sans-serif; font-weight: bold;`.
+The name of the OpenTripPlanner project is written in CamelCase: capital letters at the beginning of
+each word, with no spaces between the words. For the logotype we do not strictly adhere to a
+standard typeface. The OTP website just uses the CSS
+declarations `font: 30pt helvetica, sans-serif; font-weight: bold;`.
 
-The OpenTripPlanner logo was created by Brooklyn-based cartographer and graphic designer [Kate Chanba](https://kchanba.com/), who has also done extensive work on transit system maps.
+The OpenTripPlanner logo was created by Brooklyn-based cartographer and graphic
+designer [Kate Chanba](https://kchanba.com/), who has also done extensive work on transit system
+maps.

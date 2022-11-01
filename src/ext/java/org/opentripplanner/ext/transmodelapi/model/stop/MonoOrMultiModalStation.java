@@ -1,13 +1,19 @@
 package org.opentripplanner.ext.transmodelapi.model.stop;
 
-import org.opentripplanner.model.*;
-
+import java.time.ZoneId;
 import java.util.Collection;
-import java.util.TimeZone;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 
-public class MonoOrMultiModalStation extends TransitEntity {
+public class MonoOrMultiModalStation {
 
-  private final String name;
+  private final FeedScopedId id;
+
+  private final I18NString name;
 
   private final double lat;
 
@@ -21,50 +27,50 @@ public class MonoOrMultiModalStation extends TransitEntity {
   /**
    * Additional information about the station (if needed)
    */
-  private final String description;
+  private final I18NString description;
 
   /**
    * URL to a web page containing information about this particular station
    */
-  private final String url;
+  private final I18NString url;
 
-  private final TimeZone timezone;
+  private final ZoneId timezone;
 
   private final Collection<StopLocation> childStops;
 
   private final MonoOrMultiModalStation parentStation;
 
   public MonoOrMultiModalStation(Station station, MultiModalStation parentStation) {
-      super(station.getId());
-
-      this.name = station.getName();
-      this.lat = station.getLat();
-      this.lon = station.getLon();
-      this.code = station.getCode();
-      this.description = station.getDescription();
-      this.url = station.getUrl();
-      this.timezone = station.getTimezone();
-      this.childStops = station.getChildStops();
-      this.parentStation =
-          parentStation != null
-              ? new MonoOrMultiModalStation(parentStation)
-              : null;
+    this.id = station.getId();
+    this.name = station.getName();
+    this.lat = station.getLat();
+    this.lon = station.getLon();
+    this.code = station.getCode();
+    this.description = station.getDescription();
+    this.url = station.getUrl();
+    this.timezone = station.getTimezone();
+    this.childStops = station.getChildStops();
+    this.parentStation = parentStation != null ? new MonoOrMultiModalStation(parentStation) : null;
   }
 
   public MonoOrMultiModalStation(MultiModalStation multiModalStation) {
-    super(multiModalStation.getId());
+    this.id = multiModalStation.getId();
     this.name = multiModalStation.getName();
     this.lat = multiModalStation.getLat();
     this.lon = multiModalStation.getLon();
     this.code = multiModalStation.getCode();
-    this.description = multiModalStation.getDescription();
+    this.description = NonLocalizedString.ofNullable(multiModalStation.getDescription());
     this.url = multiModalStation.getUrl();
     this.timezone = null;
     this.childStops = multiModalStation.getChildStops();
     this.parentStation = null;
   }
 
-  public String getName() {
+  public final FeedScopedId getId() {
+    return id;
+  }
+
+  public I18NString getName() {
     return name;
   }
 
@@ -80,15 +86,15 @@ public class MonoOrMultiModalStation extends TransitEntity {
     return code;
   }
 
-  public String getDescription() {
+  public I18NString getDescription() {
     return description;
   }
 
-  public String getUrl() {
+  public I18NString getUrl() {
     return url;
   }
 
-  public TimeZone getTimezone() {
+  public ZoneId getTimezone() {
     return timezone;
   }
 
@@ -101,7 +107,29 @@ public class MonoOrMultiModalStation extends TransitEntity {
   }
 
   @Override
-  public String toString() {
-    return "<MonoOrMultiModalStation " + getId() + ">";
+  public final int hashCode() {
+    return getId().hashCode();
+  }
+
+  /**
+   * Uses the  {@code id} for identity. We could use the {@link Object#equals(Object)} method, but
+   * this causes the equals to fail in cases were the same entity is created twice - for example
+   * after reloading a serialized instance.
+   */
+  @Override
+  public final boolean equals(Object obj) {
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    MonoOrMultiModalStation other = (MonoOrMultiModalStation) obj;
+    return getId().equals(other.getId());
+  }
+
+  /**
+   * Provide a default toString implementation with class name and id.
+   */
+  @Override
+  public final String toString() {
+    return getClass().getSimpleName() + '{' + getId() + '}';
   }
 }

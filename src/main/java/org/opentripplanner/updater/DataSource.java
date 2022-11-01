@@ -7,9 +7,9 @@ import java.util.List;
  * that these methods are never called in parallel (i.e. updater doesn't run on multiple threads).
  */
 public interface DataSource<T> {
-
   /**
    * Fetch current data about given type and availability from this source.
+   *
    * @return true if this operation may have changed something in the list of types.
    */
   boolean update();

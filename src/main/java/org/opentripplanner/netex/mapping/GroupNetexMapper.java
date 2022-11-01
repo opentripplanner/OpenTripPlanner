@@ -12,50 +12,51 @@ import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
 /**
  * Entities x-referencing entries in more than on independent file must be mapped AFTER all
- * individual files are processed. This class is responsible for the "post-process-mapping",
- * and delegate to mappers for each specific type.
+ * individual files are processed. This class is responsible for the "post-process-mapping", and
+ * delegate to mappers for each specific type.
  */
 class GroupNetexMapper {
-    private final FeedScopedIdFactory idFactory;
-    private final DataImportIssueStore issueStore;
-    private final OtpTransitServiceBuilder transitBuilder;
-    private final List<ServiceJourneyInterchange> interchanges = new ArrayList<>();
 
-    /**
-     * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
-     */
-    final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
+  private final FeedScopedIdFactory idFactory;
+  private final DataImportIssueStore issueStore;
+  private final OtpTransitServiceBuilder transitBuilder;
+  private final List<ServiceJourneyInterchange> interchanges = new ArrayList<>();
 
-    GroupNetexMapper(
-            FeedScopedIdFactory idFactory,
-            DataImportIssueStore issueStore,
-            OtpTransitServiceBuilder transitBuilder
-    ) {
-        this.idFactory = idFactory;
-        this.issueStore = issueStore;
-        this.transitBuilder = transitBuilder;
+  /**
+   * A map from trip/serviceJourney id to an ordered list of scheduled stop point ids.
+   */
+  final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
+
+  GroupNetexMapper(
+    FeedScopedIdFactory idFactory,
+    DataImportIssueStore issueStore,
+    OtpTransitServiceBuilder transitBuilder
+  ) {
+    this.idFactory = idFactory;
+    this.issueStore = issueStore;
+    this.transitBuilder = transitBuilder;
+  }
+
+  void addInterchange(Collection<ServiceJourneyInterchange> interchanges) {
+    this.interchanges.addAll(interchanges);
+  }
+
+  void mapGroupEntries() {
+    mapInterchanges();
+  }
+
+  private void mapInterchanges() {
+    var mapper = new TransferMapper(
+      idFactory,
+      issueStore,
+      scheduledStopPointsIndex,
+      transitBuilder.getTripsById()
+    );
+    for (ServiceJourneyInterchange it : interchanges) {
+      ConstrainedTransfer result = mapper.mapToTransfer(it);
+      if (result != null) {
+        transitBuilder.getTransfers().add(result);
+      }
     }
-
-    void addInterchange(Collection<ServiceJourneyInterchange> interchanges) {
-        this.interchanges.addAll(interchanges);
-    }
-
-    void mapGroupEntries() {
-        mapInterchanges();
-    }
-
-    private void mapInterchanges() {
-        var mapper = new TransferMapper(
-                idFactory,
-                issueStore,
-                scheduledStopPointsIndex,
-                transitBuilder.getTripsById()
-        );
-        for (ServiceJourneyInterchange it : interchanges) {
-            ConstrainedTransfer result = mapper.mapToTransfer(it);
-            if(result != null) {
-                transitBuilder.getTransfers().add(result);
-            }
-        }
-    }
+  }
 }

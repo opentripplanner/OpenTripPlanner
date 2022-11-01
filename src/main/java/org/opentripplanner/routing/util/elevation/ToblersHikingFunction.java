@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.util.elevation;
 
-
 /**
  * <p>
- * Tobler's hiking function is an exponential function determining the hiking speed, taking into account the
- * slope angle. It was formulated by Waldo Tobler. This function was estimated from empirical data of Eduard Imhof.
- * [ <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function">Wikipedia</a> ]
+ * Tobler's hiking function is an exponential function determining the hiking speed, taking into
+ * account the slope angle. It was formulated by Waldo Tobler. This function was estimated from
+ * empirical data of Eduard Imhof. [ <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function">Wikipedia</a>
+ * ]
  * </p>
  * <pre>
  * Walking speed(W):
@@ -14,9 +14,10 @@ package org.opentripplanner.routing.util.elevation;
  * </pre>
  *
  * <p>
- * The {@code 6 m/s} is the Maximum speed achieved. This happens at angle 2.86 degrees or -5% downhill. In OTP we
- * want to apply this as a multiplier to the horizontal walking distance. This is done for all walkable edges in
- * the graph. To find the walkingtime for an edge we use the horizontal walking speed. Therefore:
+ * The {@code 6 m/s} is the Maximum speed achieved. This happens at angle 2.86 degrees or -5%
+ * downhill. In OTP we want to apply this as a multiplier to the horizontal walking distance. This
+ * is done for all walkable edges in the graph. To find the walkingtime for an edge we use the
+ * horizontal walking speed. Therefore:
  * </p>
  * <pre>
  * Given:
@@ -65,46 +66,50 @@ package org.opentripplanner.routing.util.elevation;
  */
 public class ToblersHikingFunction {
 
-    /**
-     * The exponential growth factor in Tobler´s function.
-     */
-    private static final double E = -3.5;
+  /**
+   * The exponential growth factor in Tobler´s function.
+   */
+  private static final double E = -3.5;
 
-    /**
-     * The slope offset where the maximum speed will occur. The value 0.05 will result in a maximum speed at
-     * -2.86 degrees (5% downhill).
-     */
-    private static final double A = 0.05;
+  /**
+   * The slope offset where the maximum speed will occur. The value 0.05 will result in a maximum
+   * speed at -2.86 degrees (5% downhill).
+   */
+  private static final double A = 0.05;
 
-    /** The horizontal speed to maximum speed factor: Vmax = C * Vflat */
-    private static final double C = 1 / Math.exp(E * A);
+  /** The horizontal speed to maximum speed factor: Vmax = C * Vflat */
+  private static final double C = 1 / Math.exp(E * A);
 
+  private final double walkDistMultiplierMaxLimit;
 
-    private final double walkDistMultiplierMaxLimit;
-
-
-    /**
-     * @param walkDistMultiplierMaxLimit this property is used to set a maximum limit for the horizontal walking
-     *                                   distance multiplier. Must be less than 1.0. See the table in the class documentation
-     *                                   for finding reasonable values for this constant.
-     */
-    public ToblersHikingFunction(double walkDistMultiplierMaxLimit) {
-        if(walkDistMultiplierMaxLimit < 1.0) {
-            throw new IllegalArgumentException("The 'walkDistMultiplierMaxLimit' is " + walkDistMultiplierMaxLimit +
-                    ", but must be greater then 1.");
-        }
-        this.walkDistMultiplierMaxLimit = walkDistMultiplierMaxLimit;
+  /**
+   * @param walkDistMultiplierMaxLimit this property is used to set a maximum limit for the
+   *                                   horizontal walking distance multiplier. Must be less than
+   *                                   1.0. See the table in the class documentation for finding
+   *                                   reasonable values for this constant.
+   */
+  public ToblersHikingFunction(double walkDistMultiplierMaxLimit) {
+    if (walkDistMultiplierMaxLimit < 1.0) {
+      throw new IllegalArgumentException(
+        "The 'walkDistMultiplierMaxLimit' is " +
+        walkDistMultiplierMaxLimit +
+        ", but must be greater then 1."
+      );
     }
+    this.walkDistMultiplierMaxLimit = walkDistMultiplierMaxLimit;
+  }
 
-    /**
-     * Calculate a walking distance multiplier to account tor the slope penalty.
-     * @param dx The horizontal walking distance
-     * @param dh The vertical distance (height)
-     */
-    public double calculateHorizontalWalkingDistanceMultiplier(double dx, double dh) {
+  /**
+   * Calculate a walking distance multiplier to account tor the slope penalty.
+   *
+   * @param dx The horizontal walking distance
+   * @param dh The vertical distance (height)
+   */
+  public double calculateHorizontalWalkingDistanceMultiplier(double dx, double dh) {
+    double distanceMultiplier = 1.0 / (C * Math.exp(E * Math.abs(dh / dx + A)));
 
-        double  distanceMultiplier = 1.0 / (C * Math.exp(E * Math.abs(dh/dx + A)));
-
-        return distanceMultiplier < walkDistMultiplierMaxLimit ? distanceMultiplier : walkDistMultiplierMaxLimit;
-    }
+    return distanceMultiplier < walkDistMultiplierMaxLimit
+      ? distanceMultiplier
+      : walkDistMultiplierMaxLimit;
+  }
 }

@@ -1,16 +1,15 @@
 package org.opentripplanner.netex.mapping.calendar;
 
-import org.opentripplanner.model.calendar.ServiceDate;
+import java.time.LocalDate;
+import javax.annotation.Nonnull;
 import org.rutebanken.netex.model.OperatingDay;
-
-import javax.validation.constraints.NotNull;
 
 class OperatingDayMapper {
 
   /** Utility class, prevent instantiation. */
-  private OperatingDayMapper() { }
+  private OperatingDayMapper() {}
 
-  static ServiceDate map(@NotNull OperatingDay opDay) {
-    return new ServiceDate(opDay.getCalendarDate().toLocalDate());
+  static LocalDate map(@Nonnull OperatingDay opDay) {
+    return opDay.getCalendarDate().toLocalDate();
   }
 }

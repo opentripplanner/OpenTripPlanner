@@ -25,7 +25,7 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
   mappers:
-    Agency: org.opentripplanner.model.Agency#Agency
+    Agency: org.opentripplanner.transit.model.organization.Agency#Agency
     RouteType: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLRouteTypeModel#LegacyGraphQLRouteTypeModel
     Alert: org.opentripplanner.routing.alertpatch.TransitAlert#TransitAlert
     AlertCauseType: String
@@ -41,7 +41,7 @@ config:
     BookingInfo: org.opentripplanner.model.BookingInfo
     BookingTime: org.opentripplanner.model.BookingTime
     CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
-    ContactInfo: org.opentripplanner.model.ContactInfo
+    ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
@@ -51,11 +51,12 @@ config:
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
+    InputField: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLInputField#LegacyGraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
     PageInfo: Object
-    Pattern: org.opentripplanner.model.TripPattern#TripPattern
+    Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
     PickupDropoffType: String
     Place: org.opentripplanner.model.plan.StopArrival#StopArrival
     placeAtDistance: org.opentripplanner.routing.graphfinder.PlaceAtDistance#PlaceAtDistance
@@ -63,7 +64,9 @@ config:
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
     Plan: graphql.execution.DataFetcherResult<org.opentripplanner.routing.api.response.RoutingResponse>
     RealtimeState: String
-    Route: org.opentripplanner.model.Route#Route
+    Route: org.opentripplanner.transit.model.network.Route#Route
+    RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
+    RoutingErrorCode: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode#LegacyGraphQLRoutingErrorCode
     serviceTimeRange: Object
     step: org.opentripplanner.model.plan.WalkStep#WalkStep
     Stop: Object # Can be either Stop or Station
@@ -74,12 +77,18 @@ config:
     StopOnTrip: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLStopOnTripModel#LegacyGraphQLStopOnTripModel
     Stoptime: org.opentripplanner.model.TripTimeOnDate#TripTimeOnDate
     StoptimesInPattern: org.opentripplanner.model.StopTimesInPattern#StopTimesInPattern
-    TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
+    TicketType: org.opentripplanner.ext.fares.model.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
-    Trip: org.opentripplanner.model.Trip#Trip
+    Trip: org.opentripplanner.transit.model.timetable.Trip#Trip
     Unknown: org.opentripplanner.ext.legacygraphqlapi.model.LegacyGraphQLUnknownModel#LegacyGraphQLUnknownModel
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
     VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
+    VehiclePosition: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition#RealtimeVehiclePosition
+    StopRelationship: org.opentripplanner.model.vehicle_position.RealtimeVehiclePosition.StopRelationship#StopRelationship
+    WheelchairBoarding: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding
+    FormFactor: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor
+    PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
+    RentalVehicleType: org.opentripplanner.routing.vehicle_rental.RentalVehicleType#RentalVehicleType

@@ -2,9 +2,10 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.util.List;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * Represents a transfer between stops with the street network path attatched to it.
@@ -17,40 +18,44 @@ import org.opentripplanner.routing.graph.Edge;
  *      where this class is used
  */
 public class PathTransfer implements Serializable {
-    private static final long serialVersionUID = 20200316L;
 
-    public final StopLocation from;
+  private static final long serialVersionUID = 20200316L;
 
-    public final StopLocation to;
+  public final StopLocation from;
 
-    private final double distanceMeters;
+  public final StopLocation to;
 
-    private final List<Edge> edges;
+  private final double distanceMeters;
 
-    public PathTransfer(StopLocation from, StopLocation to, double distanceMeters, List<Edge> edges) {
-        this.from = from;
-        this.to = to;
-        this.distanceMeters = distanceMeters;
-        this.edges = edges;
-    }
+  private final List<Edge> edges;
 
-    public String getName() {
-        return from + " => " + to;
-    }
+  public PathTransfer(StopLocation from, StopLocation to, double distanceMeters, List<Edge> edges) {
+    this.from = from;
+    this.to = to;
+    this.distanceMeters = distanceMeters;
+    this.edges = edges;
+  }
 
-    public double getDistanceMeters() {
-        return distanceMeters;
-    }
+  public String getName() {
+    return from + " => " + to;
+  }
 
-    public List<Edge> getEdges() { return this.edges; }
+  public double getDistanceMeters() {
+    return distanceMeters;
+  }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(getClass())
-                .addObj("from", from)
-                .addObj("to", to)
-                .addNum("distance", distanceMeters)
-                .addColSize("edges", edges)
-                .toString();
-    }
+  public List<Edge> getEdges() {
+    return this.edges;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(getClass())
+      .addObj("from", from)
+      .addObj("to", to)
+      .addNum("distance", distanceMeters)
+      .addColSize("edges", edges)
+      .toString();
+  }
 }

@@ -1,51 +1,43 @@
 package org.opentripplanner.api.parameter;
 
-import static org.opentripplanner.model.modes.AllowedTransitMode.fromMainModeEnum;
-
-import java.util.Set;
-import org.opentripplanner.model.modes.AllowedTransitMode;
-import org.opentripplanner.model.TransitMode;
-
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 public enum ApiRequestMode {
-    WALK(),
-    BICYCLE(),
-    SCOOTER(),
-    CAR(),
-    TRAM(fromMainModeEnum(TransitMode.TRAM)),
-    SUBWAY(fromMainModeEnum(TransitMode.SUBWAY)),
-    RAIL(fromMainModeEnum(TransitMode.RAIL)),
-    BUS(Set.of(
-            fromMainModeEnum(TransitMode.BUS),
-            fromMainModeEnum(TransitMode.COACH)
-    )),
-    FERRY(fromMainModeEnum(TransitMode.FERRY)),
-    CABLE_CAR(fromMainModeEnum(TransitMode.CABLE_CAR)),
-    GONDOLA(fromMainModeEnum(TransitMode.GONDOLA)),
-    FUNICULAR(fromMainModeEnum(TransitMode.FUNICULAR)),
-    TRANSIT(AllowedTransitMode.getAllTransitModes()),
-    AIRPLANE(fromMainModeEnum(TransitMode.AIRPLANE)),
-    TROLLEYBUS(fromMainModeEnum(TransitMode.TROLLEYBUS)),
-    MONORAIL(fromMainModeEnum(TransitMode.MONORAIL)),
-    FLEX();
+  WALK(),
+  BICYCLE(),
+  SCOOTER(),
+  CAR(),
+  TRAM(TransitMode.TRAM),
+  SUBWAY(TransitMode.SUBWAY),
+  RAIL(TransitMode.RAIL),
+  BUS(TransitMode.BUS, TransitMode.COACH),
+  FERRY(TransitMode.FERRY),
+  CABLE_CAR(TransitMode.CABLE_CAR),
+  GONDOLA(TransitMode.GONDOLA),
+  FUNICULAR(TransitMode.FUNICULAR),
+  TRANSIT(TransitMode.values()),
+  AIRPLANE(TransitMode.AIRPLANE),
+  TROLLEYBUS(TransitMode.TROLLEYBUS),
+  MONORAIL(TransitMode.MONORAIL),
+  FLEX();
 
-    private final Set<AllowedTransitMode> transitModes;
+  private final List<TransitMode> transitModes;
 
-    ApiRequestMode(Set<AllowedTransitMode> transitModes) {
-        this.transitModes = transitModes;
-    }
+  ApiRequestMode(TransitMode... transitModes) {
+    this.transitModes = List.of(transitModes);
+  }
 
-    ApiRequestMode(AllowedTransitMode transitMode) {
-        this.transitModes = Set.of(transitMode);
-    }
+  ApiRequestMode(TransitMode transitMode) {
+    this.transitModes = List.of(transitMode);
+  }
 
-    ApiRequestMode() {
-        this.transitModes = Collections.emptySet();
-    }
+  ApiRequestMode() {
+    this.transitModes = List.of();
+  }
 
-    public Collection<AllowedTransitMode> getTransitModes() {
-        return transitModes;
-    }
+  public Collection<TransitMode> getTransitModes() {
+    return transitModes;
+  }
 }

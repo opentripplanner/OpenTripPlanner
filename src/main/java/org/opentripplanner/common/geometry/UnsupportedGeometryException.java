@@ -7,5 +7,4 @@ public class UnsupportedGeometryException extends Exception {
   public UnsupportedGeometryException(String message) {
     this.message = message;
   }
-
 }

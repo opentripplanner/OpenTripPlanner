@@ -1,18 +1,20 @@
 package org.opentripplanner.model.projectinfo;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class OtpProjectInfoTest {
 
   @Test
   public void projectInfo() {
     OtpProjectInfo p = OtpProjectInfo.projectInfo();
+
+    System.out.println(p);
 
     p.otpConfigVersion = "1";
     assertEquals("1", p.otpConfigVersion);
@@ -24,12 +26,11 @@ public class OtpProjectInfoTest {
     assertTrue(p.version.patch >= 0);
 
     if (!"UNKNOWN".equals(p.versionControl.branch)) {
-      assertTrue(p.versionControl.commit, p.versionControl.commit.matches("[a-f0-9]{8,}"));
+      assertTrue(p.versionControl.commit.matches("[a-f0-9]{8,}"), p.versionControl.commit);
       assertNotNull(p.versionControl.branch);
       assertNotNull(p.versionControl.buildTime);
       assertNotNull(p.versionControl.commitTime);
-    }
-    else {
+    } else {
       assertEquals("UNKNOWN", p.graphFileHeaderInfo.otpSerializationVersionIdPadded());
       assertEquals("UNKNOWN", p.versionControl.commit);
       assertEquals("UNKNOWN", p.versionControl.branch);

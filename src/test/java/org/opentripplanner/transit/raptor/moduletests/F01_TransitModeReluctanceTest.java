@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 
@@ -11,47 +10,48 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
 
 /**
  * FEATURE UNDER TEST
  * <p>
- * Raptor should return transit option with the lowest cost when to rides are equal, but
- * have different transit-reluctance.
+ * Raptor should return transit option with the lowest cost when to rides are equal, but have
+ * different transit-reluctance.
  */
 public class F01_TransitModeReluctanceTest implements RaptorTestConstants {
 
+  private static final String EXPECTED =
+    "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
-          RaptorConfig.defaultConfigForTest()
+    RaptorConfig.defaultConfigForTest()
   );
-
-  private final static String EXPECTED =  "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s "
-          + "[0:00:30 0:03 2m30s 0tx $%d]";
 
   @BeforeEach
   public void setup() {
     // Given 2 identical routes R1 and R2
     data.withRoute(
-        route(pattern("R1", STOP_A, STOP_B))
+      route(pattern("R1", STOP_A, STOP_B))
         .withTimetable(schedule("00:01, 00:02:40").transitReluctanceIndex(0))
     );
     data.withRoute(
-        route(pattern("R2", STOP_A, STOP_B))
+      route(pattern("R2", STOP_A, STOP_B))
         .withTimetable(schedule("00:01, 00:02:40").transitReluctanceIndex(1))
     );
 
-    requestBuilder.searchParams()
-        .addAccessPaths(walk(STOP_A, D30s))
-        .addEgressPaths(walk(STOP_B, D20s))
-        .earliestDepartureTime(T00_00)
-        .latestArrivalTime(T00_10)
-        .timetableEnabled(true);
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_B, D20s))
+      .earliestDepartureTime(T00_00)
+      .latestArrivalTime(T00_10)
+      .timetableEnabled(true);
 
     requestBuilder.profile(RaptorProfile.MULTI_CRITERIA);
 

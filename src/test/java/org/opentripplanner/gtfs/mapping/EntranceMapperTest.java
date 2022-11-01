@@ -1,19 +1,22 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.model.WheelChairBoarding;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
+import org.junit.jupiter.api.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.site.Entrance;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+public class EntranceMapperTest {
 
-public class EntranceMapperTest  {
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "E1");
 
   private static final String CODE = "Code";
@@ -36,11 +39,16 @@ public class EntranceMapperTest  {
 
   private static final int WHEELCHAIR_BOARDING = 1;
 
-  private static final WheelChairBoarding WHEELCHAIR_BOARDING_ENUM = WheelChairBoarding.POSSIBLE;
+  private static final Accessibility WHEELCHAIR_BOARDING_ENUM = Accessibility.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
   private static final Stop STOP = new Stop();
+
+  private final EntranceMapper subject = new EntranceMapper(
+    new TranslationHelper(),
+    stationId -> null
+  );
 
   static {
     STOP.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
@@ -58,26 +66,24 @@ public class EntranceMapperTest  {
     STOP.setZoneId(ZONE_ID);
   }
 
-  private EntranceMapper subject = new EntranceMapper();
-
   @Test
   public void testMapCollection() throws Exception {
-    assertNull(null, subject.map((Collection<Stop>) null));
+    assertNull(subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
 
   @Test
   public void testMap() throws Exception {
-    org.opentripplanner.model.Entrance result = subject.map(STOP);
+    Entrance result = subject.map(STOP);
 
     assertEquals("A:E1", result.getId().toString());
     assertEquals(CODE, result.getCode());
-    assertEquals(DESC, result.getDescription());
+    assertEquals(DESC, result.getDescription().toString());
     assertEquals(LAT, result.getCoordinate().latitude(), 0.0001d);
     assertEquals(LON, result.getCoordinate().longitude(), 0.0001d);
-    assertEquals(NAME, result.getName());
-    assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(NAME, result.getName().toString());
+    assertEquals(Accessibility.POSSIBLE, result.getWheelchairAccessibility());
   }
 
   @Test
@@ -85,36 +91,39 @@ public class EntranceMapperTest  {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
     input.setId(AGENCY_AND_ID);
+    input.setName(NAME);
+    input.setLat(LAT);
+    input.setLon(LON);
 
-    org.opentripplanner.model.Entrance result = subject.map(input);
+    Entrance result = subject.map(input);
 
     assertNotNull(result.getId());
+    assertNotNull(result.getCoordinate());
+    assertNotNull(result.getName());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertNull(result.getName());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
-    assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+    assertEquals(Accessibility.NO_INFORMATION, result.getWheelchairAccessibility());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
     input.setId(AGENCY_AND_ID);
-
-    org.opentripplanner.model.Entrance result = subject.map(input);
+    input.setName(NAME);
 
     // Exception expected because the entrence and the parent do not have a coordinate
-    result.getCoordinate().latitude();
+    assertThrows(IllegalStateException.class, () -> subject.map(input));
   }
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
   public void testMapCache() throws Exception {
-    org.opentripplanner.model.Entrance result1 = subject.map(STOP);
-    org.opentripplanner.model.Entrance result2 = subject.map(STOP);
+    Entrance result1 = subject.map(STOP);
+    Entrance result2 = subject.map(STOP);
 
-    assertTrue(result1 == result2);
+    assertSame(result1, result2);
   }
 }

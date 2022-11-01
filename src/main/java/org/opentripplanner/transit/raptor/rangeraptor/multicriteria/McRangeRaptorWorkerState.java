@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
@@ -18,7 +20,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Tra
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
-
 
 /**
  * Tracks the state of a RAPTOR search, specifically the best arrival times at each transit stop at
@@ -30,170 +31,181 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implements WorkerState<T> {
+public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
+  implements WorkerState<T> {
 
-    private final StopArrivals<T> arrivals;
-    private final DestinationArrivalPaths<T> paths;
-    private final HeuristicsProvider<T> heuristics;
-    private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
-    private final CostCalculator costCalculator;
-    private final TransitCalculator<T> transitCalculator;
+  private final McStopArrivals<T> arrivals;
+  private final DestinationArrivalPaths<T> paths;
+  private final HeuristicsProvider<T> heuristics;
+  private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
+  private final CostCalculator<T> costCalculator;
+  private final TransitCalculator<T> transitCalculator;
 
-    /**
-     * create a RaptorState for a network with a particular number of stops, and a given maximum
-     * duration
-     */
-    public McRangeRaptorWorkerState(
-            StopArrivals<T> arrivals,
-            DestinationArrivalPaths<T> paths,
-            HeuristicsProvider<T> heuristics,
-            CostCalculator costCalculator,
-            TransitCalculator<T> transitCalculator,
-            WorkerLifeCycle lifeCycle
-    ) {
-        this.arrivals = arrivals;
-        this.paths = paths;
-        this.heuristics = heuristics;
-        this.costCalculator = costCalculator;
-        this.transitCalculator = transitCalculator;
+  /**
+   * create a RaptorState for a network with a particular number of stops, and a given maximum
+   * duration
+   */
+  public McRangeRaptorWorkerState(
+    McStopArrivals<T> arrivals,
+    DestinationArrivalPaths<T> paths,
+    HeuristicsProvider<T> heuristics,
+    CostCalculator<T> costCalculator,
+    TransitCalculator<T> transitCalculator,
+    WorkerLifeCycle lifeCycle
+  ) {
+    this.arrivals = arrivals;
+    this.paths = paths;
+    this.heuristics = heuristics;
+    this.costCalculator = costCalculator;
+    this.transitCalculator = transitCalculator;
 
-        // Attach to the RR life cycle
-        lifeCycle.onSetupIteration((ignore) -> setupIteration());
-        lifeCycle.onTransitsForRoundComplete(this::transitsForRoundComplete);
-        lifeCycle.onTransfersForRoundComplete(this::transfersForRoundComplete);
+    // Attach to the RR life cycle
+    lifeCycle.onSetupIteration(ignore -> setupIteration());
+    lifeCycle.onTransitsForRoundComplete(this::transitsForRoundComplete);
+    lifeCycle.onTransfersForRoundComplete(this::transfersForRoundComplete);
+  }
+
+  // The below methods are ordered after the sequence they naturally appear in the algorithm,
+  // also private life-cycle callbacks are listed here (not in the private method section).
+
+  @Override
+  public boolean isNewRoundAvailable() {
+    return arrivals.updateExist();
+  }
+
+  @Override
+  public IntIterator stopsTouchedPreviousRound() {
+    return arrivals.stopsTouchedIterator();
+  }
+
+  @Override
+  public IntIterator stopsTouchedByTransitCurrentRound() {
+    return arrivals.stopsTouchedIterator();
+  }
+
+  @Override
+  public boolean isDestinationReachedInCurrentRound() {
+    return paths.isReachedCurrentRound();
+  }
+
+  @Override
+  public void setAccessToStop(RaptorAccessEgress accessPath, int departureTime) {
+    addStopArrival(new AccessStopArrival<>(departureTime, accessPath));
+  }
+
+  /**
+   * Set the time at a transit stops iff it is optimal.
+   */
+  @Override
+  public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
+    Iterable<? extends AbstractStopArrival<T>> fromArrivals = arrivals.listArrivalsAfterMarker(
+      fromStop
+    );
+
+    while (transfers.hasNext()) {
+      transferToStop(fromArrivals, transfers.next());
+    }
+  }
+
+  @Override
+  public Collection<Path<T>> extractPaths() {
+    arrivals.debugStateInfo();
+    return paths.listPaths();
+  }
+
+  @Override
+  public StopArrivals extractStopArrivals() {
+    return arrivals;
+  }
+
+  Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
+    return arrivals.listArrivalsAfterMarker(stop);
+  }
+
+  /**
+   * Set the time at a transit stop iff it is optimal.
+   */
+  void transitToStop(
+    final PatternRide<T> ride,
+    final int alightStop,
+    final int alightTime,
+    final int alightSlack
+  ) {
+    final int stopArrivalTime = alightTime + alightSlack;
+
+    if (exceedsTimeLimit(stopArrivalTime)) {
+      return;
     }
 
-    // The below methods are ordered after the sequence they naturally appear in the algorithm,
-    // also private life-cycle callbacks are listed here (not in the private method section).
+    final int costTransit = costCalculator.transitArrivalCost(
+      ride.boardCost(),
+      alightSlack,
+      alightTime - ride.boardTime(),
+      ride.trip(),
+      alightStop
+    );
 
-    @Override
-    public boolean isNewRoundAvailable() {
-        return arrivals.updateExist();
+    arrivalsCache.add(
+      new TransitStopArrival<>(
+        ride.prevArrival(),
+        alightStop,
+        stopArrivalTime,
+        costTransit,
+        ride.trip()
+      )
+    );
+  }
+
+  /* private methods */
+
+  /** This method is called by the Worker life cycle */
+  private void setupIteration() {
+    arrivalsCache.clear();
+    // clear all touched stops to avoid constant re-exploration
+    arrivals.clearTouchedStopsAndSetStopMarkers();
+  }
+
+  /** This method is called by the Worker life cycle */
+  private void transitsForRoundComplete() {
+    arrivals.clearTouchedStopsAndSetStopMarkers();
+    commitCachedArrivals();
+  }
+
+  /** This method is part of Worker life cycle */
+  private void transfersForRoundComplete() {
+    commitCachedArrivals();
+  }
+
+  private void transferToStop(
+    Iterable<? extends AbstractStopArrival<T>> fromArrivals,
+    RaptorTransfer transfer
+  ) {
+    final int transferTimeInSeconds = transfer.durationInSeconds();
+
+    for (AbstractStopArrival<T> it : fromArrivals) {
+      int arrivalTime = it.arrivalTime() + transferTimeInSeconds;
+
+      if (!exceedsTimeLimit(arrivalTime)) {
+        arrivalsCache.add(new TransferStopArrival<>(it, transfer, arrivalTime));
+      }
     }
+  }
 
-    @Override
-    public IntIterator stopsTouchedPreviousRound() {
-        return arrivals.stopsTouchedIterator();
+  private void commitCachedArrivals() {
+    for (AbstractStopArrival<T> arrival : arrivalsCache) {
+      addStopArrival(arrival);
     }
+    arrivalsCache.clear();
+  }
 
-    @Override
-    public IntIterator stopsTouchedByTransitCurrentRound() {
-        return arrivals.stopsTouchedIterator();
+  private void addStopArrival(AbstractStopArrival<T> arrival) {
+    if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
+      return;
     }
+    arrivals.addStopArrival(arrival);
+  }
 
-    @Override
-    public boolean isDestinationReachedInCurrentRound() {
-        return paths.isReachedCurrentRound();
-    }
-
-    @Override
-    public void setAccessToStop(RaptorTransfer accessPath, int departureTime) {
-        addStopArrival(new AccessStopArrival<>(departureTime, accessPath));
-    }
-
-    /**
-     * Set the time at a transit stops iff it is optimal.
-     */
-    @Override
-    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
-        Iterable<? extends AbstractStopArrival<T>> fromArrivals = arrivals.listArrivalsAfterMarker(fromStop);
-
-        while (transfers.hasNext()) {
-            transferToStop(fromArrivals, transfers.next());
-        }
-    }
-
-    @Override
-    public Collection<Path<T>> extractPaths() {
-        arrivals.debugStateInfo();
-        return paths.listPaths();
-    }
-
-    Iterable<? extends AbstractStopArrival<T>> listStopArrivalsPreviousRound(int stop) {
-        return arrivals.listArrivalsAfterMarker(stop);
-    }
-
-    /**
-     * Set the time at a transit stop iff it is optimal.
-     */
-    void transitToStop(
-        final PatternRide<T> ride,
-        final int alightStop,
-        final int alightTime,
-        final int alightSlack
-    ) {
-        final int stopArrivalTime = alightTime + alightSlack;
-
-        if (exceedsTimeLimit(stopArrivalTime)) { return; }
-
-        final int costTransit = costCalculator.transitArrivalCost(
-            ride.boardCost,
-            alightSlack,
-            alightTime - ride.boardTime,
-            ride.trip.transitReluctanceFactorIndex(),
-            alightStop
-        );
-
-        arrivalsCache.add(
-            new TransitStopArrival<>(
-                ride.prevArrival,
-                alightStop,
-                stopArrivalTime,
-                costTransit,
-                ride.trip
-            )
-        );
-    }
-
-
-    /* private methods */
-
-    /** This method is called by the Worker life cycle */
-    private void setupIteration() {
-        arrivalsCache.clear();
-        // clear all touched stops to avoid constant re-exploration
-        arrivals.clearTouchedStopsAndSetStopMarkers();
-    }
-
-    /** This method is called by the Worker life cycle */
-    private void transitsForRoundComplete() {
-        arrivals.clearTouchedStopsAndSetStopMarkers();
-        commitCachedArrivals();
-    }
-
-    /** This method is part of Worker life cycle */
-    private void transfersForRoundComplete() {
-        commitCachedArrivals();
-    }
-
-    private void transferToStop(Iterable<? extends AbstractStopArrival<T>> fromArrivals, RaptorTransfer transfer) {
-        final int transferTimeInSeconds = transfer.durationInSeconds();
-
-        for (AbstractStopArrival<T> it : fromArrivals) {
-            int arrivalTime = it.arrivalTime() + transferTimeInSeconds;
-
-            if (!exceedsTimeLimit(arrivalTime)) {
-                arrivalsCache.add(new TransferStopArrival<>(it, transfer, arrivalTime));
-            }
-        }
-    }
-
-    private void commitCachedArrivals() {
-        for (AbstractStopArrival<T> arrival : arrivalsCache) {
-            addStopArrival(arrival);
-        }
-        arrivalsCache.clear();
-    }
-
-    private void addStopArrival(AbstractStopArrival<T> arrival) {
-        if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
-            return;
-        }
-        arrivals.addStopArrival(arrival);
-    }
-
-    private boolean exceedsTimeLimit(int time) {
-        return transitCalculator.exceedsTimeLimit(time);
-    }
-
+  private boolean exceedsTimeLimit(int time) {
+    return transitCalculator.exceedsTimeLimit(time);
+  }
 }

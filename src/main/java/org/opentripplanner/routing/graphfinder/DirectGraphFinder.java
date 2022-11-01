@@ -1,15 +1,16 @@
 package org.opentripplanner.routing.graphfinder;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A Graph finder used in conjunction with a graph, which does not have a street network included.
@@ -17,29 +18,30 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  */
 public class DirectGraphFinder implements GraphFinder {
 
-  private final StreetVertexIndex streetIndex;
+  private final Function<Envelope, Collection<RegularStop>> queryNearbyStops;
 
-  public DirectGraphFinder(Graph graph) {
-    this.streetIndex = graph.getStreetIndex();
+  public DirectGraphFinder(Function<Envelope, Collection<RegularStop>> queryNearbyStops) {
+    this.queryNearbyStops = queryNearbyStops;
   }
 
   /**
-   * Return all stops within a certain radius of the given vertex, using straight-line distance independent of streets.
-   * If the origin vertex is a StopVertex, the result will include it.
+   * Return all stops within a certain radius of the given vertex, using straight-line distance
+   * independent of streets. If the origin vertex is a StopVertex, the result will include it.
    */
   @Override
-  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
-    List<NearbyStop> stopsFound = Lists.newArrayList();
-    Coordinate coordinate = new Coordinate(lon, lat);
-    for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
-      double distance = Math.round(SphericalDistanceLibrary.distance(coordinate, it.getCoordinate()));
+  public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
+    List<NearbyStop> stopsFound = new ArrayList<>();
+    Envelope envelope = new Envelope(coordinate);
+    envelope.expandBy(
+      SphericalDistanceLibrary.metersToLonDegrees(radiusMeters, coordinate.y),
+      SphericalDistanceLibrary.metersToDegrees(radiusMeters)
+    );
+    for (RegularStop it : queryNearbyStops.apply(envelope)) {
+      double distance = Math.round(
+        SphericalDistanceLibrary.distance(coordinate, it.getCoordinate().asJtsCoordinate())
+      );
       if (distance < radiusMeters) {
-        NearbyStop sd = new NearbyStop(
-            it,
-            distance,
-            null,
-            null
-        );
+        NearbyStop sd = new NearbyStop(it, distance, null, null);
         stopsFound.add(sd);
       }
     }
@@ -51,10 +53,16 @@ public class DirectGraphFinder implements GraphFinder {
 
   @Override
   public List<PlaceAtDistance> findClosestPlaces(
-      double lat, double lon, double maxDistance, int maxResults, List<TransitMode> filterByModes,
-      List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
-      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
-      List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
+    double lat,
+    double lon,
+    double maxDistance,
+    int maxResults,
+    List<TransitMode> filterByModes,
+    List<PlaceType> filterByPlaceTypes,
+    List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByRoutes,
+    List<String> filterByBikeRentalStations,
+    TransitService transitService
   ) {
     throw new UnsupportedOperationException("Not implemented");
   }

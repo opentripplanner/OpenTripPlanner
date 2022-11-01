@@ -17,33 +17,29 @@ import org.slf4j.LoggerFactory;
  */
 public class DebugLoggingSupport {
 
-    public static List<String> getLogs() {
-        List<String> result = new ArrayList<>();
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        for (Logger log : context.getLoggerList()) {
-            var name = log.getName();
-            if (
-                    name.matches("(org\\.opentripplanner\\..*|[A-Z0-9_]*)")
-                    && !name.equals("ROOT")
-            ) {
-                result.add(logDisplayName(name));
-            }
-        }
-        return result;
+  public static List<String> getLogs() {
+    List<String> result = new ArrayList<>();
+    LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (Logger log : context.getLoggerList()) {
+      var name = log.getName();
+      if (name.matches("(org\\.opentripplanner\\..*|[A-Z0-9_]*)") && !name.equals("ROOT")) {
+        result.add(logDisplayName(name));
+      }
     }
+    return result;
+  }
 
-
-    public static void configureDebugLogging(Map<String, Boolean> loggers) {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        for (Logger log : context.getLoggerList()) {
-            var name = logDisplayName(log.getName());
-            if(loggers.getOrDefault(name, false))  {
-                log.setLevel(Level.DEBUG);
-            }
-        }
+  public static void configureDebugLogging(Map<String, Boolean> loggers) {
+    LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    for (Logger log : context.getLoggerList()) {
+      var name = logDisplayName(log.getName());
+      if (loggers.getOrDefault(name, false)) {
+        log.setLevel(Level.DEBUG);
+      }
     }
+  }
 
-    private static String logDisplayName(String name) {
-        return name.replace("org.opentripplanner.", "o.o.");
-    }
+  private static String logDisplayName(String name) {
+    return name.replace("org.opentripplanner.", "o.o.");
+  }
 }

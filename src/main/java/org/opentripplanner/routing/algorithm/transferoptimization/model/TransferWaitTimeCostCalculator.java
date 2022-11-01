@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 /**
@@ -115,6 +114,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
  * </ol>
  */
 public class TransferWaitTimeCostCalculator {
+
   public static final int ZERO_COST = 0;
 
   /**
@@ -133,7 +133,6 @@ public class TransferWaitTimeCostCalculator {
   private int t0 = -1;
   private double a = Double.NaN;
 
-
   /**
    * Set the scale factor N, so:
    * <pre>
@@ -145,8 +144,8 @@ public class TransferWaitTimeCostCalculator {
    *                                 the wait time against extra transit time and less walking.
    */
   public TransferWaitTimeCostCalculator(
-      double backTravelWaitTimeFactor,
-      double minSafeWaitTimeFactor
+    double backTravelWaitTimeFactor,
+    double minSafeWaitTimeFactor
   ) {
     this.backTravelWaitTimeFactor = backTravelWaitTimeFactor;
     this.n = minSafeWaitTimeFactor;
@@ -160,7 +159,6 @@ public class TransferWaitTimeCostCalculator {
     this.a = (Math.E - 1.0) / minSafeTransferTime;
   }
 
-
   double avoidShortWaitTimeCost(int waitTime) {
     return n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime));
   }
@@ -170,15 +168,15 @@ public class TransferWaitTimeCostCalculator {
   }
 
   /**
-   * The optimized transfer normally do not need to account for transfer constraints, but we want
-   * a guaranteed or stay-seated transfer to "win" over a normal transfer - independent of what
-   * the wait-times of the facilitated transfer are. We also need to account for the case where we
-   * have to choose between facilitated transfers.
+   * The optimized transfer normally do not need to account for transfer constraints, but we want a
+   * guaranteed or stay-seated transfer to "win" over a normal transfer - independent of what the
+   * wait-times of the facilitated transfer are. We also need to account for the case where we have
+   * to choose between facilitated transfers.
    * <p>
    * Here is an example with to possible paths: {@code A-B-D-E-H-J} and {@code A-C-F-G-I-J}, the
-   * {@code \} is a normal transfer and the {@code \\} is a guaranteed transfer. The path
-   * {@code A-B-D-G-I-J} is also possible, but can be dropped early, because it does not contain
-   * any guaranteed transfers.
+   * {@code \} is a normal transfer and the {@code \\} is a guaranteed transfer. The path {@code
+   * A-B-D-G-I-J} is also possible, but can be dropped early, because it does not contain any
+   * guaranteed transfers.
    * <pre>
    *  A --- B ---------- C
    *         \           \\
@@ -209,12 +207,12 @@ public class TransferWaitTimeCostCalculator {
   }
 
   int calculateOptimizedWaitCost(int waitTime) {
-    if(waitTime < 0 ) { return ZERO_COST; }
+    if (waitTime < 0) {
+      return ZERO_COST;
+    }
     assertMinSafeTransferTimeSet();
 
-    return toRaptorCost(
-        avoidShortWaitTimeCost(waitTime) + avoidBackTravelCost(waitTime)
-    );
+    return toRaptorCost(avoidShortWaitTimeCost(waitTime) + avoidBackTravelCost(waitTime));
   }
 
   private void assertMinSafeTransferTimeSet() {

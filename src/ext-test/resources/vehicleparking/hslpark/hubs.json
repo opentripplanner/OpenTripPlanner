@@ -1,0 +1,76 @@
+{
+    "results": [
+        {
+            "id": 321,
+            "name": {
+                "fi": "HubYksi",
+                "sv": "HubEn",
+                "en": "HubOne"
+            },
+            "location": {
+                "crs": {
+                    "type": "name",
+                    "properties": {
+                        "name": "EPSG:4326"
+                    }
+                },
+                "type": "Point",
+                "coordinates": [
+                    24.804913,
+                    60.176064
+                ]
+            },
+            "facilityIds": [
+                990,
+                1037
+            ],
+            "address": {
+                "streetAddress": null,
+                "postalCode": null,
+                "city": {
+                    "fi": "Espoo",
+                    "sv": "Esbo",
+                    "en": "Espoo"
+                }
+            },
+            "modifiedAt": null,
+            "modifiedBy": null
+        },
+        {
+            "id": 129,
+            "name": {
+                "fi": "HubKaksi",
+                "sv": "HubTvå",
+                "en": "HubTwo"
+            },
+            "location": {
+                "crs": {
+                    "type": "name",
+                    "properties": {
+                        "name": "EPSG:4326"
+                    }
+                },
+                "type": "Point",
+                "coordinates": [
+                    25.101168,
+                    60.45744
+                ]
+            },
+            "facilityIds": [
+                894
+            ],
+            "address": {
+                "streetAddress": null,
+                "postalCode": null,
+                "city": {
+                    "fi": "Järvenpää",
+                    "sv": "Träskända",
+                    "en": "Järvenpää"
+                }
+            },
+            "modifiedAt": null,
+            "modifiedBy": null
+        }
+    ],
+    "hasMore": false
+}

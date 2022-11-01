@@ -1,12 +1,14 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.ApiAlert;
-import org.opentripplanner.routing.alertpatch.TransitAlert;
-
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.opentripplanner.api.model.ApiAlert;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 public class AlertMapper {
 
@@ -40,9 +42,13 @@ public class AlertMapper {
       api.alertUrl = domain.alertUrl.toString(locale);
     }
 
-    api.effectiveStartDate = domain.getEffectiveStartDate();
-    api.effectiveEndDate = domain.getEffectiveEndDate();
+    api.effectiveStartDate = ofNullableInstant(domain.getEffectiveStartDate());
+    api.effectiveEndDate = ofNullableInstant(domain.getEffectiveEndDate());
 
     return api;
+  }
+
+  private static Date ofNullableInstant(Instant instant) {
+    return Optional.ofNullable(instant).map(Date::from).orElse(null);
   }
 }

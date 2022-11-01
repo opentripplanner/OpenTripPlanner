@@ -24,5 +24,5 @@ public enum Qualifier {
   /**
    * The mode is used for the direct street search.
    */
-  DIRECT
+  DIRECT,
 }

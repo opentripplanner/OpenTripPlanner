@@ -1,85 +1,81 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.util.geometry.GeometryUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A relatively high cost edge for boarding an elevator.
- * @author mattwigway
  *
+ * @author mattwigway
  */
 public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, ElevatorEdge {
 
-    private static final long serialVersionUID = 3925814840369402222L;
+  /**
+   * The polyline geometry of this edge. It's generally a polyline with two coincident points, but
+   * some elevators have horizontal dimension, e.g. the ones on the Eiffel Tower.
+   */
+  private final LineString geometry;
 
-    /**
-     * The polyline geometry of this edge.
-     * It's generally a polyline with two coincident points, but some elevators have horizontal
-     * dimension, e.g. the ones on the Eiffel Tower.
-     */
-    private LineString the_geom;
+  public ElevatorBoardEdge(ElevatorOffboardVertex from, ElevatorOnboardVertex to) {
+    super(from, to);
+    geometry =
+      GeometryUtils.makeLineString(
+        List.of(new Coordinate(from.getX(), from.getY()), new Coordinate(to.getX(), to.getY()))
+      );
+  }
 
-    public ElevatorBoardEdge(ElevatorOffboardVertex from, ElevatorOnboardVertex to) {
-        super(from, to);
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
+  }
 
-        // set up the geometry
-        Coordinate[] coords = new Coordinate[2];
-        coords[0] = new Coordinate(from.getX(), from.getY());
-        coords[1] = new Coordinate(to.getX(), to.getY());
-        the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
-    }
-    
-    @Override
-    public State traverse(State s0) {
-        StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
-        if (s1 == null) {
-            return null;
-        }
-
-        RoutingRequest options = s0.getOptions();
-        s1.incrementWeight(options.elevatorBoardCost);
-        s1.incrementTimeInSeconds(options.elevatorBoardTime);
-
-        return s1.makeState();
+  @Override
+  public State traverse(State s0) {
+    StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
+    if (s1 == null) {
+      return null;
     }
 
-    @Override
-    public double getDistanceMeters() {
-        return 0;
-    }
+    var streetPreferences = s0.getPreferences().street();
 
-    @Override
-    public LineString getGeometry() {
-        return the_geom;
-    }
+    s1.incrementWeight(streetPreferences.elevator().boardCost());
+    s1.incrementTimeInSeconds(streetPreferences.elevator().boardTime());
 
-    @Override
-    public I18NString getName() {
-        // TODO: i18n
-        return new NonLocalizedString( "Elevator");
-    }
+    return s1.makeState();
+  }
 
-    /** 
-     * Since board edges always are called Elevator,
-     * the name is utterly and completely bogus but is never included
-     * in plans..
-     */
-    @Override
-    public boolean hasBogusName() {
-        return true;
-    }
-    
-    public String toString() {
-        return "ElevatorBoardEdge(" + fromv + " -> " + tov + ")";
-    }
+  @Override
+  public I18NString getName() {
+    // TODO: i18n
+    return new NonLocalizedString("Elevator");
+  }
+
+  /**
+   * Since board edges always are called Elevator, the name is utterly and completely bogus but is
+   * never included in plans.
+   */
+  @Override
+  public boolean hasBogusName() {
+    return true;
+  }
+
+  @Override
+  public LineString getGeometry() {
+    return geometry;
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return 0;
+  }
 }

@@ -1,49 +1,50 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.junit.Test;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
+import org.junit.jupiter.api.Test;
 
 public class StateEditorTest {
 
-    @Test
-    public final void testIncrementTimeInSeconds() {
-        RoutingRequest routingRequest = new RoutingRequest();
-        StateEditor stateEditor = new StateEditor(routingRequest, null);
+  @Test
+  public final void testIncrementTimeInSeconds() {
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
 
-        stateEditor.setTimeSeconds(0);
-        stateEditor.incrementTimeInSeconds(999999999);
+    stateEditor.setTimeSeconds(0);
+    stateEditor.incrementTimeInSeconds(999999999);
 
-        assertEquals(999999999, stateEditor.child.getTimeSeconds());
-    }
+    assertEquals(999999999, stateEditor.child.getTimeSeconds());
+  }
 
-    /**
-     * Test update of non transit options.
-     */
-    @Test
-    public final void testSetNonTransitOptionsFromState(){
-        RoutingRequest request = new RoutingRequest();
-        request.setMode(TraverseMode.CAR);
-        request.parkAndRide = true;
-        Graph graph = new Graph();
-        graph.index = new GraphIndex(graph);
-        request.rctx = new RoutingContext(request, graph);
-        State state = new State(request);
+  @Test
+  public final void testWeightIncrement() {
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
 
-        state.stateData.vehicleParked = true;
-        state.stateData.vehicleRentalState = VehicleRentalState.BEFORE_RENTING;
-        state.stateData.currentMode = TraverseMode.WALK;
+    stateEditor.setTimeSeconds(0);
+    stateEditor.incrementWeight(10);
 
-        StateEditor se = new StateEditor(request, null);
-        se.setNonTransitOptionsFromState(state);
-        State updatedState = se.makeState();
-        assertEquals(TraverseMode.WALK, updatedState.getNonTransitMode());
-        assertTrue(updatedState.isVehicleParked());
-        assertFalse(updatedState.isRentingVehicle());
-    }
+    assertNotNull(stateEditor.makeState());
+  }
+
+  @Test
+  public final void testNanWeightIncrement() {
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
+
+    stateEditor.setTimeSeconds(0);
+    stateEditor.incrementWeight(Double.NaN);
+
+    assertNull(stateEditor.makeState());
+  }
+
+  @Test
+  public final void testInfinityWeightIncrement() {
+    StateEditor stateEditor = new StateEditor(null, AStarRequest.of().build());
+
+    stateEditor.setTimeSeconds(0);
+    stateEditor.incrementWeight(Double.NEGATIVE_INFINITY);
+
+    assertNull(stateEditor.makeState(), "Infinity weight increment");
+  }
 }

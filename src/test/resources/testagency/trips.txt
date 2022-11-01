@@ -26,7 +26,7 @@ route_id,service_id,trip_id,shape_id,block_id,wheelchair_accessible,trip_bikes_a
 13,alldays,13.1,,,,,
 14,alldays,14.1,,,,,
 14,alldays,14.2,,,,,
-15,alldays,15.1,,,,,
+15,alldays,15.1,5,,,,
 16,alldays,16.1,,,,,
 17,alldays,17.1,,,,,
 18,alldays,18.1,,,,,N

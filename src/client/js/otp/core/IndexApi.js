@@ -237,7 +237,7 @@ otp.core.IndexApi = otp.Class({
                     if(stopAgencyId !== agencyId) continue;
                     filtered.push({
                         id : id,
-                        name : stop.description.slice(5),
+                        name : stop.description,
                         lat: stop.lat,
                         lon: stop.lng
                     });

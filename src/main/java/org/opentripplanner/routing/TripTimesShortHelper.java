@@ -1,53 +1,54 @@
 package org.opentripplanner.routing;
 
-import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.trippattern.TripTimes;
-
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.logging.AbstractFilterLogger;
+import org.opentripplanner.util.time.ServiceDateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TripTimesShortHelper {
-  public static List<TripTimeOnDate> getTripTimesShort(RoutingService routingService, Trip trip, ServiceDate serviceDate) {
-    final ServiceDay serviceDay = new ServiceDay(routingService.getServiceCodes(),
-        serviceDate,
-        routingService.getCalendarService(),
-        trip.getRoute().getAgency().getId()
-    );
-    Timetable timetable = null;
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
-    if (timetableSnapshot != null) {
-      // Check if realtime-data is available for trip
 
-      TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
-      if (pattern == null) {
-        pattern = routingService.getPatternForTrip().get(trip);
-      }
-      timetable = timetableSnapshot.resolve(pattern, serviceDate);
+  private static final Logger LOG = LoggerFactory.getLogger(TripTimesShortHelper.class);
 
-      // If realtime moved pattern back to original trip, fetch it instead
-      if (timetable.getTripIndex(trip.getId()) == -1) {
-        pattern = routingService.getPatternForTrip().get(trip);
-        timetable = timetableSnapshot.resolve(pattern, serviceDate);
-      }
-    }
-    if (timetable == null) {
-      timetable = routingService.getPatternForTrip().get(trip).getScheduledTimetable();
+  public static List<TripTimeOnDate> getTripTimesShort(
+    TransitService transitService,
+    Trip trip,
+    LocalDate serviceDate
+  ) {
+    TripPattern pattern = transitService.getPatternForTrip(trip, serviceDate);
+
+    Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
+
+    // If realtime moved pattern back to original trip, fetch it instead
+    if (timetable.getTripIndex(trip.getId()) == -1) {
+      LOG.warn(
+        "Trip {} not found in realtime pattern. This should not happen, and indicates a bug.",
+        trip
+      );
+      pattern = transitService.getPatternForTrip(trip);
+      timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
     }
 
     // This check is made here to avoid changing TripTimeShort.fromTripTimes
-    TripTimes times = timetable.getTripTimes(timetable.getTripIndex(trip.getId()));
-    if (!serviceDay.serviceRunning(times.getServiceCode())) {
+    TripTimes times = timetable.getTripTimes(trip);
+    if (
+      !transitService.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
+    ) {
       return new ArrayList<>();
-    }
-    else {
-      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDay);
+    } else {
+      Instant midnight = ServiceDateUtils
+        .asStartOfService(serviceDate, transitService.getTimeZone())
+        .toInstant();
+      return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
     }
   }
-
 }

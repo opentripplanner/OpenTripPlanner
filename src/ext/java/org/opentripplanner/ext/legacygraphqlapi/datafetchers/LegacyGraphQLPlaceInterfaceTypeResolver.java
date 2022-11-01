@@ -6,11 +6,11 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 public class LegacyGraphQLPlaceInterfaceTypeResolver implements TypeResolver {
 
@@ -38,8 +38,12 @@ public class LegacyGraphQLPlaceInterfaceTypeResolver implements TypeResolver {
     if (o instanceof VehicleRentalVehicle) {
       return schema.getObjectType("RentalVehicle");
     }
-    if (o instanceof PatternAtStop) { return schema.getObjectType("DepartureRow"); }
-    if (o instanceof Stop) { return schema.getObjectType("Stop"); }
+    if (o instanceof PatternAtStop) {
+      return schema.getObjectType("DepartureRow");
+    }
+    if (o instanceof RegularStop) {
+      return schema.getObjectType("Stop");
+    }
 
     return null;
   }

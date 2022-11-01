@@ -38,9 +38,6 @@ otp.modules.Module = otp.Class({
         this.mapLayers = {};
         this.handlers = {};
         this.templateFiles = [];
-
-        this.requiresAuth = false;
-        this.authUserRoles = [];
     },
     
 

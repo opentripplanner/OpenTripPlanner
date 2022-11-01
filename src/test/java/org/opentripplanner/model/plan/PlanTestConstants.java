@@ -2,15 +2,11 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.util.time.TimeUtils.time;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.util.time.DurationUtils;
 
 public interface PlanTestConstants {
-  String FEED_ID = "F";
-
   int NOT_SET = -999_999;
   int BOARD_COST = 120;
   float WALK_RELUCTANCE_FACTOR = 2.0f;
@@ -58,7 +54,7 @@ public interface PlanTestConstants {
   int T11_50 = time("11:50");
 
   // Stop/Places
-  Place A = place("A", 5.0, 8.0 );
+  Place A = place("A", 5.0, 8.0);
   Place B = place("B", 6.0, 8.5);
   Place C = place("C", 7.0, 9.0);
   Place D = place("D", 8.0, 9.5);
@@ -67,22 +63,13 @@ public interface PlanTestConstants {
   Place G = place("G", 9.5, 11.0);
   Place H = place("H", 10.0, 11.5);
 
-  private static Place place(String name, double lat, double lon) {
-    var stop = new Stop(
-            new FeedScopedId(FEED_ID, name),
-            name,
-            null,
-            null,
-            WgsCoordinate.creatOptionalCoordinate(lat, lon),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+  static Place place(String name, double lat, double lon) {
+    return Place.forStop(TransitModelForTest.stop(name).withCoordinate(lat, lon).build());
+  }
+
+  static Place place(String name, double lat, double lon, FareZone zone) {
+    return Place.forStop(
+      TransitModelForTest.stop(name).withCoordinate(lat, lon).addFareZones(zone).build()
     );
-    return Place.forStop(stop);
   }
 }

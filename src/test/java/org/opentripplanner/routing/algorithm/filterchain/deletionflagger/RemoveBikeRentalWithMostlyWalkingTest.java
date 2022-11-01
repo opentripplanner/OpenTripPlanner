@@ -17,11 +17,12 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
   private static final int D5m = DurationUtils.durationInSeconds("5m");
   private static final int D3h = DurationUtils.durationInSeconds("3h");
 
-  private static final int T10_10 = TimeUtils.hm2time(10,10);
-  private static final int T10_20 = TimeUtils.hm2time(10,20);
+  private static final int T10_10 = TimeUtils.hm2time(10, 10);
+  private static final int T10_20 = TimeUtils.hm2time(10, 20);
 
-  private final RemoveBikerentalWithMostlyWalkingFilter subject =
-      new RemoveBikerentalWithMostlyWalkingFilter(0.3);
+  private final RemoveBikerentalWithMostlyWalkingFilter subject = new RemoveBikerentalWithMostlyWalkingFilter(
+    0.3
+  );
 
   @Test
   public void name() {
@@ -39,8 +40,8 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
     var expected = List.of(w1, t1, t2);
 
     Assertions.assertEquals(
-            Itinerary.toStr(expected),
-            Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
+      Itinerary.toStr(expected),
+      Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
     );
   }
 }

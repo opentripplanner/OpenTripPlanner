@@ -8,16 +8,15 @@ import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
  * Transmodel GraphQL API
  */
 public interface TransmodelAPIParameters {
+  /**
+   * Should the feed id be left out from input and output mapping of the ID scalars
+   */
+  boolean hideFeedId();
 
-    /**
-     * Should the feed id be left out from input and output mapping of the ID scalars
-     */
-    boolean hideFeedId();
-
-    /**
-     * Which HTTP headers should be used as tags for performance metering in the Actuator API
-     *
-     * @see MicrometerGraphQLInstrumentation
-     */
-    Collection<String> tracingHeaderTags();
+  /**
+   * Which HTTP headers should be used as tags for performance metering in the Actuator API
+   *
+   * @see MicrometerGraphQLInstrumentation
+   */
+  Collection<String> tracingHeaderTags();
 }

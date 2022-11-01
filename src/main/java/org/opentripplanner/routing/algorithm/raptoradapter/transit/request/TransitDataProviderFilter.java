@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import java.util.BitSet;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
  * Used to filter the elements in a {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer}
@@ -11,11 +13,21 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  * only included components which are allowed by the request. Such filters may included bike or
  * wheelchair accessibility, banned routes and transit modes.
  *
- * @see RoutingRequestTransitDataProviderFilter
+ * @see RouteRequestTransitDataProviderFilter
  */
 public interface TransitDataProviderFilter {
-
   boolean tripPatternPredicate(TripPatternForDate tripPatternForDate);
 
   boolean tripTimesPredicate(TripTimes tripTimes);
+
+  /**
+   * Check if boarding/alighting is possible at each stop. If the values differ from the default
+   * input values, create a clone of the bitset and subtract the unavailable stops.
+   *
+   * @param tripPattern      Trip pattern that should contain boarding/alighting information, e.g.
+   *                         wheelchair accessibility for each stop.
+   * @param boardingPossible Initial information regarding boarding/alighting possible
+   * @return Information if stops are available for boarding or alighting
+   */
+  BitSet filterAvailableStops(RoutingTripPattern tripPattern, BitSet boardingPossible);
 }

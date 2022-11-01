@@ -9,33 +9,34 @@ import org.opentripplanner.updater.PollingGraphUpdaterParameters;
  */
 public class VehicleParkingUpdaterParameters implements PollingGraphUpdaterParameters {
 
-    private final String configRef;
-    private final int frequencySec;
-    private final DataSourceType sourceType;
+  private final String configRef;
+  private final int frequencySec;
+  private final DataSourceType sourceType;
 
+  public VehicleParkingUpdaterParameters(
+    String configRef,
+    int frequencySec,
+    DataSourceType sourceType
+  ) {
+    this.configRef = configRef;
+    this.frequencySec = frequencySec;
+    this.sourceType = sourceType;
+  }
 
-    public VehicleParkingUpdaterParameters(
-            String configRef,
-            int frequencySec,
-            DataSourceType sourceType
-    ) {
-        this.configRef = configRef;
-        this.frequencySec = frequencySec;
-        this.sourceType = sourceType;
-    }
+  @Override
+  public int getFrequencySec() {
+    return frequencySec;
+  }
 
-    @Override
-    public int getFrequencySec() {return frequencySec;}
+  /**
+   * The config name/type for the updater. Used to reference the configuration element.
+   */
+  @Override
+  public String getConfigRef() {
+    return configRef;
+  }
 
-    /**
-     * The config name/type for the updater. Used to reference the configuration element.
-     */
-    @Override
-    public String getConfigRef() {
-        return configRef;
-    }
-
-    public DataSourceType getSourceType() {
-        return sourceType;
-    }
+  public DataSourceType getSourceType() {
+    return sourceType;
+  }
 }

@@ -2,24 +2,22 @@ package org.opentripplanner.ext.dataoverlay.api;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.common.model.T2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * The purpose of this class is to hold all parameters and their value in a map. It also contains
  * logic for mapping between the data overlay domain and the API. The purpose is to provide a
- * standardized naming scheme for the parameters. The data overlay can be configured to use any
- * kind of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the
- * {@link ParameterName}, then request your parameter to be added.
+ * standardized naming scheme for the parameters. The data overlay can be configured to use any kind
+ * of parameters, so if you do not find the parameter you want (e.g. snow_depth) in the {@link
+ * ParameterName}, then request your parameter to be added.
  * <p>
- * This class contain helper logic to convert parameters to and from a string representation used
- * by the APIs(the REST API is the only supported API). The parameter string format is:
+ * This class contain helper logic to convert parameters to and from a string representation used by
+ * the APIs(the REST API is the only supported API). The parameter string format is:
  * <p>
  * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)
  * <p>
@@ -30,115 +28,108 @@ import org.slf4j.LoggerFactory;
  * carbon_monoxide_threshold
  * carbon_monoxide_penalty
  * </pre>
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
 public class DataOverlayParameters implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private final Map<T2<ParameterName, ParameterType>, Double> values;
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataOverlayParameters.class);
+  public DataOverlayParameters(Map<T2<ParameterName, ParameterType>, Double> values) {
+    // Make a defencive copy to protect the map entries, this make this class immutable
+    // and thread safe
+    this.values = Map.copyOf(values);
+  }
 
-    private final Map<T2<ParameterName, ParameterType>, Double> values = new HashMap<>();
+  /**
+   * Parse the input {@code params} and create a new {@link DataOverlayParameters} instance. All
+   * unknown parameters are ignored, so are missing values. This method is created to receive all
+   * input and filter out the data-overlay parameters.
+   */
+  public static DataOverlayParameters parseQueryParams(Map<String, List<String>> params) {
+    return DataOverlayParametersBuilder.parseQueryParams(params);
+  }
 
-    public boolean isEmpty() {
-        return values.isEmpty();
+  /**
+   * List all parameters supported as stings. The format is:
+   * <p>
+   * [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)  <p>
+   * Example:
+   * <pre>
+   * carbon_monoxide_threshold
+   * carbon_monoxide_penalty
+   * </pre>
+   */
+  public static List<String> parametersAsString() {
+    var list = new ArrayList<String>();
+    for (ParameterName name : ParameterName.values()) {
+      for (ParameterType type : ParameterType.values()) {
+        list.add((name + "_" + type).toLowerCase());
+      }
     }
+    return list;
+  }
 
-    /**
-     * Parse the input {@code params} and create a new {@link DataOverlayParameters}
-     * instance. All unknown parameters are ignored, so are missing values. This method is
-     * created to receive all input and filter out the data-overlay parameters.
-     */
-    public static DataOverlayParameters parseQueryParams(Map<String, List<String>> params) {
-        var result = new DataOverlayParameters();
-        for (String key : params.keySet()) {
-            var name = resolveKey(key);
-            if (name != null) {
-                List<String> values = params.get(key);
-                if(values == null || values.isEmpty()) {
-                    LOG.warn("The data-overlay parameter value is missing. Parameter: {}", key);
-                    continue;
-                }
-                var value = resolveValue(values.get(0));
-                if(value == null) {
-                    LOG.warn("The data-overlay parameter value is null. Parameter: {}", key);
-                    continue;
-                }
-                result.put(name, value);
-            }
-        }
-        return result;
-    }
+  public static String toStringKey(ParameterName name, ParameterType type) {
+    return (name + "_" + type).toLowerCase();
+  }
 
-    /**
-     * List all parameters supported as stings. The format is:
-     * <p>
-     *  [{@link ParameterName}] {@code + ' ' +} [{@link ParameterType}]   (lower case is used)  <p>
-     * Example:
-     * <pre>
-     * carbon_monoxide_threshold
-     * carbon_monoxide_penalty
-     * </pre>
-     */
-    public static List<String> parametersAsString() {
-        var list = new ArrayList<String>();
-        for (ParameterName name : ParameterName.values()) {
-            for (ParameterType type : ParameterType.values()) {
-                list.add((name + "_" + type).toLowerCase());
-            }
-        }
-        return list;
-    }
+  public boolean isEmpty() {
+    return values.isEmpty();
+  }
 
-    public Double get(String param) {
-        return get(resolveKey(param));
-    }
+  public Double get(String param) {
+    return get(resolveKey(param));
+  }
 
-    public Double get(ParameterName name, ParameterType type) {
-        return values.get(new T2<>(name, type));
-    }
+  public Double get(ParameterName name, ParameterType type) {
+    return values.get(new T2<>(name, type));
+  }
 
-    private Double get( T2<ParameterName, ParameterType> param) {
-        return values.get(param);
-    }
+  public Iterable<ParameterName> listParameterNames() {
+    return values.keySet().stream().map(it -> it.first).collect(Collectors.toSet());
+  }
 
-    public void put(String param, Double value) {
-        put(resolveKey(param), value);
+  @Nullable
+  static T2<ParameterName, ParameterType> resolveKey(String parameter) {
+    try {
+      int pos = parameter.lastIndexOf('_');
+      if (pos < 0 || pos > parameter.length() - 2) {
+        return null;
+      }
+      var name = ParameterName.valueOf(parameter.substring(0, pos).toUpperCase());
+      var type = ParameterType.valueOf(parameter.substring(pos + 1).toUpperCase());
+      return new T2<>(name, type);
+    } catch (IllegalArgumentException ignore) {
+      return null;
     }
+  }
 
-    public void put(ParameterName name, ParameterType type, Double value) {
-        put(new T2<>(name, type), value);
-    }
+  static String keyAsString(T2<ParameterName, ParameterType> key) {
+    return key.first.name() + '_' + key.second.name();
+  }
 
-    private void put(T2<ParameterName, ParameterType> param, Double value) {
-        if(param == null) { return; }
-        values.put(param, value);
+  @Nullable
+  static Double resolveValue(String value) {
+    try {
+      return Double.parseDouble(value);
+    } catch (NumberFormatException | NullPointerException ignore) {
+      return null;
     }
+  }
 
-    public static String toStringKey(ParameterName name, ParameterType type) {
-        return (name + "_" + type).toLowerCase();
-    }
+  private Double get(T2<ParameterName, ParameterType> param) {
+    return values.get(param);
+  }
 
-    public Iterable<ParameterName> listParameterNames() {
-        return values.keySet().stream().map(it -> it.first).collect(Collectors.toSet());
+  @Override
+  public String toString() {
+    var buf = ToStringBuilder.of(DataOverlayParameters.class);
+    // Map keys to String and sort to make the toSting() deterministic
+    var keys = values.keySet().stream().map(DataOverlayParameters::keyAsString).sorted().toList();
+    for (String key : keys) {
+      buf.addObj(key, get(key));
     }
-
-    @Nullable
-    static T2<ParameterName, ParameterType> resolveKey(String parameter) {
-        try {
-            int pos = parameter.lastIndexOf('_');
-            if (pos < 0 || pos > parameter.length() - 2) {return null;}
-            var name = ParameterName.valueOf(parameter.substring(0, pos).toUpperCase());
-            var type = ParameterType.valueOf(parameter.substring(pos + 1).toUpperCase());
-            return new T2<>(name, type);
-        }
-        catch (IllegalArgumentException ignore) {
-            return null;
-        }
-    }
-
-    @Nullable
-    static Double resolveValue(String value) {
-        try { return Double.parseDouble(value); }
-        catch (NumberFormatException | NullPointerException ignore) { return null; }
-    }
+    return buf.toString();
+  }
 }

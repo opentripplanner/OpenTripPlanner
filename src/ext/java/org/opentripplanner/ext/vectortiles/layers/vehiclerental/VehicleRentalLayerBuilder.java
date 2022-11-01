@@ -1,52 +1,52 @@
 package org.opentripplanner.ext.vectortiles.layers.vehiclerental;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends LayerBuilder<T> {
 
-public class VehicleRentalLayerBuilder extends LayerBuilder<VehicleRentalPlace> {
-  enum MapperType { Digitransit }
+  private final VehicleRentalStationService service;
 
-  static Map<MapperType, Function<Graph, PropertyMapper<VehicleRentalPlace>>> mappers = Map.of(
-      MapperType.Digitransit, DigitransitVehicleRentalPropertyMapper::create
-  );
-
-  private final Graph graph;
-
-  public VehicleRentalLayerBuilder(Graph graph, VectorTilesResource.LayerParameters layerParameters) {
-    super(
-        layerParameters.name(),
-        mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(graph)
-    );
-
-    this.graph = graph;
+  public VehicleRentalLayerBuilder(
+    VehicleRentalStationService service,
+    Map<MapperType, PropertyMapper<T>> mappers,
+    VectorTilesResource.LayerParameters layerParameters
+  ) {
+    super(layerParameters.name(), mappers.get(MapperType.valueOf(layerParameters.mapper())));
+    this.service = service;
   }
 
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
-    VehicleRentalStationService service = graph.getVehicleRentalStationService();
-    if (service == null) {return List.of();}
-    return service.getVehicleRentalPlaces()
-        .stream()
-        .map(vehicleRentalStation -> {
-          Coordinate coordinate = new Coordinate(vehicleRentalStation.getLongitude(), vehicleRentalStation.getLatitude());
-          Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-          point.setUserData(vehicleRentalStation);
-          return point;
-        })
-        .collect(Collectors.toList());
+    if (service == null) {
+      return List.of();
+    }
+    return getVehicleRentalPlaces(service)
+      .stream()
+      .map(rental -> {
+        Coordinate coordinate = new Coordinate(rental.getLongitude(), rental.getLatitude());
+        Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
+        point.setUserData(rental);
+        return (Geometry) point;
+      })
+      .toList();
+  }
+
+  protected abstract Collection<T> getVehicleRentalPlaces(VehicleRentalStationService service);
+
+  enum MapperType {
+    Digitransit,
+    DigitransitRealtime,
   }
 }

@@ -1,58 +1,62 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-
-import org.junit.Test;
-import org.opentripplanner.graph_builder.module.FakeGraph;
-import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.FakeGraph;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
+import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class PlatformLinkerTest {
 
-    /**
-     * Test linking from stairs endpoint to nodes in the ring defining the platform area.
-     * OSM test data is from Skøyen station, Norway
-     */
-    @Test
-    public void testLinkEntriesToPlatforms() throws Exception {
+  /**
+   * Test linking from stairs endpoint to nodes in the ring defining the platform area. OSM test
+   * data is from Skøyen station, Norway
+   */
+  @Test
+  public void testLinkEntriesToPlatforms() {
+    String stairsEndpointLabel = "osm:node:1028861028";
 
-        String stairsEndpointLabel = "osm:node:1028861028";
+    var deduplicator = new Deduplicator();
+    var gg = new Graph(deduplicator);
 
-        Graph gg = new Graph();
-        OpenStreetMapModule loader = new OpenStreetMapModule();
-        loader.platformEntriesLinking = true;
-        loader.skipVisibility = false;
-        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+    File file = new File(
+      URLDecoder.decode(
+        FakeGraph.class.getResource("osm/skoyen.osm.pbf").getFile(),
+        StandardCharsets.UTF_8
+      )
+    );
 
-        File file = new File(
-                URLDecoder.decode(FakeGraph.class.getResource("osm/skoyen.osm.pbf").getFile(),
-                        "UTF-8"));
+    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
 
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+    OpenStreetMapModule osmModule = new OpenStreetMapModule(
+      List.of(provider),
+      Set.of(),
+      gg,
+      DataImportIssueStore.noopIssueStore(),
+      new DefaultMapper()
+    );
+    osmModule.platformEntriesLinking = true;
+    osmModule.skipVisibility = false;
 
-        loader.setProvider(provider);
-        loader.buildGraph(gg, new HashMap<>());
+    osmModule.buildGraph();
 
-        Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);
+    Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);
 
-        // verify outgoing links
-        assertTrue(stairsEndpoint.getOutgoing().stream().anyMatch(AreaEdge.class::isInstance));
+    // verify outgoing links
+    assertTrue(stairsEndpoint.getOutgoing().stream().anyMatch(AreaEdge.class::isInstance));
 
-        // verify incoming links
-        assertTrue(stairsEndpoint.getIncoming().stream().anyMatch(AreaEdge.class::isInstance));
-
-    }
-
+    // verify incoming links
+    assertTrue(stairsEndpoint.getIncoming().stream().anyMatch(AreaEdge.class::isInstance));
+  }
 }

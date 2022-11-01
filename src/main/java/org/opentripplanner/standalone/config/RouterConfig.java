@@ -1,14 +1,23 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
+import java.time.Duration;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
+import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -21,114 +30,205 @@ import org.slf4j.LoggerFactory;
  */
 public class RouterConfig implements Serializable {
 
-    private static final double DEFAULT_STREET_ROUTING_TIMEOUT = 5.0;
-    private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
+  private static final Duration DEFAULT_STREET_ROUTING_TIMEOUT = Duration.ofSeconds(5);
+  private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
 
-    public static final RouterConfig DEFAULT = new RouterConfig(
-            MissingNode.getInstance(), "DEFAULT", false
-    );
+  public static final RouterConfig DEFAULT = new RouterConfig(
+    MissingNode.getInstance(),
+    "DEFAULT",
+    false
+  );
 
-    /**
-     * The raw JsonNode three kept for reference and (de)serialization.
-     */
-    private final JsonNode rawJson;
-    private final String configVersion;
-    private final String requestLogFile;
-    private final TransmodelAPIConfig transmodelApi;
-    private final double streetRoutingTimeoutSeconds;
-    private final RoutingRequest routingRequestDefaults;
-    private final TransitRoutingConfig transitConfig;
-    private final UpdatersParameters updatersParameters;
-    private final VectorTileConfig vectorTileLayers;
-    private final FlexConfig flexConfig;
+  /**
+   * The node adaptor kept for reference and (de)serialization.
+   */
+  private final NodeAdapter root;
+  private final String configVersion;
+  private final String requestLogFile;
+  private final TransmodelAPIConfig transmodelApi;
+  private final Duration streetRoutingTimeout;
+  private final RouteRequest routingRequestDefaults;
+  private final TransitRoutingConfig transitConfig;
+  private final UpdatersParameters updatersParameters;
+  private final VectorTileConfig vectorTileLayers;
+  private final FlexConfig flexConfig;
 
-    public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
-        NodeAdapter adapter = new NodeAdapter(node, source);
-        this.rawJson = node;
-        this.configVersion = adapter.asText("configVersion", null);
-        this.requestLogFile = adapter.asText("requestLogFile", null);
-        this.transmodelApi = new TransmodelAPIConfig(adapter.path("transmodelApi"));
-        this.streetRoutingTimeoutSeconds = adapter.asDouble(
-                "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
-        );
-        this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
-        this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updatersParameters = new UpdatersConfig(adapter);
-        this.vectorTileLayers = new VectorTileConfig(adapter.path("vectorTileLayers").asList());
-        this.flexConfig = new FlexConfig(adapter.path("flex"));
+  public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
+    this(new NodeAdapter(node, source), logUnusedParams);
+  }
 
-        if(logUnusedParams) {
-            adapter.logAllUnusedParameters(LOG);
-        }
+  /** protected to give unit-test access */
+  RouterConfig(NodeAdapter root, boolean logUnusedParams) {
+    this.root = root;
+    this.configVersion =
+      root
+        .of("configVersion")
+        .since(V2_1)
+        .summary("Deployment version of the *router-config.json*.")
+        .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
+        .asString(null);
+    this.requestLogFile =
+      root
+        .of("requestLogFile")
+        .since(V2_0)
+        .summary("The path of the log file for the requests.")
+        .description(
+          """
+You can log some characteristics of trip planning requests in a file for later analysis. Some
+transit agencies and operators find this information useful for identifying existing or unmet
+transportation demand. Logging will be performed only if you specify a log file name in the router
+config.
+
+Each line in the resulting log file will look like this:
+
+```
+2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3
+```
+
+The fields separated by whitespace are (in order):
+
+1. Date and time the request was received
+2. IP address of the user
+3. Arrive or depart search
+4. The arrival or departure time
+5. A comma-separated list of all transport modes selected
+6. Origin latitude and longitude
+7. Destination latitude and longitude
+
+Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
+number of transit vehicles used in that itinerary.
+          """
+        )
+        .asString(null);
+    this.transmodelApi =
+      new TransmodelAPIConfig(
+        root
+          .of("transmodelApi")
+          .since(NA)
+          .summary("Configuration for the Transmodel GraphQL API.")
+          .asObject()
+      );
+    this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
+    this.transitConfig = new TransitRoutingConfig("transit", root);
+    this.routingRequestDefaults =
+      RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
+    this.updatersParameters = new UpdatersConfig(root);
+    this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
+    this.flexConfig =
+      new FlexConfig(
+        root.of("flex").since(NA).summary("Configuration for flex routing.").asObject()
+      );
+
+    if (logUnusedParams && LOG.isWarnEnabled()) {
+      root.logAllUnusedParameters(LOG::warn);
     }
+  }
 
-    /**
-     * The config-version is a parameter which each OTP deployment may set to be able to
-     * query the OTP server and verify that it uses the correct version of the config. The
-     * version must be injected into the config in the operation deployment pipeline. How this
-     * is done is up to the deployment.
-     * <p>
-     * The config-version have no effect on OTP, and is provided as is on the API. There is
-     * not syntax or format check on the version and it can be any string.
-     * <p>
-     * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
-     * <p>
-     * This parameter is optional, and the default is {@code null}.
-     */
-    public String getConfigVersion() {
-        return configVersion;
-    }
+  /**
+   * The config-version is a parameter which each OTP deployment may set to be able to query the OTP
+   * server and verify that it uses the correct version of the config. The version must be injected
+   * into the config in the operation deployment pipeline. How this is done is up to the
+   * deployment.
+   * <p>
+   * The config-version have no effect on OTP, and is provided as is on the API. There is not syntax
+   * or format check on the version and it can be any string.
+   * <p>
+   * Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
+   * <p>
+   * This parameter is optional, and the default is {@code null}.
+   */
+  public String getConfigVersion() {
+    return configVersion;
+  }
 
-    public String requestLogFile() {
-        return requestLogFile;
-    }
+  public String requestLogFile() {
+    return requestLogFile;
+  }
 
-    /**
-     * The preferred way to limit the search is to limit the distance for
-     * each street mode(WALK, BIKE, CAR). So the default timeout for a
-     * street search is set quite high. This is used to abort the search
-     * if the max distance is not reached within the timeout.
-     */
-    public double streetRoutingTimeoutSeconds() {
-        return streetRoutingTimeoutSeconds;
-    }
+  /**
+   * The preferred way to limit the search is to limit the distance for each street mode(WALK, BIKE,
+   * CAR). So the default timeout for a street search is set quite high. This is used to abort the
+   * search if the max distance is not reached within the timeout.
+   */
+  public Duration streetRoutingTimeout() {
+    return streetRoutingTimeout;
+  }
 
-    public TransmodelAPIConfig transmodelApi() { return transmodelApi; }
+  public TransmodelAPIConfig transmodelApi() {
+    return transmodelApi;
+  }
 
-    public RoutingRequest routingRequestDefaults() {
-        return routingRequestDefaults;
-    }
+  public RouteRequest routingRequestDefaults() {
+    return routingRequestDefaults;
+  }
 
-    public RaptorTuningParameters raptorTuningParameters() {
-        return transitConfig;
-    }
+  public RaptorTuningParameters raptorTuningParameters() {
+    return transitConfig;
+  }
 
-    public TransitTuningParameters transitTuningParameters() {
-        return transitConfig;
-    }
+  public TransitTuningParameters transitTuningParameters() {
+    return transitConfig;
+  }
 
-    public UpdatersParameters updaterConfig() { return updatersParameters; }
+  public UpdatersParameters updaterConfig() {
+    return updatersParameters;
+  }
 
-    public VectorTilesResource.LayersParameters vectorTileLayers() { return vectorTileLayers; }
+  public VectorTilesResource.LayersParameters vectorTileLayers() {
+    return vectorTileLayers;
+  }
 
-    public FlexParameters flexParameters(RoutingRequest request) { 
-        return flexConfig.toFlexParameters(request);
-    }
+  public FlexParameters flexParameters(RoutingPreferences preferences) {
+    return flexConfig.toFlexParameters(preferences);
+  }
 
-    /**
-     * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
-     */
-    public boolean isDefault() {
-        return this.rawJson.isMissingNode();
-    }
+  public NodeAdapter asNodeAdapter() {
+    return root;
+  }
 
-    public String toJson() {
-        return rawJson.isMissingNode() ? "" : rawJson.toString();
-    }
+  /**
+   * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
+   */
+  public boolean isDefault() {
+    return root.isEmpty();
+  }
 
-    public String toString() {
-        // Print ONLY the values set, not deafult values
-        return rawJson.toPrettyString();
-    }
+  public String toJson() {
+    return root.isEmpty() ? "" : root.toJson();
+  }
 
+  public String toString() {
+    // Print ONLY the values set, not default values
+    return root.toPrettyString();
+  }
+
+  /**
+   * This method is needed, because we want to support the old format for the "streetRoutingTimeout"
+   * parameter. We will keep it for some time, to let OTP deployments update the config.
+   *
+   * @since 2.2 - The support for the old format can be removed in version > 2.2.
+   */
+  static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
+    return adapter
+      .of("streetRoutingTimeout")
+      .since(NA)
+      .summary(
+        "The maximum time a street routing request is allowed to take before returning a timeout."
+      )
+      .description(
+        """
+In OTP1 path searches sometimes took a long time to complete. With the new Raptor algorithm this is not
+the case anymore. The street part of the routing may still take a long time if searching very long
+distances. You can set the street routing timeout to avoid tying up server resources on pointless
+searches and ensure that your users receive a timely response. You can also limit the max distance
+to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
+information that can help identify problematic searches and improve our routing methods. There are
+no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
+search-window.
+
+The search aborts after this duration and any paths found are returned to the client.
+"""
+      )
+      .asDuration(DEFAULT_STREET_ROUTING_TIMEOUT);
+  }
 }

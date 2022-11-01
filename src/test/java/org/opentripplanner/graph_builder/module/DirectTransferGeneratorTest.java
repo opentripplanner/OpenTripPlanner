@@ -4,357 +4,468 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.graph_builder.DataImportIssueStore.noopIssueStore;
 
-import com.google.common.collect.Multimap;
+import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
- * This creates a graph with trip patterns S0 - V0 | S11 - V11 --------> V21 - S21 |     \ S12 - V12
- * ----> V22 - V22
+ * This creates a graph with trip patterns
+ <pre>
+  S0 -  V0 ------------
+        |     \       |
+ S11 - V11 --------> V21 - S21
+        |      \      |
+ S12 - V12 --------> V22 - V22
+        |             |
+ S13 - V13 --------> V23 - V23
+ </pre>
  */
 class DirectTransferGeneratorTest extends GraphRoutingTest {
 
-    private static final double MAX_TRANSFER_DURATION = 3600;
-    private TransitStopVertex S0, S11, S12, S21, S22;
-    private StreetVertex V0, V11, V12, V21, V22;
+  private static final Duration MAX_TRANSFER_DURATION = Duration.ofSeconds(3600);
+  private TransitStopVertex S0, S11, S12, S13, S21, S22, S23;
+  private StreetVertex V0, V11, V12, V13, V21, V22, V23;
 
-    private Graph graph(boolean addPatterns) {
-        return graphOf(new Builder() {
-            @Override
-            public void build() {
-                S0 = stop("S0", 47.495, 19.001);
-                S11 = stop("S11", 47.500, 19.001);
-                S12 = stop("S12", 47.520, 19.001);
-                S21 = stop("S21", 47.500, 19.011);
-                S22 = stop("S22", 47.520, 19.011);
+  @Test
+  public void testDirectTransfersWithoutPatterns() {
+    var otpModel = model(false);
+    var graph = otpModel.graph();
+    var transitModel = otpModel.transitModel();
+    var req = new RouteRequest();
+    req.journey().transfer().setMode(StreetMode.WALK);
+    var transferRequests = List.of(req);
+    graph.hasStreets = false;
 
-                V0 = intersection("V0", 47.495, 19.000);
-                V11 = intersection("V11", 47.500, 19.000);
-                V12 = intersection("V12", 47.510, 19.000);
-                V21 = intersection("V21", 47.500, 19.010);
-                V22 = intersection("V22", 47.510, 19.010);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-                biLink(V0, S0);
-                biLink(V11, S11);
-                biLink(V12, S12);
-                biLink(V21, S21);
-                biLink(V22, S22);
+    assertTransfers(transitModel.getAllPathTransfers());
+  }
 
-                street(V0, V11, 100, StreetTraversalPermission.ALL);
-                street(V0, V12, 200, StreetTraversalPermission.ALL);
-                street(V0, V21, 100, StreetTraversalPermission.ALL);
-                street(V0, V22, 200, StreetTraversalPermission.ALL);
+  @Test
+  public void testDirectTransfersWithPatterns() {
+    var otpModel = model(true);
+    var graph = otpModel.graph();
+    graph.hasStreets = false;
+    var transitModel = otpModel.transitModel();
+    var req = new RouteRequest();
+    req.journey().transfer().setMode(StreetMode.WALK);
+    var transferRequests = List.of(req);
 
-                street(V11, V12, 100, StreetTraversalPermission.PEDESTRIAN);
-                street(V21, V22, 100, StreetTraversalPermission.PEDESTRIAN);
-                street(V11, V21, 100, StreetTraversalPermission.PEDESTRIAN);
-                street(V11, V22, 110, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-                if (addPatterns) {
-                    var agency = agency("Agency");
+    assertTransfers(
+      transitModel.getAllPathTransfers(),
+      tr(S0, 556, S11),
+      tr(S0, 935, S21),
+      tr(S11, 751, S21),
+      tr(S12, 751, S22),
+      tr(S13, 2224, S12),
+      tr(S13, 2347, S22),
+      tr(S21, 751, S11),
+      tr(S22, 751, S12),
+      tr(S23, 2347, S12),
+      tr(S23, 2224, S22)
+    );
+  }
 
-                    tripPattern(new TripPattern(
-                            new FeedScopedId("Test", "TP1"),
-                            route("R1", TransitMode.BUS, agency),
-                            new StopPattern(List.of(st(S11), st(S12)))
-                    ));
+  @Test
+  public void testDirectTransfersWithRestrictedPatterns() {
+    var otpModel = model(true, true);
+    var graph = otpModel.graph();
+    graph.hasStreets = false;
+    var transitModel = otpModel.transitModel();
+    var transferRequests = List.of(new RouteRequest());
 
-                    tripPattern(new TripPattern(
-                            new FeedScopedId("Test", "TP2"),
-                            route("R2", TransitMode.BUS, agency),
-                            new StopPattern(List.of(st(S21), st(S22)))
-                    ));
-                }
-            }
-        });
-    }
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-    @Test
-    public void testDirectTransfersWithoutPatterns() {
-        var generator = new DirectTransferGenerator(
-                MAX_TRANSFER_DURATION,
-                List.of(
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.WALK, null, null, null)
-                        )
-                )
-        );
+    assertTransfers(
+      transitModel.getAllPathTransfers(),
+      tr(S0, 2780, S12),
+      tr(S0, 935, S21),
+      tr(S11, 2224, S12),
+      tr(S11, 751, S21),
+      tr(S12, 751, S22),
+      tr(S13, 2224, S12),
+      tr(S13, 2347, S22),
+      tr(S21, 2347, S12),
+      tr(S22, 751, S12),
+      tr(S23, 2347, S12),
+      tr(S23, 2224, S22)
+    );
+  }
 
-        var graph = graph(false);
-        graph.index();
-        graph.hasStreets = false;
+  @Test
+  public void testSingleRequestWithoutPatterns() {
+    var req = new RouteRequest();
+    req.journey().transfer().setMode(StreetMode.WALK);
+    var transferRequests = List.of(req);
 
-        generator.buildGraph(graph, null);
+    var otpModel = model(false);
+    var graph = otpModel.graph();
+    graph.hasStreets = true;
+    var transitModel = otpModel.transitModel();
 
-        assertTransfers(
-                graph.transfersByStop
-        );
-    }
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-    @Test
-    public void testDirectTransfersWithPatterns() {
-        var generator = new DirectTransferGenerator(
-                MAX_TRANSFER_DURATION,
-                List.of(
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.WALK, null, null, null)
-                        )
-                )
-        );
+    assertTransfers(transitModel.getAllPathTransfers());
+  }
 
-        var graph = graph(true);
-        graph.hasStreets = false;
+  @Test
+  public void testSingleRequestWithPatterns() {
+    var req = new RouteRequest();
+    req.journey().transfer().setMode(StreetMode.WALK);
+    var transferRequests = List.of(req);
 
-        generator.buildGraph(graph, null);
+    var otpModel = model(true);
+    var graph = otpModel.graph();
+    graph.hasStreets = true;
+    var transitModel = otpModel.transitModel();
 
-        assertTransfers(
-                graph.transfersByStop,
-                tr(S0, 556, S11),
-                tr(S0, 935, S21),
-                tr(S11, 751, S21),
-                tr(S12, 751, S22),
-                tr(S21, 751, S11),
-                tr(S22, 751, S12)
-        );
-    }
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-    @Test
-    public void testSingleRequestWithoutPatterns() {
-        var generator = new DirectTransferGenerator(
-                MAX_TRANSFER_DURATION,
-                List.of(
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.WALK, null, null, null)
-                        )
-                )
-        );
+    assertTransfers(
+      transitModel.getAllPathTransfers(),
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 100, List.of(V11, V21), S21)
+    );
+  }
 
-        var graph = graph(false);
-        graph.hasStreets = true;
+  @Test
+  public void testMultipleRequestsWithoutPatterns() {
+    var reqWalk = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.WALK);
 
-        generator.buildGraph(graph, null);
+    var reqBike = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.BIKE);
 
-        assertTransfers(
-                graph.transfersByStop
-        );
-    }
+    var transferRequests = List.of(reqWalk, reqBike);
 
-    @Test
-    public void testSingleRequestWithPatterns() {
-        var generator = new DirectTransferGenerator(
-                MAX_TRANSFER_DURATION,
-                List.of(
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.WALK, null, null, null)
-                        )
-                )
-        );
+    var otpModel = model(false);
+    var graph = otpModel.graph();
+    graph.hasStreets = true;
+    var transitModel = otpModel.transitModel();
 
-        var graph = graph(true);
-        graph.hasStreets = true;
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-        generator.buildGraph(graph, null);
+    assertTransfers(transitModel.getAllPathTransfers());
+  }
 
-        assertTransfers(
-                graph.transfersByStop,
-                tr(S0, 100, List.of(V0, V11), S11),
-                tr(S0, 100, List.of(V0, V21), S21),
-                tr(S11, 100, List.of(V11, V21), S21)
-        );
-    }
+  @Test
+  public void testMultipleRequestsWithPatterns() {
+    var reqWalk = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.WALK);
 
-    @Test
-    public void testMultipleRequestsWithoutPatterns() {
-        var generator = new DirectTransferGenerator(
-                MAX_TRANSFER_DURATION,
-                List.of(
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.WALK, null, null, null)
-                        ),
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.BIKE, null, null, null)
-                        )
-                )
-        );
+    var reqBike = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.BIKE);
 
-        var graph = graph(false);
-        graph.hasStreets = true;
+    var transferRequests = List.of(reqWalk, reqBike);
 
-        generator.buildGraph(graph, null);
+    TestOtpModel model = model(true);
+    var graph = model.graph();
+    graph.hasStreets = true;
+    var transitModel = model.transitModel();
 
-        assertTransfers(
-                graph.transfersByStop
-        );
-    }
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-    @Test
-    public void testMultipleRequestsWithPatterns() {
-        var generator = new DirectTransferGenerator(
-                MAX_TRANSFER_DURATION,
-                List.of(
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.WALK, null, null, null)
-                        ),
-                        new RoutingRequest(
-                                new RequestModes(null, StreetMode.BIKE, null, null, null)
-                        )
-                )
-        );
+    assertTransfers(
+      transitModel.getAllPathTransfers(),
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 100, List.of(V11, V21), S21),
+      tr(S11, 110, List.of(V11, V22), S22)
+    );
+  }
 
-        var graph = graph(true);
-        graph.hasStreets = true;
+  @Test
+  public void testTransferOnIsolatedStations() {
+    var otpModel = model(true, false, true);
+    var graph = otpModel.graph();
+    graph.hasStreets = false;
 
-        generator.buildGraph(graph, null);
+    var transitModel = otpModel.transitModel();
+    var req = new RouteRequest();
+    req.journey().transfer().setMode(StreetMode.WALK);
+    var transferRequests = List.of(req);
 
-        assertTransfers(
-                graph.transfersByStop,
-                tr(S0, 100, List.of(V0, V11), S11),
-                tr(S0, 100, List.of(V0, V21), S21),
-                tr(S11, 100, List.of(V11, V21), S21),
-                tr(S11, 110, List.of(V11, V22), S22)
-        );
-    }
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
 
-    private void assertTransfers(
-            Multimap<StopLocation, PathTransfer> transfersByStop,
-            TransferDescriptor... transfers
-    ) {
-        var matchedTransfers = new HashSet<PathTransfer>();
-        var assertions = Stream.concat(
-                Arrays.stream(transfers).map(td -> td.matcher(transfersByStop, matchedTransfers)),
-                Stream.of(allTransfersMatched(transfersByStop, matchedTransfers))
-        );
+    assertTrue(transitModel.getAllPathTransfers().isEmpty());
+  }
 
-        assertAll(assertions);
-    }
+  private TestOtpModel model(boolean addPatterns) {
+    return model(addPatterns, false);
+  }
 
-    private Executable allTransfersMatched(
-            Multimap<StopLocation, PathTransfer> transfersByStop,
-            Set<PathTransfer> matchedTransfers
-    ) {
-        return () -> {
-            var missingTransfers = new HashSet<>(transfersByStop.values());
-            missingTransfers.removeAll(matchedTransfers);
+  private TestOtpModel model(boolean addPatterns, boolean withBoardingConstraint) {
+    return model(addPatterns, withBoardingConstraint, false);
+  }
 
-            assertEquals(Set.of(), missingTransfers, "All transfers matched");
-        };
-    }
-
-    private TransferDescriptor tr(TransitStopVertex from, double distance, TransitStopVertex to) {
-        return new TransferDescriptor(from, distance, to);
-    }
-
-    private TransferDescriptor tr(
-            TransitStopVertex from,
-            double distance,
-            List<StreetVertex> vertices,
-            TransitStopVertex to
-    ) {
-        return new TransferDescriptor(from, distance, vertices, to);
-    }
-
-    private static class TransferDescriptor {
-
-        private final StopLocation from;
-        private final StopLocation to;
-        private final Double distanceMeters;
-        private final List<StreetVertex> vertices;
-
-        public TransferDescriptor(
-                TransitStopVertex from,
-                Double distanceMeters,
-                TransitStopVertex to
-        ) {
-            this.from = from.getStop();
-            this.distanceMeters = distanceMeters;
-            this.vertices = null;
-            this.to = to.getStop();
-        }
-
-        public TransferDescriptor(
-                TransitStopVertex from,
-                Double distanceMeters,
-                List<StreetVertex> vertices,
-                TransitStopVertex to
-        ) {
-            this.from = from.getStop();
-            this.distanceMeters = distanceMeters;
-            this.vertices = vertices;
-            this.to = to.getStop();
-        }
-
-        boolean matches(PathTransfer transfer) {
-            if (!Objects.equals(from, transfer.from) || !Objects.equals(to, transfer.to)) {
-                return false;
-            }
-
-            if (vertices == null) {
-                return distanceMeters == transfer.getDistanceMeters()
-                        && transfer.getEdges() == null;
-            }
-            else {
-                var transferVertices = transfer.getEdges().stream()
-                        .map(Edge::getToVertex)
-                        .filter(StreetVertex.class::isInstance)
-                        .collect(Collectors.toList());
-
-                return distanceMeters == transfer.getDistanceMeters() && Objects.equals(
-                        vertices, transferVertices);
-            }
-        }
-
+  private TestOtpModel model(
+    boolean addPatterns,
+    boolean withBoardingConstraint,
+    boolean withNoTransfersOnStations
+  ) {
+    return modelOf(
+      new Builder() {
         @Override
-        public String toString() {
-            return ToStringBuilder.of(getClass())
-                    .addObj("from", from)
-                    .addObj("to", to)
-                    .addNum("distanceMeters", distanceMeters)
-                    .addCol("vertices", vertices)
-                    .toString();
-        }
+        public void build() {
+          S0 = stop("S0", 47.495, 19.001, withNoTransfersOnStations);
+          S11 = stop("S11", 47.500, 19.001, withNoTransfersOnStations);
+          S12 = stop("S12", 47.520, 19.001, withNoTransfersOnStations);
+          S13 = stop("S13", 47.540, 19.001, withNoTransfersOnStations);
+          S21 = stop("S21", 47.500, 19.011, withNoTransfersOnStations);
+          S22 = stop("S22", 47.520, 19.011, withNoTransfersOnStations);
+          S23 = stop("S23", 47.540, 19.011, withNoTransfersOnStations);
 
-        private Executable matcher(
-                Multimap<StopLocation, PathTransfer> transfersByStop,
-                Set<PathTransfer> matchedTransfers
-        ) {
-            return () -> {
-                var matched = transfersByStop.values()
-                        .stream()
-                        .filter(this::matches)
-                        .findFirst();
+          V0 = intersection("V0", 47.495, 19.000);
+          V11 = intersection("V11", 47.500, 19.000);
+          V12 = intersection("V12", 47.510, 19.000);
+          V13 = intersection("V13", 47.520, 19.000);
+          V21 = intersection("V21", 47.500, 19.010);
+          V22 = intersection("V22", 47.510, 19.010);
+          V23 = intersection("V23", 47.520, 19.010);
 
-                if (matched.isPresent()) {
-                    assertTrue(true, "Found transfer for " + this);
-                    matchedTransfers.add(matched.get());
-                }
-                else {
-                    fail("Missing transfer for " + this);
-                }
-            };
+          biLink(V0, S0);
+          biLink(V11, S11);
+          biLink(V12, S12);
+          biLink(V13, S13);
+          biLink(V21, S21);
+          biLink(V22, S22);
+          biLink(V23, S23);
+
+          street(V0, V11, 100, StreetTraversalPermission.ALL);
+          street(V0, V12, 200, StreetTraversalPermission.ALL);
+          street(V0, V21, 100, StreetTraversalPermission.ALL);
+          street(V0, V22, 200, StreetTraversalPermission.ALL);
+
+          street(V11, V12, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V12, V13, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V21, V22, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V22, V23, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V11, V21, 100, StreetTraversalPermission.PEDESTRIAN);
+          street(V11, V22, 110, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+
+          if (addPatterns) {
+            var agency = TransitModelForTest.agency("Agency");
+
+            tripPattern(
+              TripPattern
+                .of(TransitModelForTest.id("TP1"))
+                .withRoute(route("R1", TransitMode.BUS, agency))
+                .withStopPattern(
+                  new StopPattern(List.of(st(S11, !withBoardingConstraint, true), st(S12), st(S13)))
+                )
+                .build()
+            );
+
+            tripPattern(
+              TripPattern
+                .of(TransitModelForTest.id("TP2"))
+                .withRoute(route("R2", TransitMode.BUS, agency))
+                .withStopPattern(new StopPattern(List.of(st(S21), st(S22), st(S23))))
+                .build()
+            );
+          }
         }
+      }
+    );
+  }
+
+  private void assertTransfers(
+    Collection<PathTransfer> allPathTransfers,
+    TransferDescriptor... transfers
+  ) {
+    var matchedTransfers = new HashSet<PathTransfer>();
+    var assertions = Stream.concat(
+      Arrays.stream(transfers).map(td -> td.matcher(allPathTransfers, matchedTransfers)),
+      Stream.of(allTransfersMatched(allPathTransfers, matchedTransfers))
+    );
+
+    assertAll(assertions);
+  }
+
+  private Executable allTransfersMatched(
+    Collection<PathTransfer> transfersByStop,
+    Set<PathTransfer> matchedTransfers
+  ) {
+    return () -> {
+      var missingTransfers = new HashSet<>(transfersByStop);
+      missingTransfers.removeAll(matchedTransfers);
+
+      assertEquals(Set.of(), missingTransfers, "All transfers matched");
+    };
+  }
+
+  private TransferDescriptor tr(TransitStopVertex from, double distance, TransitStopVertex to) {
+    return new TransferDescriptor(from, distance, to);
+  }
+
+  private TransferDescriptor tr(
+    TransitStopVertex from,
+    double distance,
+    List<StreetVertex> vertices,
+    TransitStopVertex to
+  ) {
+    return new TransferDescriptor(from, distance, vertices, to);
+  }
+
+  private static class TransferDescriptor {
+
+    private final StopLocation from;
+    private final StopLocation to;
+    private final Double distanceMeters;
+    private final List<StreetVertex> vertices;
+
+    public TransferDescriptor(TransitStopVertex from, Double distanceMeters, TransitStopVertex to) {
+      this.from = from.getStop();
+      this.distanceMeters = distanceMeters;
+      this.vertices = null;
+      this.to = to.getStop();
     }
+
+    public TransferDescriptor(
+      TransitStopVertex from,
+      Double distanceMeters,
+      List<StreetVertex> vertices,
+      TransitStopVertex to
+    ) {
+      this.from = from.getStop();
+      this.distanceMeters = distanceMeters;
+      this.vertices = vertices;
+      this.to = to.getStop();
+    }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder
+        .of(getClass())
+        .addObj("from", from)
+        .addObj("to", to)
+        .addNum("distanceMeters", distanceMeters)
+        .addCol("vertices", vertices)
+        .toString();
+    }
+
+    boolean matches(PathTransfer transfer) {
+      if (!Objects.equals(from, transfer.from) || !Objects.equals(to, transfer.to)) {
+        return false;
+      }
+
+      if (vertices == null) {
+        return distanceMeters == transfer.getDistanceMeters() && transfer.getEdges() == null;
+      } else {
+        var transferVertices = transfer
+          .getEdges()
+          .stream()
+          .map(Edge::getToVertex)
+          .filter(StreetVertex.class::isInstance)
+          .toList();
+
+        return (
+          distanceMeters == transfer.getDistanceMeters() &&
+          Objects.equals(vertices, transferVertices)
+        );
+      }
+    }
+
+    private Executable matcher(
+      Collection<PathTransfer> transfersByStop,
+      Set<PathTransfer> matchedTransfers
+    ) {
+      return () -> {
+        var matched = transfersByStop.stream().filter(this::matches).findFirst();
+
+        if (matched.isPresent()) {
+          assertTrue(true, "Found transfer for " + this);
+          matchedTransfers.add(matched.get());
+        } else {
+          fail("Missing transfer for " + this);
+        }
+      };
+    }
+  }
 }

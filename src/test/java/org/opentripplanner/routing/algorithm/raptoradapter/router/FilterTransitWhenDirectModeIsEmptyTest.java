@@ -1,18 +1,26 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
-import org.junit.Test;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.StreetMode;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.StreetMode;
 
 public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsNotWalking() {
-    var modes = new RequestModes(null, null, null, StreetMode.BIKE, Set.of());
+    var modes = RequestModes
+      .of()
+      .withAccessMode(null)
+      .withEgressMode(null)
+      .withDirectMode(StreetMode.BIKE)
+      .withTransferMode(null)
+      .clearTransitModes()
+      .build();
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 
@@ -23,7 +31,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsWalking() {
-    var modes = new RequestModes(null, null, null, StreetMode.WALK, Set.of());
+    var modes = RequestModes.of().withDirectMode(StreetMode.WALK).clearTransitModes().build();
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 
@@ -34,7 +42,14 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsEmpty() {
-    var modes = new RequestModes(null, null, null, null, Set.of());
+    var modes = RequestModes
+      .of()
+      .withAccessMode(null)
+      .withEgressMode(null)
+      .withDirectMode(null)
+      .withTransferMode(null)
+      .clearTransitModes()
+      .build();
 
     var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
 

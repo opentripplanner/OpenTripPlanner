@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.api;
 
-import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 
 /**
@@ -14,10 +13,9 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  * If enabled all of these costs are used to find the optimal transfer-points for a given set of
  * transit legs. The transfer-priority takes precedence over the wait-time-optimized-cost, and the
  * break-tie-cost is only used if the cost is the same using the two other filters. For example for
- * a given path the normal case is that the the transfer-priority-cost is
- * {@link org.opentripplanner.model.transfer.TransferPriority#NEUTRAL_PRIORITY_COST}. Then we look
- * at the wait-time-optimized-cost or the generalized-cost (from routing) - if this is the same,
- * then we use the break-tie-cost.
+ * a given path the normal case is that the transfer-priority-cost is {@link #NEUTRAL_COST}. Then
+ * we look at the wait-time-optimized-cost or the generalized-cost (from routing) - if this is the
+ * same, then we use the break-tie-cost.
  * <p>
  * The wait-time-optimized-cost is typically the same when we can do a in-station/same-stop transfer
  * at multiple locations. The break-tie-cost just looks at the transit departure-times and try to
@@ -32,34 +30,30 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
  * describe the different costs for transfer optimizing. Two classes implement this interface.
  */
 public interface TransferOptimized {
+  int NEUTRAL_COST = 0;
 
-    int NEUTRAL_COST = 0;
+  /**
+   * Return the total transfer priority cost. This is completely separate from the generalized cost.
+   * Return {@code 0}(zero) if cost is neutral/no "special" transfer characteristics are present.
+   * <p>
+   * Precedence: first
+   */
+  int transferPriorityCost();
 
-    /**
-     * Return the total transfer priority cost. This is completely separate from the
-     * generalized cost. Return {@code 0}(zero) if cost is neutral/no "special" transfer
-     * characteristics are present.
-     * <p>
-     * Precedence: first
-     *
-     * @see TransferConstraint#priorityCost()
-     */
-    int transferPriorityCost();
+  /**
+   * The generalized cost adjusted with a better wait time calculation.
+   * <p>
+   * Precedence: second
+   *
+   * @see TransferWaitTimeCostCalculator
+   */
+  int generalizedCostWaitTimeOptimized();
 
-    /**
-     * The generalized cost adjusted with a better wait time calculation.
-     * <p>
-     * Precedence: second
-     *
-     * @see TransferWaitTimeCostCalculator
-     */
-    int generalizedCostWaitTimeOptimized();
-
-    /**
-     * Optimize so that the transfers happens as early as possible. This is normally the case when
-     * two trips visit the same stops - and two or more stops are possible transfer points.
-     * <p>
-     * Precedence: third
-     */
-    int breakTieCost();
+  /**
+   * Optimize so that the transfers happens as early as possible. This is normally the case when two
+   * trips visit the same stops - and two or more stops are possible transfer points.
+   * <p>
+   * Precedence: third
+   */
+  int breakTieCost();
 }

@@ -9,67 +9,85 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.TripStopTimes;
 
 public class TransferMapperTest {
-    private static final String FEED_ID = "FEED";
 
-    private static final RouteMapper ROUTE_MAPPER =
-            new RouteMapper(new AgencyMapper(FEED_ID), new DataImportIssueStore(false));
+  private static final String FEED_ID = "FEED";
 
-    private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
+  private static final TranslationHelper TRANSLATION_HELPER = new TranslationHelper();
 
-    private static final StationMapper STATION_MAPPER = new StationMapper();
+  public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.noopIssueStore();
 
-    private static final StopMapper STOP_MAPPER = new StopMapper();
+  private static final RouteMapper ROUTE_MAPPER = new RouteMapper(
+    new AgencyMapper(FEED_ID),
+    ISSUE_STORE,
+    new TranslationHelper()
+  );
 
-    private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
+  private static final TripMapper TRIP_MAPPER = new TripMapper(
+    ROUTE_MAPPER,
+    new DirectionMapper(ISSUE_STORE),
+    TRANSLATION_HELPER
+  );
 
-    private static final Integer ID = 45;
+  private static final StationMapper STATION_MAPPER = new StationMapper(TRANSLATION_HELPER);
 
-    private static final Route FROM_ROUTE = new Route();
+  private static final StopMapper STOP_MAPPER = new StopMapper(
+    TRANSLATION_HELPER,
+    stationId -> null
+  );
 
-    private static final Stop FROM_STOP = new Stop();
+  private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
-    private static final Trip FROM_TRIP = new Trip();
+  private static final Integer ID = 45;
 
-    private static final Route TO_ROUTE = new Route();
+  private static final Route FROM_ROUTE = new Route();
 
-    private static final Stop TO_STOP = new Stop();
+  private static final Stop FROM_STOP = new Stop();
 
-    private static final Trip TO_TRIP = new Trip();
+  private static final Trip FROM_TRIP = new Trip();
 
-    private static final int MIN_TRANSFER_TIME = 200;
+  private static final Route TO_ROUTE = new Route();
 
-    private static final int TRANSFER_TYPE = 3;
+  private static final Stop TO_STOP = new Stop();
 
-    private static final Transfer TRANSFER = new Transfer();
+  private static final Trip TO_TRIP = new Trip();
 
-    static {
-        FROM_ROUTE.setId(AGENCY_AND_ID);
-        FROM_STOP.setId(AGENCY_AND_ID);
-        FROM_TRIP.setId(AGENCY_AND_ID);
-        TO_ROUTE.setId(AGENCY_AND_ID);
-        TO_STOP.setId(AGENCY_AND_ID);
-        TO_TRIP.setId(AGENCY_AND_ID);
+  private static final int MIN_TRANSFER_TIME = 200;
 
-        TRANSFER.setId(ID);
-        TRANSFER.setFromRoute(FROM_ROUTE);
-        TRANSFER.setFromStop(FROM_STOP);
-        TRANSFER.setFromTrip(FROM_TRIP);
-        TRANSFER.setToRoute(TO_ROUTE);
-        TRANSFER.setToStop(TO_STOP);
-        TRANSFER.setToTrip(TO_TRIP);
-        TRANSFER.setMinTransferTime(MIN_TRANSFER_TIME);
-        TRANSFER.setTransferType(TRANSFER_TYPE);
-    }
+  private static final int TRANSFER_TYPE = 3;
 
-    private TransferMapper subject = new TransferMapper(
-            ROUTE_MAPPER,
-            STATION_MAPPER,
-            STOP_MAPPER,
-            TRIP_MAPPER,
-            new TripStopTimes()
-    );
+  private static final Transfer TRANSFER = new Transfer();
 
-    /*
+  private static final DataImportIssueStore issueStore = DataImportIssueStore.noopIssueStore();
+
+  private final TransferMapper subject = new TransferMapper(
+    ROUTE_MAPPER,
+    STATION_MAPPER,
+    STOP_MAPPER,
+    TRIP_MAPPER,
+    new TripStopTimes(),
+    false,
+    issueStore
+  );
+
+  static {
+    FROM_ROUTE.setId(AGENCY_AND_ID);
+    FROM_STOP.setId(AGENCY_AND_ID);
+    FROM_TRIP.setId(AGENCY_AND_ID);
+    TO_ROUTE.setId(AGENCY_AND_ID);
+    TO_STOP.setId(AGENCY_AND_ID);
+    TO_TRIP.setId(AGENCY_AND_ID);
+
+    TRANSFER.setId(ID);
+    TRANSFER.setFromRoute(FROM_ROUTE);
+    TRANSFER.setFromStop(FROM_STOP);
+    TRANSFER.setFromTrip(FROM_TRIP);
+    TRANSFER.setToRoute(TO_ROUTE);
+    TRANSFER.setToStop(TO_STOP);
+    TRANSFER.setToTrip(TO_TRIP);
+    TRANSFER.setMinTransferTime(MIN_TRANSFER_TIME);
+    TRANSFER.setTransferType(TRANSFER_TYPE);
+  }
+  /*
     @Test
     public void testMapCollection() throws Exception {
         assertNull(null, subject.map((Collection<Transfer>) null));
@@ -78,8 +96,8 @@ public class TransferMapperTest {
     }
      */
 
-    // TODO Fix this
-    /*
+  // TODO Fix this
+  /*
     @Test
     public void testMap() throws Exception {
         org.opentripplanner.model.transfer.Transfer result = subject.map(TRANSFER);
@@ -95,8 +113,8 @@ public class TransferMapperTest {
     }
      */
 
-    // TODO Fix this
-    /*
+  // TODO Fix this
+  /*
     @Test
     public void testMapWithNulls() throws Exception {
         org.opentripplanner.model.transfer.Transfer result = subject.map(new Transfer());
@@ -112,16 +130,14 @@ public class TransferMapperTest {
     }
      */
 
-    /** Mapping the same object twice, should return the the same instance. */
-    // TODO Fix this
-    /*
-    @Test
-    public void testMapCache() throws Exception {
-        org.opentripplanner.model.transfer.Transfer result1 = subject.map(TRANSFER);
-        org.opentripplanner.model.transfer.Transfer result2 = subject.map(TRANSFER);
-
-        assertTrue(result1 == result2);
-    }
-
-     */
+  // /** Mapping the same object twice, should return the the same instance. */
+  // TODO Fix this
+  //
+  // @Test
+  // public void testMapCache() throws Exception {
+  //    org.opentripplanner.model.transfer.Transfer result1 = subject.map(TRANSFER);
+  //    org.opentripplanner.model.transfer.Transfer result2 = subject.map(TRANSFER);
+  //
+  //    assertTrue(result1 == result2);
+  // }
 }

@@ -8,12 +8,11 @@ import java.io.StringWriter;
  */
 public class ThrowableUtils {
 
-    public static String detailedString (Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        sw.append(throwable.getMessage());
-        sw.append("\n");
-        throwable.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
-
+  public static String detailedString(Throwable throwable) {
+    StringWriter sw = new StringWriter();
+    sw.append(throwable.getMessage());
+    sw.append("\n");
+    throwable.printStackTrace(new PrintWriter(sw));
+    return sw.toString();
+  }
 }

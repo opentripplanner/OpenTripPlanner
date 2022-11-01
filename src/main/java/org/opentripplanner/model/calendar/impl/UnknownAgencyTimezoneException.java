@@ -3,9 +3,9 @@ package org.opentripplanner.model.calendar.impl;
 
 public class UnknownAgencyTimezoneException extends RuntimeException {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    public UnknownAgencyTimezoneException(String agencyName, String timezone) {
-        super("unknown timezone \"" + timezone + "\" for agency \"" + agencyName + "\"");
-    }
+  public UnknownAgencyTimezoneException(String agencyName, String timezone) {
+    super("unknown timezone \"" + timezone + "\" for agency \"" + agencyName + "\"");
+  }
 }

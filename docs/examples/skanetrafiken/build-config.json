@@ -1,0 +1,18 @@
+{
+  "areaVisibility": true,
+  "platformEntriesLinking": true,
+  "osmDefaults": {
+    "osmTagMapping": "norway"
+  },
+  "islandWithoutStopsMaxSize": 5,
+  "islandWithStopsMaxSize": 5,
+  "dataImportReport": true,
+  "maxTransferDurationSeconds": 900,
+  "maxStopToShapeSnapDistance": 500,
+  "netexDefaults" : {
+    "sharedFilePattern" : "ST_stops.xml",
+    "sharedGroupFilePattern" : "(\\w{2})_shared_data.xml",
+    "groupFilePattern" : "(\\w{2})_line.*\\.xml",
+    "feedId": "ST"
+  }
+}

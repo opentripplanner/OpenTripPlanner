@@ -1,160 +1,133 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Collection;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
 
+public final class TemporaryPartialStreetEdge extends StreetEdge implements TemporaryEdge {
 
-final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge implements TemporaryEdge {
+  /**
+   * The edge on which this lies.
+   */
+  private final StreetEdge parentEdge;
 
-    private static final long serialVersionUID = 1L;
+  // An explicit geometry is stored, so that it may still be retrieved after this edge is removed
+  // from the graph and the from/to vertices are set to null.
+  private final LineString geometry;
 
-    /**
-     * The edge on which this lies.
-     */
-    private final StreetEdge parentEdge;
+  /**
+   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'. If the length
+   * is negative, a new length is calculated from the geometry. The elevation data is calculated
+   * using the 'parentEdge' and given 'length'.
+   */
+  public TemporaryPartialStreetEdge(
+    StreetEdge parentEdge,
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    I18NString name,
+    double length
+  ) {
+    super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
+    this.parentEdge = parentEdge;
+    this.geometry = super.getGeometry();
+  }
 
-    // An explicit geometry is stored, so that it may still be retrieved after this edge is removed
-    // from the graph and the from/to vertices are set to null.
-    private final LineString geometry;
+  /**
+   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'. The length is
+   * calculated using the provided geometry. The elevation data is calculated using the 'parentEdge'
+   * and the calculated 'length'.
+   */
+  TemporaryPartialStreetEdge(
+    StreetEdge parentEdge,
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    I18NString name,
+    boolean back
+  ) {
+    super(v1, v2, geometry, name, parentEdge.getPermission(), back);
+    this.parentEdge = parentEdge;
+    this.geometry = super.getGeometry();
+  }
 
+  /**
+   * This implementation makes it so that TurnRestrictions on the parent edge are applied to this
+   * edge as well.
+   */
+  @Override
+  public boolean isEquivalentTo(Edge e) {
+    return (e == this || e == parentEdge);
+  }
 
-    /**
-     * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'.
-     * If the length is negative, a new length is calculated from the geometry.
-     * The elevation data is calculated using the 'parentEdge' and given 'length'.
-     */
-    public TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, I18NString name, double length) {
-        super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
-        this.parentEdge = parentEdge;
-        this.geometry = super.getGeometry();
-        setCarSpeed(parentEdge.getCarSpeed());
-        setElevationProfileUsingParents();
+  @Override
+  public boolean isReverseOf(Edge e) {
+    Edge other = e;
+    if (e instanceof TemporaryPartialStreetEdge) {
+      other = ((TemporaryPartialStreetEdge) e).parentEdge;
     }
 
-    /**
-     * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'.
-     * The length is calculated using the provided geometry.
-     * The elevation data is calculated using the 'parentEdge' and the calculated 'length'.
-     */
-    TemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, I18NString name) {
-        super(v1, v2, geometry, name, parentEdge.getPermission(), false);
-        this.parentEdge = parentEdge;
-        this.geometry = super.getGeometry();
-        setCarSpeed(parentEdge.getCarSpeed());
-        setElevationProfileUsingParents();
-    }
+    // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
+    return parentEdge.isReverseOf(other);
+  }
 
-    @Override
-    public LineString getGeometry() {
-        return geometry;
-    }
+  /**
+   * Returns true if this edge is trivial - beginning and ending at the same point.
+   */
+  public boolean isTrivial() {
+    Coordinate fromCoord = this.getFromVertex().getCoordinate();
+    Coordinate toCoord = this.getToVertex().getCoordinate();
+    return fromCoord.equals(toCoord);
+  }
 
-    /**
-     * Partial edges are always partial.
-     */
-    @Override
-    public boolean isPartial() {
-        return true;
-    }
+  public StreetEdge getParentEdge() {
+    return parentEdge;
+  }
 
-    /**
-     * Have the inbound angle of  their parent.
-     */
-    @Override
-    public int getInAngle() {
-        return parentEdge.getInAngle();
-    }
+  @Override
+  public String toString() {
+    return (
+      "TemporaryPartialStreetEdge(" +
+      this.getDefaultName() +
+      ", " +
+      this.getFromVertex() +
+      " -> " +
+      this.getToVertex() +
+      " length=" +
+      this.getDistanceMeters() +
+      " carSpeed=" +
+      this.getCarSpeed() +
+      " parentEdge=" +
+      parentEdge +
+      ")"
+    );
+  }
 
-    /**
-     * Have the outbound angle of  their parent.
-     */
-    @Override
-    public int getOutAngle() {
-        return parentEdge.getInAngle();
-    }
+  @Override
+  public boolean isRoundabout() {
+    return parentEdge.isRoundabout();
+  }
 
-    @Nonnull
-    @Override
-    public Collection<TurnRestriction> getTurnRestrictions() {
-        return parentEdge.getTurnRestrictions();
-    }
+  @Override
+  public LineString getGeometry() {
+    return geometry;
+  }
 
-    /**
-     * This implementation makes it so that TurnRestrictions on the parent edge are applied to this edge as well.
-     */
-    @Override
-    public boolean isEquivalentTo(Edge e) {
-        return (e == this || e == parentEdge);
-    }
+  /**
+   * Have the inbound angle of  their parent.
+   */
+  @Override
+  public int getInAngle() {
+    return parentEdge.getInAngle();
+  }
 
-    @Override
-    public boolean isReverseOf(Edge e) {
-        Edge other = e;
-        if (e instanceof TemporaryPartialStreetEdge) {
-            other = ((TemporaryPartialStreetEdge) e).parentEdge;
-        }
-
-        // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
-        return parentEdge.isReverseOf(other);
-    }
-
-    @Override
-    public boolean isRoundabout() {
-        return parentEdge.isRoundabout();
-    }
-
-    /**
-     * Returns true if this edge is trivial - beginning and ending at the same point.
-     */
-    public boolean isTrivial() {
-        Coordinate fromCoord = this.getFromVertex().getCoordinate();
-        Coordinate toCoord = this.getToVertex().getCoordinate();
-        return fromCoord.equals(toCoord);
-    }
-
-    public StreetEdge getParentEdge() {
-        return parentEdge;
-    }
-
-    @Override
-    public String toString() {
-        return "TemporaryPartialStreetEdge(" + this.getDefaultName() + ", " + this.getFromVertex() + " -> "
-                + this.getToVertex() + " length=" + this.getDistanceMeters() + " carSpeed="
-                + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
-    }
-
-    private void assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(StreetVertex v1) {
-        if(v1 instanceof TemporaryVertex) {
-            if (((TemporaryVertex)v1).isEndVertex()) {
-                throw new IllegalStateException("A temporary edge is directed away from an end vertex");
-            }
-        }
-    }
-
-    private void assertEdgeIsDirectedTowardsTemporaryEndVertex(StreetVertex v2) {
-        if(v2 instanceof TemporaryVertex) {
-            if (!((TemporaryVertex)v2).isEndVertex()) {
-                throw new IllegalStateException("A temporary edge is directed towards a start vertex");
-            }
-        }
-    }
-
-    private void setElevationProfileUsingParents() {
-        setElevationProfile(
-                ElevationUtils.getPartialElevationProfile(
-                        getParentEdge().getElevationProfile(), 0, getDistanceMeters()
-                ),
-                false
-        );
-    }
+  /**
+   * Have the outbound angle of  their parent.
+   */
+  @Override
+  public int getOutAngle() {
+    return parentEdge.getInAngle();
+  }
 }

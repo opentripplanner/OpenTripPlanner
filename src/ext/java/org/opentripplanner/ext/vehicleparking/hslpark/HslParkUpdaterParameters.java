@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
+import java.time.ZoneId;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
@@ -9,41 +10,54 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
  */
 public class HslParkUpdaterParameters extends VehicleParkingUpdaterParameters {
 
-    private final int facilitiesFrequencySec;
-    private final String facilitiesUrl;
-    private final String feedId;
-    private final String utilizationsUrl;
+  private final int facilitiesFrequencySec;
+  private final String facilitiesUrl;
+  private final String feedId;
+  private final String hubsUrl;
+  private final String utilizationsUrl;
+  private final ZoneId timeZone;
 
-    public HslParkUpdaterParameters(
-            String configRef,
-            int facilitiesFrequencySec,
-            String facilitiesUrl,
-            String feedId,
-            DataSourceType sourceType,
-            int utilizationsFrequencySec,
-            String utilizationsUrl
+  public HslParkUpdaterParameters(
+    String configRef,
+    int facilitiesFrequencySec,
+    String facilitiesUrl,
+    String feedId,
+    DataSourceType sourceType,
+    int utilizationsFrequencySec,
+    String utilizationsUrl,
+    ZoneId timeZone,
+    String hubsUrl
+  ) {
+    super(configRef, utilizationsFrequencySec, sourceType);
+    this.facilitiesFrequencySec = facilitiesFrequencySec;
+    this.facilitiesUrl = facilitiesUrl;
+    this.feedId = feedId;
+    this.hubsUrl = hubsUrl;
+    this.utilizationsUrl = utilizationsUrl;
+    this.timeZone = timeZone;
+  }
 
-    ) {
-        super(configRef, utilizationsFrequencySec, sourceType);
-        this.facilitiesFrequencySec = facilitiesFrequencySec;
-        this.facilitiesUrl = facilitiesUrl;
-        this.feedId = feedId;
-        this.utilizationsUrl = utilizationsUrl;
-    }
+  public int getFacilitiesFrequencySec() {
+    return facilitiesFrequencySec;
+  }
 
-    public int getFacilitiesFrequencySec() {
-        return facilitiesFrequencySec;
-    }
+  public String getFeedId() {
+    return feedId;
+  }
 
-    public String getFeedId() {
-        return feedId;
-    }
+  public String getFacilitiesUrl() {
+    return facilitiesUrl;
+  }
 
-    public String getFacilitiesUrl() {
-        return facilitiesUrl;
-    }
+  public String getHubsUrl() {
+    return hubsUrl;
+  }
 
-    public String getUtilizationsUrl() {
-        return utilizationsUrl;
-    }
+  public String getUtilizationsUrl() {
+    return utilizationsUrl;
+  }
+
+  public ZoneId getTimeZone() {
+    return timeZone;
+  }
 }

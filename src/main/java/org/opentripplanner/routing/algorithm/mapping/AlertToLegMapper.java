@@ -1,287 +1,244 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.calendar.ServiceDate;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.MultiModalStation;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.model.site.StopLocation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
-
+/**
+ * This class is responsible for finding and adding transit alerts to individual transit legs.
+ */
 public class AlertToLegMapper {
 
-    public static void addTransitAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg) {
+  private final TransitAlertService transitAlertService;
 
-        // Alert patches are only relevant for transit legs
-        if (!leg.isTransitLeg()) { return; }
+  private final Function<Station, MultiModalStation> getMultiModalStation;
 
-        Set<StopCondition> departingStopConditions = isFirstLeg
-                ? StopCondition.DEPARTURE
-                : StopCondition.FIRST_DEPARTURE;
+  public AlertToLegMapper(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
+    this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
+  }
 
-        Date legStartTime = leg.getStartTime().getTime();
-        Date legEndTime = leg.getEndTime().getTime();
-        StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
-        StopLocation toStop = leg.getTo() == null ? null : leg.getTo().stop;
+  /**
+   * Find and add alerts to the leg passed in.
+   *
+   * @param isFirstLeg Whether the leg is a first leg of the itinerary. This affects the matched
+   *                   stop condition.
+   */
+  public void addTransitAlertsToLeg(Leg leg, boolean isFirstLeg) {
+    // Alert alerts are only relevant for transit legs
+    if (!leg.isTransitLeg()) {
+      return;
+    }
 
-        FeedScopedId routeId = leg.getRoute().getId();
-        FeedScopedId tripId = leg.getTrip().getId();
-        if (fromStop instanceof Stop) {
-            Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, (Stop) fromStop, routeId);
-            alerts.addAll(getAlertsForStopAndTrip(graph, (Stop) fromStop, tripId,
-                    leg.getServiceDate()
-            ));
-            alerts.addAll(getAlertsForStop(graph, (Stop) fromStop));
-            addTransitAlertPatchesToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
+    Set<StopCondition> departingStopConditions = isFirstLeg
+      ? StopCondition.DEPARTURE
+      : StopCondition.FIRST_DEPARTURE;
+
+    ZonedDateTime legStartTime = leg.getStartTime();
+    ZonedDateTime legEndTime = leg.getEndTime();
+    StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
+    StopLocation toStop = leg.getTo() == null ? null : leg.getTo().stop;
+
+    FeedScopedId routeId = leg.getRoute().getId();
+    FeedScopedId tripId = leg.getTrip().getId();
+    LocalDate serviceDate = leg.getServiceDate();
+
+    if (fromStop instanceof RegularStop stop) {
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
+      alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
+      addTransitAlertsToLeg(leg, departingStopConditions, alerts, legStartTime, legEndTime);
+    }
+    if (toStop instanceof RegularStop stop) {
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
+      alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
+      addTransitAlertsToLeg(leg, StopCondition.ARRIVING, alerts, legStartTime, legEndTime);
+    }
+
+    if (leg.getIntermediateStops() != null) {
+      for (StopArrival visit : leg.getIntermediateStops()) {
+        if (visit.place.stop instanceof RegularStop stop) {
+          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId);
+          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate));
+          alerts.addAll(getAlertsForRelatedStops(stop, transitAlertService::getStopAlerts));
+
+          ZonedDateTime stopArrival = visit.arrival;
+          ZonedDateTime stopDeparture = visit.departure;
+
+          addTransitAlertsToLeg(leg, StopCondition.PASSING, alerts, stopArrival, stopDeparture);
         }
-        if (toStop instanceof Stop) {
-            Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, (Stop) toStop, routeId);
-            alerts.addAll(getAlertsForStopAndTrip(graph, (Stop) toStop, tripId,
-                    leg.getServiceDate()
-            ));
-            alerts.addAll(getAlertsForStop(graph, (Stop) toStop));
-            addTransitAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, legStartTime, legEndTime);
-        }
+      }
+    }
 
-        if (leg.getIntermediateStops() != null) {
-            for (StopArrival visit : leg.getIntermediateStops()) {
-                if (visit.place.stop instanceof Stop) {
-                    Stop stop = (Stop) visit.place.stop;
-                    Collection<TransitAlert> alerts = getAlertsForStopAndRoute(graph, stop, routeId);
-                    alerts.addAll(getAlertsForStopAndTrip(graph, stop, tripId, leg.getServiceDate()));
-                    alerts.addAll(getAlertsForStop(graph, stop));
+    Collection<TransitAlert> alerts;
 
-                    Date stopArrival = visit.arrival.getTime();
-                    Date stopDepature = visit.departure.getTime();
+    // trips - alerts tagged on ServiceDate
+    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
+    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
 
-                    addTransitAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, stopArrival, stopDepature);
-                }
+    // trips - alerts tagged on any date
+    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), null);
+    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+
+    // route
+    alerts = transitAlertService.getRouteAlerts(leg.getRoute().getId());
+    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+
+    // agency
+    alerts = transitAlertService.getAgencyAlerts(leg.getAgency().getId());
+    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+
+    // Filter alerts when there are multiple timePeriods for each alert
+    leg
+      .getTransitAlerts()
+      .removeIf(alert ->
+        !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
+      );
+  }
+
+  /**
+   * Add alerts for the leg, if they are valid for the duration of the leg, and if the stop
+   * condition(s) match
+   */
+  private static void addTransitAlertsToLeg(
+    Leg leg,
+    Collection<StopCondition> stopConditions,
+    Collection<TransitAlert> alerts,
+    ZonedDateTime fromTime,
+    ZonedDateTime toTime
+  ) {
+    if (alerts != null) {
+      for (TransitAlert alert : alerts) {
+        if (alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond())) {
+          if (
+            !alert.getStopConditions().isEmpty() && // Skip if stopConditions are not set for alert
+            stopConditions != null &&
+            !stopConditions.isEmpty()
+          ) { // ...or specific stopConditions are not requested
+            for (StopCondition stopCondition : stopConditions) {
+              if (alert.getStopConditions().contains(stopCondition)) {
+                leg.addAlert(alert);
+                break; //Only add alert once
+              }
             }
+          } else {
+            leg.addAlert(alert);
+          }
         }
+      }
+    }
+  }
 
-        Collection<TransitAlert> patches;
+  /**
+   * Add alerts for the leg, if they are valid for the duration of the leg, without considering the
+   * stop condition(s) of the alert
+   */
+  private static void addTransitAlertsToLeg(
+    Leg leg,
+    Collection<TransitAlert> alerts,
+    ZonedDateTime fromTime,
+    ZonedDateTime toTime
+  ) {
+    addTransitAlertsToLeg(leg, null, alerts, fromTime, toTime);
+  }
 
-        // trips - alerts tagged on ServiceDate
-        patches = alertPatchService(graph)
-                .getTripAlerts(leg.getTrip().getId(), leg.getServiceDate());
-        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
+  private Collection<TransitAlert> getAlertsForStopAndRoute(
+    RegularStop stop,
+    FeedScopedId routeId
+  ) {
+    return getAlertsForRelatedStops(
+      stop,
+      id -> transitAlertService.getStopAndRouteAlerts(id, routeId)
+    );
+  }
 
-        // trips - alerts tagged on any date
-        patches = alertPatchService(graph).getTripAlerts(leg.getTrip().getId(), null);
-        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
+  private Collection<TransitAlert> getAlertsForStopAndTrip(
+    RegularStop stop,
+    FeedScopedId tripId,
+    LocalDate serviceDate
+  ) {
+    // Finding alerts for ServiceDate
+    final Collection<TransitAlert> alerts = getAlertsForRelatedStops(
+      stop,
+      id -> transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate)
+    );
 
-        // route
-        patches = alertPatchService(graph).getRouteAlerts(leg.getRoute().getId());
-        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
+    // Finding alerts for any date
+    alerts.addAll(
+      getAlertsForRelatedStops(
+        stop,
+        id -> transitAlertService.getStopAndTripAlerts(id, tripId, null)
+      )
+    );
 
-        // agency
-        patches = alertPatchService(graph).getAgencyAlerts(leg.getAgency().getId());
-        addTransitAlertPatchesToLeg(leg, patches, legStartTime, legEndTime);
+    return alerts;
+  }
 
-        // Filter alerts when there are multiple timePeriods for each alert
-        leg.getTransitAlerts().removeIf(alertPatch ->  
-                !alertPatch.displayDuring(
-                        leg.getStartTime().getTimeInMillis()/1000,
-                        leg.getEndTime().getTimeInMillis()/1000
-                )
+  /**
+   * Find alerts, which are for the stop, its parent(s) and siblings, using a provided function for
+   * finding alerts for those stops. This can be used to only find eg. alerts that are valid for
+   * only a specific route at that stop.
+   */
+  private Collection<TransitAlert> getAlertsForRelatedStops(
+    RegularStop stop,
+    Function<FeedScopedId, Collection<TransitAlert>> getAlertsForStop
+  ) {
+    if (stop == null) {
+      return new ArrayList<>();
+    }
+
+    Collection<TransitAlert> alertsForStop = getAlertsForStop.apply(stop.getId());
+    if (alertsForStop == null) {
+      alertsForStop = new HashSet<>();
+    }
+
+    if (stop.isPartOfStation()) {
+      // Also check parent
+      final Station parentStation = stop.getParentStation();
+      Collection<TransitAlert> parentStopAlerts = getAlertsForStop.apply(parentStation.getId());
+      if (parentStopAlerts != null) {
+        alertsForStop.addAll(parentStopAlerts);
+      }
+
+      // ...and siblings - platform may have been changed
+      for (var siblingStop : parentStation.getChildStops()) {
+        if (!stop.getId().equals(siblingStop.getId())) {
+          Collection<TransitAlert> siblingAlerts = getAlertsForStop.apply(parentStation.getId());
+          if (siblingAlerts != null) {
+            alertsForStop.addAll(siblingAlerts);
+          }
+        }
+      }
+
+      // Also check multimodal parent
+      MultiModalStation multiModalStation = getMultiModalStation.apply(parentStation);
+      if (multiModalStation != null) {
+        Collection<TransitAlert> multimodalStopAlerts = getAlertsForStop.apply(
+          multiModalStation.getId()
         );
-    }
-
-    private static TransitAlertService alertPatchService(Graph g) {
-        return g.getTransitAlertService();
-    }
-
-    private static Collection<TransitAlert> getAlertsForStopAndRoute(Graph graph, Stop stop, FeedScopedId routeId) {
-        return getAlertsForStopAndRoute(graph, stop, routeId, true);
-    }
-
-
-    private static Collection<TransitAlert> getAlertsForStopAndRoute(Graph graph, Stop stop, FeedScopedId routeId, boolean checkParentStop) {
-
-        if (stop == null) {
-            return new ArrayList<>();
+        if (multimodalStopAlerts != null) {
+          alertsForStop.addAll(multimodalStopAlerts);
         }
-        Collection<TransitAlert> alertsForStopAndRoute = graph.getTransitAlertService().getStopAndRouteAlerts(stop.getId(), routeId);
-        if (checkParentStop) {
-            if (alertsForStopAndRoute == null) {
-                alertsForStopAndRoute = new HashSet<>();
-            }
-            if (stop.isPartOfStation()) {
-                //Also check parent
-                Collection<TransitAlert> alerts = graph.getTransitAlertService().getStopAndRouteAlerts(stop.getParentStation().getId(), routeId);
-                if (alerts != null) {
-                    alertsForStopAndRoute.addAll(alerts);
-                }
-
-                // ...and siblings - platform may have been changed
-                for (var siblingStop : stop.getParentStation().getChildStops()) {
-                    if (!stop.getId().equals(siblingStop.getId())) {
-                        Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAndRouteAlerts(stop.getParentStation().getId(), routeId);
-                        if (siblingAlerts != null) {
-                            alertsForStopAndRoute.addAll(siblingAlerts);
-                        }
-                    }
-                }
-            }
-
-            // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
-            //            if (stop.getMultiModalStation() != null) {
-            //                //Also check multimodal parent
-            //
-            //                FeedScopedId multimodalStopId = new FeedScopedId(stopId.getAgencyId(), stop.getMultiModalStation());
-            //                Collection<AlertPatch> multimodalStopAlerts = graph.index.getAlertsForStopAndRoute(multimodalStopId, routeId);
-            //                if (multimodalStopAlerts != null) {
-            //                    alertsForStopAndRoute.addAll(multimodalStopAlerts);
-            //                }
-            //            }
-        }
-        return alertsForStopAndRoute;
+      }
     }
-
-    private static Collection<TransitAlert> getAlertsForStopAndTrip(Graph graph, Stop stop, FeedScopedId tripId, ServiceDate serviceDate) {
-
-        // Finding alerts for ServiceDate
-        final Collection<TransitAlert> alerts = getAlertsForStopAndTrip(
-            graph,
-            stop,
-            tripId,
-            true,
-            serviceDate
-        );
-
-        // Finding alerts for any date
-        alerts.addAll(getAlertsForStopAndTrip(
-            graph,
-            stop,
-            tripId,
-            true,
-            null
-        ));
-
-        return alerts;
-    }
-
-    private static Collection<TransitAlert> getAlertsForStopAndTrip(Graph graph, Stop stop, FeedScopedId tripId, boolean checkParentStop, ServiceDate serviceDate) {
-
-        if (stop == null) {
-            return new ArrayList<>();
-        }
-
-        Collection<TransitAlert> alertsForStopAndTrip = graph.getTransitAlertService().getStopAndTripAlerts(stop.getId(), tripId, serviceDate);
-        if (checkParentStop) {
-            if (alertsForStopAndTrip == null) {
-                alertsForStopAndTrip = new HashSet<>();
-            }
-            if  (stop.isPartOfStation()) {
-                // Also check parent
-                Collection<TransitAlert> alerts = graph.getTransitAlertService().getStopAndTripAlerts(stop.getParentStation().getId(), tripId, serviceDate);
-                if (alerts != null) {
-                    alertsForStopAndTrip.addAll(alerts);
-                }
-
-                // ...and siblings - platform may have been changed
-                for (var siblingStop : stop.getParentStation().getChildStops()) {
-                    if (!stop.getId().equals(siblingStop.getId())) {
-                        Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAndTripAlerts(stop.getParentStation().getId(), tripId, serviceDate);
-                        if (siblingAlerts != null) {
-                            alertsForStopAndTrip.addAll(siblingAlerts);
-                        }
-                    }
-                }
-
-            }
-            // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
-            //            if (stop.getMultiModalStation() != null) {
-            //                //Also check multimodal parent
-            //                FeedScopedId multimodalStopId = new FeedScopedId(stopId.getAgencyId(), stop.getMultiModalStation());
-            //                Collection<AlertPatch> multimodalStopAlerts = graph.index.getAlertsForStopAndTrip(multimodalStopId, tripId);
-            //                if (multimodalStopAlerts != null) {
-            //                    alertsForStopAndTrip.addAll(multimodalStopAlerts);
-            //                }
-            //            }
-        }
-        return alertsForStopAndTrip;
-    }
-
-    private static Collection<TransitAlert> getAlertsForStop(Graph graph, Stop stopId) {
-        return getAlertsForStop(graph, stopId, true);
-    }
-
-    private static Collection<TransitAlert> getAlertsForStop(Graph graph, Stop stop, boolean checkParentStop) {
-        if (stop == null) {
-            return new ArrayList<>();
-        }
-
-        Collection<TransitAlert> alertsForStop  = graph.getTransitAlertService().getStopAlerts(stop.getId());
-        if (checkParentStop) {
-            if (alertsForStop == null) {
-                alertsForStop = new HashSet<>();
-            }
-
-            if  (stop.isPartOfStation()) {
-                // Also check parent
-                Collection<TransitAlert> parentStopAlerts = graph.getTransitAlertService().getStopAlerts(stop.getParentStation().getId());
-                if (parentStopAlerts != null) {
-                    alertsForStop.addAll(parentStopAlerts);
-                }
-
-                // ...and siblings - platform may have been changed
-                for (var siblingStop : stop.getParentStation().getChildStops()) {
-                    if (!stop.getId().equals(siblingStop.getId())) {
-                        Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAlerts(stop.getParentStation().getId());
-                        if (siblingAlerts != null) {
-                            alertsForStop.addAll(siblingAlerts);
-                        }
-                    }
-                }
-            }
-
-            // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
-            //            if (stop.getMultiModalStation() != null) {
-            //                //Also check multimodal parent
-            //                FeedScopedId multimodalStopId = new FeedScopedId(stopId.getAgencyId(), stop.getMultiModalStation());
-            //                Collection<AlertPatch> multimodalStopAlerts = graph.index.getAlertsForStopId(multimodalStopId);
-            //                if (multimodalStopAlerts != null) {
-            //                    alertsForStop.addAll(multimodalStopAlerts);
-            //                }
-            //            }
-
-        }
-        return alertsForStop;
-    }
-
-
-    private static void addTransitAlertPatchesToLeg(Leg leg, Collection<StopCondition> stopConditions, Collection<TransitAlert> alertPatches, Date fromTime, Date toTime) {
-        if (alertPatches != null) {
-            for (TransitAlert alert : alertPatches) {
-                if (alert.displayDuring(fromTime.getTime() / 1000, toTime.getTime() / 1000)) {
-                    if (!alert.getStopConditions().isEmpty() &&  // Skip if stopConditions are not set for alert
-                            stopConditions != null && !stopConditions.isEmpty()) { // ...or specific stopConditions are not requested
-                        for (StopCondition stopCondition : stopConditions) {
-                            if (alert.getStopConditions().contains(stopCondition)) {
-                                leg.addAlert(alert);
-                                break; //Only add alert once
-                            }
-                        }
-                    } else {
-                        leg.addAlert(alert);
-                    }
-                }
-            }
-        }
-    }
-
-    private static void addTransitAlertPatchesToLeg(Leg leg, Collection<TransitAlert> alertPatches, Date fromTime, Date toTime) {
-        addTransitAlertPatchesToLeg(leg, null, alertPatches, fromTime, toTime);
-    }
+    return alertsForStop;
+  }
 }

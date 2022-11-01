@@ -9,31 +9,31 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule> {
 
-    public static <T extends RaptorTripSchedule> MinCostFilterChain<OptimizedPathTail<T>> filter(
-            boolean transferPriority,
-            boolean optimizeWaitTime
-    ) {
-        return new TransferOptimizedFilterFactory<T>().create(transferPriority, optimizeWaitTime);
+  public static <T extends RaptorTripSchedule> MinCostFilterChain<OptimizedPathTail<T>> filter(
+    boolean transferPriority,
+    boolean optimizeWaitTime
+  ) {
+    return new TransferOptimizedFilterFactory<T>().create(transferPriority, optimizeWaitTime);
+  }
+
+  private MinCostFilterChain<OptimizedPathTail<T>> create(
+    boolean transferPriority,
+    boolean optimizeWaitTime
+  ) {
+    List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
+
+    if (transferPriority) {
+      filters.add(OptimizedPathTail::transferPriorityCost);
     }
 
-    private MinCostFilterChain<OptimizedPathTail<T>> create(
-            boolean transferPriority, boolean optimizeWaitTime
-    ) {
-        List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
-
-        if(transferPriority) {
-            filters.add(OptimizedPathTail::transferPriorityCost);
-        }
-
-        if(optimizeWaitTime) {
-            filters.add(OptimizedPathTail::generalizedCostWaitTimeOptimized);
-        }
-        else {
-            filters.add(OptimizedPathTail::generalizedCost);
-        }
-
-        filters.add(OptimizedPathTail::breakTieCost);
-
-        return new MinCostFilterChain<>(filters);
+    if (optimizeWaitTime) {
+      filters.add(OptimizedPathTail::generalizedCostWaitTimeOptimized);
+    } else {
+      filters.add(OptimizedPathTail::generalizedCost);
     }
+
+    filters.add(OptimizedPathTail::breakTieCost);
+
+    return new MinCostFilterChain<>(filters);
+  }
 }

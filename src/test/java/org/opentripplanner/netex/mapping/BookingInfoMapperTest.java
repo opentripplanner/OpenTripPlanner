@@ -1,11 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
 import org.rutebanken.netex.model.BookingArrangementsStructure;
@@ -31,50 +31,53 @@ public class BookingInfoMapperTest {
   private static final LocalTime FIVE_THIRTY = LocalTime.of(5, 30);
   private static final Duration THIRTY_MINUTES = Duration.ofMinutes(30);
 
-  private final BookingInfoMapper subject = new BookingInfoMapper(new DataImportIssueStore(false));
+  private final BookingInfoMapper subject = new BookingInfoMapper(
+    DataImportIssueStore.noopIssueStore()
+  );
 
   @Test
   public void testMapBookingInfoPrecedence() {
     StopPointInJourneyPattern emptyStopPoint = new StopPointInJourneyPattern();
     ServiceJourney emptyServiceJourney = new ServiceJourney();
 
-    StopPointInJourneyPattern stopPoint =
-        new StopPointInJourneyPattern().withBookingArrangements(
-                new BookingArrangementsStructure().withBookingContact(
-                    new ContactStructure().withContactPerson(
-                        new MultilingualString().withValue(STOP_POINT_CONTACT))));
+    StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
+      .withBookingArrangements(
+        new BookingArrangementsStructure()
+          .withBookingContact(
+            new ContactStructure()
+              .withContactPerson(new MultilingualString().withValue(STOP_POINT_CONTACT))
+          )
+      );
 
-    ServiceJourney serviceJourney =
-        new ServiceJourney().withFlexibleServiceProperties(
-            new FlexibleServiceProperties().withBookingContact(
-                new ContactStructure().withContactPerson(
-                    new MultilingualString().withValue(SERVICE_JOURNEY_CONTACT))));
+    ServiceJourney serviceJourney = new ServiceJourney()
+      .withFlexibleServiceProperties(
+        new FlexibleServiceProperties()
+          .withBookingContact(
+            new ContactStructure()
+              .withContactPerson(new MultilingualString().withValue(SERVICE_JOURNEY_CONTACT))
+          )
+      );
 
-    FlexibleLine flexibleLine =
-        new FlexibleLine().withBookingContact(
-            new ContactStructure().withContactPerson(
-              new MultilingualString().withValue(FLEXIBLE_LINE_CONTACT)));
+    FlexibleLine flexibleLine = new FlexibleLine()
+      .withBookingContact(
+        new ContactStructure()
+          .withContactPerson(new MultilingualString().withValue(FLEXIBLE_LINE_CONTACT))
+      );
 
     assertEquals(
-        STOP_POINT_CONTACT,
-        subject
-            .map(stopPoint, serviceJourney, flexibleLine)
-            .getContactInfo()
-            .getContactPerson()
+      STOP_POINT_CONTACT,
+      subject.map(stopPoint, serviceJourney, flexibleLine).getContactInfo().getContactPerson()
     );
     assertEquals(
-        SERVICE_JOURNEY_CONTACT,
-        subject
-            .map(emptyStopPoint, serviceJourney, flexibleLine)
-            .getContactInfo()
-            .getContactPerson()
+      SERVICE_JOURNEY_CONTACT,
+      subject.map(emptyStopPoint, serviceJourney, flexibleLine).getContactInfo().getContactPerson()
     );
     assertEquals(
-        FLEXIBLE_LINE_CONTACT,
-        subject
-            .map(emptyStopPoint, emptyServiceJourney, flexibleLine)
-            .getContactInfo()
-            .getContactPerson()
+      FLEXIBLE_LINE_CONTACT,
+      subject
+        .map(emptyStopPoint, emptyServiceJourney, flexibleLine)
+        .getContactInfo()
+        .getContactPerson()
     );
   }
 
@@ -89,8 +92,8 @@ public class BookingInfoMapperTest {
     BookingArrangementsStructure bookingArrangements = new BookingArrangementsStructure();
     bookingArrangements.setBookingContact(contactStructure);
 
-    StopPointInJourneyPattern stopPoint =
-        new StopPointInJourneyPattern().withBookingArrangements(bookingArrangements);
+    StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
+      .withBookingArrangements(bookingArrangements);
 
     BookingInfo bookingInfo = subject.map(stopPoint, null, null);
 
@@ -108,27 +111,27 @@ public class BookingInfoMapperTest {
     bookingArrangements.setBookingContact(contactStructure);
     bookingArrangements.setLatestBookingTime(FIVE_THIRTY);
 
-    StopPointInJourneyPattern stopPoint =
-        new StopPointInJourneyPattern().withBookingArrangements(bookingArrangements);
+    StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
+      .withBookingArrangements(bookingArrangements);
 
     bookingArrangements.setBookWhen(PurchaseWhenEnumeration.ADVANCE_ONLY);
 
     BookingInfo bookingInfo1 = subject.map(stopPoint, null, null);
-    assertEquals(FIVE_THIRTY,  bookingInfo1.getLatestBookingTime().getTime());
+    assertEquals(FIVE_THIRTY, bookingInfo1.getLatestBookingTime().getTime());
     assertEquals(0, bookingInfo1.getLatestBookingTime().getDaysPrior());
     assertNull(bookingInfo1.getEarliestBookingTime());
 
     bookingArrangements.setBookWhen(PurchaseWhenEnumeration.UNTIL_PREVIOUS_DAY);
 
     BookingInfo bookingInfo2 = subject.map(stopPoint, null, null);
-    assertEquals(FIVE_THIRTY,  bookingInfo2.getLatestBookingTime().getTime());
+    assertEquals(FIVE_THIRTY, bookingInfo2.getLatestBookingTime().getTime());
     assertEquals(1, bookingInfo2.getLatestBookingTime().getDaysPrior());
     assertNull(bookingInfo2.getEarliestBookingTime());
 
     bookingArrangements.setBookWhen(PurchaseWhenEnumeration.DAY_OF_TRAVEL_ONLY);
 
     BookingInfo bookingInfo3 = subject.map(stopPoint, null, null);
-    assertEquals(FIVE_THIRTY,  bookingInfo3.getLatestBookingTime().getTime());
+    assertEquals(FIVE_THIRTY, bookingInfo3.getLatestBookingTime().getTime());
     assertEquals(0, bookingInfo3.getLatestBookingTime().getDaysPrior());
     assertEquals(0, bookingInfo3.getEarliestBookingTime().getDaysPrior());
     assertEquals(LocalTime.MIDNIGHT, bookingInfo3.getEarliestBookingTime().getTime());
@@ -136,7 +139,7 @@ public class BookingInfoMapperTest {
     bookingArrangements.setBookWhen(PurchaseWhenEnumeration.ADVANCE_AND_DAY_OF_TRAVEL);
 
     BookingInfo bookingInfo4 = subject.map(stopPoint, null, null);
-    assertEquals(FIVE_THIRTY,  bookingInfo4.getLatestBookingTime().getTime());
+    assertEquals(FIVE_THIRTY, bookingInfo4.getLatestBookingTime().getTime());
     assertEquals(0, bookingInfo4.getLatestBookingTime().getDaysPrior());
     assertNull(bookingInfo4.getEarliestBookingTime());
 
@@ -156,8 +159,8 @@ public class BookingInfoMapperTest {
     bookingArrangements.setBookingContact(contactStructure);
     bookingArrangements.setLatestBookingTime(FIVE_THIRTY);
 
-    StopPointInJourneyPattern stopPoint =
-        new StopPointInJourneyPattern().withBookingArrangements(bookingArrangements);
+    StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
+      .withBookingArrangements(bookingArrangements);
 
     bookingArrangements.setMinimumBookingPeriod(THIRTY_MINUTES);
 

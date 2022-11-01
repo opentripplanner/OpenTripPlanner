@@ -1,9 +1,8 @@
 package org.opentripplanner.model.transfer;
 
 import java.io.Serializable;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.base.ValueObjectToStringBuilder;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.site.Station;
 
 public final class RouteStationTransferPoint implements TransferPoint, Serializable {
 
@@ -31,19 +30,17 @@ public final class RouteStationTransferPoint implements TransferPoint, Serializa
   }
 
   @Override
-  public int getSpecificityRanking() { return 2; }
+  public int getSpecificityRanking() {
+    return 2;
+  }
 
   @Override
-  public boolean isRouteStationTransferPoint() { return true; }
+  public boolean isRouteStationTransferPoint() {
+    return true;
+  }
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder.of()
-            .addText("<Route ")
-            .addObj(route.getId())
-            .addText(", station ")
-            .addObj(station.getId())
-            .addText(">")
-            .toString();
+    return "RouteTP{" + route.getId() + ", station " + station.getId() + '}';
   }
 }

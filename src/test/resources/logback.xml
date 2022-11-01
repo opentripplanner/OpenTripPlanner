@@ -22,6 +22,21 @@
     <appender-ref ref="stdout" />
   </root>
 
+  <!-- Graph builder data import logs a summary at INFO level and issues at DEBUG level -->
+  <logger name="DATA_IMPORT_ISSUES" level="info" />
+
+
+  <logger name="org.opentripplanner" level="info"/>
+  <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
+
+
+  <logger name="org.opentripplanner.routing" level="info"/>
+  <logger name="org.opentripplanner.routing.algorithm.transferoptimization" level="info"/>
+
+  <!-- Raptor request debug logging - Turn on/off: debug/info -->
+  <logger name="org.opentripplanner.transit.raptor.RaptorService" level="info"/>
+
+  <!-- THIRD PARTY LOGGERS -->
   <!-- Log levels for individual loggers (classes). -->
   <logger name="ch.qos.logback" level="error"/>
 
@@ -31,6 +46,4 @@
   <!-- Avoid printing many warnings about stops off the edge of the OSM map in tests. -->
   <logger name="org.opentripplanner.graph_builder.linking.SimpleStreetSplitter" level="error" />
 
-  <!-- Graph builder data import logs a summary at INFO level and issues at DEBUG level -->
-  <logger name="DATA_IMPORT_ISSUES" level="info" />
 </configuration>

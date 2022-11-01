@@ -1,252 +1,233 @@
 package org.opentripplanner.ext.flex;
 
-import java.util.Calendar;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.util.lang.DoubleUtils;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
- * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and
- * stops.
+ * particular vehicle, which is running on flexible trip, i.e. not using fixed schedule and stops.
  */
-public class FlexibleTransitLeg implements Leg {
+public class FlexibleTransitLeg implements TransitLeg {
 
-    private final Trip trip;
+  private final FlexTripEdge edge;
 
-    private final Calendar startTime;
+  private final ZonedDateTime startTime;
 
-    private final Calendar endTime;
+  private final ZonedDateTime endTime;
 
-    private final Double distanceMeters;
+  private final Set<TransitAlert> transitAlerts = new HashSet<>();
 
-    private final ServiceDate serviceDate;
+  private final int generalizedCost;
 
-    private final Place from;
+  public FlexibleTransitLeg(
+    FlexTripEdge flexTripEdge,
+    ZonedDateTime startTime,
+    ZonedDateTime endTime,
+    int generalizedCost
+  ) {
+    this.edge = flexTripEdge;
 
-    private final Place to;
+    this.startTime = startTime;
+    this.endTime = endTime;
 
-    private final LineString legGeometry;
+    this.generalizedCost = generalizedCost;
+  }
 
-    private final Set<TransitAlert> transitAlerts = new HashSet<>();
+  @Override
+  public Agency getAgency() {
+    return getTrip().getRoute().getAgency();
+  }
 
-    private final PickDrop boardRule;
+  @Override
+  public Operator getOperator() {
+    return getTrip().getOperator();
+  }
 
-    private final PickDrop alightRule;
+  @Override
+  public Route getRoute() {
+    return getTrip().getRoute();
+  }
 
-    private final BookingInfo dropOffBookingInfo;
+  @Override
+  public Trip getTrip() {
+    return edge.getFlexTrip().getTrip();
+  }
 
-    private final BookingInfo pickupBookingInfo;
+  @Override
+  public Accessibility getTripWheelchairAccessibility() {
+    return edge.getFlexTrip().getTrip().getWheelchairBoarding();
+  }
 
-    private final Integer boardStopPosInPattern;
+  @Override
+  @Nonnull
+  public TransitMode getMode() {
+    return getTrip().getMode();
+  }
 
-    private final Integer alightStopPosInPattern;
+  @Override
+  public ZonedDateTime getStartTime() {
+    return startTime;
+  }
 
-    private final int generalizedCost;
+  @Override
+  public ZonedDateTime getEndTime() {
+    return endTime;
+  }
 
-    public FlexibleTransitLeg(
-            FlexTripEdge flexTripEdge,
-            Calendar startTime,
-            Calendar endTime,
-            int generalizedCost
-    ) {
-        this.trip = flexTripEdge.getTrip();
+  @Override
+  public boolean isFlexibleTrip() {
+    return true;
+  }
 
-        this.startTime = startTime;
-        this.endTime = endTime;
+  @Override
+  public double getDistanceMeters() {
+    return DoubleUtils.roundTo2Decimals(edge.getDistanceMeters());
+  }
 
-        this.from = Place.forFlexStop(flexTripEdge.s1, flexTripEdge.getFromVertex());
-        this.to = Place.forFlexStop(flexTripEdge.s2, flexTripEdge.getToVertex());
+  @Override
+  public Integer getRouteType() {
+    return getTrip().getRoute().getGtfsType();
+  }
 
-        this.distanceMeters = flexTripEdge.getDistanceMeters();
+  @Override
+  public I18NString getHeadsign() {
+    return getTrip().getHeadsign();
+  }
 
-        this.serviceDate = flexTripEdge.flexTemplate.serviceDate;
+  @Override
+  public LocalDate getServiceDate() {
+    return edge.flexTemplate.serviceDate;
+  }
 
-        this.legGeometry = flexTripEdge.getGeometry();
+  @Override
+  public Place getFrom() {
+    return Place.forFlexStop(edge.s1, edge.getFromVertex());
+  }
 
-        this.boardStopPosInPattern = flexTripEdge.flexTemplate.fromStopIndex;
-        this.alightStopPosInPattern = flexTripEdge.flexTemplate.toStopIndex;
+  @Override
+  public Place getTo() {
+    return Place.forFlexStop(edge.s2, edge.getToVertex());
+  }
 
-        FlexTrip flexTrip = flexTripEdge.getFlexTrip();
-        this.dropOffBookingInfo = flexTrip.getDropOffBookingInfo(boardStopPosInPattern);
-        this.pickupBookingInfo = flexTrip.getPickupBookingInfo(alightStopPosInPattern);
+  @Override
+  public List<StopArrival> getIntermediateStops() {
+    return List.of();
+  }
 
-        this.boardRule = flexTrip.getBoardRule(boardStopPosInPattern);
-        this.alightRule = flexTrip.getAlightRule(alightStopPosInPattern);
+  @Override
+  public LineString getLegGeometry() {
+    return edge.getGeometry();
+  }
 
-        this.generalizedCost = generalizedCost;
+  @Override
+  public Set<TransitAlert> getTransitAlerts() {
+    return transitAlerts;
+  }
+
+  @Override
+  public PickDrop getBoardRule() {
+    return edge.getFlexTrip().getBoardRule(getBoardStopPosInPattern());
+  }
+
+  @Override
+  public PickDrop getAlightRule() {
+    return edge.getFlexTrip().getAlightRule(getAlightStopPosInPattern());
+  }
+
+  @Override
+  public BookingInfo getDropOffBookingInfo() {
+    return edge.getFlexTrip().getDropOffBookingInfo(getBoardStopPosInPattern());
+  }
+
+  @Override
+  public BookingInfo getPickupBookingInfo() {
+    return edge.getFlexTrip().getPickupBookingInfo(getAlightStopPosInPattern());
+  }
+
+  @Override
+  public Integer getBoardStopPosInPattern() {
+    return edge.flexTemplate.fromStopIndex;
+  }
+
+  @Override
+  public Integer getAlightStopPosInPattern() {
+    return edge.flexTemplate.toStopIndex;
+  }
+
+  @Override
+  public int getGeneralizedCost() {
+    return generalizedCost;
+  }
+
+  public void addAlert(TransitAlert alert) {
+    transitAlerts.add(alert);
+  }
+
+  @Override
+  public Leg withTimeShift(Duration duration) {
+    FlexibleTransitLeg copy = new FlexibleTransitLeg(
+      edge,
+      startTime.plus(duration),
+      endTime.plus(duration),
+      generalizedCost
+    );
+
+    for (TransitAlert alert : transitAlerts) {
+      copy.addAlert(alert);
     }
 
+    return copy;
+  }
 
-    @Override
-    public boolean isTransitLeg() {
-        return true;
-    }
-
-    public void addAlert(TransitAlert alert) {
-        transitAlerts.add(alert);
-    }
-
-    @Override
-    public Agency getAgency() {
-        return getRoute().getAgency();
-    }
-
-    @Override
-    public Operator getOperator() {
-        return trip.getOperator();
-    }
-
-    @Override
-    public Route getRoute() {
-        return trip.getRoute();
-    }
-
-    @Override
-    public Trip getTrip() {
-        return trip;
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.fromTransitMode(trip.getRoute().getMode());
-    }
-
-    @Override
-    public Calendar getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public Calendar getEndTime() {
-        return endTime;
-    }
-
-    @Override
-    public boolean isFlexibleTrip() {
-        return true;
-    }
-
-    @Override
-    public Double getDistanceMeters() {
-        return distanceMeters;
-    }
-
-    @Override
-    public Integer getRouteType() {
-        return trip.getRoute().getGtfsType();
-    }
-
-    @Override
-    public String getHeadsign() {
-        return trip.getTripHeadsign();
-    }
-
-    @Override
-    public ServiceDate getServiceDate() {
-        return serviceDate;
-    }
-
-    @Override
-    public Place getFrom() {
-        return from;
-    }
-
-    @Override
-    public Place getTo() {
-        return to;
-    }
-
-    @Override
-    public List<StopArrival> getIntermediateStops() {
-        return List.of();
-    }
-
-    @Override
-    public LineString getLegGeometry() {
-        return legGeometry;
-    }
-
-    @Override
-    public Set<TransitAlert> getTransitAlerts() {
-        return transitAlerts;
-    }
-
-    @Override
-    public PickDrop getBoardRule() {
-        return boardRule;
-    }
-
-    @Override
-    public PickDrop getAlightRule() {
-        return alightRule;
-    }
-
-    @Override
-    public BookingInfo getDropOffBookingInfo() {
-        return dropOffBookingInfo;
-    }
-
-    @Override
-    public BookingInfo getPickupBookingInfo() {
-        return pickupBookingInfo;
-    }
-
-    @Override
-    public Integer getBoardStopPosInPattern() {
-        return boardStopPosInPattern;
-    }
-
-    @Override
-    public Integer getAlightStopPosInPattern() {
-        return alightStopPosInPattern;
-    }
-
-    @Override
-    public int getGeneralizedCost() {
-        return generalizedCost;
-    }
-
-    /**
-     * Should be used for debug logging only
-     */
-    @Override
-    public String toString() {
-        return ToStringBuilder.of(FlexibleTransitLeg.class)
-                .addObj("from", from)
-                .addObj("to", to)
-                .addTimeCal("startTime", startTime)
-                .addTimeCal("endTime", endTime)
-                .addNum("distance", distanceMeters, "m")
-                .addNum("cost", generalizedCost)
-                .addEntityId("agencyId", getAgency())
-                .addEntityId("routeId", getRoute())
-                .addEntityId("tripId", trip)
-                .addObj("serviceDate", serviceDate)
-                .addObj("legGeometry", legGeometry)
-                .addCol("transitAlerts", transitAlerts)
-                .addNum("boardingStopIndex", boardStopPosInPattern)
-                .addNum("alightStopIndex", alightStopPosInPattern)
-                .addEnum("boardRule", boardRule)
-                .addEnum("alightRule", alightRule)
-                .addObj("pickupBookingInfo", pickupBookingInfo)
-                .addObj("dropOffBookingInfo", dropOffBookingInfo)
-                .toString();
-    }
+  /**
+   * Should be used for debug logging only
+   */
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(FlexibleTransitLeg.class)
+      .addObj("from", getFrom())
+      .addObj("to", getTo())
+      .addTime("startTime", startTime)
+      .addTime("endTime", endTime)
+      .addNum("distance", getDistanceMeters(), "m")
+      .addNum("cost", generalizedCost)
+      .addObjOp("agencyId", getAgency(), AbstractTransitEntity::getId)
+      .addObjOp("routeId", getRoute(), AbstractTransitEntity::getId)
+      .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
+      .addObj("serviceDate", getServiceDate())
+      .addObj("legGeometry", getLegGeometry())
+      .addCol("transitAlerts", transitAlerts)
+      .addNum("boardingStopIndex", getBoardStopPosInPattern())
+      .addNum("alightStopIndex", getAlightStopPosInPattern())
+      .addEnum("boardRule", getBoardRule())
+      .addEnum("alightRule", getAlightRule())
+      .addObj("pickupBookingInfo", getPickupBookingInfo())
+      .addObj("dropOffBookingInfo", getDropOffBookingInfo())
+      .toString();
+  }
 }

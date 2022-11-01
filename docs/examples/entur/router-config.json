@@ -1,13 +1,11 @@
 {
   "configVersion" : "{{ Entur CI config build number inserted here }}",
-  "streetRoutingTimeout": 5,
+  "streetRoutingTimeout": "5s",
   "routingDefaults": {
     "walkSpeed": 1.3,
     "bikeSpeed": 5,
     "carSpeed": 40,
-    "wheelchairAccessible": false,
     "numItineraries": 12,
-    "showIntermediateStops": false,
     "transferPenalty": 0,
     "walkReluctance": 4.0,
     "bikeReluctance": 5.0,
@@ -32,16 +30,16 @@
     "transferSlack": 120,
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
-      "AIRPLANE" : 2100
+      "AIRPLANE" : "2100s"
     },
     "alightSlackForMode": {
-      "AIRPLANE" : 900
+      "AIRPLANE" : "900s"
     },
     "transitReluctanceForMode" : {
       "RAIL" : 0.85
     },
-    "maxAccessEgressDurationSecondsForMode": {
-      "BIKE_RENTAL": 1200
+    "maxAccessEgressDurationForMode": {
+      "BIKE_RENTAL": "20m"
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : "3600 + 2.5 x",
@@ -50,8 +48,6 @@
     "carDecelerationSpeed": 2.9,
     "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
-    "disableRemainingWeightHeuristic": false,
-    "disableAlertFiltering": false,
     "geoidElevation": false,
     "maxJourneyDuration": "36h",
     "transferOptimization": {
@@ -62,22 +58,22 @@
     }
   },
   "transit": {
-  "maxNumberOfTransfers" : 12,
-  "dynamicSearchWindow" : {
-    "minTransitTimeCoefficient" : 0.5,
-    "minWaitTimeCoefficient" : 0.5,
-    "minWinTimeMinutes" : 60,
-    "maxWinTimeMinutes" : 300
+    "maxNumberOfTransfers" : 12,
+    "dynamicSearchWindow" : {
+      "minTransitTimeCoefficient" : 0.5,
+      "minWaitTimeCoefficient" : 0.5,
+      "minWinTimeMinutes" : 60,
+      "maxWinTimeMinutes" : 300
+    },
+    "stopTransferCost" : {
+      "DISCOURAGED" : 1500,
+      "ALLOWED" : 75,
+      "RECOMMENDED" : 30,
+      "PREFERRED" : 0
+    }
   },
-  "stopTransferCost" : {
-    "DISCOURAGED" : 1500,
-    "ALLOWED" : 75,
-    "RECOMMENDED" : 30,
-    "PREFERRED" : 0
-  }
-  },
-  "bikeRentalServiceDirectory": {
-    "url": "{{ url }}",
+  "vehicleRentalServiceDirectory": {
+    "url": "https://example.com",
     "sourcesName": "systems",
     "updaterUrlName": "url",
     "updaterNetworkName": "id",
@@ -93,27 +89,25 @@
     {
       "type": "siri-sx-updater",
       "frequencySec": 60,
-      "url": "{{ url }}",
-      "feedId": "RB",
+      "url": "https://example.com",
+      "feedId": "EN",
       "blockReadinessUntilInitialized": true
     },
     // SIRI ET Google Pubsub updater
     {
       "type": "siri-et-google-pubsub-updater",
-      "feedId": "RB",
-      "reconnectPeriodSec": 5,
+      "feedId": "EN",
       "projectName": "entur-ror",
       "topicName": "estimated_timetables",
-      "dataInitializationUrl": "{{ url }}"
-    }
-    {{- else -}}
+      "dataInitializationUrl": "https://example.com"
+    },
     // SIRI ET updater
     {
       "type": "siri-et-updater",
       "frequencySec": 20,
       "previewIntervalMinutes": 180,
-      "url": "{{ url }}",
-      "feedId": "RB",
+      "url": "https://example.com",
+      "feedId": "EN",
       "blockReadinessUntilInitialized": true
     }
   ]

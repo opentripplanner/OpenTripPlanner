@@ -1,0 +1,88 @@
+package org.opentripplanner.standalone.config.buildconfig;
+
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+
+import java.util.List;
+import org.opentripplanner.graph_builder.model.DataSourceConfig;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
+import org.opentripplanner.netex.config.NetexFeedParameters;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+
+public class TransitFeedConfig {
+
+  public static TransitFeeds mapTransitFeeds(
+    NodeAdapter root,
+    String parameterName,
+    NetexFeedParameters netexDefaults
+  ) {
+    List<DataSourceConfig> list = root
+      .of(parameterName)
+      .since(V2_2)
+      .summary("Scan for transit data files")
+      .description(
+        """
+        The transitFeeds section of `build-config.json` allows you to override the default behavior
+        of scanning for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+        You can specify data located outside the local filesystem (including cloud storage services)
+        or at various different locations around the local filesystem.
+        
+        When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds 
+        section, auto-scanning in the base directory for this feed type will be disabled.
+        """
+      )
+      .asObjects(node -> TransitFeedConfig.mapTransitFeed(node, netexDefaults));
+
+    return new TransitFeeds(
+      filterListOnSubType(list, GtfsFeedParameters.class),
+      filterListOnSubType(list, NetexFeedParameters.class)
+    );
+  }
+
+  private static DataSourceConfig mapTransitFeed(
+    NodeAdapter feedNode,
+    NetexFeedParameters netexDefaults
+  ) {
+    var type = feedNode
+      .of("type")
+      .since(V2_2)
+      .summary("The feed input format.")
+      .asEnum(TransitFeedType.class);
+    return switch (type) {
+      case GTFS -> mapGtfsFeed(feedNode);
+      case NETEX -> NetexConfig.mapNetexFeed(feedNode, netexDefaults);
+    };
+  }
+
+  private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
+    return new GtfsFeedParametersBuilder()
+      .withFeedId(
+        node
+          .of("feedId")
+          .since(NA)
+          .summary(
+            "The unique ID for this feed. This overrides any feed ID defined within the feed itself."
+          )
+          .asString(null)
+      )
+      .withSource(
+        node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+      )
+      .build();
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> List<T> filterListOnSubType(List<? super T> list, Class<T> type) {
+    return list
+      .stream()
+      .filter(it -> type.isAssignableFrom(it.getClass()))
+      .map(it -> (T) it)
+      .toList();
+  }
+
+  enum TransitFeedType {
+    GTFS,
+    NETEX,
+  }
+}

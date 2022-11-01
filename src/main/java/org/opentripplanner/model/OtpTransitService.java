@@ -5,76 +5,76 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.BoardingArea;
+import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.Pathway;
+import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * Methods for accessing imported entities.
  */
 public interface OtpTransitService {
+  /**
+   * @return a list of all Agencies.
+   */
+  Collection<Agency> getAllAgencies();
 
-    /**
-     * @return  a list of all Agencies.
-     */
-    Collection<Agency> getAllAgencies();
+  /**
+   * @return a list of all Operators, the list may be empty if there are no Operators in the
+   * imported data.
+   */
+  Collection<Operator> getAllOperators();
 
-    /**
-     * @return a list of all Operators, the list may be empty if there are no Operators in the imported data.
-     */
-    Collection<Operator> getAllOperators();
+  Collection<FeedInfo> getAllFeedInfos();
 
-    Collection<FareAttribute> getAllFareAttributes();
+  StopModel stopModel();
 
-    Collection<FareRule> getAllFareRules();
+  /**
+   * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
+   * any type (Serializable).
+   */
+  Multimap<AbstractTransitEntity, Notice> getNoticeAssignments();
 
-    Collection<FeedInfo> getAllFeedInfos();
+  Collection<Pathway> getAllPathways();
 
-    Collection<GroupOfStations> getAllGroupsOfStations();
+  /**
+   * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
+   */
+  Collection<FeedScopedId> getAllServiceIds();
 
-    Collection<MultiModalStation> getAllMultiModalStations();
+  List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
 
-    /**
-     * This is equivalent to a Transmodel Notice Assignments. The map key may reference entity ids of
-     * any type (Serializable).
-     */
-    Multimap<TransitEntity, Notice> getNoticeAssignments();
+  Collection<Entrance> getAllEntrances();
 
-    Collection<Pathway> getAllPathways();
+  Collection<PathwayNode> getAllPathwayNodes();
 
-    /**
-     * @return all ids for both Calendars and CalendarDates merged into on list without duplicates.
-     */
-    Collection<FeedScopedId> getAllServiceIds();
+  Collection<BoardingArea> getAllBoardingAreas();
 
-    List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
+  /**
+   * @return the list of {@link StopTime} objects associated with the trip, sorted by {@link
+   * StopTime#getStopSequence()}
+   */
+  List<StopTime> getStopTimesForTrip(Trip trip);
 
-    Station getStationForId(FeedScopedId id);
+  Collection<ConstrainedTransfer> getAllTransfers();
 
-    Stop getStopForId(FeedScopedId id);
+  Collection<TripPattern> getTripPatterns();
 
-    Collection<Station> getAllStations();
+  Collection<Trip> getAllTrips();
 
-    Collection<Stop> getAllStops();
+  Collection<FlexTrip<?, ?>> getAllFlexTrips();
 
-    Collection<Entrance> getAllEntrances();
-
-    Collection<PathwayNode> getAllPathwayNodes();
-
-    Collection<BoardingArea> getAllBoardingAreas();
-
-    Collection<FlexStopLocation> getAllLocations();
-
-    Collection<FlexLocationGroup> getAllLocationGroups();
-
-    /**
-     * @return the list of {@link StopTime} objects associated with the trip,
-     * sorted by {@link StopTime#getStopSequence()}
-     */
-    List<StopTime> getStopTimesForTrip(Trip trip);
-
-    Collection<ConstrainedTransfer> getAllTransfers();
-
-    Collection<TripPattern> getTripPatterns();
-
-    Collection<Trip> getAllTrips();
-
-    Collection<FlexTrip> getAllFlexTrips();
+  /**
+   * @return if transit service has any active services. The graph build might filter out all
+   * transit services if they are outside the configured 'transitServiceStart' and 'transitServiceEnd'
+   */
+  boolean hasActiveTransit();
 }

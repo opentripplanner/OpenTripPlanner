@@ -7,7 +7,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Optimize
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.time.TimeUtils;
 
-
 /**
  * This class takes a list of transit legs and returns the best leg based on the {@link
  * TransferOptimizedFilterFactory} and the earliest-boarding-time. The filter is used to pick the
@@ -29,52 +28,54 @@ import org.opentripplanner.util.time.TimeUtils;
  */
 class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
-    private final MinCostFilterChain<OptimizedPathTail<T>> filter;
-    private Set<OptimizedPathTail<T>> remindingLegs;
-    private Set<OptimizedPathTail<T>> selectedLegs;
+  private final MinCostFilterChain<OptimizedPathTail<T>> filter;
+  private Set<OptimizedPathTail<T>> remindingLegs;
+  private Set<OptimizedPathTail<T>> selectedLegs;
 
-    private int lastLimit = Integer.MAX_VALUE;
+  private int lastLimit = Integer.MAX_VALUE;
 
+  TransitPathLegSelector(
+    final MinCostFilterChain<OptimizedPathTail<T>> filter,
+    final Set<OptimizedPathTail<T>> legs
+  ) {
+    this.filter = filter;
+    this.remindingLegs = Set.copyOf(legs);
+    this.selectedLegs = new HashSet<>();
+  }
 
-    TransitPathLegSelector(
-            final MinCostFilterChain<OptimizedPathTail<T>> filter,
-            final Set<OptimizedPathTail<T>> legs
-    ) {
-        this.filter = filter;
-        this.remindingLegs = Set.copyOf(legs);
-        this.selectedLegs = new HashSet<>();
+  Set<OptimizedPathTail<T>> next(final int earliestBoardingTime) {
+    if (earliestBoardingTime > lastLimit) {
+      throw new IllegalStateException(
+        "The next method must be called with decreasing time limits. " +
+        "minTimeLimit=" +
+        TimeUtils.timeToStrLong(earliestBoardingTime) +
+        ", lastLimit=" +
+        TimeUtils.timeToStrLong(lastLimit)
+      );
+    }
+    lastLimit = earliestBoardingTime;
+
+    Set<OptimizedPathTail<T>> candidates = new HashSet<>();
+    Set<OptimizedPathTail<T>> rest = new HashSet<>();
+
+    for (OptimizedPathTail<T> it : remindingLegs) {
+      if (earliestBoardingTime < it.latestPossibleBoardingTime()) {
+        candidates.add(it);
+      } else {
+        rest.add(it);
+      }
     }
 
-    Set<OptimizedPathTail<T>> next(final int earliestBoardingTime) {
-        if (earliestBoardingTime > lastLimit) {
-            throw new IllegalStateException(
-                    "The next method must be called with decreasing time limits. "
-                            + "minTimeLimit=" + TimeUtils.timeToStrLong(earliestBoardingTime)
-                            + ", lastLimit=" + TimeUtils.timeToStrLong(lastLimit)
-            );
-        }
-        lastLimit = earliestBoardingTime;
-
-        Set<OptimizedPathTail<T>> candidates = new HashSet<>();
-        Set<OptimizedPathTail<T>> rest = new HashSet<>();
-
-        for (OptimizedPathTail<T> it : remindingLegs) {
-            if (earliestBoardingTime < it.latestPossibleBoardingTime()) {
-                candidates.add(it);
-            }
-            else {
-                rest.add(it);
-            }
-        }
-
-        if (candidates.isEmpty()) { return selectedLegs; }
-
-        candidates.addAll(selectedLegs);
-
-        // Set state
-        remindingLegs = rest;
-        selectedLegs = filter.filter(candidates);
-
-        return selectedLegs;
+    if (candidates.isEmpty()) {
+      return selectedLegs;
     }
+
+    candidates.addAll(selectedLegs);
+
+    // Set state
+    remindingLegs = rest;
+    selectedLegs = filter.filter(candidates);
+
+    return selectedLegs;
+  }
 }

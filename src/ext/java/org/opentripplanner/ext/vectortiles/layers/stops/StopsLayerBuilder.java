@@ -1,47 +1,53 @@
 package org.opentripplanner.ext.vectortiles.layers.stops;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.TransitService;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
 
-public class StopsLayerBuilder extends LayerBuilder<TransitStopVertex> {
-  enum MapperType { Digitransit }
-
-  static Map<MapperType, Function<Graph, PropertyMapper<TransitStopVertex>>> mappers = Map.of(
-      MapperType.Digitransit, DigitransitStopPropertyMapper::create
+  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<RegularStop>>> mappers = Map.of(
+    MapperType.Digitransit,
+    DigitransitStopPropertyMapper::create
   );
+  private final TransitService transitService;
 
-  private final Graph graph;
-
-  public StopsLayerBuilder(Graph graph, VectorTilesResource.LayerParameters layerParameters) {
+  public StopsLayerBuilder(
+    TransitService transitService,
+    VectorTilesResource.LayerParameters layerParameters,
+    Locale locale
+  ) {
     super(
-        layerParameters.name(),
-        mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(graph)
+      layerParameters.name(),
+      mappers.get(MapperType.valueOf(layerParameters.mapper())).apply(transitService, locale)
     );
-
-    this.graph = graph;
+    this.transitService = transitService;
   }
 
   protected List<Geometry> getGeometries(Envelope query) {
-    return graph.index.getStopSpatialIndex().query(query).stream().map(transitStopVertex -> {
-      Point point = GeometryUtils
-          .getGeometryFactory()
-          .createPoint(transitStopVertex.getCoordinate());
+    return transitService
+      .findRegularStop(query)
+      .stream()
+      .map(stop -> {
+        Geometry point = stop.getGeometry();
 
-      point.setUserData(transitStopVertex);
+        point.setUserData(stop);
 
-      return point;
-    }).collect(Collectors.toList());
+        return point;
+      })
+      .collect(Collectors.toList());
+  }
+
+  enum MapperType {
+    Digitransit,
   }
 }

@@ -5,32 +5,33 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.I18NString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FlexTripEdge extends Edge {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripEdge.class);
-
-  private static final long serialVersionUID = 1L;
-
+  private final FlexTrip trip;
   public StopLocation s1;
   public StopLocation s2;
-  private FlexTrip trip;
   public FlexAccessEgressTemplate flexTemplate;
   public FlexPath flexPath;
 
   public FlexTripEdge(
-      Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip trip,
-      FlexAccessEgressTemplate flexTemplate, FlexPathCalculator calculator
+    Vertex v1,
+    Vertex v2,
+    StopLocation s1,
+    StopLocation s2,
+    FlexTrip trip,
+    FlexAccessEgressTemplate flexTemplate,
+    FlexPathCalculator calculator
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
@@ -41,17 +42,27 @@ public class FlexTripEdge extends Edge {
     this.flexTemplate = flexTemplate;
     this.fromv = v1;
     this.tov = v2;
-    this.flexPath = calculator.calculateFlexPath(fromv, tov, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+    this.flexPath =
+      calculator.calculateFlexPath(
+        fromv,
+        tov,
+        flexTemplate.fromStopIndex,
+        flexTemplate.toStopIndex
+      );
+  }
+
+  public int getTimeInSeconds() {
+    return flexPath.durationSeconds;
   }
 
   @Override
   public State traverse(State s0) {
-    if(this.flexPath == null) {
-       // not routable
-       return null;
+    if (this.flexPath == null) {
+      // not routable
+      return null;
     }
     StateEditor editor = s0.edit(this);
-    editor.setBackMode(TraverseMode.BUS);
+    editor.setBackMode(TraverseMode.FLEX);
     // TODO: decide good value
     editor.incrementWeight(10 * 60);
     int timeInSeconds = getTimeInSeconds();
@@ -61,13 +72,9 @@ public class FlexTripEdge extends Edge {
     return editor.makeState();
   }
 
-  public int getTimeInSeconds() {
-    return flexPath.durationSeconds;
-  }
-
   @Override
-  public double getDistanceMeters() {
-    return flexPath.distanceMeters;
+  public I18NString getName() {
+    return null;
   }
 
   @Override
@@ -76,13 +83,8 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  public I18NString getName() {
-    return null;
-  }
-
-  @Override
-  public Trip getTrip() {
-    return trip.getTrip();
+  public double getDistanceMeters() {
+    return flexPath.distanceMeters;
   }
 
   public FlexTrip getFlexTrip() {

@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.transfer.TransferService;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferForPatternByStopPos;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TripPatternMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModel;
 
 public class TransitLayer {
 
@@ -36,68 +37,62 @@ public class TransitLayer {
    */
   private final TransferService transferService;
 
-  /**
-   * Maps to original graph to retrieve additional data
-   */
-  private final StopIndexForRaptor stopIndex;
+  private final StopModel stopModel;
 
   private final ZoneId transitDataZoneId;
 
   private final RaptorRequestTransferCache transferCache;
 
-  private final TripPatternMapper tripPatternMapper;
+  private ConstrainedTransfersForPatterns constrainedTransfers;
 
   private final TransferIndexGenerator transferIndexGenerator;
 
+  private final int[] stopBoardAlightCosts;
+
   /**
    * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
-   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
-   * entire keys and their values in the map.
+   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace entire
+   * keys and their values in the map.
    */
   public TransitLayer(TransitLayer transitLayer) {
     this(
-        transitLayer.tripPatternsRunningOnDate,
-        transitLayer.transfersByStopIndex,
-        transitLayer.transferService,
-        transitLayer.stopIndex,
-        transitLayer.transitDataZoneId,
-        transitLayer.transferCache,
-        transitLayer.tripPatternMapper,
-        transitLayer.transferIndexGenerator
+      transitLayer.tripPatternsRunningOnDate,
+      transitLayer.transfersByStopIndex,
+      transitLayer.transferService,
+      transitLayer.stopModel,
+      transitLayer.transitDataZoneId,
+      transitLayer.transferCache,
+      transitLayer.constrainedTransfers,
+      transitLayer.transferIndexGenerator,
+      transitLayer.stopBoardAlightCosts
     );
   }
 
   public TransitLayer(
-      Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
-      List<List<Transfer>> transfersByStopIndex,
-      TransferService transferService,
-      StopIndexForRaptor stopIndex,
-      ZoneId transitDataZoneId,
-      RaptorRequestTransferCache transferCache,
-      TripPatternMapper tripPatternMapper,
-      TransferIndexGenerator transferIndexGenerator
+    Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
+    List<List<Transfer>> transfersByStopIndex,
+    TransferService transferService,
+    StopModel stopModel,
+    ZoneId transitDataZoneId,
+    RaptorRequestTransferCache transferCache,
+    ConstrainedTransfersForPatterns constrainedTransfers,
+    TransferIndexGenerator transferIndexGenerator,
+    int[] stopBoardAlightCosts
   ) {
     this.tripPatternsRunningOnDate = new HashMap<>(tripPatternsRunningOnDate);
     this.transfersByStopIndex = transfersByStopIndex;
     this.transferService = transferService;
-    this.stopIndex = stopIndex;
+    this.stopModel = stopModel;
     this.transitDataZoneId = transitDataZoneId;
     this.transferCache = transferCache;
-    this.tripPatternMapper = tripPatternMapper;
+    this.constrainedTransfers = constrainedTransfers;
     this.transferIndexGenerator = transferIndexGenerator;
-  }
-
-  public int getIndexByStop(Stop stop) {
-    return stopIndex.indexOf(stop);
+    this.stopBoardAlightCosts = stopBoardAlightCosts;
   }
 
   @Nullable
   public StopLocation getStopByIndex(int stop) {
-    return stop == -1 ? null : this.stopIndex.stopByIndex(stop);
-  }
-
-  public StopIndexForRaptor getStopIndex() {
-    return this.stopIndex;
+    return stop == -1 ? null : this.stopModel.stopByIndex(stop);
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
@@ -105,64 +100,72 @@ public class TransitLayer {
   }
 
   /**
-   * This is the time zone which is used for interpreting all local "service" times
-   * (in transfers, trip schedules and so on). This is the time zone of the internal OTP
-   * time - which is used in logging and debugging. This is independent of the time zone
-   * of imported data and of the time zone used on any API - it can be the same, but it does
-   * not need to.
+   * This is the time zone which is used for interpreting all local "service" times (in transfers,
+   * trip schedules and so on). This is the time zone of the internal OTP time - which is used in
+   * logging and debugging. This is independent of the time zone of imported data and of the time
+   * zone used on any API - it can be the same, but it does not need to.
    */
   public ZoneId getTransitDataZoneId() {
     return transitDataZoneId;
   }
 
   public int getStopCount() {
-    return stopIndex.size();
+    return stopModel.stopIndexSize();
   }
 
-  @Nullable
   public List<TripPatternForDate> getTripPatternsRunningOnDateCopy(LocalDate runningPeriodDate) {
     List<TripPatternForDate> tripPatternForDate = tripPatternsRunningOnDate.get(runningPeriodDate);
-    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : null;
+    return tripPatternForDate != null ? new ArrayList<>(tripPatternForDate) : new ArrayList<>();
   }
 
-  @Nullable
   public List<TripPatternForDate> getTripPatternsStartingOnDateCopy(LocalDate date) {
     List<TripPatternForDate> tripPatternsRunningOnDate = getTripPatternsRunningOnDateCopy(date);
-    return tripPatternsRunningOnDate != null ? tripPatternsRunningOnDate
-        .stream()
-        .filter(t -> t.getLocalDate().equals(date))
-        .collect(Collectors.toList()) : null;
+    return tripPatternsRunningOnDate
+      .stream()
+      .filter(t -> t.getLocalDate().equals(date))
+      .collect(Collectors.toList());
   }
 
   public TransferService getTransferService() {
     return transferService;
   }
 
-  public RaptorTransferIndex getRaptorTransfersForRequest(RoutingRequest routingRequest) {
-    return transferCache.get(transfersByStopIndex, routingRequest);
+  public RaptorTransferIndex getRaptorTransfersForRequest(RouteRequest request) {
+    return transferCache.get(transfersByStopIndex, request);
   }
 
   public RaptorRequestTransferCache getTransferCache() {
     return transferCache;
   }
 
-  public TripPatternMapper getTripPatternMapper() {
-    return tripPatternMapper;
+  public List<TransferForPatternByStopPos> getForwardConstrainedTransfers() {
+    return constrainedTransfers != null ? constrainedTransfers.forward() : null;
+  }
+
+  public List<TransferForPatternByStopPos> getReverseConstrainedTransfers() {
+    return constrainedTransfers != null ? constrainedTransfers.reverse() : null;
   }
 
   public TransferIndexGenerator getTransferIndexGenerator() {
     return transferIndexGenerator;
   }
 
+  public int[] getStopBoardAlightCosts() {
+    return stopBoardAlightCosts;
+  }
 
   /**
    * Replaces all the TripPatternForDates for a single date. This is an atomic operation according
    * to the HashMap implementation.
    */
   public void replaceTripPatternsForDate(
-      LocalDate date,
-      List<TripPatternForDate> tripPatternForDates
+    LocalDate date,
+    List<TripPatternForDate> tripPatternForDates
   ) {
     this.tripPatternsRunningOnDate.replace(date, tripPatternForDates);
+  }
+
+  public void setConstrainedTransfers(ConstrainedTransfersForPatterns constrainedTransfers) {
+    this.constrainedTransfers = constrainedTransfers;
   }
 }

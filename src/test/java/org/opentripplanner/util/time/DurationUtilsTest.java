@@ -1,10 +1,9 @@
 package org.opentripplanner.util.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 
 public class DurationUtilsTest {
+
   private final Duration D3d = Duration.ofDays(3);
   private final Duration D2h = Duration.ofHours(2);
   private final Duration D5m = Duration.ofMinutes(5);
@@ -35,7 +35,7 @@ public class DurationUtilsTest {
     assertEquals("-13h33m57s", DurationUtils.durationToStr(timeSeconds2));
     int timeSeconds1 = -I9h31m;
     assertEquals("-9h31m", DurationUtils.durationToStr(timeSeconds1));
-    int timeSeconds = -(int)D9s.toSeconds();
+    int timeSeconds = -(int) D9s.toSeconds();
     assertEquals("-9s", DurationUtils.durationToStr(timeSeconds));
 
     int notSet = 999_999;
@@ -70,6 +70,11 @@ public class DurationUtilsTest {
     assertEquals(D9s, DurationUtils.duration("PT9s"));
     assertEquals(D3d, DurationUtils.duration("P3d"));
     assertEquals(D3d5m9s, DurationUtils.duration("P3dT5m9s"));
+
+    // With unit
+    assertEquals(D9s, DurationUtils.duration("PT9s", ChronoUnit.DAYS), "ignore unit");
+    assertEquals(D9s, DurationUtils.duration("9", ChronoUnit.SECONDS));
+    assertEquals(-D9s.toSeconds(), DurationUtils.duration("-9", ChronoUnit.SECONDS).toSeconds());
   }
 
   @Test
@@ -98,8 +103,8 @@ public class DurationUtilsTest {
       assertEquals("1.0 seconds", DurationUtils.msToSecondsStr(1001));
       assertEquals("9.9 seconds", DurationUtils.msToSecondsStr(9_949));
       assertEquals("10 seconds", DurationUtils.msToSecondsStr(9_950));
-      assertEquals("-0.456 seconds", DurationUtils.msToSecondsStr(-456));    }
-    finally {
+      assertEquals("-0.456 seconds", DurationUtils.msToSecondsStr(-456));
+    } finally {
       Locale.setDefault(defaultLocale);
     }
   }

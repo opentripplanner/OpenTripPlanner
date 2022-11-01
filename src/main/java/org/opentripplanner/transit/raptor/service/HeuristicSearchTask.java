@@ -5,12 +5,12 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MIN_T
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.view.Heuristics;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
+import org.opentripplanner.transit.raptor.api.transit.SearchDirection;
+import org.opentripplanner.transit.raptor.configure.RaptorConfig;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicSearch;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,24 +38,19 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
   private RaptorRequest<T> heuristicReq;
 
   public HeuristicSearchTask(
-      RaptorRequest<T> request,
-      RaptorConfig<T> config,
-      RaptorTransitDataProvider<T> transitData
+    RaptorRequest<T> request,
+    RaptorConfig<T> config,
+    RaptorTransitDataProvider<T> transitData
   ) {
-    this(
-        request.searchDirection(),
-        RequestAlias.alias(request, config.isMultiThreaded()),
-        config,
-        transitData
-    );
+    this(request.searchDirection(), request.alias(), config, transitData);
     this.originalRequest = request;
   }
 
   public HeuristicSearchTask(
-      SearchDirection direction,
-      String name,
-      RaptorConfig<T> config,
-      RaptorTransitDataProvider<T> transitData
+    SearchDirection direction,
+    String name,
+    RaptorConfig<T> config,
+    RaptorTransitDataProvider<T> transitData
   ) {
     this.direction = direction;
     this.name = name;
@@ -79,10 +74,6 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     return direction;
   }
 
-  public HeuristicSearch<T> search() {
-    return search;
-  }
-
   @Nullable
   public Heuristics result() {
     return search == null ? null : search.heuristics();
@@ -102,11 +93,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (!isEnabled() || !other.isEnabled()) {
       return;
     }
-    DebugHeuristics.debug(
-        name(), result(),
-        other.name(), other.result(),
-        originalRequest
-    );
+    DebugHeuristics.debug(name(), result(), other.name(), other.result(), originalRequest);
   }
 
   /**
@@ -138,21 +125,34 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     if (search == null) {
       var profile = MIN_TRAVEL_DURATION_BEST_TIME;
 
-      if(request.searchParams().constrainedTransfersEnabled()) {
+      if (request.searchParams().constrainedTransfersEnabled()) {
         // We need to look up the previous transit arrival, this is not possible with the
         // BEST_TIMES only states.
         profile = MIN_TRAVEL_DURATION;
       }
 
-      heuristicReq = request
-          .mutate()
-          // Disable any optimization that is not valid for a heuristic search
-          .clearOptimizations()
-          .profile(profile)
-          .searchDirection(direction)
-          .searchParams().searchOneIterationOnly()
-          .build();
-      search = config.createHeuristicSearch(transitData, heuristicReq);
+      var builder = request
+        .mutate()
+        // Disable any optimization that is not valid for a heuristic search
+        .clearOptimizations()
+        .profile(profile)
+        .searchDirection(direction);
+
+      builder.searchParams().searchOneIterationOnly();
+
+      // Add this last, it depends on generating an alias from the set values
+      builder.performanceTimers(
+        request.performanceTimers().withNamePrefix(builder.generateAlias())
+      );
+
+      heuristicReq = builder.build();
+
+      search =
+        config.createHeuristicSearch(
+          transitData,
+          transitData.multiCriteriaCostCalculator(),
+          heuristicReq
+        );
     }
   }
 }

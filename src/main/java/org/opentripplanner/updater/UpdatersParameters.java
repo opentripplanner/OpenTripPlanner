@@ -1,21 +1,24 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import java.util.List;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
+import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.street_note.WFSNotePollingGraphUpdaterParameters;
+import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
+import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
-import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
-
-import java.util.List;
 
 public interface UpdatersParameters {
+  TimetableSnapshotSourceParameters timetableSnapshotParameters();
 
   VehicleRentalServiceDirectoryFetcherParameters getVehicleRentalServiceDirectoryFetcherParameters();
 
@@ -23,7 +26,9 @@ public interface UpdatersParameters {
 
   List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters();
 
-  List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters();
+  List<PollingTripUpdaterParameters> getPollingStoptimeUpdaterParameters();
+
+  List<VehiclePositionsUpdaterParameters> getVehiclePositionsUpdaterParameters();
 
   List<SiriETUpdaterParameters> getSiriETUpdaterParameters();
 
@@ -40,4 +45,8 @@ public interface UpdatersParameters {
   List<VehicleParkingUpdaterParameters> getVehicleParkingUpdaterParameters();
 
   List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters();
+
+  List<SiriAzureETUpdaterParameters> getSiriAzureETUpdaterParameters();
+
+  List<SiriAzureSXUpdaterParameters> getSiriAzureSXUpdaterParameters();
 }

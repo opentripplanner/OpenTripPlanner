@@ -3,42 +3,19 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptime {
 
   @Override
-  public DataFetcher<Object> stop() {
-    return environment -> getRoutingService(environment).getStopForId(getSource(environment).getStopId());
-  }
-
-  @Override
-  public DataFetcher<Integer> scheduledArrival() {
-    return environment -> missingValueToNull(getSource(environment).getScheduledArrival());
-  }
-
-  @Override
-  public DataFetcher<Integer> realtimeArrival() {
-    return environment -> missingValueToNull(getSource(environment).getRealtimeArrival());
-  }
-
-  @Override
   public DataFetcher<Integer> arrivalDelay() {
     return environment -> missingValueToNull(getSource(environment).getArrivalDelay());
-  }
-
-  @Override
-  public DataFetcher<Integer> scheduledDeparture() {
-    return environment -> missingValueToNull(getSource(environment).getScheduledDeparture());
-  }
-
-  @Override
-  public DataFetcher<Integer> realtimeDeparture() {
-    return environment -> missingValueToNull(getSource(environment).getRealtimeDeparture());
   }
 
   @Override
@@ -47,8 +24,33 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   @Override
-  public DataFetcher<Boolean> timepoint() {
-    return environment -> getSource(environment).isTimepoint();
+  public DataFetcher<String> dropoffType() {
+    return environment ->
+      switch (getSource(environment).getDropoffType()) {
+        case SCHEDULED -> "SCHEDULED";
+        case NONE -> "NONE";
+        case CALL_AGENCY -> "CALL_AGENCY";
+        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
+        case CANCELLED -> null;
+      };
+  }
+
+  @Override
+  public DataFetcher<String> headsign() {
+    return environment ->
+      LegacyGraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
+  }
+
+  @Override
+  public DataFetcher<String> pickupType() {
+    return environment ->
+      switch (getSource(environment).getPickupType()) {
+        case SCHEDULED -> "SCHEDULED";
+        case NONE -> "NONE";
+        case CALL_AGENCY -> "CALL_AGENCY";
+        case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
+        case CANCELLED -> null;
+      };
   }
 
   @Override
@@ -57,49 +59,51 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   @Override
+  public DataFetcher<Integer> realtimeArrival() {
+    return environment -> missingValueToNull(getSource(environment).getRealtimeArrival());
+  }
+
+  @Override
+  public DataFetcher<Integer> realtimeDeparture() {
+    return environment -> missingValueToNull(getSource(environment).getRealtimeDeparture());
+  }
+
+  @Override
   public DataFetcher<String> realtimeState() {
-    return environment -> getSource(environment).getRealtimeState().name();
+    return environment ->
+      getSource(environment).isCanceledEffectively()
+        ? RealTimeState.CANCELED.name()
+        : getSource(environment).getRealtimeState().name();
   }
 
   @Override
-  public DataFetcher<String> pickupType() {
-    return environment -> {
-      switch (getSource(environment).getPickupType().getGtfsCode()) {
-        case 0: return "SCHEDULED";
-        case 1: return "NONE";
-        case 2: return "CALL_AGENCY";
-        case 3: return "COORDINATE_WITH_DRIVER";
-        default: return null;
-      }
-    };
+  public DataFetcher<Integer> scheduledArrival() {
+    return environment -> missingValueToNull(getSource(environment).getScheduledArrival());
   }
 
   @Override
-  public DataFetcher<String> dropoffType() {
-    return environment -> {
-      switch (getSource(environment).getDropoffType().getGtfsCode()) {
-        case 0: return "SCHEDULED";
-        case 1: return "NONE";
-        case 2: return "CALL_AGENCY";
-        case 3: return "COORDINATE_WITH_DRIVER";
-        default: return null;
-      }
-    };
+  public DataFetcher<Integer> scheduledDeparture() {
+    return environment -> missingValueToNull(getSource(environment).getScheduledDeparture());
   }
 
   @Override
   public DataFetcher<Long> serviceDay() {
-    return environment -> getSource(environment).getServiceDay();
+    return environment -> getSource(environment).getServiceDayMidnight();
+  }
+
+  @Override
+  public DataFetcher<Object> stop() {
+    return environment -> getSource(environment).getStop();
+  }
+
+  @Override
+  public DataFetcher<Boolean> timepoint() {
+    return environment -> getSource(environment).isTimepoint();
   }
 
   @Override
   public DataFetcher<Trip> trip() {
     return environment -> getSource(environment).getTrip();
-  }
-
-  @Override
-  public DataFetcher<String> headsign() {
-    return environment -> getSource(environment).getHeadsign();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
@@ -111,15 +115,14 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   /**
-   * Generally the missing values are removed during the graph build. However, for flex
-   * trips they are not and have to be converted to null here.
+   * Generally the missing values are removed during the graph build. However, for flex trips they
+   * are not and have to be converted to null here.
    */
   private Integer missingValueToNull(int value) {
-      if(value == StopTime.MISSING_VALUE) {
-        return null;
-      }
-      else {
-        return value;
-      }
+    if (value == StopTime.MISSING_VALUE) {
+      return null;
+    } else {
+      return value;
+    }
   }
 }

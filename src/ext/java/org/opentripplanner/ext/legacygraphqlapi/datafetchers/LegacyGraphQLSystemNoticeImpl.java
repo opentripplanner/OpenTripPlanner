@@ -6,19 +6,19 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.SystemNotice;
 
 public class LegacyGraphQLSystemNoticeImpl
-        implements LegacyGraphQLDataFetchers.LegacyGraphQLSystemNotice {
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLSystemNotice {
 
-    @Override
-    public DataFetcher<String> tag() {
-        return environment -> getSource(environment).tag;
-    }
+  @Override
+  public DataFetcher<String> tag() {
+    return environment -> getSource(environment).tag;
+  }
 
-    @Override
-    public DataFetcher<String> text() {
-        return environment -> getSource(environment).text;
-    }
+  @Override
+  public DataFetcher<String> text() {
+    return environment -> getSource(environment).text;
+  }
 
-    private SystemNotice getSource(DataFetchingEnvironment environment) {
-        return environment.getSource();
-    }
+  private SystemNotice getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
+  }
 }

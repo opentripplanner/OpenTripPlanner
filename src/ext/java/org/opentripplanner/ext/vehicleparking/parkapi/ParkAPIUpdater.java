@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
+import ch.poole.openinghoursparser.OpeningHoursParseException;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,169 +8,194 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.openinghours.OHCalendar;
+import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
-import org.opentripplanner.util.TranslatedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Vehicle parking updater class for https://github.com/offenesdresden/ParkAPI format APIs.
  */
 abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
 
-    private static final String JSON_PARSE_PATH = "lots";
+  private static final Logger LOG = LoggerFactory.getLogger(ParkAPIUpdater.class);
 
-    private final String feedId;
-    private final Collection<String> staticTags;
+  private static final String JSON_PARSE_PATH = "lots";
 
-    public ParkAPIUpdater(ParkAPIUpdaterParameters parameters) {
-        super(parameters.getUrl(), JSON_PARSE_PATH, parameters.getHttpHeaders());
-        this.feedId = parameters.getFeedId();
-        this.staticTags = parameters.getTags();
+  private final String feedId;
+  private final Collection<String> staticTags;
+
+  private final OSMOpeningHoursParser osmOpeningHoursParser;
+
+  public ParkAPIUpdater(
+    ParkAPIUpdaterParameters parameters,
+    OpeningHoursCalendarService openingHoursCalendarService
+  ) {
+    super(parameters.getUrl(), JSON_PARSE_PATH, parameters.getHttpHeaders());
+    this.feedId = parameters.getFeedId();
+    this.staticTags = parameters.getTags();
+    this.osmOpeningHoursParser =
+      new OSMOpeningHoursParser(openingHoursCalendarService, parameters.getTimeZone());
+  }
+
+  @Override
+  protected VehicleParking parseElement(JsonNode jsonNode) {
+    var capacity = parseCapacity(jsonNode);
+    var availability = parseAvailability(jsonNode);
+
+    I18NString note = null;
+    if (jsonNode.has("notes") && !jsonNode.get("notes").isEmpty()) {
+      var noteFieldIterator = jsonNode.path("notes").fields();
+      Map<String, String> noteLocalizations = new HashMap<>();
+      while (noteFieldIterator.hasNext()) {
+        var noteFiled = noteFieldIterator.next();
+        noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asText());
+      }
+      note = TranslatedString.getI18NString(noteLocalizations, true, false);
     }
 
-    @Override
-    protected VehicleParking parseElement(JsonNode jsonNode) {
+    var vehicleParkId = createIdForNode(jsonNode);
+    double x = jsonNode.path("coords").path("lng").asDouble();
+    double y = jsonNode.path("coords").path("lat").asDouble();
 
-        var capacity = parseCapacity(jsonNode);
-        var availability = parseAvailability(jsonNode);
+    VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
+      builder
+        .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
+        .name(new NonLocalizedString(jsonNode.path("name").asText()))
+        .coordinate(new WgsCoordinate(y, x))
+        .walkAccessible(true)
+        .carAccessible(true);
 
-        I18NString note = null;
-        if (jsonNode.has("notes") && !jsonNode.get("notes").isEmpty()) {
-            var noteFieldIterator = jsonNode.path("notes").fields();
-            Map<String, String> noteLocalizations = new HashMap<>();
-            while (noteFieldIterator.hasNext()) {
-                var noteFiled = noteFieldIterator.next();
-                noteLocalizations.put(noteFiled.getKey(), noteFiled.getValue().asText());
-            }
-            note = TranslatedString.getI18NString(noteLocalizations);
-        }
+    var stateText = jsonNode.get("state").asText();
+    var state = stateText.equals("closed")
+      ? VehicleParkingState.CLOSED
+      : VehicleParkingState.OPERATIONAL;
 
-        var vehicleParkId = createIdForNode(jsonNode);
-        double x = jsonNode.path("coords").path("lng").asDouble();
-        double y = jsonNode.path("coords").path("lat").asDouble();
+    var tags = parseTags(jsonNode, "lot_type", "address", "forecast", "state");
+    tags.addAll(staticTags);
 
-        VehicleParking.VehicleParkingEntranceCreator entrance = builder -> builder
-                .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
-                .name(new NonLocalizedString(jsonNode.path("name").asText()))
-                .x(x)
-                .y(y)
-                .walkAccessible(true)
-                .carAccessible(true);
+    var maybeCapacity = Optional.ofNullable(capacity);
+    var bicyclePlaces = maybeCapacity
+      .map(c -> hasPlaces(capacity.getBicycleSpaces()))
+      .orElse(false);
+    var carPlaces = maybeCapacity.map(c -> hasPlaces(capacity.getCarSpaces())).orElse(true);
+    var wheelChairAccessiblePlaces = maybeCapacity
+      .map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
+      .orElse(false);
 
-        var stateText = jsonNode.get("state").asText();
-        var state = stateText.equals("closed")
-                ? VehicleParkingState.CLOSED
-                : VehicleParkingState.OPERATIONAL;
+    return VehicleParking
+      .builder()
+      .id(vehicleParkId)
+      .name(new NonLocalizedString(jsonNode.path("name").asText()))
+      .state(state)
+      .coordinate(new WgsCoordinate(y, x))
+      .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours"), vehicleParkId))
+      // TODO
+      // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
+      .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
+      .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asText() : null)
+      .note(note)
+      .capacity(capacity)
+      .availability(availability)
+      .bicyclePlaces(bicyclePlaces)
+      .carPlaces(carPlaces)
+      .wheelchairAccessibleCarPlaces(wheelChairAccessiblePlaces)
+      .entrance(entrance)
+      .tags(tags)
+      .build();
+  }
 
-        var tags = parseTags(jsonNode, "lot_type", "address", "forecast", "state");
-        tags.addAll(staticTags);
+  protected VehicleParkingSpaces parseVehicleSpaces(
+    JsonNode node,
+    String bicycleTag,
+    String carTag,
+    String wheelchairAccessibleCarTag
+  ) {
+    var bicycleSpaces = parseSpacesValue(node, bicycleTag);
+    var carSpaces = parseSpacesValue(node, carTag);
+    var wheelchairAccessibleCarSpaces = parseSpacesValue(node, wheelchairAccessibleCarTag);
 
-        var maybeCapacity = Optional.ofNullable(capacity);
-        var bicyclePlaces = maybeCapacity.map(c -> hasPlaces(capacity.getBicycleSpaces())).orElse(false);
-        var carPlaces= maybeCapacity.map(c -> hasPlaces(capacity.getCarSpaces())).orElse(true);
-        var wheelChairAccessiblePlaces= maybeCapacity.map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces())).orElse(false);
-
-        return VehicleParking.builder()
-                .id(vehicleParkId)
-                .name(new NonLocalizedString(jsonNode.path("name").asText()))
-                .state(state)
-                .x(x)
-                .y(y)
-                // TODO
-                // .openingHours(parseOpeningHours(jsonNode.path("opening_hours")))
-                // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))
-                .detailsUrl(jsonNode.has("url") ? jsonNode.get("url").asText() : null)
-                .imageUrl(jsonNode.has("image_url") ? jsonNode.get("image_url").asText() : null)
-                .note(note)
-                .capacity(capacity)
-                .availability(availability)
-                .bicyclePlaces(bicyclePlaces)
-                .carPlaces(carPlaces)
-                .wheelchairAccessibleCarPlaces(wheelChairAccessiblePlaces)
-                .entrance(entrance)
-                .tags(tags)
-                .build();
+    if (bicycleSpaces == null && carSpaces == null && wheelchairAccessibleCarSpaces == null) {
+      return null;
     }
 
-    abstract VehicleParkingSpaces parseCapacity(JsonNode jsonNode);
+    return createVehiclePlaces(carSpaces, wheelchairAccessibleCarSpaces, bicycleSpaces);
+  }
 
-    abstract VehicleParkingSpaces parseAvailability(JsonNode jsonNode);
+  abstract VehicleParkingSpaces parseCapacity(JsonNode jsonNode);
 
-    protected VehicleParkingSpaces parseVehicleSpaces(
-            JsonNode node,
-            String bicycleTag,
-            String carTag,
-            String wheelchairAccessibleCarTag
-    ) {
-        var bicycleSpaces = parseSpacesValue(node, bicycleTag);
-        var carSpaces = parseSpacesValue(node, carTag);
-        var wheelchairAccessibleCarSpaces = parseSpacesValue(node, wheelchairAccessibleCarTag);
+  abstract VehicleParkingSpaces parseAvailability(JsonNode jsonNode);
 
-        if (bicycleSpaces == null && carSpaces == null && wheelchairAccessibleCarSpaces == null) {
-            return null;
-        }
+  private VehicleParkingSpaces createVehiclePlaces(
+    Integer carSpaces,
+    Integer wheelchairAccessibleCarSpaces,
+    Integer bicycleSpaces
+  ) {
+    return VehicleParkingSpaces
+      .builder()
+      .bicycleSpaces(bicycleSpaces)
+      .carSpaces(carSpaces)
+      .wheelchairAccessibleCarSpaces(wheelchairAccessibleCarSpaces)
+      .build();
+  }
 
-        return createVehiclePlaces(carSpaces, wheelchairAccessibleCarSpaces, bicycleSpaces);
+  private boolean hasPlaces(Integer spaces) {
+    return spaces != null && spaces > 0;
+  }
+
+  private OHCalendar parseOpeningHours(JsonNode jsonNode, FeedScopedId id) {
+    if (jsonNode == null || jsonNode.asText().isBlank()) {
+      return null;
     }
 
-    private VehicleParkingSpaces createVehiclePlaces(
-            Integer carSpaces,
-            Integer wheelchairAccessibleCarSpaces,
-            Integer bicycleSpaces
-    ) {
-        return VehicleParkingSpaces.builder()
-                .bicycleSpaces(bicycleSpaces)
-                .carSpaces(carSpaces)
-                .wheelchairAccessibleCarSpaces(wheelchairAccessibleCarSpaces)
-                .build();
+    try {
+      return osmOpeningHoursParser.parseOpeningHours(jsonNode.asText(), id.toString(), null);
+    } catch (OpeningHoursParseException e) {
+      LOG.info("Parsing of opening hours failed for park {}, it is now always open:\n{}", id, e);
+      return null;
     }
+  }
 
-    private boolean hasPlaces(Integer spaces) {
-        return spaces != null && spaces > 0;
+  private Integer parseSpacesValue(JsonNode jsonNode, String fieldName) {
+    if (!jsonNode.has(fieldName)) {
+      return null;
     }
+    return jsonNode.get(fieldName).asInt();
+  }
 
-    // TODO
-    // private TimeRestriction parseOpeningHours(JsonNode jsonNode) {
-    //     if (jsonNode == null || jsonNode.asText().isBlank()) {
-    //         return null;
-    //     }
-
-    //     return OsmOpeningHours.parseFromOsm(jsonNode.asText());
-    // }
-
-    private Integer parseSpacesValue(JsonNode jsonNode, String fieldName) {
-        if (!jsonNode.has(fieldName)) {
-            return null;
-        }
-        return jsonNode.get(fieldName).asInt();
+  private FeedScopedId createIdForNode(JsonNode jsonNode) {
+    String id;
+    if (jsonNode.has("id")) {
+      id = jsonNode.path("id").asText();
+    } else {
+      id =
+        String.format(
+          "%s/%f/%f",
+          jsonNode.get("name"),
+          jsonNode.path("coords").path("lng").asDouble(),
+          jsonNode.path("coords").path("lat").asDouble()
+        );
     }
+    return new FeedScopedId(feedId, id);
+  }
 
-    private FeedScopedId createIdForNode(JsonNode jsonNode) {
-        String id;
-        if (jsonNode.has("id")) {
-            id = jsonNode.path("id").asText();
-        }
-        else {
-            id = String.format("%s/%f/%f", jsonNode.get("name"),
-                    jsonNode.path("coords").path("lng").asDouble(),
-                    jsonNode.path("coords").path("lat").asDouble()
-            );
-        }
-        return new FeedScopedId(feedId, id);
+  private List<String> parseTags(JsonNode node, String... tagNames) {
+    var tagList = new ArrayList<String>();
+    for (var tagName : tagNames) {
+      if (node.has(tagName)) {
+        tagList.add(tagName + ":" + node.get(tagName).asText());
+      }
     }
-
-    private List<String> parseTags(JsonNode node, String... tagNames) {
-        var tagList = new ArrayList<String>();
-        for (var tagName : tagNames) {
-            if (node.has(tagName)) {
-                tagList.add(tagName + ":" + node.get(tagName).asText());
-            }
-        }
-        return tagList;
-    }
+    return tagList;
+  }
 }

@@ -3,8 +3,6 @@ package org.opentripplanner.model.transfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_1;
-import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_2;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1A;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_1S;
 import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2B;
@@ -12,19 +10,18 @@ import static org.opentripplanner.model.transfer.TransferTestData.ROUTE_POINT_2S
 import static org.opentripplanner.model.transfer.TransferTestData.STATION_POINT;
 import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_A;
 import static org.opentripplanner.model.transfer.TransferTestData.STOP_POINT_B;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_11;
-import static org.opentripplanner.model.transfer.TransferTestData.TRIP_21;
 import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_11_1;
 import static org.opentripplanner.model.transfer.TransferTestData.TRIP_POINT_21_3;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 
 public class ConstrainedTransferTest {
 
   private static final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
-  private static final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
+  private static final TransferConstraint GUARANTIED = TransferConstraint
+    .create()
+    .guaranteed()
+    .build();
 
   private final ConstrainedTransfer TX_STATION_TO_STATION = noConstTx(STATION_POINT, STATION_POINT);
   private final ConstrainedTransfer TX_STATION_TO_B = noConstTx(STATION_POINT, STOP_POINT_B);
@@ -58,19 +55,12 @@ public class ConstrainedTransferTest {
 
   private final ConstrainedTransfer TX_NO_CONSTRAINS = noConstTx(STOP_POINT_A, STOP_POINT_B);
 
-  private final ConstrainedTransfer TX_GUARANTIED =  new ConstrainedTransfer(
-          null, TRIP_POINT_11_1, TRIP_POINT_21_3, GUARANTIED
+  private final ConstrainedTransfer TX_GUARANTIED = new ConstrainedTransfer(
+    null,
+    TRIP_POINT_11_1,
+    TRIP_POINT_21_3,
+    GUARANTIED
   );
-
-  @BeforeEach
-  public void setup() {
-    ROUTE_1.setShortName("L1");
-    ROUTE_2.setShortName("L2");
-    TRIP_11.setRoute(ROUTE_1);
-    TRIP_21.setRoute(ROUTE_2);
-    TRIP_11.setRoute(ROUTE_1);
-    TRIP_21.setRoute(ROUTE_2);
-  }
 
   @Test
   public void getSpecificityRanking() {
@@ -120,8 +110,8 @@ public class ConstrainedTransferTest {
   @Test
   public void testToString() {
     assertEquals(
-            "ConstrainedTransfer{from: <Stop F:A>, to: <Stop F:B>, constraint: {no constraints}}",
-            TX_A_TO_B.toString()
+      "ConstrainedTransfer{from: StopTP{F:A}, to: StopTP{F:B}, constraint: {no constraints}}",
+      TX_A_TO_B.toString()
     );
   }
 

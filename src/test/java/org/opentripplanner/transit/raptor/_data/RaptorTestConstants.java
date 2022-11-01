@@ -4,8 +4,6 @@ import static org.opentripplanner.util.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.util.time.TimeUtils.hm2time;
 
 public interface RaptorTestConstants {
-
-
   // Time duration(D) constants, all values are in seconds
   int D0s = 0;
   int D1s = 1;

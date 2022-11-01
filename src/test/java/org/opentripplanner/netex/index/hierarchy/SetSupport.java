@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
  */
 class SetSupport {
 
-    /**
-     * Create a new sorted list of the given values.
-     */
-    static <E extends Comparable<E>> List<E> sort(Collection<E> values) {
-        return values.stream().sorted().collect(Collectors.toList());
-    }
+  /**
+   * Create a new sorted list of the given values.
+   */
+  static <E extends Comparable<E>> List<E> sort(Collection<E> values) {
+    return values.stream().sorted().collect(Collectors.toList());
+  }
 }

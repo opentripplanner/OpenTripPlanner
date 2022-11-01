@@ -9,41 +9,40 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
  */
 public class KmlUpdaterParameters extends VehicleParkingUpdaterParameters {
 
-    private final String url;
-    private final String feedId;
-    private final String namePrefix;
-    private final boolean zip;
+  private final String url;
+  private final String feedId;
+  private final String namePrefix;
+  private final boolean zip;
 
+  public KmlUpdaterParameters(
+    String configRef,
+    String url,
+    String feedId,
+    String namePrefix,
+    int frequencySec,
+    boolean zip,
+    DataSourceType sourceType
+  ) {
+    super(configRef, frequencySec, sourceType);
+    this.url = url;
+    this.feedId = feedId;
+    this.namePrefix = namePrefix;
+    this.zip = zip;
+  }
 
-    public KmlUpdaterParameters(
-            String configRef,
-            String url,
-            String feedId,
-            String namePrefix,
-            int frequencySec,
-            boolean zip,
-            DataSourceType sourceType
-    ) {
-        super(configRef, frequencySec, sourceType);
-        this.url = url;
-        this.feedId = feedId;
-        this.namePrefix = namePrefix;
-        this.zip = zip;
-    }
+  public String getFeedId() {
+    return feedId;
+  }
 
-    public String getFeedId() {
-        return feedId;
-    }
+  public String getUrl() {
+    return url;
+  }
 
-    public String getUrl() {
-        return url;
-    }
+  public String getNamePrefix() {
+    return namePrefix;
+  }
 
-    public String getNamePrefix() {
-        return namePrefix;
-    }
-
-    public boolean isZip() {
-        return zip;
-    }
+  public boolean isZip() {
+    return zip;
+  }
 }

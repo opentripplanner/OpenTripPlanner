@@ -3,164 +3,185 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Objects;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.PathwayMode;
+import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends Edge implements BikeWalkableEdge {
+public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
-    private static final long serialVersionUID = -3311099256178798982L;
-    public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
+  public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
+  private final I18NString name;
+  private final int traversalTime;
+  private final double distance;
+  private final int steps;
+  private final double slope;
+  private final PathwayMode mode;
 
-    private final I18NString name;
-    private final int traversalTime;
-    private final double distance;
-    private final int steps;
-    private final double slope;
+  private final boolean wheelchairAccessible;
+  private final FeedScopedId id;
 
-    private final boolean wheelchairAccessible;
-    private final FeedScopedId id;
+  public PathwayEdge(
+    Vertex fromv,
+    Vertex tov,
+    FeedScopedId id,
+    I18NString name,
+    int traversalTime,
+    double distance,
+    int steps,
+    double slope,
+    boolean wheelchairAccessible,
+    PathwayMode mode
+  ) {
+    super(fromv, tov);
+    this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
+    this.id = id;
+    this.traversalTime = traversalTime;
+    this.steps = steps;
+    this.slope = slope;
+    this.wheelchairAccessible = wheelchairAccessible;
+    this.distance = distance;
+    this.mode = mode;
+  }
 
-    /**
-     * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean)}
-     */
-    public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name) {
-        return PathwayEdge.lowCost(
-                fromV,
-                toV,
-                null,
-                name,
-                true
-        );
+  /**
+   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
+   */
+  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name, PathwayMode mode) {
+    return PathwayEdge.lowCost(fromV, toV, null, name, true, mode);
+  }
+
+  /**
+   * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
+   * <p>
+   * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
+   */
+  public static PathwayEdge lowCost(
+    Vertex fromV,
+    Vertex toV,
+    FeedScopedId id,
+    I18NString name,
+    boolean wheelchairAccessible,
+    PathwayMode mode
+  ) {
+    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+  }
+
+  public State traverse(State s0) {
+    StateEditor s1 = createEditorForWalking(s0, this);
+    if (s1 == null) {
+      return null;
     }
 
-    /**
-     * Create a PathwayEdge that doesn't have a traversal time, distance or steps.
-     *
-     * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
-     */
-    public static PathwayEdge lowCost(Vertex fromV, Vertex toV, FeedScopedId id, I18NString name, boolean wheelchairAccessible) {
-        return new PathwayEdge(
-                fromV,
-                toV,
-                id,
-                name,
-                0,
-                0,
-                0,
-                0,
-                wheelchairAccessible
-        );
+    RoutingPreferences preferences = s0.getPreferences();
+
+    /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
+    int time = traversalTime;
+
+    if (time == 0) {
+      if (distance > 0) {
+        time = (int) (distance * preferences.walk().speed());
+      } else if (isStairs()) {
+        // 1 step corresponds to 20cm, doubling that to compensate for elevation;
+        time = (int) (0.4 * Math.abs(steps) * preferences.walk().speed());
+      }
     }
 
-    public PathwayEdge(
-            Vertex fromv,
-            Vertex tov,
-            FeedScopedId id,
-            I18NString name,
-            int traversalTime,
-            double distance,
-            int steps,
-            double slope,
-            boolean wheelchairAccessible
-    ) {
-        super(fromv, tov);
-        this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
-        this.id = id;
-        this.traversalTime = traversalTime;
-        this.steps = steps;
-        this.slope = slope;
-        this.wheelchairAccessible = wheelchairAccessible;
-        this.distance = distance;
+    if (time > 0) {
+      double weight = time;
+      if (s0.getRequest().wheelchair()) {
+        weight *=
+          StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
+            preferences,
+            slope,
+            wheelchairAccessible,
+            isStairs()
+          );
+      } else {
+        weight *=
+          StreetEdgeReluctanceCalculator.computeReluctance(
+            preferences,
+            TraverseMode.WALK,
+            s0.getNonTransitMode() == TraverseMode.BICYCLE,
+            isStairs()
+          );
+      }
+      s1.incrementTimeInSeconds(time);
+      s1.incrementWeight(weight);
+    } else {
+      // elevators often don't have a traversal time, distance or steps, so we need to add
+      // _some_ cost. the real cost is added in ElevatorHopEdge.
+      // adding a cost of 1 is analogous to FreeEdge
+      s1.incrementWeight(1);
     }
 
-    public String getDirection() {
-        return null;
+    return s1.makeState();
+  }
+
+  @Override
+  public I18NString getName() {
+    return name;
+  }
+
+  @Override
+  public boolean hasBogusName() {
+    return name.equals(DEFAULT_NAME);
+  }
+
+  public LineString getGeometry() {
+    Coordinate[] coordinates = new Coordinate[] {
+      getFromVertex().getCoordinate(),
+      getToVertex().getCoordinate(),
+    };
+    return GeometryUtils.getGeometryFactory().createLineString(coordinates);
+  }
+
+  public double getDistanceMeters() {
+    return this.distance;
+  }
+
+  @Override
+  public double getEffectiveWalkDistance() {
+    if (traversalTime > 0) {
+      return 0;
+    } else {
+      return distance;
     }
+  }
 
-    public double getDistanceMeters() {
-        return this.distance;
-    }
+  @Override
+  public int getDistanceIndependentTime() {
+    return traversalTime;
+  }
 
-    @Override
-    public double getEffectiveWalkDistance() {
-        if (traversalTime > 0) {
-            return 0;
-        }
-        else {
-            return distance;
-        }
-    }
+  public int getSteps() {
+    return steps;
+  }
 
-    @Override
-    public int getDistanceIndependentTime() {
-        return traversalTime;
-    }
+  public FeedScopedId getId() {
+    return id;
+  }
 
-    public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[]{
-                getFromVertex().getCoordinate(),
-                getToVertex().getCoordinate()
-        };
-        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
-    }
+  @Override
+  public boolean isWheelchairAccessible() {
+    return wheelchairAccessible;
+  }
 
-    @Override
-    public I18NString getName() {
-        return name;
-    }
+  public PathwayMode getMode() {
+    return mode;
+  }
 
-    public FeedScopedId getId() {return id;}
-
-    public State traverse(State s0) {
-        StateEditor s1 = createEditorForWalking(s0, this);
-        if (s1 == null) {
-            return null;
-        }
-
-        /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
-        int time = traversalTime;
-        if (s0.getOptions().wheelchairAccessible) {
-            if (!this.wheelchairAccessible) {
-                return null;
-            }
-            if (this.slope > s0.getOptions().maxWheelchairSlope) {
-                return null;
-            }
-        }
-
-        if (time == 0) {
-            if (distance > 0) {
-                time = (int) (distance * s0.getOptions().walkSpeed);
-            }
-            else if (steps > 0) {
-                // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-                time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
-            }
-        }
-
-        if (time > 0){
-            double weight = time * s0.getOptions()
-                .getReluctance(TraverseMode.WALK, s0.getNonTransitMode() == TraverseMode.BICYCLE);
-
-            s1.incrementTimeInSeconds(time);
-            s1.incrementWeight(weight);
-        } else {
-            // elevators often don't have a traversal time, distance or steps, so we need to add
-            // _some_ cost. the real cost is added in ElevatorHopEdge.
-            // adding a cost of 1 is analogous to FreeEdge
-            s1.incrementWeight(1);
-        }
-
-        return s1.makeState();
-    }
+  private boolean isStairs() {
+    return steps > 0;
+  }
 }

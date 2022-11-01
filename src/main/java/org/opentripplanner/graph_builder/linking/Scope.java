@@ -14,5 +14,5 @@ enum Scope {
    * Temporary changes made by a single routing request. These should only be visible to the same
    * routing request.
    */
-  REQUEST
+  REQUEST,
 }

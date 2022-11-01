@@ -1,30 +1,38 @@
 package org.opentripplanner.routing.trippattern;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 @SuppressWarnings("StringOperationCanBeSimplified")
 public class DeduplicatorTest {
+
   private static final BitSet BIT_SET = new BitSet(8);
   private static final BitSet BIT_SET_2 = new BitSet(8);
-  private static final int[] INT_ARRAY = new int[]{ 1, 0, 7 };
-  private static final int[] INT_ARRAY_2 = new int[]{ 1, 0, 7 };
-  private static final String STRING = new String(new char[] {'A', 'b', 'b', 'a' });
+  private static final int[] INT_ARRAY = new int[] { 1, 0, 7 };
+  private static final int[] INT_ARRAY_2 = new int[] { 1, 0, 7 };
+  private static final String STRING = new String(new char[] { 'A', 'b', 'b', 'a' });
   private static final String STRING_2 = new String("Abba");
-  private static final String[] STRING_ARRAY = {"Alf"};
-  private static final String[] STRING_ARRAY_2 = {"Alf"};
-  private static final String[][] STRING_2D_ARRAY = new String[][] {{"test_1", "test_2"}, {"test_3", "test_4"}};
-  private static final String[][] STRING_2D_ARRAY_2 = new String[][] {{"test_1", "test_2"}, {"test_3", "test_4"}};
+  private static final String[] STRING_ARRAY = { "Alf" };
+  private static final String[] STRING_ARRAY_2 = { "Alf" };
+  private static final String[][] STRING_2D_ARRAY = new String[][] {
+    { "test_1", "test_2" },
+    { "test_3", "test_4" },
+  };
+  private static final String[][] STRING_2D_ARRAY_2 = new String[][] {
+    { "test_1", "test_2" },
+    { "test_3", "test_4" },
+  };
   private static final LocalDate DATE = LocalDate.of(2021, 1, 15);
   private static final LocalDate DATE_2 = LocalDate.of(2021, 1, 15);
   private static final LocalTime TIME = LocalTime.of(12, 45);
@@ -36,11 +44,14 @@ public class DeduplicatorTest {
   private static final List<LocalDate> DATE_LIST_2 = List.of(DATE_2);
   private static final List<LocalTime> TIME_LIST = List.of(TIME);
   private static final List<LocalTime> TIME_LIST_2 = List.of(TIME_2);
-
+  private static final List<LocalTime> TIME_LIST_W_NULL = Arrays.asList(TIME, null);
+  private static final List<LocalTime> TIME_LIST_2_W_NULL = Arrays.asList(TIME_2, null);
+  private static final LocalTime[] OBJ_ARRAY_1 = new LocalTime[] { TIME, null };
+  private static final LocalTime[] OBJ_ARRAY_2 = new LocalTime[] { TIME_2, null };
 
   private final Deduplicator subject = new Deduplicator();
 
-  @Before
+  @BeforeEach
   public void assertSetup() {
     assertNotSame(BIT_SET, BIT_SET_2);
     assertNotSame(INT_ARRAY, INT_ARRAY_2);
@@ -49,7 +60,6 @@ public class DeduplicatorTest {
     assertNotSame(STRING, STRING_2);
     assertNotSame(DATE, DATE_2);
   }
-
 
   @Test
   public void deduplicateGetAndReset() {
@@ -60,13 +70,11 @@ public class DeduplicatorTest {
     assertNotSame(STRING, STRING_2);
     assertNotSame(DATE, DATE_2);
     assertNotSame(TIME, TIME_2);
+    assertNotSame(OBJ_ARRAY_1, OBJ_ARRAY_2);
 
     subject.reset();
 
-    assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
-        subject.toString()
-    );
+    assertEquals("Deduplicator{}", subject.toString());
   }
 
   @Test
@@ -75,13 +83,10 @@ public class DeduplicatorTest {
 
     assertSame(INT_ARRAY, subject.deduplicateIntArray(INT_ARRAY_2));
 
-    assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 1(2), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
-        subject.toString()
-    );
+    assertEquals("Deduplicator{int[]: 1(2)}", subject.toString());
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertSame(INT_ARRAY_2, subject.deduplicateIntArray(INT_ARRAY_2));
   }
 
@@ -91,13 +96,10 @@ public class DeduplicatorTest {
 
     assertSame(STRING, subject.deduplicateString(STRING_2));
 
-    assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(2), StringArray: 0(0), String2DArray: 0(0)}",
-        subject.toString()
-    );
+    assertEquals("Deduplicator{String: 1(2)}", subject.toString());
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertSame(STRING_2, subject.deduplicateString(STRING_2));
   }
 
@@ -107,13 +109,10 @@ public class DeduplicatorTest {
 
     assertSame(BIT_SET, subject.deduplicateBitSet(BIT_SET_2));
 
-    assertEquals(
-        "Deduplicator{BitSet: 1(2), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
-        subject.toString()
-    );
+    assertEquals("Deduplicator{BitSet: 1(2)}", subject.toString());
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertSame(BIT_SET_2, subject.deduplicateBitSet(BIT_SET_2));
   }
 
@@ -123,13 +122,10 @@ public class DeduplicatorTest {
 
     assertSame(deduplicatedArray, subject.deduplicateStringArray(STRING_ARRAY_2));
 
-    assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 1(1), StringArray: 1(2), String2DArray: 0(0)}",
-        subject.toString()
-    );
+    assertEquals("Deduplicator{String: 1(1), String[]: 1(2)}", subject.toString());
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertNotSame(deduplicatedArray, subject.deduplicateStringArray(STRING_ARRAY_2));
   }
 
@@ -140,11 +136,12 @@ public class DeduplicatorTest {
     assertSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
 
     assertEquals(
-            "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 4(4), StringArray: 2(2), String2DArray: 1(2)}",
-            subject.toString());
+      "Deduplicator{String: 4(4), String[]: 2(2), String[][]: 1(2)}",
+      subject.toString()
+    );
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertNotSame(deduplicatedArray, subject.deduplicateString2DArray(STRING_2D_ARRAY_2));
   }
 
@@ -156,14 +153,25 @@ public class DeduplicatorTest {
     assertSame(TIME, subject.deduplicateObject(TIME_CL, TIME));
     assertSame(TIME, subject.deduplicateObject(TIME_CL, TIME_2));
 
-    // The order which each generic type occur in the toString is undefined; hence the *contains*
-    var value = subject.toString();
-    assertTrue(value, value.contains("LocalTime: 1(2)"));
-    assertTrue(value, value.contains("LocalDate: 1(2)"));
+    assertEquals("Deduplicator{LocalDate: 1(2), LocalTime: 1(2)}", subject.toString());
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertSame(DATE_2, subject.deduplicateObject(DATE_CL, DATE_2));
+  }
+
+  @Test
+  public void deduplicateObjectArray() {
+    var deduplicatedArray = subject.deduplicateObjectArray(LocalTime.class, OBJ_ARRAY_1);
+
+    assertSame(deduplicatedArray, subject.deduplicateObjectArray(LocalTime.class, OBJ_ARRAY_2));
+
+    assertEquals("Deduplicator{LocalTime: 1(1), LocalTime[]: 1(2)}", subject.toString());
+
+    subject.reset();
+
+    // After reset the "old" entry is removed
+    assertNotSame(deduplicatedArray, subject.deduplicateObjectArray(LocalTime.class, OBJ_ARRAY_1));
   }
 
   @Test
@@ -174,24 +182,24 @@ public class DeduplicatorTest {
     var timeList = subject.deduplicateImmutableList(TIME_CL, TIME_LIST);
     assertSame(timeList, subject.deduplicateImmutableList(TIME_CL, TIME_LIST_2));
 
+    var timeListWNull = subject.deduplicateImmutableList(TIME_CL, TIME_LIST_W_NULL);
+    assertSame(timeListWNull, subject.deduplicateImmutableList(TIME_CL, TIME_LIST_2_W_NULL));
+
     // The order which each generic type occur in the toString is undefined; hence the *contains*
     var value = subject.toString();
-    assertTrue(value, value.contains("LocalTime: 1(1)"));
-    assertTrue(value, value.contains("LocalDate: 1(1)"));
-    assertTrue(value, value.contains("List<LocalTime>: 1(2)"));
-    assertTrue(value, value.contains("List<LocalDate>: 1(2)"));
+    assertTrue(value.contains("LocalTime: 1(2)"), value);
+    assertTrue(value.contains("LocalDate: 1(1)"), value);
+    assertTrue(value.contains("List<LocalTime>: 2(4)"), value);
+    assertTrue(value.contains("List<LocalDate>: 1(2)"), value);
 
     subject.reset();
-    // After reset the "new" value is used
+    // After reset the "old" entry is removed
     assertNotSame(dateList, subject.deduplicateImmutableList(DATE_CL, DATE_LIST));
   }
 
   @Test
   public void testToStringForEmptyDeduplicator() {
-    assertEquals(
-        "Deduplicator{BitSet: 0(0), IntArray: 0(0), String: 0(0), StringArray: 0(0), String2DArray: 0(0)}",
-        subject.toString()
-    );
+    assertEquals("Deduplicator{}", subject.toString());
   }
 
   @Test
@@ -202,18 +210,21 @@ public class DeduplicatorTest {
     subject.deduplicateStringArray(STRING_ARRAY);
     subject.deduplicateObject(DATE_CL, DATE);
     subject.deduplicateImmutableList(DATE_CL, DATE_LIST);
+    subject.deduplicateObjectArray(LocalTime.class, OBJ_ARRAY_1);
+    subject.deduplicateObjectArray(LocalTime.class, OBJ_ARRAY_2);
 
     assertEquals(
-        "Deduplicator{"
-                + "BitSet: 1(1), "
-                + "IntArray: 1(1), "
-                + "String: 2(2), "
-                + "StringArray: 1(1), "
-                + "String2DArray: 0(0), "
-                + "LocalDate: 1(2), "
-                + "List<LocalDate>: 1(1)"
-                + "}",
-        subject.toString()
+      "Deduplicator{" +
+      "BitSet: 1(1), " +
+      "int[]: 1(1), " +
+      "String: 2(2), " +
+      "String[]: 1(1), " +
+      "LocalDate: 1(2), " +
+      "LocalTime: 1(1), " +
+      "LocalTime[]: 1(2), " +
+      "List<LocalDate>: 1(1)" +
+      "}",
+      subject.toString()
     );
   }
 }

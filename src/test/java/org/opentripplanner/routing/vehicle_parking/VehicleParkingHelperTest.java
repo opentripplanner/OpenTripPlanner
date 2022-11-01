@@ -6,12 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.edgetype.VehicleParkingEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking.VehicleParkingEntranceCreator;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
-import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VehicleParkingHelperTest {
 
@@ -41,20 +42,23 @@ class VehicleParkingHelperTest {
   void linkSkippingEdgesTest() {
     Graph graph = new Graph();
     var vehicleParking = VehicleParking
-        .builder()
-        .entrances(
-                IntStream.rangeClosed(1, 3)
-                        .<VehicleParkingEntranceCreator>mapToObj(id -> builder -> builder
-                                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                                .name(new NonLocalizedString("Entrance " + id))
-                                .x(id)
-                                .y(id)
-                                .carAccessible(id == 1 || id == 3)
-                                .walkAccessible(id == 2 || id == 3))
-                .collect(Collectors.toList())
-        )
-        .wheelchairAccessibleCarPlaces(true)
-        .build();
+      .builder()
+      .entrances(
+        IntStream
+          .rangeClosed(1, 3)
+          .<VehicleParkingEntranceCreator>mapToObj(id ->
+            builder ->
+              builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                .name(new NonLocalizedString("Entrance " + id))
+                .coordinate(new WgsCoordinate(id, id))
+                .carAccessible(id == 1 || id == 3)
+                .walkAccessible(id == 2 || id == 3)
+          )
+          .collect(Collectors.toList())
+      )
+      .wheelchairAccessibleCarPlaces(true)
+      .build();
 
     VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
 
@@ -64,19 +68,22 @@ class VehicleParkingHelperTest {
 
   private VehicleParking createParingWithEntrances(int entranceNumber) {
     return VehicleParking
-        .builder()
-        .bicyclePlaces(true)
-        .entrances(
-                IntStream.rangeClosed(1, entranceNumber)
-                        .<VehicleParkingEntranceCreator>mapToObj(id -> builder -> builder
-                                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
-                                .name(new NonLocalizedString("Entrance " + id))
-                                .x(id)
-                                .y(id)
-                                .walkAccessible(true))
-                        .collect(Collectors.toList())
-        )
-        .build();
+      .builder()
+      .bicyclePlaces(true)
+      .entrances(
+        IntStream
+          .rangeClosed(1, entranceNumber)
+          .<VehicleParkingEntranceCreator>mapToObj(id ->
+            builder ->
+              builder
+                .entranceId(new FeedScopedId(TEST_FEED_ID, "Entrance " + id))
+                .name(new NonLocalizedString("Entrance " + id))
+                .coordinate(new WgsCoordinate(id, id))
+                .walkAccessible(true)
+          )
+          .collect(Collectors.toList())
+      )
+      .build();
   }
 
   private void assertGraph(Graph graph, int vertexNumber) {
@@ -84,7 +91,8 @@ class VehicleParkingHelperTest {
     assertEquals(vertexNumber, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
     for (VehicleParkingEntranceVertex vehicleParkingEntranceVertex : graph.getVerticesOfType(
-        VehicleParkingEntranceVertex.class)) {
+      VehicleParkingEntranceVertex.class
+    )) {
       assertEquals(vertexNumber, vehicleParkingEntranceVertex.getOutgoing().size());
       assertEquals(vertexNumber, vehicleParkingEntranceVertex.getIncoming().size());
 
