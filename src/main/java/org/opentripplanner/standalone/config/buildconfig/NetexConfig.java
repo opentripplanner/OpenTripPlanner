@@ -31,7 +31,11 @@ public class NetexConfig {
     return mapFilePatternParameters(feedNode, original)
       .withFeedId(readFeedId(feedNode).asString())
       .withSource(
-        feedNode.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
+        feedNode
+          .of("source")
+          .since(V2_2)
+          .summary("The unique URI pointing to the data file.")
+          .asUri()
       )
       .build();
   }

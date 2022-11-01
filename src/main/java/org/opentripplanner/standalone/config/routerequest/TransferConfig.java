@@ -91,6 +91,9 @@ is adjusted with a new cost for wait-time (optimized-wait-time-cost).
 The defaults should work fine, but if you have results with short wait-times dominating a better 
 option or "back-travel", then try to increase the `minSafeWaitTimeFactor`, 
 `backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
+
+For details on the logic/design see [transfer optimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+package documentation.
 """
             )
             .asObject()
@@ -106,7 +109,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
         c
           .of("optimizeTransferWaitTime")
           .since(V2_1)
-          .summary("This enables the transfer wait time optimization. See []() ")
+          .summary("This enables the transfer wait time optimization.")
           .description(
             "If not enabled generalizedCost function is used to pick the optimal transfer point."
           )

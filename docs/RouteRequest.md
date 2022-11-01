@@ -100,7 +100,7 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 |    [backTravelWaitTimeFactor](#rd_to_backTravelWaitTimeFactor)                                   |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |  2.1  |
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                     |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |  2.1  |
 |    [minSafeWaitTimeFactor](#rd_to_minSafeWaitTimeFactor)                                         |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                              | *Optional* | `5.0`                    |  2.1  |
-|    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                   |        `boolean`       | This enables the transfer wait time optimization. See []()                                                                         | *Optional* | `true`                   |  2.1  |
+|    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                   |        `boolean`       | This enables the transfer wait time optimization.                                                                                  | *Optional* | `true`                   |  2.1  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                         |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                      | *Optional* |                          |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                   |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |  2.2  |
 | wheelchairAccessibility                                                                          |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
@@ -581,6 +581,9 @@ The defaults should work fine, but if you have results with short wait-times dom
 option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
 `backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
 
+For details on the logic/design see [transferoptimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+package documentation.
+
 
 <h3 id="rd_to_backTravelWaitTimeFactor">backTravelWaitTimeFactor</h3>
 
@@ -622,7 +625,7 @@ This defines the maximum cost for the logarithmic function relative to the min-s
 **Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
 **Path:** /routingDefaults/transferOptimization 
 
-This enables the transfer wait time optimization. See []() 
+This enables the transfer wait time optimization.
 
 If not enabled generalizedCost function is used to pick the optimal transfer point.
 
