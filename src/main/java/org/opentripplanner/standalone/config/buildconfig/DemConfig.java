@@ -21,7 +21,7 @@ public class DemConfig {
         .description(
           """
           The dem section allows you to override the default behavior of scanning for elevation
-          files in the *[base directory](Configuration.md#Base-Directory). You can specify data
+          files in the [base directory](Configuration.md#Base-Directory). You can specify data
           located outside the local filesystem (including cloud storage services) or at various
           different locations around the local filesystem.
 

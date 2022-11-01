@@ -30,8 +30,8 @@ public enum ConfigType {
   LOCALE(
     JsonType.string,
     "_`Language[\\_country[\\_variant]]`_. A Locale object represents a specific " +
-    "geographical, political, or cultural region. For more information see the [Java 11 Locale]" +
-    "(https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).",
+    "geographical, political, or cultural region. For more information see the [Java Locale]" +
+    "(https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html).",
     "en_US",
     "nn_NO"
   ),

@@ -456,7 +456,7 @@ a way to improve travel time. You can specify how long it takes to reach a subwa
 
 This setting does not generalize to other modes like airplanes because you often need much longer time
 to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
-(perhaps 1 hour). Use [alightSlackForMode](RouteRequest.md#rd_alightSlackForMode) and
+(perhaps 1 hour). Use [`boardSlackForMode`](RouteRequest.md#rd_boardSlackForMode) and
 [`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.
 """
         )
@@ -564,7 +564,7 @@ recommended.
         .summary(
           "What OSM tags should be looked on for the source of matching stops to platforms and stops."
         )
-        .description("[Detailed documentation](docs/BoardingLocations.md)")
+        .description("[Detailed documentation](BoardingLocations.md)")
         .asStringSet(List.copyOf(Set.of("ref")));
     discardMinTransferTimes =
       root

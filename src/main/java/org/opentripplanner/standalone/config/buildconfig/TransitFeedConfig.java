@@ -24,7 +24,7 @@ public class TransitFeedConfig {
       .description(
         """
         The transitFeeds section of `build-config.json` allows you to override the default behavior
-        of scanning for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+        of scanning for transit data files in the [base directory](Configuration.md#Base-Directory).
         You can specify data located outside the local filesystem (including cloud storage services)
         or at various different locations around the local filesystem.
         
