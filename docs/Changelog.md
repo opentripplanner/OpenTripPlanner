@@ -3,8 +3,12 @@
 The changelog list most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
+## 2.3.0 (in progress)
 
-## 2.2.0 (in progress)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
+
+## 2.2.0 (2022-11-01)
 
 - Optimize merging of trip patterns on dates [#3925](https://github.com/opentripplanner/OpenTripPlanner/pull/3925)
 - Fix default value for transit alerts [#3934](https://github.com/opentripplanner/OpenTripPlanner/pull/3934)
@@ -132,7 +136,6 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Read the feed id from the agency when storing agencies [#4536](https://github.com/opentripplanner/OpenTripPlanner/pull/4536)
 - Add possibility to supply generalized cost from Heuristic [#4513](https://github.com/opentripplanner/OpenTripPlanner/pull/4513)
 - Improve configuration documentation [#4550](https://github.com/opentripplanner/OpenTripPlanner/pull/4550)
-  [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
 
