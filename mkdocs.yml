@@ -9,11 +9,12 @@ repo_url: https://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
 site_dir: target/mkdocs
 
+theme: material
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.
 # The list below organizes them into categories and controls the order.
 
-pages:
+nav:
 - Home: 'index.md'
 - About:
     - Governance: 'Governance.md'
