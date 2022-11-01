@@ -19,7 +19,7 @@ public class TransitFeedConfig {
   ) {
     List<DataSourceConfig> list = root
       .of(parameterName)
-      .since(NA)
+      .since(V2_2)
       .summary("Scan for transit data files")
       .description(
         """

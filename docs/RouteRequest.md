@@ -15,9 +15,9 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 
 | Config Parameter                                                                                 |          Type          | Summary                                                                                                                            |  Req./Opt. | Default Value            | Since |
 |--------------------------------------------------------------------------------------------------|:----------------------:|------------------------------------------------------------------------------------------------------------------------------------|:----------:|--------------------------|:-----:|
-| [alightSlack](#rd_alightSlack)                                                                   |       `duration`       | The minimum extra time after exiting a public transport vehicle.                                                                   | *Optional* | `"PT0S"`                 |   na  |
-| allowKeepingRentedBicycleAtDestination                                                           |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                    | *Optional* | `false`                  |   na  |
-| arriveBy                                                                                         |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                           | *Optional* | `false`                  |   na  |
+| [alightSlack](#rd_alightSlack)                                                                   |       `duration`       | The minimum extra time after exiting a public transport vehicle.                                                                   | *Optional* | `"PT0S"`                 |  2.0  |
+| allowKeepingRentedBicycleAtDestination                                                           |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                    | *Optional* | `false`                  |  2.2  |
+| arriveBy                                                                                         |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                           | *Optional* | `false`                  |  2.0  |
 | [bikeBoardCost](#rd_bikeBoardCost)                                                               |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle.                                                            | *Optional* | `600`                    |   na  |
 | bikeParkCost                                                                                     |        `integer`       | Cost to park a bike.                                                                                                               | *Optional* | `120`                    |   na  |
 | bikeParkTime                                                                                     |        `integer`       | Time to park a bike.                                                                                                               | *Optional* | `60`                     |   na  |
@@ -26,15 +26,15 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | bikeRentalDropoffTime                                                                            |        `integer`       | Time to drop-off a rented bike.                                                                                                    | *Optional* | `30`                     |   na  |
 | bikeRentalPickupCost                                                                             |        `integer`       | Cost to rent a bike.                                                                                                               | *Optional* | `120`                    |   na  |
 | bikeRentalPickupTime                                                                             |        `integer`       | Time to rent a bike.                                                                                                               | *Optional* | `60`                     |   na  |
-| bikeSpeed                                                                                        |        `double`        | Max bike speed along streets, in meters per second                                                                                 | *Optional* | `5.0`                    |   na  |
+| bikeSpeed                                                                                        |        `double`        | Max bike speed along streets, in meters per second                                                                                 | *Optional* | `5.0`                    |  2.0  |
 | bikeSwitchCost                                                                                   |        `integer`       | The cost of the user fetching their bike and parking it again.                                                                     | *Optional* | `0`                      |   na  |
 | bikeSwitchTime                                                                                   |        `integer`       | The time it takes the user to fetch their bike and park it again in seconds.                                                       | *Optional* | `0`                      |   na  |
-| bikeTriangleSafetyFactor                                                                         |        `double`        | For bike triangle routing, how much safety matters (range 0-1).                                                                    | *Optional* | `0.0`                    |   na  |
-| bikeTriangleSlopeFactor                                                                          |        `double`        | For bike triangle routing, how much slope matters (range 0-1).                                                                     | *Optional* | `0.0`                    |   na  |
-| bikeTriangleTimeFactor                                                                           |        `double`        | For bike triangle routing, how much time matters (range 0-1).                                                                      | *Optional* | `0.0`                    |   na  |
+| bikeTriangleSafetyFactor                                                                         |        `double`        | For bike triangle routing, how much safety matters (range 0-1).                                                                    | *Optional* | `0.0`                    |  2.0  |
+| bikeTriangleSlopeFactor                                                                          |        `double`        | For bike triangle routing, how much slope matters (range 0-1).                                                                     | *Optional* | `0.0`                    |  2.0  |
+| bikeTriangleTimeFactor                                                                           |        `double`        | For bike triangle routing, how much time matters (range 0-1).                                                                      | *Optional* | `0.0`                    |  2.0  |
 | bikeWalkingReluctance                                                                            |        `double`        | A multiplier for how bad walking with a bike is, compared to being in transit for equal lengths of time.                           | *Optional* | `5.0`                    |   na  |
 | bikeWalkingSpeed                                                                                 |        `double`        | The user's bike walking speed in meters/second. Defaults to approximately 3 MPH.                                                   | *Optional* | `1.33`                   |   na  |
-| [boardSlack](#rd_boardSlack)                                                                     |       `duration`       | The boardSlack is the minimum extra time to board a public transport vehicle.                                                      | *Optional* | `"PT0S"`                 |   na  |
+| [boardSlack](#rd_boardSlack)                                                                     |       `duration`       | The boardSlack is the minimum extra time to board a public transport vehicle.                                                      | *Optional* | `"PT0S"`                 |  2.0  |
 | carAccelerationSpeed                                                                             |        `double`        | The acceleration speed of an automobile, in meters per second per second.                                                          | *Optional* | `2.9`                    |   na  |
 | carDecelerationSpeed                                                                             |        `double`        | The deceleration speed of an automobile, in meters per second per second.                                                          | *Optional* | `2.9`                    |   na  |
 | carDropoffTime                                                                                   |        `integer`       | Time to park a car in a park and ride, w/o taking into account driving and walking cost.                                           | *Optional* | `120`                    |   na  |
@@ -42,8 +42,8 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | carParkTime                                                                                      |        `integer`       | Time to park a car                                                                                                                 | *Optional* | `60`                     |   na  |
 | carPickupCost                                                                                    |        `integer`       | Add a cost for car pickup changes when a pickup or drop off takes place                                                            | *Optional* | `120`                    |  2.1  |
 | carPickupTime                                                                                    |        `integer`       | Add a time for car pickup changes when a pickup or drop off takes place                                                            | *Optional* | `60`                     |  2.1  |
-| carReluctance                                                                                    |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |   na  |
-| carSpeed                                                                                         |        `double`        | Max car speed along streets, in meters per second                                                                                  | *Optional* | `40.0`                   |   na  |
+| carReluctance                                                                                    |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |  2.0  |
+| carSpeed                                                                                         |        `double`        | Max car speed along streets, in meters per second                                                                                  | *Optional* | `40.0`                   |  2.0  |
 | [drivingDirection](#rd_drivingDirection)                                                         |         `enum`         | The driving direction to use in the intersection traversal calculation                                                             | *Optional* | `"right"`                |   na  |
 | elevatorBoardCost                                                                                |        `integer`       | What is the cost of boarding a elevator?                                                                                           | *Optional* | `90`                     |   na  |
 | elevatorBoardTime                                                                                |        `integer`       | How long does it take to get on an elevator, on average.                                                                           | *Optional* | `90`                     |   na  |
@@ -53,33 +53,33 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 | ignoreRealtimeUpdates                                                                            |        `boolean`       | When true, realtime updates are ignored during this search.                                                                        | *Optional* | `false`                  |   na  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                     |         `enum`         | The model that computes the costs of turns.                                                                                        | *Optional* | `"simple"`               |   na  |
 | keepingRentedBicycleAtDestinationCost                                                            |        `double`        | The cost of arriving at the destination with the rented bicycle, to discourage doing so.                                           | *Optional* | `0.0`                    |   na  |
-| locale                                                                                           |        `locale`        | TODO                                                                                                                               | *Optional* | `"en_US"`                |   na  |
+| locale                                                                                           |        `locale`        | TODO                                                                                                                               | *Optional* | `"en_US"`                |  2.0  |
 | [maxAccessEgressDuration](#rd_maxAccessEgressDuration)                                           |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                | *Optional* | `"PT45M"`                |  2.2  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                           |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                             | *Optional* | `"PT4H"`                 |   na  |
-| [maxJourneyDuration](#rd_maxJourneyDuration)                                                     |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                              | *Optional* | `"PT24H"`                |   na  |
-| [modes](/docs/RoutingModes.md)                                                                   |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                     | *Optional* | `"TRANSIT,WALK"`         |   na  |
-| nonpreferredTransferPenalty                                                                      |        `integer`       | Penalty (in seconds) for using a non-preferred transfer.                                                                           | *Optional* | `180`                    |   na  |
-| numItineraries                                                                                   |        `integer`       | The maximum number of itineraries to return.                                                                                       | *Optional* | `50`                     |   na  |
-| [optimize](#rd_optimize)                                                                         |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                    | *Optional* | `"safe"`                 |   na  |
+| [maxJourneyDuration](#rd_maxJourneyDuration)                                                     |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                              | *Optional* | `"PT24H"`                |  2.1  |
+| [modes](/docs/RoutingModes.md)                                                                   |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                     | *Optional* | `"TRANSIT,WALK"`         |  2.0  |
+| nonpreferredTransferPenalty                                                                      |        `integer`       | Penalty (in seconds) for using a non-preferred transfer.                                                                           | *Optional* | `180`                    |  2.0  |
+| numItineraries                                                                                   |        `integer`       | The maximum number of itineraries to return.                                                                                       | *Optional* | `50`                     |  2.0  |
+| [optimize](#rd_optimize)                                                                         |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                    | *Optional* | `"safe"`                 |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                           |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                      | *Optional* | `300`                    |   na  |
-| [searchWindow](#rd_searchWindow)                                                                 |       `duration`       | The duration of the search-window.                                                                                                 | *Optional* |                          |   na  |
+| [searchWindow](#rd_searchWindow)                                                                 |       `duration`       | The duration of the search-window.                                                                                                 | *Optional* |                          |  2.0  |
 | stairsReluctance                                                                                 |        `double`        | Used instead of walkReluctance for stairs.                                                                                         | *Optional* | `2.0`                    |   na  |
 | [stairsTimeFactor](#rd_stairsTimeFactor)                                                         |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                        | *Optional* | `3.0`                    |   na  |
-| [transferPenalty](#rd_transferPenalty)                                                           |        `integer`       | An additional penalty added to boardings after the first.                                                                          | *Optional* | `0`                      |   na  |
-| [transferSlack](#rd_transferSlack)                                                               |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                          | *Optional* | `120`                    |   na  |
+| [transferPenalty](#rd_transferPenalty)                                                           |        `integer`       | An additional penalty added to boardings after the first.                                                                          | *Optional* | `0`                      |  2.0  |
+| [transferSlack](#rd_transferSlack)                                                               |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                          | *Optional* | `120`                    |  2.0  |
 | turnReluctance                                                                                   |        `double`        | Multiplicative factor on expected turning time.                                                                                    | *Optional* | `1.0`                    |   na  |
 | [unpreferredCost](#rd_unpreferredCost)                                                           |    `linear-function`   | A cost function used to calculate penalty for an unpreferred route.                                                                | *Optional* | `"f(x) = 0 + 1.0 x"`     |  2.2  |
 | useBikeRentalAvailabilityInformation                                                             |        `boolean`       | Whether or not bike rental availability information will be used to plan bike rental trips.                                        | *Optional* | `false`                  |   na  |
 | useVehicleParkingAvailabilityInformation                                                         |        `boolean`       | TODO: Add short summary.                                                                                                           | *Optional* | `false`                  |   na  |
-| waitReluctance                                                                                   |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                  | *Optional* | `1.0`                    |   na  |
+| waitReluctance                                                                                   |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                  | *Optional* | `1.0`                    |  2.0  |
 | walkBoardCost                                                                                    |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking. | *Optional* | `600`                    |   na  |
 | [walkReluctance](#rd_walkReluctance)                                                             |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                       | *Optional* | `2.0`                    |   na  |
 | [walkSafetyFactor](#rd_walkSafetyFactor)                                                         |        `double`        | Factor for how much the walk safety is considered in routing.                                                                      | *Optional* | `1.0`                    |   na  |
-| walkSpeed                                                                                        |        `double`        | The user's walking speed in meters/second.                                                                                         | *Optional* | `1.33`                   |   na  |
+| walkSpeed                                                                                        |        `double`        | The user's walking speed in meters/second.                                                                                         | *Optional* | `1.33`                   |  2.0  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                     | `enum map of duration` | How much time alighting a vehicle takes for each given mode.                                                                       | *Optional* |                          |  2.0  |
-| [allowedVehicleRentalNetworks](#rd_allowedVehicleRentalNetworks)                                 |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                  | *Optional* |                          |   na  |
-| [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                         |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned                                                   | *Optional* |                          |   na  |
-| [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                   |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |   na  |
+| [allowedVehicleRentalNetworks](#rd_allowedVehicleRentalNetworks)                                 |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                  | *Optional* |                          |  2.1  |
+| [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                         |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned                                                   | *Optional* |                          |  2.1  |
+| [bannedVehicleRentalNetworks](#rd_bannedVehicleRentalNetworks)                                   |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                       | `enum map of duration` | How much time ride a vehicle takes for each given mode.                                                                            | *Optional* |                          |  2.0  |
 | [itineraryFilters](#rd_itineraryFilters)                                                         |        `object`        | Configure itinerary filters that may modify itineraries, sort them, and filter away less preferable results.                       | *Optional* |                          |  2.0  |
 |    [accessibilityScore](#rd_if_accessibilityScore)                                               |        `boolean`       | A experimental feature contributed by IBI which adds an sandbox accessibility *score* between 0 and 1 for each leg and itinerary.  | *Optional* | `false`                  |   na  |
@@ -95,18 +95,18 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                             |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                 | *Optional* |                          |   na  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                             | `enum map of duration` | Limit access/egress per street mode.                                                                                               | *Optional* |                          |   na  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                             | `enum map of duration` | Limit direct route duration per street mode.                                                                                       | *Optional* |                          |  2.2  |
-| [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                     |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |   na  |
-| [transferOptimization](#rd_transferOptimization)                                                 |        `object`        | Optimize where a transfer between to trip happens.                                                                                 | *Optional* |                          |   na  |
-|    [backTravelWaitTimeFactor](#rd_toO_backTravelWaitTimeFactor)                                  |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |   na  |
-|    [extraStopBoardAlightCostsFactor](#rd_toO_extraStopBoardAlightCostsFactor)                    |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |   na  |
-|    [minSafeWaitTimeFactor](#rd_toO_minSafeWaitTimeFactor)                                        |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                              | *Optional* | `5.0`                    |   na  |
-|    [optimizeTransferWaitTime](#rd_toO_optimizeTransferWaitTime)                                  |        `boolean`       | This enables the transfer wait time optimization. See []()                                                                         | *Optional* | `true`                   |   na  |
+| [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                     |       `string[]`       | Tags which are required to use a vehicle parking. If empty, no tags are required.                                                  | *Optional* |                          |  2.1  |
+| [transferOptimization](#rd_transferOptimization)                                                 |        `object`        | Optimize where a transfer between to trip happens.                                                                                 | *Optional* |                          |  2.1  |
+|    [backTravelWaitTimeFactor](#rd_toO_backTravelWaitTimeFactor)                                  |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                          | *Optional* | `1.0`                    |  2.1  |
+|    [extraStopBoardAlightCostsFactor](#rd_toO_extraStopBoardAlightCostsFactor)                    |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                         | *Optional* | `0.0`                    |  2.1  |
+|    [minSafeWaitTimeFactor](#rd_toO_minSafeWaitTimeFactor)                                        |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                              | *Optional* | `5.0`                    |  2.1  |
+|    [optimizeTransferWaitTime](#rd_toO_optimizeTransferWaitTime)                                  |        `boolean`       | This enables the transfer wait time optimization. See []()                                                                         | *Optional* | `true`                   |  2.1  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                         |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                      | *Optional* |                          |   na  |
 | [unpreferred](#rd_unpreferred)                                                                   |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                        | *Optional* |                          |   na  |
 | wheelchairAccessibility                                                                          |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                   | *Optional* |                          |  2.2  |
-|    enabled                                                                                       |        `boolean`       | Enable wheelchair accessibility.                                                                                                   | *Optional* | `false`                  |  2.2  |
+|    enabled                                                                                       |        `boolean`       | Enable wheelchair accessibility.                                                                                                   | *Optional* | `false`                  |  2.0  |
 |    inaccessibleStreetReluctance                                                                  |        `double`        | The factor to to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                  | *Optional* | `25.0`                   |  2.2  |
-|    [maxSlope](#rd_wheelchairAccessibility_maxSlope)                                              |        `double`        | The maximum slope as a fraction of 1.                                                                                              | *Optional* | `0.083`                  |  2.2  |
+|    [maxSlope](#rd_wheelchairAccessibility_maxSlope)                                              |        `double`        | The maximum slope as a fraction of 1.                                                                                              | *Optional* | `0.083`                  |  2.0  |
 |    [slopeExceededReluctance](#rd_wheelchairAccessibility_slopeExceededReluctance)                |        `double`        | How much streets with high slope should be avoided.                                                                                | *Optional* | `1.0`                    |  2.2  |
 |    [stairsReluctance](#rd_wheelchairAccessibility_stairsReluctance)                              |        `double`        | How much stairs should be avoided.                                                                                                 | *Optional* | `100.0`                  |  2.2  |
 |    elevator                                                                                      |        `object`        | Configuration for when to use inaccessible elevators.                                                                              | *Optional* |                          |  2.2  |
@@ -129,7 +129,7 @@ and in the [transferRequests in build-config.json](/docs/BuildConfiguration.md#t
 
 <h3 id="rd_alightSlack">alightSlack</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`  \
 **Path:** /routingDefaults 
 
 The minimum extra time after exiting a public transport vehicle.
@@ -147,7 +147,7 @@ This is the cost that is used when boarding while cycling.This is usually higher
 
 <h3 id="rd_boardSlack">boardSlack</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`  \
 **Path:** /routingDefaults 
 
 The boardSlack is the minimum extra time to board a public transport vehicle.
@@ -205,7 +205,7 @@ do not exist."
 
 <h3 id="rd_maxJourneyDuration">maxJourneyDuration</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT24H"`  \
+**Since version:** `2.1` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT24H"`  \
 **Path:** /routingDefaults 
 
 The expected maximum time a journey can last across all possible journeys for the current deployment.
@@ -223,7 +223,7 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
 
 <h3 id="rd_optimize">optimize</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe"`  \
+**Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe"`  \
 **Path:** /routingDefaults  \
 **Enum values:** `quick` | `safe` | `flat` | `greenways` | `triangle`
 
@@ -240,7 +240,7 @@ We return number of seconds that we are willing to wait for preferred route.
 
 <h3 id="rd_searchWindow">searchWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults 
 
 The duration of the search-window.
@@ -279,7 +279,7 @@ speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 1
 
 <h3 id="rd_transferPenalty">transferPenalty</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`  \
+**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`  \
 **Path:** /routingDefaults 
 
 An additional penalty added to boardings after the first.
@@ -291,7 +291,7 @@ significant time or walking will still be taken.
 
 <h3 id="rd_transferSlack">transferSlack</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `120`  \
+**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `120`  \
 **Path:** /routingDefaults 
 
 The extra time needed to make a safe transfer in seconds.
@@ -348,21 +348,21 @@ Sometimes there is a need to configure a longer alighting times for specific mod
 
 <h3 id="rd_allowedVehicleRentalNetworks">allowedVehicleRentalNetworks</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults 
 
 The vehicle rental networks which may be used. If empty all networks may be used.
 
 <h3 id="rd_bannedVehicleParkingTags">bannedVehicleParkingTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults 
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned
 
 <h3 id="rd_bannedVehicleRentalNetworks">bannedVehicleRentalNetworks</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults 
 
 he vehicle rental networks which may not be used. If empty, no networks are banned.
@@ -543,14 +543,14 @@ done because some street modes searches are much more resource intensive than ot
 
 <h3 id="rd_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
-**Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults 
 
 Tags which are required to use a vehicle parking. If empty, no tags are required.
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`  \
 **Path:** /routingDefaults 
 
 Optimize where a transfer between to trip happens. 
@@ -585,7 +585,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
 
 <h3 id="rd_toO_backTravelWaitTimeFactor">backTravelWaitTimeFactor</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`  \
 **Path:** /routingDefaults/transferOptimization 
 
 To reduce back-travel we favor waiting, this reduces the cost of waiting.
@@ -594,7 +594,7 @@ The wait time is used to prevent *back-travel*, the `backTravelWaitTimeFactor` i
 
 <h3 id="rd_toO_extraStopBoardAlightCostsFactor">extraStopBoardAlightCostsFactor</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`  \
 **Path:** /routingDefaults/transferOptimization 
 
 Add an extra board- and alight-cost for prioritized stops.
@@ -611,7 +611,7 @@ doubled. Stop priority is only supported by the NeTEx import, not GTFS.
 
 <h3 id="rd_toO_minSafeWaitTimeFactor">minSafeWaitTimeFactor</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `5.0`  \
 **Path:** /routingDefaults/transferOptimization 
 
 Used to set a maximum wait-time cost, base on min-safe-transfer-time.
@@ -620,7 +620,7 @@ This defines the maximum cost for the logarithmic function relative to the min-s
 
 <h3 id="rd_toO_optimizeTransferWaitTime">optimizeTransferWaitTime</h3>
 
-**Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
+**Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `true`  \
 **Path:** /routingDefaults/transferOptimization 
 
 This enables the transfer wait time optimization. See []() 
@@ -642,7 +642,7 @@ Transit reluctance for a given transport mode
 
 Parameters listing authorities or lines that preferably should not be used in trip patters.
 
-A cost is applied to boarding nonpreferred authorities or lines.
+A cost is applied to boarding nonpreferred authorities or routes.
 
 The routing engine will add extra penalty - on the *unpreferred* routes and/or agencies using a
 cost function. The cost function (`unpreferredCost`) is defined as a linear function of the form
@@ -652,7 +652,7 @@ travel time `x` (in seconds).
 
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.083`  \
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.083`  \
 **Path:** /routingDefaults/wheelchairAccessibility 
 
 The maximum slope as a fraction of 1.

@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -227,7 +229,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     configVersion =
       root
         .of("configVersion")
-        .since(NA)
+        .since(V2_1)
         .summary("Deployment version of the *build-config.json*.")
         .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
         .asString(null);
@@ -371,7 +373,7 @@ all of the elevation values in the street edges.
     maxStopToShapeSnapDistance =
       root
         .of("maxStopToShapeSnapDistance")
-        .since(NA)
+        .since(V2_1)
         .summary("Maximum distance between route shapes and their stops.")
         .description(
           """
@@ -491,7 +493,7 @@ to check in to a flight (2-3 hours for international flights) than to alight and
       transitServiceStart =
         root
           .of("transitServiceStart")
-          .since(NA)
+          .since(V2_0)
           .summary("Limit the import of transit services to the given START date.")
           .description(
             """
@@ -508,7 +510,7 @@ Use an empty string to make unbounded.
       transitServiceEnd =
         root
           .of("transitServiceEnd")
-          .since(NA)
+          .since(V2_0)
           .summary("Limit the import of transit services to the given end date.")
           .description(
             """
@@ -558,7 +560,7 @@ recommended.
     maxAreaNodes =
       root
         .of("maxAreaNodes")
-        .since(NA)
+        .since(V2_1)
         .summary(
           "Visibility calculations for an area will not be done if there are more nodes than this limit."
         )

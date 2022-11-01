@@ -64,7 +64,7 @@ public class RouteRequestConfig {
     vehicleRental.setAllowedNetworks(
       c
         .of("allowedVehicleRentalNetworks")
-        .since(NA)
+        .since(V2_1)
         .summary(
           "The vehicle rental networks which may be used. If empty all networks may be used."
         )
@@ -73,21 +73,21 @@ public class RouteRequestConfig {
     request.setArriveBy(
       c
         .of("arriveBy")
-        .since(NA)
+        .since(V2_0)
         .summary("Whether the trip should depart or arrive at the specified date and time.")
         .asBoolean(dft.arriveBy())
     );
     vehicleParking.setBannedTags(
       c
         .of("bannedVehicleParkingTags")
-        .since(NA)
+        .since(V2_1)
         .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned")
         .asStringSet(vehicleParking.bannedTags())
     );
     vehicleRental.setBannedNetworks(
       c
         .of("bannedVehicleRentalNetworks")
-        .since(NA)
+        .since(V2_1)
         .summary(
           "he vehicle rental networks which may not be used. If empty, no networks are banned."
         )
@@ -100,21 +100,21 @@ public class RouteRequestConfig {
       .setAllowArrivingInRentedVehicleAtDestination(
         c
           .of("allowKeepingRentedBicycleAtDestination")
-          .since(NA)
+          .since(V2_2)
           .summary(
             "If a vehicle should be allowed to be kept at the end of a station-based rental."
           )
           .asBoolean(request.journey().rental().allowArrivingInRentedVehicleAtDestination())
       );
 
-    request.setLocale(c.of("locale").since(NA).summary("TODO").asLocale(dft.locale()));
+    request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
 
     request
       .journey()
       .setModes(
         c
           .of("modes")
-          .since(NA)
+          .since(V2_0)
           .summary("The set of access/egress/direct/transit modes to be used for the route search.")
           .asCustomStringType(
             RequestModes.defaultRequestModes(),
@@ -126,14 +126,14 @@ public class RouteRequestConfig {
     request.setNumItineraries(
       c
         .of("numItineraries")
-        .since(NA)
+        .since(V2_0)
         .summary("The maximum number of itineraries to return.")
         .asInt(dft.numItineraries())
     );
     request.setSearchWindow(
       c
         .of("searchWindow")
-        .since(NA)
+        .since(V2_0)
         .summary("The duration of the search-window.")
         .description(
           """
@@ -163,7 +163,7 @@ public class RouteRequestConfig {
     vehicleParking.setRequiredTags(
       c
         .of("requiredVehicleParkingTags")
-        .since(NA)
+        .since(V2_1)
         .summary(
           "Tags which are required to use a vehicle parking. If empty, no tags are required."
         )
@@ -180,10 +180,10 @@ public class RouteRequestConfig {
       )
       .description(
         """
-A cost is applied to boarding nonpreferred authorities or lines.
+A cost is applied to boarding nonpreferred authorities or routes.
                     
-The routing engine will add extra penalty - on the *unpreferred* routes and/or agencies using a 
-cost function. The cost function (`unpreferredCost`) is defined as a linear function of the form 
+The routing engine will add extra penalty - on the *unpreferred* routes and/or agencies using a
+cost function. The cost function (`unpreferredCost`) is defined as a linear function of the form
 `A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg
 travel time `x` (in seconds).
 """
@@ -205,10 +205,10 @@ travel time `x` (in seconds).
       .transit()
       .setUnpreferredAgencies(
         unpreferred
-          .of("routes")
+          .of("agencies")
           .since(NA)
           .summary("TODO")
-          .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
+          .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
 
     // Map preferences
@@ -241,7 +241,7 @@ travel time `x` (in seconds).
           .withDefault(
             c
               .of("alightSlack")
-              .since(NA)
+              .since(V2_0)
               .summary("The minimum extra time after exiting a public transport vehicle.")
               .description(
                 "The slack is added to the time when going from the transit vehicle to the stop."
@@ -265,7 +265,7 @@ travel time `x` (in seconds).
           .withDefault(
             c
               .of("boardSlack")
-              .since(NA)
+              .since(V2_0)
               .summary(
                 "The boardSlack is the minimum extra time to board a public transport vehicle."
               )
@@ -341,7 +341,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withSpeed(
         c
           .of("bikeSpeed")
-          .since(NA)
+          .since(V2_0)
           .summary("Max bike speed along streets, in meters per second")
           .asDouble(dft.speed())
       )
@@ -406,7 +406,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withOptimizeType(
         c
           .of("optimize")
-          .since(NA)
+          .since(V2_0)
           .summary("The set of characteristics that the user wants to optimize for.")
           .asEnum(dft.optimizeType())
       )
@@ -415,21 +415,21 @@ ferries, where the check-in process needs to be done in good time before ride.
           .withTime(
             c
               .of("bikeTriangleTimeFactor")
-              .since(NA)
+              .since(V2_0)
               .summary("For bike triangle routing, how much time matters (range 0-1).")
               .asDouble(it.time())
           )
           .withSlope(
             c
               .of("bikeTriangleSlopeFactor")
-              .since(NA)
+              .since(V2_0)
               .summary("For bike triangle routing, how much slope matters (range 0-1).")
               .asDouble(it.slope())
           )
           .withSafety(
             c
               .of("bikeTriangleSafetyFactor")
-              .since(NA)
+              .since(V2_0)
               .summary("For bike triangle routing, how much safety matters (range 0-1).")
               .asDouble(it.safety())
           )
@@ -608,14 +608,14 @@ do not exist."
       .withSpeed(
         c
           .of("carSpeed")
-          .since(NA)
+          .since(V2_0)
           .summary("Max car speed along streets, in meters per second")
           .asDouble(dft.speed())
       )
       .withReluctance(
         c
           .of("carReluctance")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "A multiplier for how bad driving is, compared to being in transit for equal lengths of time."
           )
@@ -681,7 +681,7 @@ do not exist."
       .withMaxJourneyDuration(
         c
           .of("maxJourneyDuration")
-          .since(NA)
+          .since(V2_1)
           .summary(
             "The expected maximum time a journey can last across all possible journeys for the current deployment."
           )
@@ -705,7 +705,7 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
         DataOverlayParametersMapper.map(
           c
             .of("dataOverlay")
-            .since(NA)
+            .since(V2_1)
             .summary("The filled request parameters for penalties and thresholds values")
             .description(/*TODO DOC*/"TODO")
             .asObject()
@@ -731,7 +731,7 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
       .withSpeed(
         c
           .of("walkSpeed")
-          .since(NA)
+          .since(V2_0)
           .summary("The user's walking speed in meters/second.")
           .asDouble(dft.speed())
       )

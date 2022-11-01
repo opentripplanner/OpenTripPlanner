@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import java.net.URI;
 import java.time.ZoneId;
@@ -19,7 +19,7 @@ public class OsmConfig {
   public static OsmDefaultParameters mapOsmDefaults(NodeAdapter root, String parameterName) {
     var osmDefaults = root
       .of(parameterName)
-      .since(NA)
+      .since(V2_2)
       .summary("Default properties for OpenStreetMap feeds.")
       .asObject();
 
@@ -30,7 +30,7 @@ public class OsmConfig {
     return new OsmExtractParametersList(
       root
         .of(parameterName)
-        .since(NA)
+        .since(V2_2)
         .summary("Configure properties for a given OpenStreetMap feed.")
         .description(
           """
@@ -55,7 +55,7 @@ public class OsmConfig {
   private static URI mapSource(NodeAdapter config) {
     return config
       .of("source")
-      .since(NA)
+      .since(V2_2)
       .summary("The unique URI pointing to the data file.")
       .asUri();
   }
@@ -63,7 +63,7 @@ public class OsmConfig {
   private static ZoneId mapTimeZone(NodeAdapter config) {
     return config
       .of("timeZone")
-      .since(NA)
+      .since(V2_2)
       .summary(
         "The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults."
       )
@@ -73,7 +73,7 @@ public class OsmConfig {
   private static OsmTagMapper mapTagMapping(NodeAdapter node) {
     return node
       .of("osmTagMapping")
-      .since(NA)
+      .since(V2_2)
       .summary("The named set of mapping rules applied when parsing OSM tags.")
       .asEnum(OsmTagMapper.Source.DEFAULT)
       .getInstance();

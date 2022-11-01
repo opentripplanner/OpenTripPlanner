@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.routing.api.request.preference.WheelchairPreferences.DEFAULT;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
@@ -13,7 +14,7 @@ public class WheelchairConfig {
     return WheelchairConfig
       .wheelchairRoot(root, parameterName)
       .of("enabled")
-      .since(V2_2)
+      .since(V2_0)
       .summary("Enable wheelchair accessibility.")
       .asBoolean(false);
   }
@@ -55,7 +56,7 @@ public class WheelchairConfig {
         .asDouble(DEFAULT.inaccessibleStreetReluctance()),
       a
         .of("maxSlope")
-        .since(V2_2)
+        .since(V2_0)
         .summary("The maximum slope as a fraction of 1.")
         .description("9 percent would be `0.09`")
         .asDouble(DEFAULT.maxSlope()),

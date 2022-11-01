@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class OtpConfig {
     this.configVersion =
       root
         .of("configVersion")
-        .since(NA)
+        .since(V2_1)
         .summary("Deployment version of the *otp-config.json*.")
         .description(CONFIG_VERSION_DESCRIPTION)
         .asString(null);

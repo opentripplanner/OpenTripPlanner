@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerequest;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import org.opentripplanner.routing.api.request.preference.TransferOptimizationPreferences;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
@@ -14,14 +15,14 @@ class TransferConfig {
       .withNonpreferredCost(
         c
           .of("nonpreferredTransferPenalty")
-          .since(NA)
+          .since(V2_0)
           .summary("Penalty (in seconds) for using a non-preferred transfer.")
           .asInt(dft.nonpreferredCost())
       )
       .withCost(
         c
           .of("transferPenalty")
-          .since(NA)
+          .since(V2_0)
           .summary("An additional penalty added to boardings after the first.")
           .description(
             """
@@ -35,7 +36,7 @@ class TransferConfig {
       .withSlack(
         c
           .of("transferSlack")
-          .since(NA)
+          .since(V2_0)
           .summary("The extra time needed to make a safe transfer in seconds.")
           .description(
             """
@@ -50,7 +51,7 @@ class TransferConfig {
       .withWaitReluctance(
         c
           .of("waitReluctance")
-          .since(NA)
+          .since(V2_0)
           .summary(
             "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
           )
@@ -60,7 +61,7 @@ class TransferConfig {
         mapTransferOptimization(
           c
             .of("transferOptimization")
-            .since(NA)
+            .since(V2_1)
             .summary("Optimize where a transfer between to trip happens. ")
             .description(
               """
@@ -104,7 +105,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
       .withOptimizeTransferWaitTime(
         c
           .of("optimizeTransferWaitTime")
-          .since(NA)
+          .since(V2_1)
           .summary("This enables the transfer wait time optimization. See []() ")
           .description(
             "If not enabled generalizedCost function is used to pick the optimal transfer point."
@@ -114,7 +115,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
       .withMinSafeWaitTimeFactor(
         c
           .of("minSafeWaitTimeFactor")
-          .since(NA)
+          .since(V2_1)
           .summary("Used to set a maximum wait-time cost, base on min-safe-transfer-time.")
           .description(
             "This defines the maximum cost for the logarithmic function relative to the " +
@@ -125,7 +126,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
       .withBackTravelWaitTimeFactor(
         c
           .of("backTravelWaitTimeFactor")
-          .since(NA)
+          .since(V2_1)
           .summary("To reduce back-travel we favor waiting, this reduces the cost of waiting.")
           .description(
             "The wait time is used to prevent *back-travel*, the `backTravelWaitTimeFactor` is " +
@@ -136,7 +137,7 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
       .withExtraStopBoardAlightCostsFactor(
         c
           .of("extraStopBoardAlightCostsFactor")
-          .since(NA)
+          .since(V2_1)
           .summary("Add an extra board- and alight-cost for prioritized stops.")
           .description(
             """

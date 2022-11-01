@@ -33,7 +33,7 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 
 | Config Parameter                                                                          |          Type         | Summary                                                                                           |  Req./Opt. | Default Value | Since |
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |   na  |
+| [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximimg time a street routing request is allowed to take before returning a timeout.         | *Optional* | `"PT5S"`      |   na  |
 | flex                                                                                      |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |   na  |
@@ -77,7 +77,7 @@ A full list of them can be found in the [RouteRequest](/docs/RouteRequest.md).
 
 <h3 id="configVersion">configVersion</h3>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Deployment version of the *router-config.json*.

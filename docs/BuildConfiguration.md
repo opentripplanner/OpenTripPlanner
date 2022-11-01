@@ -24,7 +24,7 @@ Sections follow that describe particular settings in more depth.
 | banDiscouragedWalking                                                    |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                        | *Optional* | `false`                           |   na  |
 | blockBasedInterlining                                                    |  `boolean`  | Whether to create stay-seated transfers in between two trips with the same block id.                                        | *Optional* | `true`                            |   na  |
 | [buildReportDir](#buildReportDir)                                        |    `uri`    | URI to the directory where the graph build report should be written to.                                                     | *Optional* |                                   |   na  |
-| [configVersion](#configVersion)                                          |   `string`  | Deployment version of the *build-config.json*.                                                                              | *Optional* |                                   |   na  |
+| [configVersion](#configVersion)                                          |   `string`  | Deployment version of the *build-config.json*.                                                                              | *Optional* |                                   |  2.1  |
 | [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                          | *Optional* | `false`                           |   na  |
 | [discardMinTransferTimes](#discardMinTransferTimes)                      |  `boolean`  | Should minimum transfer times in GTFS files be discarded.                                                                   | *Optional* | `false`                           |   na  |
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                           | *Optional* | `10.0`                            |   na  |
@@ -37,11 +37,11 @@ Sections follow that describe particular settings in more depth.
 | [islandWithStopsMaxSize](#islandWithStopsMaxSize)                        |  `integer`  | When a graph island with stops in it should be pruned.                                                                      | *Optional* | `5`                               |   na  |
 | [islandWithoutStopsMaxSize](#islandWithoutStopsMaxSize)                  |  `integer`  | When a graph island without stops should be pruned.                                                                         | *Optional* | `40`                              |   na  |
 | matchBusRoutesToStreets                                                  |  `boolean`  | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking.                                 | *Optional* | `false`                           |   na  |
-| maxAreaNodes                                                             |  `integer`  | Visibility calculations for an area will not be done if there are more nodes than this limit.                               | *Optional* | `500`                             |   na  |
+| maxAreaNodes                                                             |  `integer`  | Visibility calculations for an area will not be done if there are more nodes than this limit.                               | *Optional* | `500`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |  `integer`  | When to split the import report.                                                                                            | *Optional* | `1000`                            |   na  |
 | maxElevationPropagationMeters                                            |  `integer`  | The maximum distance to propagate elevation to vertices which have no elevation.                                            | *Optional* | `2000`                            |   na  |
 | maxInterlineDistance                                                     |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.               | *Optional* | `200`                             |   na  |
-| [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                |   `double`  | Maximum distance between route shapes and their stops.                                                                      | *Optional* | `150.0`                           |   na  |
+| [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                |   `double`  | Maximum distance between route shapes and their stops.                                                                      | *Optional* | `150.0`                           |  2.1  |
 | maxTransferDurationSeconds                                               |   `double`  | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.           | *Optional* | `1800.0`                          |   na  |
 | [multiThreadElevationCalculations](#multiThreadElevationCalculations)    |  `boolean`  | Configuring multi-threading during elevation calculations.                                                                  | *Optional* | `false`                           |   na  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                  |  `boolean`  | If OSM data should be cached in memory during processing.                                                                   | *Optional* | `false`                           |   na  |
@@ -54,8 +54,8 @@ Sections follow that describe particular settings in more depth.
 | [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                        | *Optional* | `2.0`                             |   na  |
 | transit                                                                  |  `boolean`  | Include all transit input files (GTFS) from scanned directory.                                                              | *Optional* | `true`                            |   na  |
 | [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                    | *Optional* |                                   |   na  |
-| [transitServiceEnd](#transitServiceEnd)                                  |  `duration` | Limit the import of transit services to the given end date.                                                                 | *Optional* | `"P3Y"`                           |   na  |
-| [transitServiceStart](#transitServiceStart)                              |  `duration` | Limit the import of transit services to the given START date.                                                               | *Optional* | `"-P1Y"`                          |   na  |
+| [transitServiceEnd](#transitServiceEnd)                                  |  `duration` | Limit the import of transit services to the given end date.                                                                 | *Optional* | `"P3Y"`                           |  2.0  |
+| [transitServiceStart](#transitServiceStart)                              |  `duration` | Limit the import of transit services to the given START date.                                                               | *Optional* | `"-P1Y"`                          |  2.0  |
 | [writeCachedElevations](#writeCachedElevations)                          |  `boolean`  | Reusing elevation data from previous builds                                                                                 | *Optional* | `false`                           |   na  |
 | [boardingLocationTags](#boardingLocationTags)                            |  `string[]` | What OSM tags should be looked on for the source of matching stops to platforms and stops.                                  | *Optional* |                                   |   na  |
 | [dataOverlay](/docs/sandbox/DataOverlay.md)                              |   `object`  | Config for the DataOverlay Sandbox module                                                                                   | *Optional* |                                   |  2.2  |
@@ -77,21 +77,21 @@ Sections follow that describe particular settings in more depth.
 |    [sharedFilePattern](#nd_sharedFilePattern)                            |   `regexp`  | Pattern for matching shared NeTEx files in a NeTEx bundle.                                                                  | *Optional* | `"shared-data\.xml"`              |  2.0  |
 |    [sharedGroupFilePattern](#nd_sharedGroupFilePattern)                  |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                            | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |    [ferryIdsNotAllowedForBicycle](#nd_ferryIdsNotAllowedForBicycle)      |  `string[]` | List ferries witch do not allow bikes.                                                                                      | *Optional* |                                   |  2.0  |
-| [osm](#osm)                                                              |  `object[]` | Configure properties for a given OpenStreetMap feed.                                                                        | *Optional* |                                   |   na  |
-|       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |   na  |
-|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |   na  |
-|       timeZone                                                           | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |   na  |
-| osmDefaults                                                              |   `object`  | Default properties for OpenStreetMap feeds.                                                                                 | *Optional* |                                   |   na  |
-|    [osmTagMapping](#od_osmTagMapping)                                    |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |   na  |
-|    timeZone                                                              | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |   na  |
+| [osm](#osm)                                                              |  `object[]` | Configure properties for a given OpenStreetMap feed.                                                                        | *Optional* |                                   |  2.2  |
+|       [osmTagMapping](#osm_0_osmTagMapping)                              |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |  2.2  |
+|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |  2.2  |
+|       timeZone                                                           | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |  2.2  |
+| osmDefaults                                                              |   `object`  | Default properties for OpenStreetMap feeds.                                                                                 | *Optional* |                                   |  2.2  |
+|    [osmTagMapping](#od_osmTagMapping)                                    |    `enum`   | The named set of mapping rules applied when parsing OSM tags.                                                               | *Optional* | `"default"`                       |  2.2  |
+|    timeZone                                                              | `time-zone` | The timezone used to resolve opening hours in OSM data. Overrides the value specified in osmDefaults.                       | *Optional* |                                   |  2.2  |
 | osmNaming                                                                |   `object`  | A custom OSM namer to use.                                                                                                  | *Optional* |                                   |  2.0  |
 | [transferRequests](/docs/RouteRequest.md)                                |  `object[]` | Routing requests to use for pre-calculating stop-to-stop transfers.                                                         | *Optional* |                                   |  2.1  |
-| [transitFeeds](#transitFeeds)                                            |  `object[]` | Scan for transit data files                                                                                                 | *Optional* |                                   |   na  |
-|    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |   na  |
+| [transitFeeds](#transitFeeds)                                            |  `object[]` | Scan for transit data files                                                                                                 | *Optional* |                                   |  2.2  |
+|    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "GTFS"                                                      |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                     | *Optional* |                                   |   na  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                   | *Required* |                                   |   na  |
-|    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |   na  |
+|    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                    | *Optional* |                                   |  2.2  |
 |       type = "NETEX"                                                     |    `enum`   | The feed input format.                                                                                                      | *Required* |                                   |  2.2  |
 |       feedId                                                             |   `string`  | This field is used to identify the specific NeTEx feed. It is used instead of the feed_id field in GTFS file feed_info.txt. | *Required* |                                   |  2.2  |
 |       [groupFilePattern](#tf_1_groupFilePattern)                         |   `regexp`  | Pattern for matching group NeTEx files.                                                                                     | *Optional* | `"(\w{3})_.*\.xml"`               |  2.0  |
@@ -432,7 +432,7 @@ If it does not exist, it is created.
 
 <h3 id="configVersion">configVersion</h3>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.1` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Deployment version of the *build-config.json*.
@@ -563,7 +563,7 @@ When to split the import report.
 
 <h3 id="maxStopToShapeSnapDistance">maxStopToShapeSnapDistance</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0`  \
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `150.0`  \
 **Path:** / 
 
 Maximum distance between route shapes and their stops.
@@ -653,7 +653,7 @@ This is used to store the timetables in the transit model, and to interpret time
 
 <h3 id="transitServiceEnd">transitServiceEnd</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"P3Y"`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"P3Y"`  \
 **Path:** / 
 
 Limit the import of transit services to the given end date.
@@ -669,7 +669,7 @@ Use an empty string to make it unbounded.
 
 <h3 id="transitServiceStart">transitServiceStart</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"-P1Y"`  \
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"-P1Y"`  \
 **Path:** / 
 
 Limit the import of transit services to the given START date.
@@ -917,7 +917,7 @@ case where this is not the case.
 
 <h3 id="osm">osm</h3>
 
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Configure properties for a given OpenStreetMap feed.
@@ -930,7 +930,7 @@ the local filesystem.
 
 <h3 id="osm_0_osmTagMapping">osmTagMapping</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
 **Path:** /osm/[0]  \
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
@@ -938,7 +938,7 @@ The named set of mapping rules applied when parsing OSM tags.
 
 <h3 id="od_osmTagMapping">osmTagMapping</h3>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`  \
 **Path:** /osmDefaults  \
 **Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston`
 
@@ -946,7 +946,7 @@ The named set of mapping rules applied when parsing OSM tags.
 
 <h3 id="transitFeeds">transitFeeds</h3>
 
-**Since version:** `na` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`  \
 **Path:** / 
 
 Scan for transit data files
