@@ -13,7 +13,8 @@ theme:
     name: material
     features:
         - navigation.tabs
-        
+        - toc.integrate
+
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.
 # The list below organizes them into categories and controls the order.
