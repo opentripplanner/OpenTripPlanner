@@ -142,12 +142,12 @@ option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
           .description(
             """
             A stopBoardAlightCosts is added to the generalized-cost during routing. But this cost
-            cannot be too high, because that would add extra cost to the transfer, and favor other 
-            alternative paths. But, when optimizing transfers, we do not have to take other paths 
-            into consideration and can *boost* the stop-priority-cost to allow transfers to 
-            take place at a preferred stop. The cost added during routing is already added to the 
-            generalized-cost used as a base in the optimized transfer calculation. By setting this 
-            parameter to 0, no extra cost is added, by setting it to {@code 1.0} the stop-cost is
+            cannot be too high, because that would add extra cost to the transfer, and favor other
+            alternative paths. But, when optimizing transfers, we do not have to take other paths
+            into consideration and can *boost* the stop-priority-cost to allow transfers to
+            take place at a preferred stop. The cost added during routing is already added to the
+            generalized-cost used as a base in the optimized transfer calculation. By setting this
+            parameter to 0, no extra cost is added, by setting it to `1.0` the stop-cost is
             doubled. Stop priority is only supported by the NeTEx import, not GTFS.
             """
           )

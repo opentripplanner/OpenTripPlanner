@@ -147,8 +147,8 @@ generalized-cost value is used as input to the function. Then function is used t
 *generalized-cost*. Itineraries with a cost higher than the max-limit is dropped from the result
 set.
 
-For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000}, 
-then all non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
+non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` is dropped.
 """
           )
           .asLinearFunction(dft.nonTransitGeneralizedCostLimit())

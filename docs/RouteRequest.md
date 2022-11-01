@@ -254,12 +254,12 @@ All optimal travels that depart within the search window is guarantied to be fou
 This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
 Transit search as well; Hence this is named search-window and not raptor-search-window.
 
-This is normally dynamically calculated by the server. Use {@code null} to unset, and
-{@link Duration#ZERO} to do one Raptor iteration. The value is dynamically  assigned a suitable
-value, if not set. In a small to medium size operation you may use a fixed value, like 60 minutes.
-If you have a mixture of high frequency cities routes and  infrequent long distant journeys, the
-best option is normally to use the dynamic auto assignment. If not provided the value is resolved
-depending on the other input parameters, available transit options and realtime changes.
+This is normally dynamically calculated by the server. Use `null` to unset, and *zero* to do one
+Raptor iteration. The value is dynamically  assigned a suitable value, if not set. In a small to
+medium size operation you may use a fixed value, like 60 minutes. If you have a mixture of high
+frequency cities routes and  infrequent long distant journeys, the best option is normally to use
+the dynamic auto assignment. If not provided the value is resolved depending on the other input
+parameters, available transit options and realtime changes.
 
 There is no need to set this when going to the next/previous page. The OTP Server will
 increase/decrease the search-window when paging to match the requested number of itineraries.
@@ -476,8 +476,8 @@ generalized-cost value is used as input to the function. Then function is used t
 *generalized-cost*. Itineraries with a cost higher than the max-limit is dropped from the result
 set.
 
-For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is {@code 5000},
-then all non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
+For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
+non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` is dropped.
 
 
 <h3 id="rd_if_parkAndRideDurationRatio">parkAndRideDurationRatio</h3>
@@ -604,7 +604,7 @@ alternative paths. But, when optimizing transfers, we do not have to take other 
 into consideration and can *boost* the stop-priority-cost to allow transfers to
 take place at a preferred stop. The cost added during routing is already added to the
 generalized-cost used as a base in the optimized transfer calculation. By setting this
-parameter to 0, no extra cost is added, by setting it to {@code 1.0} the stop-cost is
+parameter to 0, no extra cost is added, by setting it to `1.0` the stop-cost is
 doubled. Stop priority is only supported by the NeTEx import, not GTFS.
 
 
