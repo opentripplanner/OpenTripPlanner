@@ -131,6 +131,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add skanetrafiken to deployment docs [#4535](https://github.com/opentripplanner/OpenTripPlanner/pull/4535)
 - Read the feed id from the agency when storing agencies [#4536](https://github.com/opentripplanner/OpenTripPlanner/pull/4536)
 - Add possibility to supply generalized cost from Heuristic [#4513](https://github.com/opentripplanner/OpenTripPlanner/pull/4513)
+- Improve configuration documentation [#4550](https://github.com/opentripplanner/OpenTripPlanner/pull/4550)
   [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.1.0 (2022-03-17)
