@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config.buildconfig;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
@@ -16,7 +16,7 @@ public class DemConfig {
     return new DemExtractParametersList(
       root
         .of(parameterName)
-        .since(NA)
+        .since(V2_2)
         .summary("Specify parameters for DEM extracts.")
         .description(
           """
@@ -36,18 +36,19 @@ public class DemConfig {
   private static DemExtractParameters mapDemExtract(NodeAdapter config) {
     return new DemExtractParametersBuilder()
       .withSource(
-        config.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+        config.of("source").since(V2_2).summary("The unique URI pointing to the data file.").asUri()
       )
       .withElevationUnitMultiplier(
         config
           .of("elevationUnitMultiplier")
-          .since(NA)
+          .since(V2_2)
           .summary("Specify a multiplier to convert elevation units from source to meters.")
           .description(
             """
-          Sse 0.1 if values are given in decimeters. Overrides the value specified in
-          [`elevationUnitMultiplier`](#elevationUnitMultiplier) at the top-level of the 
-          configuration file.
+            Unit conversion multiplier for elevation values. No conversion needed if the elevation
+            values are defined in meters in the source data. If, for example, decimetres are used
+            in the source data, this should be set to 0.1. This overrides the value specified in
+            [`elevationUnitMultiplier`](#elevationUnitMultiplier) in the build config at root level.
           """
           )
           .asDoubleOptional()
