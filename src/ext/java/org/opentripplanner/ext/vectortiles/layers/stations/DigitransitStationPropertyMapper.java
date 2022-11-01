@@ -2,10 +2,12 @@ package org.opentripplanner.ext.vectortiles.layers.stations;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.vectortiles.I18NStringMapper;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
@@ -15,13 +17,18 @@ import org.opentripplanner.transit.service.TransitService;
 public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
   private final TransitService transitService;
+  private final I18NStringMapper i18NStringMapper;
 
-  private DigitransitStationPropertyMapper(TransitService transitService) {
+  private DigitransitStationPropertyMapper(TransitService transitService, Locale locale) {
     this.transitService = transitService;
+    this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  public static DigitransitStationPropertyMapper create(TransitService transitService) {
-    return new DigitransitStationPropertyMapper(transitService);
+  public static DigitransitStationPropertyMapper create(
+    TransitService transitService,
+    Locale locale
+  ) {
+    return new DigitransitStationPropertyMapper(transitService, locale);
   }
 
   @Override
@@ -30,8 +37,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
 
     return List.of(
       new T2<>("gtfsId", station.getId().toString()),
-      // Name is I18NString now, we return default name
-      new T2<>("name", station.getName().toString()),
+      new T2<>("name", i18NStringMapper.mapNonnullToApi(station.getName())),
       new T2<>(
         "type",
         childStops

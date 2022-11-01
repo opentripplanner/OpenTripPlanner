@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -19,24 +19,21 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
   private final Heuristics heuristics;
   private final RoundProvider roundProvider;
   private final DestinationArrivalPaths<T> paths;
-  private final CostCalculator<T> costCalculator;
   private final HeuristicAtStop[] stops;
   private final DebugHandlerFactory<T> debugHandlerFactory;
 
   public HeuristicsProvider() {
-    this(null, null, null, null, null);
+    this(null, null, null, null);
   }
 
   public HeuristicsProvider(
     Heuristics heuristics,
     RoundProvider roundProvider,
     DestinationArrivalPaths<T> paths,
-    CostCalculator<T> costCalculator,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     this.heuristics = heuristics;
     this.roundProvider = roundProvider;
-    this.costCalculator = costCalculator;
     this.paths = paths;
     this.stops = heuristics == null ? null : new HeuristicAtStop[heuristics.size()];
     this.debugHandlerFactory = debugHandlerFactory;
@@ -90,10 +87,10 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     if (h == null) {
       return false;
     }
-    int minArrivalTime = arrivalTime + h.getMinTravelDuration();
-    int minNumberOfTransfers = roundProvider.round() - 1 + h.getMinNumTransfers();
-    int minTravelDuration = travelDuration + h.getMinTravelDuration();
-    int minCost = cost + h.getMinCost();
+    int minArrivalTime = arrivalTime + h.minTravelDuration();
+    int minNumberOfTransfers = roundProvider.round() - 1 + h.minNumTransfers();
+    int minTravelDuration = travelDuration + h.minTravelDuration();
+    int minCost = cost + h.minCost();
     int departureTime = minArrivalTime - minTravelDuration;
     return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost);
   }
@@ -106,20 +103,8 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
 
   private HeuristicAtStop get(int stop) {
     if (stops[stop] == null && heuristics.reached(stop)) {
-      stops[stop] =
-        createHeuristicAtStop(
-          heuristics.bestTravelDuration(stop),
-          heuristics.bestNumOfTransfers(stop)
-        );
+      stops[stop] = heuristics.createHeuristicAtStop(stop);
     }
     return stops[stop];
-  }
-
-  private HeuristicAtStop createHeuristicAtStop(int bestTravelDuration, int bestNumOfTransfers) {
-    return new HeuristicAtStop(
-      bestTravelDuration,
-      bestNumOfTransfers,
-      costCalculator.calculateMinCost(bestTravelDuration, bestNumOfTransfers)
-    );
   }
 }

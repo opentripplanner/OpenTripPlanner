@@ -20,9 +20,9 @@
   "extraEdgesStopPlatformLink": true,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
-  "streetGraph": "gs://<bucket>/${OTP_GCS_BASE_GRAPH_PATH}",
-  "graph": "gs://<bucket>/${OTP_GCS_WORK_DIR}/Graph-otp2-${otp.serialization.version.id}.obj",
-  "buildReportDir": "gs://<bucket>/${OTP_GCS_WORK_DIR}/report",
+  "streetGraph": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_BASE_GRAPH_PATH}",
+  "graph": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_WORK_DIR}/Graph-otp2-${otp.serialization.version.id}.obj",
+  "buildReportDir": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_WORK_DIR}/report",
   "gsCredentials": "/etc/otp2/credentials.json",
   "netexDefaults": {
     "sharedFilePattern": "_stops.xml",
@@ -37,23 +37,24 @@
   "transitFeeds": [
     {
       "type": "netex",
-      "source": "gs://<bucket>/outbound/netex/rb_norway-aggregated-netex-otp2.zip"
+      "source": "gs://${OTP_GCS_BUCKET}/outbound/netex/rb_norway-aggregated-netex-otp2.zip",
+      "feedId": "EN"
     }
   ],
   "osm": [
     {
-      "source": "gs://<bucket>/osm/norway-latest.osm.pbf"
+      "source": "gs://${OTP_GCS_BUCKET}/osm/norway-latest.osm.pbf"
     },
     {
-      "source": "gs://<bucket>/osm/static/osm_static_sweden_extract.pbf"
+      "source": "gs://${OTP_GCS_BUCKET}/osm/static/osm_static_sweden_extract.pbf"
     },
     {
-      "source": "gs://<bucket>/osm/static/osm_static_sweden_storlien_extract.pbf"
+      "source": "gs://${OTP_GCS_BUCKET}/osm/static/osm_static_sweden_storlien_extract.pbf"
     }
   ],
   "dem": [
     {
-      "source": "gs://<bucket>/kartverket/heightData/norge_dem_50m_33.tif"
+      "source": "gs://${OTP_GCS_BUCKET}/kartverket/heightData/norge_dem_50m_33.tif"
     }
   ]
 }

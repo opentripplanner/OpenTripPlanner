@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -7,12 +10,13 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
-import java.util.OptionalInt;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -358,7 +362,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public OptionalInt findFirstNoneIncreasingStopTime() {
+  public Result<?, UpdateError> validateNonIncreasingTimes() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -366,14 +370,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        return OptionalInt.of(s);
+        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_DWELL_TIME, s));
       }
       if (prevDep > arr) {
-        return OptionalInt.of(s);
+        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_HOP_TIME, s));
       }
       prevDep = dep;
     }
-    return OptionalInt.empty();
+    return Result.success();
   }
 
   /** Cancel this entire trip */
@@ -467,9 +471,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
-   * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it
-   * and arrival/departure times for the stops before that stop.
-   * Returns {@code true} if times have been adjusted.
+   * Adjusts arrival time for the stop at the firstUpdatedIndex if no update was given for it and
+   * arrival/departure times for the stops before that stop. Returns {@code true} if times have been
+   * adjusted.
    */
   public boolean adjustTimesBeforeAlways(int firstUpdatedIndex) {
     boolean hasAdjustedTimes = false;

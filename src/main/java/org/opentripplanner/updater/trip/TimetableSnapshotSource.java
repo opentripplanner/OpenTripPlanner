@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -42,6 +41,7 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -339,7 +339,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         .keySet()
         .forEach(key -> {
           var value = errorIndex.get(key);
-          var tripIds = value.stream().map(UpdateError::tripId).collect(Collectors.toSet());
+          var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
           LOG.error("[feedId: {}] {} failures of type {}: {}", feedId, value.size(), key, tripIds);
         });
 

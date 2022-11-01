@@ -5,6 +5,7 @@ import static java.util.Locale.ROOT;
 import java.util.List;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.DataSource;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
@@ -68,15 +69,13 @@ public class KmlBikeParkDataSource implements DataSource<VehicleParking> {
       return VehicleParking
         .builder()
         .name(localizedName)
-        .x(x)
-        .y(y)
+        .coordinate(new WgsCoordinate(y, x))
         .id(new FeedScopedId(this.feedId, id))
         .entrance(builder ->
           builder
             .entranceId(new FeedScopedId(this.feedId, id))
             .name(localizedName)
-            .x(x)
-            .y(y)
+            .coordinate(new WgsCoordinate(y, x))
             .walkAccessible(true)
         )
         .build();

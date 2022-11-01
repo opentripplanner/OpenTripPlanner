@@ -21,12 +21,12 @@ public class LegacyGraphQLCarParkImpl implements LegacyGraphQLDataFetchers.Legac
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).getY();
+    return environment -> getSource(environment).getCoordinate().latitude();
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).getX();
+    return environment -> getSource(environment).getCoordinate().longitude();
   }
 
   @Override

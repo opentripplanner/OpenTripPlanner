@@ -1,7 +1,9 @@
 package org.opentripplanner.datastore.https;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import org.apache.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
@@ -15,6 +17,8 @@ import org.opentripplanner.util.HttpUtils;
  * This data store accesses files in read-only mode over HTTPS.
  */
 public class HttpsDataSourceRepository implements DataSourceRepository {
+
+  private static final Duration HTTP_HEAD_REQUEST_TIMEOUT = Duration.ofSeconds(20);
 
   @Override
   public String description() {
@@ -69,6 +73,6 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   protected List<Header> getHttpHeaders(URI uri) {
-    return HttpUtils.getHeaders(uri);
+    return HttpUtils.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
   }
 }
