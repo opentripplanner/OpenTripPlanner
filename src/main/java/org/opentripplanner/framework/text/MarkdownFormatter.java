@@ -1,7 +1,6 @@
 package org.opentripplanner.framework.text;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.util.lang.StringUtils;
 
 /**
  * This utility can be used to format Markdown text. This is useful when generating documentation.
@@ -13,7 +12,7 @@ public class MarkdownFormatter {
   public static int HEADER_3 = 3;
   public static int HEADER_4 = 4;
 
-  public static final char NBSP = '\u00A0';
+  public static final String NBSP = "\u00A0";
   public static final String NEW_LINE = "\n";
 
   /** Return the given input as emphasise text. */
@@ -51,7 +50,7 @@ public class MarkdownFormatter {
     if (anchor != null && !anchor.isBlank()) {
       return "<h%d id=\"%s\">%s</h%d>".formatted(level, normalizeAnchor(anchor), header, level);
     } else {
-      return StringUtils.fill('#', level) + " " + header;
+      return "#".repeat(level) + " " + header;
     }
   }
 
@@ -76,7 +75,7 @@ public class MarkdownFormatter {
 
   /** Return whitespace witch can be used to indent inside a table cell. */
   public static String indentInTable(int level) {
-    return level <= 0 ? "" : StringUtils.fill(NBSP, 3 * level);
+    return level <= 0 ? "" : NBSP.repeat(3 * level);
   }
 
   public static String lineBreak() {
