@@ -53,8 +53,9 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
         .of("mapper")
         .since(V2_0)
         .summary(
-          "Describes the mapper converting the properties from the OTP model entities to the vector tile properties. Currently `Digitransit` is supported for all layer types."
+          "Describes the mapper converting from the OTP model entities to the vector tile properties."
         )
+        .description("Currently `Digitransit` is supported for all layer types.")
         .asString(),
       node
         .of("maxZoom")
@@ -69,15 +70,16 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
       node
         .of("cacheMaxSeconds")
         .since(V2_0)
-        .summary(
-          "Sets the cache header in the response. The lowest value of the layers included is selected."
-        )
+        .summary("Sets the cache header in the response.")
+        .description("The lowest value of the layers included is selected.")
         .asInt(CACHE_MAX_SECONDS),
       node
         .of("expansionFactor")
         .since(V2_0)
-        .summary(
-          "How far outside its boundaries should the tile contain information. The value is a fraction of the tile size. If you are having problem with icons and shapes being clipped at tile edges, then increase this number."
+        .summary("How far outside its boundaries should the tile contain information.")
+        .description(
+          "The value is a fraction of the tile size. If you are having problem with icons and " +
+          "shapes being clipped at tile edges, then increase this number."
         )
         .asDouble(EXPANSION_FACTOR)
     );
