@@ -1,6 +1,8 @@
 package org.opentripplanner.generate.doc.framework;
 
 import static org.opentripplanner.generate.doc.framework.NodeAdapterHelper.anchor;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
 
 import java.util.EnumSet;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
@@ -41,18 +43,27 @@ public class ParameterDetailsList {
       }
       printNode(node, it);
 
-      if (it.type().isComplex()) {
-        var child = node.child(it.name());
+      if (!it.type().isComplex()) {
+        continue;
+      }
+      if (it.type() == ENUM_SET) {
+        continue;
+      }
+      //noinspection ConstantConditions
+      if (it.type() == ENUM_MAP && it.elementType().isSimple()) {
+        continue;
+      }
 
-        if (child == null || child.isEmpty()) {
-          LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
-        } else if (it.type() == ConfigType.ARRAY) {
-          for (String childName : child.listChildrenByName()) {
-            addParametersList(child.child(childName));
-          }
-        } else {
-          addParametersList(child);
+      var child = node.child(it.name());
+
+      if (child == null || child.isEmpty()) {
+        LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
+      } else if (it.type() == ConfigType.ARRAY) {
+        for (String childName : child.listChildrenByName()) {
+          addParametersList(child.child(childName));
         }
+      } else {
+        addParametersList(child);
       }
     }
   }

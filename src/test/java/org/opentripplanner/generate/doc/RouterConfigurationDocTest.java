@@ -59,7 +59,7 @@ public class RouterConfigurationDocTest {
 
   private NodeAdapter readBuildConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
-    var conf = new RouterConfig(json, CONFIG_PATH, false);
+    var conf = new RouterConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();
   }
 

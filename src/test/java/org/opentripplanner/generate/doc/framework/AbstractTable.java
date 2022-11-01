@@ -49,23 +49,28 @@ abstract class AbstractTable {
 
       addRow(node, table, it);
 
-      if (it.type().isComplex() && !skip(it)) {
-        if (it.type() == ENUM_SET) {
-          continue;
-        }
-        //noinspection ConstantConditions
-        if (it.type() == ENUM_MAP && it.elementType().isSimple()) {
-          continue;
-        }
-        var child = node.child(it.name());
+      if (skip(it)) {
+        continue;
+      }
+      if (!it.type().isComplex()) {
+        continue;
+      }
+      if (it.type() == ENUM_SET) {
+        continue;
+      }
+      //noinspection ConstantConditions
+      if (it.type() == ENUM_MAP && it.elementType().isSimple()) {
+        continue;
+      }
 
-        if (child == null || child.isEmpty()) {
-          LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
-        } else if (it.type() == ConfigType.ARRAY) {
-          addArrayChildrenToTable(it, child, table);
-        } else {
-          addParametersToTable(child, table);
-        }
+      var child = node.child(it.name());
+
+      if (child == null || child.isEmpty()) {
+        LOG.error("Not found: {} : {}", node.fullPath(it.name()), it.type().docName());
+      } else if (it.type() == ConfigType.ARRAY) {
+        addArrayChildrenToTable(it, child, table);
+      } else {
+        addParametersToTable(child, table);
       }
     }
   }

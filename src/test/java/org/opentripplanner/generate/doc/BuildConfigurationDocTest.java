@@ -58,7 +58,7 @@ public class BuildConfigurationDocTest {
 
   private NodeAdapter readBuildConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
-    var conf = new BuildConfig(json, CONFIG_PATH, false);
+    var conf = new BuildConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();
   }
 
