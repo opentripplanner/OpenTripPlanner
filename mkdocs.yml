@@ -47,6 +47,7 @@ pages:
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
     - Sandbox development: 'SandboxExtension.md'
+    - Release Checklist: 'ReleaseChecklist.md'
 - Sandbox:
     - About: 'SandboxExtension.md'
     - Actuator API: 'sandbox/ActuatorAPI.md'
