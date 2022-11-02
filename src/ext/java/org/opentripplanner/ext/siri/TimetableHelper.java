@@ -884,13 +884,13 @@ public class TimetableHelper {
       }
     }
 
-    var recordedCalls = journey.getRecordedCalls();
-    var estimatedCalls = journey.getEstimatedCalls();
+    var recordedCalls = getRecordedCalls(journey);
+    var estimatedCalls = getEstimatedCalls(journey);
     ZonedDateTime firstDeparture;
-    if (recordedCalls.getRecordedCalls().isEmpty()) {
-      firstDeparture = estimatedCalls.getEstimatedCalls().get(0).getAimedDepartureTime();
+    if (recordedCalls.isEmpty()) {
+      firstDeparture = estimatedCalls.get(0).getAimedDepartureTime();
     } else {
-      firstDeparture = recordedCalls.getRecordedCalls().get(0).getAimedDepartureTime();
+      firstDeparture = recordedCalls.get(0).getAimedDepartureTime();
     }
 
     return firstDeparture
