@@ -34,7 +34,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git add pom.xml`
     * `git commit -m "prepare release x.y.z"`
 * Run a test build of the release locally, without deploying it
-    * `mvn clean install site`
+    * `mvn clean install site -Prelease`
       The current version of ENUNCIATE does not support Java 17 "out of the box", use 
       `export MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"`
       to ignore the problem.
@@ -74,7 +74,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       set up.
     * Apply the changes recorded
       in https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central
-    * While still on the tag commit, run `mvn deploy`.
+    * While still on the tag commit, run `mvn deploy -Prelease`.
 * Set up next development iteration
     * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
     * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`
