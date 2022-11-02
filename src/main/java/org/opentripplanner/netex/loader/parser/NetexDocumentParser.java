@@ -8,6 +8,7 @@ import javax.xml.bind.JAXBElement;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
 import org.rutebanken.netex.model.CompositeFrame;
+import org.rutebanken.netex.model.FareFrame;
 import org.rutebanken.netex.model.GeneralFrame;
 import org.rutebanken.netex.model.InfrastructureFrame;
 import org.rutebanken.netex.model.LocaleStructure;
@@ -74,6 +75,8 @@ public class NetexDocumentParser {
       parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
     } else if (value instanceof SiteFrame) {
       parse((SiteFrame) value, new SiteFrameParser());
+    } else if (value instanceof FareFrame) {
+      parse((FareFrame) value, new FareFrameParser());
     } else if (value instanceof CompositeFrame) {
       // We recursively parse composite frames and content until there
       // is no more nested frames - this is accepting documents which
