@@ -165,6 +165,18 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
+                        <id>package-javadoc</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classesDirectory>${basedir}/docs/javadoc</classesDirectory>
+                            <classifier>javadoc</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
@@ -448,21 +460,6 @@
                         </permissions>
                     </extraDirectories>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <!-- We sign in the verify phase, which means it will happen for install and deploy but not package. -->
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- compile the gtfs-realtime.proto file to Java code
@@ -941,6 +938,51 @@
                                     </includes>
                                 </fileset>
                             </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>ci</id>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>OpenTripPlanner Maven Repository on Github Packages</name>
+                    <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>releaseMavenCentral</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <!-- We sign in the verify phase, which means it will happen before install and deploy (the last two phases)
+                                     but not before earlier phases like test or package. -->
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.12</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                 </plugins>
