@@ -254,4 +254,4 @@ failure and require storing a lot of infrequently used secret information in the
 environment variables on GitHub. Our releases are currently not very frequent so we just carry out
 these steps manually by following the checklist. We aim to make a release every 6 months.
 
-Use the [Release Checklist](DevReleaseChecklist.md) to perform the release.
+Use the [Release Checklist](ReleaseChecklist.md) to perform the release.
