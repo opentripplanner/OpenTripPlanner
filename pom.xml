@@ -944,7 +944,7 @@
             </build>
         </profile>
         <profile>
-            <id>ci</id>
+            <id>deployGitHub</id>
             <distributionManagement>
                 <repository>
                     <id>github</id>
