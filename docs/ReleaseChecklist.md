@@ -16,7 +16,9 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * If you suspect any changes are not reflected in the Changelog, review the commit log and add
       any missing items
     * Update the header at the top of the list from `x.y.z-SNAPSHOT` to just `x.y.z (current date)`
-    * Check in any changes, and push to Github
+    * Check in any changes, and push to GitHub
+    * It is important to finalize the documentation before tagging the release, to ensure the 
+      published documentation is associated with the release tag 
 * Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that
   the build is currently passing
 * Switch to the HEAD of master branch, and ensure it's up to date with no uncommitted changes
