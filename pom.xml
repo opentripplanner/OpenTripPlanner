@@ -21,6 +21,40 @@
         <url>https://github.com/opentripplanner/OpenTripPlanner</url>
     </scm>
 
+    <!--
+      Developer entries are provided for the main contributors on the GitHub stats page for to the
+      dev-2.x branch. This minimal information is only present to meet the Sonatype artifact upload
+      requirements. For other contributors, see
+      https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors
+    -->
+    <developers>
+        <developer>
+            <name>Andrew Byrd</name>
+            <email>andrew@fastmail.net</email>
+            <organization>Conveyal</organization>
+            <organizationUrl>http://conveyal.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Thomas Gran</name>
+            <email>t2gran@gmail.com</email>
+            <organization>Entur</organization>
+            <organizationUrl>http://entur.org/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Leonard Ehrenfried</name>
+            <email>mail@leonard.io</email>
+            <organization>Independent Contractor</organization>
+            <organizationUrl>https://leonard.io</organizationUrl>
+        </developer>
+        <developer>
+            <name>Hannes Junnila</name>
+            <email>hannes.junnila@gmail.com</email>
+            <organization>Entur</organization>
+            <organizationUrl>http://entur.org/</organizationUrl>
+        </developer>
+    </developers>
+
+
     <properties>
         <otp.serialization.version.id>76</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
