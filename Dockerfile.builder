@@ -9,6 +9,8 @@ WORKDIR ${OTP_ROOT}
 
 ADD pom.xml ${OTP_ROOT}/pom.xml
 ADD src ${OTP_ROOT}/src
+ADD doc-templates ${OTP_ROOT}/doc-templates
+ADD docs ${OTP_ROOT}/docs
 add .git ${OTP_ROOT}/.git
 
 # Build OTP
