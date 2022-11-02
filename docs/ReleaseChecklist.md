@@ -36,7 +36,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
 * Run a test build of the release locally, without deploying it
     * `mvn clean install site`
       The current version of ENUNCIATE does not support Java 17 "out of the box", use 
-      `export MAVEN_OPTS=´--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED´`
+      `export MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"`
       to ignore the problem.
     * The `install` goal will sign the Maven artifacts so you need the GPG signing certificate set
       up
