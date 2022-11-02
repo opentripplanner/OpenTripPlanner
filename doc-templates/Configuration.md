@@ -141,7 +141,7 @@ possible to keep parts of the configuration in separate files. To include the co
 use
 `${includeFile:FILE_NAME}`. The `FILE_NAME` must be the name of a file in the configuration
 directory. Relative paths are not supported.
-<p>
+
 To allow both files (the configuration file and the injected file) to be valid JSON files, a special
 case is supported. If the include file directive is quoted, then the quotes are removed, if the 
 text inserted is valid JSON (starts with `{` and ends with `}`). 
