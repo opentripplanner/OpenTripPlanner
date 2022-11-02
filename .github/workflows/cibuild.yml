@@ -57,19 +57,20 @@ jobs:
         run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
 
   docs:
-    #iif: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    #if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
     runs-on: ubuntu-latest
     #needs: build
     steps:
       - uses: actions/checkout@v3.1.0
-        with:
-          fetch-depth: 0
       - name: Install Python dependencies
-        run: pip install mkdocs mkdocs-material
+        run: pip install -r docs/requirements.txt
       - name: Deploy docs to Github pages
         run: |
-          mkdocs build
-          mkdocs gh-deploy
+          git config --global user.name 'OTP Bot'
+          git config --global user.email 'bot@opentripplanner.org'
+          git pull --rebase origin gh-pages
+          mike list
+          mike deploy --push dev
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
