@@ -148,6 +148,13 @@ public class NetexConfig {
             """
           )
           .asStringSet(original.ferryIdsNotAllowedForBicycle())
+      )
+      .withIgnoreFareFrame(
+        config
+          .of("ignoreFareFrame")
+          .since(V2_2)
+          .summary("Ignore contents of the FareFrame")
+          .asBoolean(original.ignoreFareFrame())
       );
   }
 
