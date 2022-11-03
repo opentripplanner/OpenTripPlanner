@@ -13,9 +13,12 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.request.ViaLocation;
+import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
+import org.opentripplanner.routing.error.RoutingValidationException;
 
 public class ViaRoutingWorker {
 
@@ -33,9 +36,7 @@ public class ViaRoutingWorker {
   }
 
   public ViaRoutingResponse route() {
-    /**
-     * Loop over Via, for each cycle change from/to and JourneyRequest.
-     */
+    //Loop over Via, for each cycle change from/to and JourneyRequest.
     var result = viaRequest.viaLegs().stream().map(v -> getRoutingResponse(viaRequest, v)).toList();
 
     return combineRoutingResponse(result);
@@ -53,13 +54,19 @@ public class ViaRoutingWorker {
       this.request.setTo(request.routeRequest().to());
     }
 
-    var response = this.routingWorker.apply(this.request); //new RoutingWorker(serverContext, this.request, serverContext.transitService().getTimeZone()).route();
-    var firstArrival = firstArrival(response).orElseThrow();
-    var lastArrival = lastArrival(response).orElseThrow();
+    var e = new RoutingError(
+      RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
+      InputField.INTERMEDIATE_PLACE
+    );
+    var response = this.routingWorker.apply(this.request);
+    var firstArrival = firstArrival(response)
+      .orElseThrow(() -> new RoutingValidationException(List.of(e)));
+    var lastArrival = lastArrival(response)
+      .orElseThrow(() -> new RoutingValidationException(List.of(e)));
     var maxSlack = Optional
       .ofNullable(v.viaLocation())
       .map(ViaLocation::maxSlack)
-      .orElse(Duration.ZERO);
+      .orElse(ViaLocation.DEFAULT_MAX_SLACK);
 
     if (v.viaLocation() == null) {
       return response;
@@ -112,13 +119,13 @@ public class ViaRoutingWorker {
     List<Itinerary> itineraries,
     ViaLocation viaLocation
   ) {
-    return itineraries.stream().filter(predicate(i, viaLocation)).toList();
+    return itineraries.stream().filter(withinSlackTest(i, viaLocation)).toList();
   }
 
   /**
    * Only allow departures within min/max slack time.
    */
-  private Predicate<Itinerary> predicate(Itinerary i, ViaLocation v) {
+  private Predicate<Itinerary> withinSlackTest(Itinerary i, ViaLocation v) {
     var earliestDeparturetime = i.endTime().plus(v.minSlack());
     var latestDeparturetime = i.endTime().plus(v.maxSlack());
 

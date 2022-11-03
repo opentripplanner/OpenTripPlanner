@@ -40,7 +40,7 @@ import org.opentripplanner.util.time.TimeUtils;
  * <p>
  * s1i2 should be combined only with s2i3 because it arrives after departure on the others.
  */
-public class TestViaRoutingWorker {
+public class ViaRoutingWorkerTest {
 
   private static Itinerary s1i1;
   private static Itinerary s1i2;
@@ -60,38 +60,38 @@ public class TestViaRoutingWorker {
     var result = new ViaRoutingWorker(request, this::createRoutingResponse).route();
 
     assertNotNull(result, "result must not be null");
-    assertNotNull(result.getPlan(), "plan must not be null");
+    assertNotNull(result.plan(), "plan must not be null");
 
-    var plan = result.getPlan();
+    var plan = result.plan();
 
     assertFalse(plan.keySet().isEmpty(), "plan must not be empty");
     assertEquals(2, plan.keySet().size(), "plan should contain 2 itineraries");
 
     // First trip (s1s1) should match 2 trips (s2i1, s2i2)
-    assertNotNull(result.getPlan().get(s1i1), "First itinerary (s1i1) should be in the plan");
+    assertNotNull(result.plan().get(s1i1), "First itinerary (s1i1) should be in the plan");
     assertEquals(
       2,
-      result.getPlan().get(s1i1).size(),
+      result.plan().get(s1i1).size(),
       "First itinerary should be combined with two itineraries on second search"
     );
     assertTrue(
-      result.getPlan().get(s1i1).contains(s2i1),
+      result.plan().get(s1i1).contains(s2i1),
       "First itinerary should be combined with s2i1"
     );
     assertTrue(
-      result.getPlan().get(s1i1).contains(s2i2),
+      result.plan().get(s1i1).contains(s2i2),
       "First itinerary should be combined with s2i2"
     );
 
     // Second trip (s1s2) should match 1 trip (s2r3)
-    assertNotNull(result.getPlan().get(s1i2), "Second itinerary (s1i2) should be in the plan");
+    assertNotNull(result.plan().get(s1i2), "Second itinerary (s1i2) should be in the plan");
     assertEquals(
       1,
-      result.getPlan().get(s1i2).size(),
+      result.plan().get(s1i2).size(),
       "Second itinerary should be combined with one itinerary on second search"
     );
     assertTrue(
-      result.getPlan().get(s1i2).contains(s2i3),
+      result.plan().get(s1i2).contains(s2i3),
       "Second itinerary should be combined with s2i3"
     );
   }
@@ -115,13 +115,6 @@ public class TestViaRoutingWorker {
    */
   public RouteViaRequest createRouteViaRequest() {
     var dateTime = ZonedDateTime.parse("2021-12-02T12:00:00-05:00[America/New_York]").toInstant();
-    var request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(new GenericLocation(A.coordinate.latitude(), A.coordinate.longitude()));
-    request.setTo(new GenericLocation(B.coordinate.latitude(), B.coordinate.longitude()));
-    request.setNumItineraries(10);
-    request.setSearchWindow(Duration.ofHours(1));
-
     // One via location and 2 viaJourneys
     int minSlack = 10;
     int maxSlack = 45;
@@ -136,7 +129,14 @@ public class TestViaRoutingWorker {
 
     var viaJourneys = List.of(new JourneyRequest(), new JourneyRequest());
 
-    return new RouteViaRequest(null, viaLocations, viaJourneys, request);
+    var request = new RouteViaRequest(viaLocations, viaJourneys);
+
+    request.setDateTime(dateTime);
+    request.setFrom(new GenericLocation(A.coordinate.latitude(), A.coordinate.longitude()));
+    request.setTo(new GenericLocation(B.coordinate.latitude(), B.coordinate.longitude()));
+    request.setSearchWindow(Duration.ofHours(1));
+
+    return request;
   }
 
   /**
