@@ -47,17 +47,11 @@ public class StreetEdge
   implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
-  /* TODO combine these with OSM highway= flags? */
-  public static final int CLASS_STREET = 3;
-  public static final int CLASS_CROSSING = 4;
-  public static final int CLASS_OTHERPATH = 5;
-  public static final int CLASS_OTHER_PLATFORM = 8;
-  public static final int CLASS_TRAIN_PLATFORM = 16;
-  public static final int CLASS_LINK = 32; // on/offramps; OSM calls them "links"
+
   private static final double GREENWAY_SAFETY_FACTOR = 0.1;
   // TODO(flamholz): do something smarter with the car speed here.
   public static final float DEFAULT_CAR_SPEED = 11.2f;
-  /** If you have more than 8 flags, increase flags to short or int */
+  /** If you have more than 16 flags, increase flags to short or int */
   private static final int BACK_FLAG_INDEX = 0;
   private static final int ROUNDABOUT_FLAG_INDEX = 1;
   private static final int HASBOGUSNAME_FLAG_INDEX = 2;
@@ -67,6 +61,7 @@ public class StreetEdge
   private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
   private static final int BICYCLE_NOTHRUTRAFFIC = 7;
   private static final int WALK_NOTHRUTRAFFIC = 8;
+  private static final int CLASS_LINK = 9;
   private StreetEdgeCostExtension costExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
@@ -98,8 +93,6 @@ public class StreetEdge
   private I18NString name;
 
   private StreetTraversalPermission permission;
-
-  private int streetClass = CLASS_OTHERPATH;
 
   /**
    * The speed (meters / sec) at which an automobile can traverse this street segment.
@@ -558,14 +551,6 @@ public class StreetEdge
     this.permission = permission;
   }
 
-  public int getStreetClass() {
-    return streetClass;
-  }
-
-  public void setStreetClass(int streetClass) {
-    this.streetClass = streetClass;
-  }
-
   /**
    * Marks that this edge is the reverse of the one defined in the source data. Does NOT mean
    * fromv/tov are reversed.
@@ -615,6 +600,17 @@ public class StreetEdge
 
   public void setStairs(boolean stairs) {
     flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
+  }
+
+  /**
+   * The edge is part of an osm way, which is of type link
+   */
+  public boolean isLink() {
+    return BitSetUtils.get(flags, CLASS_LINK);
+  }
+
+  public void setLink(boolean link) {
+    flags = BitSetUtils.set(flags, CLASS_LINK, link);
   }
 
   public float getCarSpeed() {
@@ -880,7 +876,7 @@ public class StreetEdge
     splitEdge.flags = this.flags;
     splitEdge.setBicycleSafetyFactor(bicycleSafetyFactor);
     splitEdge.setWalkSafetyFactor(walkSafetyFactor);
-    splitEdge.setStreetClass(getStreetClass());
+    splitEdge.setLink(isLink());
     splitEdge.setCarSpeed(getCarSpeed());
     splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
   }

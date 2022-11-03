@@ -209,32 +209,9 @@ public class OSMFilter {
     return new P2<>(permissionsFront, permissionsBack);
   }
 
-  public static int getStreetClasses(OSMWithTags way) {
-    int link = 0;
+  public static boolean isLink(OSMWithTags way) {
     String highway = way.getTag("highway");
-    if (highway != null && highway.endsWith(("_link"))) {
-      link = StreetEdge.CLASS_LINK;
-    }
-    return getPlatformClass(way) | link;
-  }
-
-  public static int getPlatformClass(OSMWithTags way) {
-    String highway = way.getTag("highway");
-    if ("platform".equals(way.getTag("railway"))) {
-      return StreetEdge.CLASS_TRAIN_PLATFORM;
-    }
-    if ("platform".equals(highway) || "platform".equals(way.getTag("public_transport"))) {
-      if (
-        way.isTagTrue("train") ||
-        way.isTagTrue("subway") ||
-        way.isTagTrue("tram") ||
-        way.isTagTrue("monorail")
-      ) {
-        return StreetEdge.CLASS_TRAIN_PLATFORM;
-      }
-      return StreetEdge.CLASS_OTHER_PLATFORM;
-    }
-    return 0;
+    return highway != null && highway.endsWith(("_link"));
   }
 
   /**
