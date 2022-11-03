@@ -5,6 +5,10 @@ the actions taken by the Maven release plugin. Based on past experience, the Mav
 can fail at various points in the process leaving the repo in a confusing state. Taking each action
 manually is more tedious, but keeps eyes on each step and is less prone to failure.
 
+* Make sure the documentation is up to date
+  * Check all links and references to the release and update to the target release version. Search
+    all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new 
+    version.
 * Check that your local copy of the dev branch is up to date with no uncommitted changes
     * `git status`
     * `git checkout dev-2.x`
@@ -62,7 +66,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       the commit that should be tagged as the release)
     * Go to the [GitHub tags page](https://github.com/opentripplanner/OpenTripPlanner/tags) and use
       the `...` button to mark the new tag as a release.
-    * Give the release a name like `v2.1.0 (March 2022)`
+    * Give the release a name like `v2.2.0 (November 2022)`
     * Optionally add a very condensed version of the changelog in the description box, with only the
       5-10 most significant changes that might affect someone's choice to upgrade.
     * Attach the JAR files produced in `/target` to the GitHub release page you just created.
