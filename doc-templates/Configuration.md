@@ -149,7 +149,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.1.0 of OTP:
+Here is an example including variable substitution, assuming version 2.2.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -162,7 +162,7 @@ Here is an example including variable substitution, assuming version 2.1.0 of OT
 // transit.json
 [
   {
-  "source": "netex-v${FEED_VERSION}.obj"
+  "source": "netex-v${maven.version.short}.obj"
 }
 ]
 ``` 
@@ -173,7 +173,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2_0.obj"
+          "source": "netex-v2.2.0.obj"
         }
       ]
 } 
