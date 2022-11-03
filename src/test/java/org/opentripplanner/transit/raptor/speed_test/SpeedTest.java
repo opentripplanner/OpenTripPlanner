@@ -177,6 +177,7 @@ public class SpeedTest {
     timer.globalCount("jvm_free_memory", runtime.freeMemory());
     timer.globalCount("jvm_max_memory", runtime.maxMemory());
     timer.globalCount("jvm_total_memory", runtime.totalMemory());
+    timer.globalCount("jvm_used_memory", runtime.totalMemory() - runtime.freeMemory());
 
     timer.finishUp();
 
