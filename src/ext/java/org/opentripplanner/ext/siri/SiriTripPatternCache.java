@@ -126,7 +126,7 @@ public class SiriTripPatternCache {
         patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));
         int sizeAfter = patternsForStop.values().size();
 
-        log.info(
+        log.debug(
           "Removed outdated TripPattern for {} stops in {} ms - tripId: {}",
           (sizeBefore - sizeAfter),
           (System.currentTimeMillis() - t1),
