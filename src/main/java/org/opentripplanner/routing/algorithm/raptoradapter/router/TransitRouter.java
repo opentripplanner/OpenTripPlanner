@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.function.Function;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
@@ -26,9 +28,11 @@ import org.opentripplanner.routing.core.TemporaryVerticesContainer;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.OTPFeature;
 
 public class TransitRouter {
@@ -135,7 +139,7 @@ public class TransitRouter {
 
     // Create itineraries
 
-    RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
+    RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper(
       serverContext.graph(),
       serverContext.transitService(),
       transitLayer,
@@ -143,7 +147,7 @@ public class TransitRouter {
       request
     );
 
-    var itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
+    List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
 
     debugTimingAggregator.finishedItineraryCreation();
 

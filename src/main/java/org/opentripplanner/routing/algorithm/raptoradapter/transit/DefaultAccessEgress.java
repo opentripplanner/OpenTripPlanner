@@ -37,6 +37,11 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
+  public boolean stopReachedOnBoard() {
+    return durationInSeconds == 0;
+  }
+
+  @Override
   public int stop() {
     return stop;
   }

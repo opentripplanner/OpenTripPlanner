@@ -56,6 +56,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
       .build();
   }
 
+  public static TestAccessEgress zeroDurationAccess(int stop, int durationInSeconds, int cost) {
+    return new Builder(stop, durationInSeconds).withStopReachedOnBoard(true).withCost(cost).build();
+  }
+
   /**
    * Creates a walk transfer with time restrictions. opening and closing may be specified as seconds
    * since the start of "RAPTOR time" to limit the time periods that the access is traversable,
@@ -256,6 +260,11 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.stopReachedOnBoard = transfer.stopReachedOnBoard;
       this.opening = transfer.opening;
       this.closing = transfer.closing;
+    }
+
+    Builder withStopReachedOnBoard(boolean stopReachedOnBoard) {
+      this.stopReachedOnBoard = stopReachedOnBoard;
+      return this;
     }
 
     Builder withCost(int cost) {
