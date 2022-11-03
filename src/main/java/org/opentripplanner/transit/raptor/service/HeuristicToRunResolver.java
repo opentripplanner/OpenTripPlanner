@@ -38,11 +38,6 @@ class HeuristicToRunResolver {
       reverse = true;
     }
 
-    // Use FWD heuristics to find LAT(latest arrival time) if REV heuristics is enabled
-    if (!s.isLatestArrivalTimeSet() && reverse) {
-      forward = true;
-    }
-
     // Use either REV/FWD heuristics to calculate search window
     if (!s.isSearchWindowSet() && !reverse) {
       forward = true;
