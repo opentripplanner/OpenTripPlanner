@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vectortiles;
 
-import com.wdtinc.mapbox_vector_tile.VectorTile;
+import edu.colorado.cires.cmg.mvt.VectorTile;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;

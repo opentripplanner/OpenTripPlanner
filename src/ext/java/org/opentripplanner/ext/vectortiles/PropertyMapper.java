@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.vectortiles;
 
-import com.wdtinc.mapbox_vector_tile.VectorTile;
-import com.wdtinc.mapbox_vector_tile.adapt.jts.IUserDataConverter;
-import com.wdtinc.mapbox_vector_tile.adapt.jts.UserDataKeyValueMapConverter;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerProps;
+import edu.colorado.cires.cmg.mvt.VectorTile;
+import edu.colorado.cires.cmg.mvt.adapt.jts.IUserDataConverter;
+import edu.colorado.cires.cmg.mvt.adapt.jts.UserDataKeyValueMapConverter;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerProps;
 import java.util.Collection;
 import org.opentripplanner.common.model.T2;
 

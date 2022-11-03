@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.vectortiles;
 
-import com.wdtinc.mapbox_vector_tile.VectorTile;
-import com.wdtinc.mapbox_vector_tile.adapt.jts.JtsAdapter;
-import com.wdtinc.mapbox_vector_tile.adapt.jts.TileGeomResult;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerBuild;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerParams;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerProps;
+import edu.colorado.cires.cmg.mvt.VectorTile;
+import edu.colorado.cires.cmg.mvt.adapt.jts.JtsAdapter;
+import edu.colorado.cires.cmg.mvt.adapt.jts.TileGeomResult;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerBuild;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerParams;
+import edu.colorado.cires.cmg.mvt.build.MvtLayerProps;
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
