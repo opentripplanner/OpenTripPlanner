@@ -1,9 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test.model.timer;
 
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Meter.Id;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.cumulative.CumulativeCounter;
 import io.micrometer.core.instrument.cumulative.CumulativeTimer;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.distribution.HistogramGauges;
@@ -95,6 +97,11 @@ class MeterRegistrySetup {
       );
       HistogramGauges.registerWithCommonFormat(timer, this);
       return timer;
+    }
+
+    @Override
+    protected Counter newCounter(Id id) {
+      return new CumulativeCounter(id);
     }
   }
 }

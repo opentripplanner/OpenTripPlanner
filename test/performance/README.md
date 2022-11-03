@@ -1,4 +1,4 @@
-## Speed test
+# Speed test
 
 This folder contains configuration and expectations to run the OTP speed test. The test runs 
 automatically after each merged PR and the results are visualised on a [Grafana instance](https://otp-performance.leonard.io).
@@ -17,22 +17,25 @@ mvn exec:java -Dexec.mainClass="org.opentripplanner.transit.raptor.speed_test.Sp
 
 The results will be displayed on the console.
 
-### Instrumentation
+## Instrumentation
 
 Each run on CI is instrumented with Java Flight Recorder. The results are then saved as an artifact
 and can be downloaded. IntelliJ for example can display a very useful flame graph from those jrf files
 that shows bottlenecks in the code.
 
-### Configure the test
+## Configure the test
 
 - Pick a valid "testDate" for your data set and set it in the speed-test-config.json.
 - Make sure build-config "transitServiceStart" and "transitServiceEnd" include the "testDate".
 
-### Data files
+## Data files
 
 All data input files are located at https://otp-performance.leonard.io/data/
 
-#### Norway
+### Norway
+
+[📊 Dashboard](https://otp-performance.leonard.io/) 
+
 Data used:
 - Norwegian NeTEx data
 - Norway OSM data
@@ -43,20 +46,29 @@ If the link above do not work you should be able to find it on the ENTUR web:
 
 - https://www.entur.org/
 
-#### Baden-Württemberg, Germany
+### Baden-Württemberg, Germany
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=baden-wuerttemberg&var-branch=dev-2.x&from=1658872800000&to=now)
+
 Data used:
 - Tidied GTFS data
 - BW OSM data
 
 [build-config](baden-wuerttemberg/build-config.json)
  
-#### Germany
+### Germany
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=germany&var-branch=dev-2.x&from=1661292000000&to=now)
+
 Data used:
 - Tidied GTFS data
 
 [build-config](germany/build-config.json)
 
-#### Skånetrafiken
+### Skånetrafiken
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=top-5000&var-branch_fixed=dev-2.x&var-location=skanetrafiken&var-branch=dev-2.x&from=1666965240000&to=now)
+
 Data used:
 - Skånetrafiken NeTEx data
 - Sweden OSM data
