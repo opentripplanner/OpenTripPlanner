@@ -21,11 +21,11 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  * http://wiki.openstreetmap.org/wiki/Relation:multipolygon/Algorithm but generally done in a
  * quick/dirty way.
  */
-class Area {
+public class Area {
 
-  final List<Ring> outermostRings;
+  public final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
-  OSMWithTags parent;
+  public OSMWithTags parent;
   public MultiPolygon jtsMultiPolygon;
 
   Area(
