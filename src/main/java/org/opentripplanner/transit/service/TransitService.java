@@ -189,5 +189,7 @@ public interface TransitService {
 
   Collection<RegularStop> findRegularStop(Envelope envelope);
 
+  Collection<AreaStop> findAreaStops(Envelope envelope);
+
   GraphUpdaterStatus getUpdaterStatus();
 }
