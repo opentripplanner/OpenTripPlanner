@@ -24,6 +24,7 @@ import org.geotools.geometry.Envelope2D;
 import org.glassfish.grizzly.http.server.Request;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
+import org.opentripplanner.ext.vectortiles.layers.areastops.AreaStopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
@@ -50,6 +51,11 @@ public class VectorTilesResource {
       LayerType.Stop,
       (graph, transitService, layerParameters, locale) ->
         new StopsLayerBuilder(transitService, layerParameters, locale)
+    );
+    layers.put(
+      LayerType.AreaStop,
+      (graph, transitService, layerParameters, locale) ->
+        new AreaStopsLayerBuilder(transitService, layerParameters, locale)
     );
     layers.put(
       LayerType.Station,
@@ -190,6 +196,7 @@ public class VectorTilesResource {
 
   public enum LayerType {
     Stop,
+    AreaStop,
     Station,
     VehicleRental,
     VehicleRentalVehicle,
