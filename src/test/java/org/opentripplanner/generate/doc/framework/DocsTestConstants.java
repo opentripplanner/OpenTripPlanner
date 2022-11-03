@@ -4,6 +4,9 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Define a few constants used by most of the doc generating tests.
+ */
 public interface DocsTestConstants {
   Logger LOG = LoggerFactory.getLogger(DocsTestConstants.class);
   File TEMPLATE_ROOT = new File("doc-templates");
