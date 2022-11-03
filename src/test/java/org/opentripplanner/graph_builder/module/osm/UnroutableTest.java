@@ -47,7 +47,8 @@ public class UnroutableTest {
       Set.of(),
       graph,
       noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
     osmBuilder.buildGraph();
   }

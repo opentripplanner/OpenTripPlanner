@@ -58,7 +58,8 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
 
     osmModule.buildGraph();
@@ -125,7 +126,8 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       gg,
       noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
 
     osmModule.buildGraph();
@@ -340,9 +342,9 @@ public class OpenStreetMapModuleTest {
       Set.of(),
       graph,
       noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      !skipVisibility
     );
-    loader.skipVisibility = skipVisibility;
 
     loader.buildGraph();
 

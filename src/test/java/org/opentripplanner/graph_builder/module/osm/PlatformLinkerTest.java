@@ -44,10 +44,10 @@ public class PlatformLinkerTest {
       Set.of(),
       gg,
       DataImportIssueStore.noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
     osmModule.platformEntriesLinking = true;
-    osmModule.skipVisibility = false;
 
     osmModule.buildGraph();
 

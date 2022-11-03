@@ -29,7 +29,6 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.model.StreetNote;
-import org.opentripplanner.openstreetmap.OSMOpeningHoursParser;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -83,8 +82,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
   private final OsmTagMapper osmTagMapper;
   private final Graph graph;
-  private OSMOpeningHoursParser osmOpeningHoursParser;
-  public boolean skipVisibility = false;
+
+  private final boolean areaVisibility;
   // Members that can be set by clients.
   public boolean platformEntriesLinking = false;
   /**
@@ -117,13 +116,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     Set<String> boardingAreaRefTags,
     Graph graph,
     DataImportIssueStore issueStore,
-    OsmTagMapper osmTagMapper
+    OsmTagMapper osmTagMapper,
+    boolean areaVisibility
   ) {
     this.providers = List.copyOf(providers);
     this.boardingAreaRefTags = boardingAreaRefTags;
     this.graph = graph;
     this.issueStore = issueStore;
     this.osmTagMapper = osmTagMapper;
+    this.areaVisibility = areaVisibility;
   }
 
   public OpenStreetMapModule(
@@ -138,10 +139,10 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       boardingAreaRefTags,
       graph,
       issueStore,
-      config.osmDefaults.osmOsmTagMapper
+      config.osmDefaults.osmOsmTagMapper,
+      config.areaVisibility
     );
     this.customNamer = config.customNamer;
-    this.skipVisibility = !config.areaVisibility;
     this.platformEntriesLinking = config.platformEntriesLinking;
     this.staticBikeParkAndRide = config.staticBikeParkAndRide;
     this.staticParkAndRide = config.staticParkAndRide;
@@ -249,7 +250,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       initIntersectionNodes();
 
       buildBasicGraph();
-      buildWalkableAreas(skipVisibility, platformEntriesLinking);
+      buildWalkableAreas(!areaVisibility, platformEntriesLinking);
 
       if (staticParkAndRide) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());

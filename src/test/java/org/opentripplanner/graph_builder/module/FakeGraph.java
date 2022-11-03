@@ -49,7 +49,8 @@ public class FakeGraph {
       Set.of(),
       gg,
       DataImportIssueStore.noopIssueStore(),
-      new DefaultMapper()
+      new DefaultMapper(),
+      true
     );
 
     osmModule.buildGraph();

@@ -139,11 +139,11 @@ public class ConstantsForTests {
           // Need to use a mutable set here, since it is used
           graph,
           noopIssueStore(),
-          new DefaultMapper()
+          new DefaultMapper(),
+          false
         );
         osmModule.staticBikeParkAndRide = true;
         osmModule.staticParkAndRide = true;
-        osmModule.skipVisibility = true;
         osmModule.buildGraph();
       }
       // Add transit data from GTFS
@@ -189,9 +189,9 @@ public class ConstantsForTests {
         Set.of(),
         graph,
         noopIssueStore(),
-        new DefaultMapper()
+        new DefaultMapper(),
+        false
       );
-      osmModule.skipVisibility = true;
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {
@@ -248,9 +248,9 @@ public class ConstantsForTests {
           Set.of(),
           graph,
           noopIssueStore(),
-          new DefaultMapper()
+          new DefaultMapper(),
+          false
         );
-        osmModule.skipVisibility = true;
         osmModule.buildGraph();
       }
       // Add transit data from Netex
