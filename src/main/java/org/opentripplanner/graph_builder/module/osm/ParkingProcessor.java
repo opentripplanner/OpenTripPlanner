@@ -435,3 +435,5 @@ public class ParkingProcessor {
     return entrances;
   }
 }
+
+record VertexAndName(I18NString name, IntersectionVertex vertex) {}
