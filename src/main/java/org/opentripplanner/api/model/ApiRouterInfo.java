@@ -44,10 +44,10 @@ public class ApiRouterInfo {
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
     this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
     this.envelope = graph.getEnvelope();
-    this.hasParkRide = graph.hasParkRide;
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
+    this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
     this.travelOptions = TravelOptionsMaker.makeOptions(graph, transitService);
     transitService.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);

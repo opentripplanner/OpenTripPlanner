@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.locationtech.jts.geom.Coordinate;
@@ -68,10 +69,6 @@ public class Graph implements Serializable {
 
   /* The preferences that were used for graph building. */
   public Preferences preferences = null;
-  // TODO OTP2: This is only enabled with static bike rental
-  public boolean hasBikeSharing = false;
-  public boolean hasParkRide = false;
-  public boolean hasBikeRide = false;
 
   /** True if OSM data was loaded into this Graph. */
   public boolean hasStreets = false;
@@ -436,6 +433,7 @@ public class Graph implements Serializable {
     return vehicleRentalStationService;
   }
 
+  @Nonnull
   public VehicleParkingService getVehicleParkingService() {
     return vehicleParkingService;
   }

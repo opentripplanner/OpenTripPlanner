@@ -26,11 +26,12 @@ public final class TravelOptionsMaker {
   }
 
   public static List<TravelOption> makeOptions(Graph graph, TransitService transitService) {
+    var service = graph.getVehicleParkingService();
     return makeOptions(
       transitService.getTransitModes(),
-      graph.hasBikeSharing,
-      graph.hasBikeRide,
-      graph.hasParkRide
+      false,
+      service.hasBikeParkingLots(),
+      service.hasCarParkingLots()
     );
   }
 

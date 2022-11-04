@@ -48,6 +48,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -221,23 +222,21 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public void buildGraph() {
       var parkingProcessor = new ParkingProcessor(graph, issueStore, this::getVertexForOsmNode);
 
+      var parkingLots = new ArrayList<VehicleParking>();
+
       if (staticParkAndRide) {
-        var carParkingLots = parkingProcessor.processParkAndRideNodes(
+        var carParkingNodes = parkingProcessor.processParkAndRideNodes(
           osmdb.getCarParkingNodes(),
           true
         );
-        if (!carParkingLots.isEmpty()) {
-          graph.getVehicleParkingService().updateVehicleParking(carParkingLots, List.of());
-        }
+        parkingLots.addAll(carParkingNodes);
       }
       if (staticBikeParkAndRide) {
-        var bikeParkingLots = parkingProcessor.processParkAndRideNodes(
+        var bikeParkingNodes = parkingProcessor.processParkAndRideNodes(
           osmdb.getBikeParkingNodes(),
           false
         );
-        if (!bikeParkingLots.isEmpty()) {
-          graph.getVehicleParkingService().updateVehicleParking(bikeParkingLots, List.of());
-        }
+        parkingLots.addAll(bikeParkingNodes);
       }
 
       for (Area area : Iterables.concat(
@@ -254,11 +253,19 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
       if (staticParkAndRide) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
-        parkingProcessor.buildParkAndRideAreas(areaGroups);
+        var carParkingAreas = parkingProcessor.buildParkAndRideAreas(areaGroups);
+        parkingLots.addAll(carParkingAreas);
+        LOG.info("Created {} car P+R areas.", carParkingAreas.size());
       }
       if (staticBikeParkAndRide) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
-        parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
+        var bikeParkingAreas = parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
+        parkingLots.addAll(bikeParkingAreas);
+        LOG.info("Created {} bike P+R areas", bikeParkingAreas.size());
+      }
+
+      if (!parkingLots.isEmpty()) {
+        graph.getVehicleParkingService().updateVehicleParking(parkingLots, List.of());
       }
 
       buildElevatorEdges(graph);

@@ -26,7 +26,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
@@ -107,26 +106,12 @@ public class ParkingProcessor {
     return vehicleParkingToAdd;
   }
 
-  public void buildBikeParkAndRideAreas(List<AreaGroup> areaGroups) {
-    LOG.info("Building bike P+R areas");
-    List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, false);
-    if (!vehicleParkingToAdd.isEmpty()) {
-      graph.hasBikeRide = true;
-      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-      vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
-    }
-    LOG.info("Created {} bike P+R areas.", vehicleParkingToAdd.size());
+  public Collection<VehicleParking> buildBikeParkAndRideAreas(List<AreaGroup> areaGroups) {
+    return buildParkAndRideAreasForGroups(areaGroups, false);
   }
 
-  public void buildParkAndRideAreas(List<AreaGroup> areaGroups) {
-    LOG.info("Building car P+R areas");
-    List<VehicleParking> vehicleParkingToAdd = buildParkAndRideAreasForGroups(areaGroups, true);
-    if (!vehicleParkingToAdd.isEmpty()) {
-      graph.hasParkRide = true;
-      VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-      vehicleParkingService.updateVehicleParking(vehicleParkingToAdd, List.of());
-    }
-    LOG.info("Created {} car P+R areas.", vehicleParkingToAdd.size());
+  public Collection<VehicleParking> buildParkAndRideAreas(List<AreaGroup> areaGroups) {
+    return buildParkAndRideAreasForGroups(areaGroups, true);
   }
 
   private List<VehicleParking> buildParkAndRideAreasForGroups(
