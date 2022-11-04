@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
 /**
  * A group of possibly-contiguous areas sharing the same level
  */
-public class AreaGroup {
+class AreaGroup {
 
   private static final Logger LOG = LoggerFactory.getLogger(AreaGroup.class);
 
   /*
    * The list of underlying areas, used when generating edges out of the visibility graph
    */
-  public final Collection<Area> areas;
+  Collection<Area> areas;
 
   /**
    * The joined outermost rings of the areas (with inner rings for holes as necessary).
