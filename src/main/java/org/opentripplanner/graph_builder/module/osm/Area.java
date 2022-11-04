@@ -25,7 +25,7 @@ class Area {
 
   final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
-  public OSMWithTags parent;
+  OSMWithTags parent;
   public MultiPolygon jtsMultiPolygon;
 
   Area(
