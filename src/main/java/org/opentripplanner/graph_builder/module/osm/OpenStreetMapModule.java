@@ -225,14 +225,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       var parkingLots = new ArrayList<VehicleParking>();
 
       if (staticParkAndRide) {
-        var carParkingNodes = parkingProcessor.processParkAndRideNodes(
+        var carParkingNodes = parkingProcessor.buildParkAndRideNodes(
           osmdb.getCarParkingNodes(),
           true
         );
         parkingLots.addAll(carParkingNodes);
       }
       if (staticBikeParkAndRide) {
-        var bikeParkingNodes = parkingProcessor.processParkAndRideNodes(
+        var bikeParkingNodes = parkingProcessor.buildParkAndRideNodes(
           osmdb.getBikeParkingNodes(),
           false
         );

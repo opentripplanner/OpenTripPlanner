@@ -58,7 +58,7 @@ public class ParkingProcessor {
       new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
   }
 
-  public List<VehicleParking> processParkAndRideNodes(
+  public List<VehicleParking> buildParkAndRideNodes(
     Collection<OSMNode> nodes,
     boolean isCarParkAndRide
   ) {
