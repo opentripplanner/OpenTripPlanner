@@ -49,16 +49,28 @@ public class TripTimeShortHelper {
         }
          */
   }
+
   /**
    * Find trip time short for the from place in transit leg, or null. Use transitService.
    */
   @Nullable
-  public static TripTimeOnDate getTripTimeShortForFromPlace(Leg leg, TransitService transitService) {
-    if (!leg.isTransitLeg()) { return null; }
-    if (leg.isFlexibleTrip()) { return null; }
+  public static TripTimeOnDate getTripTimeShortForFromPlace(
+    Leg leg,
+    TransitService transitService
+  ) {
+    if (!leg.isTransitLeg()) {
+      return null;
+    }
+    if (leg.isFlexibleTrip()) {
+      return null;
+    }
 
     var serviceDate = leg.getServiceDate();
-    var tripTimes = TripTimesShortHelper.getTripTimesShort(transitService, leg.getTrip(), serviceDate);
+    var tripTimes = TripTimesShortHelper.getTripTimesShort(
+      transitService,
+      leg.getTrip(),
+      serviceDate
+    );
 
     return tripTimes.get(leg.getBoardStopPosInPattern());
   }
@@ -93,11 +105,19 @@ public class TripTimeShortHelper {
   }
 
   public static TripTimeOnDate getTripTimeShortForToPlace(Leg leg, TransitService transitService) {
-    if (!leg.isTransitLeg()) { return null; }
-    if (leg.isFlexibleTrip()) { return null; }
+    if (!leg.isTransitLeg()) {
+      return null;
+    }
+    if (leg.isFlexibleTrip()) {
+      return null;
+    }
 
     var serviceDate = leg.getServiceDate();
-    var tripTimes = TripTimesShortHelper.getTripTimesShort(transitService, leg.getTrip(), serviceDate);
+    var tripTimes = TripTimesShortHelper.getTripTimesShort(
+      transitService,
+      leg.getTrip(),
+      serviceDate
+    );
 
     return tripTimes.get(leg.getAlightStopPosInPattern());
   }
@@ -140,13 +160,24 @@ public class TripTimeShortHelper {
       .collect(Collectors.toList());
   }
 
-  public static List<TripTimeOnDate> getIntermediateTripTimeShortsForLeg(Leg leg, TransitService transitService) {
-    if (!leg.isTransitLeg()) { return List.of(); }
-    if (leg.isFlexibleTrip()) { return List.of(); }
+  public static List<TripTimeOnDate> getIntermediateTripTimeShortsForLeg(
+    Leg leg,
+    TransitService transitService
+  ) {
+    if (!leg.isTransitLeg()) {
+      return List.of();
+    }
+    if (leg.isFlexibleTrip()) {
+      return List.of();
+    }
 
     var serviceDate = leg.getServiceDate();
 
-    var tripTimes = TripTimesShortHelper.getTripTimesShort(transitService, leg.getTrip(), serviceDate);
+    var tripTimes = TripTimesShortHelper.getTripTimesShort(
+      transitService,
+      leg.getTrip(),
+      serviceDate
+    );
     return tripTimes.subList(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern());
   }
 }
