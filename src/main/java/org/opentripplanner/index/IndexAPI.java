@@ -203,7 +203,7 @@ public class IndexAPI {
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
       return new DirectGraphFinder(serverContext.transitService()::findRegularStop)
-        .findClosestStops(lat, lon, radius)
+        .findClosestStops(new Coordinate(lon, lat), radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))
         .collect(Collectors.toList());
@@ -308,7 +308,8 @@ public class IndexAPI {
       .getStopTimesForStop(
         stop,
         serviceDate,
-        omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
+        omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+        true
       );
     return StopTimesInPatternMapper.mapToApi(stopTimes);
   }

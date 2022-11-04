@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.AccessPathView;
 
@@ -11,9 +11,9 @@ import org.opentripplanner.transit.raptor.api.view.AccessPathView;
  */
 public final class AccessStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
 
-  private final RaptorTransfer access;
+  private final RaptorAccessEgress access;
 
-  public AccessStopArrival(int departureTime, RaptorTransfer access) {
+  public AccessStopArrival(int departureTime, RaptorAccessEgress access) {
     super(
       access.stop(),
       departureTime,

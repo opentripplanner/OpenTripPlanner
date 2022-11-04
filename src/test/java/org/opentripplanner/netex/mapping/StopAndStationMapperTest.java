@@ -1,13 +1,18 @@
 package org.opentripplanner.netex.mapping;
 
+import static graphql.Assert.assertFalse;
+import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalVersionMapById;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -17,6 +22,7 @@ import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
+import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
@@ -26,6 +32,8 @@ import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 public class StopAndStationMapperTest {
+
+  public static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("Europe/Oslo");
 
   @Test
   public void testWheelChairBoarding() {
@@ -68,7 +76,9 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       new HierarchicalVersionMapById<>(),
       null,
-      DataImportIssueStore.noopIssueStore()
+      DEFAULT_TIME_ZONE,
+      DataImportIssueStore.noopIssueStore(),
+      false
     );
 
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
@@ -146,7 +156,9 @@ public class StopAndStationMapperTest {
       MappingSupport.ID_FACTORY,
       quaysById,
       null,
-      DataImportIssueStore.noopIssueStore()
+      DEFAULT_TIME_ZONE,
+      DataImportIssueStore.noopIssueStore(),
+      false
     );
 
     stopMapper.mapParentAndChildStops(stopPlaces);
@@ -186,6 +198,47 @@ public class StopAndStationMapperTest {
     assertEquals(59.909911, childStop1.getLat(), 0.0001);
     assertEquals(10.753008, childStop1.getLon(), 0.0001);
     assertEquals("A", childStop1.getPlatformCode());
+
+    assertEquals(DEFAULT_TIME_ZONE, parentStop.getTimezone());
+    assertEquals(DEFAULT_TIME_ZONE, childStop1.getTimeZone());
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = { "true", "false" })
+  public void testMapIsolatedStopPlace(boolean isolated) {
+    Collection<StopPlace> stopPlaces = new ArrayList<>();
+    StopPlace stopPlace;
+    stopPlace =
+      createStopPlace(
+        "NSR:StopPlace:1",
+        "Oslo A",
+        "1",
+        59.909584,
+        10.755165,
+        VehicleModeEnumeration.TRAM
+      );
+
+    stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
+
+    stopPlaces.add(stopPlace);
+    StopAndStationMapper stopMapper = new StopAndStationMapper(
+      MappingSupport.ID_FACTORY,
+      new HierarchicalVersionMapById<>(),
+      null,
+      DEFAULT_TIME_ZONE,
+      DataImportIssueStore.noopIssueStore(),
+      isolated
+    );
+
+    stopMapper.mapParentAndChildStops(stopPlaces);
+    Collection<Station> stations = stopMapper.resultStations;
+
+    assertEquals(1, stations.size());
+    if (isolated) {
+      assertTrue(stations.stream().findFirst().get().isTransfersNotAllowed());
+    } else {
+      assertFalse(stations.stream().findFirst().get().isTransfersNotAllowed());
+    }
   }
 
   private static StopPlace createStopPlace(

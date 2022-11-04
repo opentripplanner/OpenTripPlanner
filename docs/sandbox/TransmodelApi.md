@@ -55,6 +55,8 @@
   [#4365](https://github.com/opentripplanner/OpenTripPlanner/pull/4365)
 - Allow specifying allowed/banned rental networks in trip query
   [#4459](https://github.com/opentripplanner/OpenTripPlanner/pull/4459)
+- Add flexible stops
+  [#4485](https://github.com/opentripplanner/OpenTripPlanner/pull/4485)
 
 ## Documentation
 

@@ -274,7 +274,9 @@ type BikePark implements Node & PlaceInterface {
     bikeParkId: String
 
     """Name of the bike park"""
-    name: String!
+    name(
+        """Returns name with the specified language, if found, otherwise returns with some default language."""
+        language: String): String!
 
     """Number of spaces available for bikes"""
     spacesAvailable: Int
@@ -318,7 +320,9 @@ type VehicleParking implements Node & PlaceInterface {
     vehicleParkingId: String
 
     """Name of the park"""
-    name: String!
+    name(
+        """Returns name with the specified language, if found, otherwise returns with some default language."""
+        language: String): String!
 
     """
     If true, value of `spacesAvailable` is updated from a real-time source.
@@ -350,7 +354,9 @@ type VehicleParking implements Node & PlaceInterface {
     """
     A short translatable note containing details of this vehicle parking.
     """
-    note: String
+    note(
+        """Returns note with the specified language, if found, otherwise returns with some default language."""
+        language: String): String
 
     """
     The state of this vehicle parking.
@@ -722,7 +728,9 @@ type CarPark implements Node & PlaceInterface {
     carParkId: String
 
     """Name of the car park"""
-    name: String!
+    name(
+        """Returns name with the specified language, if found, otherwise returns with some default language."""
+        language: String): String!
 
     """Number of parking spaces at the car park"""
     maxCapacity: Int
@@ -1114,20 +1122,21 @@ input InputUnpreferred {
     agencies: String
 
     """
-    An cost function used to calculate penalty for an unpreferred route. Function should return
-    number of seconds that we are willing to wait for preferred route. String must be of the format:
+    An cost function used to calculate penalty for an unpreferred route/agency. Function should return
+    number of seconds that we are willing to wait for unpreferred route/agency.
+    String must be of the format:
     `A + B x`, where A is fixed penalty and B is a multiplier of transit leg travel time x.
     For example: `600 + 2.0 x`
     """
-    unpreferredRouteCost: String
+    unpreferredCost: String
 
     """
     Penalty added for using route that is unpreferred, i.e. number of seconds that we are willing to
     wait for route that is unpreferred.
 
-    Deprecated: Use `unpreferredRouteCost` instead.
+    Deprecated: Use `unpreferredCost` instead.
     """
-    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredRouteCost instead")
+    useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredCost instead")
 }
 
 enum RoutingErrorCode {
@@ -2435,6 +2444,8 @@ type QueryType {
         """
         How much less bad is waiting at the beginning of the trip (replaces
         `waitReluctance` on the first boarding). Default value: 0.4
+
+        Deprecated, not used, the timetable-view replaces this functionality.
         """
         waitAtBeginningFactor: Float
 
@@ -3220,7 +3231,11 @@ type Stoptime {
     the trip (e.g. on routes which run on loops), so this value should be used
     instead of `tripHeadsign` to display the headsign relevant to the user.
     """
-    headsign: String
+    headsign(
+        """If translated headsign is found from gtfs translation.txt and wanted language is not same as
+    feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+    """
+    language: String): String
 }
 
 """Stoptimes grouped by pattern"""
@@ -3290,9 +3305,12 @@ type Trip implements Node {
     """List of dates when this trip is in service. Format: YYYYMMDD"""
     activeDates: [String]
     tripShortName: String
-
     """Headsign of the vehicle when running on this trip"""
-    tripHeadsign: String
+    tripHeadsign(
+        """If translated headsign is found from gtfs translation.txt and wanted language is not same as
+        feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
+        """
+        language: String): String
 
     """
     Short name of the route this trip is running. See field `shortName` of Route.

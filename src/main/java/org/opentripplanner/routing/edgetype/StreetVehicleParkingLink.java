@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -33,8 +34,6 @@ public class StreetVehicleParkingLink extends Edge {
   }
 
   public State traverse(State s0) {
-    final var options = s0.getOptions();
-
     // Disallow traversing two StreetBikeParkLinks in a row.
     // Prevents router using bike rental stations as shortcuts to get around
     // turn restrictions.
@@ -52,7 +51,11 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
-    if (hasMissingRequiredTags(options, vehicleParking) || hasBannedTags(options, vehicleParking)) {
+    final VehicleParkingRequest parkingRequest = s0.getRequest().parking();
+    if (
+      hasMissingRequiredTags(vehicleParking, parkingRequest.requiredTags()) ||
+      hasBannedTags(vehicleParking, parkingRequest.bannedTags())
+    ) {
       return null;
     }
 
@@ -74,21 +77,18 @@ public class StreetVehicleParkingLink extends Edge {
     return 0;
   }
 
-  private boolean hasBannedTags(RouteRequest options, VehicleParking vehicleParking) {
-    if (options.journey().parking().bannedTags().isEmpty()) {
+  private boolean hasBannedTags(VehicleParking vehicleParking, Set<String> bannedTags) {
+    if (bannedTags.isEmpty()) {
       return false;
     }
 
-    return vehicleParking
-      .getTags()
-      .stream()
-      .anyMatch(options.journey().parking().bannedTags()::contains);
+    return vehicleParking.getTags().stream().anyMatch(bannedTags::contains);
   }
 
-  private boolean hasMissingRequiredTags(RouteRequest options, VehicleParking vehicleParking) {
-    if (options.journey().parking().requiredTags().isEmpty()) {
+  private boolean hasMissingRequiredTags(VehicleParking vehicleParking, Set<String> requiredTags) {
+    if (requiredTags.isEmpty()) {
       return false;
     }
-    return !vehicleParking.getTags().containsAll(options.journey().parking().requiredTags());
+    return !vehicleParking.getTags().containsAll(requiredTags);
   }
 }

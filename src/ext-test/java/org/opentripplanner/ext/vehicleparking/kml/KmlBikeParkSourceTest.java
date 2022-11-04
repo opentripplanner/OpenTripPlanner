@@ -11,6 +11,8 @@ public class KmlBikeParkSourceTest {
 
   private static final String TEST_FEED_ID = "testFeed";
 
+  private static final double EPSILON = 0.0001;
+
   @Test
   public void testKML() {
     var parameters = new KmlUpdaterParameters(
@@ -30,10 +32,12 @@ public class KmlBikeParkSourceTest {
     VehicleParking zwolle = bikeParks.get(4);
     assertEquals("Station Alkmaar", alkmaar.getName().toString());
     assertEquals("Station Zwolle", zwolle.getName().toString());
-    assertTrue(alkmaar.getX() >= 4.739850 && alkmaar.getX() <= 4.739851);
-    assertTrue(alkmaar.getY() >= 52.637531 && alkmaar.getY() <= 52.637532);
-    assertTrue(zwolle.getX() >= 6.091060 && zwolle.getX() <= 6.091061);
-    assertTrue(zwolle.getY() >= 52.504990 && zwolle.getY() <= 52.504991);
+    var alkmaarCoordinate = alkmaar.getCoordinate();
+    assertEquals(4.739850, alkmaarCoordinate.longitude(), EPSILON);
+    assertEquals(52.637531, alkmaarCoordinate.latitude(), EPSILON);
+    var zwolleCoordinate = zwolle.getCoordinate();
+    assertEquals(6.091060, zwolleCoordinate.longitude(), EPSILON);
+    assertEquals(52.504990, zwolleCoordinate.latitude(), EPSILON);
   }
 
   @Test
@@ -55,9 +59,11 @@ public class KmlBikeParkSourceTest {
     VehicleParking almere = bikeParks.get(4);
     assertEquals("Station Alkmaar", alkmaar.getName().toString());
     assertEquals("Station Almere Centrum", almere.getName().toString());
-    assertTrue(alkmaar.getX() >= 4.739850 && alkmaar.getX() <= 4.739851);
-    assertTrue(alkmaar.getY() >= 52.637531 && alkmaar.getY() <= 52.637532);
-    assertTrue(almere.getX() >= 5.21780 && almere.getX() <= 5.21782);
-    assertTrue(almere.getY() >= 52.3746190 && almere.getY() <= 52.3746191);
+    var alkmaarCoordinate = alkmaar.getCoordinate();
+    assertEquals(4.739850, alkmaarCoordinate.longitude(), EPSILON);
+    assertEquals(52.637531, alkmaarCoordinate.latitude(), EPSILON);
+    var almereCoordinate = almere.getCoordinate();
+    assertEquals(5.21780, almereCoordinate.longitude(), EPSILON);
+    assertEquals(52.3746190, almereCoordinate.latitude(), EPSILON);
   }
 }

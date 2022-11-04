@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
@@ -54,25 +55,24 @@ public class LegacyGraphQLVehicleParkingImpl
 
   @Override
   public DataFetcher<Double> lat() {
-    return environment -> getSource(environment).getY();
+    return environment -> getSource(environment).getCoordinate().latitude();
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return environment -> getSource(environment).getX();
+    return environment -> getSource(environment).getCoordinate().longitude();
   }
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString();
+    return environment ->
+      LegacyGraphQLUtils.getTranslation(getSource(environment).getName(), environment);
   }
 
   @Override
   public DataFetcher<String> note() {
-    return environment -> {
-      var note = getSource(environment).getNote();
-      return note != null ? note.toString() : null;
-    };
+    return environment ->
+      LegacyGraphQLUtils.getTranslation(getSource(environment).getNote(), environment);
   }
 
   @Override

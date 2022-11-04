@@ -14,70 +14,43 @@ jobs:
         include:
 
           - location: germany # all of Germany (500k stops, 200k patterns) but no OSM
-            transit-url: https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip
-            transit-filename: germany.gtfs.zip
             iterations: 1
             jfr-delay: "50s"
 
           - location: norway
-            osm-url: https://download.geofabrik.de/europe/norway-210101.osm.pbf
-            transit-url: https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip
-            transit-filename: rb_norway-aggregated-netex.zip
             iterations: 4
             jfr-delay: "35s"
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
-            osm-url: https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf
-            transit-url: https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip
-            transit-filename: baden-wuerttemberg.gtfs.zip
             iterations: 4
             jfr-delay: "50s"
 
+          - location: skanetrafiken
+            iterations: 1
+            jfr-delay: "50s"
     steps:
-      - uses: actions/checkout@v2.3.2
+      - uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 17
+          distribution: temurin
+          cache: maven
 
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.2
+        uses: stCarolas/setup-maven@v.4.5
         with:
           maven-version: 3.8.2
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-
-      - name: Cache graph input files
-        uses: actions/cache@v2
-        with:
-          path: |
-            graph/*.pbf
-            graph/*.zip
-          key: graph-${{ matrix.transit-url}}-${{ matrix.osm-url}}
 
       - name: Build jar
         run: mvn -DskipTests --batch-mode package -P prettierSkip
 
-      - name: Download OSM & Netex data
-        run: |
-          mkdir -p graph
-          if [ "${{ matrix.osm-url }}" = "" ];
-          then
-            echo "No OSM download specified. Skipping..."
-          else
-            wget ${{ matrix.osm-url }} -O graph/osm.pbf --no-clobber -q --show-progress --progress=bar:force || true
-          fi
-          wget ${{ matrix.transit-url }} -O graph/${{ matrix.transit-filename }} --no-clobber -q --show-progress --progress=bar:force || true
-
       - name: Build graph
         run: |
+          mkdir graph
           cp test/performance/${{ matrix.location }}/build-config.json graph/build-config.json
           cp target/otp-*-SNAPSHOT-shaded.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save graph

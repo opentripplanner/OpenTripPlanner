@@ -12,10 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType;
@@ -35,7 +34,6 @@ import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 public class BikeRentalTest extends GraphRoutingTest {
 
   private final String NON_NETWORK = "non network";
-  private Graph graph;
   private TransitStopVertex S1;
   private TemporaryStreetLocation T1, T2;
   private TransitEntranceVertex E1;
@@ -54,7 +52,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     //   D <-> E1
     //   D <-> T2
 
-    var otpModel = modelOf(
+    modelOf(
       new Builder() {
         @Override
         public void build() {
@@ -86,7 +84,6 @@ public class BikeRentalTest extends GraphRoutingTest {
         }
       }
     );
-    graph = otpModel.graph();
   }
 
   // This tests exists to test if the cost of walking with a bike changes
@@ -581,15 +578,17 @@ public class BikeRentalTest extends GraphRoutingTest {
       toVertex,
       arriveBy,
       options -> {
-        options.preferences().rental().setUseAvailabilityInformation(useAvailabilityInformation);
+        options.withPreferences(p ->
+          p.withRental(rental ->
+            rental
+              .withUseAvailabilityInformation(useAvailabilityInformation)
+              .withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost)
+          )
+        );
         options
           .journey()
           .rental()
           .setAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
-        options
-          .preferences()
-          .rental()
-          .setArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
       }
     );
   }
@@ -601,13 +600,14 @@ public class BikeRentalTest extends GraphRoutingTest {
     Consumer<RouteRequest> optionsSetter
   ) {
     var request = new RouteRequest();
-    var preferences = request.preferences();
 
     request.setArriveBy(arriveBy);
-    preferences.rental().setPickupTime(42);
-    preferences.rental().setPickupCost(62);
-    preferences.rental().setDropoffCost(33);
-    preferences.rental().setDropoffTime(15);
+
+    request.withPreferences(preferences ->
+      preferences.withRental(rental ->
+        rental.withPickupTime(42).withPickupCost(62).withDropoffCost(33).withDropoffTime(15)
+      )
+    );
 
     optionsSetter.accept(request);
 
@@ -627,11 +627,12 @@ public class BikeRentalTest extends GraphRoutingTest {
     RouteRequest options,
     StreetMode streetMode
   ) {
-    var bikeRentalOptions = options.getStreetSearchRequest(streetMode);
-
     var tree = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(bikeRentalOptions, graph, fromVertex, toVertex))
+      .setRequest(options)
+      .setStreetRequest(new StreetRequest(streetMode))
+      .setFrom(fromVertex)
+      .setTo(toVertex)
       .getShortestPathTree();
 
     var path = tree.getPath(arriveBy ? fromVertex : toVertex);

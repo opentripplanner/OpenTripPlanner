@@ -18,6 +18,8 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.I18NString;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -68,7 +70,7 @@ class StopTimesMapper {
 
   private final ReadOnlyHierarchicalMapById<FlexibleLine> flexibleLinesById;
 
-  private String currentHeadSign;
+  private I18NString currentHeadSign;
 
   private List<String> currentHeadSignVias;
 
@@ -335,7 +337,7 @@ class StopTimesMapper {
         );
 
         if (destinationDisplay != null) {
-          currentHeadSign = destinationDisplay.getFrontText().getValue();
+          currentHeadSign = new NonLocalizedString(destinationDisplay.getFrontText().getValue());
           Vias_RelStructure viaValues = destinationDisplay.getVias();
           if (viaValues != null && viaValues.getVia() != null) {
             currentHeadSignVias =

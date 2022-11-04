@@ -3,10 +3,9 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.join;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flex;
+import static org.opentripplanner.transit.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flex;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.flexAndWalk;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
 
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -47,13 +47,13 @@ public class B11_FlexEgressTest implements RaptorTestConstants {
     );
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_B, D1m))
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D1m))
       // All egress paths are all pareto-optimal (McRaptor).
       .addEgressPaths(
         flexAndWalk(STOP_C, D7m), // best combination of transfers and time
         flex(STOP_D, D3m, TWO_RIDES), // earliest arrival time
         flexAndWalk(STOP_E, D1m59s, TWO_RIDES), // lowest cost
-        walk(STOP_F, D10m) // lowest num-of-transfers (0)
+        TestAccessEgress.walk(STOP_F, D10m) // lowest num-of-transfers (0)
       );
     requestBuilder.searchParams().earliestDepartureTime(T00_00).latestArrivalTime(T00_30);
 

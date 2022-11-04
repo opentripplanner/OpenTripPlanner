@@ -13,6 +13,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
  * A base class for OSM entities containing common methods.
@@ -283,10 +284,14 @@ public class OSMWithTags {
   /**
    * Returns true if bikes are explicitly denied access.
    * <p>
-   * bicycle is denied if bicycle:no, bicycle:license or bicycle:use_sidepath
+   * bicycle is denied if bicycle:no, bicycle:dismount, bicycle:license or bicycle:use_sidepath
    */
   public boolean isBicycleExplicitlyDenied() {
-    return isTagDeniedAccess("bicycle") || "use_sidepath".equals(getTag("bicycle"));
+    return (
+      isTagDeniedAccess("bicycle") ||
+      "dismount".equals(getTag("bicycle")) ||
+      "use_sidepath".equals(getTag("bicycle"))
+    );
   }
 
   /**
@@ -396,5 +401,10 @@ public class OSMWithTags {
   private boolean isTagDeniedAccess(String tagName) {
     String tagValue = getTag(tagName);
     return "no".equals(tagValue) || "license".equals(tagValue);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(this.getClass()).addObj("tags", tags).toString();
   }
 }

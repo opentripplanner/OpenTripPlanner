@@ -17,6 +17,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
 import org.slf4j.Logger;
@@ -71,8 +72,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       builder
         .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
         .name(new NonLocalizedString(jsonNode.path("name").asText()))
-        .x(x)
-        .y(y)
+        .coordinate(new WgsCoordinate(y, x))
         .walkAccessible(true)
         .carAccessible(true);
 
@@ -98,8 +98,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .id(vehicleParkId)
       .name(new NonLocalizedString(jsonNode.path("name").asText()))
       .state(state)
-      .x(x)
-      .y(y)
+      .coordinate(new WgsCoordinate(y, x))
       .openingHoursCalendar(parseOpeningHours(jsonNode.path("opening_hours"), vehicleParkId))
       // TODO
       // .feeHours(parseOpeningHours(jsonNode.path("fee_hours")))

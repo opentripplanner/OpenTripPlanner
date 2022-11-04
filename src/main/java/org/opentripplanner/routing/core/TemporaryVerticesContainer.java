@@ -12,6 +12,7 @@ import org.opentripplanner.graph_builder.linking.DisposableEdgeCollection;
 import org.opentripplanner.graph_builder.linking.SameEdgeAdjuster;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -23,7 +24,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
- * This class is responsible for linking the RoutingRequest origin and destination to the Graph used
+ * This class is responsible for linking the RouteRequest origin and destination to the Graph used
  * in the A-Star search, as well as removing them after the search has been done. It implements
  * AutoCloseable, in order to be able to use the try-with-resources statement, making the clean-up
  * automatic.
@@ -36,14 +37,19 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
 
-  public TemporaryVerticesContainer(Graph graph, RouteRequest opt) {
+  public TemporaryVerticesContainer(
+    Graph graph,
+    RouteRequest opt,
+    StreetMode accessMode,
+    StreetMode egressMode
+  ) {
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
     StreetVertexIndex index = this.graph.getStreetIndex();
     this.opt = opt;
-    fromVertices = index.getVerticesForLocation(opt.from(), opt, false, tempEdges);
-    toVertices = index.getVerticesForLocation(opt.to(), opt, true, tempEdges);
+    fromVertices = index.getVerticesForLocation(opt.from(), accessMode, false, tempEdges);
+    toVertices = index.getVerticesForLocation(opt.to(), egressMode, true, tempEdges);
 
     checkIfVerticesFound(opt.arriveBy());
 

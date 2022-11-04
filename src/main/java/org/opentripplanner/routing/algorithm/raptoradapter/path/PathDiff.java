@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.path;
 
-import static org.opentripplanner.util.lang.TableFormatter.Align.Center;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Left;
-import static org.opentripplanner.util.lang.TableFormatter.Align.Right;
+import static org.opentripplanner.framework.text.Table.Align.Center;
+import static org.opentripplanner.framework.text.Table.Align.Left;
+import static org.opentripplanner.framework.text.Table.Align.Right;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,13 +10,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.text.Table;
+import org.opentripplanner.framework.text.TableBuilder;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.CompositeComparator;
-import org.opentripplanner.util.lang.TableFormatter;
 import org.opentripplanner.util.time.DurationUtils;
 import org.opentripplanner.util.time.TimeUtils;
 
@@ -67,10 +68,10 @@ public class PathDiff<T extends RaptorTripSchedule> {
   ) {
     var result = diff(left, right, skipCost);
 
-    TableFormatter tbl = new TableFormatter(
-      List.of(Center, Right, Right, Right, Right, Right, Right, Left),
-      List.of("STATUS", "TX", "Duration", "Cost", "Walk", "Start", "End", "Path")
-    );
+    TableBuilder tbl = Table
+      .of()
+      .withAlights(Center, Right, Right, Right, Right, Right, Right, Left)
+      .withHeaders("STATUS", "TX", "Duration", "Cost", "Walk", "Start", "End", "Path");
 
     for (DiffEntry<PathDiff<T>> e : result) {
       if (skipEquals && e.isEqual()) {

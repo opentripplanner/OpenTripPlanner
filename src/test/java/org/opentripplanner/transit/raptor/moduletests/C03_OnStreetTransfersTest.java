@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.moduletests;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.transit.raptor._data.transit.TestRoute.route;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.transit.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider.defaultSlackProvider;
@@ -12,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor._data.RaptorTestConstants;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTransitData;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
@@ -54,7 +55,7 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
     );
 
     // It is not possible to transfer from D -> C
-    data.withTransfer(STOP_C, walk(STOP_D, D30s));
+    data.withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30s));
 
     data.withRoute(
       route(pattern("R2", STOP_D, STOP_E))
@@ -66,8 +67,8 @@ public class C03_OnStreetTransfersTest implements RaptorTestConstants {
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(walk(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
-      .addEgressPaths(walk(STOP_E, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
+      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s)) // Start walking 1m before: 30s walk + 30s board-slack
+      .addEgressPaths(TestAccessEgress.walk(STOP_E, D20s)) // Ends 30s after last stop arrival: 10s alight-slack + 20s walk
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T00_30)
       .searchWindowInSeconds(D3m);

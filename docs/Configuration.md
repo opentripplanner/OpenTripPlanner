@@ -1,3 +1,10 @@
+<!--
+  NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
+
+   - Template directory is:  /doc-templates
+   - Generated directory is: /docs 
+-->
+
 # Configuring OpenTripPlanner
 
 _Note: if you are familiar with OTP1 configuration and are migrating to OTP2, please read the
@@ -58,25 +65,34 @@ nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` or `fals
 these basic types some configuration parameters are parsed with some restrictions. In the
 documentation below we will refer to the following types:
 
-| Type            | Description                                                                                                                                                                                                                                                         | Examples                                                                                                                                                                                                       |
-|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| boolean         | This is the Boolean JSON type.                                                                                                                                                                                                                                      | `true` or `false`                                                                                                                                                                                              |
-| number          | This is the Number JSON type.                                                                                                                                                                                                                                       | `1`, `5`, `3.14`                                                                                                                                                                                               |
-| string          | A quoted string. This is the String JSON type.                                                                                                                                                                                                                      | `"This is a string!"`                                                                                                                                                                                          |
-| _Type_[]        | Array of of given Type. This is the Array JSON type.                                                                                                                                                                                                                | `[ 1, 2, 3 ]`                                                                                                                                                                                                  |
-| double          | A decimal floating point _number_. 64 bit.                                                                                                                                                                                                                          | `3.14`                                                                                                                                                                                                         |
-| integer         | A decimal integer _number_. 32 bit.                                                                                                                                                                                                                                 | `1`, `-7`, `2100200300`                                                                                                                                                                                        |
-| long            | A decimal integer _number_. 64 bit.                                                                                                                                                                                                                                 | `-1234567890123456789`                                                                                                                                                                                         |
-| enum            | A fixed set of string literals.                                                                                                                                                                                                                                     | BicycleOptimize: `"QUICK"`, `"SAFE"` ...                                                                                                                                                                       |
-| enum-map        | List of key/value pairs, where the key is a enum and the value can be any given type.                                                                                                                                                                               | `{ RAIL: 1.2, BUS: 2.3 }`                                                                                                                                                                                      |
-| enum-set        | List of enum string values                                                                                                                                                                                                                                          | `[ "RAIL", "TRAM" ]`                                                                                                                                                                                           |
-| locale          | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).           | `en_US`, `nn_NO`                                                                                                                                                                                               |
-| date            | Local date. The format is _YYYY-MM-DD_ (ISO-8601).                                                                                                                                                                                                                  | `2020-09-21`                                                                                                                                                                                                   |
-| date or period  | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number.                                                                                    | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.                                                                                                                  |
-| duration        | A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where `n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not case sensitive.                                                                         | `3h` is 3 hours, `2m` means 2 minutes, and `1d5h2m3s` is 1 day, 5 hours, 2 minutes and 3 seconds. Use the "PT" form with negative values like `-P2dT-1s` and `P-2dT1s` (both is minus 2 days plus one second). |
-| regexp pattern  | A regular expression pattern used to match a sting.                                                                                                                                                                                                                 | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension. |
-| uri             | An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path.                                                                                                                                                           | `"gs://bucket/path/a.obj"` `"http://foo.bar/"` `"file:///Users/x/local/file"` `"myGraph.obj"` `"../street/streetGraph-${otp.serialization.version.id}.obj"`                                                    |
-| linear function | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x` | `"600 + 2.0 x"`                                                                                                                                                                                                |
+<!-- CONFIGURATION-TYPES-TABLE BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Type              | Description                                                                                                                                                                                                                                            | Examples                                                             |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| `boolean`         | This is the Boolean JSON type                                                                                                                                                                                                                          | `true`, `false`                                                      |
+| `string`          | This is the String JSON type.                                                                                                                                                                                                                          | `"This is a string!"`                                                |
+| `double`          | A decimal floating point _number_. 64 bit.                                                                                                                                                                                                             | `3.15`                                                               |
+| `integer`         | A decimal integer _number_. 32 bit.                                                                                                                                                                                                                    | `1`, `-7`, `2100`                                                    |
+| `long`            | A decimal integer _number_. 64 bit.                                                                                                                                                                                                                    | `-1234567890`                                                        |
+| `enum`            | A fixed set of string literals.                                                                                                                                                                                                                        | `"RAIL"`, `"BUS"`                                                    |
+| `enum-map`        | List of key/value pairs, where the key is a enum and the value can be any given type.                                                                                                                                                                  | `{ "RAIL: 1.2, "BUS": 2.3 }`                                         |
+| `enum-set`        | List of enum string values                                                                                                                                                                                                                             | `[ "RAIL", "TRAM" ]`                                                 |
+| `locale`          | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java Locale](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html). | `"en_US"`, `"nn_NO"`                                                 |
+| `date`            | Local date. The format is _YYYY-MM-DD_ (ISO-8601).                                                                                                                                                                                                     | `"2020-09-21"`                                                       |
+| `date-or-period`  | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number.                                                                       | `"P1Y"`, `"-P3M2D"`, `"P1D"`                                         |
+| `duration`        | A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where `n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not case sensitive.                                                            | `"3h"`, `"2m"`, `"1d5h2m3s"`, `"-P2dT-1s"`                           |
+| `regexp`          | A regular expression pattern used to match a sting.                                                                                                                                                                                                    | `"$^"`, `"gtfs"`, `"\w{3})-.*\.xml"`                                 |
+| `uri`             | An URI path to a resource like a file or a URL. Relative URIs are resolved relative to the OTP base path.                                                                                                                                              | `"http://foo.bar/"`, `"file:///Users/jon/local/file"`, `"graph.obj"` |
+| `time-zone`       | Time-Zone ID                                                                                                                                                                                                                                           | `"UTC"`, `"Europe/Paris"`, `"-05:00"`                                |
+| `feed-scoped-id`  | FeedScopedId                                                                                                                                                                                                                                           | `"NO:1001"`, `"1:101"`                                               |
+| `linear-function` | A linear function with one input parameter(x) used to calculate a value. Usually used to calculate a limit or cost.                                                                                                                                    |                                                                      |
+| `map`             | List of key/value pairs, where the key is a string and the value can be any given type.                                                                                                                                                                | `{ "one": 1.2, "two": 2.3 }`                                         |
+| `object`          | Config object containing nested elements                                                                                                                                                                                                               | `"walk": { "speed": 1.3, "reluctance": 5 }`                          |
+| `array`           | Config object containing an array/list of elements                                                                                                                                                                                                     | `"array": [ 1, 2, 3 ]`                                               |
+
+<!-- CONFIGURATION-TYPES-TABLE END -->
+
 
 ## System environment and project information substitution
 
@@ -159,7 +175,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.1.0 of OTP:
+Here is an example including variable substitution, assuming version 2.2.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -172,7 +188,7 @@ Here is an example including variable substitution, assuming version 2.1.0 of OT
 // transit.json
 [
   {
-  "source": "netex-v${FEED_VERSION}.obj"
+  "source": "netex-v${maven.version.short}.obj"
 }
 ]
 ``` 
@@ -183,7 +199,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2_0.obj"
+          "source": "netex-v2.2.0.obj"
         }
       ]
 } 
@@ -196,10 +212,47 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 sandbox features are disabled. So for most OTP2 use cases it is not necessary to create this file.
 Features that can be toggled in this file are generally only affect the routing phase of OTP2 usage,
 but for consistency all such "feature flags", even those that would affect graph building, are
-managed in this one file. See
-the [OTPFeature](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/util/OTPFeature.java)
-Java class for an enumeration of all available features and their default settings. Here is an
-example:
+managed in this one file. 
+
+## OTP Features
+
+Here is a list of all features which can be toggled on/off and their default values.
+
+<!-- OTP-FEATURE-TABLE BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Feature                              | Description                                                                                                                                                                                       | Enabled by default | Sandbox |
+|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------:|:-------:|
+| `APIBikeRental`                      | Enable the bike rental endpoint.                                                                                                                                                                  |         ✓️         |         |
+| `APIServerInfo`                      | Enable the server info endpoint.                                                                                                                                                                  |         ✓️         |         |
+| `APIGraphInspectorTile`              | Enable the inspector  endpoint for graph information for inspection/debugging purpose.                                                                                                            |         ✓️         |         |
+| `APIUpdaterStatus`                   | Enable endpoint for graph updaters status.                                                                                                                                                        |         ✓️         |         |
+| `ConsiderPatternsForDirectTransfers` | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                                |         ✓️         |         |
+| `DebugClient`                        | Enable the debug web client located at the root of the web server.                                                                                                                                |         ✓️         |         |
+| `FloatingBike`                       | Enable floating bike routing.                                                                                                                                                                     |         ✓️         |         |
+| `MinimumTransferTimeIsDefinitive`    | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives from OSM data. |                    |         |
+| `OptimizeTransfers`                  | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                         |         ✓️         |         |
+| `ParallelRouting`                    | Enable performing parts of the trip planning in parallel.                                                                                                                                         |                    |         |
+| `TransferConstraints`                | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little.                                     |         ✓️         |         |
+| `ActuatorAPI`                        | Endpoint for actuators (service health status).                                                                                                                                                   |                    |    ✓️   |
+| `DataOverlay`                        | Enable usage of data overlay when calculating costs for the street network.                                                                                                                       |                    |    ✓️   |
+| `FaresV2`                            | Enable import of GTFS-Fares v2 data.                                                                                                                                                              |                    |    ✓️   |
+| `FlexRouting`                        | Enable FLEX routing.                                                                                                                                                                              |                    |    ✓️   |
+| `GoogleCloudStorage`                 | Enable Google Cloud Storage integration.                                                                                                                                                          |                    |    ✓️   |
+| `ReportApi`                          | Enable the report API.                                                                                                                                                                            |                    |    ✓️   |
+| `SandboxAPIGeocoder`                 | Enable the Geocoder API.                                                                                                                                                                          |                    |    ✓️   |
+| `SandboxAPILegacyGraphQLApi`         | Enable (GTFS) GraphQL API.                                                                                                                                                                        |                    |    ✓️   |
+| `SandboxAPIMapboxVectorTilesApi`     | Enable Mapbox vector tiles API.                                                                                                                                                                   |                    |    ✓️   |
+| `SandboxAPIParkAndRideApi`           | Enable park-and-ride endpoint.                                                                                                                                                                    |                    |    ✓️   |
+| `SandboxAPITransmodelApi`            | Enable Entur Transmodel(NeTEx) GraphQL API.                                                                                                                                                       |                    |    ✓️   |
+| `SandboxAPITravelTime`               | Enable the isochrone/travel time surface API.                                                                                                                                                     |                    |    ✓️   |
+| `TransferAnalyzer`                   | Analyze transfers during graph build.                                                                                                                                                             |                    |    ✓️   |
+| `VehicleToStopHeuristics`            | Enable improved heuristic for park-and-ride queries.                                                                                                                                              |                    |    ✓️   |
+
+<!-- OTP-FEATURE-TABLE END -->
+
+
+**Example**
 
 ```JSON
 // otp-config.json
@@ -211,27 +264,51 @@ example:
 }
 ```
 
-## OTP Features
 
-Here is a list of all features which can be toggled on/off.
+# JVM configuration
 
-| Feature                                | Description                                                                                                                                                                                     | Enabled by default | Sandbox |
-|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|---------|
-| `APIBikeRental`                        | Enable the bike rental endpoint                                                                                                                                                                 | yes                | no      |
-| `APIServerInfo`                        | Enable the server info endpoint                                                                                                                                                                 | yes                | no      |
-| `APIGraphInspectorTile`                | Enable the inspector  endpoint for graph information for inspection/debugging purpose                                                                                                           | yes                | no      |
-| `APIUpdaterStatus`                     | Enable endpoint for graph updaters status                                                                                                                                                       | yes                | no      |
-| `ConsiderPatternsForDirectTransfers`   | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                              | yes                | no      | 
-| `OptimizeTransfers`                    | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                       | yes                | no      |
-| `MinimumTransferTimeIsDefinitive`      | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to true if you want to set a transfer time lower than what OTP derives from OSM data. | no                 | no      |
-| `ParallelRouting`                      | Enable performing parts of the trip planning in parallel                                                                                                                                        | no                 | no      |
-| `TransferConstraints`                  | Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little.                                   | yes                | no      |
-| `ActuatorAPI`                          | Enpoint for actuators (service health status)                                                                                                                                                   | no                 | yes     |
-| `GoogleCloudStorage`                   | Enable Google Cloud Storage integration                                                                                                                                                         | no                 | yes     |
-| `SandboxAPITransmodelApi`              | Enable Entur Transmodel(NeTEx) GraphQL API                                                                                                                                                      | no                 | yes     |
-| `SandboxAPILegacyGraphQLApi`           | Enable (GTFS) GraphQL API                                                                                                                                                                       | no                 | yes     |
-| `SandboxAPIMapboxVectorTilesApi`       | Enable Mapbox vector tiles API                                                                                                                                                                  | no                 | yes     |
-| `SandboxAPIParkAndRideApi`             | Enable park-and-ride endpoint                                                                                                                                                                   | no                 | yes     |
-| `TransferAnalyzer`                     | Analyze transfers during graph build                                                                                                                                                            | no                 | yes     |
-| `FlexRouting`                          | Enable FLEX routing                                                                                                                                                                             | no                 | yes     |
-| `FloatingBike`                         | Enable floating bike routing                                                                                                                                                                    | yes                | yes     |
+This section contains general recommendations for tuning the JVM in a production environment.  
+It focuses mainly on garbage collection configuration and memory settings.  
+See [Garbage Collector Tuning](https://docs.oracle.com/en/java/javase/17/gctuning/introduction-garbage-collection-tuning.html) for general information on garbage collection.  
+See [Large Pages in Java](https://kstefanj.github.io/2021/05/19/large-pages-and-java.html) and  [Transparent Huge Pages](https://shipilev.net/jvm/anatomy-quarks/2-transparent-huge-pages) for general information on large memory pages.
+
+
+## OTP server
+
+The OTP server processes concurrent routing requests in real time.  
+The main optimization goal for the OTP server is minimizing response time.
+
+
+### Garbage collector
+- 
+- The G1 garbage collector (default since Java 9) offers a good compromise between low latency (i.e. low GC pause time) and GC overhead.
+- If latency spikes are an issue, the ZGC garbage collector is an alternative. It produces in general more overhead than G1.  
+
+
+### Memory settings 
+- 
+- Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
+- It is in general not recommended to use large memory page in _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) for latency-sensitive applications, since memory is allocated on-demand and this can induce latency spikes if the memory is fragmented.  
+  Thus _TLBFS_ mode (`-XX:+UseHugeTLBFS`) should be the first choice.
+- If _TLBFS_ mode is not an option,  _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) can be used instead, with additional provisions to mitigate the risk of latency spikes:  
+The physical memory can be committed upfront, at JVM startup time. This can be done by forcing a fixed heap size and pre-touching the memory.  
+Example: `-Xms18g -Xmx18g -XX:+UseTransparentHugePages -XX:+AlwaysPreTouch`  
+
+
+## Graph Builder
+
+The Graph Builder is the non-interactive mode used to build street graphs and transit graphs.     
+The main optimization goal for the Graph Builder is minimizing total build time.  
+
+
+### Garbage collector
+- 
+- In theory, the Parallel garbage collector offers the best throughput.  
+In practice, it can be challenging to optimize the Parallel GC to build both a street graph and a transit graph, the memory usage patterns being different. 
+- The G1 garbage collector provides in general a good compromise.  
+
+
+### Memory settings 
+- 
+- Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
+- Since latency is not an issue, Large Memory Pages can be used indifferently in _TLBFS_ mode (`-XX:+UseHugeTLBFS`) or _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`)

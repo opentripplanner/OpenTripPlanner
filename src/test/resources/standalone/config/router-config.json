@@ -1,0 +1,219 @@
+{
+  "configVersion" : "v2.2.0-EN000121",
+  "streetRoutingTimeout": "5s",
+  "routingDefaults": {
+    "walkSpeed": 1.3,
+    "bikeSpeed": 5,
+    "carSpeed": 40,
+    "numItineraries": 12,
+    "transferPenalty": 0,
+    "walkReluctance": 4.0,
+    "bikeReluctance": 5.0,
+    "bikeWalkingReluctance": 10.0,
+    "carReluctance": 10.0,
+    "stairsReluctance": 1.65,
+    "turnReluctance": 1.0,
+    "elevatorBoardTime": 90,
+    "elevatorBoardCost": 90,
+    "elevatorHopTime": 20,
+    "elevatorHopCost": 20,
+    "bikeRentalPickupCost": 120,
+    "bikeRentalDropoffTime": 30,
+    "bikeRentalDropoffCost": 30,
+    "bikeParkTime": 60,
+    "bikeParkCost": 120,
+    "carDropoffTime": 120,
+    "waitReluctance": 1.0,
+    "walkBoardCost": 600,
+    "bikeBoardCost": 600,
+    "otherThanPreferredRoutesPenalty": 300,
+    "transferSlack": 120,
+    // Default slack for any mode is 0 (zero)
+    "boardSlackForMode": {
+      "AIRPLANE" : "35m"
+    },
+    "alightSlackForMode": {
+      "AIRPLANE" : "15m"
+    },
+    "transitReluctanceForMode" : {
+      "RAIL" : 0.85
+    },
+    "maxAccessEgressDurationForMode": {
+      "BIKE_RENTAL": "20m"
+    },
+    "itineraryFilters" : {
+      "transitGeneralizedCostLimit" : "3600 + 2.5 x",
+      "bikeRentalDistanceRatio": 0.3,
+      "accessibilityScore": true
+    },
+    "carDecelerationSpeed": 2.9,
+    "carAccelerationSpeed": 2.9,
+    "ignoreRealtimeUpdates": false,
+    "geoidElevation": false,
+    "maxJourneyDuration": "36h",
+    "transferOptimization": {
+      "optimizeTransferWaitTime": true,
+      "minSafeWaitTimeFactor": 5.0,
+      "backTravelWaitTimeFactor": 1.0,
+      "extraStopBoardAlightCostsFactor": 8.0
+    },
+    // use stop and trip with unknown wheelchair accessibility during routing
+    "wheelchairAccessibility": {
+      "trip": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      },
+      "stop": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      }
+    }
+  },
+  "flex": {
+    "maxTransferDurationSeconds": 240
+  },
+  "transit": {
+    "maxNumberOfTransfers" : 12,
+    "dynamicSearchWindow" : {
+      "minTransitTimeCoefficient" : 0.5,
+      "minWaitTimeCoefficient" : 0.5,
+      "minWinTimeMinutes" : 60,
+      "maxWinTimeMinutes" : 300
+    },
+    "stopTransferCost" : {
+      "DISCOURAGED" : 1500,
+      "ALLOWED" : 75,
+      "RECOMMENDED" : 30,
+      "PREFERRED" : 0
+    }
+  },
+  "vehicleRentalServiceDirectory": {
+    "url": "https://entur.no/bikeRentalServiceDirectory",
+    "sourcesName": "systems",
+    "updaterUrlName": "url",
+    "updaterNetworkName": "id",
+    "headers": {
+      "ET-Client-Name": "MY_ORG_CLIENT_NAME"
+    }
+  },
+  "transmodelApi": {
+    "hideFeedId" : true
+  },
+  "vectorTileLayers": [
+    {
+      "name": "stops",
+      "type": "Stop",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 600
+    },
+    {
+      "name": "stations",
+      "type": "Station",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 12,
+      "cacheMaxSeconds": 600
+    },
+    {
+      "name": "rentalPlaces",
+      "type": "VehicleRental", // all rental places: stations and free-floating vehicles
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60,
+      "expansionFactor": 0.25
+    },
+    {
+      "name": "rentalVehicle",
+      "type": "VehicleRentalVehicle", // just free-floating vehicles
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60
+    },
+    {
+      "name": "rentalStation",
+      "type": "VehicleRentalStation", // just rental stations
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 600
+    },
+    {
+      "name": "vehicleParking",
+      "type": "VehicleParking",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60,
+      "expansionFactor": 0.25
+    }
+  ],
+  "updaters": [
+    // GTFS-RT service alerts (frequent polling)
+    {
+      "type": "real-time-alerts",
+      "frequencySec": 30,
+      "url": "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
+      "feedId": "TriMet"
+    },
+    //<!--- Tampa Area GBFS bike share -->
+    {
+      "type": "vehicle-rental",
+      "network": "socialbicycles_coast",
+      "sourceType": "gbfs",
+      "language": "en",
+      "frequencySec": 60,
+      "allowKeepingRentedBicycleAtDestination": true,
+      "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
+      "headers": {
+        // example for authentication headers
+        "Auth": "<any-token>",
+        // example for any header
+        "<key>": "<value>"
+      }
+    },
+    {
+      "type": "vehicle-parking",
+      "sourceType": "hsl-park"
+    },
+    {
+      "type": "stop-time-updater",
+      "frequencySec": 60,
+      "backwardsDelayPropagationType": "REQUIRED_NO_DATA",
+      "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
+      "feedId": "TriMet"
+    },
+    // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL APIss
+    {
+      "type": "vehicle-positions",
+      "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
+      "feedId": "1",
+      "frequencySec": 60
+    },
+
+    // Streaming differential GTFS-RT TripUpdates over websockets
+    {
+      "type": "websocket-gtfs-rt-updater"
+    },
+
+    // SIRI SX updater for Azure Service Bus
+    {
+      "type": "siri-azure-sx-updater",
+      "topic": "some_topic",
+      "servicebus-url": "service_bus_url",
+      "feedId": "feed_id",
+      "customMidnight":  4,
+      "history": {
+        "url": "endpoint_url",
+        "fromDateTime": "-P1D",
+        "toDateTime": "P1D",
+        "timeout": 300000
+      }
+    }
+  ]
+}

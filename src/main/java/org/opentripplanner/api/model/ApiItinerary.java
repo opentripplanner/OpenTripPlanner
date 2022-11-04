@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.routing.api.request.ItineraryFilterParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -92,7 +92,7 @@ public class ApiItinerary {
    * response if explicit asked for in the request.
    * <p>
    * For example when tuning or manually testing the itinerary-filter-chain it you can enable the
-   * {@link ItineraryFilterParameters#debug} and instead of removing itineraries from the result the
+   * {@link ItineraryFilterPreferences#debug} and instead of removing itineraries from the result the
    * itineraries would be tagged by the filters instead. This enable investigating, why an expected
    * itinerary is missing from the result set.
    */

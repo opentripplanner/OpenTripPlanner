@@ -4,14 +4,14 @@ import static java.lang.Integer.min;
 
 import java.util.Comparator;
 import java.util.List;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -31,9 +31,14 @@ public class StreetGraphFinder implements GraphFinder {
   }
 
   @Override
-  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
+  public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
     StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor(radiusMeters);
-    findClosestUsingStreets(lat, lon, visitor, visitor.getSkipEdgeStrategy());
+    findClosestUsingStreets(
+      coordinate.getY(),
+      coordinate.getX(),
+      visitor,
+      visitor.getSkipEdgeStrategy()
+    );
     return visitor.stopsFound;
   }
 
@@ -75,18 +80,26 @@ public class StreetGraphFinder implements GraphFinder {
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
-    RouteRequest rr = new RouteRequest(TraverseMode.WALK);
+    RouteRequest rr = new RouteRequest();
     rr.setFrom(new GenericLocation(null, null, lat, lon));
-    rr.preferences().withWalk(it -> it.setSpeed(1));
+    rr.withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)));
     rr.setNumItineraries(1);
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, rr)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        rr,
+        StreetMode.WALK,
+        StreetMode.WALK
+      )
+    ) {
       AStarBuilder
         .allDirections(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunction.LeastWalk())
-        .setContext(new RoutingContext(rr, graph, temporaryVertices))
+        .setRequest(rr)
+        .setVerticesContainer(temporaryVertices)
         .getShortestPathTree();
     }
   }

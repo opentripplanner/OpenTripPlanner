@@ -5,10 +5,10 @@ import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestMapper;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.util.ReversedRaptorTransfer;
 
 public class RaptorTransferIndex {
 
@@ -27,7 +27,7 @@ public class RaptorTransferIndex {
 
   public static RaptorTransferIndex create(
     List<List<Transfer>> transfersByStopIndex,
-    RoutingContext routingContext
+    RouteRequest request
   ) {
     var forwardTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
     var reversedTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
@@ -37,13 +37,18 @@ public class RaptorTransferIndex {
       reversedTransfers.add(new ArrayList<>());
     }
 
+    final AStarRequest aStarRequest = AStarRequestMapper
+      .map(request)
+      .withMode(request.journey().transfer().mode())
+      .build();
+
     for (int fromStop = 0; fromStop < transfersByStopIndex.size(); fromStop++) {
       // The transfers are filtered so that there is only one possible directional transfer
       // for a stop pair.
       var transfers = transfersByStopIndex
         .get(fromStop)
         .stream()
-        .flatMap(s -> s.asRaptorTransfer(routingContext).stream())
+        .flatMap(s -> s.asRaptorTransfer(aStarRequest).stream())
         .collect(
           toMap(
             RaptorTransfer::stop,
@@ -58,7 +63,7 @@ public class RaptorTransferIndex {
       for (RaptorTransfer forwardTransfer : transfers) {
         reversedTransfers
           .get(forwardTransfer.stop())
-          .add(new ReversedRaptorTransfer(fromStop, forwardTransfer));
+          .add(DefaultRaptorTransfer.reverseOf(fromStop, forwardTransfer));
       }
     }
 

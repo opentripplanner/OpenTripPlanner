@@ -30,9 +30,9 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.algorithm.astar.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.NamedArea;
@@ -374,23 +374,25 @@ public class WalkableAreaBuilder {
     Set<Edge> edgesToKeep
   ) {
     if (edges.size() == 0) return;
-    TraverseMode mode;
+    StreetMode mode;
     StreetEdge firstEdge = (StreetEdge) edges.iterator().next();
 
     if (firstEdge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
-      mode = TraverseMode.WALK;
+      mode = StreetMode.WALK;
     } else if (firstEdge.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
-      mode = TraverseMode.BICYCLE;
+      mode = StreetMode.BIKE;
     } else {
-      mode = TraverseMode.CAR;
+      mode = StreetMode.CAR;
     }
-    RouteRequest options = new RouteRequest(mode);
+    RouteRequest options = new RouteRequest();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree spt = AStarBuilder
         .allDirections(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunction.EarliestArrival())
-        .setContext(new RoutingContext(options, graph, vertex, null))
+        .setRequest(options)
+        .setStreetRequest(new StreetRequest(mode))
+        .setFrom(vertex)
         .getShortestPathTree();
 
       for (Vertex endVertex : startingVertices) {
@@ -484,9 +486,6 @@ public class WalkableAreaBuilder {
         endEndpoint.getCoordinate()
       );
 
-      int cls = StreetEdge.CLASS_OTHERPATH;
-      cls |= OSMFilter.getStreetClasses(areaEntity);
-
       String label =
         "way (area) " +
         areaEntity.getId() +
@@ -516,7 +515,7 @@ public class WalkableAreaBuilder {
         street.setWheelchairAccessible(false);
       }
 
-      street.setStreetClass(cls);
+      street.setLink(OSMFilter.isLink(areaEntity));
 
       label =
         "way (area) " +
@@ -547,7 +546,7 @@ public class WalkableAreaBuilder {
         backStreet.setWheelchairAccessible(false);
       }
 
-      backStreet.setStreetClass(cls);
+      backStreet.setLink(OSMFilter.isLink(areaEntity));
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
@@ -630,9 +629,6 @@ public class WalkableAreaBuilder {
       }
       NamedArea namedArea = new NamedArea();
       OSMWithTags areaEntity = area.parent;
-      int cls = StreetEdge.CLASS_OTHERPATH;
-      cls |= OSMFilter.getStreetClasses(areaEntity);
-      namedArea.setStreetClass(cls);
 
       String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
       I18NString name = handler.getNameForWay(areaEntity, id);
@@ -646,10 +642,13 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      Double bicycleSafety = wayPropertiesCache.get(areaEntity).getBicycleSafetyFeatures().first;
+      Double bicycleSafety = wayPropertiesCache
+        .get(areaEntity)
+        .getBicycleSafetyFeatures()
+        .forward();
       namedArea.setBicycleSafetyMultiplier(bicycleSafety);
 
-      Double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().first;
+      Double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().forward();
       namedArea.setWalkSafetyMultiplier(walkSafety);
 
       namedArea.setOriginalEdges(intersection);

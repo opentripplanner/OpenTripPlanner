@@ -87,7 +87,8 @@ public class StopTimesHelper {
     TransitService transitService,
     StopLocation stop,
     LocalDate serviceDate,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
@@ -106,7 +107,13 @@ public class StopTimesHelper {
           if (skipByPickUpDropOff(pattern, arrivalDeparture, i)) {
             continue;
           }
+          if (skipByStopCancellation(pattern, includeCancellations, i)) {
+            continue;
+          }
           for (TripTimes t : tt.getTripTimes()) {
+            if (skipByTripCancellation(t, includeCancellations)) {
+              continue;
+            }
             if (servicesRunning.contains(t.getServiceCode())) {
               stopTimes.times.add(new TripTimeOnDate(t, i, pattern, serviceDate, midnight));
             }
@@ -140,7 +147,8 @@ public class StopTimesHelper {
     Instant startTime,
     Duration timeRange,
     int numberOfDepartures,
-    ArrivalDeparture arrivalDeparture
+    ArrivalDeparture arrivalDeparture,
+    boolean includeCancellations
   ) {
     Queue<TripTimeOnDate> pq = listTripTimeShortsForPatternAtStop(
       transitService,
@@ -150,7 +158,7 @@ public class StopTimesHelper {
       timeRange,
       numberOfDepartures,
       arrivalDeparture,
-      false,
+      includeCancellations,
       true
     );
 
@@ -191,7 +199,7 @@ public class StopTimesHelper {
     List<LocalDate> serviceDates = startDate.datesUntil(endDate.plusDays(1)).toList();
 
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
-    // relay on the trip times to be in order because of real-time updates. This code can
+    // rely on the trip times to be in order because of real-time updates. This code can
     // probably be optimized, and the trip search in the Raptor search does almost the same
     // thing. This is no part of a routing request, but is a used frequently in some
     // operation like Entur for "departure boards" (apps, widgets, screens on platforms, and

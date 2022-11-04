@@ -30,7 +30,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
     Optional<Itinerary> bestStreetOp = itineraries
       .stream()
       .filter(Itinerary::isOnStreetAllTheWay)
-      .min(Comparator.comparingInt(l -> l.getGeneralizedCost()));
+      .min(Comparator.comparingInt(Itinerary::getGeneralizedCost));
 
     if (bestStreetOp.isEmpty()) {
       return List.of();

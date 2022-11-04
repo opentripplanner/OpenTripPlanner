@@ -5,7 +5,7 @@ import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 
 /**
  * This serializer is needed because there is no default constructor on the {@link BuildConfig}. The
@@ -29,6 +29,10 @@ public class BuildConfigSerializer extends Serializer<BuildConfig> {
 
   @Override
   public BuildConfig read(Kryo kryo, Input input, Class<? extends BuildConfig> type) {
-    return new BuildConfig(ConfigLoader.nodeFromString(input.readString(), SOURCE), SOURCE, false);
+    return new BuildConfig(
+      ConfigFileLoader.nodeFromString(input.readString(), SOURCE),
+      SOURCE,
+      false
+    );
   }
 }

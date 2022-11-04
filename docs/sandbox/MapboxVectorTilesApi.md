@@ -6,17 +6,6 @@
 - Kyyti Group Oy, Finland
 - Hannes Junnila
 
-## Changelog
-
-- 2020-07-09: Initial version of Mapbox vector tiles API
-- 2021-05-12: Make expansion factor configurable
-- 2021-09-07: Rename `BikeRental` to `VehicleRental`
-- 2021-10-13: Correctly serialize the vehicle rental
-  name [#3648](https://github.com/opentripplanner/OpenTripPlanner/pull/3648)
-- 2022-01-03: Add support for VehicleParking entities
-- 2022-04-27: Read the headsign for frequency-only patterns correctly [#4122](https://github.com/opentripplanner/OpenTripPlanner/pull/4122)
-- 2022-08-23: Remove patterns and add route gtfsTypes to stop layer [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
-
 ## Documentation
 
 This API produces [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/), which are
@@ -25,6 +14,9 @@ public transit entities on the map.
 
 The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`,
 where `layers` is a comma separated list of layer names from the configuration.
+
+Translatable fields in the tiles are translated based on the `accept-language` header in requests.
+Currently, only the language with the highest priority from the header is used.
 
 ### Configuration
 
@@ -51,6 +43,7 @@ The feature must be configured in `router-config.json` as follows
       "minZoom": 12,
       "cacheMaxSeconds": 600
     },
+    // all rental places: stations and free-floating vehicles
     {
       "name": "citybikes",
       "type": "VehicleRental",
@@ -60,13 +53,63 @@ The feature must be configured in `router-config.json` as follows
       "cacheMaxSeconds": 60,
       "expansionFactor": 0.25
     },
+    // just free-floating vehicles
+    {
+      "name": "rentalVehicles",
+      "type": "VehicleRentalVehicle",
+      "mapper": "DigitransitRealtime",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60
+    },
+    // just rental stations
+    {
+      "name": "rentalStations",
+      "type": "VehicleRentalStation",
+      "mapper": "Digitransit",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 600
+    },
+    // Contains just stations and realtime information for them
+    {
+      "name": "realtimeRentalStations",
+      "type": "VehicleRentalStation",
+      "mapper": "DigitransitRealtime",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60
+    },
+    // This exists for backwards compatibility. At some point, we might want
+    // to add a new realtime parking mapper with better translation support
+    // and less unnecessary fields.
+    {
+      "name": "stadtnaviVehicleParking",
+      "type": "VehicleParking",
+      "mapper": "Stadtnavi",
+      "maxZoom": 20,
+      "minZoom": 14,
+      "cacheMaxSeconds": 60,
+      "expansionFactor": 0.25
+    },
+    // no realtime, translatable fields are translated based on accept-language header
+    // and contains less fields than the Stadtnavi mapper
     {
       "name": "vehicleParking",
       "type": "VehicleParking",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
-      "cacheMaxSeconds": 60,
+      "cacheMaxSeconds": 600,
+      "expansionFactor": 0.25
+    },
+    {
+      "name": "vehicleParkingGroups",
+      "type": "VehicleParkingGroup",
+      "mapper": "Digitransit",
+      "maxZoom": 17,
+      "minZoom": 14,
+      "cacheMaxSeconds": 600,
       "expansionFactor": 0.25
     }
   ]
@@ -76,8 +119,14 @@ The feature must be configured in `router-config.json` as follows
 For each layer, the configuration includes:
 
 - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
-- `type` which tells the type of the layer. Currently `Stop`, `Station`, `VehicleRental`
-  and `VehicleParking` are supported.
+- `type` which tells the type of the layer. Currently supported:
+    - `Stop`
+    - `Station`
+    - `VehicleRental`: all rental places: stations and free-floating vehicles
+    - `VehicleRentalVehicle`: free-floating rental vehicles
+    - `VehicleRentalStation`: rental stations
+    - `VehicleParking`
+    - `VehicleParkingGroup`
 - `mapper` which describes the mapper converting the properties from the OTP model entities to the
   vector tile properties. Currently `Digitransit` is supported for all layer types.
 - `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
@@ -117,3 +166,19 @@ be written into the vector tile.
 The mapper needs to be added to the `mappers` map in the layer, with a new `MapperType` enum as the
 key, and a function to create the mapper, with a `Graph` object as a parameter, as the value.
 
+## Changelog
+
+- 2020-07-09: Initial version of Mapbox vector tiles API
+- 2021-05-12: Make expansion factor configurable
+- 2021-09-07: Rename `BikeRental` to `VehicleRental`
+- 2021-10-13: Correctly serialize the vehicle rental name [#3648](https://github.com/opentripplanner/OpenTripPlanner/pull/3648)
+- 2022-01-03: Add support for VehicleParking entities
+- 2022-04-27: Read the headsign for frequency-only patterns correctly [#4122](https://github.com/opentripplanner/OpenTripPlanner/pull/4122)
+- 2022-08-23: Remove patterns and add route gtfsTypes to stop layer [#4404](https://github.com/opentripplanner/OpenTripPlanner/pull/4404)
+- 2022-10-11: Added layer for VehicleParkingGroups [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510)
+- 2022-10-14: Add separate layers for vehicle rental place types [#4516](https://github.com/opentripplanner/OpenTripPlanner/pull/4516)
+- 2022-10-19 [#4529](https://github.com/opentripplanner/OpenTripPlanner/pull/4529):
+  * Translatable fields are now translated based on accept-language header
+  * Added DigitransitRealtime for vehicle rental stations
+  * Changed old vehicle parking mapper to be Stadtnavi
+  * Added a new Digitransit vehicle parking mapper with no realtime information and less fields

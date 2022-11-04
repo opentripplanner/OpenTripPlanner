@@ -10,9 +10,10 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.LinkingDirection;
 import org.opentripplanner.graph_builder.linking.VertexLinker;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -47,10 +48,9 @@ public class FakeGraph {
       List.of(provider),
       Set.of(),
       gg,
-      transitModel.getTimeZone(),
-      DataImportIssueStore.noopIssueStore()
+      DataImportIssueStore.noopIssueStore(),
+      new DefaultMapper()
     );
-    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 
     osmModule.buildGraph();
     return new TestOtpModel(gg, transitModel);

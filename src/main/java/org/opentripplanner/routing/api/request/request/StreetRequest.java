@@ -7,7 +7,15 @@ import org.opentripplanner.routing.api.request.StreetMode;
 // TODO VIA (Hannes): Missing VehicleRentalRequest and VehicleParkingRequest
 public class StreetRequest implements Cloneable, Serializable {
 
-  private StreetMode mode = StreetMode.WALK;
+  private StreetMode mode;
+
+  public StreetRequest() {
+    this(StreetMode.WALK);
+  }
+
+  public StreetRequest(StreetMode mode) {
+    this.mode = mode;
+  }
 
   public void setMode(StreetMode mode) {
     this.mode = mode;

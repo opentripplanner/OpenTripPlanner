@@ -15,7 +15,7 @@ public class TestServerContext {
 
   private TestServerContext() {}
 
-  /** Create a context for unit testing, using the default RoutingRequest. */
+  /** Create a context for unit testing, using the default RouteRequest. */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TransitModel transitModel

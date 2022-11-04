@@ -1,11 +1,28 @@
 package org.opentripplanner.model;
 
-import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 
-public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
+public record UpdateError(
+  @Nullable FeedScopedId tripId,
+  UpdateErrorType errorType,
+  @Nullable Integer stopIndex
+) {
+  public UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorType) {
+    this(tripId, errorType, null);
+  }
+
+  public String debugId() {
+    if (tripId == null) {
+      return "no trip id";
+    } else if (stopIndex == null) {
+      return tripId.toString();
+    } else {
+      return "%s{stopIndex=%s}".formatted(tripId, stopIndex);
+    }
+  }
+
   public enum UpdateErrorType {
     UNKNOWN,
     INVALID_INPUT_STRUCTURE,
@@ -21,22 +38,16 @@ public record UpdateError(@Nullable FeedScopedId tripId, UpdateErrorType errorTy
     NO_SERVICE_ON_DATE,
     INVALID_ARRIVAL_TIME,
     INVALID_DEPARTURE_TIME,
-    NON_INCREASING_TRIP_TIMES,
+    NEGATIVE_DWELL_TIME,
+    NEGATIVE_HOP_TIME,
     INVALID_STOP_SEQUENCE,
     NOT_IMPLEMENTED_UNSCHEDULED,
     NOT_IMPLEMENTED_DUPLICATED,
-  }
-
-  public static Optional<UpdateError> optional(FeedScopedId tripId, UpdateErrorType errorType) {
-    return Optional.of(new UpdateError(tripId, errorType));
+    NOT_MONITORED,
   }
 
   public static <T> Result<T, UpdateError> result(FeedScopedId tripId, UpdateErrorType errorType) {
     return Result.failure(new UpdateError(tripId, errorType));
-  }
-
-  public static Optional<UpdateError> noError() {
-    return Optional.empty();
   }
 
   public static UpdateError noTripId(UpdateErrorType errorType) {

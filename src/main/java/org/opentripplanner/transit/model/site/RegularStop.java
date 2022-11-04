@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.site;
 
 import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -84,7 +83,12 @@ public final class RegularStop
   @Override
   @Nullable
   public ZoneId getTimeZone() {
-    return timeZone;
+    if (timeZone != null) {
+      return timeZone;
+    } else if (isPartOfStation()) {
+      return getParentStation().getTimezone();
+    }
+    return null;
   }
 
   /**
@@ -148,5 +152,11 @@ public final class RegularStop
       Objects.equals(boardingAreas, other.boardingAreas) &&
       Objects.equals(fareZones, other.fareZones)
     );
+  }
+
+  @Override
+  public boolean transfersNotAllowed() {
+    var parentStation = getParentStation();
+    return parentStation != null && parentStation.isTransfersNotAllowed();
   }
 }

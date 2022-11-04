@@ -1,15 +1,16 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
-import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.routerequest.RouteRequestConfig.mapRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.standalone.config.TransitRoutingConfig;
+import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,15 +37,15 @@ public class SpeedTestConfig {
   public SpeedTestConfig(JsonNode node) {
     NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
     this.rawNode = node;
-    testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
-    graph = adapter.asUri("graph", null);
-    feedId = adapter.asText("feedId");
-    transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
-    request = mapRoutingRequest(adapter.path("routingDefaults"));
+    testDate = adapter.of("testDate").asDateOrRelativePeriod("PT0D", ZoneId.of("UTC"));
+    graph = adapter.of("graph").asUri(null);
+    feedId = adapter.of("feedId").asString();
+    transitRoutingParams = new TransitRoutingConfig("tuningParameters", adapter);
+    request = mapRouteRequest(adapter.of("routingDefaults").asObject());
   }
 
   public static SpeedTestConfig config(File dir) {
-    var json = new ConfigLoader(dir).loadJsonByFilename(FILE_NAME);
+    var json = ConfigFileLoader.of().withConfigDir(dir).loadFromFile(FILE_NAME);
     SpeedTestConfig config = new SpeedTestConfig(json);
     LOG.info("SpeedTest config loaded: {}", config);
     return config;

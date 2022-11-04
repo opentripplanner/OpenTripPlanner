@@ -141,9 +141,9 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       .of()
       .addObj(super.toString())
       .addText(" [")
-      .addCost(generalizedCost())
-      .addCost(transferPriorityCost, "pri")
-      .addCost(generalizedCostWaitTimeOptimized(), "wtc")
+      .addCostCenti(generalizedCost())
+      .addCostCenti(transferPriorityCost, "pri")
+      .addCostCenti(generalizedCostWaitTimeOptimized(), "wtc")
       .addText("]")
       .toString();
   }

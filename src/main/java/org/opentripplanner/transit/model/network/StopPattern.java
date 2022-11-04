@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -220,10 +221,10 @@ public final class StopPattern implements Serializable {
    * (centroids) and might not have times.
    */
   private static PickDrop computePickDrop(StopLocation stop, PickDrop pickDrop) {
-    if (stop instanceof AreaStop) {
-      return PickDrop.NONE;
-    } else {
+    if (stop instanceof RegularStop) {
       return pickDrop;
+    } else {
+      return PickDrop.NONE;
     }
   }
 

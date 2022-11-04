@@ -42,7 +42,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
+import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.framework.AuthorityType;
@@ -116,7 +116,7 @@ public class TransmodelGraphQLSchema {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLSchema.class);
 
-  private final DefaultRoutingRequestType routing;
+  private final DefaultRouteRequestType routing;
 
   private final GqlUtil gqlUtil;
 
@@ -124,7 +124,7 @@ public class TransmodelGraphQLSchema {
 
   private TransmodelGraphQLSchema(RouteRequest defaultRequest, GqlUtil gqlUtil) {
     this.gqlUtil = gqlUtil;
-    this.routing = new DefaultRoutingRequestType(defaultRequest);
+    this.routing = new DefaultRouteRequestType(defaultRequest);
   }
 
   public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil qglUtil) {
@@ -557,11 +557,11 @@ public class TransmodelGraphQLSchema {
               .type(new GraphQLNonNull(Scalars.GraphQLString))
               .build()
           )
-          .dataFetcher(environment -> {
-            return GqlUtil
+          .dataFetcher(environment ->
+            GqlUtil
               .getTransitService(environment)
-              .getRegularStop(TransitIdMapper.mapIDToDomain(environment.getArgument("id")));
-          })
+              .getStopLocation(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
+          )
           .build()
       )
       .field(
@@ -594,7 +594,7 @@ public class TransmodelGraphQLSchema {
               }
               TransitService transitService = GqlUtil.getTransitService(environment);
               return ((List<String>) environment.getArgument("ids")).stream()
-                .map(id -> transitService.getRegularStop(TransitIdMapper.mapIDToDomain(id)))
+                .map(id -> transitService.getStopLocation(TransitIdMapper.mapIDToDomain(id)))
                 .collect(Collectors.toList());
             }
             if (environment.getArgument("name") == null) {
@@ -740,8 +740,10 @@ public class TransmodelGraphQLSchema {
                 GqlUtil
                   .getRoutingService(environment)
                   .findClosestStops(
-                    environment.getArgument("latitude"),
-                    environment.getArgument("longitude"),
+                    new Coordinate(
+                      environment.getArgument("longitude"),
+                      environment.getArgument("latitude")
+                    ),
                     environment.getArgument("radius")
                   )
                   .stream()

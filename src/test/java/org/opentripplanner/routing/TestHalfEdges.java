@@ -23,10 +23,11 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.core.AStarRequest;
+import org.opentripplanner.routing.core.AStarRequestBuilder;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TemporaryVerticesContainer;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -45,6 +46,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertexBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -124,7 +126,7 @@ public class TestHalfEdges {
     StreetEdge topBack = new StreetEdge(
       tr,
       tl,
-      (LineString) top.getGeometry().reverse(),
+      top.getGeometry().reverse(),
       "topBack",
       1500,
       StreetTraversalPermission.ALL,
@@ -134,7 +136,7 @@ public class TestHalfEdges {
     StreetEdge bottomBack = new StreetEdge(
       br,
       bl,
-      (LineString) bottom.getGeometry().reverse(),
+      bottom.getGeometry().reverse(),
       "bottomBack",
       1500,
       StreetTraversalPermission.ALL,
@@ -144,7 +146,7 @@ public class TestHalfEdges {
       new StreetEdge(
         tl,
         bl,
-        (LineString) left.getGeometry().reverse(),
+        left.getGeometry().reverse(),
         "leftBack",
         1500,
         StreetTraversalPermission.ALL,
@@ -154,7 +156,7 @@ public class TestHalfEdges {
       new StreetEdge(
         tr,
         br,
-        (LineString) right.getGeometry().reverse(),
+        right.getGeometry().reverse(),
         "rightBack",
         1500,
         StreetTraversalPermission.ALL,
@@ -227,7 +229,10 @@ public class TestHalfEdges {
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree spt1 = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, br, end))
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(br)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath pathBr = spt1.getPath(end);
@@ -235,7 +240,10 @@ public class TestHalfEdges {
 
     ShortestPathTree spt2 = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, tr, end))
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(tr)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath pathTr = spt2.getPath(end);
@@ -247,7 +255,10 @@ public class TestHalfEdges {
 
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, start, end))
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(start)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
@@ -263,7 +274,10 @@ public class TestHalfEdges {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, start, end))
+        .setRequest(options)
+        .setStreetRequest(options.journey().direct())
+        .setFrom(start)
+        .setTo(end)
         .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -285,7 +299,8 @@ public class TestHalfEdges {
      * that (b) it is not preferred to riding a tiny bit longer.
      */
 
-    options = new RouteRequest(TraverseMode.BICYCLE);
+    options = new RouteRequest();
+    options.journey().direct().setMode(StreetMode.BIKE);
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
         "start1",
@@ -308,7 +323,10 @@ public class TestHalfEdges {
     spt =
       AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(options, graph, start, end))
+        .setRequest(options)
+        .setStreetRequest(options.journey().direct())
+        .setFrom(start)
+        .setTo(end)
         .getShortestPathTree();
 
     path = spt.getPath(start);
@@ -345,10 +363,7 @@ public class TestHalfEdges {
       );
 
     spt =
-      AStarBuilder
-        .oneToOne()
-        .setContext(new RoutingContext(options, graph, start, end))
-        .getShortestPathTree();
+      AStarBuilder.oneToOne().setRequest(options).setFrom(start).setTo(end).getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom");
@@ -405,7 +420,10 @@ public class TestHalfEdges {
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, start, end))
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(start)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
@@ -454,7 +472,10 @@ public class TestHalfEdges {
     options.setDateTime(Instant.ofEpochSecond(startTime));
     ShortestPathTree spt = AStarBuilder
       .oneToOne()
-      .setContext(new RoutingContext(options, graph, start, end))
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(start)
+      .setTo(end)
       .getShortestPathTree();
 
     GraphPath path = spt.getPath(end);
@@ -494,8 +515,8 @@ public class TestHalfEdges {
 
     // The alert should be preserved
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
-    RouteRequest req = new RouteRequest();
-    State traversedOne = new State(start, req, null);
+    AStarRequestBuilder req = AStarRequest.of();
+    State traversedOne = new State(start, req.build());
     State currentState;
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
@@ -527,7 +548,7 @@ public class TestHalfEdges {
       StreetNotesService.WHEELCHAIR_MATCHER
     );
 
-    req.setWheelchair(true);
+    req.withWheelchair(true);
 
     start =
       StreetVertexIndex.createTemporaryStreetLocationForTest(
@@ -539,7 +560,7 @@ public class TestHalfEdges {
         tempEdges
       );
 
-    traversedOne = new State(start, req, null);
+    traversedOne = new State(start, req.build());
     for (Edge e : start.getOutgoing()) {
       currentState = e.traverse(traversedOne);
       if (currentState != null) {
@@ -556,17 +577,16 @@ public class TestHalfEdges {
 
   @Test
   public void testStreetLocationFinder() {
-    RouteRequest options = new RouteRequest();
     StreetVertexIndex finder = graph.getStreetIndex();
     GraphFinder graphFinder = new DirectGraphFinder(transitModel.getStopModel()::findRegularStops);
     Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
     // test that the local stop finder finds stops
-    assertTrue(graphFinder.findClosestStops(40.01, -74.005000001, 100).size() > 0);
+    assertTrue(graphFinder.findClosestStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
 
     // test that the closest vertex finder returns the closest vertex
     TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.00, -74.00),
-      options,
+      StreetMode.WALK,
       true,
       tempEdges
     );
@@ -575,7 +595,7 @@ public class TestHalfEdges {
     // test that the closest vertex finder correctly splits streets
     TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.004, -74.01),
-      options,
+      StreetMode.WALK,
       false,
       tempEdges
     );
@@ -588,10 +608,9 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    RouteRequest biking = new RouteRequest(TraverseMode.BICYCLE);
     TemporaryStreetLocation end = (TemporaryStreetLocation) finder.getVertexForLocationForTest(
       new GenericLocation(40.008, -74.0),
-      biking,
+      StreetMode.BIKE,
       true,
       tempEdges
     );
@@ -606,16 +625,23 @@ public class TestHalfEdges {
   @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
-    RouteRequest walking = new RouteRequest(TraverseMode.WALK);
+    RouteRequest walking = new RouteRequest();
     walking.setFrom(new GenericLocation(40.004, -74.0));
     walking.setTo(new GenericLocation(40.008, -74.0));
-    try (var container = new TemporaryVerticesContainer(graph, walking)) {
+    try (
+      var container = new TemporaryVerticesContainer(
+        graph,
+        walking,
+        StreetMode.WALK,
+        StreetMode.WALK
+      )
+    ) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
-      // The visibility for temp edges for start and end is set in the setRoutingContext call
       ShortestPathTree spt = AStarBuilder
         .oneToOne()
-        .setContext(new RoutingContext(walking, graph, container))
+        .setRequest(walking)
+        .setVerticesContainer(container)
         .getShortestPathTree();
       GraphPath path = spt.getPath(container.getToVertices().iterator().next());
       for (State s : path.states) {

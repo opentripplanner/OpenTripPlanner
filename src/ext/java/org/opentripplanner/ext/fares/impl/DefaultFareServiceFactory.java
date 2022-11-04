@@ -13,6 +13,7 @@ import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareRule;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.FareRulesData;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
@@ -34,24 +35,25 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
   protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
   private final List<FareLegRule> fareLegRules = new ArrayList<>();
+  private final List<FareTransferRule> fareTransferRules = new ArrayList<>();
 
   // mapping the stop ids to area ids. one stop can be in several areas.
   private final Multimap<FeedScopedId, String> stopAreas = ArrayListMultimap.create();
 
   @Override
   public FareService makeFareService() {
-    DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
+    DefaultFareService fareService = new DefaultFareService();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
 
-    var faresV2Service = new GtfsFaresV2Service(fareLegRules.stream().toList(), stopAreas);
+    var faresV2Service = new GtfsFaresV2Service(fareLegRules, fareTransferRules, stopAreas);
     return new GtfsFaresService(fareService, faresV2Service);
   }
 
   @Override
-  public void processGtfs(FareRulesData fareRuleService, OtpTransitService transitService) {
-    fillFareRules(fareRuleService.fareAttributes(), fareRuleService.fareRules(), regularFareRules);
-
-    fareLegRules.addAll(fareRuleService.fareLegRules());
+  public void processGtfs(FareRulesData fareRulesData, OtpTransitService transitService) {
+    fillFareRules(fareRulesData.fareAttributes(), fareRulesData.fareRules(), regularFareRules);
+    this.fareLegRules.addAll(fareRulesData.fareLegRules());
+    this.fareTransferRules.addAll(fareRulesData.fareTransferRules());
   }
 
   public void configure(JsonNode config) {

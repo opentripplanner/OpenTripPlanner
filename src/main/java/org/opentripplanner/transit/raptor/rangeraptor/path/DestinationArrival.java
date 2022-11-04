@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.EgressPathView;
@@ -28,13 +28,13 @@ import org.opentripplanner.transit.raptor.api.view.EgressPathView;
 public class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
   private final ArrivalView<T> previous;
-  private final RaptorTransfer egress;
+  private final RaptorAccessEgress egress;
   private final int arrivalTime;
   private final int numberOfTransfers;
   private final int cost;
 
   public DestinationArrival(
-    RaptorTransfer egress,
+    RaptorAccessEgress egress,
     ArrivalView<T> previous,
     int arrivalTime,
     int additionalCost

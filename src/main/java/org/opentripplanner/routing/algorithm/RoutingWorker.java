@@ -14,7 +14,7 @@ import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
+import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
@@ -22,6 +22,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -124,12 +125,16 @@ public class RoutingWorker {
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
-    ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
+    boolean removeWalkAllTheWayResultsFromDirectFlex =
+      request.journey().direct().mode() == StreetMode.FLEXIBLE;
+
+    ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
-      request.preferences().system().itineraryFilters(),
+      request.preferences().itineraryFilter(),
       request.numItineraries(),
       filterOnLatestDepartureTime(),
-      emptyDirectModeHandler.removeWalkAllTheWayResults(),
+      emptyDirectModeHandler.removeWalkAllTheWayResults() ||
+      removeWalkAllTheWayResultsFromDirectFlex,
       request.maxNumberOfItinerariesCropHead(),
       it -> firstRemovedItinerary = it,
       request.wheelchair(),

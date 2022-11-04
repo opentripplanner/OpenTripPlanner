@@ -15,6 +15,8 @@ import static org.opentripplanner.util.lang.DoubleUtils.roundTo2Decimals;
  * </pre>
  * <p>
  * This class is currently only used with bicycle routing, but is not limited to that.
+ * <p>
+ * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public record TimeSlopeSafetyTriangle(double time, double slope, double safety) {
   private static final double ZERO = 0.0;
@@ -23,7 +25,7 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
 
   /**
    * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
-   * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and
+   * and speed. These three fields of the RouteRequest should have values between 0 and 1, and
    * should add up to 1. This setter function accepts any three numbers and will normalize them to
    * add up to 1.
    */

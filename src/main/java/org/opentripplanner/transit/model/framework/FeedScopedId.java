@@ -28,8 +28,8 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   private final String id;
 
   public FeedScopedId(@Nonnull String feedId, @Nonnull String id) {
-    this.feedId = assertHasValue(feedId);
-    this.id = assertHasValue(id);
+    this.feedId = assertHasValue(feedId, "Missing mandatory feedId on FeedScopeId");
+    this.id = assertHasValue(id, "Missing mandatory id on FeedScopeId");
   }
 
   /**

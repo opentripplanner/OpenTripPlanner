@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.internalapi;
 
 import java.util.function.IntConsumer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripScheduleBoardOrAlightEvent;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
@@ -23,7 +23,7 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
    *                                   this is the time shifted to fit the window.
    */
   void setAccessToStop(
-    RaptorTransfer accessPath,
+    RaptorAccessEgress accessPath,
     int iterationDepartureTime,
     int timeDependentDepartureTime
   );

@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import javax.annotation.Nullable;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
+import org.opentripplanner.transit.raptor.rangeraptor.internalapi.HeuristicAtStop;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
@@ -25,8 +28,9 @@ public class HeuristicsAdapter implements Heuristics {
   private static final int NOT_SET = Integer.MAX_VALUE;
   private final BestTimes times;
   private final BestNumberOfTransfers transfers;
-  private final TIntObjectMap<List<RaptorTransfer>> egressPaths;
+  private final TIntObjectMap<List<RaptorAccessEgress>> egressPaths;
   private final TransitCalculator<?> calculator;
+  private final CostCalculator<?> costCalculator;
   private int originDepartureTime = -1;
   private boolean aggregatedResultsCalculated = false;
 
@@ -39,12 +43,14 @@ public class HeuristicsAdapter implements Heuristics {
     BestNumberOfTransfers transfers,
     EgressPaths egressPaths,
     TransitCalculator<?> calculator,
+    CostCalculator<?> costCalculator,
     WorkerLifeCycle lifeCycle
   ) {
     this.times = times;
     this.transfers = transfers;
     this.egressPaths = egressPaths.byStop();
     this.calculator = calculator;
+    this.costCalculator = costCalculator;
     lifeCycle.onSetupIteration(this::setUpIteration);
   }
 
@@ -74,6 +80,31 @@ public class HeuristicsAdapter implements Heuristics {
   @Override
   public int[] bestNumOfTransfersToIntArray(int unreached) {
     return toIntArray(size(), unreached, this::bestNumOfTransfers);
+  }
+
+  @Override
+  public int bestGeneralizedCost(int stop) {
+    if (reached(stop)) {
+      return costCalculator.calculateMinCost(bestTravelDuration(stop), bestNumOfTransfers(stop));
+    }
+    return NOT_SET;
+  }
+
+  @Override
+  public int[] bestGeneralizedCostToIntArray(int unreached) {
+    return toIntArray(size(), unreached, this::bestGeneralizedCost);
+  }
+
+  @Override
+  @Nullable
+  public HeuristicAtStop createHeuristicAtStop(int stop) {
+    return reached(stop)
+      ? new HeuristicAtStop(
+        bestTravelDuration(stop),
+        bestNumOfTransfers(stop),
+        bestGeneralizedCost(stop)
+      )
+      : null;
   }
 
   @Override
@@ -151,7 +182,7 @@ public class HeuristicsAdapter implements Heuristics {
       boolean stopReachedByTransit = times.isStopReachedByTransit(stop);
 
       if (stopReached || stopReachedByTransit) {
-        for (RaptorTransfer it : list) {
+        for (RaptorAccessEgress it : list) {
           boolean destinationReached = it.stopReachedOnBoard() ? stopReached : stopReachedByTransit;
 
           if (!destinationReached) {

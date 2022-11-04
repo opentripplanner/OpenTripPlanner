@@ -33,6 +33,9 @@ pages:
         - "Boarding locations": 'BoardingLocations.md'
         - Router: 'RouterConfiguration.md'
         - Accessibility: 'Accessibility.md'
+        - "Route Request": 'RouteRequest.md'
+        - "Realtime Updaters" : 'UpdaterConfig.md'
+        - "Routing Modes" : "RoutingModes.md"
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
@@ -44,6 +47,7 @@ pages:
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
     - Sandbox development: 'SandboxExtension.md'
+    - Release Checklist: 'ReleaseChecklist.md'
 - Sandbox:
     - About: 'SandboxExtension.md'
     - Actuator API: 'sandbox/ActuatorAPI.md'

@@ -19,11 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStarBuilder;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.routing.core.intersection_model.IntersectionTraversalCalculator;
 import org.opentripplanner.routing.graph.Edge;
@@ -32,17 +35,12 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
-import org.opentripplanner.transit.service.TransitModel;
 
 public class TriangleInequalityTest {
 
   private static Graph graph;
-  private static TransitModel transitModel;
+
   private final IntersectionTraversalCalculator calculator = new ConstantIntersectionTraversalCalculator(
     10.0
   );
@@ -52,10 +50,7 @@ public class TriangleInequalityTest {
 
   @BeforeAll
   public static void onlyOnce() {
-    var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    graph = new Graph(deduplicator);
-    transitModel = new TransitModel(stopModel, deduplicator);
+    graph = new Graph(new Deduplicator());
 
     File file = new File(
       URLDecoder.decode(
@@ -64,13 +59,13 @@ public class TriangleInequalityTest {
       )
     );
     FileDataSource dataSource = new FileDataSource(file, FileType.OSM);
-    ConfiguredDataSource<OsmExtractConfig> source = new ConfiguredDataSource<>(
+    ConfiguredDataSource<OsmExtractParameters> source = new ConfiguredDataSource<>(
       dataSource,
-      new OsmExtractConfigBuilder().withSource(dataSource.uri()).build()
+      new OsmExtractParametersBuilder().withSource(dataSource.uri()).build()
     );
     OpenStreetMapProvider provider = new OpenStreetMapProvider(
       source,
-      new OsmDefaultsConfig(),
+      new OsmDefaultParameters(),
       true
     );
 
@@ -78,10 +73,9 @@ public class TriangleInequalityTest {
       List.of(provider),
       Set.of(),
       graph,
-      transitModel.getTimeZone(),
-      noopIssueStore()
+      noopIssueStore(),
+      new DefaultMapper()
     );
-    osmModule.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
     osmModule.buildGraph();
   }
 
@@ -182,7 +176,9 @@ public class TriangleInequalityTest {
     return AStarBuilder
       .oneToOne()
       .setOriginBackEdge(startBackEdge)
-      .setContext(new RoutingContext(options, graph, u, v))
+      .setRequest(options)
+      .setFrom(u)
+      .setTo(v)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree()
       .getPath(v);
@@ -199,16 +195,13 @@ public class TriangleInequalityTest {
     RouteRequest prototypeOptions = new RouteRequest();
 
     // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions
-      .preferences()
-      .withWalk(walk -> {
-        walk.setStairsReluctance(1.0);
-        walk.setSpeed(1.0);
-      });
-    prototypeOptions.preferences().setAllStreetReluctance(1.0);
-    prototypeOptions.preferences().street().setTurnReluctance(1.0);
-    prototypeOptions.preferences().car().setSpeed(1.0);
-    prototypeOptions.preferences().withBike(it -> it.setSpeed(1.0));
+    prototypeOptions.withPreferences(preferences ->
+      preferences
+        .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
+        .withStreet(street -> street.withTurnReluctance(1.0))
+        .withCar(car -> car.withSpeed(1.0).withReluctance(1.0))
+        .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
+    );
 
     if (modes != null) {
       prototypeOptions.journey().setModes(modes);
@@ -217,7 +210,9 @@ public class TriangleInequalityTest {
     ShortestPathTree tree = AStarBuilder
       .oneToOne()
       .setDominanceFunction(new DominanceFunction.EarliestArrival())
-      .setContext(new RoutingContext(prototypeOptions, graph, start, end))
+      .setRequest(prototypeOptions)
+      .setFrom(start)
+      .setTo(end)
       .setIntersectionTraversalCalculator(calculator)
       .getShortestPathTree();
 

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.response.StopArrivals;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
@@ -43,7 +44,7 @@ public interface WorkerState<T extends RaptorTripSchedule> {
    * the algorithm according to the {@link RaptorTransfer#numberOfRides()} and {@link
    * RaptorTransfer#stopReachedOnBoard()}.
    */
-  void setAccessToStop(RaptorTransfer accessPath, int iterationDepartureTime);
+  void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime);
 
   /**
    * Update state with a new transfer.

@@ -1,6 +1,7 @@
 package org.opentripplanner.util.lang;
 
 import static java.lang.Boolean.TRUE;
+import static org.opentripplanner.util.time.DurationUtils.durationToStr;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -81,6 +82,14 @@ public class ToStringBuilder {
     return addIfNotNull(name, num, n -> numFormat.formatNumber(n, unit));
   }
 
+  public ToStringBuilder addCost(String name, Integer cost, Integer ignoreValue) {
+    return addIfNotIgnored(name, cost, ignoreValue, OtpNumberFormat::formatCost);
+  }
+
+  public ToStringBuilder addCostCenti(String name, Integer cost, Integer ignoreValue) {
+    return addIfNotIgnored(name, cost, ignoreValue, OtpNumberFormat::formatCostCenti);
+  }
+
   public ToStringBuilder addBool(String name, Boolean value) {
     return addIfNotNull(name, value);
   }
@@ -92,8 +101,12 @@ public class ToStringBuilder {
     return this;
   }
 
+  public ToStringBuilder addStr(String name, String value, String ignoreValue) {
+    return addIfNotIgnored(name, value, ignoreValue, v -> "'" + v + "'");
+  }
+
   public ToStringBuilder addStr(String name, String value) {
-    return addIfNotNull(name, value, v -> "'" + v + "'");
+    return addStr(name, value, null);
   }
 
   public ToStringBuilder addEnum(String name, Enum<?> value) {
@@ -114,15 +127,30 @@ public class ToStringBuilder {
 
   /**
    * Use this if you would like a custom toString function to convert the value. If the given value
-   * is null, then the value is not printed. The "Op" (Operation) suffix is necessary to separate
-   * this from {@link #addObj(String, Object, Object)},  when the last argument is null.
+   * is null, then the value is not printed.
+   * <p>
+   * Implementation note! The "Op" (Operation) suffix is necessary to separate this from
+   * {@link #addObj(String, Object, Object)},  when the last argument is null.
    */
   public <T> ToStringBuilder addObjOp(
     String name,
     @Nullable T value,
     Function<T, Object> toObjectOp
   ) {
-    return addIfNotIgnored(name, value, null, v -> nullSafeToString(toObjectOp.apply(v)));
+    return addObjOp(name, value, null, toObjectOp);
+  }
+
+  /**
+   * Use this if you would like a custom toString function to convert the value. If the given value
+   * equals the given {@code ignoreValue}, then the value is not printed.
+   */
+  public <T> ToStringBuilder addObjOp(
+    String name,
+    @Nullable T value,
+    @Nullable T ignoreValue,
+    Function<T, Object> toObjectOp
+  ) {
+    return addIfNotIgnored(name, value, ignoreValue, v -> nullSafeToString(toObjectOp.apply(v)));
   }
 
   public ToStringBuilder addInts(String name, int[] intArray) {
@@ -142,6 +170,10 @@ public class ToStringBuilder {
   /** Add collection if not null or not empty, all elements are added */
   public ToStringBuilder addCol(String name, Collection<?> c) {
     return addIfNotNull(name, c == null || c.isEmpty() ? null : c);
+  }
+
+  public ToStringBuilder addCol(String name, Collection<?> c, Collection<?> ignoreValue) {
+    return addIfNotIgnored(name, c, ignoreValue, Objects::toString);
   }
 
   /**
@@ -267,13 +299,20 @@ public class ToStringBuilder {
     return addIfNotIgnored(name, durationSeconds, ignoreValue, DurationUtils::durationToStr);
   }
 
+  /**
+   * Same as {@link #addDuration(String, Duration, Duration)} with ignore-value {@code null}.
+   */
   public ToStringBuilder addDuration(String name, Duration duration) {
-    return addIfNotIgnored(
-      name,
-      duration,
-      null,
-      d -> DurationUtils.durationToStr((int) d.toSeconds())
-    );
+    return addDuration(name, duration, null);
+  }
+
+  /**
+   * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
+   * seconds) is only added if they are not zero {@code 0}. This is the same format as the {@link
+   * Duration#toString()}, but without the 'PT' prefix.
+   */
+  public ToStringBuilder addDuration(String name, Duration duration, Duration ignoreValue) {
+    return addIfNotIgnored(name, duration, ignoreValue, d -> durationToStr((int) d.toSeconds()));
   }
 
   @Override

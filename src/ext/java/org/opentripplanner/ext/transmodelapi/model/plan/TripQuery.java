@@ -7,7 +7,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
-import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
+import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
@@ -18,7 +18,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 public class TripQuery {
 
   public static GraphQLFieldDefinition create(
-    DefaultRoutingRequestType routing,
+    DefaultRouteRequestType routing,
     GraphQLOutputType tripType,
     GqlUtil gqlUtil
   ) {
@@ -429,7 +429,7 @@ public class TripQuery {
             "instead of removing them. This is very convenient when tuning the filters."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(preferences.system().itineraryFilters().debug)
+          .defaultValue(preferences.itineraryFilter().debug())
           .build()
       )
       .argument(
@@ -440,7 +440,7 @@ public class TripQuery {
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
-          .type(ItineraryFiltersInputType.create(gqlUtil, preferences.system().itineraryFilters()))
+          .type(ItineraryFiltersInputType.create(gqlUtil, preferences.itineraryFilter()))
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

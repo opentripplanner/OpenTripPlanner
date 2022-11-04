@@ -1,9 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.I18NString;
@@ -11,6 +13,8 @@ import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.site.Station;
+import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
+import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.Quay;
@@ -22,13 +26,24 @@ class StationMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  StationMapper(DataImportIssueStore issueStore, FeedScopedIdFactory idFactory) {
+  private final ZoneId defaultTimeZone;
+
+  private final boolean noTransfersOnIsolatedStops;
+
+  StationMapper(
+    DataImportIssueStore issueStore,
+    FeedScopedIdFactory idFactory,
+    ZoneId defaultTimeZone,
+    boolean noTransfersOnIsolatedStops
+  ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
+    this.defaultTimeZone = defaultTimeZone;
+    this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
   }
 
   Station map(StopPlace stopPlace) {
-    return Station
+    var builder = Station
       .of(idFactory.createId(stopPlace.getId()))
       .withName(resolveName(stopPlace))
       .withCoordinate(mapCoordinate(stopPlace))
@@ -36,7 +51,21 @@ class StationMapper {
         NonLocalizedString.ofNullable(stopPlace.getDescription(), MultilingualString::getValue)
       )
       .withPriority(StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting()))
-      .build();
+      .withTimezone(
+        Optional
+          .ofNullable(stopPlace.getLocale())
+          .map(LocaleStructure::getTimeZone)
+          .map(ZoneId::of)
+          .orElse(defaultTimeZone)
+      );
+
+    if (noTransfersOnIsolatedStops) {
+      builder.withTransfersNotAllowed(
+        LimitedUseTypeEnumeration.ISOLATED.equals(stopPlace.getLimitedUse())
+      );
+    }
+
+    return builder.build();
   }
 
   private I18NString resolveName(StopPlace stopPlace) {

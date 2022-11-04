@@ -130,8 +130,6 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
           continue;
         }
 
-        vehicleParkingService.removeVehicleParking(oldVehicleParking);
-
         if (verticesByPark.containsKey(oldVehicleParking)) {
           tempEdgesByPark.get(oldVehicleParking).forEach(DisposableEdgeCollection::disposeEdges);
           verticesByPark
@@ -159,9 +157,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         tempEdgesByPark.put(updatedVehicleParking, disposableEdgeCollectionsForVertex);
       }
 
-      for (final VehicleParking vehicleParking : toAdd) {
-        vehicleParkingService.addVehicleParking(vehicleParking);
-      }
+      vehicleParkingService.updateVehicleParking(toAdd, toRemove);
 
       oldVehicleParkings.removeAll(toRemove);
       oldVehicleParkings.addAll(toAdd);

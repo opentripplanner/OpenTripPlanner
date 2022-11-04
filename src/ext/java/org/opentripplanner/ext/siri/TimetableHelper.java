@@ -4,30 +4,31 @@ import static org.opentripplanner.model.PickDrop.CANCELLED;
 import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NON_INCREASING_TRIP_TIMES;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.xml.datatype.Duration;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
@@ -120,7 +121,9 @@ public class TimetableHelper {
     OccupancyEnumeration journeyOccupancy = journey.getOccupancy();
 
     int callCounter = 0;
-    ZonedDateTime departureDate = null;
+
+    LocalDate serviceDate = getServiceDate(journey, zoneId, oldTimes);
+    ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<Object> alreadyVisited = new HashSet<>();
 
     boolean isJourneyPredictionInaccurate =
@@ -150,19 +153,6 @@ public class TimetableHelper {
         }
 
         if (foundMatch) {
-          if (departureDate == null) {
-            departureDate = recordedCall.getAimedDepartureTime();
-            if (departureDate == null) {
-              departureDate = recordedCall.getAimedArrivalTime();
-            }
-            departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
-          }
-
-          ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-            departureDate.toLocalDate(),
-            zoneId
-          );
-
           int arrivalTime = newTimes.getArrivalTime(callCounter);
 
           Integer realtimeArrivalTime = getAvailableTime(
@@ -259,14 +249,6 @@ public class TimetableHelper {
           }
 
           if (foundMatch) {
-            if (departureDate == null) {
-              departureDate = estimatedCall.getAimedDepartureTime();
-              if (departureDate == null) {
-                departureDate = estimatedCall.getAimedArrivalTime();
-              }
-              departureDate = departureDate.minusDays(calculateDayOffset(oldTimes));
-            }
-
             boolean isCallPredictionInaccurate =
               estimatedCall.isPredictionInaccurate() != null &&
               estimatedCall.isPredictionInaccurate();
@@ -291,11 +273,6 @@ public class TimetableHelper {
             if (departureStatus == CallStatusEnumeration.CANCELLED) {
               modifiedStopTimes.get(callCounter).cancelPickup();
             }
-
-            ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(
-              departureDate.toLocalDate(),
-              zoneId
-            );
 
             int arrivalTime = newTimes.getArrivalTime(callCounter);
 
@@ -389,15 +366,16 @@ public class TimetableHelper {
       newTimes.cancelTrip();
     }
 
-    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
-    if (invalidStopIndex.isPresent()) {
+    var result = newTimes.validateNonIncreasingTimes();
+    if (result.isFailure()) {
+      var updateError = result.failureValue();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         journey.getLineRef().getValue(),
         tripId,
-        invalidStopIndex.getAsInt()
+        updateError.stopIndex()
       );
-      return UpdateError.result(tripId, NON_INCREASING_TRIP_TIMES);
+      return Result.failure(updateError);
     }
 
     if (newTimes.getNumStops() != pattern.numberOfStops()) {
@@ -553,7 +531,6 @@ public class TimetableHelper {
 
     List<StopTime> modifiedStops = new ArrayList<>();
 
-    ZonedDateTime departureDate = null;
     int numberOfRecordedCalls = recordedCalls.size();
     Set<Object> alreadyVisited = new HashSet<>();
     // modify updated stop-times
@@ -613,14 +590,6 @@ public class TimetableHelper {
           if (alreadyVisited.contains(estimatedCall)) {
             continue;
           }
-          if (departureDate == null) {
-            departureDate =
-              (
-                estimatedCall.getAimedDepartureTime() != null
-                  ? estimatedCall.getAimedDepartureTime()
-                  : estimatedCall.getAimedArrivalTime()
-              );
-          }
 
           //Current stop is being updated
           boolean stopsMatchById = stop
@@ -672,7 +641,7 @@ public class TimetableHelper {
               NaturalLanguageStringStructure destinationDisplay = estimatedCall
                 .getDestinationDisplaies()
                 .get(0);
-              stopTime.setStopHeadsign(destinationDisplay.getValue());
+              stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
             }
 
             modifiedStops.add(stopTime);
@@ -727,11 +696,10 @@ public class TimetableHelper {
       return Result.failure(new UpdateError(tripId, INVALID_INPUT_STRUCTURE));
     }
 
-    VehicleActivityStructure.MonitoredVehicleJourney monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
+    MonitoredVehicleJourneyStructure monitoredVehicleJourney = activity.getMonitoredVehicleJourney();
 
-    Duration delay = null;
     if (monitoredVehicleJourney != null) {
-      delay = monitoredVehicleJourney.getDelay();
+      Duration delay = monitoredVehicleJourney.getDelay();
       int updatedDelay = 0;
       if (delay != null) {
         updatedDelay =
@@ -782,15 +750,16 @@ public class TimetableHelper {
       }
     }
 
-    OptionalInt invalidStopIndex = newTimes.findFirstNoneIncreasingStopTime();
-    if (invalidStopIndex.isPresent()) {
+    var result = newTimes.validateNonIncreasingTimes();
+    if (result.isFailure()) {
+      var error = result.failureValue();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - LineRef {}, TripId {}. Stop index {}",
         timetable.getPattern().getRoute().getId(),
         tripId,
-        invalidStopIndex.getAsInt()
+        error.stopIndex()
       );
-      return Result.failure(new UpdateError(tripId, NON_INCREASING_TRIP_TIMES));
+      return Result.failure(error);
     }
 
     //If state is already MODIFIED - keep existing state
@@ -894,5 +863,39 @@ public class TimetableHelper {
       case NO_BOARDING -> Optional.of(NONE);
       case PASS_THRU -> Optional.of(CANCELLED);
     };
+  }
+
+  private static LocalDate getServiceDate(
+    EstimatedVehicleJourney journey,
+    ZoneId zoneId,
+    TripTimes oldTimes
+  ) {
+    if (
+      journey.getFramedVehicleJourneyRef() != null &&
+      journey.getFramedVehicleJourneyRef().getDataFrameRef() != null
+    ) {
+      var dataFrame = journey.getFramedVehicleJourneyRef().getDataFrameRef();
+      if (dataFrame != null) {
+        try {
+          return LocalDate.parse(dataFrame.getValue());
+        } catch (DateTimeParseException ignored) {
+          LOG.warn("Invalid dataFrame format: {}", dataFrame.getValue());
+        }
+      }
+    }
+
+    var recordedCalls = getRecordedCalls(journey);
+    var estimatedCalls = getEstimatedCalls(journey);
+    ZonedDateTime firstDeparture;
+    if (recordedCalls.isEmpty()) {
+      firstDeparture = estimatedCalls.get(0).getAimedDepartureTime();
+    } else {
+      firstDeparture = recordedCalls.get(0).getAimedDepartureTime();
+    }
+
+    return firstDeparture
+      .minusDays(calculateDayOffset(oldTimes))
+      .withZoneSameInstant(zoneId)
+      .toLocalDate();
   }
 }

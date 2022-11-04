@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 public class HeuristicToRunResolverTest {
 
@@ -37,8 +37,8 @@ public class HeuristicToRunResolverTest {
 
     given(DEST, EDT, LAT, WIN).expect(_x_, REV);
     given(DEST, EDT, LAT, _x_).expect(_x_, REV);
-    given(DEST, EDT, _x_, WIN).expect(FWD, REV);
-    given(DEST, EDT, _x_, _x_).expect(FWD, REV);
+    given(DEST, EDT, _x_, WIN).expect(_x_, REV);
+    given(DEST, EDT, _x_, _x_).expect(_x_, REV);
     given(DEST, _x_, LAT, WIN).expect(_x_, REV);
     given(DEST, _x_, LAT, _x_).expect(_x_, REV);
     // Skip alternatives with both EAT & LAT off.
@@ -119,7 +119,7 @@ public class HeuristicToRunResolverTest {
     reverse = true;
   }
 
-  private RaptorTransfer dummyAccessEgress() {
-    return TestTransfer.walk(1, 10);
+  private RaptorAccessEgress dummyAccessEgress() {
+    return TestAccessEgress.walk(1, 10);
   }
 }

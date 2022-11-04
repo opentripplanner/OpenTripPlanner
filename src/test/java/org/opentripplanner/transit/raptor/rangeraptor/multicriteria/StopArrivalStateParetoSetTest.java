@@ -1,10 +1,11 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.raptor._data.transit.TestTransfer.walk;
 
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.transit.raptor._data.transit.TestTransfer;
 import org.opentripplanner.transit.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -127,7 +128,10 @@ public class StopArrivalStateParetoSetTest {
     int accessDurationInSeconds,
     int cost
   ) {
-    return new AccessStopArrival<>(A_TIME, walk(stop, accessDurationInSeconds, cost));
+    return new AccessStopArrival<>(
+      A_TIME,
+      TestAccessEgress.walk(stop, accessDurationInSeconds, cost)
+    );
   }
 
   private static TransitStopArrival<RaptorTripSchedule> newTransitStopState(
@@ -147,7 +151,11 @@ public class StopArrivalStateParetoSetTest {
     int cost
   ) {
     var prev = prev(round);
-    return new TransferStopArrival<>(prev, walk(stop, ANY, cost - prev.cost()), arrivalTime);
+    return new TransferStopArrival<>(
+      prev,
+      TestTransfer.transfer(stop, ANY, cost - prev.cost()),
+      arrivalTime
+    );
   }
 
   private static AbstractStopArrival<RaptorTripSchedule> prev(int round) {

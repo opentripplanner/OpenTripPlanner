@@ -624,7 +624,7 @@ msgstr "Reiseplanleggeren svarer ikke på forspørsel. Prøv igjen senere."
 msgid "The request has errors that the server is not willing or able to process."
 msgstr ""
 "Ugyldig input data. Server er ikke i stand til å behandle "
-"'RoutingRequest'."
+"'RouteRequest'."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:106
 msgid "Origin is unknown. Can you be a bit more descriptive?"

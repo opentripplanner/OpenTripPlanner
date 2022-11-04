@@ -153,17 +153,25 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Add  a cost in the format $N.NN or $N (id decimals are zero)
+   * Add  a cost in the format $N, as in "transit seconds", not centi-seconds as used by Raptor.
    */
-  public ValueObjectToStringBuilder addCost(Integer cost) {
-    return addIt(cost, OtpNumberFormat::formatCost);
+  public ValueObjectToStringBuilder addCost(Integer costSeconds) {
+    return addIt(costSeconds, OtpNumberFormat::formatCost);
+  }
+
+  /**
+   * Add  a cost in the format $N.NN or $N (if decimals are zero). The cost is interoperated as
+   * a generalized-cost like the cost used by Raptor in "centi-seconds"
+   */
+  public ValueObjectToStringBuilder addCostCenti(Integer costCentiSeconds) {
+    return addIt(costCentiSeconds, OtpNumberFormat::formatCostCenti);
   }
 
   /**
    * Add a cost in the format $N.NNu or $Nu, where 'N' is the number and 'u' is the unit.
    */
-  public ValueObjectToStringBuilder addCost(Integer cost, String unit) {
-    return addIt(cost, it -> OtpNumberFormat.formatCost(it, unit));
+  public ValueObjectToStringBuilder addCostCenti(Integer costCentiSeconds, String unit) {
+    return addIt(costCentiSeconds, it -> OtpNumberFormat.formatCost(it, unit));
   }
 
   @Override

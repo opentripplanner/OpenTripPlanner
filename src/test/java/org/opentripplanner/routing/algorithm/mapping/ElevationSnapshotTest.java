@@ -91,12 +91,13 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directBike() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request
-      .preferences()
-      .withBike(bike -> {
-        bike.setOptimizeType(BicycleOptimizeType.TRIANGLE);
-        bike.withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3));
-      });
+    request.withPreferences(pref ->
+      pref.withBike(bike ->
+        bike
+          .withOptimizeType(BicycleOptimizeType.TRIANGLE)
+          .withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3))
+      )
+    );
 
     request.journey().direct().setMode(StreetMode.BIKE);
     request.journey().transit().setModes(List.of());

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitArrival;
@@ -33,7 +34,7 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule>
   }
 
   @Override
-  public void setAccessTime(int arrivalTime, RaptorTransfer access, boolean bestTime) {
+  public void setAccessTime(int arrivalTime, RaptorAccessEgress access, boolean bestTime) {
     bestNumberOfTransfers.arriveAtStop(access.stop());
   }
 

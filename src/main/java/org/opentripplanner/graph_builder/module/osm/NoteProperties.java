@@ -3,13 +3,16 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 
-//Currently unused since notes are disabled in DefaultWayPropertySetSource
+/**
+ * Currently unused since notes are disabled in {@link DefaultMapper}
+ */
 public class NoteProperties {
 
   private static final Pattern patternMatcher = Pattern.compile("\\{(.*?)}");

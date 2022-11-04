@@ -7,9 +7,8 @@ The following are known deployments of OTP in a government- or agency-sponsored 
 * **Norway (nationwide)** Since November 2017, the national integrated ticketing agency Entur has
   prodvided a [national journey planner](https://en-tur.no/) which consumes schedule data in the EU
   standard NeTEx format with SIRI realtime updates. Entur has contributed greatly to the OTP2 effort
-  and primarily uses OTP2 in production, handling peak loads in excess of 20 requests per second.
-* **Oslo, Norway** Ruter provides a [journey planner for the Oslo region](https://ruter.no/). It has
-  been in production since January 2016 and serves around 200,000 users per day.
+  and primarily uses OTP2 in production, handling peak loads in excess of 20 requests per second. 
+  Most regional agencies in Norway, like **Ruter, Oslo area** uses OTP as a service provided by Entur.
 * **Finland (nationwide)** The [Helsinki Regional Transport Authority](https://www.reittiopas.fi/),
   the [Finnish Transport Agency](https://opas.matka.fi/), and
   other [Finnish cities](https://waltti.fi/?lang=en) have collaborated to
@@ -74,6 +73,8 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   around the campus using multiple modes of transportation, including the USF Bull Runner campus
   shuttle, Share-A-Bull bike share, and pedestrian pathways.
   Open-sourced [on Github](https://github.com/CUTR-at-USF/usf-mobullity).
+* **Skåne, Sweden**, the JourneyPlanner and mobile app for the regional transit agency [Skånetrafiken](https://www.skanetrafiken.se/) 
+  uses OTP2 with the nordic profile of NeTEx and SIRI for realtime updates.
 
 ## Independent Production
 

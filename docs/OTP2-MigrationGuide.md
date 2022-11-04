@@ -42,7 +42,7 @@ of this type:
 - `maxAreaNodes` Visibility calculations will not be done for areas with more nodes than this limit.
   Since v2.1
 - `maxJourneyDuration` This limits the patterns we consider in the transit search.
-  See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
+  See [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.1/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
   . Since v2.1
 - `maxStopToShapeSnapDistance` Used for mapping route geometry shapes. Since v2.1
 - `transferRequests` Pre-calculate transfers. Since v2.1
@@ -50,6 +50,8 @@ of this type:
   Default: `-P1Y`. Since v2.0
 - `transitServiceEnd` Limit the import of transit services to the given *end* date. *Inclusive*.
   Default: `P3Y`. Since v2.0
+- Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` 
+  nodes.
 
 #### Parameters whose names were changed
 
@@ -68,8 +70,6 @@ of this type:
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
 
-Since v2.2, data feeds can be configured individually by using the `transitFeeds`, `osm` and `dem` 
-nodes.
 
 Since v2.2, `osmWayPropertySet` was renamed `osmTagMapping` and is part of the individual osm 
 source. The driving direction and intersection cost model were decoupled for the tag mapping and can
@@ -113,6 +113,7 @@ routing parameters.
 - `boardTimes` is replaced by `request` parameter `boardSlack` and `boardSlackForMode`. Since v2.0
 - `alightTimes` is replaced by `request` parameter `alightSlack` and `alightSlackForMode`. Since
   v2.0
+- `disableAlertFiltering` Not implemented in OTP2. Since v2.0
 
 ## REST API
 
@@ -124,9 +125,9 @@ these parameters may only be available as `defaultRequest` configuration paramet
 #### Query parameter changes
 
 A lot of the query parameters in the REST API are ignored/deprecated, see
-the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java)
+the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.1/src/main/java/org/opentripplanner/routing/api/request/RouteRequest.java)
 and
-the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.1/src/main/java/org/opentripplanner/api/common/RouteResource.java)
 class for the documentation on what is now supported in OTP2.
 
 #### Parameters missing in OTP2 but intended to be reintroduced
@@ -157,7 +158,7 @@ permanently from OTP2, but may require some development to support valid importa
 - `waitAtBeginningFactor` - No longer necessary to weight the initial wait differently based on the
   the Range Raptor search algorithm, which no longer prefers a departure at one valid time over
   another. Filtering could be implemented on top of Raptor to show certain departure times before
-  others.
+  others. Removed in v2.2.
 - `pathComparator` - The ability to set a sort order based on departure or arrival should be the
   domain of the API rather than the search.
 - `startingTransitStopId` - this is redundant, as the same thing can be achieved with fromPlace
@@ -174,7 +175,7 @@ permanently from OTP2, but may require some development to support valid importa
   pareto-optimal itineraries when paging. Also, a large search-window and a small `numItineraries`
   waste computer CPU calculation time. Consider tuning the `searchWindow` instead of setting this to
   a small value. Since 2.0
-- `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. This
+- `modes` The REST API is unchanged, but is mapped into a new structure in the RouteRequest. This
   means not all combinations of non-transit modes that was available in OTP1 is available in OTP2.
   Since 2.0
 - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use
@@ -208,6 +209,7 @@ permanently from OTP2, but may require some development to support valid importa
 - `maxWeight` Since 2.1
 - `driveOnRight` You can specify the driving direction in your way property set. Since 2.1
 - `bannedTrips` Not supported in 2.0 and 2.1
+- `waitAtBeginningFactor` Since 2.2 
 
 #### Paging
 
