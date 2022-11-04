@@ -4,22 +4,26 @@ import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
+@OnlyIfDocsExist
 public class RouteRequestDocTest {
 
-  private static final File TEMPLATE = new File("doc-templates", "RouteRequest.md");
-  private static final File OUT_FILE = new File("docs", "RouteRequest.md");
+  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouteRequest.md");
+  private static final File OUT_FILE = new File(DOCS_ROOT, "RouteRequest.md");
   private static final String BUILD_CONFIG_FILENAME = "standalone/config/router-config.json";
   private static final SkipNodes SKIP_NODES = SkipNodes
     .of()
