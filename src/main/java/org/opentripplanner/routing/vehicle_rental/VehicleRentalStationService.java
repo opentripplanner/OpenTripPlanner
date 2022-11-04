@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class VehicleRentalStationService implements Serializable {
@@ -64,8 +65,22 @@ public class VehicleRentalStationService implements Serializable {
     vehicleRentalStations.remove(vehicleRentalStationId);
   }
 
-  public boolean hasRentalPlaces() {
-    return !vehicleRentalStations.isEmpty();
+  public boolean hasRentalBikes() {
+    return vehicleRentalStations
+      .values()
+      .stream()
+      .anyMatch(place -> {
+        if (place instanceof VehicleRentalVehicle vehicle) {
+          return vehicle.vehicleType.formFactor == FormFactor.BICYCLE;
+        } else if (place instanceof VehicleRentalStation station) {
+          return station.vehicleTypesAvailable
+            .keySet()
+            .stream()
+            .anyMatch(t -> t.formFactor == FormFactor.BICYCLE);
+        } else {
+          return false;
+        }
+      });
   }
 
   /**

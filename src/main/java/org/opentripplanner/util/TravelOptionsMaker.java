@@ -29,7 +29,7 @@ public final class TravelOptionsMaker {
     var service = graph.getVehicleParkingService();
     return makeOptions(
       transitService.getTransitModes(),
-      graph.getVehicleRentalStationService().hasRentalPlaces(),
+      graph.getVehicleRentalStationService().hasRentalBikes(),
       service.hasBikeParkingLots(),
       service.hasCarParkingLots()
     );
