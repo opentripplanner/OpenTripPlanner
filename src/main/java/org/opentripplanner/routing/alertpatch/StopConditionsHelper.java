@@ -5,12 +5,13 @@ import java.util.Collection;
 public class StopConditionsHelper {
 
   /**
-   * Matches an EntitySelector's stopConditions with the stopConditions required. Returns true
-   * if at least one StopCondition  matches the requirement
+   * Returns true if at least one StopCondition in the entity selector matches the requested
+   * conditions. Also returns true, if the EntitySelector or the request don't specify any stop
+   * conditions.
    *
-   * @param stopConditions StopConditions set for EntitySelector
-   * @param requestConditions StopConditions to compare with
-   * @return true if stopConditions match
+   * @param stopConditions StopConditions set of the EntitySelector
+   * @param requestConditions StopConditions requested by the client/matching the usage of the stop
+   *                          in a leg
    */
   public static boolean matchesStopCondition(
     Collection<StopCondition> stopConditions,

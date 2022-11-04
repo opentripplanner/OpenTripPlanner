@@ -58,8 +58,8 @@ public class AlertToLegMapper {
 
     if (fromStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = isFirstLeg
-        ? StopCondition.DEPARTURE
-        : StopCondition.FIRST_DEPARTURE;
+        ? StopCondition.FIRST_DEPARTURE
+        : StopCondition.DEPARTURE;
 
       Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
       alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));

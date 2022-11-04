@@ -14,6 +14,11 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 
+/**
+ * This class is used to combine alerts from multiple {@link TransitAlertService}s. Each
+ * {@link TransitAlertProvider} has its own service, and all need to be queried in order to fetch
+ * all alerts.
+ */
 public class DelegatingTransitAlertServiceImpl implements TransitAlertService {
 
   private final ArrayList<TransitAlertService> transitAlertServices = new ArrayList<>();
