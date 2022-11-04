@@ -75,7 +75,7 @@ public class ParkAndRideResource {
 
     var prs = vehicleParkingService
       .getCarParks()
-      .filter(lot -> envelope.contains(new Coordinate(lot.getX(), lot.getY())))
+      .filter(lot -> envelope.contains(lot.getCoordinate().asJtsCoordinate()))
       .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))
       .map(ParkAndRideInfo::ofVehicleParking)
       .toList();
@@ -87,7 +87,10 @@ public class ParkAndRideResource {
     if (maxTransitDistance == null) {
       return true;
     } else {
-      var stops = graphFinder.findClosestStops(lot.getY(), lot.getX(), maxTransitDistance);
+      var stops = graphFinder.findClosestStops(
+        lot.getCoordinate().asJtsCoordinate(),
+        maxTransitDistance
+      );
       return !stops.isEmpty();
     }
   }
@@ -99,7 +102,11 @@ public class ParkAndRideResource {
         .map(I18NString::toString)
         .orElse(parking.getId().getId());
 
-      return new ParkAndRideInfo(name, parking.getX(), parking.getY());
+      return new ParkAndRideInfo(
+        name,
+        parking.getCoordinate().longitude(),
+        parking.getCoordinate().latitude()
+      );
     }
   }
 }

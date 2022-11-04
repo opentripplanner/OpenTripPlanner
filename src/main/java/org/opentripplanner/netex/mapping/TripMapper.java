@@ -9,6 +9,7 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -136,7 +137,7 @@ class TripMapper {
     // TODO RTM - Instead of getting the first headsign from the StopTime this could be the
     //          - default behaviour of the TransitModel - So, in the NeTEx mapper we would just
     //          - ignore setting the headsign on the Trip.
-    builder.withHeadsign(headsign.get());
+    builder.withHeadsign(new NonLocalizedString(headsign.get()));
 
     return builder.build();
   }

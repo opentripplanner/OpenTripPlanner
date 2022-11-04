@@ -9,6 +9,7 @@
 - Create initial sandbox implementation (January
   2022, https://github.com/opentripplanner/OpenTripPlanner/pull/3796)
 - Add timeZone parameter to hsl and parkapi updaters (September 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4427)
+- Added support for HSL parking hubs (October 2022, https://github.com/opentripplanner/OpenTripPlanner/pull/4510)
 
 ## Documentation
 
@@ -42,7 +43,8 @@ All updaters have the following parameters in common:
     "facilitiesFrequencySec": 3600,
     "facilitiesUrl": "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
     "utilizationsFrequencySec": 600,
-    "utilizationsUrl": "https://p.hsl.fi/api/v1/utilizations.json?limit=-1"
+    "utilizationsUrl": "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
+    "hubsUrl": "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
 }
 ```
 
@@ -56,6 +58,7 @@ All updaters have the following parameters in common:
 - `utilizationsFrequencySec`: how often should the basic information for parks be refetched. Should
   be less than `facilitiesFrequencySec` and if it's < 0, realtime information is never refetched.
   Default `3600`.
+- `hubsUrl` URL that contains parking hubs
 
 <b>To use KML park updater:</b>
 

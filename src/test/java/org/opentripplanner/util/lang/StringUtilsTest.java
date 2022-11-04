@@ -39,9 +39,36 @@ class StringUtilsTest {
   }
 
   @Test
-  void pad() {
-    assertEquals("ABC?????", StringUtils.pad(new StringBuilder("ABC"), '?', 8).toString());
-    assertEquals("ABC", StringUtils.pad(new StringBuilder("ABC"), '+', 3).toString());
-    assertEquals("ABC", StringUtils.pad(new StringBuilder("ABC"), '+', 0).toString());
+  void padLeft() {
+    assertEquals("?????ABC", StringUtils.padLeft("ABC", '?', 8));
+    assertEquals("ABC", StringUtils.padLeft("ABC", '?', 3));
+    assertEquals("????????", StringUtils.padLeft(null, '?', 8));
+  }
+
+  @Test
+  void padCenter() {
+    assertEquals("??AB??", StringUtils.padBoth("AB", '?', 6));
+    assertEquals("???AB??", StringUtils.padBoth("AB", '?', 7));
+    assertEquals("??ABC?", StringUtils.padBoth("ABC", '?', 6));
+    assertEquals("??ABC??", StringUtils.padBoth("ABC", '?', 7));
+    assertEquals("ABC", StringUtils.padBoth("ABC", '?', 3));
+    assertEquals("????????", StringUtils.padBoth(null, '?', 8));
+  }
+
+  @Test
+  void padRight() {
+    assertEquals("ABC???", StringUtils.padRight("ABC", '?', 6));
+    assertEquals("??????", StringUtils.padRight(null, '?', 6));
+    assertEquals("ABC", StringUtils.padRight("ABC", '?', 3));
+  }
+
+  @Test
+  void fill() {
+    assertEquals("$$$", StringUtils.fill('$', 3));
+  }
+
+  @Test
+  void quoteReplace() {
+    assertEquals("\"key\" : \"value\"", StringUtils.quoteReplace("'key' : 'value'"));
   }
 }

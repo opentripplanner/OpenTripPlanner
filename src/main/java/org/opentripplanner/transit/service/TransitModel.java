@@ -260,10 +260,10 @@ public class TransitModel implements Serializable {
     return feedInfoForId.get(feedId);
   }
 
-  public void addAgency(String feedId, Agency agency) {
+  public void addAgency(Agency agency) {
     invalidateIndex();
     agencies.add(agency);
-    this.feedIds.add(feedId);
+    this.feedIds.add(agency.getId().getFeedId());
   }
 
   public void addFeedInfo(FeedInfo info) {

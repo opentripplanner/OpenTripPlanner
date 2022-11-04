@@ -11,6 +11,6 @@
     "sharedFilePattern" : "ST_stops.xml",
     "sharedGroupFilePattern" : "(\\w{2})_shared_data.xml",
     "groupFilePattern" : "(\\w{2})_line.*\\.xml",
-    "netexFeedId": "ST"
+    "feedId": "ST"
   }
 }

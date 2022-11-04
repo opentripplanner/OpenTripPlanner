@@ -74,6 +74,8 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   around the campus using multiple modes of transportation, including the USF Bull Runner campus
   shuttle, Share-A-Bull bike share, and pedestrian pathways.
   Open-sourced [on Github](https://github.com/CUTR-at-USF/usf-mobullity).
+* **Skåne, Sweden**, the JourneyPlanner and mobile app for the regional transit agency [Skånetrafiken](https://www.skanetrafiken.se/) 
+  uses OTP2 with the nordic profile of NeTEx and SIRI for realtime updates.
 
 ## Independent Production
 

@@ -24,17 +24,20 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingsLayerBuilder;
-import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalPlacesLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalStationsLayerBuilder;
+import org.opentripplanner.ext.vectortiles.layers.vehiclerental.VehicleRentalVehiclesLayerBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.VectorTileConfig;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.WorldEnvelope;
 
 @Path("/routers/{ignoreRouterId}/vectorTiles")
 public class VectorTilesResource {
 
+  public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
   private static final Map<LayerType, LayerBuilderFactory> layers = new HashMap<>();
   private final OtpServerRequestContext serverContext;
   private final String ignoreRouterId;
@@ -42,8 +45,29 @@ public class VectorTilesResource {
   static {
     layers.put(LayerType.Stop, StopsLayerBuilder::new);
     layers.put(LayerType.Station, StationsLayerBuilder::new);
-    layers.put(LayerType.VehicleRental, VehicleRentalLayerBuilder::new);
+    layers.put(
+      LayerType.VehicleRental,
+      (graph, transitService, layerParameters) ->
+        new VehicleRentalPlacesLayerBuilder(graph.getVehicleRentalStationService(), layerParameters)
+    );
+    layers.put(
+      LayerType.VehicleRentalStation,
+      (graph, transitService, layerParameters) ->
+        new VehicleRentalStationsLayerBuilder(
+          graph.getVehicleRentalStationService(),
+          layerParameters
+        )
+    );
+    layers.put(
+      LayerType.VehicleRentalVehicle,
+      (graph, transitService, layerParameters) ->
+        new VehicleRentalVehiclesLayerBuilder(
+          graph.getVehicleRentalStationService(),
+          layerParameters
+        )
+    );
     layers.put(LayerType.VehicleParking, VehicleParkingsLayerBuilder::new);
+    layers.put(LayerType.VehicleParkingGroup, VehicleParkingGroupsLayerBuilder::new);
   }
 
   public VectorTilesResource(
@@ -60,7 +84,7 @@ public class VectorTilesResource {
 
   @GET
   @Path("/{layers}/{z}/{x}/{y}.pbf")
-  @Produces("application/x-protobuf")
+  @Produces(APPLICATION_X_PROTOBUF)
   public Response tileGet(
     @PathParam("x") int x,
     @PathParam("y") int y,
@@ -69,7 +93,7 @@ public class VectorTilesResource {
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
 
-    if (z < VectorTileConfig.MIN_ZOOM) {
+    if (z < LayerParameters.MIN_ZOOM) {
       return Response.status(Response.Status.OK).entity(mvtBuilder.build().toByteArray()).build();
     }
 
@@ -92,7 +116,7 @@ public class VectorTilesResource {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         mvtBuilder.addLayers(
           VectorTilesResource.layers
-            .get(LayerType.valueOf(layerParameters.type()))
+            .get(layerParameters.type())
             .create(serverContext.graph(), serverContext.transitService(), layerParameters)
             .build(envelope, layerParameters)
         );
@@ -144,11 +168,14 @@ public class VectorTilesResource {
     return protocol + "://" + host;
   }
 
-  enum LayerType {
+  public enum LayerType {
     Stop,
     Station,
     VehicleRental,
+    VehicleRentalVehicle,
+    VehicleRentalStation,
     VehicleParking,
+    VehicleParkingGroup,
   }
 
   public interface LayersParameters {
@@ -156,9 +183,14 @@ public class VectorTilesResource {
   }
 
   public interface LayerParameters {
+    int MIN_ZOOM = 9;
+    int MAX_ZOOM = 20;
+    int CACHE_MAX_SECONDS = -1;
+    double EXPANSION_FACTOR = 0.25d;
+
     String name();
 
-    String type();
+    LayerType type();
 
     String mapper();
 
@@ -183,10 +215,10 @@ public class VectorTilesResource {
     public final String scheme = "xyz";
 
     @SuppressWarnings("unused")
-    public final int minzoom = VectorTileConfig.MIN_ZOOM;
+    public final int minzoom = LayerParameters.MIN_ZOOM;
 
     @SuppressWarnings("unused")
-    public final int maxzoom = VectorTileConfig.MAX_ZOOM;
+    public final int maxzoom = LayerParameters.MAX_ZOOM;
 
     public final String name = "OpenTripPlanner";
     public final String attribution;

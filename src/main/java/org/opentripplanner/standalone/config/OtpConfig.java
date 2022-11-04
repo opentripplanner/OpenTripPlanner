@@ -33,21 +33,12 @@ public class OtpConfig {
    */
   public final String configVersion;
 
-  OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
+  public OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
     this.root = new NodeAdapter(otpConfig, source);
 
-    this.configVersion =
-      root
-        .of("configVersion")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asString(null);
+    this.configVersion = root.of("configVersion").since(NA).summary("TODO").asString(null);
     this.otpFeatures =
-      root
-        .of("otpFeatures")
-        .withDoc(NA, /*TODO DOC*/"TODO")
-        .withExample(/*TODO DOC*/"TODO")
-        .asEnumMap(OTPFeature.class, Boolean.class);
+      root.of("otpFeatures").since(NA).summary("TODO").asEnumMap(OTPFeature.class, Boolean.class);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllUnusedParameters(LOG::warn);

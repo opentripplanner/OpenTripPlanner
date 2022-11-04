@@ -30,10 +30,12 @@ that shows bottlenecks in the code.
 
 ### Data files
 
+All data input files are located at https://otp-performance.leonard.io/data/
+
 #### Norway
 
-- [Norwegian NeTEx data](https://leonard.io/otp/rb_norway-aggregated-netex-2021-12-11.zip)
-- [Norway OSM data](https://download.geofabrik.de/europe/norway-210101.osm.pbf)
+- [Norwegian NeTEx data](https://otp-performance.leonard.io/data/norway/rb_norway-aggregated-netex-2021-12-11.zip)
+- [Norway OSM data](https://otp-performance.leonard.io/data/norway/norway-210101.osm.pbf)
 
 If the link above do not work you should be able to find it on the ENTUR web:
 
@@ -41,9 +43,9 @@ If the link above do not work you should be able to find it on the ENTUR web:
 
 #### Baden-Württemberg, Germany
 
-- [Tidied GTFS data](https://leonard.io/otp/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip)
-- [BW OSM data](https://download.geofabrik.de/europe/germany/baden-wuerttemberg-220101.osm.pbf)
+- [Tidied GTFS data](https://otp-performance.leonard.io/data/baden-wuerttemberg/baden-wuerttemberg-2022-07-25.gtfs.tidy.zip)
+- [BW OSM data](https://otp-performance.leonard.io/data/baden-wuerttemberg/baden-wuerttemberg-220101.osm.pbf)
  
 #### Germany
 
-- [Tidied GTFS data](https://leonard.io/otp/germany-2022-08-23.tidy.gtfs.zip)
+- [Tidied GTFS data](https://otp-performance.leonard.io/data/germany/germany-2022-08-23.tidy.gtfs.zip)

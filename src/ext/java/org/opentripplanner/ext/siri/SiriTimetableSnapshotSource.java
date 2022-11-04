@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
-import org.opentripplanner.common.model.Result;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
@@ -32,8 +31,10 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -610,9 +611,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       estimatedVehicleJourney.getDestinationNames() != null &&
       !estimatedVehicleJourney.getDestinationNames().isEmpty()
     ) {
-      tripBuilder.withHeadsign(
+      NonLocalizedString str = new NonLocalizedString(
         "" + estimatedVehicleJourney.getDestinationNames().get(0).getValue()
       );
+      tripBuilder.withHeadsign(str);
     }
 
     tripBuilder.withOperator(operator);
@@ -688,10 +690,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         NaturalLanguageStringStructure destinationDisplay = estimatedCall
           .getDestinationDisplaies()
           .get(0);
-        stopTime.setStopHeadsign(destinationDisplay.getValue());
+        stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay.getValue()));
       } else if (tripBuilder.getHeadsign() == null) {
         // Fallback to empty string
-        stopTime.setStopHeadsign("");
+        stopTime.setStopHeadsign(new NonLocalizedString(""));
       }
 
       if (i == 0) {
@@ -782,12 +784,13 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     pattern.add(tripTimes);
 
     tripTimes
-      .findFirstNoneIncreasingStopTime()
-      .ifPresent(invalidStopIndex -> {
+      .validateNonIncreasingTimes()
+      .ifFailure(error -> {
         throw new IllegalStateException(
           String.format(
-            "Non-increasing triptimes for added trip at stop index %d",
-            invalidStopIndex
+            "Non-increasing triptimes for added trip at stop index %d, error %s",
+            error.stopIndex(),
+            error.errorType()
           )
         );
       });
@@ -986,15 +989,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       Trip trip = tripTimes.getTrip();
       for (TripPattern pattern : patterns) {
         if (tripTimes.getNumStops() == pattern.numberOfStops()) {
+          // All tripTimes should be handled the same way to always allow latest realtime-update to
+          // replace previous update regardless of realtimestate
+          cancelScheduledTrip(trip, serviceDate);
+
+          // Also check whether trip id has been used for previously ADDED/MODIFIED trip message and
+          // remove the previously created trip
+          removePreviousRealtimeUpdate(trip, serviceDate);
+
           if (!tripTimes.isCanceled()) {
-            // UPDATED and MODIFIED tripTimes should be handled the same way to always allow latest
-            // realtime-update to replace previous update regardless of realtimestate
-            cancelScheduledTrip(trip, serviceDate);
-
-            // Check whether trip id has been used for previously ADDED/MODIFIED trip message and remove
-            // previously created trip
-            removePreviousRealtimeUpdate(trip, serviceDate);
-
             // Calculate modified stop-pattern
             var modifiedStops = createModifiedStops(
               pattern,
@@ -1024,8 +1027,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
               )
                 .ifFailure(errors::add);
             }
-          } else {
-            buffer.update(pattern, tripTimes, serviceDate).ifFailure(errors::add);
           }
 
           LOG.debug("Applied realtime data for trip {}", trip.getId().getId());
@@ -1119,12 +1120,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Add new trip times to the buffer and return success
-    var maybeError = buffer.update(pattern, updatedTripTimes, serviceDate);
+    var result = buffer.update(pattern, updatedTripTimes, serviceDate);
 
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
     addTripOnServiceDateToBuffer(trip, serviceDate, estimatedVehicleJourney, feedId);
 
-    return maybeError;
+    return result;
   }
 
   private void addTripOnServiceDateToBuffer(

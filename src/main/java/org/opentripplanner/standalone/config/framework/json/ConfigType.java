@@ -2,32 +2,37 @@ package org.opentripplanner.standalone.config.framework.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.text.MarkdownFormatter;
+import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.time.DurationUtils;
 
 /**
  * These are the types we support in the NodeAdaptor
  */
 public enum ConfigType {
-  BOOLEAN(JsonType.basic, "This is the Boolean JSON type", "true or false"),
-  STRING(JsonType.string, "This is the String JSON type.", "'This is a string!'"),
+  BOOLEAN(JsonType.basic, "This is the Boolean JSON type", "true", "false"),
+  STRING(JsonType.string, "This is the String JSON type.", "This is a string!"),
   DOUBLE(JsonType.basic, "A decimal floating point _number_. 64 bit.", "3.15"),
-  INTEGER(JsonType.basic, "A decimal integer _number_. 32 bit.", "1, -7, 2100200300"),
-  LONG(JsonType.basic, "A decimal integer _number_. 64 bit.", "-1234567890123456789"),
-  ENUM(JsonType.string, "A fixed set of string literals.", "BicycleOptimize: QUICK, SAFE..."),
+  INTEGER(JsonType.basic, "A decimal integer _number_. 32 bit.", "1", "-7", "2100"),
+  LONG(JsonType.basic, "A decimal integer _number_. 64 bit.", "-1234567890"),
+  ENUM(JsonType.string, "A fixed set of string literals.", "RAIL", "BUS"),
   ENUM_MAP(
     JsonType.object,
     "List of key/value pairs, where the key is a enum and the value can be any given type.",
-    "{ RAIL: 1.2, BUS: 2.3 }"
+    "{ 'RAIL: 1.2, 'BUS': 2.3 }"
   ),
-  ENUM_SET(JsonType.object, "List of enum string values", "[ RAIL, TRAM ]"),
+  ENUM_SET(JsonType.object, "List of enum string values", "[ 'RAIL', 'TRAM' ]"),
   LOCALE(
     JsonType.string,
     "_`Language[\\_country[\\_variant]]`_. A Locale object represents a specific " +
     "geographical, political, or cultural region. For more information see the [Java 11 Locale]" +
     "(https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).",
-    "en_US, nn_NO"
+    "en_US",
+    "nn_NO"
   ),
   DATE(JsonType.string, "Local date. The format is _YYYY-MM-DD_ (ISO-8601).", "2020-09-21"),
   DATE_OR_PERIOD(
@@ -35,39 +40,45 @@ public enum ConfigType {
     "A _local date_, or a _period_ relative to today. The local date has the format " +
     "`YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer " +
     "number.",
-    "P1Y, -P3M2D, P1D"
+    "P1Y",
+    "-P3M2D",
+    "P1D"
   ),
   DURATION(
     JsonType.string,
     "A _duration_ is a amount of time. The format is `PnDTnHnMnS` or `nDnHnMnS` where " +
     "`n` is a  integer number. The `D`(days), `H`(hours), `M`(minutes) and `S`(seconds) are not " +
     "case sensitive.",
-    "3h, 2m, 1d5h2m3s, -P2dT-1s, P-2dT1s"
+    "3h",
+    "2m",
+    "1d5h2m3s",
+    "-P2dT-1s"
   ),
   REGEXP(
     JsonType.string,
     "A regular expression pattern used to match a sting.",
-    "'$^', 'gtfs', '$\\w{3})-.*\\.xml^'"
+    "$^",
+    "gtfs",
+    "\\w{3})-.*\\.xml"
   ),
   URI(
     JsonType.string,
     "An URI path to a resource like a file or a URL. Relative URIs are resolved relative " +
     "to the OTP base path.",
-    "'gs://bucket/path/a.obj', 'http://foo.bar/', 'file:///Users/x/local/file', " +
-    "'myGraph.obj', '../street/streetGraph-${otp.serialization.version.id}.obj'"
+    "http://foo.bar/",
+    "file:///Users/jon/local/file",
+    "graph.obj"
   ),
-  ZONE_ID(JsonType.string, "TODO", "TODO"),
-  FEED_SCOPED_ID(JsonType.string, "FeedScopedId", "FEED_ID:1001"),
+  TIME_ZONE(JsonType.string, "Time-Zone ID", "UTC", "Europe/Paris", "-05:00"),
+  FEED_SCOPED_ID(JsonType.string, "FeedScopedId", "NO:1001", "1:101"),
   LINEAR_FUNCTION(
     JsonType.string,
-    "A linear function with one input parameter(x) used to calculate a value. Usually " +
-    "used to calculate a limit. For example to calculate a limit in seconds to be 1 hour plus 2 " +
-    "times the value(x) use: `3600 + 2.0 x`, to set an absolute value(3000) use: `3000 + 0x`",
-    "'600 + 2.0 x'"
+    "A linear function with one input parameter(x) used to calculate a value. Usually used " +
+    "to calculate a limit or cost."
   ),
   MAP(
     JsonType.object,
-    "List of key/value pairs, where the key is a string and the value can be any given " + "type.",
+    "List of key/value pairs, where the key is a string and the value can be any given type.",
     "{ 'one': 1.2, 'two': 2.3 }"
   ),
   OBJECT(
@@ -83,31 +94,36 @@ public enum ConfigType {
 
   private final JsonType type;
   private final String description;
-  private final String examples;
+  private final String[] examples;
 
-  ConfigType(JsonType type, String description, String examples) {
+  ConfigType(JsonType type, String description, String... examples) {
     this.type = type;
     this.description = description;
-    this.examples = examples.replace('\'', '\"');
+    this.examples = examples;
   }
 
   public String description() {
     return description;
   }
 
-  public String examples() {
-    return examples.replace('\'', '\"');
+  public String examplesToMarkdown() {
+    return Arrays
+      .stream(examples)
+      .map(StringUtils::quoteReplace)
+      .map(this::quote)
+      .map(MarkdownFormatter::code)
+      .collect(Collectors.joining(", "));
   }
 
   public String docName() {
-    return name().toLowerCase();
+    return name().toLowerCase().replace('_', '-');
   }
 
   /**
    * Quote the given {@code value} is the JSON type is a {@code string}.
    */
   public String quote(@Nonnull Object value) {
-    return type == JsonType.string ? "\"" + value + "\"" : value.toString();
+    return type == JsonType.string ? MarkdownFormatter.quote(value) : value.toString();
   }
 
   /**

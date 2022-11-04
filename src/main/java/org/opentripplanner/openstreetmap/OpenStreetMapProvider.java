@@ -12,11 +12,11 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmDefaultParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
+import org.opentripplanner.graph_builder.module.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.model.OSMProvider;
-import org.opentripplanner.standalone.config.feed.OsmDefaultsConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfig;
-import org.opentripplanner.standalone.config.feed.OsmExtractConfigBuilder;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class OpenStreetMapProvider implements OSMProvider {
 
   private boolean hasWarnedAboutMissingTimeZone = false;
 
-  private final WayPropertySetSource wayPropertySetSource;
+  private final OsmTagMapper osmTagMapper;
 
   private final WayPropertySet wayPropertySet;
   private byte[] cachedBytes = null;
@@ -51,28 +51,28 @@ public class OpenStreetMapProvider implements OSMProvider {
     this(
       new ConfiguredDataSource<>(
         fileDataSource,
-        new OsmExtractConfigBuilder().withSource(fileDataSource.uri()).build()
+        new OsmExtractParametersBuilder().withSource(fileDataSource.uri()).build()
       ),
-      new OsmDefaultsConfig(),
+      new OsmDefaultParameters(),
       cacheDataInMem
     );
   }
 
   public OpenStreetMapProvider(
-    ConfiguredDataSource<OsmExtractConfig> osmExtractConfigConfiguredDataSource,
-    OsmDefaultsConfig osmDefaultsConfig,
+    ConfiguredDataSource<OsmExtractParameters> osmExtractConfigConfiguredDataSource,
+    OsmDefaultParameters defaultParameters,
     boolean cacheDataInMem
   ) {
     this.source = osmExtractConfigConfiguredDataSource.dataSource();
     this.zoneId =
-      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(osmDefaultsConfig.timeZone);
-    this.wayPropertySetSource =
+      osmExtractConfigConfiguredDataSource.config().timeZone().orElse(defaultParameters.timeZone);
+    this.osmTagMapper =
       osmExtractConfigConfiguredDataSource
         .config()
-        .osmWayPropertySet()
-        .orElse(osmDefaultsConfig.osmWayPropertySetSource);
+        .osmTagMapper()
+        .orElse(defaultParameters.osmOsmTagMapper);
     this.wayPropertySet = new WayPropertySet();
-    wayPropertySetSource.populateProperties(wayPropertySet);
+    osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
   }
 
@@ -158,8 +158,8 @@ public class OpenStreetMapProvider implements OSMProvider {
   }
 
   @Override
-  public WayPropertySetSource getWayPropertySetSource() {
-    return wayPropertySetSource;
+  public OsmTagMapper getOsmTagMapper() {
+    return osmTagMapper;
   }
 
   @Override

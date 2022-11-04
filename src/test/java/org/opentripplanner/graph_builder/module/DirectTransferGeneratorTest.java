@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -29,7 +30,9 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
 /**
@@ -250,22 +253,53 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     );
   }
 
+  @Test
+  public void testTransferOnIsolatedStations() {
+    var otpModel = model(true, false, true);
+    var graph = otpModel.graph();
+    graph.hasStreets = false;
+
+    var transitModel = otpModel.transitModel();
+    var req = new RouteRequest();
+    req.journey().transfer().setMode(StreetMode.WALK);
+    var transferRequests = List.of(req);
+
+    new DirectTransferGenerator(
+      graph,
+      transitModel,
+      noopIssueStore(),
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
+
+    assertTrue(transitModel.getAllPathTransfers().isEmpty());
+  }
+
   private TestOtpModel model(boolean addPatterns) {
     return model(addPatterns, false);
   }
 
   private TestOtpModel model(boolean addPatterns, boolean withBoardingConstraint) {
+    return model(addPatterns, withBoardingConstraint, false);
+  }
+
+  private TestOtpModel model(
+    boolean addPatterns,
+    boolean withBoardingConstraint,
+    boolean withNoTransfersOnStations
+  ) {
     return modelOf(
       new Builder() {
         @Override
         public void build() {
-          S0 = stop("S0", 47.495, 19.001);
-          S11 = stop("S11", 47.500, 19.001);
-          S12 = stop("S12", 47.520, 19.001);
-          S13 = stop("S13", 47.540, 19.001);
-          S21 = stop("S21", 47.500, 19.011);
-          S22 = stop("S22", 47.520, 19.011);
-          S23 = stop("S23", 47.540, 19.011);
+          S0 = stop("S0", 47.495, 19.001, withNoTransfersOnStations);
+          S11 = stop("S11", 47.500, 19.001, withNoTransfersOnStations);
+          S12 = stop("S12", 47.520, 19.001, withNoTransfersOnStations);
+          S13 = stop("S13", 47.540, 19.001, withNoTransfersOnStations);
+          S21 = stop("S21", 47.500, 19.011, withNoTransfersOnStations);
+          S22 = stop("S22", 47.520, 19.011, withNoTransfersOnStations);
+          S23 = stop("S23", 47.540, 19.011, withNoTransfersOnStations);
 
           V0 = intersection("V0", 47.495, 19.000);
           V11 = intersection("V11", 47.500, 19.000);

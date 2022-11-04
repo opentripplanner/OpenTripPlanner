@@ -11,7 +11,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.LO
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.REGEXP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ZONE_ID;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_ZONE;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.net.URI;
@@ -63,21 +63,21 @@ public class ParameterBuilder {
     info.withName(paramName);
   }
 
+  /** Add version where this parameter first was added. */
+  public ParameterBuilder since(OtpVersion version) {
+    this.info.withSince(version);
+    return this;
+  }
+
   /** Add documentation metadata. This can be used to generate a user documentation */
-  public ParameterBuilder withDoc(OtpVersion since, String summary) {
-    this.info.withSince(since).withSummary(summary);
+  public ParameterBuilder summary(String summary) {
+    this.info.withSummary(summary);
     return this;
   }
 
   /** Add documentation detail description to a parameter. */
-  public ParameterBuilder withDescription(String description) {
+  public ParameterBuilder description(String description) {
     this.info.withDescription(description);
-    return this;
-  }
-
-  /** Add documentation detail description to a parameter. */
-  public ParameterBuilder withExample(Object example) {
-    this.info.withExample(example);
     return this;
   }
 
@@ -156,40 +156,48 @@ public class ParameterBuilder {
     return buildObject();
   }
 
+  /**
+   * Return a list with objects of type {@code T}. The given {@code mapper} is used to map
+   * the nested child JSON nodes into elements.
+   * <p>
+   * An empty list is returned if there is no elements in the list or the list is not present.
+   */
   public <T> List<T> asObjects(Function<NodeAdapter, T> mapper) {
-    info.withRequired().withArray(OBJECT);
-    return buildAndListObjects(List.of(), mapper);
+    return asObjects(List.of(), mapper);
   }
 
   public <T> List<T> asObjects(List<T> defaultValues, Function<NodeAdapter, T> mapper) {
     info.withOptional(defaultValues.isEmpty() ? "[]" : defaultValues.toString()).withArray(OBJECT);
-    return buildAndListObjects(defaultValues, mapper);
+    return buildAndListComplexArrayElements(defaultValues, mapper);
   }
 
   public <T extends Enum<T>> T asEnum(Class<T> enumType) {
-    //noinspection unchecked
-    info.withRequired().withEnum((Class<Enum<?>>) enumType);
+    info.withRequired().withEnum(enumType);
     return parseEnum(build().asText(), enumType);
   }
 
   /** Get optional enum value. Parser is not case sensitive. */
   @SuppressWarnings("unchecked")
   public <T extends Enum<T>> T asEnum(T defaultValue) {
-    info.withEnum((Class<Enum<?>>) defaultValue.getClass()).withOptional(defaultValue.name());
+    info
+      .withEnum((Class<? extends Enum<?>>) defaultValue.getClass())
+      .withOptional(defaultValue.name());
     // Do not inline the node, calling the build is required.
     var node = build();
     return exist() ? parseEnum(node.asText(), (Class<T>) defaultValue.getClass()) : defaultValue;
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
-    //noinspection unchecked
-    info.withOptional().withEnumSet((Class<Enum<?>>) enumClass);
-    List<T> result = buildAndListValues(List.of(), it -> parseEnum(it.asText(), enumClass));
+    info.withOptional().withEnumSet(enumClass);
+    List<T> result = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseEnum(it.asText(), enumClass)
+    );
     return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
   }
 
   /**
-   * Get a map of enum values listed in the config like this: (This example have Boolean values)
+   * Get a map of enum values listed in the config like this: (This example has Boolean values)
    * <pre>
    * key : {
    *   A : true,  // turned on
@@ -205,8 +213,7 @@ public class ParameterBuilder {
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(Class<E> enumType, Class<T> elementJavaType) {
     var elementType = ConfigType.of(elementJavaType);
-    //noinspection unchecked
-    info.withOptional().withEnumMap((Class<Enum<?>>) enumType, elementType);
+    info.withOptional().withEnumMap(enumType, elementType);
 
     var mapNode = buildObject();
 
@@ -311,6 +318,7 @@ public class ParameterBuilder {
     return ofOptionalString(REGEXP, defaultValue, Pattern::compile);
   }
 
+  /** Required URI, OTP support a limited set of URIs. */
   public URI asUri() {
     return ofRequired(ConfigType.URI, n -> parseUri(n.asText()));
   }
@@ -324,7 +332,7 @@ public class ParameterBuilder {
   }
 
   public ZoneId asZoneId(ZoneId defaultValue) {
-    return ofOptional(ZONE_ID, defaultValue, n -> parseZoneId(n.asText()));
+    return ofOptional(TIME_ZONE, defaultValue, n -> parseZoneId(n.asText()));
   }
 
   /* Custom OTP types */
@@ -335,7 +343,7 @@ public class ParameterBuilder {
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     info.withOptional(defaultValues.toString()).withArray(FEED_SCOPED_ID);
-    return buildAndListValues(defaultValues, it -> FeedScopedId.parseId(it.asText()));
+    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
   }
 
   public DoubleAlgorithmFunction asLinearFunction(DoubleAlgorithmFunction defaultValue) {
@@ -398,7 +406,7 @@ public class ParameterBuilder {
     Function<JsonNode, T> mapper
   ) {
     info.withOptional(String.valueOf(defaultValue)).withArray(elementType);
-    return buildAndListValues(defaultValue, mapper);
+    return buildAndListSimpleArrayElements(defaultValue, mapper);
   }
 
   private <T> Map<String, T> ofOptionalMap(ConfigType elementType, Function<JsonNode, T> mapper) {
@@ -428,7 +436,15 @@ public class ParameterBuilder {
     return target.path(paramName(), node);
   }
 
-  private <T> List<T> buildAndListValues(List<T> defaultValues, Function<JsonNode, T> mapper) {
+  /**
+   * Build node info for "simple" element types(JSON leafs) and list all values. Use
+   * {@link #buildAndListComplexArrayElements(List, Function)} for building array with complex
+   * elements.
+   */
+  private <T> List<T> buildAndListSimpleArrayElements(
+    List<T> defaultValues,
+    Function<JsonNode, T> mapper
+  ) {
     JsonNode array = build();
     if (array.isMissingNode()) {
       return defaultValues;
@@ -443,8 +459,17 @@ public class ParameterBuilder {
     return values;
   }
 
-  private <T> List<T> buildAndListObjects(List<T> defaultValues, Function<NodeAdapter, T> parse) {
+  /**
+   * Build node info for "complex" element types and list all values. Use
+   * {@link #buildAndListSimpleArrayElements(List, Function)} for building an array with simple
+   * elements.
+   */
+  private <T> List<T> buildAndListComplexArrayElements(
+    List<T> defaultValues,
+    Function<NodeAdapter, T> parse
+  ) {
     var array = build();
+
     if (array.isMissingNode()) {
       return defaultValues;
     }
@@ -453,8 +478,12 @@ public class ParameterBuilder {
     }
     List<T> values = new ArrayList<>();
     int i = 0;
+
+    var arrayAdaptor = target.path(paramName(), array);
+
     for (JsonNode node : array) {
-      values.add(parse.apply(target.path("[" + i + "]", node)));
+      var element = arrayAdaptor.path("[" + i + "]", node);
+      values.add(parse.apply(element));
       ++i;
     }
     return values;
@@ -476,7 +505,7 @@ public class ParameterBuilder {
     }
   }
 
-  private <T extends Enum<T>> T parseEnum(String value, Class<T> ofType) {
+  private <E extends Enum<E>> E parseEnum(String value, Class<E> ofType) {
     var upperCaseValue = value.toUpperCase().replace('-', '_');
     return Stream
       .of(ofType.getEnumConstants())

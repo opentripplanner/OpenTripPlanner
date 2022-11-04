@@ -14,6 +14,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
@@ -164,7 +165,7 @@ public class TestRouteData {
     s.setArrivalTime(time);
     s.setDepartureTime(time);
     s.setStopSequence(seq);
-    s.setStopHeadsign("NA");
+    s.setStopHeadsign(new NonLocalizedString("NA"));
     s.setRouteShortName("NA");
     return s;
   }

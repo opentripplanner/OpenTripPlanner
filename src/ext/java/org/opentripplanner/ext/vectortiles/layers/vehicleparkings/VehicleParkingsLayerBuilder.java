@@ -48,7 +48,7 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
     return service
       .getVehicleParkings()
       .map(vehicleParking -> {
-        Coordinate coordinate = new Coordinate(vehicleParking.getX(), vehicleParking.getY());
+        Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
         point.setUserData(vehicleParking);
         return point;

@@ -79,12 +79,13 @@ When a feed of a particular type (`netex` or `gtfs`) is specified in the transit
 
 The netexDefaults section of `build-config.json` allows you to specify default properties for NeTEx files.
 
-| config key                | description                                                                                       | value type      | value default |
-|---------------------------|---------------------------------------------------------------------------------------------------|-----------------|---------------|
-| `sharedFilePattern`       | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type.       | regexp pattern  | `null`        |
-| `sharedGroupFilePattern`  | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type. | regexp pattern  | `null`        |
-| `ignoreFilePattern`       | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type.            | regexp pattern  | `null`        |
-| `groupFilePattern`        | Pattern for matching group NeTEx files. Valid only for the `netex` type.                          | regexp pattern  | `null`        |
+| config key                   | description                                                                                                   | value type      | value default |
+|------------------------------|---------------------------------------------------------------------------------------------------------------|-----------------|---------------|
+| `sharedFilePattern`          | Pattern for matching shared NeTEx files in a NeTEx bundle. Valid only for the `netex` type.                   | regexp pattern  | `null`        |
+| `sharedGroupFilePattern`     | Pattern for matching shared group NeTEx files in a NeTEx bundle. Valid only for the `netex` type.             | regexp pattern  | `null`        |
+| `ignoreFilePattern`          | Pattern for matching ignored files in a NeTEx bundle. Valid only for the `netex` type.                        | regexp pattern  | `null`        |
+| `groupFilePattern`           | Pattern for matching group NeTEx files. Valid only for the `netex` type.                                      | regexp pattern  | `null`        |
+| `noTransfersOnIsolatedStops` | In case StopPlace is marked with limitedUsage ISOLATED do not generate any transfers from or to that station. | boolean         | `false`       |
 
 
 ## OSM 
@@ -432,10 +433,10 @@ directory. By default, this file is not written during graph builds. There is al
 parameter called `readCachedElevations` which is set to `true` by default.
 
 In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from the
-cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overriden via the
-CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, the
-time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly 9
-minutes).
+cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden via 
+the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, 
+the time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly
+9 minutes).
 
 The cached data is a lookup table where the coordinate sequences of respective street edges are used
 as keys for calculated data. It is assumed that all of the other input data except for the

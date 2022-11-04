@@ -1,14 +1,9 @@
 package org.opentripplanner.standalone.config.framework.json;
 
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ARRAY;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_MAP;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM_SET;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.MAP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
 
@@ -38,15 +33,17 @@ public record NodeInfo(
   String summary,
   @Nullable String description,
   ConfigType type,
-  @Nullable Class<Enum<?>> enumType,
+  @Nullable Class<? extends Enum<?>> enumType,
   @Nullable ConfigType elementType,
   OtpVersion since,
   @Nullable String defaultValue,
-  @Nullable Object exampleValue,
   boolean required,
   boolean skipChild,
   @Nullable DeprecatedInfo deprecated
-) {
+)
+  implements Comparable<NodeInfo> {
+  private static final String TYPE_QUALIFIER = "type";
+
   public NodeInfo {
     Objects.requireNonNull(name);
     Objects.requireNonNull(type);
@@ -78,42 +75,58 @@ public record NodeInfo(
   }
 
   /**
+   * For array of objects the child elements does not have as part of the node-info of
+   * the parent. Hence, we need to skip the child when generating documentation. So, this factory
+   * method is used to generate a placeholder in these cases.
+   * <p>
+   * TODO DOC: A better way to do this is to remove this and add proper NodeInfo elements for
+   *           the child, but that requires a bit of refactoring.
+   */
+  public NodeInfo arraysChild() {
+    return of()
+      .withName("[ ]")
+      .withSummary("")
+      .withType(elementType)
+      .withSince(since)
+      .withOptional()
+      .build();
+  }
+
+  /**
    * This method will return {@code true} if there is more information than just the basic
    * required info. It is used to be able to list a node in a "details" section of a document in
    * the case where there is more info than the info listed in the summary section.
    */
   public boolean printDetails() {
-    return description != null;
+    return (description != null || enumType != null || elementType != null) && !isTypeQualifier();
   }
 
   public boolean isDeprecated() {
     return deprecated != null;
   }
 
-  public String exampleValueJson() {
-    return exampleValueJson(type);
-  }
-
-  public Object exampleOrFallback(Object fallback) {
-    if (exampleValue != null) {
-      if (type.isComplex()) {
-        try {
-          new ObjectMapper().writeValueAsString(exampleValue);
-        } catch (JsonProcessingException e) {
-          throw new IllegalStateException(
-            "JSON serialization of exampleValue failed!: " + e.getMessage(),
-            e
-          );
-        }
-      } else {
-        return exampleValue;
-      }
-    }
-    return fallback;
-  }
-
   static NodeInfoBuilder of() {
     return new NodeInfoBuilder();
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  public String typeDescription() {
+    return switch (type) {
+      case ARRAY -> elementType.docName() + "[]";
+      case MAP -> "map of " + elementType.docName();
+      case ENUM_MAP -> "enum map of " + elementType.docName();
+      case ENUM_SET -> "enum set";
+      default -> type.docName();
+    };
+  }
+
+  /**
+   * A type qualifier is a field in an JASON object witch determin witch type it is.
+   * Usually the mapping is split in two diffrent paths - creating diffrent types.
+   * For example we have both NETEX and GTFS config types in the same list/JSON array.
+   */
+  public boolean isTypeQualifier() {
+    return enumType != null && TYPE_QUALIFIER.equalsIgnoreCase(name);
   }
 
   @Override
@@ -129,22 +142,13 @@ public record NodeInfo(
     return Objects.hash(name);
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Override
   public String toString() {
-    var builder = ValueObjectToStringBuilder.of().addText(name).addText(" : ");
-
-    if (type == ARRAY) {
-      builder.addText(elementType.docName()).addText("[]");
-    } else if (type == MAP) {
-      builder.addText("map of ").addText(elementType.docName());
-    } else if (type == ENUM_MAP) {
-      builder.addText("enum map of ").addText(elementType.docName());
-    } else if (type == ENUM_SET) {
-      builder.addText("set of ").addText(elementType.docName());
-    } else {
-      builder.addText(type.docName());
-    }
+    var builder = ValueObjectToStringBuilder
+      .of()
+      .addText(name)
+      .addText(" : ")
+      .addText(typeDescription());
 
     if (required) {
       builder.addText(" Required");
@@ -160,37 +164,28 @@ public record NodeInfo(
     return builder.toString();
   }
 
-  @SuppressWarnings("ConstantConditions")
-  private String exampleValueJson(ConfigType type) {
-    return type.quote(
-      switch (type) {
-        case BOOLEAN -> exampleOrFallback("true").toString().toLowerCase();
-        case DOUBLE -> exampleOrFallback(3.15);
-        case INTEGER -> exampleOrFallback(123);
-        case LONG -> exampleOrFallback(1000);
-        case ENUM -> exampleOrFallback(firstEnumValue());
-        case STRING -> exampleOrFallback("A String");
-        case LOCALE -> exampleOrFallback("en_US");
-        case DATE -> exampleOrFallback("20022-05-31");
-        case DATE_OR_PERIOD -> exampleOrFallback("P1Y5D");
-        case DURATION -> exampleOrFallback("45s");
-        case REGEXP -> exampleOrFallback("-?[\\d+=*/ =]+");
-        case URI -> exampleOrFallback("https://www.opentripplanner.org/");
-        case ZONE_ID -> exampleOrFallback("UTC");
-        case FEED_SCOPED_ID -> exampleOrFallback("FID:Trip0001");
-        case LINEAR_FUNCTION -> exampleOrFallback("600 + 3.0 x");
-        case OBJECT -> exampleOrFallback("{a:1}");
-        case MAP -> exampleOrFallback("{a:" + exampleValueJson(elementType) + "}");
-        case ENUM_MAP -> exampleOrFallback(
-          "{" + firstEnumValue() + " : " + exampleValueJson(elementType) + "}"
-        );
-        case ENUM_SET -> exampleOrFallback("[" + firstEnumValue() + "]");
-        case ARRAY -> exampleOrFallback("[{n:1},{n:2}]");
-      }
-    );
-  }
-  private String firstEnumValue() {
-    //noinspection ConstantConditions
-    return enumType.getEnumConstants()[0].name();
+  /**
+   * NodeInfo's are sorted by:
+   * <ol>
+   *   <li>Type qualifier</li>
+   *   <li>simple before complex types</li>
+   *   <li>alphabetical on name</li>
+   * </ol>
+   */
+  @Override
+  public int compareTo(@Nonnull NodeInfo other) {
+    // Put type qualifier first
+    if (isTypeQualifier()) {
+      return -1;
+    }
+    if (other.isTypeQualifier()) {
+      return 1;
+    }
+    // Put simple types before complex
+    if (type.isSimple() != other.type.isSimple()) {
+      return type.isSimple() ? -1 : 1;
+    }
+    // Sort by name
+    return name.compareTo(other.name);
   }
 }

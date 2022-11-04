@@ -1,0 +1,33 @@
+{
+  "dataOverlay" : {
+    "fileName": "graphs/data-file.nc4",
+    "latitudeVariable": "lat",
+    "longitudeVariable": "lon",
+    "timeVariable": "time",
+    "timeFormat": "HOURS",
+    "indexVariables": [
+      {
+        "name": "harmfulMicroparticlesPM2_5",
+        "displayName": "Harmful micro particles pm 2.5",
+        "variable": "cnc_PM2_5"
+      },
+      {
+        "name": "harmfulMicroparticlesPM10",
+        "displayName": "Harmful micro particles pm 10",
+        "variable": "cnc_PM10"
+      }
+    ],
+    "requestParameters": [
+      {
+        "name": "PARTICULATE_MATTER_2_5",
+        "variable": "harmfulMicroparticlesPM2_5",
+        "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+      },
+      {
+        "name": "PARTICULATE_MATTER_10",
+        "variable": "harmfulMicroparticlesPM10",
+        "formula": "(VALUE + 1 - THRESHOLD) * PENALTY"
+      }
+    ]
+  }
+}
