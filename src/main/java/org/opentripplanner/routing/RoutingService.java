@@ -135,7 +135,7 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
   }
 
   /** {@link Graph#getVehicleRentalService()} */
-  public VehicleRentalService getVehicleRentalStationService() {
+  public VehicleRentalService getVehicleRentalService() {
     return this.graph.getVehicleRentalService();
   }
 

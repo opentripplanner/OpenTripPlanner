@@ -221,7 +221,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalStationService();
+        .getVehicleRentalService();
 
       if (vehicleRentalStationService == null) {
         return null;
@@ -242,7 +242,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations() {
     return environment -> {
       VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalStationService();
+        .getVehicleRentalService();
 
       if (vehicleRentalStationService == null) {
         return null;
@@ -479,7 +479,7 @@ public class LegacyGraphQLQueryTypeImpl
         .<LegacyGraphQLRequestContext>getContext()
         .getTransitService();
       VehicleParkingService vehicleParkingService = routingService.getVehicleParkingService();
-      VehicleRentalService vehicleRentalStationService = routingService.getVehicleRentalStationService();
+      VehicleRentalService vehicleRentalStationService = routingService.getVehicleRentalService();
 
       switch (type) {
         case "Agency":
@@ -809,7 +809,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalStationService();
+        .getVehicleRentalService();
 
       if (vehicleRentalStationService == null) {
         return null;
@@ -830,7 +830,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles() {
     return environment -> {
       VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalStationService();
+        .getVehicleRentalService();
 
       if (vehicleRentalStationService == null) {
         return null;
@@ -1180,7 +1180,7 @@ public class LegacyGraphQLQueryTypeImpl
       );
 
       VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalStationService();
+        .getVehicleRentalService();
 
       if (vehicleRentalStationService == null) {
         return null;
@@ -1201,7 +1201,7 @@ public class LegacyGraphQLQueryTypeImpl
   public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations() {
     return environment -> {
       VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
-        .getVehicleRentalStationService();
+        .getVehicleRentalService();
 
       if (vehicleRentalStationService == null) {
         return null;
