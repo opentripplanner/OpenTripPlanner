@@ -7,6 +7,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 - Remove unused StreetClasses from StreetEdge [#4545](https://github.com/opentripplanner/OpenTripPlanner/pull/4545)
 - Do not run forward heuristic to calculate LAT, it is calculated from data already [#4537](https://github.com/opentripplanner/OpenTripPlanner/pull/4537)
+- Refactoring SIRI StopConditions from TransitAlert to EntitySelector [#4196](https://github.com/opentripplanner/OpenTripPlanner/pull/4196)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
