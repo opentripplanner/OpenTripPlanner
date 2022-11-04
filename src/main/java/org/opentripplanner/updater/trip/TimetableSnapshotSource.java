@@ -447,7 +447,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         pattern
       );
 
-      cancelScheduledTrip(tripId, serviceDate);
+      setScheduledTripAsReplaced(tripId, serviceDate);
       return buffer.update(newPattern, updatedTripTimes, serviceDate);
     } else {
       // Set the updated trip times in the buffer
@@ -848,6 +848,38 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
+   * Cancel scheduled trip in buffer given trip id  on service date
+   *
+   * @param tripId      trip id
+   * @param serviceDate service date
+   * @return true if scheduled trip was cancelled
+   */
+  private boolean setScheduledTripAsReplaced(
+    final FeedScopedId tripId,
+    final LocalDate serviceDate
+  ) {
+    boolean success = false;
+
+    final TripPattern pattern = getPatternForTripId(tripId);
+
+    if (pattern != null) {
+      // Set scheduled trip times as replaced for this trip in this pattern
+      final Timetable timetable = pattern.getScheduledTimetable();
+      final int tripIndex = timetable.getTripIndex(tripId);
+      if (tripIndex == -1) {
+        debug(tripId, "Could not set scheduled trip as replaced because it's not in the timetable");
+      } else {
+        final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
+        newTripTimes.setReplaced(true);
+        buffer.update(pattern, newTripTimes, serviceDate);
+        success = true;
+      }
+    }
+
+    return success;
+  }
+
+  /**
    * Cancel previously added trip from buffer if there is a previously added trip with given trip id
    * (without agency id) on service date. This does not remove the modified/added trip from the
    * buffer, it just marks it as canceled. This also does not remove the corresponding vertices and
@@ -973,7 +1005,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     // Cancel scheduled trip
     var tripId = trip.getId();
-    cancelScheduledTrip(tripId, serviceDate);
+    setScheduledTripAsReplaced(tripId, serviceDate);
 
     // Check whether trip id has been used for previously ADDED/REPLACEMENT trip message and cancel
     // previously created trip
