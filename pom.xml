@@ -954,7 +954,7 @@
             </distributionManagement>
         </profile>
         <profile>
-            <id>releaseMavenCentral</id>
+            <id>release</id>
             <build>
                 <plugins>
                     <plugin>
