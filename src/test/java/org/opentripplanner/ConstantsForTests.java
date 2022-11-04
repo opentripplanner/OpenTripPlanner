@@ -54,7 +54,7 @@ public class ConstantsForTests {
 
   private static final String PORTLAND_GTFS = "src/test/resources/portland/portland.gtfs.zip";
 
-  private static final String PORTLAND_CENTRAL_OSM =
+  public static final String PORTLAND_CENTRAL_OSM =
     "src/test/resources/portland/portland-central-filtered.osm.pbf";
 
   private static final String PORTLAND_BIKE_SHARE_CSV =
@@ -93,8 +93,6 @@ public class ConstantsForTests {
     "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
   public static final String HERRENBERG_OSM =
     "src/test/resources/germany/herrenberg-minimal.osm.pbf";
-  public static final String STUTTGART_SCHWABSTR_OSM =
-    "src/test/resources/germany/stuttgart-schwabstrasse.osm.pbf";
   public static final String ISLAND_PRUNE_OSM =
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
 

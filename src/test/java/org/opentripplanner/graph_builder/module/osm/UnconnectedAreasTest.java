@@ -27,7 +27,7 @@ import org.opentripplanner.transit.service.TransitModel;
 public class UnconnectedAreasTest {
 
   /**
-   * The P+R.osm.gz file contains 2 park and ride, one a single way area and the other a
+   * The P+R.osm.pbf file contains 2 park and ride, one a single way area and the other a
    * multipolygon with a hole. Both are not linked to any street, apart from three roads that
    * crosses the P+R with w/o common nodes.
    * <p>
@@ -35,7 +35,7 @@ public class UnconnectedAreasTest {
    * virtual nodes at the place where the street intersects the P+R areas. See ticket #1562.
    */
   @Test
-  public void testUnconnectedCarParkAndRide() {
+  public void unconnectedCarParkAndRide() {
     DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
@@ -52,7 +52,7 @@ public class UnconnectedAreasTest {
   }
 
   @Test
-  public void testUnconnectedBikeParkAndRide() {
+  public void unconnectedBikeParkAndRide() {
     DataImportIssueStore issueStore = new DataImportIssueStore();
     Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
 

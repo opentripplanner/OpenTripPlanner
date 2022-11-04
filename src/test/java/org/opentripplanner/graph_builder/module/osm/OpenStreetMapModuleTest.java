@@ -18,8 +18,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
 import org.opentripplanner.graph_builder.module.osm.specifier.OsmSpecifier;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
@@ -160,12 +162,12 @@ public class OpenStreetMapModuleTest {
   }
 
   @Test
-  public void testBuildAreaWithoutVisibility() throws Exception {
+  public void testBuildAreaWithoutVisibility() {
     testBuildingAreas(true);
   }
 
   @Test
-  public void testBuildAreaWithVisibility() throws Exception {
+  public void testBuildAreaWithVisibility() {
     testBuildingAreas(false);
   }
 
@@ -286,6 +288,32 @@ public class OpenStreetMapModuleTest {
     assertEquals("Kreuzung first mit second", localizedString.toString(new Locale("de")));
   }
 
+  @Test
+  void addParkingLotsToService() {
+    var graph = new Graph();
+    var providers = Stream
+      .of("B+R.osm.pbf", "P+R.osm.pbf")
+      .map(f -> new File(getClass().getResource(f).getFile()))
+      .map(f -> new OpenStreetMapProvider(f, false))
+      .toList();
+    var module = new OpenStreetMapModule(
+      providers,
+      Set.of(),
+      graph,
+      DataImportIssueStore.noopIssueStore(),
+      new DefaultMapper(),
+      false
+    );
+    module.staticParkAndRide = true;
+    module.staticBikeParkAndRide = true;
+    module.buildGraph();
+
+    var service = graph.getVehicleParkingService();
+    assertEquals(8, service.getVehicleParkings().count());
+    assertEquals(4, service.getBikeParks().count());
+    assertEquals(4, service.getCarParks().count());
+  }
+
   /**
    * This reads test file with area and tests if it can be routed if visibility is used and if it
    * isn't
@@ -338,18 +366,4 @@ public class OpenStreetMapModuleTest {
       assertFalse(path.states.isEmpty());
     }
   }
-  // disabled pending discussion with author (AMB)
-  // @Test
-  // public void testMultipolygon() throws Exception {
-  // Graph gg = new Graph();
-  // OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
-  //
-  // FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
-  // pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
-  // loader.setProvider(pr);
-  //
-  // loader.buildGraph(gg, extra);
-  //
-  // assertNotNull(gg.getVertex("way -3535 from 4"));
-  // }
 }
