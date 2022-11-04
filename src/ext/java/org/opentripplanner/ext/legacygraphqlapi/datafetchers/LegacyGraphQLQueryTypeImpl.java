@@ -59,8 +59,8 @@ import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -220,7 +220,7 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
         .getVehicleRentalStationService();
 
       if (vehicleRentalStationService == null) {
@@ -241,7 +241,7 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations() {
     return environment -> {
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
         .getVehicleRentalStationService();
 
       if (vehicleRentalStationService == null) {
@@ -479,7 +479,7 @@ public class LegacyGraphQLQueryTypeImpl
         .<LegacyGraphQLRequestContext>getContext()
         .getTransitService();
       VehicleParkingService vehicleParkingService = routingService.getVehicleParkingService();
-      VehicleRentalStationService vehicleRentalStationService = routingService.getVehicleRentalStationService();
+      VehicleRentalService vehicleRentalStationService = routingService.getVehicleRentalStationService();
 
       switch (type) {
         case "Agency":
@@ -808,7 +808,7 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
         .getVehicleRentalStationService();
 
       if (vehicleRentalStationService == null) {
@@ -829,7 +829,7 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalVehicle>> rentalVehicles() {
     return environment -> {
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
         .getVehicleRentalStationService();
 
       if (vehicleRentalStationService == null) {
@@ -1179,7 +1179,7 @@ public class LegacyGraphQLQueryTypeImpl
         environment.getArguments()
       );
 
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
         .getVehicleRentalStationService();
 
       if (vehicleRentalStationService == null) {
@@ -1200,7 +1200,7 @@ public class LegacyGraphQLQueryTypeImpl
   @Override
   public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations() {
     return environment -> {
-      VehicleRentalStationService vehicleRentalStationService = getRoutingService(environment)
+      VehicleRentalService vehicleRentalStationService = getRoutingService(environment)
         .getVehicleRentalStationService();
 
       if (vehicleRentalStationService == null) {

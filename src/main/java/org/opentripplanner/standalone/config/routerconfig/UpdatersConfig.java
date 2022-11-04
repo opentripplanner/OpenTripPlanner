@@ -35,7 +35,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.GtfsRealtimeAlertsUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealtimeUpdaterConfig;
-import org.opentripplanner.standalone.config.routerconfig.updaters.PollingStoptimeUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
@@ -233,7 +233,7 @@ public class UpdatersConfig implements UpdatersParameters {
     // TODO: deprecated, remove in next major version
     BIKE_RENTAL(VehicleRentalUpdaterConfig::create),
     VEHICLE_RENTAL(VehicleRentalUpdaterConfig::create),
-    STOP_TIME_UPDATER(PollingStoptimeUpdaterConfig::create),
+    STOP_TIME_UPDATER(PollingTripUpdaterConfig::create),
     WEBSOCKET_GTFS_RT_UPDATER(WebsocketGtfsRealtimeUpdaterConfig::create),
     MQTT_GTFS_RT_UPDATER(MqttGtfsRealtimeUpdaterConfig::create),
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),

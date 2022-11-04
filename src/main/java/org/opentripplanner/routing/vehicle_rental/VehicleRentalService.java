@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class VehicleRentalStationService implements Serializable {
+public class VehicleRentalService implements Serializable {
 
   private final Map<FeedScopedId, VehicleRentalPlace> vehicleRentalStations = new HashMap<>();
 
