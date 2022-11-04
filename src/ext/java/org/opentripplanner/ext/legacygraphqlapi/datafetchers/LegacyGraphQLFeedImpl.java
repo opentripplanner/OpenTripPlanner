@@ -45,11 +45,11 @@ public class LegacyGraphQLFeedImpl implements LegacyGraphQLDataFetchers.LegacyGr
                   alert
                     .getEntities()
                     .stream()
-                    .filter(entitySelector -> entitySelector instanceof EntitySelector.RouteType)
+                    .filter(EntitySelector.RouteType.class::isInstance)
                     .map(EntitySelector.RouteType.class::cast)
-                    .anyMatch(entity -> entity.feedId.equals(getSource(environment)))
+                    .anyMatch(entity -> entity.feedId().equals(getSource(environment)))
                 )
-                .forEach(alert -> alerts.add(alert));
+                .forEach(alerts::add);
               break;
           }
         });
