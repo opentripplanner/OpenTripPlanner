@@ -64,6 +64,10 @@ public class VehicleRentalStationService implements Serializable {
     vehicleRentalStations.remove(vehicleRentalStationId);
   }
 
+  public boolean hasRentalPlaces() {
+    return !vehicleRentalStations.isEmpty();
+  }
+
   /**
    * Gets all the vehicle rental stations inside the envelope. This is currently done by iterating
    * over a set, but we could use a spatial index if the number of vehicle rental stations is high

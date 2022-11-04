@@ -429,6 +429,7 @@ public class Graph implements Serializable {
     return vehiclePositionService;
   }
 
+  @Nonnull
   public VehicleRentalStationService getVehicleRentalStationService() {
     return vehicleRentalStationService;
   }
