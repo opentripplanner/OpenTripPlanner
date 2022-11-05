@@ -76,3 +76,14 @@ Data used:
 - Denmark OSM data
 
 [build-config](skanetrafiken/build-config.json)
+
+
+### Switzerland
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=switzerland&var-branch=dev-2.x&from=1666965240000&to=now)
+
+Data used:
+- Switzerland OSM data
+- Switzerland GTFS national data
+
+[build-config](switzerland/build-config.json)
