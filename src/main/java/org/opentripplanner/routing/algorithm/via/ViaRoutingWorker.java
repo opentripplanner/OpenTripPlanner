@@ -54,24 +54,15 @@ public class ViaRoutingWorker {
       this.request.setTo(request.routeRequest().to());
     }
 
-    var e = new RoutingError(
-      RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
-      InputField.INTERMEDIATE_PLACE
-    );
     var response = this.routingWorker.apply(this.request);
-    var firstArrival = firstArrival(response)
-      .orElseThrow(() -> new RoutingValidationException(List.of(e)));
-    var lastArrival = lastArrival(response)
-      .orElseThrow(() -> new RoutingValidationException(List.of(e)));
-    var maxSlack = Optional
-      .ofNullable(v.viaLocation())
-      .map(ViaLocation::maxSlack)
-      .orElse(ViaLocation.DEFAULT_MAX_SLACK);
 
     if (v.viaLocation() == null) {
       return response;
     }
 
+    var firstArrival = firstArrival(response).orElseThrow(this::createRoutingException);
+    var lastArrival = lastArrival(response).orElseThrow(this::createRoutingException);
+    var maxSlack = v.viaLocation().maxSlack();
     // Prepare next search
     var searchWindow = Duration.between(firstArrival, lastArrival).plus(maxSlack);
 
@@ -148,5 +139,16 @@ public class ViaRoutingWorker {
       .map(t -> t.itineraries)
       .flatMap(i -> i.stream().max(Comparator.comparing(Itinerary::endTime)))
       .map(Itinerary::endTime);
+  }
+
+  private RoutingValidationException createRoutingException() {
+    return new RoutingValidationException(
+      List.of(
+        new RoutingError(
+          RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
+          InputField.INTERMEDIATE_PLACE
+        )
+      )
+    );
   }
 }

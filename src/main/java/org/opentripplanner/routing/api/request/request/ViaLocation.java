@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.time.Duration;
+import java.util.Objects;
 import org.opentripplanner.model.GenericLocation;
 
 /**
@@ -19,6 +20,11 @@ public record ViaLocation(
 ) {
   public static final Duration DEFAULT_MAX_SLACK = Duration.ofMinutes(5L);
   public static final Duration DEFAULT_MIN_SLACK = Duration.ofMinutes(20L);
+
+  public ViaLocation {
+    Objects.requireNonNull(minSlack);
+    Objects.requireNonNull(maxSlack);
+  }
 
   public ViaLocation(GenericLocation point, boolean passThroughPoint, Duration minSlack) {
     this(point, passThroughPoint, minSlack, DEFAULT_MAX_SLACK);
