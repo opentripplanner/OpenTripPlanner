@@ -35,4 +35,57 @@ public class FileUtils {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
+
+  /**
+   * This asserts can be used to compare a document with a file content, trailing whitespace
+   * including line-breaks are striped away before comparison.
+   */
+  public static void assertFileEquals(String expectedDoc, File newFile) {
+    String resultDoc = readFile(newFile);
+
+    var expectedLines = expectedDoc.split("[\n\r]+");
+    var resultLines = resultDoc.split("[\n\r]+");
+
+    int i = 0, j = 0;
+
+    while (i < expectedLines.length && j < resultLines.length) {
+      while (expectedLines[i].isBlank()) {
+        ++i;
+      }
+      while (resultLines[j].isBlank()) {
+        ++j;
+      }
+      var expected = expectedLines[i].stripTrailing();
+      var result = resultLines[j].stripTrailing();
+
+      if (!expected.equals(result)) {
+        throw new IllegalStateException(
+          """
+          The file(%s) differ from the expected document.
+            Expected (line: %3d): %s
+            Result   (line: %3d): %s
+          """.formatted(
+              newFile.getAbsolutePath(),
+              i,
+              expected,
+              j,
+              result
+            )
+        );
+      }
+      ++i;
+      ++j;
+    }
+
+    if (i < expectedLines.length) {
+      throw new IllegalStateException(
+        "Lines missing in new file(" + newFile.getAbsolutePath() + "): " + expectedLines[i]
+      );
+    }
+    if (j < resultLines.length) {
+      throw new IllegalStateException(
+        "Lines not expected in new file(" + newFile.getAbsolutePath() + "): " + resultLines[j]
+      );
+    }
+  }
 }

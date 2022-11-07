@@ -442,9 +442,12 @@ public class AlertsUpdateHandlerTest {
       .getEntities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
-      .collect(Collectors.toList());
+      .toList();
     assertEquals(1l, selectors.size());
-    assertEquals("Alert had no entities", ((EntitySelector.Unknown) selectors.get(0)).description);
+    assertEquals(
+      "Alert had no entities",
+      ((EntitySelector.Unknown) selectors.get(0)).description()
+    );
   }
 
   @Test
@@ -461,11 +464,11 @@ public class AlertsUpdateHandlerTest {
       .getEntities()
       .stream()
       .filter(entitySelector -> entitySelector instanceof EntitySelector.Unknown)
-      .collect(Collectors.toList());
+      .toList();
     assertEquals(1l, selectors.size());
     assertEquals(
       "Entity selector: direction_id: 1\n",
-      ((EntitySelector.Unknown) selectors.get(0)).description
+      ((EntitySelector.Unknown) selectors.get(0)).description()
     );
   }
 

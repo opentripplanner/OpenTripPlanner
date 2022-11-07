@@ -7,7 +7,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLPlanner;
-import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
+import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
@@ -18,7 +18,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 public class TripQuery {
 
   public static GraphQLFieldDefinition create(
-    DefaultRoutingRequestType routing,
+    DefaultRouteRequestType routing,
     GraphQLOutputType tripType,
     GqlUtil gqlUtil
   ) {

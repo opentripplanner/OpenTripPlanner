@@ -1,15 +1,13 @@
 package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
-public class RoutingRequestTest {
+public class RouteRequestTest {
 
   @Test
   public void testRequest() {
@@ -31,7 +29,7 @@ public class RoutingRequestTest {
   @Test
   public void testIntermediatePlaces() {
     // TODO VIA - Part 2: those methods no longer exist (we will refactor them later). What should we do with this test?
-    //    RoutingRequest req = new RoutingRequest();
+    //    RouteRequest req = new RouteRequest();
     //    assertFalse(req.hasIntermediatePlaces());
     //
     //    req.clearIntermediatePlaces();

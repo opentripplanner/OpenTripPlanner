@@ -2,6 +2,8 @@ package org.opentripplanner.standalone.config.framework.json;
 
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,8 +24,6 @@ import org.opentripplanner.util.lang.ValueObjectToStringBuilder;
  *                 set.
  * @param skipChild Skip generating doc for this node - the child(this) is documented in the parent
  *                  node.
- * @param deprecated This parameter is no longer in use in OTP, we keep it here to be able to
- *                   generate documentation.
  *
  *
  * TODO DOC - Add Unit tests on this class using the builder
@@ -38,11 +38,10 @@ public record NodeInfo(
   OtpVersion since,
   @Nullable String defaultValue,
   boolean required,
-  boolean skipChild,
-  @Nullable DeprecatedInfo deprecated
+  boolean skipChild
 )
   implements Comparable<NodeInfo> {
-  private static final String TYPE_QUALIFIER = "type";
+  static final String TYPE_QUALIFIER = "type";
 
   public NodeInfo {
     Objects.requireNonNull(name);
@@ -84,8 +83,8 @@ public record NodeInfo(
    */
   public NodeInfo arraysChild() {
     return of()
-      .withName("[ ]")
-      .withSummary("")
+      .withName("{ object }")
+      .withSummary("Nested object in array. The object type is determined by the parameters.")
       .withType(elementType)
       .withSince(since)
       .withOptional()
@@ -99,10 +98,6 @@ public record NodeInfo(
    */
   public boolean printDetails() {
     return (description != null || enumType != null || elementType != null) && !isTypeQualifier();
-  }
-
-  public boolean isDeprecated() {
-    return deprecated != null;
   }
 
   static NodeInfoBuilder of() {
@@ -121,12 +116,26 @@ public record NodeInfo(
   }
 
   /**
-   * A type qualifier is a field in an JASON object witch determin witch type it is.
-   * Usually the mapping is split in two diffrent paths - creating diffrent types.
-   * For example we have both NETEX and GTFS config types in the same list/JSON array.
+   * A type qualifier is a field in an JSON object which determines which type it is.
+   * Usually the mapping is split in two different paths - creating different types.
+   * For example, we have both NETEX and GTFS config types in the same list/JSON array.
    */
   public boolean isTypeQualifier() {
     return enumType != null && TYPE_QUALIFIER.equalsIgnoreCase(name);
+  }
+
+  public List<? extends Enum<?>> enumTypeValues() {
+    return enumType == null ? List.of() : Arrays.stream(enumType.getEnumConstants()).toList();
+  }
+
+  /**
+   * Format the given value (read from JSON file) to a Markdown formatted string.
+   */
+  public String toMarkdownString(Object value) {
+    if (enumType != null) {
+      value = EnumMapper.mapToEnum2((String) value, enumType).orElseThrow();
+    }
+    return type.quote(value);
   }
 
   @Override

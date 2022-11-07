@@ -19,12 +19,12 @@ public class TransitFeedConfig {
   ) {
     List<DataSourceConfig> list = root
       .of(parameterName)
-      .since(NA)
+      .since(V2_2)
       .summary("Scan for transit data files")
       .description(
         """
         The transitFeeds section of `build-config.json` allows you to override the default behavior
-        of scanning for transit data files in the [base directory](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md#Base-Directory).
+        of scanning for transit data files in the [base directory](Configuration.md#Base-Directory).
         You can specify data located outside the local filesystem (including cloud storage services)
         or at various different locations around the local filesystem.
         
@@ -57,8 +57,18 @@ public class TransitFeedConfig {
 
   private static DataSourceConfig mapGtfsFeed(NodeAdapter node) {
     return new GtfsFeedParametersBuilder()
-      .withFeedId(node.of("feedId").since(NA).summary("TODO").asString(null))
-      .withSource(node.of("source").since(NA).summary("TODO").asUri())
+      .withFeedId(
+        node
+          .of("feedId")
+          .since(NA)
+          .summary(
+            "The unique ID for this feed. This overrides any feed ID defined within the feed itself."
+          )
+          .asString(null)
+      )
+      .withSource(
+        node.of("source").since(NA).summary("The unique URI pointing to the data file.").asUri()
+      )
       .build();
   }
 

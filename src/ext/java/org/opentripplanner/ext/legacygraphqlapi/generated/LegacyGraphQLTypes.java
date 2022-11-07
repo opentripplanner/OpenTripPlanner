@@ -82,6 +82,25 @@ public class LegacyGraphQLTypes {
     WARNING,
   }
 
+  public static class LegacyGraphQLBikeParkNameArgs {
+
+    private String language;
+
+    public LegacyGraphQLBikeParkNameArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
   public static class LegacyGraphQLBikeParkOpeningHoursArgs {
 
     private Iterable<String> dates;
@@ -105,6 +124,25 @@ public class LegacyGraphQLTypes {
     ALLOWED,
     NOT_ALLOWED,
     NO_INFORMATION,
+  }
+
+  public static class LegacyGraphQLCarParkNameArgs {
+
+    private String language;
+
+    public LegacyGraphQLCarParkNameArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
   }
 
   public static class LegacyGraphQLCarParkOpeningHoursArgs {
@@ -3099,6 +3137,44 @@ public class LegacyGraphQLTypes {
     ROUTE_TYPE,
     STOPS_ON_TRIP,
     TRIP,
+  }
+
+  public static class LegacyGraphQLVehicleParkingNameArgs {
+
+    private String language;
+
+    public LegacyGraphQLVehicleParkingNameArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
+  }
+
+  public static class LegacyGraphQLVehicleParkingNoteArgs {
+
+    private String language;
+
+    public LegacyGraphQLVehicleParkingNoteArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.language = (String) args.get("language");
+      }
+    }
+
+    public String getLegacyGraphQLLanguage() {
+      return this.language;
+    }
+
+    public void setLegacyGraphQLLanguage(String language) {
+      this.language = language;
+    }
   }
 
   /**

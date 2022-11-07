@@ -4,7 +4,7 @@ import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParam
 import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.EXPANSION_FACTOR;
 import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.MAX_ZOOM;
 import static org.opentripplanner.ext.vectortiles.VectorTilesResource.LayerParameters.MIN_ZOOM;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,22 +31,57 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters {
     return new VectorTileConfig(
       root
         .of(vectorTileLayers)
-        .since(NA)
-        .summary("TODO")
-        .description(/*TODO DOC*/"TODO")
+        .since(V2_0)
+        .summary("Configuration of the individual layers for the Mapbox vector tiles.")
         .asObjects(VectorTileConfig::mapLayer)
     );
   }
 
   public static Layer mapLayer(NodeAdapter node) {
     return new Layer(
-      node.of("name").since(NA).summary("TODO").asString(),
-      node.of("type").since(NA).summary("TODO").asEnum(VectorTilesResource.LayerType.class),
-      node.of("mapper").since(NA).summary("TODO").asString(),
-      node.of("maxZoom").since(NA).summary("TODO").asInt(MAX_ZOOM),
-      node.of("minZoom").since(NA).summary("TODO").asInt(MIN_ZOOM),
-      node.of("cacheMaxSeconds").since(NA).summary("TODO").asInt(CACHE_MAX_SECONDS),
-      node.of("expansionFactor").since(NA).summary("TODO").asDouble(EXPANSION_FACTOR)
+      node
+        .of("name")
+        .since(V2_0)
+        .summary("Used in the url to fetch tiles, and as the layer name in the vector tiles.")
+        .asString(),
+      node
+        .of("type")
+        .since(V2_0)
+        .summary("Type of the layer.")
+        .asEnum(VectorTilesResource.LayerType.class),
+      node
+        .of("mapper")
+        .since(V2_0)
+        .summary(
+          "Describes the mapper converting from the OTP model entities to the vector tile properties."
+        )
+        .description("Currently `Digitransit` is supported for all layer types.")
+        .asString(),
+      node
+        .of("maxZoom")
+        .since(V2_0)
+        .summary("Maximum zoom levels the layer is active for.")
+        .asInt(MAX_ZOOM),
+      node
+        .of("minZoom")
+        .since(V2_0)
+        .summary("Minimum zoom levels the layer is active for.")
+        .asInt(MIN_ZOOM),
+      node
+        .of("cacheMaxSeconds")
+        .since(V2_0)
+        .summary("Sets the cache header in the response.")
+        .description("The lowest value of the layers included is selected.")
+        .asInt(CACHE_MAX_SECONDS),
+      node
+        .of("expansionFactor")
+        .since(V2_0)
+        .summary("How far outside its boundaries should the tile contain information.")
+        .description(
+          "The value is a fraction of the tile size. If you are having problem with icons and " +
+          "shapes being clipped at tile edges, then increase this number."
+        )
+        .asDouble(EXPANSION_FACTOR)
     );
   }
 

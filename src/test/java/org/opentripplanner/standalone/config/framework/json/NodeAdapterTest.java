@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +33,21 @@ public class NodeAdapterTest {
 
   @Test
   public void testAsRawNode() {
-    NodeAdapter subject = newNodeAdapterForTest("{ foo : 'bar' }");
-    assertFalse(subject.rawNode("anObject").has("withText"));
+    NodeAdapter subject = newNodeAdapterForTest("{ child : { foo : 'bar' } }");
+
+    // Define child
+    var child = subject.of("child").asObject();
+
+    // Retrieve child as raw node
+    assertEquals("{\"foo\":\"bar\"}", child.rawNode().toString());
+
+    // Both the root(subject) and the child should report an empty list of unused parameters
+    var up = new ArrayList<>();
+    subject.logAllUnusedParameters(up::add);
+    assertEquals(List.of(), up);
+
+    child.logAllUnusedParameters(up::add);
+    assertEquals(List.of(), up);
   }
 
   @Test
@@ -66,7 +80,7 @@ public class NodeAdapterTest {
     assertEquals(
       "[" +
       "bool : boolean Required Since 2.0, " +
-      "en : enum = \"SECONDS\" Since 2.1, " +
+      "en : enum = \"seconds\" Since 2.1, " +
       "em : enum map of string Optional Since 2.1" +
       "]",
       infos.toString()
@@ -316,12 +330,6 @@ public class NodeAdapterTest {
 
     // as required duration v2 (with unit)
     assertEquals("PT1S", subject.of("k1").asDuration().toString());
-    assertEquals("PT7S", subject.of("k3").asDuration2(SECONDS).toString());
-
-    // as optional duration v2 (with unit)
-    assertEquals("PT1S", subject.of("k1").asDuration2(null, SECONDS).toString());
-    assertEquals("PT7S", subject.of("k3").asDuration2(null, SECONDS).toString());
-    assertEquals("PT3H", subject.of("missing-key").asDuration2(D3h, SECONDS).toString());
   }
 
   @Test

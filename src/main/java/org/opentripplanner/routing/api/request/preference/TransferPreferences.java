@@ -79,7 +79,7 @@ public final class TransferPreferences implements Serializable {
    * TransitPreferences#boardSlack()}. This time should also be overridden by specific transfer timing information in
    * transfers.txt
    * <p>
-   * This only apply to transfers between two trips, it does not apply when boarding the first
+   * This only apply to transfer between two trips, it does not apply when boarding the first
    * transit.
    * <p>
    * Unit is seconds. Default value is 2 minutes.

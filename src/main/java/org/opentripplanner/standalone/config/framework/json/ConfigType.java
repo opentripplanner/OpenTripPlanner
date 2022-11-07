@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.util.lang.StringUtils;
 import org.opentripplanner.util.time.DurationUtils;
@@ -29,8 +30,8 @@ public enum ConfigType {
   LOCALE(
     JsonType.string,
     "_`Language[\\_country[\\_variant]]`_. A Locale object represents a specific " +
-    "geographical, political, or cultural region. For more information see the [Java 11 Locale]" +
-    "(https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html).",
+    "geographical, political, or cultural region. For more information see the [Java Locale]" +
+    "(https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Locale.html).",
     "en_US",
     "nn_NO"
   ),
@@ -116,14 +117,14 @@ public enum ConfigType {
   }
 
   public String docName() {
-    return name().toLowerCase().replace('_', '-');
+    return EnumMapper.toString(this);
   }
 
   /**
    * Quote the given {@code value} is the JSON type is a {@code string}.
    */
   public String quote(@Nonnull Object value) {
-    return type == JsonType.string ? MarkdownFormatter.quote(value) : value.toString();
+    return type == JsonType.string ? quoteText(value) : value.toString();
   }
 
   /**
@@ -197,5 +198,12 @@ public enum ConfigType {
       case DURATION -> (T) DurationUtils.duration(node.asText());
       default -> throw new IllegalArgumentException("Unsupported element type: " + this);
     };
+  }
+
+  /**
+   * Return the given input formatted as a quoted text.
+   */
+  private static String quoteText(@Nullable Object text) {
+    return text == null ? "" : "\"" + text + "\"";
   }
 }

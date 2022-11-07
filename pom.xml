@@ -7,7 +7,7 @@
     <url>https://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -20,6 +20,40 @@
     <scm>
         <url>https://github.com/opentripplanner/OpenTripPlanner</url>
     </scm>
+
+    <!--
+      Developer entries are provided for the main contributors on the GitHub stats page for to the
+      dev-2.x branch. This minimal information is only present to meet the Sonatype artifact upload
+      requirements. For other contributors, see
+      https://github.com/opentripplanner/OpenTripPlanner/graphs/contributors
+    -->
+    <developers>
+        <developer>
+            <name>Andrew Byrd</name>
+            <email>andrew@fastmail.net</email>
+            <organization>Conveyal</organization>
+            <organizationUrl>http://conveyal.com/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Thomas Gran</name>
+            <email>t2gran@gmail.com</email>
+            <organization>Entur</organization>
+            <organizationUrl>http://entur.org/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Leonard Ehrenfried</name>
+            <email>mail@leonard.io</email>
+            <organization>Independent Contractor</organization>
+            <organizationUrl>https://leonard.io</organizationUrl>
+        </developer>
+        <developer>
+            <name>Hannes Junnila</name>
+            <email>hannes.junnila@gmail.com</email>
+            <organization>Entur</organization>
+            <organizationUrl>http://entur.org/</organizationUrl>
+        </developer>
+    </developers>
+
 
     <properties>
         <otp.serialization.version.id>76</otp.serialization.version.id>
@@ -72,15 +106,6 @@
                 <targetPath>client</targetPath>
                 <filtering>false</filtering>
             </resource>
-            <resource>
-                <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
-                <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
-                <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
-                <directory>src/scripts</directory>
-                <filtering>true</filtering>
-                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
-                <targetPath>../..</targetPath>
-            </resource>
         </resources>
         <testResources>
             <testResource>
@@ -88,6 +113,15 @@
             </testResource>
             <testResource>
                 <directory>src/ext-test/resources</directory>
+            </testResource>
+            <testResource>
+                <!-- Shell scripts to start up OTP, need to be filtered to insert the JAR file name. -->
+                <!-- These are treated as testResources rather than resources to keep them out of the JAR. -->
+                <!-- The staging repo will reject a JAR containing them as they use traversal paths (../..). -->
+                <directory>src/scripts</directory>
+                <filtering>true</filtering>
+                <!-- Copy the scripts up into the root of the repo, not /target/classes -->
+                <targetPath>../..</targetPath>
             </testResource>
         </testResources>
         <extensions>
@@ -131,6 +165,18 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- OTP includes an empty javadoc.jar file. See docs/javadoc/README.md -->
+                        <id>package-javadoc</id>
+                        <phase>package</phase>
+                        <goals><goal>jar</goal></goals>
+                        <configuration>
+                            <classesDirectory>${basedir}/docs/javadoc</classesDirectory>
+                            <classifier>javadoc</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
@@ -892,6 +938,51 @@
                                     </includes>
                                 </fileset>
                             </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>deployGitHub</id>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>OpenTripPlanner Maven Repository on Github Packages</name>
+                    <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <!-- We sign in the verify phase, which means it will happen before install and deploy (the last two phases)
+                                     but not before earlier phases like test or package. -->
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Recommended way to deploy to OSSRH , which allows deferred manual release to Central. -->
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.12</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
                 </plugins>

@@ -16,7 +16,6 @@
 The code in this sandbox used to be part of OTP core but to allow more experimentation - in 
 particular regarding GTFS Fares V2 - it was moved into a sandbox.
 
-The main documentation is located at [Build configuration](../BuildConfiguration.md#fares-configuration).
 
 ## Fares V2
 
@@ -66,3 +65,94 @@ they were [removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273
 - DutchFareServiceImpl
 
 If you were using these calculators, you're welcome to re-add them to the code base.
+
+
+## Fares configuration
+
+By default OTP will compute fares according to the GTFS specification if fare data is provided in
+your GTFS input. It is possible to turn off this by setting the fare to "off". For more complex
+scenarios or to handle vehicle rental fares, it is necessary to manually configure fares using the
+`fares` section in `build-config.json`. You can combine different fares (for example transit and
+vehicle-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine
+(all fields starting with `fare` are considered to be sub-fares).
+
+```JSON
+// build-config.json
+{
+  // Select the custom fare "seattle"
+  "fares": "seattle"
+}
+```
+
+Or this alternative form that could allow additional configuration
+
+```JSON
+// build-config.json
+{
+  "fares": {
+	"type": "seattle"
+  }
+}
+```
+
+```JSON
+// build-config.json
+{
+  "fares": {
+    // Combine two fares by simply adding them
+    "combinationStrategy": "additive",
+    // First fare to combine
+    "fare0": "new-york",
+    // Second fare to combine
+    "fare1": {
+      "type": "vehicle-rental-time-based",
+      "currency": "USD",
+      "prices": {
+          // For trip shorter than 30', $4 fare
+          "30":   4.00,
+          // For trip shorter than 1h, $6 fare
+          "1:00": 6.00
+      }
+    }
+    // We could also add fareFoo, fareBar...
+  }
+}
+```
+
+Turning the fare service _off_, this will ignore any fare data in the provided GTFS data.
+
+```JSON
+// build-config.json
+{
+  "fares": "off"
+}
+```
+
+The current list of custom fare type is:
+
+- `vehicle-rental-time-based` - accepting the following parameters:
+    - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
+    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed
+      time of vehicle rental is lower than the defined time.
+- `san-francisco` (no parameters)
+- `new-york` (no parameters)
+- `seattle` (no parameters)
+- `highest-fare-in-free-transfer-window` Will apply the highest observed transit fare (across all
+  operators) within a free transfer window, adding to the cost if a trip is boarded outside the free
+  transfer window. It accepts the following parameters:
+    - `freeTransferWindow` the duration (in ISO8601-ish notation) that free transfers are
+      possible after the board time of the first transit leg. Default: `2h30m`.
+    - `analyzeInterlinedTransfers` If true, will treat interlined transfers as actual transfers.
+      This is merely a work-around for transit agencies that choose to code their fares in a
+      route-based fashion instead of a zone-based fashion. Default: `false`
+- `atlanta` (no parameters)
+- `combine-interlined-legs` Will treat two interlined legs (those with a stay-seated transfer in
+  between them) as a single leg for the purpose of fare calculation.
+  It has a single parameter `mode` which controls when exactly the combination should happen:
+    - `ALWAYS`: All interlined legs are combined. (default)
+    - `SAME_ROUTE`: Only interlined legs whose route ID are identical are encountered.
+- `off` (no parameters)
+
+The current list of `combinationStrategy` is:
+
+- `additive` - simply adds all sub-fares.

@@ -67,18 +67,13 @@ public class SpeedTestTimer {
 
   public void setUp(boolean logResultsByTestCaseCategory) {
     this.groupResultByTestCaseCategory = logResultsByTestCaseCategory;
-    var measurementEnv = Optional
-      .ofNullable(System.getenv("MEASUREMENT_ENVIRONMENT"))
-      .orElse("local");
     var location = Optional.ofNullable(System.getenv("SPEEDTEST_LOCATION")).orElse("unknown");
     registry
       .config()
       .commonTags(
         List.of(
-          Tag.of("measurement.environment", measurementEnv),
           Tag.of("git.commit", projectInfo().versionControl.commit),
           Tag.of("git.branch", projectInfo().versionControl.branch),
-          Tag.of("git.buildtime", projectInfo().versionControl.buildTime),
           Tag.of("location", location)
         )
       );
@@ -124,6 +119,15 @@ public class SpeedTestTimer {
     // close() sends the results to influxdb
     if (uploadRegistry != null) {
       uploadRegistry.close();
+    }
+  }
+
+  public void globalCount(String meterName, long count) {
+    if (uploadRegistry != null) {
+      registry.add(uploadRegistry);
+      var counter = registry.counter(meterName);
+      counter.increment(count);
+      registry.remove(uploadRegistry);
     }
   }
 

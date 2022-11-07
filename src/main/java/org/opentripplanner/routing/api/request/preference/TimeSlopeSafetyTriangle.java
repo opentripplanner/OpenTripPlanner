@@ -25,7 +25,7 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
 
   /**
    * Sets the bicycle triangle routing parameters -- the relative importance of safety, flatness,
-   * and speed. These three fields of the RoutingRequest should have values between 0 and 1, and
+   * and speed. These three fields of the RouteRequest should have values between 0 and 1, and
    * should add up to 1. This setter function accepts any three numbers and will normalize them to
    * add up to 1.
    */

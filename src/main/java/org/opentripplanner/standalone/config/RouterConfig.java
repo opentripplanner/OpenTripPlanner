@@ -1,13 +1,13 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.routingrequest.RoutingRequestMapper.mapRoutingRequest;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -17,6 +17,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -59,36 +60,63 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion = root.of("configVersion").since(NA).summary("TODO").asString(null);
-    this.requestLogFile = root.of("requestLogFile").since(NA).summary("TODO").asString(null);
+    this.configVersion =
+      root
+        .of("configVersion")
+        .since(V2_1)
+        .summary("Deployment version of the *router-config.json*.")
+        .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
+        .asString(null);
+    this.requestLogFile =
+      root
+        .of("requestLogFile")
+        .since(V2_0)
+        .summary("The path of the log file for the requests.")
+        .description(
+          """
+You can log some characteristics of trip planning requests in a file for later analysis. Some
+transit agencies and operators find this information useful for identifying existing or unmet
+transportation demand. Logging will be performed only if you specify a log file name in the router
+config.
+
+Each line in the resulting log file will look like this:
+
+```
+2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3
+```
+
+The fields separated by whitespace are (in order):
+
+1. Date and time the request was received
+2. IP address of the user
+3. Arrive or depart search
+4. The arrival or departure time
+5. A comma-separated list of all transport modes selected
+6. Origin latitude and longitude
+7. Destination latitude and longitude
+
+Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
+number of transit vehicles used in that itinerary.
+          """
+        )
+        .asString(null);
     this.transmodelApi =
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
           .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
+          .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
     this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
-    this.transitConfig =
-      new TransitRoutingConfig(
-        root.of("transit").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
-      );
+    this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
-      mapRoutingRequest(
-        root
-          .of("routingDefaults")
-          .since(NA)
-          .summary("TODO")
-          .description(/*TODO DOC*/"TODO")
-          .asObject()
-      );
+      RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
     this.updatersParameters = new UpdatersConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig =
       new FlexConfig(
-        root.of("flex").since(NA).summary("TODO").description(/*TODO DOC*/"TODO").asObject()
+        root.of("flex").since(NA).summary("Configuration for flex routing.").asObject()
       );
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -154,6 +182,10 @@ public class RouterConfig implements Serializable {
     return flexConfig.toFlexParameters(preferences);
   }
 
+  public NodeAdapter asNodeAdapter() {
+    return root;
+  }
+
   /**
    * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
    */
@@ -173,13 +205,30 @@ public class RouterConfig implements Serializable {
   /**
    * This method is needed, because we want to support the old format for the "streetRoutingTimeout"
    * parameter. We will keep it for some time, to let OTP deployments update the config.
+   *
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
   static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
     return adapter
       .of("streetRoutingTimeout")
       .since(NA)
-      .summary("TODO")
-      .asDuration2(DEFAULT_STREET_ROUTING_TIMEOUT, ChronoUnit.SECONDS);
+      .summary(
+        "The maximum time a street routing request is allowed to take before returning a timeout."
+      )
+      .description(
+        """
+In OTP1 path searches sometimes took a long time to complete. With the new Raptor algorithm this is not
+the case anymore. The street part of the routing may still take a long time if searching very long
+distances. You can set the street routing timeout to avoid tying up server resources on pointless
+searches and ensure that your users receive a timely response. You can also limit the max distance
+to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
+information that can help identify problematic searches and improve our routing methods. There are
+no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
+search-window.
+
+The search aborts after this duration and any paths found are returned to the client.
+"""
+      )
+      .asDuration(DEFAULT_STREET_ROUTING_TIMEOUT);
   }
 }

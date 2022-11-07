@@ -14,7 +14,7 @@ import java.util.concurrent.CompletionException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
+import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
@@ -128,7 +128,7 @@ public class RoutingWorker {
     boolean removeWalkAllTheWayResultsFromDirectFlex =
       request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
-    ItineraryListFilterChain filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
+    ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
       request.itinerariesSortOrder(),
       request.preferences().itineraryFilter(),
       request.numItineraries(),

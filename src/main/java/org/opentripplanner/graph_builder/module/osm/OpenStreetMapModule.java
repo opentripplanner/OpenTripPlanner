@@ -1582,34 +1582,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         back
       );
       street.setCarSpeed(carSpeed);
-
-      String highway = way.getTag("highway");
-      int cls;
-      if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {
-        cls = StreetEdge.CLASS_CROSSING;
-      } else if (
-        "footway".equals(highway) &&
-        way.isTag("footway", "crossing") &&
-        !way.isTag("bicycle", "designated")
-      ) {
-        cls = StreetEdge.CLASS_CROSSING;
-      } else if (
-        "residential".equals(highway) ||
-        "tertiary".equals(highway) ||
-        "secondary".equals(highway) ||
-        "secondary_link".equals(highway) ||
-        "primary".equals(highway) ||
-        "primary_link".equals(highway) ||
-        "trunk".equals(highway) ||
-        "trunk_link".equals(highway)
-      ) {
-        cls = StreetEdge.CLASS_STREET;
-      } else {
-        cls = StreetEdge.CLASS_OTHERPATH;
-      }
-
-      cls |= OSMFilter.getStreetClasses(way);
-      street.setStreetClass(cls);
+      street.setLink(OSMFilter.isLink(way));
 
       if (!way.hasTag("name") && !way.hasTag("ref")) {
         street.setHasBogusName(true);
