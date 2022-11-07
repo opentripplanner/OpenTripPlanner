@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 /**
@@ -22,6 +23,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int durationInSeconds;
   private final int cost;
   private final int numberOfRides;
+  private final boolean stopReachedOnBoard;
   private final boolean isZeroDuration;
   private final Integer opening;
   private final Integer closing;
@@ -31,6 +33,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.durationInSeconds = builder.durationInSeconds;
     this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
+    this.stopReachedOnBoard = builder.stopReachedOnBoard;
     this.isZeroDuration = builder.isZeroDuration;
     this.opening = builder.opening;
     this.closing = builder.closing;
@@ -218,10 +221,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public boolean isZeroDurationLeg() {
-    return isZeroDuration;
+  public boolean stopReachedOnBoard() {
+    return stopReachedOnBoard;
   }
-
+  
   @Override
   public String toString() {
     return asString();
@@ -256,6 +259,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     Builder(TestAccessEgress transfer) {
       this.stop = transfer.stop;
       this.durationInSeconds = transfer.durationInSeconds;
+      this.stopReachedOnBoard = transfer.stopReachedOnBoard;
       this.cost = transfer.cost;
       this.numberOfRides = transfer.numberOfRides;
       this.opening = transfer.opening;
