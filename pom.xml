@@ -280,7 +280,6 @@
                         --add-opens java.base/java.time.chrono=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED
-                        --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
                         --add-opens java.base/java.util.regex=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
                         --add-opens java.base/java.util.logging=ALL-UNNAMED
@@ -291,7 +290,6 @@
                         --add-opens java.base/jdk.internal.util=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.module=ALL-UNNAMED
-                        --add-opens java.base/sun.invoke.util=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
                         --add-opens java.base/sun.util.calendar=ALL-UNNAMED
