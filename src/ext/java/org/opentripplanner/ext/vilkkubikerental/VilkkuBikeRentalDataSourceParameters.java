@@ -2,7 +2,7 @@ package org.opentripplanner.ext.vilkkubikerental;
 
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 public class VilkkuBikeRentalDataSourceParameters extends VehicleRentalDataSourceParameters {
@@ -16,7 +16,7 @@ public class VilkkuBikeRentalDataSourceParameters extends VehicleRentalDataSourc
     boolean allowOverloading,
     @Nonnull Map<String, String> httpHeaders
   ) {
-    super(DataSourceType.VILKKU, url, httpHeaders);
+    super(VehicleRentalSourceType.VILKKU, url, httpHeaders);
     this.network = network;
     this.allowOverloading = allowOverloading;
   }

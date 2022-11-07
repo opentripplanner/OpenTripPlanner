@@ -1,11 +1,10 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
 import java.time.ZoneId;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
@@ -19,7 +18,7 @@ public record ParkAPIUpdaterParameters(
   int frequencySec,
   @Nonnull Map<String, String> httpHeaders,
   List<String> tags,
-  DataSourceType sourceType,
+  VehicleParkingSourceType sourceType,
   ZoneId timeZone
 )
   implements VehicleParkingUpdaterParameters {}

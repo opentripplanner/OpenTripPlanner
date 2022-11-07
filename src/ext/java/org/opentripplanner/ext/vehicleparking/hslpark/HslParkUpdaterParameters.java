@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
 import java.time.ZoneId;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
@@ -13,7 +13,7 @@ public record HslParkUpdaterParameters(
   int facilitiesFrequencySec,
   String facilitiesUrl,
   String feedId,
-  DataSourceType sourceType,
+  VehicleParkingSourceType sourceType,
   int utilizationsFrequencySec,
   String utilizationsUrl,
   ZoneId timeZone,

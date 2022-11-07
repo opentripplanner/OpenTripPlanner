@@ -8,7 +8,7 @@ import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
@@ -19,7 +19,7 @@ public class VehicleParkingUpdaterConfig {
       .of("sourceType")
       .since(V2_2)
       .summary("The source of the vehicle updates.")
-      .asEnum(DataSourceType.class);
+      .asEnum(VehicleParkingSourceType.class);
     var feedId = c
       .of("feedId")
       .since(V2_2)

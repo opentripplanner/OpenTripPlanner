@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.kml;
 
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
@@ -14,6 +14,6 @@ public record KmlUpdaterParameters(
   String namePrefix,
   int frequencySec,
   boolean zip,
-  DataSourceType sourceType
+  VehicleParkingSourceType sourceType
 )
   implements VehicleParkingUpdaterParameters {}

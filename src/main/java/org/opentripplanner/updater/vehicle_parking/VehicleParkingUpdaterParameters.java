@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.vehicle_parking;
 
-import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 
 /**
@@ -8,5 +7,5 @@ import org.opentripplanner.updater.PollingGraphUpdaterParameters;
  * parameters required by a custom vehicle parking updater.
  */
 public interface VehicleParkingUpdaterParameters extends PollingGraphUpdaterParameters {
-  DataSourceType sourceType();
+  VehicleParkingSourceType sourceType();
 }
