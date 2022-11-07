@@ -73,7 +73,6 @@ public class VehicleParkingUpdaterConfig {
         sourceType,
         timeZone
       );
-      default -> throw new OtpAppException("The updater source type is unhandled: " + sourceType);
     };
   }
 }
