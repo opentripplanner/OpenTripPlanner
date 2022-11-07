@@ -142,7 +142,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
-    if (accessPathLeg.access().stopReachedOnBoard()) {
+    if (isZeroDurationAccessEgress(accessPathLeg.access())) {
       return List.of();
     }
 
@@ -170,7 +170,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     // leg given that it is the last leg.
     int lastLegCost = 0;
     PathLeg<T> nextLeg = pathLeg.nextLeg();
-    if (nextLeg.isEgressLeg() && nextLeg.asEgressLeg().egress().stopReachedOnBoard()) {
+    if (nextLeg.isEgressLeg() && isZeroDurationLeg(nextLeg.asEgressLeg())) {
       lastLegCost = pathLeg.nextLeg().generalizedCost();
     }
 
@@ -220,6 +220,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     );
   }
 
+  private boolean isZeroDurationLeg(EgressPathLeg<T> egressPathLeg) {
+    return isZeroDurationAccessEgress(egressPathLeg.egress());
+  }
+
+  private boolean isZeroDurationAccessEgress(RaptorAccessEgress accessEgress) {
+    return accessEgress.isZeroDurationLeg();
+  }
+
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
     var transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
     var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
@@ -231,7 +239,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
-    if (egressPathLeg.egress().stopReachedOnBoard()) {
+    if (isZeroDurationLeg(egressPathLeg)) {
       return null;
     }
 

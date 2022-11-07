@@ -22,7 +22,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int durationInSeconds;
   private final int cost;
   private final int numberOfRides;
-  private final boolean stopReachedOnBoard;
+  private final boolean isZeroDuration;
   private final Integer opening;
   private final Integer closing;
 
@@ -31,7 +31,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.durationInSeconds = builder.durationInSeconds;
     this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
-    this.stopReachedOnBoard = builder.stopReachedOnBoard;
+    this.isZeroDuration = builder.isZeroDuration;
     this.opening = builder.opening;
     this.closing = builder.closing;
   }
@@ -57,7 +57,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   public static TestAccessEgress zeroDurationAccess(int stop, int durationInSeconds, int cost) {
-    return new Builder(stop, durationInSeconds).withStopReachedOnBoard(true).withCost(cost).build();
+    return new Builder(stop, durationInSeconds).withZeroDurationLeg(true).withCost(cost).build();
   }
 
   /**
@@ -218,8 +218,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public boolean stopReachedOnBoard() {
-    return stopReachedOnBoard;
+  public boolean isZeroDurationLeg() {
+    return isZeroDuration;
   }
 
   @Override
@@ -245,6 +245,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
     Integer opening = null;
     Integer closing = null;
+    private boolean isZeroDuration;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -257,13 +258,12 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.durationInSeconds = transfer.durationInSeconds;
       this.cost = transfer.cost;
       this.numberOfRides = transfer.numberOfRides;
-      this.stopReachedOnBoard = transfer.stopReachedOnBoard;
       this.opening = transfer.opening;
       this.closing = transfer.closing;
     }
 
-    Builder withStopReachedOnBoard(boolean stopReachedOnBoard) {
-      this.stopReachedOnBoard = stopReachedOnBoard;
+    Builder withZeroDurationLeg(boolean isZeroDuration) {
+      this.isZeroDuration = isZeroDuration;
       return this;
     }
 
