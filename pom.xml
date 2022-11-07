@@ -67,8 +67,10 @@
         <micrometer.version>1.9.5</micrometer.version>
         <netcdf4.version>5.5.2</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
+        <logback.version>1.3.4</logback.version>
         <lucene.version>9.4.1</lucene.version>
         <graphql.version>19.2</graphql.version>
+        <slf4j.version>2.0.3</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -278,6 +280,7 @@
                         --add-opens java.base/java.time.chrono=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED
+                        --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
                         --add-opens java.base/java.util.regex=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
                         --add-opens java.base/java.util.logging=ALL-UNNAMED
@@ -288,6 +291,7 @@
                         --add-opens java.base/jdk.internal.util=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.module=ALL-UNNAMED
+                        --add-opens java.base/sun.invoke.util=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
                         --add-opens java.base/sun.util.calendar=ALL-UNNAMED
@@ -530,17 +534,23 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Logging library, implements slf4j logging API -->
+        <!-- Logging API -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.4.4</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <!-- Jersey uses java.util logging, redirect it to slf4j API (we use the Logback implementation) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>2.0.3</version>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <!-- Logging library, implements slf4j logging API -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
 
         <!-- dependency injection -->
