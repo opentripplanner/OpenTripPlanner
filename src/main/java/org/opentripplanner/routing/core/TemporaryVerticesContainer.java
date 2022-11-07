@@ -17,7 +17,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graph.index.StreetVertexIndex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -46,7 +46,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
-    StreetVertexIndex index = this.graph.getStreetIndex();
+    StreetIndex index = this.graph.getStreetIndex();
     this.opt = opt;
     fromVertices = index.getVerticesForLocation(opt.from(), accessMode, false, tempEdges);
     toVertices = index.getVerticesForLocation(opt.to(), egressMode, true, tempEdges);

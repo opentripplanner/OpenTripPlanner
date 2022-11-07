@@ -11,7 +11,6 @@ import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graph.index.Scope;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class SameEdgeAdjuster {

@@ -15,7 +15,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graph.index.StreetVertexIndex;
+import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -111,7 +111,7 @@ public class RoutingService implements org.opentripplanner.routing.api.request.R
   }
 
   /** {@link Graph#getStreetIndex()} */
-  public StreetVertexIndex getStreetIndex() {
+  public StreetIndex getStreetIndex() {
     return this.graph.getStreetIndex();
   }
 

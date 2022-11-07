@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.index;
+package org.opentripplanner.routing.linking;
 
 public enum Scope {
   /**
