@@ -405,11 +405,6 @@ public final class TripPattern
     return tripTimes.getHeadsign(stopIndex);
   }
 
-  // TODO get submode from trips, not route
-  public boolean matchesModeOrSubMode(TransitMode mode, SubMode transportSubmode) {
-    return getMode().equals(mode) || route.getNetexSubmode().equals(transportSubmode);
-  }
-
   public TripPattern clone() {
     try {
       return (TripPattern) super.clone();
