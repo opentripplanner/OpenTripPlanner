@@ -555,10 +555,9 @@ public class TimetableSnapshotSourceTest {
         originalTripIndexForToday
       );
       assertTrue(
-        originalTripTimesForToday.isCanceled(),
-        "Original trip times should be canceled in time table for service date"
+        originalTripTimesForToday.replaced(),
+        "Original trip times should be marked as replaced in time table for service date"
       );
-      assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
     }
 
     // New trip pattern
@@ -834,7 +833,7 @@ public class TimetableSnapshotSourceTest {
         originalTripIndexForToday
       );
       // original trip should be canceled
-      assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
+      assertTrue(originalTripTimesForToday.replaced());
     }
 
     // New trip pattern
@@ -987,7 +986,7 @@ public class TimetableSnapshotSourceTest {
         originalTripIndexForToday
       );
       // original trip should be canceled
-      assertEquals(RealTimeState.CANCELED, originalTripTimesForToday.getRealTimeState());
+      assertTrue(originalTripTimesForToday.replaced());
     }
 
     // New trip pattern
