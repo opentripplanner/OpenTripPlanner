@@ -17,7 +17,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptor
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -29,7 +28,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -37,7 +35,6 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
@@ -142,7 +139,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
-    if (isZeroDurationAccessEgress(accessPathLeg.access())) {
+    if (isEmptyAccessEgress(accessPathLeg.access())) {
       return List.of();
     }
 
@@ -170,7 +167,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     // leg given that it is the last leg.
     int lastLegCost = 0;
     PathLeg<T> nextLeg = pathLeg.nextLeg();
-    if (nextLeg.isEgressLeg() && isZeroDurationLeg(nextLeg.asEgressLeg())) {
+    if (nextLeg.isEgressLeg() && isEmpty(nextLeg.asEgressLeg())) {
       lastLegCost = pathLeg.nextLeg().generalizedCost();
     }
 
@@ -220,12 +217,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     );
   }
 
-  private boolean isZeroDurationLeg(EgressPathLeg<T> egressPathLeg) {
-    return isZeroDurationAccessEgress(egressPathLeg.egress());
+  private boolean isEmpty(EgressPathLeg<T> egressPathLeg) {
+    return isEmptyAccessEgress(egressPathLeg.egress());
   }
 
-  private boolean isZeroDurationAccessEgress(RaptorAccessEgress accessEgress) {
-    return accessEgress.isZeroDurationLeg();
+  private boolean isEmptyAccessEgress(RaptorAccessEgress accessEgress) {
+    return accessEgress.isEmpty();
   }
 
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
@@ -239,7 +236,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
-    if (isZeroDurationLeg(egressPathLeg)) {
+    if (isEmpty(egressPathLeg)) {
       return null;
     }
 

@@ -59,8 +59,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
       .build();
   }
 
-  public static TestAccessEgress zeroDurationAccess(int stop, int durationInSeconds, int cost) {
-    return new Builder(stop, durationInSeconds).withZeroDurationLeg(true).withCost(cost).build();
+  public static TestAccessEgress zeroDurationAccess(int stop, int cost) {
+    return new Builder(stop, 0).withZeroDurationLeg(true).withCost(cost).build();
   }
 
   /**

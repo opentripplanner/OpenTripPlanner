@@ -63,7 +63,7 @@ public class RaptorPathToItineraryMapperTest {
 
     Path<TestTripSchedule> path = getTestTripSchedulePath(getTestTripSchedule())
       .egress(
-        TestAccessEgress.zeroDurationAccess(2, 0, RaptorCostConverter.toRaptorCost(LAST_LEG_COST))
+        TestAccessEgress.zeroDurationAccess(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST))
       );
 
     // Act
@@ -103,7 +103,7 @@ public class RaptorPathToItineraryMapperTest {
   private TestPathBuilder getTestTripSchedulePath(TestTripSchedule testTripSchedule) {
     TestPathBuilder pathBuilder = new TestPathBuilder(0, COST_CALCULATOR);
     return pathBuilder
-      .access(ACCESS_START, TestAccessEgress.zeroDurationAccess(1, 0, 0))
+      .access(ACCESS_START, TestAccessEgress.zeroDurationAccess(1, 0))
       .bus(testTripSchedule, 2);
   }
 

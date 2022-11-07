@@ -138,7 +138,7 @@ public interface RaptorAccessEgress {
    * An empty egress where you alight transit directly at the destination
    * @return true if the duration is 0;
    */
-  default boolean isZeroDurationLeg() {
+  default boolean isEmpty() {
     return durationInSeconds() == 0;
   }
 
