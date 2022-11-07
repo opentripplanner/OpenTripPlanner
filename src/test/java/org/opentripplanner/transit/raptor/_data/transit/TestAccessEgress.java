@@ -5,7 +5,6 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 
 /**
@@ -24,7 +23,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int cost;
   private final int numberOfRides;
   private final boolean stopReachedOnBoard;
-  private final boolean isZeroDuration;
+  private final boolean isEmpty;
   private final Integer opening;
   private final Integer closing;
 
@@ -34,7 +33,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
     this.stopReachedOnBoard = builder.stopReachedOnBoard;
-    this.isZeroDuration = builder.isZeroDuration;
+    this.isEmpty = builder.isEmpty;
     this.opening = builder.opening;
     this.closing = builder.closing;
   }
@@ -60,7 +59,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   public static TestAccessEgress zeroDurationAccess(int stop, int cost) {
-    return new Builder(stop, 0).withZeroDurationLeg(true).withCost(cost).build();
+    return new Builder(stop, 0).withIsEmpty(true).withCost(cost).build();
   }
 
   /**
@@ -226,6 +225,11 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
+  public boolean isEmpty() {
+    return this.isEmpty;
+  }
+
+  @Override
   public String toString() {
     return asString();
   }
@@ -248,7 +252,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
     Integer opening = null;
     Integer closing = null;
-    private boolean isZeroDuration;
+    private boolean isEmpty;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -266,8 +270,8 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.closing = transfer.closing;
     }
 
-    Builder withZeroDurationLeg(boolean isZeroDuration) {
-      this.isZeroDuration = isZeroDuration;
+    Builder withIsEmpty(boolean isEmpty) {
+      this.isEmpty = isEmpty;
       return this;
     }
 
