@@ -2,11 +2,9 @@ package org.opentripplanner.ext.vehicleparking.bikely;
 
 import java.time.Duration;
 import java.time.ZoneId;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opentripplanner.updater.DataSourceType;
+import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 
 /**
@@ -28,7 +26,7 @@ public record BikelyUpdaterParameters(
   }
 
   @Override
-  public DataSourceType sourceType() {
-    return DataSourceType.BIKELY;
+  public VehicleParkingSourceType sourceType() {
+    return VehicleParkingSourceType.BIKELY;
   }
 }
