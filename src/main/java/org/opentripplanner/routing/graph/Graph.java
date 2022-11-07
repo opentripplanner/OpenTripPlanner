@@ -24,7 +24,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.graph.index.StreetVertexIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;

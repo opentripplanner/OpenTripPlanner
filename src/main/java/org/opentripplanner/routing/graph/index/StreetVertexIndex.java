@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.routing.graph.index;
 
 import java.util.Collection;
 import java.util.HashMap;

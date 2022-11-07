@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.routing.graph.index;
 
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
@@ -29,13 +29,13 @@ import org.opentripplanner.routing.graph.Edge;
  * <p>
  * See #3351
  */
-class StreetSpatialIndex {
+public class StreetSpatialIndex {
 
   private final HashGridSpatialIndex<Edge> permanentIndex = new HashGridSpatialIndex<>();
 
   private final HashGridSpatialIndex<Edge> realTimeIndex = new HashGridSpatialIndex<>();
 
-  void insert(LineString lineString, Object obj, Scope scope) {
+  public void insert(LineString lineString, Object obj, Scope scope) {
     switch (scope) {
       case PERMANENT:
         permanentIndex.insert(lineString, obj);
@@ -48,7 +48,7 @@ class StreetSpatialIndex {
     }
   }
 
-  void remove(Envelope envelope, final Object item, Scope scope) {
+  public void remove(Envelope envelope, final Object item, Scope scope) {
     switch (scope) {
       case PERMANENT:
         permanentIndex.remove(envelope, item);
@@ -61,7 +61,7 @@ class StreetSpatialIndex {
     }
   }
 
-  final Stream<Edge> query(Envelope envelope, Scope scope) {
+  public final Stream<Edge> query(Envelope envelope, Scope scope) {
     switch (scope) {
       case PERMANENT:
       case REALTIME:

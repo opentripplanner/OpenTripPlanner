@@ -1,6 +1,6 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.routing.graph.index;
 
-enum Scope {
+public enum Scope {
   /**
    * Permanent changes to the street graph done during graph building.
    */

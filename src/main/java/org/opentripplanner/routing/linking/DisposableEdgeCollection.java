@@ -7,6 +7,7 @@ import java.util.Set;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.index.Scope;
 
 /**
  * This class is used to keep track of temporary edges added to the graph, so that they can be
