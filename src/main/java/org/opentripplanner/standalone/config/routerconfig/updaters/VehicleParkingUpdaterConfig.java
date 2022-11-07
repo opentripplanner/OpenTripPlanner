@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
-import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
@@ -47,15 +46,6 @@ public class VehicleParkingUpdaterConfig {
         c.of("utilizationsUrl").since(V2_2).summary("URL of the utilization data.").asString(null),
         getTimeZone(c),
         c.of("hubsUrl").since(V2_2).summary("Hubs URL").asString(null)
-      );
-      case KML -> new KmlUpdaterParameters(
-        updaterRef,
-        c.of("url").since(V2_2).summary("URL of the KML file.").asString(null),
-        feedId,
-        c.of("namePrefix").since(V2_2).summary("Prefix for the names.").asString(null),
-        c.of("frequencySec").since(V2_2).summary("How often to update the parking lots.").asInt(60),
-        c.of("zip").since(V2_2).summary("Whether the resource is zip-compressed.").asBoolean(false),
-        sourceType
       );
       case PARK_API, BICYCLE_PARK_API -> new ParkAPIUpdaterParameters(
         updaterRef,
