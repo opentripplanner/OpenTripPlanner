@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.linking;
+package org.opentripplanner.routing.linking;
 
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
