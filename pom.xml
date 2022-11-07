@@ -266,15 +266,20 @@
                         --add-opens java.base/java.io=ALL-UNNAMED
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.lang.module=ALL-UNNAMED
+                        --add-opens java.base/java.lang.invoke=ALL-UNNAMED
+                        --add-opens java.base/java.lang.ref=ALL-UNNAMED
                         --add-opens java.base/java.math=ALL-UNNAMED
                         --add-opens java.base/java.net=ALL-UNNAMED
                         --add-opens java.base/java.text=ALL-UNNAMED
                         --add-opens java.base/java.time=ALL-UNNAMED
                         --add-opens java.base/java.time.zone=ALL-UNNAMED
                         --add-opens java.base/java.time.format=ALL-UNNAMED
+                        --add-opens java.base/java.time.temporal=ALL-UNNAMED
+                        --add-opens java.base/java.time.chrono=ALL-UNNAMED
                         --add-opens java.base/java.util=ALL-UNNAMED
                         --add-opens java.base/java.util.concurrent.locks=ALL-UNNAMED
                         --add-opens java.base/java.util.regex=ALL-UNNAMED
+                        --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
@@ -286,6 +291,7 @@
                         --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
                         --add-opens java.base/sun.util.calendar=ALL-UNNAMED
                         --add-opens java.base/sun.util.locale=ALL-UNNAMED
+                        --add-opens java.base/sun.invoke.util=ALL-UNNAMED
                         --add-opens java.xml/org.xml.sax.helpers=ALL-UNNAMED
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
@@ -686,13 +692,13 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>0.23.1</version>
+            <version>1.0.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.4.0</version>
+            <version>4.8.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
