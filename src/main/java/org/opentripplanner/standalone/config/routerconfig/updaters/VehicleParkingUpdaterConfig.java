@@ -3,8 +3,6 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
@@ -15,15 +13,6 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
 import org.opentripplanner.util.OtpAppException;
 
 public class VehicleParkingUpdaterConfig {
-
-  private static final Map<String, DataSourceType> CONFIG_MAPPING = new HashMap<>();
-
-  static {
-    CONFIG_MAPPING.put("hsl-park", DataSourceType.HSL_PARK);
-    CONFIG_MAPPING.put("kml", DataSourceType.KML);
-    CONFIG_MAPPING.put("park-api", DataSourceType.PARK_API);
-    CONFIG_MAPPING.put("bicycle-park-api", DataSourceType.BICYCLE_PARK_API);
-  }
 
   public static VehicleParkingUpdaterParameters create(String updaterRef, NodeAdapter c) {
     var sourceType = c
