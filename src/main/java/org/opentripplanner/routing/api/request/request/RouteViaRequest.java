@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.api.request.request;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -13,31 +15,21 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 /**
  * Trip planning request with a list of via points.
  */
-public class RouteViaRequest {
+public class RouteViaRequest implements Serializable {
 
-  private final List<ViaLeg> viaLegs = new ArrayList<>();
-
-  private GenericLocation from;
-
-  private GenericLocation to;
-
+  private List<ViaLeg> viaLegs = new ArrayList<>();
+  private GenericLocation from = new GenericLocation(null, null);
+  private GenericLocation to = new GenericLocation(null, null);
   private Instant dateTime = Instant.now();
-
   private Duration searchWindow;
-
   private boolean timetableView = true;
-
   private boolean arriveBy = false;
-
   private Locale locale = new Locale("en", "US");
-
   private JourneyRequest journey = new JourneyRequest();
-
   private boolean wheelchair = false;
+  private RoutingPreferences preferences = new RoutingPreferences();
 
-  private Consumer<RoutingPreferences.Builder> preferences;
-
-  public RouteViaRequest(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
+  private RouteViaRequest(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
     if (viaLocations == null || viaLocations.isEmpty()) {
       throw new IllegalArgumentException("viaLocations must not be empty");
     }
@@ -55,6 +47,28 @@ public class RouteViaRequest {
     }
   }
 
+  private RouteViaRequest(Builder builder) {
+    this.viaLegs = Objects.requireNonNull(builder.viaLegs);
+    this.from = Objects.requireNonNull(builder.from);
+    this.to = Objects.requireNonNull(builder.to);
+    this.dateTime = Objects.requireNonNull(builder.dateTime);
+    this.searchWindow = Objects.requireNonNull(builder.searchWindow);
+    this.timetableView = builder.timetableView;
+    this.arriveBy = builder.arriveBy;
+    this.locale = Objects.requireNonNull(builder.locale);
+    this.journey = Objects.requireNonNull(builder.journey);
+    this.wheelchair = builder.wheelchair;
+    this.preferences = Objects.requireNonNull(builder.preferences);
+  }
+
+  public static Builder of(List<ViaLocation> viaLocations, List<JourneyRequest> viaJourneys) {
+    return new Builder(new RouteViaRequest(viaLocations, viaJourneys));
+  }
+
+  public Builder copyOf() {
+    return new Builder(this);
+  }
+
   public RouteRequest routeRequest() {
     var request = new RouteRequest();
 
@@ -67,95 +81,178 @@ public class RouteViaRequest {
     request.setJourney(journey);
     request.setWheelchair(wheelchair);
     request.setTimetableView(timetableView);
-
-    if (preferences != null) {
-      request.withPreferences(preferences);
-    }
+    request.setPreferences(preferences);
 
     return request;
   }
 
-  public void withPreferences(Consumer<RoutingPreferences.Builder> preferences) {
-    this.preferences = preferences;
-  }
-
-  public void setJourney(JourneyRequest journey) {
-    this.journey = journey;
-  }
-
-  public JourneyRequest journey() {
-    return journey;
-  }
-
-  public void setArriveBy(boolean arriveBy) {
-    this.arriveBy = arriveBy;
-  }
-
-  public boolean arriveBy() {
-    return arriveBy;
-  }
-
-  /**
-   * Whether the trip must be wheelchair-accessible
-   */
-  public boolean wheelchair() {
-    return wheelchair;
-  }
-
-  public void setWheelchair(boolean wheelchair) {
-    this.wheelchair = wheelchair;
-  }
-
-  public Instant dateTime() {
-    return dateTime;
-  }
-
-  public void setDateTime(Instant dateTime) {
-    this.dateTime = dateTime;
+  public List<ViaLeg> viaLegs() {
+    return viaLegs;
   }
 
   public GenericLocation from() {
     return from;
   }
 
-  public void setFrom(GenericLocation from) {
-    this.from = from;
-  }
-
   public GenericLocation to() {
     return to;
   }
 
-  public void setTo(GenericLocation to) {
-    this.to = to;
+  public Instant dateTime() {
+    return dateTime;
   }
 
   public Duration searchWindow() {
     return searchWindow;
   }
 
-  public void setSearchWindow(Duration searchWindow) {
-    this.searchWindow = searchWindow;
+  public boolean timetableView() {
+    return timetableView;
+  }
+
+  public boolean arriveBy() {
+    return arriveBy;
   }
 
   public Locale locale() {
     return locale;
   }
 
-  public void setLocale(Locale locale) {
-    this.locale = locale;
+  public JourneyRequest journey() {
+    return journey;
   }
 
-  public boolean timetableView() {
-    return timetableView;
+  public boolean wheelchair() {
+    return wheelchair;
   }
 
-  public void setTimetableView(boolean timetableView) {
-    this.timetableView = timetableView;
+  public RoutingPreferences preferences() {
+    return preferences;
   }
 
-  public List<ViaLeg> viaLegs() {
-    return this.viaLegs;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (!(o instanceof RouteViaRequest other)) {
+      return false;
+    }
+
+    return (
+      viaLegs.equals(other.viaLegs) &&
+      from.equals(other.from) &&
+      to.equals(other.to) &&
+      dateTime.equals(other.dateTime) &&
+      searchWindow.equals(other.searchWindow) &&
+      timetableView == other.timetableView &&
+      arriveBy == other.arriveBy &&
+      locale.equals(other.locale) &&
+      journey.equals(other.journey) &&
+      wheelchair == other.wheelchair &&
+      preferences.equals(other.preferences)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      viaLegs,
+      from,
+      to,
+      dateTime,
+      searchWindow,
+      timetableView,
+      arriveBy,
+      locale,
+      journey,
+      wheelchair,
+      preferences
+    );
+  }
+
+  public static class Builder {
+
+    private final List<ViaLeg> viaLegs;
+    private GenericLocation from;
+    private GenericLocation to;
+    private Instant dateTime;
+    private Duration searchWindow;
+    private boolean timetableView;
+    private boolean arriveBy;
+    private Locale locale;
+    private JourneyRequest journey;
+    private boolean wheelchair;
+    private RoutingPreferences preferences;
+
+    public Builder(RouteViaRequest original) {
+      this.from = original.from;
+      this.to = original.to;
+      this.dateTime = original.dateTime;
+      this.searchWindow = original.searchWindow;
+      this.timetableView = original.timetableView;
+      this.arriveBy = original.arriveBy;
+      this.locale = original.locale;
+      this.journey = original.journey;
+      this.wheelchair = original.wheelchair;
+      this.preferences = original.preferences;
+      this.viaLegs = original.viaLegs;
+    }
+
+    public RouteViaRequest build() {
+      return new RouteViaRequest(this);
+    }
+
+    public Builder withFrom(GenericLocation from) {
+      this.from = from;
+      return this;
+    }
+
+    public Builder withTo(GenericLocation to) {
+      this.to = to;
+      return this;
+    }
+
+    public Builder withDateTime(Instant dateTime) {
+      this.dateTime = dateTime;
+      return this;
+    }
+
+    public Builder withSearchWindow(Duration searchWindow) {
+      this.searchWindow = searchWindow;
+      return this;
+    }
+
+    public Builder withTimetableView(boolean timetableView) {
+      this.timetableView = timetableView;
+      return this;
+    }
+
+    public Builder withArriveBy(boolean arriveBy) {
+      this.arriveBy = arriveBy;
+      return this;
+    }
+
+    public Builder withLocale(Locale locale) {
+      this.locale = locale;
+      return this;
+    }
+
+    public Builder withJourney(JourneyRequest journey) {
+      this.journey = journey;
+      return this;
+    }
+
+    public Builder withWheelchair(boolean wheelchair) {
+      this.wheelchair = wheelchair;
+      return this;
+    }
+
+    public Builder withPreferences(Consumer<RoutingPreferences.Builder> prefs) {
+      preferences = preferences.copyOf().apply(prefs).build();
+      return this;
+    }
   }
 
   public record ViaLeg(JourneyRequest journeyRequest, ViaLocation viaLocation) {}

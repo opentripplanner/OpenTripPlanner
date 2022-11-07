@@ -129,14 +129,13 @@ public class ViaRoutingWorkerTest {
 
     var viaJourneys = List.of(new JourneyRequest(), new JourneyRequest());
 
-    var request = new RouteViaRequest(viaLocations, viaJourneys);
-
-    request.setDateTime(dateTime);
-    request.setFrom(new GenericLocation(A.coordinate.latitude(), A.coordinate.longitude()));
-    request.setTo(new GenericLocation(B.coordinate.latitude(), B.coordinate.longitude()));
-    request.setSearchWindow(Duration.ofHours(1));
-
-    return request;
+    return RouteViaRequest
+      .of(viaLocations, viaJourneys)
+      .withDateTime(dateTime)
+      .withFrom(new GenericLocation(A.coordinate.latitude(), A.coordinate.longitude()))
+      .withTo(new GenericLocation(B.coordinate.latitude(), B.coordinate.longitude()))
+      .withSearchWindow(Duration.ofHours(1))
+      .build();
   }
 
   /**
