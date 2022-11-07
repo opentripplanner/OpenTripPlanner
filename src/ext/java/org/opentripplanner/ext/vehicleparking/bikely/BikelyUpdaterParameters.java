@@ -20,4 +20,15 @@ public record BikelyUpdaterParameters(
   Duration frequency,
   @Nonnull Map<String, String> httpHeaders,
   ZoneId timeZone
-) {}
+)
+  implements VehicleParkingUpdaterParameters {
+  @Override
+  public int frequencySec() {
+    return (int) frequency.toSeconds();
+  }
+
+  @Override
+  public DataSourceType sourceType() {
+    return DataSourceType.BIKELY;
+  }
+}
