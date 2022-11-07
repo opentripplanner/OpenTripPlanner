@@ -19,14 +19,7 @@ public class BikelyUpdaterTest {
   void parseBikeBoxes() {
     var url = "file:src/ext-test/resources/vehicleparking/bikely/bikely.json";
     var timeZone = ZoneId.of("Europe/Oslo");
-    var parameters = new BikelyUpdaterParameters(
-      "",
-      url,
-      "bikely",
-      Duration.ofSeconds(30),
-      Map.of(),
-      timeZone
-    );
+    var parameters = new BikelyUpdaterParameters("", url, "bikely", 30, Map.of(), timeZone);
     var updater = new BikelyUpdater(parameters);
 
     assertTrue(updater.update());

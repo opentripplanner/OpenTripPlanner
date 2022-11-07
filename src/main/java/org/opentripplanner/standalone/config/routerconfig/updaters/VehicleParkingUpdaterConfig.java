@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.ArrayList;
 import java.util.Set;
+import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.kml.KmlUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
@@ -71,6 +72,14 @@ public class VehicleParkingUpdaterConfig {
           c.of("tags").since(V2_2).summary("Tags to add to the parking lots.").asStringSet(Set.of())
         ),
         sourceType,
+        timeZone
+      );
+      case BIKELY -> new BikelyUpdaterParameters(
+        updaterRef,
+        c.of("url").since(V2_2).summary("URL of the locations endpoint.").asString(null),
+        feedId,
+        c.of("frequencySec").since(V2_2).summary("How often to update the source.").asInt(60),
+        c.of("headers").since(V2_2).summary("HTTP headers to add.").asStringMap(),
         timeZone
       );
     };

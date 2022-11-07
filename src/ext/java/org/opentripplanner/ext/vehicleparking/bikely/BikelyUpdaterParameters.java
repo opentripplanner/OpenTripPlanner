@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.vehicleparking.bikely;
 
-import java.time.Duration;
 import java.time.ZoneId;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -15,14 +14,14 @@ public record BikelyUpdaterParameters(
   String configRef,
   String url,
   String feedId,
-  Duration frequency,
+  int frequencySec,
   @Nonnull Map<String, String> httpHeaders,
   ZoneId timeZone
 )
   implements VehicleParkingUpdaterParameters {
   @Override
   public int frequencySec() {
-    return (int) frequency.toSeconds();
+    return frequencySec;
   }
 
   @Override
