@@ -91,8 +91,6 @@ predicted arrival and departure times for the remainder of the trip.
 | feedId                                                                |  `string` | Which feed the updates apply to.                    | *Optional* |                      |   na  |
 | frequencySec                                                          | `integer` | How often the data should be downloaded in seconds. | *Optional* | `60`                 |   na  |
 | fuzzyTripMatching                                                     | `boolean` | If the trips should be matched fuzzily.             | *Optional* | `false`              |   na  |
-| maxSnapshotFrequencyMs                                                | `integer` | TODO                                                | *Optional* | `-1`                 |   na  |
-| purgeExpiredData                                                      | `boolean` | Should expired data removed from the snapshot.      | *Optional* | `false`              |   na  |
 | url                                                                   |  `string` | The URL of the GTFS-RT resource.                    | *Required* |                      |   na  |
 
 

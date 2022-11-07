@@ -38,35 +38,31 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
     HslParkUpdaterParameters parameters,
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
-    String feedId = parameters.getFeedId();
+    String feedId = parameters.feedId();
     vehicleParkingMapper =
-      new HslParkToVehicleParkingMapper(
-        feedId,
-        openingHoursCalendarService,
-        parameters.getTimeZone()
-      );
+      new HslParkToVehicleParkingMapper(feedId, openingHoursCalendarService, parameters.timeZone());
     vehicleParkingGroupMapper = new HslHubToVehicleParkingGroupMapper(feedId);
     parkPatchMapper = new HslParkUtilizationToPatchMapper(feedId);
     facilitiesDownloader =
       new HslFacilitiesDownloader(
-        parameters.getFacilitiesUrl(),
+        parameters.facilitiesUrl(),
         JSON_PARSE_PATH,
         vehicleParkingMapper::parsePark
       );
     hubsDownloader =
       new HslHubsDownloader(
-        parameters.getHubsUrl(),
+        parameters.hubsUrl(),
         JSON_PARSE_PATH,
         vehicleParkingGroupMapper::parseHub
       );
     utilizationsDownloader =
       new JsonDataListDownloader<>(
-        parameters.getUtilizationsUrl(),
+        parameters.utilizationsUrl(),
         "",
         parkPatchMapper::parseUtilization,
         null
       );
-    this.facilitiesFrequencySec = parameters.getFacilitiesFrequencySec();
+    this.facilitiesFrequencySec = parameters.facilitiesFrequencySec();
   }
 
   /**

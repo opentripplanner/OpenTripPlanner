@@ -20,6 +20,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.routing.vertextype.VehicleParkingEntranceVertex;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.DataSource;
+import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -46,7 +47,22 @@ class VehicleParkingUpdaterTest {
     transitModel.index();
     graph.index(transitModel.getStopModel());
 
-    var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
+    var parameters = new VehicleParkingUpdaterParameters() {
+      @Override
+      public DataSourceType sourceType() {
+        return null;
+      }
+
+      @Override
+      public int frequencySec() {
+        return -1;
+      }
+
+      @Override
+      public String configRef() {
+        return null;
+      }
+    };
     vehicleParkingUpdater =
       new VehicleParkingUpdater(
         parameters,

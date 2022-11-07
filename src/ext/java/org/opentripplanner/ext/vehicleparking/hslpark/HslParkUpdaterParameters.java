@@ -8,56 +8,20 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
  * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link
  * HslParkUpdater}.
  */
-public class HslParkUpdaterParameters extends VehicleParkingUpdaterParameters {
-
-  private final int facilitiesFrequencySec;
-  private final String facilitiesUrl;
-  private final String feedId;
-  private final String hubsUrl;
-  private final String utilizationsUrl;
-  private final ZoneId timeZone;
-
-  public HslParkUpdaterParameters(
-    String configRef,
-    int facilitiesFrequencySec,
-    String facilitiesUrl,
-    String feedId,
-    DataSourceType sourceType,
-    int utilizationsFrequencySec,
-    String utilizationsUrl,
-    ZoneId timeZone,
-    String hubsUrl
-  ) {
-    super(configRef, utilizationsFrequencySec, sourceType);
-    this.facilitiesFrequencySec = facilitiesFrequencySec;
-    this.facilitiesUrl = facilitiesUrl;
-    this.feedId = feedId;
-    this.hubsUrl = hubsUrl;
-    this.utilizationsUrl = utilizationsUrl;
-    this.timeZone = timeZone;
-  }
-
-  public int getFacilitiesFrequencySec() {
-    return facilitiesFrequencySec;
-  }
-
-  public String getFeedId() {
-    return feedId;
-  }
-
-  public String getFacilitiesUrl() {
-    return facilitiesUrl;
-  }
-
-  public String getHubsUrl() {
-    return hubsUrl;
-  }
-
-  public String getUtilizationsUrl() {
-    return utilizationsUrl;
-  }
-
-  public ZoneId getTimeZone() {
-    return timeZone;
+public record HslParkUpdaterParameters(
+  String configRef,
+  int facilitiesFrequencySec,
+  String facilitiesUrl,
+  String feedId,
+  DataSourceType sourceType,
+  int utilizationsFrequencySec,
+  String utilizationsUrl,
+  ZoneId timeZone,
+  String hubsUrl
+)
+  implements VehicleParkingUpdaterParameters {
+  @Override
+  public int frequencySec() {
+    return Math.min(facilitiesFrequencySec, utilizationsFrequencySec);
   }
 }

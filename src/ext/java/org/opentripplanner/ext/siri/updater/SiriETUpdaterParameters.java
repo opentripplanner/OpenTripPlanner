@@ -71,7 +71,7 @@ public class SiriETUpdaterParameters
   }
 
   @Override
-  public int getFrequencySec() {
+  public int frequencySec() {
     return frequencySec;
   }
 
@@ -81,7 +81,7 @@ public class SiriETUpdaterParameters
   }
 
   @Override
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 
