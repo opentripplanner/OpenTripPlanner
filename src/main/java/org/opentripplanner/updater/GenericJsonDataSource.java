@@ -11,17 +11,13 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(GenericJsonDataSource.class);
   private final JsonDataListDownloader<T> jsonDataListDownloader;
-  private String url;
+  private final String url;
   protected List<T> updates = List.of();
 
   public GenericJsonDataSource(String url, String jsonParsePath, Map<String, String> headers) {
     this.url = url;
     jsonDataListDownloader =
       new JsonDataListDownloader<>(url, jsonParsePath, this::parseElement, headers);
-  }
-
-  public GenericJsonDataSource(String url, String jsonParsePath) {
-    this(url, jsonParsePath, null);
   }
 
   @Override
@@ -40,11 +36,6 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   @Override
   public List<T> getUpdates() {
     return updates;
-  }
-
-  public void setUrl(String url) {
-    this.url = url;
-    this.jsonDataListDownloader.setUrl(url);
   }
 
   protected abstract T parseElement(JsonNode jsonNode);
