@@ -224,7 +224,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   public boolean stopReachedOnBoard() {
     return stopReachedOnBoard;
   }
-  
+
   @Override
   public String toString() {
     return asString();
