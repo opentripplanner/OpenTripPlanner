@@ -222,15 +222,11 @@ public class SiriFuzzyTripMatcher {
         }
 
         if (tripPattern.matchesModeOrSubMode(TransitMode.RAIL, SubMode.of("railReplacementBus"))) {
-          if (trip.getNetexInternalPlanningCode() != null) {
-            String internalPlanningCode = trip.getNetexInternalPlanningCode();
-            if (internalPlanningCodeCache.containsKey(internalPlanningCode)) {
-              internalPlanningCodeCache.get(internalPlanningCode).add(trip);
-            } else {
-              Set<Trip> initialSet = new HashSet<>();
-              initialSet.add(trip);
-              internalPlanningCodeCache.put(internalPlanningCode, initialSet);
-            }
+          String internalPlanningCode = trip.getNetexInternalPlanningCode();
+          if (internalPlanningCode != null) {
+            internalPlanningCodeCache
+              .computeIfAbsent(internalPlanningCode, key -> new HashSet<>())
+              .add(trip);
           }
         }
         String lastStopId = tripPattern.lastStop().getId().getId();
@@ -240,13 +236,7 @@ public class SiriFuzzyTripMatcher {
           int arrivalTime = tripTimes.getArrivalTime(tripTimes.getNumStops() - 1);
 
           String key = createStartStopKey(lastStopId, arrivalTime);
-          if (startStopTripCache.containsKey(key)) {
-            startStopTripCache.get(key).add(trip);
-          } else {
-            Set<Trip> initialSet = new HashSet<>();
-            initialSet.add(trip);
-            startStopTripCache.put(key, initialSet);
-          }
+          startStopTripCache.computeIfAbsent(key, k -> new HashSet<>()).add(trip);
         }
       }
 
