@@ -22,6 +22,6 @@ public record HslParkUpdaterParameters(
   implements VehicleParkingUpdaterParameters {
   @Override
   public int frequencySec() {
-    return Math.min(facilitiesFrequencySec, utilizationsFrequencySec);
+    return utilizationsFrequencySec;
   }
 }
