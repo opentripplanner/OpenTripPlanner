@@ -25,6 +25,8 @@ public class ViaRoutingWorker {
   private final RouteViaRequest viaRequest;
   private final RouteRequest request;
   private final Function<RouteRequest, RoutingResponse> routingWorker;
+  // TODO: This constant already exists in RoutingRequestToFilterChainMapper, so when POC is done use only constant
+  private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
   public ViaRoutingWorker(
     RouteViaRequest request,
@@ -66,6 +68,7 @@ public class ViaRoutingWorker {
     // Prepare next search
     var searchWindow = Duration.between(firstArrival, lastArrival).plus(maxSlack);
 
+    this.request.setNumItineraries(MAX_NUMBER_OF_ITINERARIES);
     this.request.setSearchWindow(searchWindow);
     this.request.setDateTime(firstArrival.plus(v.viaLocation().minSlack()).toInstant());
     this.request.setFrom(v.viaLocation().point());
