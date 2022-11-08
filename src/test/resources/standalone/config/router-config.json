@@ -120,8 +120,8 @@
     },
     {
       "name": "rentalPlaces",
-      "type": "VehicleRental",
       // all rental places: stations and free-floating vehicles
+      "type": "VehicleRental",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
@@ -130,8 +130,8 @@
     },
     {
       "name": "rentalVehicle",
-      "type": "VehicleRentalVehicle",
       // just free-floating vehicles
+      "type": "VehicleRentalVehicle",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
@@ -139,8 +139,8 @@
     },
     {
       "name": "rentalStation",
-      "type": "VehicleRentalStation",
       // just rental stations
+      "type": "VehicleRentalStation",
       "mapper": "Digitransit",
       "maxZoom": 20,
       "minZoom": 14,
