@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
@@ -56,7 +56,7 @@ public class RaptorPathToItineraryMapperTest {
   );
 
   @ParameterizedTest
-  @CsvSource({ "0", "3000", "-3000" })
+  @ValueSource(strings = {"0","3000","-3000"})
   public void createItineraryTestZeroDurationEgress(int LAST_LEG_COST) {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
