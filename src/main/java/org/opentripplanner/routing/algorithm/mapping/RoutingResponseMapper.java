@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -17,6 +18,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +34,16 @@ public class RoutingResponseMapper {
     Itinerary firstRemovedItinerary,
     List<Itinerary> itineraries,
     Set<RoutingError> routingErrors,
-    DebugTimingAggregator debugTimingAggregator
+    DebugTimingAggregator debugTimingAggregator,
+    TransitService transitService
   ) {
+    // Search is performed without realtime, but we still want to
+    // include realtime information in the result
+    if (request.preferences().transit().ignoreRealtimeUpdates()) {
+      System.out.println("populate with realtime");
+      populateLegsWithRealtime(itineraries, transitService);
+    }
+
     // Create response
     var tripPlan = TripPlanMapper.mapTripPlan(request, itineraries);
 
@@ -141,5 +151,35 @@ public class RoutingResponseMapper {
     LOG.debug("PageCursor previous : {}", prevPageCursor);
     LOG.debug("PageCursor next ... : {}", nextPageCursor);
     LOG.debug("Errors ............ : {}", errors);
+  }
+
+  private static void populateLegsWithRealtime(
+    List<Itinerary> itineraries,
+    TransitService transitService
+  ) {
+    itineraries.forEach(it -> {
+      if (it.isFlaggedForDeletion()) {
+        return;
+      }
+      var legs = it
+        .getLegs()
+        .stream()
+        .map(l -> {
+          var ref = l.getLegReference();
+          if (ref == null) {
+            return l;
+          }
+
+          var leg = ref.getLeg(transitService);
+          if (leg != null) {
+            return leg;
+          }
+
+          return l;
+        })
+        .collect(Collectors.toList());
+
+      it.setLegs(legs);
+    });
   }
 }
