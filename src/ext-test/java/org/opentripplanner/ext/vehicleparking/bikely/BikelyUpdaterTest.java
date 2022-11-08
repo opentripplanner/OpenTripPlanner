@@ -39,12 +39,12 @@ public class BikelyUpdaterTest {
       first.getNote().toString(Locale.ENGLISH)
     );
     assertEquals(
-      "First 4 hour(s) is kr 0,00, afterwards kr 10,00 per 1 hour(s)",
+      "Første 4 time(r) er kr 0,00. Etter kr 10,00 per 1 time(r)",
       first.getNote().toString(Locales.NORWEGIAN_BOKMAL)
     );
     assertEquals(
-      "First 4 hour(s) is 0.00 kr, afterwards 10.00 kr per 1 hour(s)",
-      first.getNote().toString(Locales.NORWEGIAN_NYNORSK)
+      "Første 4 time(r) er kr 0,00. Etter kr 10,00 per 1 time(r)",
+      first.getNote().toString(Locales.NORWAY)
     );
 
     var freeParkingLots = parkingLots.get(2);
