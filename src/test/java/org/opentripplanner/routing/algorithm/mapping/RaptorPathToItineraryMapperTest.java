@@ -56,7 +56,7 @@ public class RaptorPathToItineraryMapperTest {
   );
 
   @ParameterizedTest
-  @ValueSource(strings = {"0","3000","-3000"})
+  @ValueSource(strings = { "0", "3000", "-3000" })
   public void createItineraryTestZeroDurationEgress(int LAST_LEG_COST) {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
