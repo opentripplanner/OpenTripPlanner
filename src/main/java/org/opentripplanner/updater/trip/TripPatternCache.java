@@ -53,6 +53,7 @@ public class TripPatternCache {
       TripPatternBuilder tripPatternBuilder = TripPattern
         .of(id)
         .withRoute(route)
+        .withMode(trip.getMode())
         .withStopPattern(stopPattern);
 
       tripPatternBuilder.withCreatedByRealtimeUpdater(true);
