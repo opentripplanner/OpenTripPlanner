@@ -52,6 +52,7 @@ public class GtfsContextBuilder {
       gtfsImport.getDao()
     );
     mapper.mapStopTripAndRouteDataIntoBuilder();
+    mapper.mapAndAddTransfersToBuilder();
     OtpTransitServiceBuilder transitBuilder = mapper.getBuilder();
     return new GtfsContextBuilder(feedId, transitBuilder)
       .withDataImportIssueStore(DataImportIssueStore.noopIssueStore());
