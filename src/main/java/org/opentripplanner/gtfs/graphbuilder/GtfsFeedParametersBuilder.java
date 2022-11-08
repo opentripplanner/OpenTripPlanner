@@ -9,7 +9,7 @@ public class GtfsFeedParametersBuilder {
 
   private URI source;
   private String feedId;
-  private boolean removeRepeatedStops;
+  private boolean removeRepeatedStops = true;
 
   public GtfsFeedParametersBuilder withFeedId(String feedId) {
     this.feedId = feedId;
