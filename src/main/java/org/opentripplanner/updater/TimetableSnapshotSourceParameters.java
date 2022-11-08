@@ -1,13 +1,7 @@
 package org.opentripplanner.updater;
 
 /**
- * @param maxSnapshotFrequencyMs If a timetable snapshot is requested less than this number of
- *                               milliseconds after the previous snapshot, then return the same
- *                               instance. Throttles the potentially resource-consuming task of
- *                               duplicating a TripPattern → Timetable map and indexing the new
- *                               Timetables. Apply to GTFS-RT and Siri updates.
- * @param purgeExpiredData       Should expired realtime data be purged from the graph. Apply to
- *                               GTFS-RT and Siri updates.
+ * {@link org.opentripplanner.standalone.config.routerconfig.UpdatersConfig#timetableUpdates(org.opentripplanner.standalone.config.framework.json.NodeAdapter)}
  */
 public record TimetableSnapshotSourceParameters(
   int maxSnapshotFrequencyMs,

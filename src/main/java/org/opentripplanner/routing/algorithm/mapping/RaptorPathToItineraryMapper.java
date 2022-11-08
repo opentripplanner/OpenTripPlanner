@@ -34,6 +34,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorAccessEgress;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
@@ -43,7 +44,7 @@ import org.opentripplanner.util.geometry.GeometryUtils;
  * information needed for routing. Additional information has to be fetched from the graph index to
  * create complete itineraries that can be shown in a trip planner.
  */
-public class RaptorPathToItineraryMapper {
+public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private final TransitLayer transitLayer;
 
@@ -85,13 +86,13 @@ public class RaptorPathToItineraryMapper {
       );
   }
 
-  public Itinerary createItinerary(Path<TripSchedule> path) {
+  public Itinerary createItinerary(Path<T> path) {
     var optimizedPath = path instanceof OptimizedPath ? (OptimizedPath<TripSchedule>) path : null;
 
     // Map access leg
     List<Leg> legs = new ArrayList<>(mapAccessLeg(path.accessLeg()));
 
-    PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
+    PathLeg<T> pathLeg = path.accessLeg().nextLeg();
 
     Leg transitLeg = null;
 
@@ -115,7 +116,7 @@ public class RaptorPathToItineraryMapper {
     }
 
     // Map egress leg
-    EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
+    EgressPathLeg<T> egressPathLeg = pathLeg.asEgressLeg();
     Itinerary mapped = mapEgressLeg(egressPathLeg);
     legs.addAll(mapped == null ? List.of() : mapped.getLegs());
 
@@ -137,12 +138,12 @@ public class RaptorPathToItineraryMapper {
     return itinerary;
   }
 
-  private List<Leg> mapAccessLeg(AccessPathLeg<TripSchedule> accessPathLeg) {
-    DefaultAccessEgress accessPath = (DefaultAccessEgress) accessPathLeg.access();
-
-    if (accessPath.durationInSeconds() == 0) {
+  private List<Leg> mapAccessLeg(AccessPathLeg<T> accessPathLeg) {
+    if (isEmptyAccessEgress(accessPathLeg.access())) {
       return List.of();
     }
+
+    DefaultAccessEgress accessPath = (DefaultAccessEgress) accessPathLeg.access();
 
     GraphPath graphPath = new GraphPath(accessPath.getLastState());
 
@@ -157,8 +158,18 @@ public class RaptorPathToItineraryMapper {
       .getLegs();
   }
 
-  private Leg mapTransitLeg(Leg prevTransitLeg, TransitPathLeg<TripSchedule> pathLeg) {
-    TripSchedule tripSchedule = pathLeg.trip();
+  private Leg mapTransitLeg(Leg prevTransitLeg, TransitPathLeg<T> pathLeg) {
+    T tripSchedule = pathLeg.trip();
+
+    // If the next leg is an egress leg without a duration then this transit leg
+    // arrives at the destination.
+    // The cost of the egress should therefore be included in the last transit
+    // leg given that it is the last leg.
+    int lastLegCost = 0;
+    PathLeg<T> nextLeg = pathLeg.nextLeg();
+    if (nextLeg.isEgressLeg() && isEmpty(nextLeg.asEgressLeg())) {
+      lastLegCost = pathLeg.nextLeg().generalizedCost();
+    }
 
     // Find stop positions in pattern where this leg boards and alights.
     // We cannot assume every stop appears only once in a pattern, so we
@@ -185,7 +196,7 @@ public class RaptorPathToItineraryMapper {
         transitSearchTimeZero.getZone().normalized(),
         (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
         (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
-        toOtpDomainCost(pathLeg.generalizedCost()),
+        toOtpDomainCost(pathLeg.generalizedCost() + lastLegCost),
         frequencyHeadwayInSeconds,
         null
       );
@@ -201,15 +212,20 @@ public class RaptorPathToItineraryMapper {
       transitSearchTimeZero.getZone().normalized(),
       (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg()),
       (ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg(),
-      toOtpDomainCost(pathLeg.generalizedCost()),
+      toOtpDomainCost(pathLeg.generalizedCost() + lastLegCost),
       null
     );
   }
 
-  private List<Leg> mapTransferLeg(
-    TransferPathLeg<TripSchedule> pathLeg,
-    TraverseMode transferMode
-  ) {
+  private boolean isEmpty(EgressPathLeg<T> egressPathLeg) {
+    return isEmptyAccessEgress(egressPathLeg.egress());
+  }
+
+  private boolean isEmptyAccessEgress(RaptorAccessEgress accessEgress) {
+    return accessEgress.isEmpty();
+  }
+
+  private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
     var transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
     var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
     Transfer transfer = ((DefaultRaptorTransfer) pathLeg.transfer()).transfer();
@@ -219,12 +235,12 @@ public class RaptorPathToItineraryMapper {
     return mapNonTransitLeg(pathLeg, transfer, transferMode, from, to);
   }
 
-  private Itinerary mapEgressLeg(EgressPathLeg<TripSchedule> egressPathLeg) {
-    DefaultAccessEgress egressPath = (DefaultAccessEgress) egressPathLeg.egress();
-
-    if (egressPath.durationInSeconds() == 0) {
+  private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
+    if (isEmpty(egressPathLeg)) {
       return null;
     }
+
+    DefaultAccessEgress egressPath = (DefaultAccessEgress) egressPathLeg.egress();
 
     GraphPath graphPath = new GraphPath(egressPath.getLastState());
 
@@ -238,7 +254,7 @@ public class RaptorPathToItineraryMapper {
   }
 
   private List<Leg> mapNonTransitLeg(
-    PathLeg<TripSchedule> pathLeg,
+    PathLeg<T> pathLeg,
     Transfer transfer,
     TraverseMode transferMode,
     Place from,

@@ -76,10 +76,10 @@ public class GraphBuilderDataSources {
     this.baseDirectory = baseDirectory;
 
     // Select which files to import
-    include(cli.doBuildStreet() && bc.streets, OSM);
-    include(cli.doBuildStreet() && bc.streets, DEM);
-    include(cli.doBuildTransit() && bc.transit, GTFS);
-    include(cli.doBuildTransit() && bc.transit, NETEX);
+    include(cli.doBuildStreet(), OSM);
+    include(cli.doBuildStreet(), DEM);
+    include(cli.doBuildTransit(), GTFS);
+    include(cli.doBuildTransit(), NETEX);
 
     selectFilesToImport();
 

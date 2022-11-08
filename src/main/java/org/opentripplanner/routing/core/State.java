@@ -259,7 +259,7 @@ public class State implements Cloneable {
   }
 
   /**
-   * This method is on State rather than RoutingRequest because we care whether the user is in
+   * This method is on State rather than RouteRequest because we care whether the user is in
    * possession of a rented bike.
    *
    * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on to

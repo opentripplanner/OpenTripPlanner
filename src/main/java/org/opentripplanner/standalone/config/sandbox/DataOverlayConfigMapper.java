@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.ext.dataoverlay.api.ParameterName;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
@@ -14,9 +15,8 @@ public class DataOverlayConfigMapper {
   public static DataOverlayConfig map(NodeAdapter root, String dataOverlayName) {
     var node = root
       .of(dataOverlayName)
-      .since(NA)
-      .summary("TODO")
-      .description(/*TODO DOC*/"TODO")
+      .since(V2_2)
+      .summary("Config for the DataOverlay Sandbox module")
       .asObject();
 
     if (node.isEmpty()) {

@@ -274,7 +274,9 @@ type BikePark implements Node & PlaceInterface {
     bikeParkId: String
 
     """Name of the bike park"""
-    name: String!
+    name(
+        """Returns name with the specified language, if found, otherwise returns with some default language."""
+        language: String): String!
 
     """Number of spaces available for bikes"""
     spacesAvailable: Int
@@ -318,7 +320,9 @@ type VehicleParking implements Node & PlaceInterface {
     vehicleParkingId: String
 
     """Name of the park"""
-    name: String!
+    name(
+        """Returns name with the specified language, if found, otherwise returns with some default language."""
+        language: String): String!
 
     """
     If true, value of `spacesAvailable` is updated from a real-time source.
@@ -350,7 +354,9 @@ type VehicleParking implements Node & PlaceInterface {
     """
     A short translatable note containing details of this vehicle parking.
     """
-    note: String
+    note(
+        """Returns note with the specified language, if found, otherwise returns with some default language."""
+        language: String): String
 
     """
     The state of this vehicle parking.
@@ -722,7 +728,9 @@ type CarPark implements Node & PlaceInterface {
     carParkId: String
 
     """Name of the car park"""
-    name: String!
+    name(
+        """Returns name with the specified language, if found, otherwise returns with some default language."""
+        language: String): String!
 
     """Number of parking spaces at the car park"""
     maxCapacity: Int

@@ -150,9 +150,9 @@ The OTP REST API documentation is available online in the format of:
 
 http://dev.opentripplanner.org/apidoc/x.x.x/index.html
 
-For example, for v2.1.0:
+For example, for v2.2.0:
 
-http://dev.opentripplanner.org/apidoc/2.1.0/index.html
+http://dev.opentripplanner.org/apidoc/2.2.0/index.html
 
 ### Debug layers
 
@@ -254,4 +254,4 @@ failure and require storing a lot of infrequently used secret information in the
 environment variables on GitHub. Our releases are currently not very frequent so we just carry out
 these steps manually by following the checklist. We aim to make a release every 6 months.
 
-Use the [Release Checklist](DevReleaseChecklist.md) to perform the release.
+Use the [Release Checklist](ReleaseChecklist.md) to perform the release.

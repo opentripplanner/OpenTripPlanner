@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
@@ -14,7 +13,6 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.util.OTPFeature;
 
 public class DirectStreetRouter {
 
@@ -78,7 +76,7 @@ public class DirectStreetRouter {
   /**
    * Calculates the maximum distance in meters based on the maxDirectStreetDuration and the
    * fastest mode available. This assumes that it is not possible to exceed the speed defined in the
-   * RoutingRequest.
+   * RouteRequest.
    */
   private static double calculateDistanceMaxLimit(RouteRequest request) {
     var preferences = request.preferences();

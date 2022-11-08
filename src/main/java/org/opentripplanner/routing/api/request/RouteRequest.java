@@ -23,10 +23,9 @@ import org.slf4j.LoggerFactory;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries.
  * <p>
- * All defaults should be specified here in the RoutingRequest, NOT as annotations on query
- * parameters in web services that create RoutingRequests. This establishes a priority chain for
- * default values: RoutingRequest field initializers, then JSON router config, then query
- * parameters.
+ * All defaults should be specified here in the RouteRequest, NOT as annotations on query parameters
+ * in web services that create RouteRequests. This establishes a priority chain for default values:
+ * RouteRequest field initializers, then JSON router config, then query parameters.
  *
  * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor
  * router or other non-transit routing (walk, bike, car etc.)

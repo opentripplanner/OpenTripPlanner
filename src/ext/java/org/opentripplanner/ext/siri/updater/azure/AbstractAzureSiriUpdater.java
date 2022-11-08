@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -104,6 +105,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
     // If Idle more then one day, then delete subscription so we don't have old obsolete subscriptions on Azure Service Bus
     var options = new CreateSubscriptionOptions();
+    options.setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS));
     options.setAutoDeleteOnIdle(Duration.ofDays(1));
 
     // Make sure there is no old subscription on serviceBus

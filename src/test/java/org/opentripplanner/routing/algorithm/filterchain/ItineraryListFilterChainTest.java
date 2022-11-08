@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -190,8 +191,12 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     chain.filter(List.of(i1, i2, i3));
 
     // Then transitAlertService should have been called with stop and route ids
-    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(A.stop.getId());
-    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(E.stop.getId());
+    Mockito
+      .verify(transitAlertService, Mockito.atLeastOnce())
+      .getStopAlerts(A.stop.getId(), StopCondition.FIRST_DEPARTURE);
+    Mockito
+      .verify(transitAlertService, Mockito.atLeastOnce())
+      .getStopAlerts(E.stop.getId(), StopCondition.ARRIVING);
     Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getRouteAlerts(BUS_ROUTE.getId());
   }
 

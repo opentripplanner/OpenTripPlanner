@@ -53,7 +53,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccess
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RoutingRequestTransitDataProviderFilter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.AStarRequest;
@@ -132,7 +132,7 @@ public class TravelTimeResource {
     LocalDate endDate = LocalDate.ofInstant(endTime, zoneId);
     startOfTime = ServiceDateUtils.asStartOfService(startDate, zoneId);
 
-    RouteRequest transferRoutingRequest = routingRequest.copyAndPrepareForTransferRouting();
+    RouteRequest transferRouteRequest = routingRequest.copyAndPrepareForTransferRouting();
 
     requestTransitDataProvider =
       new RaptorRoutingRequestTransitData(
@@ -140,8 +140,8 @@ public class TravelTimeResource {
         startOfTime,
         0,
         (int) Period.between(startDate, endDate).get(ChronoUnit.DAYS),
-        new RoutingRequestTransitDataProviderFilter(routingRequest, transitService),
-        transferRoutingRequest
+        new RouteRequestTransitDataProviderFilter(routingRequest, transitService),
+        transferRouteRequest
       );
 
     raptorService = new RaptorService<>(serverContext.raptorConfig());

@@ -19,14 +19,13 @@ public class GtfsFeedParameters implements DataSourceConfig {
     this.feedId = builder.feedId();
   }
 
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
   @Override
   public URI source() {
     return source;
   }
 
-  /**
-   * The unique ID for this feed.
-   */
+  /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
   public Optional<String> feedId() {
     return Optional.ofNullable(feedId);
   }

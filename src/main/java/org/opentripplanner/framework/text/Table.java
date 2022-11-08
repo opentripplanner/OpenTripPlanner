@@ -142,7 +142,14 @@ public class Table {
    * Convert a list of objects to a list of Strings with the same length as the header row.
    */
   static List<String> normalizeRow(Collection<?> row, int nColumns) {
-    var list = new ArrayList<>(row.stream().map(ObjectUtils::toString).toList());
+    var list = new ArrayList<>(
+      row
+        .stream()
+        .map(ObjectUtils::toString)
+        .map(it -> it.replace('\n', ' '))
+        .map(String::trim)
+        .toList()
+    );
     while (list.size() < nColumns) {
       list.add(EMPTY_STRING);
     }
