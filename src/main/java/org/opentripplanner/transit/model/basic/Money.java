@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.transit.model.basic;
 
 import java.text.NumberFormat;
 import java.util.Currency;

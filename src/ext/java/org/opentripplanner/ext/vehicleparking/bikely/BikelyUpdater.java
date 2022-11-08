@@ -4,12 +4,12 @@ import static org.opentripplanner.routing.vehicle_parking.VehicleParkingState.OP
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Currency;
-import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.LocalizedMoney;
 import org.opentripplanner.transit.model.basic.LocalizedString;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
