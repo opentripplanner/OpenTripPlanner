@@ -84,7 +84,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       .build();
 
     startTime = now();
-    LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", url, timeout);
+    LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
 
     HashMap<String, String> headers = new HashMap<>();
     headers.put("Accept", "application/xml");
@@ -172,7 +172,11 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       siri.getServiceDelivery().getEstimatedTimetableDeliveries() == null ||
       siri.getServiceDelivery().getEstimatedTimetableDeliveries().isEmpty()
     ) {
-      LOG.warn("Empty Siri message {}: {}", id, message);
+      if (siri.getHeartbeatNotification() != null) {
+        LOG.info("Received SIRI heartbeat message");
+      } else {
+        LOG.warn("Empty Siri message {}: {}", id, message);
+      }
       return new ArrayList<>();
     }
 

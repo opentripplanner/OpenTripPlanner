@@ -5,6 +5,10 @@ the actions taken by the Maven release plugin. Based on past experience, the Mav
 can fail at various points in the process leaving the repo in a confusing state. Taking each action
 manually is more tedious, but keeps eyes on each step and is less prone to failure.
 
+* Make sure the documentation is up to date
+  * Check all links and references to the release and update to the target release version. Search
+    all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new 
+    version.
 * Check that your local copy of the dev branch is up to date with no uncommitted changes
     * `git status`
     * `git checkout dev-2.x`
@@ -16,7 +20,9 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * If you suspect any changes are not reflected in the Changelog, review the commit log and add
       any missing items
     * Update the header at the top of the list from `x.y.z-SNAPSHOT` to just `x.y.z (current date)`
-    * Check in any changes, and push to Github
+    * Check in any changes, and push to GitHub
+    * It is important to finalize the documentation before tagging the release, to ensure the 
+      published documentation is associated with the release tag 
 * Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that
   the build is currently passing
 * Switch to the HEAD of master branch, and ensure it's up to date with no uncommitted changes
@@ -32,7 +38,10 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git add pom.xml`
     * `git commit -m "prepare release x.y.z"`
 * Run a test build of the release locally, without deploying it
-    * `mvn clean install site`
+    * `mvn clean install site -Prelease`
+      The current version of ENUNCIATE does not support Java 17 "out of the box", use 
+      `export MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"`
+      to ignore the problem.
     * The `install` goal will sign the Maven artifacts so you need the GPG signing certificate set
       up
     * You can also use the `package` goal instead of the `install` goal to avoid signing if you
@@ -57,7 +66,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       the commit that should be tagged as the release)
     * Go to the [GitHub tags page](https://github.com/opentripplanner/OpenTripPlanner/tags) and use
       the `...` button to mark the new tag as a release.
-    * Give the release a name like `v2.1.0 (March 2022)`
+    * Give the release a name like `v2.2.0 (November 2022)`
     * Optionally add a very condensed version of the changelog in the description box, with only the
       5-10 most significant changes that might affect someone's choice to upgrade.
     * Attach the JAR files produced in `/target` to the GitHub release page you just created.
@@ -69,7 +78,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
       set up.
     * Apply the changes recorded
       in https://github.com/opentripplanner/OpenTripPlanner/tree/signed-deploy-to-central
-    * While still on the tag commit, run `mvn deploy`.
+    * While still on the tag commit, run `mvn deploy -Prelease`.
 * Set up next development iteration
     * Add a new section header to `docs/Changelog.md` like `x.y+1.0-SNAPSHOT (in progress)`
     * Edit minor version in `pom.xml` to `x.y+1.0-SNAPSHOT`

@@ -2,10 +2,22 @@ package org.opentripplanner.transit.raptor._data.transit;
 
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultTripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.StopPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.network.TripPatternBuilder;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.util.lang.ToStringBuilder;
 import org.opentripplanner.util.time.TimeUtils;
@@ -15,7 +27,7 @@ import org.opentripplanner.util.time.TimeUtils;
  * <p>
  * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
-public class TestTripSchedule implements DefaultTripSchedule {
+public class TestTripSchedule implements TripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;
   private final DefaultTripPattern pattern;
@@ -23,19 +35,22 @@ public class TestTripSchedule implements DefaultTripSchedule {
   private final int[] departureTimes;
   private final int transitReluctanceIndex;
   private final Accessibility wheelchairBoarding;
+  private final TripPattern originalPattern;
 
   protected TestTripSchedule(
     TestTripPattern pattern,
     int[] arrivalTimes,
     int[] departureTimes,
     int transitReluctanceIndex,
-    Accessibility wheelchairBoarding
+    Accessibility wheelchairBoarding,
+    TripPattern originalPattern
   ) {
     this.pattern = pattern;
     this.arrivalTimes = arrivalTimes;
     this.departureTimes = departureTimes;
     this.transitReluctanceIndex = transitReluctanceIndex;
     this.wheelchairBoarding = wheelchairBoarding;
+    this.originalPattern = originalPattern;
   }
 
   public static TestTripSchedule.Builder schedule() {
@@ -44,6 +59,13 @@ public class TestTripSchedule implements DefaultTripSchedule {
 
   public static TestTripSchedule.Builder schedule(TestTripPattern pattern) {
     return schedule().pattern(pattern);
+  }
+
+  public static TestTripSchedule.Builder schedule(
+    TestTripPattern pattern,
+    TripPattern originalPattern
+  ) {
+    return schedule().pattern(pattern).originalPattern(originalPattern);
   }
 
   public static TestTripSchedule.Builder schedule(String times) {
@@ -100,6 +122,21 @@ public class TestTripSchedule implements DefaultTripSchedule {
       .toString();
   }
 
+  @Override
+  public LocalDate getServiceDate() {
+    return null;
+  }
+
+  @Override
+  public TripTimes getOriginalTripTimes() {
+    return null;
+  }
+
+  @Override
+  public TripPattern getOriginalTripPattern() {
+    return this.originalPattern;
+  }
+
   @SuppressWarnings("UnusedReturnValue")
   public static class Builder {
 
@@ -109,9 +146,15 @@ public class TestTripSchedule implements DefaultTripSchedule {
     private int arrivalDepartureOffset = DEFAULT_DEPARTURE_DELAY;
     private int transitReluctanceIndex = 0;
     private Accessibility wheelchairBoarding = NO_INFORMATION;
+    private TripPattern originalPattern;
 
     public TestTripSchedule.Builder pattern(TestTripPattern pattern) {
       this.pattern = pattern;
+      return this;
+    }
+
+    public TestTripSchedule.Builder originalPattern(TripPattern pattern) {
+      this.originalPattern = pattern;
       return this;
     }
 
@@ -212,7 +255,8 @@ public class TestTripSchedule implements DefaultTripSchedule {
         arrivalTimes,
         departureTimes,
         transitReluctanceIndex,
-        wheelchairBoarding
+        wheelchairBoarding,
+        originalPattern
       );
     }
 

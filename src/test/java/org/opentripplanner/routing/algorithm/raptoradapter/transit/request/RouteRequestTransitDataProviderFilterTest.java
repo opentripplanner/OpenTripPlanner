@@ -36,7 +36,7 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class RoutingRequestTransitDataProviderFilterTest {
+public class RouteRequestTransitDataProviderFilterTest {
 
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
@@ -77,7 +77,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       DEFAULT_ACCESSIBILITY,
@@ -101,7 +101,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   public void notFilteringExpectedTripPatternForDateTest() {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -120,7 +120,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
   public void bannedRouteFilteringTest() {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -147,7 +147,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       null
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -200,7 +200,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       null
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -227,7 +227,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       null
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       true,
       true,
       WheelchairPreferences.DEFAULT,
@@ -254,7 +254,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       null
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       WheelchairPreferences.DEFAULT,
@@ -281,7 +281,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       WheelchairPreferences.DEFAULT,
@@ -308,7 +308,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       true,
       WheelchairPreferences.DEFAULT,
@@ -347,7 +347,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     );
 
     // Given
-    var filter1 = new RoutingRequestTransitDataProviderFilter(
+    var filter1 = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       WheelchairPreferences.DEFAULT,
@@ -368,7 +368,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     assertTrue(valid2);
 
     // Given
-    var filter2 = new RoutingRequestTransitDataProviderFilter(
+    var filter2 = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,
@@ -396,32 +396,32 @@ public class RoutingRequestTransitDataProviderFilterTest {
 
     assertEquals(
       BikeAccess.UNKNOWN,
-      RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
+      RouteRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
     trip.withBikesAllowed(BikeAccess.ALLOWED);
     assertEquals(
       BikeAccess.ALLOWED,
-      RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
+      RouteRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
     trip.withBikesAllowed(BikeAccess.NOT_ALLOWED);
     assertEquals(
       BikeAccess.NOT_ALLOWED,
-      RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
+      RouteRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
     trip.withRoute(routeBuilder.withBikesAllowed(BikeAccess.ALLOWED).build());
     assertEquals(
       BikeAccess.NOT_ALLOWED,
-      RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
+      RouteRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
     trip.withBikesAllowed(BikeAccess.UNKNOWN);
     assertEquals(
       BikeAccess.ALLOWED,
-      RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
+      RouteRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
     trip.withRoute(routeBuilder.withBikesAllowed(BikeAccess.NOT_ALLOWED).build());
     assertEquals(
       BikeAccess.NOT_ALLOWED,
-      RoutingRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
+      RouteRequestTransitDataProviderFilter.bikeAccessForTrip(trip.build())
     );
   }
 
@@ -482,7 +482,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
       TripAlteration.CANCELLATION
     );
 
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       true,
       true,
       DEFAULT_ACCESSIBILITY,
@@ -505,7 +505,7 @@ public class RoutingRequestTransitDataProviderFilterTest {
     Collection<MainAndSubMode> allowedModes,
     TripTimes tripTimes
   ) {
-    var filter = new RoutingRequestTransitDataProviderFilter(
+    var filter = new RouteRequestTransitDataProviderFilter(
       false,
       false,
       DEFAULT_ACCESSIBILITY,

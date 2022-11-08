@@ -8,20 +8,20 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
-import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.TariffZoneRef;
+import org.rutebanken.netex.model.TariffZone_VersionStructure;
 
 class TariffZoneMapper {
 
   private final LocalDateTime startOfPeriod;
   private final FeedScopedIdFactory idFactory;
-  private final ReadOnlyHierarchicalVersionMapById<TariffZone> tariffZonesById;
+  private final ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> tariffZonesById;
   private final Multimap<FeedScopedId, FareZone> deduplicateCache = ArrayListMultimap.create();
 
   TariffZoneMapper(
     LocalDateTime startOfPeriod,
     FeedScopedIdFactory idFactory,
-    ReadOnlyHierarchicalVersionMapById<TariffZone> tariffZonesById
+    ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> tariffZonesById
   ) {
     this.startOfPeriod = startOfPeriod;
     this.idFactory = idFactory;
@@ -50,7 +50,7 @@ class TariffZoneMapper {
   /**
    * Map Netex TariffZone to OTP TariffZone
    */
-  private FareZone mapTariffZone(org.rutebanken.netex.model.TariffZone tariffZone) {
+  private FareZone mapTariffZone(TariffZone_VersionStructure tariffZone) {
     if (tariffZone == null) {
       return null;
     }

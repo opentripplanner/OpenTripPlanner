@@ -165,6 +165,20 @@ public class SpeedTest {
     }
     printProfileStatistics();
 
+    final var transitService = serverContext.transitService();
+    timer.globalCount("transitdata_stops", transitService.listStopLocations().size());
+    timer.globalCount("transitdata_patterns", transitService.getAllTripPatterns().size());
+    timer.globalCount("transitdata_trips", transitService.getAllTrips().size());
+
+    // we want to get the numbers after the garbage collection
+    forceGCToAvoidGCLater();
+
+    final var runtime = Runtime.getRuntime();
+    timer.globalCount("jvm_free_memory", runtime.freeMemory());
+    timer.globalCount("jvm_max_memory", runtime.maxMemory());
+    timer.globalCount("jvm_total_memory", runtime.totalMemory());
+    timer.globalCount("jvm_used_memory", runtime.totalMemory() - runtime.freeMemory());
+
     timer.finishUp();
 
     System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
@@ -226,7 +240,7 @@ public class SpeedTest {
         routeProfile,
         getTimeZoneId()
       );
-      var routingRequest = speedTestRequest.toRoutingRequest();
+      var routingRequest = speedTestRequest.toRouteRequest();
       RoutingResponse routingResponse = serverContext.routingService().route(routingRequest);
 
       var times = routingResponse.getDebugTimingAggregator().finishedRendering();

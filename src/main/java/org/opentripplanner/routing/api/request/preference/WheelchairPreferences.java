@@ -4,15 +4,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
- * @param slopeExceededReluctance What factor should be given to street edges, which are over the
- *                                max slope. The penalty is not static but scales with how much you
- *                                exceed the maximum slope. Set to negative to disable routing on
- *                                too steep edges.
- * @param stairsReluctance        Stairs are not completely excluded for wheelchair users but
- *                                severely punished. This value determines how much they are
- *                                punished. This should be a very high value as you want to only
- *                                include stairs as a last result.
- * @param maxSlope                TODO, unit?
+ * See the configuration for documentation of each field.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */

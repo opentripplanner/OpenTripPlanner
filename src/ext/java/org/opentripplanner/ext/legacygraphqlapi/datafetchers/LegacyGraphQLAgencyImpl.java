@@ -40,13 +40,11 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
                   alert
                     .getEntities()
                     .stream()
-                    .filter(entitySelector ->
-                      entitySelector instanceof EntitySelector.RouteTypeAndAgency
-                    )
+                    .filter(EntitySelector.RouteTypeAndAgency.class::isInstance)
                     .map(EntitySelector.RouteTypeAndAgency.class::cast)
-                    .anyMatch(entity -> entity.agencyId.equals(getSource(environment).getId()))
+                    .anyMatch(entity -> entity.agencyId().equals(getSource(environment).getId()))
                 )
-                .forEach(alert -> alerts.add(alert));
+                .forEach(alerts::add);
               break;
             case ROUTES:
               getRoutes(environment)

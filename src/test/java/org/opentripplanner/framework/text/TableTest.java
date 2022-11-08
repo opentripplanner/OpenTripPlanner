@@ -12,19 +12,22 @@ public class TableTest {
 
   @Test
   public void buildAndPrintTable() {
+    // Test various normalization cases
     var builder = Table
       .of()
       .withAlights(Left, Center, Right)
       .withHeaders("LEFT", "CENTER", "RIGHT")
-      .addRow("AAA", "Long-value", 2)
+      .addRow(" SPACE ", " Long-value\t", 2)
+      .addRow("\nNL Before", "NL\nin middle", "NL after\n")
       .addRow(null, "Short", 123);
 
     var expected =
       """
-      LEFT |   CENTER   | RIGHT
-      AAA  | Long-value |     2
-           |    Short   |   123
-      """;
+        LEFT      |    CENTER    |    RIGHT
+        SPACE     |  Long-value  |        2
+        NL Before | NL in middle | NL after
+                  |     Short    |      123
+        """;
 
     // Both the builder and the Table returns the same table as toString()
     assertEquals(expected, builder.toString());

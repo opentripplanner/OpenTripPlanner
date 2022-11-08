@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
-public class RoutingRequestTransitDataProviderFilter implements TransitDataProviderFilter {
+public class RouteRequestTransitDataProviderFilter implements TransitDataProviderFilter {
 
   private final boolean requireBikesAllowed;
 
@@ -37,7 +37,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
 
   private final Set<FeedScopedId> bannedTrips;
 
-  public RoutingRequestTransitDataProviderFilter(
+  public RouteRequestTransitDataProviderFilter(
     boolean requireBikesAllowed,
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences,
@@ -55,7 +55,7 @@ public class RoutingRequestTransitDataProviderFilter implements TransitDataProvi
     this.transitModeFilter = AllowTransitModeFilter.of(allowedTransitModes);
   }
 
-  public RoutingRequestTransitDataProviderFilter(
+  public RouteRequestTransitDataProviderFilter(
     RouteRequest request,
     TransitService transitService
   ) {

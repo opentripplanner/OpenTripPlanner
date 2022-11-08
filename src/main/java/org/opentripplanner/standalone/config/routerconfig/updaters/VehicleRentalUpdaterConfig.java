@@ -10,10 +10,18 @@ import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters
 public class VehicleRentalUpdaterConfig {
 
   public static VehicleRentalUpdaterParameters create(String configRef, NodeAdapter c) {
-    var sourceType = c.of("sourceType").since(NA).summary("TODO").asEnum(DataSourceType.class);
+    var sourceType = c
+      .of("sourceType")
+      .since(NA)
+      .summary("What source of vehicle rental updater to use.")
+      .asEnum(DataSourceType.class);
     return new VehicleRentalUpdaterParameters(
       configRef + "." + sourceType,
-      c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+      c
+        .of("frequencySec")
+        .since(NA)
+        .summary("How often the data should be updated in seconds.")
+        .asInt(60),
       VehicleRentalSourceFactory.create(sourceType, c)
     );
   }

@@ -1,37 +1,39 @@
 package org.opentripplanner.generate.doc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
+import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
 import static org.opentripplanner.standalone.config.framework.JsonSupport.jsonNodeFromResource;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.generate.doc.framework.MarkDownDocWriter;
+import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
+@OnlyIfDocsExist
 public class BuildConfigurationDocTest {
 
-  private static final File FILE = new File("docs", "BuildConfiguration-poc.md");
+  private static final String CONFIG_JSON = "build-config.json";
+  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "BuildConfiguration.md");
+  private static final File OUT_FILE = new File(DOCS_ROOT, "BuildConfiguration.md");
 
-  private static final String PARAMETERS_TABLE = "PARAMETERS-TABLE";
-  private static final String PARAMETERS_DETAILS = "PARAMETERS-DETAILS";
-
-  private static final String BUILD_CONFIG_FILENAME = "standalone/config/build-config.json";
-  private static final SkipNodes SKIP_NODES = SkipNodes.of(
-    "dataOverlay",
-    "/docs/sandbox/DataOverlay.md",
-    "transferRequests",
-    "/docs/RoutingRequest.md"
-  );
+  private static final String CONFIG_PATH = "standalone/config/" + CONFIG_JSON;
+  private static final SkipNodes SKIP_NODES = SkipNodes
+    .of()
+    .add("dataOverlay", "sandbox/DataOverlay.md")
+    .add("fares", "sandbox/Fares.md")
+    .add("transferRequests", "RouteRequest.md")
+    .build();
 
   /**
    * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
@@ -46,19 +48,21 @@ public class BuildConfigurationDocTest {
     NodeAdapter node = readBuildConfig();
 
     // Read and close inout file (same as output file)
-    String doc = readFile(FILE);
+    String doc = readFile(TEMPLATE);
+    String original = readFile(OUT_FILE);
 
-    doc = replaceSection(doc, PARAMETERS_TABLE, getParameterSummaryTable(node));
-    doc = replaceSection(doc, PARAMETERS_DETAILS, getParameterDetailsTable(node));
+    doc = replaceParametersTable(doc, getParameterSummaryTable(node));
+    doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
+    doc = replaceJsonExample(doc, node, CONFIG_JSON);
 
-    writeFile(FILE, doc);
+    writeFile(OUT_FILE, doc);
 
-    assertEquals(doc, readFile(FILE));
+    assertFileEquals(original, OUT_FILE);
   }
 
   private NodeAdapter readBuildConfig() {
-    var json = jsonNodeFromResource(BUILD_CONFIG_FILENAME);
-    var conf = new BuildConfig(json, BUILD_CONFIG_FILENAME, false);
+    var json = jsonNodeFromResource(CONFIG_PATH);
+    var conf = new BuildConfig(json, CONFIG_PATH, true);
     return conf.asNodeAdapter();
   }
 
@@ -67,9 +71,6 @@ public class BuildConfigurationDocTest {
   }
 
   private String getParameterDetailsTable(NodeAdapter node) {
-    var stream = new ByteArrayOutputStream();
-    var out = new MarkDownDocWriter(new PrintStream(stream));
-    ParameterDetailsList.listParametersWithDetails(node, out, SKIP_NODES);
-    return stream.toString(StandardCharsets.UTF_8);
+    return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_3);
   }
 }

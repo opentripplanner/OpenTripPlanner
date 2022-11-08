@@ -1,6 +1,5 @@
 package org.opentripplanner.util.lang;
 
-import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 /**
@@ -58,7 +57,7 @@ public class StringUtils {
 
   public static String padLeft(String value, char ch, int width) {
     if (value == null) {
-      return fill(ch, width);
+      return String.valueOf(ch).repeat(width);
     }
     if (value.length() >= width) {
       return value;
@@ -71,7 +70,7 @@ public class StringUtils {
 
   public static String padBoth(String value, char ch, int width) {
     if (value == null) {
-      return fill(ch, width);
+      return String.valueOf(ch).repeat(width);
     }
     if (value.length() >= width) {
       return value;
@@ -85,22 +84,12 @@ public class StringUtils {
 
   public static String padRight(String value, char ch, int width) {
     if (value == null) {
-      return fill(ch, width);
+      return String.valueOf(ch).repeat(width);
     }
     if (value.length() >= width) {
       return value;
     }
     return StringUtils.append(new StringBuilder(value), ch, width - value.length()).toString();
-  }
-
-  /**
-   * Create a new String with the given {@code length} and all characters set to the given {@code ch}
-   * character.
-   */
-  public static String fill(char ch, int length) {
-    char[] array = new char[length];
-    Arrays.fill(array, ch);
-    return new String(array);
   }
 
   /** Replace single quotes with double quotes.  */

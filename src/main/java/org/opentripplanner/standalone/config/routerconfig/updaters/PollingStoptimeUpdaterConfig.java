@@ -1,9 +1,9 @@
 package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
@@ -15,9 +15,9 @@ public class PollingStoptimeUpdaterConfig {
     String url = null;
 
     if (c.exist("file")) {
-      file = c.of("file").since(NA).summary("TODO").asString();
+      file = c.of("file").since(NA).summary("The path of the GTFS-RT file.").asString();
     } else if (c.exist("url")) {
-      url = c.of("url").since(NA).summary("TODO").asString();
+      url = c.of("url").since(NA).summary("The URL of the GTFS-RT resource.").asString();
     } else {
       throw new OtpAppException(
         "Need either 'url' or 'file' properties to configure " +
@@ -27,20 +27,46 @@ public class PollingStoptimeUpdaterConfig {
       );
     }
 
-    // TODO DOC: Deprecate  c.of("logFrequency").withDoc(NA, /*TODO DOC*/"TODO").asInt(-1)
-
     return new PollingTripUpdaterParameters(
       configRef,
-      c.of("frequencySec").since(NA).summary("TODO").asInt(60),
+      c
+        .of("frequencySec")
+        .since(NA)
+        .summary("How often the data should be downloaded in seconds.")
+        .asInt(60),
       c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
-      c.of("purgeExpiredData").since(NA).summary("TODO").asBoolean(false),
-      c.of("fuzzyTripMatching").since(NA).summary("TODO").asBoolean(false),
+      c
+        .of("purgeExpiredData")
+        .since(NA)
+        .summary("Should expired data removed from the snapshot.")
+        .asBoolean(false),
+      c
+        .of("fuzzyTripMatching")
+        .since(NA)
+        .summary("If the trips should be matched fuzzily.")
+        .asBoolean(false),
       c
         .of("backwardsDelayPropagationType")
-        .since(NA)
-        .summary("TODO")
+        .since(V2_2)
+        .summary("How backwards propagation should be handled.")
+        .description(
+          """
+  REQUIRED_NO_DATA:
+  Default value. Only propagates delays backwards when it is required to ensure that the times
+  are increasing, and it sets the NO_DATA flag on the stops so these automatically updated times
+  are not exposed through APIs.
+  
+  REQUIRED:
+  Only propagates delays backwards when it is required to ensure that the times are increasing.
+  The updated times are exposed through APIs.
+  
+  ALWAYS
+  Propagates delays backwards on stops with no estimates regardless if it's required or not.
+  The updated times are exposed through APIs.
+"""
+        )
         .asEnum(BackwardsDelayPropagationType.REQUIRED_NO_DATA),
-      c.of("feedId").since(NA).summary("TODO").asString(null),
+      c.of("feedId").since(NA).summary("Which feed the updates apply to.").asString(null),
       url,
       file
     );

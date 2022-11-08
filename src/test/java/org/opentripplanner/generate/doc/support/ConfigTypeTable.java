@@ -1,8 +1,5 @@
-package org.opentripplanner.generate.doc.framework;
+package org.opentripplanner.generate.doc.support;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.text.MarkdownFormatter;
 import org.opentripplanner.framework.text.Table;
 import org.opentripplanner.standalone.config.framework.json.ConfigType;
@@ -23,13 +20,5 @@ public class ConfigTypeTable {
     }
     var rows = tbl.build().toMarkdownRows();
     return String.join(NEW_LINE, rows) + NEW_LINE;
-  }
-
-  @Test
-  void configTypeTableTest() {
-    var table = configTypeTable();
-    for (ConfigType it : ConfigType.values()) {
-      assertTrue(table.contains(it.docName()), table);
-    }
   }
 }

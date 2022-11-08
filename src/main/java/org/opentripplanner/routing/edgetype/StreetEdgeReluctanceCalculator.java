@@ -10,7 +10,7 @@ class StreetEdgeReluctanceCalculator {
 
   /**
    * Compute reluctance for a regular street section. Note! This does not apply if in a wheelchair,
-   * see {@link #computeWheelchairReluctance(RoutingRequest, double, boolean, boolean)}.
+   * see {@link #computeWheelchairReluctance(RouteRequest, double, boolean, boolean)}.
    */
   static double computeReluctance(
     RoutingPreferences pref,

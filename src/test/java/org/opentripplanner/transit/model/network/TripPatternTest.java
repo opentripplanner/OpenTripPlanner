@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 class TripPatternTest {
 
@@ -56,6 +57,7 @@ class TripPatternTest {
         subject.copy().withRoute(TransitModelForTest.route("anotherId").build()).build()
       )
     );
+    assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));
     assertFalse(
       subject.sameAs(subject.copy().withStopPattern(TransitModelForTest.stopPattern(11)).build())
     );
@@ -78,5 +80,16 @@ class TripPatternTest {
     noNameYet.initName(name);
 
     assertEquals(name, noNameYet.getName());
+  }
+
+  @Test
+  void shouldResolveMode() {
+    var patternWithoutExplicitMode = TripPattern
+      .of(TransitModelForTest.id(ID))
+      .withRoute(ROUTE)
+      .withStopPattern(STOP_PATTERN)
+      .build();
+
+    assertEquals(patternWithoutExplicitMode.getMode(), ROUTE.getMode());
   }
 }
