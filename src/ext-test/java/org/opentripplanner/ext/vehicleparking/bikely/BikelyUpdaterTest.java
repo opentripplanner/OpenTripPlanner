@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.basic.Locales;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class BikelyUpdaterTest {
@@ -34,8 +35,16 @@ public class BikelyUpdaterTest {
     assertTrue(first.hasBicyclePlaces());
     assertNull(first.getCapacity());
     assertEquals(
-      "First 4 hour(s) is 0.0 kr, afterwards 10.0 kr per 1 hour(s)",
+      "First 4 hour(s) is NOK0.00, afterwards NOK10.00 per 1 hour(s)",
       first.getNote().toString(Locale.ENGLISH)
+    );
+    assertEquals(
+      "First 4 hour(s) is kr 0,00, afterwards kr 10,00 per 1 hour(s)",
+      first.getNote().toString(Locales.NORWEGIAN_BOKMAL)
+    );
+    assertEquals(
+      "First 4 hour(s) is 0.00 kr, afterwards 10.00 kr per 1 hour(s)",
+      first.getNote().toString(Locales.NORWEGIAN_NYNORSK)
     );
 
     var freeParkingLots = parkingLots.get(2);

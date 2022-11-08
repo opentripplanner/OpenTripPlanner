@@ -3,9 +3,12 @@ package org.opentripplanner.ext.vehicleparking.bikely;
 import static org.opentripplanner.routing.vehicle_parking.VehicleParkingState.OPERATIONAL;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Currency;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.basic.LocalizedMoney;
 import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
@@ -19,7 +22,7 @@ import org.opentripplanner.updater.GenericJsonDataSource;
 class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
 
   private static final String JSON_PARSE_PATH = "result";
-
+  private static final Currency NOK = Currency.getInstance("NOK");
   private final String feedId;
 
   public BikelyUpdater(BikelyUpdaterParameters parameters) {
@@ -79,8 +82,8 @@ class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
       return new LocalizedString(
         "price.startMain",
         NonLocalizedString.ofNumber(startPriceDurationHours),
-        NonLocalizedString.ofNumber(startPriceAmount),
-        NonLocalizedString.ofNumber(mainPriceAmount),
+        new LocalizedMoney(new Money(NOK, (int) (startPriceAmount * 100))),
+        new LocalizedMoney(new Money(NOK, (int) (mainPriceAmount * 100))),
         NonLocalizedString.ofNumber(mainPriceDurationHours)
       );
     }
