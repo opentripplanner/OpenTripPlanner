@@ -84,7 +84,7 @@ public class FinlandMapperTest {
     assertEquals(1.0, wps.getDataForWay(tunnel).getWalkSafetyFeatures().forward(), epsilon);
     assertEquals(1.0, wps.getDataForWay(bridge).getWalkSafetyFeatures().forward(), epsilon);
     assertEquals(
-      1.4,
+      1.3,
       wps.getDataForWay(footwayCrossing).getWalkSafetyFeatures().forward(),
       epsilon
     );
@@ -94,7 +94,7 @@ public class FinlandMapperTest {
       epsilon
     );
     assertEquals(
-      1.45,
+      1.35,
       wps.getDataForWay(cyclewayCrossing).getWalkSafetyFeatures().forward(),
       epsilon
     );
@@ -104,7 +104,7 @@ public class FinlandMapperTest {
       epsilon
     );
     assertEquals(
-      1.4,
+      1.3,
       wps.getDataForWay(cyclewaySegregatedCrossing).getWalkSafetyFeatures().forward(),
       epsilon
     );
