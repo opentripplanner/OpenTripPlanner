@@ -12,7 +12,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.GenericJsonDataSource;
 
 /**
- * Vehicle parking updater class for the Norwegian bike box provider Bikely: https://www.safebikely.com/
+ * Vehicle parking updater class for the Norwegian bike box provider Bikely:
+ * https://www.safebikely.com/
  */
 class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
 
@@ -29,20 +30,22 @@ class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
   protected VehicleParking parseElement(JsonNode jsonNode) {
     var vehicleParkId = new FeedScopedId(feedId, jsonNode.get("id").asText());
 
-    var addressNode = jsonNode.get("address");
-    var workingHoursNode = jsonNode.get("workingHours");
+    var address = jsonNode.get("address");
+    var workingHours = jsonNode.get("workingHours");
 
-    var lat = addressNode.get("latitude").asDouble();
-    var lng = addressNode.get("longitude").asDouble();
+    var lat = address.get("latitude").asDouble();
+    var lng = address.get("longitude").asDouble();
     var coord = new WgsCoordinate(lat, lng);
 
+    var name = new NonLocalizedString(jsonNode.path("name").asText());
+
     var freeSpots = jsonNode.get("availableParkingSpots").asInt();
-    var isUnderMaintenance = workingHoursNode.get("isUnderMaintenance").asBoolean();
+    var isUnderMaintenance = workingHours.get("isUnderMaintenance").asBoolean();
 
     VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
       builder
         .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
-        .name(new NonLocalizedString(jsonNode.path("name").asText()))
+        .name(name)
         .coordinate(coord)
         .walkAccessible(true)
         .carAccessible(false);
@@ -50,16 +53,16 @@ class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
     return VehicleParking
       .builder()
       .id(vehicleParkId)
-      .name(new NonLocalizedString(jsonNode.path("name").asText()))
+      .name(name)
       .bicyclePlaces(true)
       .availability(VehicleParkingSpaces.builder().bicycleSpaces(freeSpots).build())
-      .state(toStatus(isUnderMaintenance))
+      .state(toState(isUnderMaintenance))
       .coordinate(coord)
       .entrance(entrance)
       .build();
   }
 
-  private VehicleParkingState toStatus(boolean isUnderMaintenance) {
+  private VehicleParkingState toState(boolean isUnderMaintenance) {
     if (isUnderMaintenance) return VehicleParkingState.TEMPORARILY_CLOSED; else return OPERATIONAL;
   }
 }
