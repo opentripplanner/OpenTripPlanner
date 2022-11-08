@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.ext.realtimeresolver.RealtimeResolver.populateLegsWithRealtime;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -19,6 +21,7 @@ import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +42,9 @@ public class RoutingResponseMapper {
   ) {
     // Search is performed without realtime, but we still want to
     // include realtime information in the result
-    if (request.preferences().transit().ignoreRealtimeUpdates()) {
-      System.out.println("populate with realtime");
+    if (
+      request.preferences().transit().ignoreRealtimeUpdates() && OTPFeature.RealtimeResolver.isOn()
+    ) {
       populateLegsWithRealtime(itineraries, transitService);
     }
 
@@ -151,35 +155,5 @@ public class RoutingResponseMapper {
     LOG.debug("PageCursor previous : {}", prevPageCursor);
     LOG.debug("PageCursor next ... : {}", nextPageCursor);
     LOG.debug("Errors ............ : {}", errors);
-  }
-
-  private static void populateLegsWithRealtime(
-    List<Itinerary> itineraries,
-    TransitService transitService
-  ) {
-    itineraries.forEach(it -> {
-      if (it.isFlaggedForDeletion()) {
-        return;
-      }
-      var legs = it
-        .getLegs()
-        .stream()
-        .map(l -> {
-          var ref = l.getLegReference();
-          if (ref == null) {
-            return l;
-          }
-
-          var leg = ref.getLeg(transitService);
-          if (leg != null) {
-            return leg;
-          }
-
-          return l;
-        })
-        .collect(Collectors.toList());
-
-      it.setLegs(legs);
-    });
   }
 }
