@@ -156,6 +156,9 @@ public class GtfsModule implements GraphBuilderModule {
 
         validateAndInterpolateStopTimesForEachTrip(builder.getStopTimesSortedByTrip(), issueStore);
 
+        // We need to run this after the cleaning of the data, as stop indices might have changed
+        mapper.mapAndAddTransfersToBuilder();
+
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
           gtfsBundle.getMaxStopToShapeSnapDistance(),

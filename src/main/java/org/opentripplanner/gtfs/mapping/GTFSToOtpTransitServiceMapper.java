@@ -172,8 +172,6 @@ public class GTFSToOtpTransitServiceMapper {
     fareRulesBuilder
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
-
-    mapAndAddTransfersToBuilder();
   }
 
   private void mapGtfsStopsToOtpTypes(Collection<org.onebusaway.gtfs.model.Stop> stops) {
@@ -206,7 +204,7 @@ public class GTFSToOtpTransitServiceMapper {
   /**
    * Note! Trip-pattens must be added BEFORE mapping transfers
    */
-  private void mapAndAddTransfersToBuilder() {
+  public void mapAndAddTransfersToBuilder() {
     TransferMapper transferMapper = new TransferMapper(
       routeMapper,
       stationMapper,
