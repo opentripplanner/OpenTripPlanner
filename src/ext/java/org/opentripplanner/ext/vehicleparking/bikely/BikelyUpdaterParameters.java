@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.vehicleparking.bikely;
 
-import java.time.ZoneId;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
@@ -15,8 +14,7 @@ public record BikelyUpdaterParameters(
   String url,
   String feedId,
   int frequencySec,
-  @Nonnull Map<String, String> httpHeaders,
-  ZoneId timeZone
+  @Nonnull Map<String, String> httpHeaders
 )
   implements VehicleParkingUpdaterParameters {
   @Override

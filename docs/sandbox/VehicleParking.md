@@ -12,10 +12,10 @@ enabled/disabled through `otp-config.json` but from `router-config.json` updater
 
 Currently contains the following updaters:
 
-- HSL Park and Ride (https://p.hsl.fi/docs/index.html)
-- ParkAPI (https://github.com/offenesdresden/ParkAPI)
+- [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
+- [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - KML (Keyhole Markup language) placemark parks. Use name as bike park name and point coordinates.
-- Bikely (https://www.safebikely.com/)
+- [Bikely](https://www.safebikely.com/)
 
 ### Configuration
 
@@ -27,7 +27,7 @@ All updaters have the following parameters in common:
 - `type`: this needs to be `"vehicle-parking"`
 - `feedId`: this is used as a "prefix" for park ids, entrance ids and sometimes also for tags.
 
-## HSL parking
+## HSL Park and Ride
 
 <!-- hsl-park BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -102,16 +102,15 @@ Used for converting abstract opening hours into concrete points in time.
 <!-- kml BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                |     Type    | Summary                                 |  Req./Opt. | Default Value | Since |
-|---------------------------------|:-----------:|-----------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                | *Required* |               |   na  |
-| [feedId](#u__3__feedId)         |   `string`  | The name of the data source.            | *Optional* |               |  2.2  |
-| frequencySec                    |  `integer`  | How often to update the parking lots.   | *Optional* | `60`          |  2.2  |
-| namePrefix                      |   `string`  | Prefix for the names.                   | *Optional* |               |  2.2  |
-| [sourceType](#u__3__sourceType) |    `enum`   | The source of the vehicle updates.      | *Required* |               |  2.2  |
-| [timeZone](#u__3__timeZone)     | `time-zone` | The time zone of the feed.              | *Optional* |               |  2.2  |
-| url                             |   `string`  | URL of the KML file.                    | *Optional* |               |  2.2  |
-| zip                             |  `boolean`  | Whether the resource is zip-compressed. | *Optional* | `false`       |  2.2  |
+| Config Parameter                |    Type   | Summary                                 |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------:|-----------------------------------------|:----------:|---------------|:-----:|
+| type = "VEHICLE_PARKING"        |   `enum`  | The type of the updater.                | *Required* |               |   na  |
+| [feedId](#u__3__feedId)         |  `string` | The name of the data source.            | *Optional* |               |  2.2  |
+| frequencySec                    | `integer` | How often to update the parking lots.   | *Optional* | `60`          |  2.2  |
+| namePrefix                      |  `string` | Prefix for the names.                   | *Optional* |               |  2.2  |
+| [sourceType](#u__3__sourceType) |   `enum`  | The source of the vehicle updates.      | *Required* |               |  2.2  |
+| url                             |  `string` | URL of the KML file.                    | *Optional* |               |  2.2  |
+| zip                             | `boolean` | Whether the resource is zip-compressed. | *Optional* | `false`       |  2.2  |
 
 
 #### Details
@@ -132,15 +131,6 @@ This will end up in the API responses as the feed id of of the parking lot.
 **Enum values:** `kml` | `park-api` | `bicycle-park-api` | `hsl-park` | `bikely`
 
 The source of the vehicle updates.
-
-<h4 id="u__3__timeZone">timeZone</h4>
-
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
-**Path:** /updaters/[3] 
-
-The time zone of the feed.
-
-Used for converting abstract opening hours into concrete points in time.
 
 
 
@@ -257,11 +247,10 @@ Tags to add to the parking lots.
 |---------------------------------|:---------------:|------------------------------------|:----------:|---------------|:-----:|
 | type = "VEHICLE_PARKING"        |      `enum`     | The type of the updater.           | *Required* |               |   na  |
 | [feedId](#u__5__feedId)         |     `string`    | The name of the data source.       | *Optional* |               |  2.2  |
-| frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.2  |
+| frequencySec                    |    `integer`    | How often to update the source.    | *Optional* | `60`          |  2.3  |
 | [sourceType](#u__5__sourceType) |      `enum`     | The source of the vehicle updates. | *Required* |               |  2.2  |
-| [timeZone](#u__5__timeZone)     |   `time-zone`   | The time zone of the feed.         | *Optional* |               |  2.2  |
-| url                             |     `string`    | URL of the locations endpoint.     | *Optional* |               |  2.2  |
-| [headers](#u__5__headers)       | `map of string` | HTTP headers to add.               | *Optional* |               |  2.2  |
+| url                             |     `string`    | URL of the locations endpoint.     | *Optional* |               |  2.3  |
+| [headers](#u__5__headers)       | `map of string` | HTTP headers to add.               | *Optional* |               |  2.3  |
 
 
 #### Details
@@ -283,18 +272,9 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 The source of the vehicle updates.
 
-<h4 id="u__5__timeZone">timeZone</h4>
-
-**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
-**Path:** /updaters/[5] 
-
-The time zone of the feed.
-
-Used for converting abstract opening hours into concrete points in time.
-
 <h4 id="u__5__headers">headers</h4>
 
-**Since version:** `2.2` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`  \
 **Path:** /updaters/[5] 
 
 HTTP headers to add.

@@ -12,10 +12,10 @@ enabled/disabled through `otp-config.json` but from `router-config.json` updater
 
 Currently contains the following updaters:
 
-- HSL Park and Ride (https://p.hsl.fi/docs/index.html)
-- ParkAPI (https://github.com/offenesdresden/ParkAPI)
+- [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
+- [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - KML (Keyhole Markup language) placemark parks. Use name as bike park name and point coordinates.
-- Bikely (https://www.safebikely.com/)
+- [Bikely](https://www.safebikely.com/)
 
 ### Configuration
 
@@ -27,7 +27,7 @@ All updaters have the following parameters in common:
 - `type`: this needs to be `"vehicle-parking"`
 - `feedId`: this is used as a "prefix" for park ids, entrance ids and sometimes also for tags.
 
-## HSL parking
+## HSL Park and Ride
 
 <!-- INSERT: hsl-park -->
 
