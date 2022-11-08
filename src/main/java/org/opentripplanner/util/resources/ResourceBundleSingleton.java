@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
+import java.util.Set;
 
 /**
  * @author mabu
@@ -13,6 +14,15 @@ public enum ResourceBundleSingleton {
 
   static final ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(
     Control.FORMAT_PROPERTIES
+  );
+  private final Set<String> internalKeys = Set.of(
+    "corner",
+    "unnamedStreet",
+    "origin",
+    "destination",
+    "partOf",
+    "price.free",
+    "price.startMain"
   );
 
   //in singleton because resurce bundles are cached based on calling class
@@ -26,13 +36,7 @@ public enum ResourceBundleSingleton {
     }
     try {
       ResourceBundle resourceBundle = null;
-      if (
-        key.equals("corner") ||
-        key.equals("unnamedStreet") ||
-        key.equals("origin") ||
-        key.equals("destination") ||
-        key.equals("partOf")
-      ) {
+      if (internalKeys.contains(key)) {
         resourceBundle = ResourceBundle.getBundle("internals", locale, noFallbackControl);
       } else {
         resourceBundle = ResourceBundle.getBundle("WayProperties", locale, noFallbackControl);

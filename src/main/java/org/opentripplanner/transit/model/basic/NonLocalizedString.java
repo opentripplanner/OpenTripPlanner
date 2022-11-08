@@ -81,6 +81,10 @@ public class NonLocalizedString implements I18NString, Serializable {
     return name == null ? defaultName : new NonLocalizedString(name);
   }
 
+  public static I18NString ofNumber(Number startPriceDurationHours) {
+    return new NonLocalizedString(startPriceDurationHours.toString());
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(name);

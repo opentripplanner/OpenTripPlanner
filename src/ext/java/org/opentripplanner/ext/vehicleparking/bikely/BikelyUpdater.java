@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.transit.model.basic.LocalizedString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
 import org.opentripplanner.transit.model.basic.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -42,6 +43,8 @@ class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
     var freeSpots = jsonNode.get("availableParkingSpots").asInt();
     var isUnderMaintenance = workingHours.get("isUnderMaintenance").asBoolean();
 
+    LocalizedString note = toNote(jsonNode.get("price"));
+
     VehicleParking.VehicleParkingEntranceCreator entrance = builder ->
       builder
         .entranceId(new FeedScopedId(feedId, vehicleParkId.getId() + "/entrance"))
@@ -59,10 +62,31 @@ class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
       .state(toState(isUnderMaintenance))
       .coordinate(coord)
       .entrance(entrance)
+      .note(note)
       .build();
   }
 
-  private VehicleParkingState toState(boolean isUnderMaintenance) {
+  private static LocalizedString toNote(JsonNode price) {
+    var startPriceAmount = price.get("startPriceAmount").asDouble();
+    var mainPriceAmount = price.get("mainPriceAmount").asDouble();
+
+    var startPriceDurationHours = price.get("startPriceDurationHours").asInt();
+    var mainPriceDurationHours = price.get("mainPriceDurationHours").asInt();
+
+    if (startPriceAmount == 0 && mainPriceAmount == 0) {
+      return new LocalizedString("price.free");
+    } else {
+      return new LocalizedString(
+        "price.startMain",
+        NonLocalizedString.ofNumber(startPriceDurationHours),
+        NonLocalizedString.ofNumber(startPriceAmount),
+        NonLocalizedString.ofNumber(mainPriceAmount),
+        NonLocalizedString.ofNumber(mainPriceDurationHours)
+      );
+    }
+  }
+
+  private static VehicleParkingState toState(boolean isUnderMaintenance) {
     if (isUnderMaintenance) return VehicleParkingState.TEMPORARILY_CLOSED; else return OPERATIONAL;
   }
 }

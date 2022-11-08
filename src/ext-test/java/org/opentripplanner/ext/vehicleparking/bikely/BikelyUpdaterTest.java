@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Duration;
 import java.time.ZoneId;
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -33,6 +33,13 @@ public class BikelyUpdaterTest {
     assertFalse(first.hasAnyCarPlaces());
     assertTrue(first.hasBicyclePlaces());
     assertNull(first.getCapacity());
+    assertEquals(
+      "First 4 hour(s) is 0.0 kr, afterwards 10.0 kr per 1 hour(s)",
+      first.getNote().toString(Locale.ENGLISH)
+    );
+
+    var freeParkingLots = parkingLots.get(2);
+    assertEquals("Free of charge", freeParkingLots.getNote().toString(Locale.ENGLISH));
 
     var last = parkingLots.get(99);
     assertEquals("Hamar Stasjon", last.getName().toString());
