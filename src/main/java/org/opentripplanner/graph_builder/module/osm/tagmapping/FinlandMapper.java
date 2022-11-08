@@ -117,8 +117,16 @@ public class FinlandMapper implements OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.2).bicycleSafety(1.2)
     );
     props.setProperties(
+      "highway=cycleway;footway=crossing;segregated=yes;crossing=traffic_signals",
+      withModes(PEDESTRIAN).walkSafety(1.2).bicycleSafety(1.2)
+    );
+    props.setProperties(
       "highway=cycleway;cycleway=crossing;segregated=yes",
       withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.3).bicycleSafety(1.2)
+    );
+    props.setProperties(
+      "highway=cycleway;footway=crossing;segregated=yes",
+      withModes(PEDESTRIAN).walkSafety(1.3).bicycleSafety(1.2)
     );
 
     // If cycleway is not segregated, walking is less safe on crossing than it is footway crossings
@@ -127,7 +135,15 @@ public class FinlandMapper implements OsmTagMapper {
       withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.25).bicycleSafety(1.2)
     );
     props.setProperties(
+      "highway=cycleway;footway=crossing;crossing=traffic_signals",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.25).bicycleSafety(1.2)
+    );
+    props.setProperties(
       "highway=cycleway;cycleway=crossing",
+      withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.35).bicycleSafety(1.2)
+    );
+    props.setProperties(
+      "highway=cycleway;footway=crossing",
       withModes(PEDESTRIAN_AND_BICYCLE).walkSafety(1.35).bicycleSafety(1.2)
     );
 
