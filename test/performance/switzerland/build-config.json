@@ -9,13 +9,13 @@
   "transitFeeds": [
     {
       "type": "gtfs",
-      "source": "https://opentransportdata.swiss/en/dataset/timetable-2022-gtfs2020/resource_permalink/gtfs_fp2022_2022-11-02_04-15.zip",
+      "source": "https://otp-performance.leonard.io/data/switzerland/gtfs_fp2022_2022-11-02_04-15.zip",
       "feedId": "1"
     }
   ],
   "osm": [
     {
-      "source": "https://planet.osm.ch/switzerland-padded.osm.pbf"
+      "source": "https://otp-performance.leonard.io/data/switzerland/switzerland-padded-2022-11-07.osm.pbf"
     }
   ]
 }
