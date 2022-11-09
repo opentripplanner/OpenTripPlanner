@@ -48,4 +48,11 @@ public class WayTestData {
 
     return way;
   }
+
+  public static OSMWithTags cyclewayLeft() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("cycleway:left", "lane");
+    return way;
+  }
 }

@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module.osm.specifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 class BestMatchSpecifierTest extends SpecifierTest {
 
@@ -11,6 +10,8 @@ class BestMatchSpecifierTest extends SpecifierTest {
   OsmSpecifier pedestrianUndergroundTunnel = new BestMatchSpecifier(
     "highway=footway;layer=-1;tunnel=yes;indoor=yes"
   );
+
+  OsmSpecifier bikeLane = new BestMatchSpecifier("highway=residential;cycleway=lane");
 
   @Test
   public void carTunnel() {
@@ -25,5 +26,13 @@ class BestMatchSpecifierTest extends SpecifierTest {
 
     assertScore(0, highwayPrimary, tunnel);
     assertScore(410, pedestrianUndergroundTunnel, tunnel);
+  }
+
+  @Test
+  public void leftRightMatch() {
+    var way = WayTestData.cyclewayLeft();
+    var result = bikeLane.matchScores(way);
+    assertEquals(210, result.left());
+    assertEquals(100, result.right());
   }
 }

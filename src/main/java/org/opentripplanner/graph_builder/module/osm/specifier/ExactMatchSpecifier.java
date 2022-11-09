@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
 import java.util.List;
-import java.util.Objects;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.HoustonMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
@@ -26,17 +25,17 @@ public class ExactMatchSpecifier implements OsmSpecifier {
    */
   public static final int MATCH_MULTIPLIER = 200;
   public static final int NO_MATCH_SCORE = 0;
-  private final List<Tag> pairs;
+  private final List<Operation> operations;
   private final int bestMatchScore;
 
   public ExactMatchSpecifier(String spec) {
-    pairs = OsmSpecifier.getTagsFromString(spec, ";");
-    if (pairs.stream().anyMatch(Tag::isWildcard)) {
+    operations = OsmSpecifier.parseOperations(spec, ";");
+    if (operations.stream().anyMatch(Operation::isWildcard)) {
       throw new IllegalArgumentException(
         "Wildcards are not allowed in %s".formatted(this.getClass().getSimpleName())
       );
     }
-    bestMatchScore = pairs.size() * MATCH_MULTIPLIER;
+    bestMatchScore = operations.size() * MATCH_MULTIPLIER;
   }
 
   @Override
@@ -54,10 +53,6 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   public boolean allTagsMatch(OSMWithTags way) {
-    return pairs.stream().allMatch(p -> matchValue(way.getTag(p.key()), p.value()));
-  }
-
-  private static boolean matchValue(String wayValue, String specValue) {
-    return ((Objects.nonNull(wayValue) && wayValue.equals(specValue)));
+    return operations.stream().allMatch(o -> o.matches(way));
   }
 }

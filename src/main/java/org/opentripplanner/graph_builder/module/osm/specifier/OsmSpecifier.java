@@ -15,13 +15,13 @@ public interface OsmSpecifier {
     return matchValue != null && value != null && value.equals("*");
   }
 
-  static List<Tag> getTagsFromString(String spec, String separator) {
+  static List<Operation> parseOperations(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
-        return new Tag(kv[0].toLowerCase(), kv[1].toLowerCase());
+        return (Operation) new Operation.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
       })
       .toList();
   }
@@ -42,12 +42,6 @@ public interface OsmSpecifier {
    * :left and :right.
    */
   int matchScore(OSMWithTags way);
-
-  record Tag(String key, String value) {
-    public boolean isWildcard() {
-      return value.equals("*");
-    }
-  }
 
   record Scores(int left, int right) {
     public static Scores of(int s) {

@@ -21,24 +21,56 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * @see ExactMatchSpecifier#MATCH_MULTIPLIER
    */
   public static final int EXACT_MATCH_SCORE = 100;
-  private final List<Tag> pairs;
+  private final List<Operation> operations;
 
   public BestMatchSpecifier(String spec) {
-    pairs = OsmSpecifier.getTagsFromString(spec, ";");
+    operations = OsmSpecifier.parseOperations(spec, ";");
   }
 
   @Override
   public Scores matchScores(OSMWithTags way) {
-    return computeScores(way);
+    int leftScore = 0, rightScore = 0;
+    int leftMatches = 0, rightMatches = 0;
+
+    for (var pair : operations) {
+      String tag = pair.key();
+      String value = pair.value();
+      var leftMatchValue = way.getTag(tag + ":left");
+      String rightMatchValue = way.getTag(tag + ":right");
+      String matchValue = way.getTag(tag);
+      if (leftMatchValue == null) {
+        leftMatchValue = matchValue;
+      }
+      if (rightMatchValue == null) {
+        rightMatchValue = matchValue;
+      }
+
+      int leftTagScore = getTagScore(value, leftMatchValue);
+      leftScore += leftTagScore;
+      if (leftTagScore > 0) {
+        leftMatches++;
+      }
+      int rightTagScore = getTagScore(value, rightMatchValue);
+      rightScore += rightTagScore;
+      if (rightTagScore > 0) {
+        rightMatches++;
+      }
+    }
+
+    int allMatchLeftBonus = (leftMatches == operations.size()) ? 10 : 0;
+    leftScore += allMatchLeftBonus;
+    int allMatchRightBonus = (rightMatches == operations.size()) ? 10 : 0;
+    rightScore += allMatchRightBonus;
+    return new Scores(leftScore, rightScore);
   }
 
   @Override
   public int matchScore(OSMWithTags way) {
     int score = 0;
     int matches = 0;
-    for (var pair : pairs) {
-      String tag = pair.key();
-      String value = pair.value();
+    for (var op : operations) {
+      String tag = op.key();
+      String value = op.value();
       String matchValue = way.getTag(tag);
       int tagScore = getTagScore(value, matchValue);
       score += tagScore;
@@ -46,13 +78,13 @@ public class BestMatchSpecifier implements OsmSpecifier {
         matches += 1;
       }
     }
-    score += matches == pairs.size() ? 10 : 0;
+    score += matches == operations.size() ? 10 : 0;
     return score;
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("pairs", pairs).toString();
+    return ToStringBuilder.of(this.getClass()).addObj("pairs", operations).toString();
   }
 
   /**
@@ -81,41 +113,5 @@ public class BestMatchSpecifier implements OsmSpecifier {
         return 0;
       }
     }
-  }
-
-  private Scores computeScores(OSMWithTags way) {
-    int leftScore = 0, rightScore = 0;
-    int leftMatches = 0, rightMatches = 0;
-
-    for (var pair : pairs) {
-      String tag = pair.key();
-      String value = pair.value();
-      String leftMatchValue = way.getTag(tag + ":left");
-      String rightMatchValue = way.getTag(tag + ":right");
-      String matchValue = way.getTag(tag);
-      if (leftMatchValue == null) {
-        leftMatchValue = matchValue;
-      }
-      if (rightMatchValue == null) {
-        rightMatchValue = matchValue;
-      }
-
-      int leftTagScore = getTagScore(value, leftMatchValue);
-      leftScore += leftTagScore;
-      if (leftTagScore > 0) {
-        leftMatches++;
-      }
-      int rightTagScore = getTagScore(value, rightMatchValue);
-      rightScore += rightTagScore;
-      if (rightTagScore > 0) {
-        rightMatches++;
-      }
-    }
-
-    int allMatchLeftBonus = (leftMatches == pairs.size()) ? 10 : 0;
-    leftScore += allMatchLeftBonus;
-    int allMatchRightBonus = (rightMatches == pairs.size()) ? 10 : 0;
-    rightScore += allMatchRightBonus;
-    return new Scores(leftScore, rightScore);
   }
 }
