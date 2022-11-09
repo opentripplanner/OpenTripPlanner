@@ -59,6 +59,10 @@ jobs:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
     runs-on: ubuntu-latest
     needs: build
+    env:
+      REMOTE: docs
+      LOCAL_BRANCH: local-pages
+      REMOTE_BRANCH: main
     steps:
       - uses: actions/checkout@v3.1.0
       - name: Install Python dependencies
@@ -67,8 +71,12 @@ jobs:
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
-          mike list
-          mike deploy --remote git@github.com:opentripplanner/docs-experiment.git --branch main --push dev
+          
+          git remote add $REMOTE git@github.com:opentripplanner/docs-experiment.git
+          git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
+          
+          mike deploy --branch $LOCAL_BRANCH 2.2
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
