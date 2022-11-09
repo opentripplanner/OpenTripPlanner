@@ -64,8 +64,12 @@ jobs:
       REMOTE: docs
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
+      TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
+
     steps:
       - uses: actions/checkout@v3.1.0
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
       - name: Deploy docs to Github pages
@@ -73,11 +77,11 @@ jobs:
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
           
-          git remote add $REMOTE https://${{ secrets.CHANGELOG_TOKEN }}@github.com/opentripplanner/docs-experiment.git 
-          git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
+          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/docs-experiment.git 
           
+          git fetch $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
           mike deploy --branch $LOCAL_BRANCH dev
-          git push https://${{ secrets.CHANGELOG_TOKEN }}@github.com/opentripplanner/docs-experiment.git $LOCAL_BRANCH:$REMOTE_BRANCH
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
