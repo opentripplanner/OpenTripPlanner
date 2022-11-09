@@ -70,6 +70,11 @@ public enum OTPFeature {
   FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
+  RealtimeResolver(
+    false,
+    true,
+    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
+  ),
   ReportApi(false, true, "Enable the report API."),
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPILegacyGraphQLApi(false, true, "Enable (GTFS) GraphQL API."),
@@ -78,12 +83,7 @@ public enum OTPFeature {
   SandboxAPITransmodelApi(false, true, "Enable Entur Transmodel(NeTEx) GraphQL API."),
   SandboxAPITravelTime(false, true, "Enable the isochrone/travel time surface API."),
   TransferAnalyzer(false, true, "Analyze transfers during graph build."),
-  VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries."),
-  RealtimeResolver(
-    false,
-    true,
-    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
-  );
+  VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries.");
 
   private static final Object TEST_LOCK = new Object();
 
