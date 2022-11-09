@@ -71,7 +71,7 @@ public class TestRouteData {
     var patternForDates = new TripPatternForDates(
       routingTripPattern,
       listOfTripPatternForDates,
-      new TIntArrayList(new int[] { OFFSET }),
+      new int[] { OFFSET },
       null,
       null
     );

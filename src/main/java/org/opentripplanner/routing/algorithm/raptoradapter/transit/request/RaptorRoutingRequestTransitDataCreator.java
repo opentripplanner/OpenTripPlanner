@@ -118,17 +118,15 @@ class RaptorRoutingRequestTransitDataCreator {
       patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
 
       // Calculate offsets per date
-      TIntList offsets = new TIntArrayList();
-      for (TripPatternForDate tripPatternForDate : patternsSorted) {
-        LocalDate serviceDate = tripPatternForDate.getLocalDate();
-        int offset;
+      int[] offsets = new int[patternsSorted.size()];
+      for (int i = 0; i < patternsSorted.size(); i++) {
+        LocalDate serviceDate = patternsSorted.get(i).getLocalDate();
         if (offsetCache.containsKey(serviceDate)) {
-          offset = offsetCache.get(serviceDate);
+          offsets[i] = offsetCache.get(serviceDate);
         } else {
-          offset = secondsSinceStartOfTime(transitSearchTimeZero, serviceDate);
-          offsetCache.put(serviceDate, offset);
+          offsets[i] = secondsSinceStartOfTime(transitSearchTimeZero, serviceDate);
+          offsetCache.put(serviceDate, offsets[i]);
         }
-        offsets.add(offset);
       }
 
       // Combine TripPatternForDate objects

@@ -65,13 +65,13 @@ public class TripPatternForDates
   TripPatternForDates(
     RoutingTripPattern tripPattern,
     List<TripPatternForDate> tripPatternForDates,
-    TIntList offsets,
+    int[] offsets,
     BitSet boardingPossible,
     BitSet alightningPossible
   ) {
     this.tripPattern = tripPattern;
     this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[] {});
-    this.offsets = offsets.toArray();
+    this.offsets = offsets;
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
 
