@@ -19,7 +19,7 @@ import org.opentripplanner.routing.edgetype.VehicleRentalEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_rental.RentalVehicleType.FormFactor;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vertextype.VehicleRentalPlaceVertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
@@ -45,13 +45,13 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private VertexLinker linker;
 
-  private VehicleRentalStationService service;
+  private VehicleRentalService service;
 
   public VehicleRentalUpdater(
     VehicleRentalUpdaterParameters parameters,
     DataSource<VehicleRentalPlace> source,
     VertexLinker vertexLinker,
-    VehicleRentalStationService vehicleRentalStationService
+    VehicleRentalService vehicleRentalStationService
   ) throws IllegalArgumentException {
     super(parameters);
     // Configure updater

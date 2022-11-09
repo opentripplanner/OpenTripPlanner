@@ -8,7 +8,7 @@ import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
-public class PollingStoptimeUpdaterConfig {
+public class PollingTripUpdaterConfig {
 
   public static PollingTripUpdaterParameters create(String configRef, NodeAdapter c) {
     String file = null;
