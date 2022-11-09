@@ -10,15 +10,18 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.util.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,15 +171,21 @@ class RaptorRoutingRequestTransitDataCreator {
     // On the first search day we want to add both TripPatternsForDate objects that start that day
     // and any previous day, while on subsequent search days we only want to add the
     // TripPatternForDate objects that start on that particular day. This is to prevent duplicates.
-
-    return transitLayer
-      .getTripPatternsForDate(date)
-      .stream()
-      .filter(filter::tripPatternPredicate)
-      .filter(p -> firstDay || p.getStartOfRunningPeriod().toLocalDate().equals(date))
-      .map(p -> p.newWithFilteredTripTimes(filter::tripTimesPredicate))
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+    // This was previously a stream, but was unrolled for improved performance.
+    Predicate<TripTimes> tripTimesPredicate = filter::tripTimesPredicate;
+    Collection<TripPatternForDate> tripPatternsForDate = transitLayer.getTripPatternsForDate(date);
+    List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
+    for (TripPatternForDate p : tripPatternsForDate) {
+      if (filter.tripPatternPredicate(p)) {
+        if (firstDay || p.getStartOfRunningPeriod().toLocalDate().equals(date)) {
+          TripPatternForDate tripPatternForDate = p.newWithFilteredTripTimes(tripTimesPredicate);
+          if (tripPatternForDate != null) {
+            result.add(tripPatternForDate);
+          }
+        }
+      }
+    }
+    return result;
   }
 
   private List<TripPatternForDate> getTripPatternsForDateRange(
