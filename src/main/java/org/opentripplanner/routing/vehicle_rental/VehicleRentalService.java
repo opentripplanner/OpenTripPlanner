@@ -66,7 +66,7 @@ public class VehicleRentalService implements Serializable {
   }
 
   public boolean hasRentalBikes() {
-    return vehicleRentalStations
+    return rentalPlaces
       .values()
       .stream()
       .anyMatch(place -> {
