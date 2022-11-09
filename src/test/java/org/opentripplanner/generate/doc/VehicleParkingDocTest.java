@@ -81,6 +81,7 @@ public class VehicleParkingDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
+    buf.addSection("##### Example configuration");
     buf.addExample(
       "router-config.json",
       """

@@ -75,6 +75,8 @@ Used for converting abstract opening hours into concrete points in time.
 
 
 
+##### Example configuration
+
 ```JSON
 // router-config.json
 {
@@ -133,6 +135,8 @@ This will end up in the API responses as the feed id of of the parking lot.
 The source of the vehicle updates.
 
 
+
+##### Example configuration
 
 ```JSON
 // router-config.json
@@ -215,6 +219,8 @@ Tags to add to the parking lots.
 
 
 
+##### Example configuration
+
 ```JSON
 // router-config.json
 {
@@ -280,6 +286,8 @@ The source of the vehicle updates.
 HTTP headers to add.
 
 
+
+##### Example configuration
 
 ```JSON
 // router-config.json
