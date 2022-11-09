@@ -15,7 +15,6 @@ public class TransitAlert implements Serializable {
 
   private static final long serialVersionUID = 8305126586053909836L;
   private final Set<EntitySelector> entities = new HashSet<>();
-  private final Collection<StopCondition> stopConditions = new ArrayList<>();
   private String id;
   public I18NString alertHeaderText;
   public I18NString alertDescriptionText;
@@ -81,10 +80,6 @@ public class TransitAlert implements Serializable {
 
   public Set<EntitySelector> getEntities() {
     return entities;
-  }
-
-  public Collection<StopCondition> getStopConditions() {
-    return stopConditions;
   }
 
   public String getFeedId() {

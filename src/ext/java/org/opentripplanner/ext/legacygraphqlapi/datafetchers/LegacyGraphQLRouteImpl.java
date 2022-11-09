@@ -74,10 +74,8 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                       .getEntities()
                       .stream()
                       .anyMatch(entity ->
-                        entity instanceof EntitySelector.StopAndRoute &&
-                        ((EntitySelector.StopAndRoute) entity).stopAndRoute.routeOrTrip.equals(
-                            getSource(environment).getId()
-                          )
+                        entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                        stopAndRoute.routeId().equals(getSource(environment).getId())
                       )
                   )
                   .toList()
@@ -99,10 +97,8 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
                         .getEntities()
                         .stream()
                         .anyMatch(entity ->
-                          entity instanceof EntitySelector.StopAndTrip &&
-                          ((EntitySelector.StopAndTrip) entity).stopAndTrip.routeOrTrip.equals(
-                              trip.getId()
-                            )
+                          entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                          stopAndTrip.tripId().equals(trip.getId())
                         )
                     )
                     .toList()

@@ -159,7 +159,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     return filterByPlaceTypes == null || filterByPlaceTypes.contains(type);
   }
 
-  private boolean stopHasRoutesWithMode(RegularStop stop, Set<TransitMode> modes) {
+  private boolean stopHasPatternsWithMode(RegularStop stop, Set<TransitMode> modes) {
     return transitService
       .getPatternsForStop(stop)
       .stream()
@@ -174,7 +174,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     if (
       includeStops &&
       !seenStops.contains(stop.getId()) &&
-      (filterByModes == null || stopHasRoutesWithMode(stop, filterByModes))
+      (filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
     ) {
       placesFound.add(new PlaceAtDistance(stop, distance));
       seenStops.add(stop.getId());

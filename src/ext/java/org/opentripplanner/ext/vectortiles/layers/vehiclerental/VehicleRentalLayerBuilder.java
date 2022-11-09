@@ -11,15 +11,15 @@ import org.opentripplanner.ext.vectortiles.LayerBuilder;
 import org.opentripplanner.ext.vectortiles.PropertyMapper;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalPlace;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends LayerBuilder<T> {
 
-  private final VehicleRentalStationService service;
+  private final VehicleRentalService service;
 
   public VehicleRentalLayerBuilder(
-    VehicleRentalStationService service,
+    VehicleRentalService service,
     Map<MapperType, PropertyMapper<T>> mappers,
     VectorTilesResource.LayerParameters layerParameters
   ) {
@@ -43,7 +43,7 @@ abstract class VehicleRentalLayerBuilder<T extends VehicleRentalPlace> extends L
       .toList();
   }
 
-  protected abstract Collection<T> getVehicleRentalPlaces(VehicleRentalStationService service);
+  protected abstract Collection<T> getVehicleRentalPlaces(VehicleRentalService service);
 
   enum MapperType {
     Digitransit,

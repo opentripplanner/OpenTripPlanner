@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.util.TravelOption;
@@ -34,7 +34,7 @@ public class ApiRouterInfo {
 
   /** TODO: Do not pass in the graph here, do this in a mapper instead. */
   public ApiRouterInfo(String routerId, Graph graph, TransitService transitService) {
-    VehicleRentalStationService vehicleRentalService = graph.getVehicleRentalStationService();
+    VehicleRentalService vehicleRentalService = graph.getVehicleRentalService();
     VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
 
     this.routerId = routerId;
@@ -53,7 +53,7 @@ public class ApiRouterInfo {
     transitService.getCenter().ifPresentOrElse(this::setCenter, this::calculateCenter);
   }
 
-  public boolean mapHasBikeSharing(VehicleRentalStationService service) {
+  public boolean mapHasBikeSharing(VehicleRentalService service) {
     if (service == null) {
       return false;
     }

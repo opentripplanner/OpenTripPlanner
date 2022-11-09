@@ -9,11 +9,13 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentest4j.AssertionFailedError;
+import org.opentripplanner.generate.doc.framework.OnlyIfDocsExist;
 import org.opentripplanner.standalone.config.framework.JsonSupport;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.project.EnvironmentVariableReplacer;
 import org.opentripplanner.test.support.FilePatternSource;
 
+@OnlyIfDocsExist
 public class ExampleConfigTest {
 
   @FilePatternSource(pattern = "docs/examples/**/router-config.json")

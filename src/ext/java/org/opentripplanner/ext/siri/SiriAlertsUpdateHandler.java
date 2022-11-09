@@ -17,8 +17,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -235,9 +233,12 @@ public class SiriAlertsUpdateHandler {
             stopId = new FeedScopedId(feedId, stopPointRef.getValue());
           }
 
-          alert.addEntity(new EntitySelector.Stop(stopId));
-          // TODO: is this correct? Should the stop conditions be in the entity selector?
-          updateStopConditions(alert, stopPoint.getStopConditions());
+          EntitySelector.Stop entitySelector = new EntitySelector.Stop(
+            stopId,
+            resolveStopConditions(stopPoint.getStopConditions())
+          );
+
+          alert.addEntity(entitySelector);
         }
       } else if (stopPlaces != null && isNotEmpty(stopPlaces.getAffectedStopPlaces())) {
         for (AffectedStopPlaceStructure stopPoint : stopPlaces.getAffectedStopPlaces()) {
@@ -300,9 +301,12 @@ public class SiriAlertsUpdateHandler {
                   if (stop == null) {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
                   }
-                  alert.addEntity(new EntitySelector.StopAndRoute(stop, affectedRoute));
-                  // TODO: is this correct? Should the stop conditions be in the entity selector?
-                  updateStopConditions(alert, affectedStop.getStopConditions());
+                  EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
+                    stop,
+                    resolveStopConditions(affectedStop.getStopConditions()),
+                    affectedRoute
+                  );
+                  alert.addEntity(entitySelector);
                 }
               } else {
                 alert.addEntity(new EntitySelector.Route(affectedRoute));
@@ -369,11 +373,9 @@ public class SiriAlertsUpdateHandler {
                 tripIds.add(tripIdFromVehicleJourney);
               } else if (siriFuzzyTripMatcher != null) {
                 tripIds =
-                  siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDateAndMode(
+                  siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                     vehicleJourneyRef.getValue(),
-                    serviceDate,
-                    TransitMode.RAIL,
-                    SubMode.of("railReplacementBus")
+                    serviceDate
                   );
               }
 
@@ -389,10 +391,13 @@ public class SiriAlertsUpdateHandler {
                       stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
                     }
                     // Creating unique, deterministic id for the alert
-                    alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId, serviceDate));
-
-                    // TODO: is this correct? Should the stop conditions be in the entity selector?
-                    updateStopConditions(alert, affectedStop.getStopConditions());
+                    EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
+                      stop,
+                      tripId,
+                      serviceDate,
+                      resolveStopConditions(affectedStop.getStopConditions())
+                    );
+                    alert.addEntity(entitySelector);
                   }
                 } else {
                   alert.addEntity(new EntitySelector.Trip(tripId, serviceDate));
@@ -425,7 +430,14 @@ public class SiriAlertsUpdateHandler {
                     stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
                   }
 
-                  alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId, serviceDate));
+                  alert.addEntity(
+                    new EntitySelector.StopAndTrip(
+                      stop,
+                      tripId,
+                      serviceDate,
+                      resolveStopConditions(affectedStop.getStopConditions())
+                    )
+                  );
                 }
               } else {
                 alert.addEntity(new EntitySelector.Trip(tripId, serviceDate));
@@ -434,10 +446,6 @@ public class SiriAlertsUpdateHandler {
           }
         }
       }
-    }
-
-    if (alert.getStopConditions().isEmpty()) {
-      updateStopConditions(alert, null);
     }
 
     alert.alertType = situation.getReportType();
@@ -545,10 +553,7 @@ public class SiriAlertsUpdateHandler {
     return alertUrls;
   }
 
-  private void updateStopConditions(
-    TransitAlert alertPatch,
-    List<RoutePointTypeEnumeration> stopConditions
-  ) {
+  private Set<StopCondition> resolveStopConditions(List<RoutePointTypeEnumeration> stopConditions) {
     Set<StopCondition> alertStopConditions = new HashSet<>();
     if (stopConditions != null) {
       for (RoutePointTypeEnumeration stopCondition : stopConditions) {
@@ -576,7 +581,7 @@ public class SiriAlertsUpdateHandler {
       alertStopConditions.add(StopCondition.START_POINT);
       alertStopConditions.add(StopCondition.DESTINATION);
     }
-    alertPatch.getStopConditions().addAll(alertStopConditions);
+    return alertStopConditions;
   }
 
   /**

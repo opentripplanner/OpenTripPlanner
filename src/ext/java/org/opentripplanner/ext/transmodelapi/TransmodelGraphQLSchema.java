@@ -1336,7 +1336,7 @@ public class TransmodelGraphQLSchema {
             Collection<VehicleRentalPlace> all = new ArrayList<>(
               GqlUtil
                 .getRoutingService(environment)
-                .getVehicleRentalStationService()
+                .getVehicleRentalService()
                 .getVehicleRentalStations()
             );
             List<String> filterByIds = environment.getArgument("ids");
@@ -1367,7 +1367,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             return GqlUtil
               .getRoutingService(environment)
-              .getVehicleRentalStationService()
+              .getVehicleRentalService()
               .getVehicleRentalStations()
               .stream()
               .filter(bikeRentalStation ->
@@ -1408,7 +1408,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment ->
             GqlUtil
               .getRoutingService(environment)
-              .getVehicleRentalStationService()
+              .getVehicleRentalService()
               .getVehicleRentalStationForEnvelope(
                 environment.getArgument("minimumLongitude"),
                 environment.getArgument("minimumLatitude"),

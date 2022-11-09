@@ -30,7 +30,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.RealtimeVehiclePositionService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_rental.VehicleRentalStationService;
+import org.opentripplanner.routing.vehicle_rental.VehicleRentalService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -102,7 +102,7 @@ public class Graph implements Serializable {
   private double distanceBetweenElevationSamples;
 
   private transient RealtimeVehiclePositionService vehiclePositionService;
-  private final VehicleRentalStationService vehicleRentalStationService = new VehicleRentalStationService();
+  private final VehicleRentalService vehicleRentalStationService = new VehicleRentalService();
 
   private final VehicleParkingService vehicleParkingService = new VehicleParkingService();
   private FareService fareService;
@@ -430,7 +430,7 @@ public class Graph implements Serializable {
   }
 
   @Nonnull
-  public VehicleRentalStationService getVehicleRentalStationService() {
+  public VehicleRentalService getVehicleRentalService() {
     return vehicleRentalStationService;
   }
 

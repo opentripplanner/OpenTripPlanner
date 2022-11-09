@@ -23,6 +23,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final int cost;
   private final int numberOfRides;
   private final boolean stopReachedOnBoard;
+  private final boolean isEmpty;
   private final Integer opening;
   private final Integer closing;
 
@@ -32,6 +33,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.cost = builder.cost;
     this.numberOfRides = builder.numberOfRides;
     this.stopReachedOnBoard = builder.stopReachedOnBoard;
+    this.isEmpty = builder.isEmpty;
     this.opening = builder.opening;
     this.closing = builder.closing;
   }
@@ -54,6 +56,10 @@ public class TestAccessEgress implements RaptorAccessEgress {
       .withNRides(1)
       .stopReachedOnBoard()
       .build();
+  }
+
+  public static TestAccessEgress zeroDurationAccess(int stop, int cost) {
+    return new Builder(stop, 0).withIsEmpty(true).withCost(cost).build();
   }
 
   /**
@@ -219,6 +225,11 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
+  public boolean isEmpty() {
+    return this.isEmpty;
+  }
+
+  @Override
   public String toString() {
     return asString();
   }
@@ -241,6 +252,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
     Integer opening = null;
     Integer closing = null;
+    private boolean isEmpty;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -251,11 +263,16 @@ public class TestAccessEgress implements RaptorAccessEgress {
     Builder(TestAccessEgress transfer) {
       this.stop = transfer.stop;
       this.durationInSeconds = transfer.durationInSeconds;
+      this.stopReachedOnBoard = transfer.stopReachedOnBoard;
       this.cost = transfer.cost;
       this.numberOfRides = transfer.numberOfRides;
-      this.stopReachedOnBoard = transfer.stopReachedOnBoard;
       this.opening = transfer.opening;
       this.closing = transfer.closing;
+    }
+
+    Builder withIsEmpty(boolean isEmpty) {
+      this.isEmpty = isEmpty;
+      return this;
     }
 
     Builder withCost(int cost) {
