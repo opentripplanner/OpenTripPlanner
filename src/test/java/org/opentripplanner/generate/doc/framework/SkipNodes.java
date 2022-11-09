@@ -12,14 +12,14 @@ import org.opentripplanner.standalone.config.framework.json.NodeInfo;
  */
 public class SkipNodes implements SkipFunction {
 
-  private final Map<String, String> map = new HashMap<>();
+  private final Map<String, String> map;
 
-  public static SkipNodes of(String... values) {
-    var skipNodes = new SkipNodes();
-    for (int i = 0; i < values.length; i += 2) {
-      skipNodes.put(values[i], values[i + 1]);
-    }
-    return skipNodes;
+  public SkipNodes(Map<String, String> map) {
+    this.map = Map.copyOf(map);
+  }
+
+  public static Builder of() {
+    return new Builder();
   }
 
   @Override
@@ -34,5 +34,19 @@ public class SkipNodes implements SkipFunction {
 
   private void put(String key, String value) {
     map.put(key, value);
+  }
+
+  public static class Builder {
+
+    Map<String, String> map = new HashMap<>();
+
+    public Builder add(String parameterName, String link) {
+      map.put(parameterName, link);
+      return this;
+    }
+
+    public SkipNodes build() {
+      return new SkipNodes(map);
+    }
   }
 }

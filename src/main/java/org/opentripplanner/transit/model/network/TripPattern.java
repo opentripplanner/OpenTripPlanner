@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.network;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElseGet;
 import static org.opentripplanner.util.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ public final class TripPattern
    */
   private final StopPattern stopPattern;
   private final Timetable scheduledTimetable;
+  private final TransitMode mode;
   private String name;
   /**
    * Geometries of each inter-stop segment of the tripPattern.
@@ -84,6 +86,7 @@ public final class TripPattern
     this.route = builder.getRoute();
     this.stopPattern = requireNonNull(builder.getStopPattern());
     this.createdByRealtimeUpdater = builder.isCreatedByRealtimeUpdate();
+    this.mode = requireNonNullElseGet(builder.getMode(), route::getMode);
 
     this.scheduledTimetable =
       builder.getScheduledTimetable() != null
@@ -117,10 +120,10 @@ public final class TripPattern
   }
 
   /**
-   * Convenience method to get the route traverse mode, the mode for all trips in this pattern.
+   * Get the mode for all trips in this pattern.
    */
   public TransitMode getMode() {
-    return route.getMode();
+    return mode;
   }
 
   public LineString getHopGeometry(int stopPosInPattern) {
@@ -402,10 +405,6 @@ public final class TripPattern
     return tripTimes.getHeadsign(stopIndex);
   }
 
-  public boolean matchesModeOrSubMode(TransitMode mode, SubMode transportSubmode) {
-    return getMode().equals(mode) || route.getNetexSubmode().equals(transportSubmode);
-  }
-
   public TripPattern clone() {
     try {
       return (TripPattern) super.clone();
@@ -443,6 +442,7 @@ public final class TripPattern
     return (
       getId().equals(other.getId()) &&
       Objects.equals(this.route, other.route) &&
+      Objects.equals(this.mode, other.mode) &&
       Objects.equals(this.name, other.name) &&
       Objects.equals(this.stopPattern, other.stopPattern) &&
       Objects.equals(this.scheduledTimetable, other.scheduledTimetable)

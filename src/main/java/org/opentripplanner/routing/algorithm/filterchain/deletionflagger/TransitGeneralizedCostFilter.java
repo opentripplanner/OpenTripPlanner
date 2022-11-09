@@ -57,7 +57,7 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
   private double getWaitTimeCost(Itinerary a, Itinerary b) {
     return (
       intervalRelaxFactor *
-      Math.max(
+      Math.min(
         Math.abs(ChronoUnit.SECONDS.between(a.startTime(), b.startTime())),
         Math.abs(ChronoUnit.SECONDS.between(a.endTime(), b.endTime()))
       )

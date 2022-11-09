@@ -16,9 +16,22 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
   private final Collection<String> tracingHeaderTags;
 
   public TransmodelAPIConfig(NodeAdapter node) {
-    hideFeedId = node.of("hideFeedId").since(NA).summary("TODO").asBoolean(false);
+    hideFeedId =
+      node
+        .of("hideFeedId")
+        .since(NA)
+        .summary("Hide the FeedId in all API output, and add it to input.")
+        .description(
+          "Only turn this feature on if you have unique ids across all feeds, without the " +
+          "feedId prefix."
+        )
+        .asBoolean(false);
     tracingHeaderTags =
-      node.of("tracingHeaderTags").since(NA).summary("TODO").asStringList(Set.of());
+      node
+        .of("tracingHeaderTags")
+        .since(NA)
+        .summary("Used to group requests when monitoring OTP.")
+        .asStringList(Set.of());
   }
 
   @Override

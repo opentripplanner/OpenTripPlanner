@@ -13,6 +13,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
  * related to street and transit routing. The values are normalized(rounded) so the class
  * can used as a cache key.
  * <p>
+ * See the configuration for documentation of each field.
+ * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 public final class WalkPreferences implements Serializable {
@@ -89,13 +91,6 @@ public final class WalkPreferences implements Serializable {
     return stairsReluctance;
   }
 
-  /**
-   * How much more time does it take to walk a flight of stairs compared to walking a similar
-   * horizontal length
-   * <p>
-   * Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking speed of
-   * pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
-   */
   public double stairsTimeFactor() {
     return stairsTimeFactor;
   }

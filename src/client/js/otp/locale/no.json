@@ -104,7 +104,7 @@
     "No trip found. There may be no transit service within the maximum specified distance or at the specified time, or your start or end point might not be safely accessible.": "Ingen reise funnet. Sjekk at fra/til sted er innenfor angitt gangavstand til destinasjon, stopested, bysykkel-stativ og/eller påstigningspunkt for bil.",
     "No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose.": "Ingen kolektivreiser funnet for denne dagen.",
     "The trip planner is taking way too long to process your request. Please try again later.": "Reiseplanleggeren svarer ikke på forspørsel. Prøv igjen senere.",
-    "The request has errors that the server is not willing or able to process.": "Ugyldig input data. Server er ikke i stand til å behandle 'RoutingRequest'.",
+    "The request has errors that the server is not willing or able to process.": "Ugyldig input data. Server er ikke i stand til å behandle 'RouteRequest'.",
     "Origin is unknown. Can you be a bit more descriptive?": "Avreisested er ukjent. Kan du spesifisere nærmere?",
     "Destination is unknown.  Can you be a bit more descriptive?": "Reisemålet er ukjent. Kan du spesifisere nærmere?",
     "Both origin and destination are unknown. Can you be a bit more descriptive?": "Både fra/til sted er ukjent. Kan du spesifisere nærmere?",

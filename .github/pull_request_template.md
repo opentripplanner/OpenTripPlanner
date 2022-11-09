@@ -55,8 +55,7 @@ Write a few words on how the new code is tested.
 - Have you added documentation in code covering design and rationale behind the code?
 - Were all non-trivial public classes and methods documented with Javadoc?
 - Were any new configuration options added? If so were the tables in
-  the [configuration documentation](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/docs/Configuration.md)
-  updated?
+  the [configuration documentation](Configuration.md) updated?
 
 ### Changelog
 

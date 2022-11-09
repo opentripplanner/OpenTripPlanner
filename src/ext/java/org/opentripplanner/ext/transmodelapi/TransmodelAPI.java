@@ -72,14 +72,14 @@ public class TransmodelAPI {
   public static void setUp(
     TransmodelAPIParameters config,
     TransitModel transitModel,
-    RouteRequest defaultRoutingRequest
+    RouteRequest defaultRouteRequest
   ) {
     if (config.hideFeedId()) {
       TransitIdMapper.setupFixedFeedId(transitModel.getAgencies());
     }
     tracingHeaderTags = config.tracingHeaderTags();
     GqlUtil gqlUtil = new GqlUtil(transitModel.getTimeZone());
-    schema = TransmodelGraphQLSchema.create(defaultRoutingRequest, gqlUtil);
+    schema = TransmodelGraphQLSchema.create(defaultRouteRequest, gqlUtil);
   }
 
   /**

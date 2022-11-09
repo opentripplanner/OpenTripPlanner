@@ -42,7 +42,7 @@ import org.slf4j.Logger;
 @HttpRequestScoped
 public interface OtpServerRequestContext {
   /**
-   * A RoutingRequest containing default parameters that will be cloned when handling each request.
+   * A RouteRequest containing default parameters that will be cloned when handling each request.
    */
   @HttpRequestScoped
   RouteRequest defaultRouteRequest();

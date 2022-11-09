@@ -84,7 +84,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       .addParameter("publishToDateTime", toDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
       .build();
 
-    LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", url, timeout);
+    LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
 
     final long t1 = System.currentTimeMillis();
     HashMap<String, String> headers = new HashMap<>();
@@ -117,8 +117,12 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       siri.getServiceDelivery().getSituationExchangeDeliveries() == null ||
       siri.getServiceDelivery().getSituationExchangeDeliveries().isEmpty()
     ) {
-      LOG.warn("Empty Siri message for messageId {}", id);
-      LOG.debug(message);
+      if (siri.getHeartbeatNotification() != null) {
+        LOG.info("Received SIRI heartbeat message");
+      } else {
+        LOG.warn("Empty Siri message for messageId {}", id);
+        LOG.debug(message);
+      }
       return null;
     }
     return siri;

@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.SlackProvider;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractEntityBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.util.geometry.CompactLineStringUtils;
@@ -17,6 +18,7 @@ public final class TripPatternBuilder
   extends AbstractEntityBuilder<TripPattern, TripPatternBuilder> {
 
   private Route route;
+  private TransitMode mode;
   private StopPattern stopPattern;
   private Timetable scheduledTimetable;
   private String name;
@@ -34,6 +36,7 @@ public final class TripPatternBuilder
     super(original);
     this.name = original.getName();
     this.route = original.getRoute();
+    this.mode = original.getMode();
     this.stopPattern = original.getStopPattern();
     this.scheduledTimetable = original.getScheduledTimetable();
     this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
@@ -51,6 +54,11 @@ public final class TripPatternBuilder
 
   public TripPatternBuilder withRoute(Route route) {
     this.route = route;
+    return this;
+  }
+
+  public TripPatternBuilder withMode(TransitMode mode) {
+    this.mode = mode;
     return this;
   }
 
@@ -91,6 +99,10 @@ public final class TripPatternBuilder
 
   public Route getRoute() {
     return route;
+  }
+
+  public TransitMode getMode() {
+    return mode;
   }
 
   public StopPattern getStopPattern() {

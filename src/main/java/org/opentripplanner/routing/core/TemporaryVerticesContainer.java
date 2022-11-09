@@ -24,7 +24,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.geometry.GeometryUtils;
 
 /**
- * This class is responsible for linking the RoutingRequest origin and destination to the Graph used
+ * This class is responsible for linking the RouteRequest origin and destination to the Graph used
  * in the A-Star search, as well as removing them after the search has been done. It implements
  * AutoCloseable, in order to be able to use the try-with-resources statement, making the clean-up
  * automatic.

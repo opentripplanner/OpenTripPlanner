@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -181,7 +180,7 @@ public class ParameterBuilder {
   public <T extends Enum<T>> T asEnum(T defaultValue) {
     info
       .withEnum((Class<? extends Enum<?>>) defaultValue.getClass())
-      .withOptional(defaultValue.name());
+      .withOptional(EnumMapper.toString(defaultValue));
     // Do not inline the node, calling the build is required.
     var node = build();
     return exist() ? parseEnum(node.asText(), (Class<T>) defaultValue.getClass()) : defaultValue;
@@ -262,8 +261,17 @@ public class ParameterBuilder {
    * the type section in the configuration documents. Also, providing user-friendly messages
    * is left to the caller.
    */
-  public <T> T asCustomStringType(T defaultValue, Function<String, T> mapper) {
-    return ofOptional(STRING, defaultValue, node -> mapper.apply(node.asText()));
+  public <T> T asCustomStringType(
+    T defaultValue,
+    String defaultValueAsString,
+    Function<String, T> mapper
+  ) {
+    return ofOptional(
+      STRING,
+      defaultValue,
+      node -> mapper.apply(node.asText()),
+      it -> defaultValueAsString
+    );
   }
 
   /* Java util/time types */
@@ -282,28 +290,6 @@ public class ParameterBuilder {
 
   public Duration asDuration() {
     return ofRequired(DURATION, node -> parseDuration(node.asText()));
-  }
-
-  /**
-   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
-   * This version can be used to be backwards compatible when moving from an integer value
-   * to a duration.
-   * @deprecated This will be removed in version 2.2, change to {@link #asDuration(Duration)}
-   */
-  @Deprecated
-  public Duration asDuration2(Duration defaultValue, ChronoUnit unit) {
-    return ofOptional(DURATION, defaultValue, node -> parseDuration(node.asText(), unit));
-  }
-
-  /**
-   * Parse int using given unit or as duration string. See {@link DurationUtils#duration(String)}.
-   * This version can be used to be backwards compatible when moving from an integer value
-   * to a duration.
-   * @deprecated This will be removed in version 2.2, change to {@link #asDuration(Duration)}
-   */
-  @Deprecated
-  public Duration asDuration2(ChronoUnit unit) {
-    return ofRequired(DURATION, node -> parseDuration(node.asText(), unit));
   }
 
   public List<Duration> asDurations(List<Duration> defaultValues) {
@@ -380,11 +366,20 @@ public class ParameterBuilder {
     return ofType(type, body);
   }
 
-  private <T> T ofOptional(ConfigType type, T defaultValue, Function<JsonNode, T> body) {
-    info.withType(type).withOptional(defaultValue == null ? null : defaultValue.toString());
+  private <T> T ofOptional(
+    ConfigType type,
+    T defaultValue,
+    Function<JsonNode, T> body,
+    Function<T, String> toText
+  ) {
+    info.withType(type).withOptional(defaultValue == null ? null : toText.apply(defaultValue));
     // Do not inline the build() call, if not called the metadata is not saved.
     var node = build();
     return exist() ? body.apply(node) : defaultValue;
+  }
+
+  private <T> T ofOptional(ConfigType type, T defaultValue, Function<JsonNode, T> body) {
+    return ofOptional(type, defaultValue, body, String::valueOf);
   }
 
   private <T> T ofOptionalString(
@@ -506,11 +501,8 @@ public class ParameterBuilder {
   }
 
   private <E extends Enum<E>> E parseEnum(String value, Class<E> ofType) {
-    var upperCaseValue = value.toUpperCase().replace('-', '_');
-    return Stream
-      .of(ofType.getEnumConstants())
-      .filter(it -> it.name().toUpperCase().equals(upperCaseValue))
-      .findFirst()
+    return EnumMapper
+      .mapToEnum(value, ofType)
       .orElseThrow(() -> {
         throw error(
           "The parameter value '%s' is not legal. Expected one of %s.".formatted(

@@ -7,8 +7,13 @@ import javax.annotation.Nullable;
  */
 public class MarkdownFormatter {
 
-  private static final char NBSP = '\u00A0';
-  private static final String INDENT_NBSP = "" + NBSP + NBSP + NBSP + NBSP;
+  public static int HEADER_1 = 1;
+  public static int HEADER_2 = 2;
+  public static int HEADER_3 = 3;
+  public static int HEADER_4 = 4;
+
+  public static final String NBSP = "\u00A0";
+  public static final String NEW_LINE = "\n";
 
   /** Return the given input as emphasise text. */
   public static String em(String text) {
@@ -25,11 +30,6 @@ public class MarkdownFormatter {
     return text == null ? "" : "`" + text + "`";
   }
 
-  /** Return the given input formatted as an inline code fragment. */
-  public static String quote(@Nullable Object text) {
-    return text == null ? "" : "\"" + text + "\"";
-  }
-
   /**
    * Link to a header in the same document. The "other" element need to be tagged with an
    * "id" attribute equals to the given anchor.
@@ -44,6 +44,14 @@ public class MarkdownFormatter {
    */
   public static String linkToDoc(String text, String url) {
     return "[%s](%s)".formatted(text, url);
+  }
+
+  public static String header(int level, String header, @Nullable String anchor) {
+    if (anchor != null && !anchor.isBlank()) {
+      return "<h%d id=\"%s\">%s</h%d>".formatted(level, normalizeAnchor(anchor), header, level);
+    } else {
+      return "#".repeat(level) + " " + header;
+    }
   }
 
   /** Return a check mark if true, or unchecked id false. */
@@ -66,11 +74,15 @@ public class MarkdownFormatter {
   }
 
   /** Return whitespace witch can be used to indent inside a table cell. */
-  public static String indentInTable() {
-    return INDENT_NBSP;
+  public static String indentInTable(int level) {
+    return level <= 0 ? "" : NBSP.repeat(3 * level);
   }
 
-  public static String normalizeAnchor(String anchor) {
+  public static String lineBreak() {
+    return " \\";
+  }
+
+  private static String normalizeAnchor(String anchor) {
     return anchor.replaceAll("[-!\"#$%&/.=?+\\[\\]]", "_");
   }
 }

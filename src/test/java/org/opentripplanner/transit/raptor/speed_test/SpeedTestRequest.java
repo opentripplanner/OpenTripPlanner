@@ -40,7 +40,7 @@ public class SpeedTestRequest {
     return testCase;
   }
 
-  RouteRequest toRoutingRequest() {
+  RouteRequest toRouteRequest() {
     var request = config.request.clone();
 
     var input = testCase.definition();

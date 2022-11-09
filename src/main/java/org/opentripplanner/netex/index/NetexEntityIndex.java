@@ -34,7 +34,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.TariffZone_VersionStructure;
 
 /**
  * This class holds indexes of Netex objects for lookup during the NeTEx import using the {@link
@@ -95,7 +95,7 @@ public class NetexEntityIndex {
   public final HierarchicalMapById<ServiceJourneyInterchange> serviceJourneyInterchangeById;
   public final HierarchicalMapById<ServiceLink> serviceLinkById;
   public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
-  public final HierarchicalVersionMapById<TariffZone> tariffZonesById;
+  public final HierarchicalVersionMapById<TariffZone_VersionStructure> tariffZonesById;
   public final HierarchicalMapById<Branding> brandingById;
 
   // Relations between entities - The Netex XML sometimes rely on the the
@@ -354,7 +354,7 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalVersionMapById<TariffZone> getTariffZonesById() {
+      public ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById() {
         return tariffZonesById;
       }
 

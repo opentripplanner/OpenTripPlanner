@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * More information is available on the OTP wiki at: https://github.com/openplans/OpenTripPlanner/wiki/LargeGraphs
  * <p>
- * One instance of this class should be constructed per search (i.e. per RoutingRequest: it is
+ * One instance of this class should be constructed per search (i.e. per RouteRequest: it is
  * request-scoped). Its behavior is undefined if it is reused for more than one search.
  * <p>
  * It is very close to being an abstract library class with only static functions. However it turns

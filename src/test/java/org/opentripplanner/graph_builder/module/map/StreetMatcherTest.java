@@ -228,11 +228,6 @@ public class StreetMatcherTest {
     }
 
     @Override
-    public int getStreetClass() {
-      return StreetEdge.CLASS_STREET;
-    }
-
-    @Override
     public boolean isMotorVehicleNoThruTraffic() {
       return false;
     }

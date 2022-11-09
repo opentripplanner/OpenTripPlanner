@@ -20,6 +20,8 @@ import org.opentripplanner.util.lang.ToStringBuilder;
 /**
  * This class holds preferences for street routing in general, not mode specific.
  * <p>
+ * See the configuration for documentation of each field.
+ * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
 @SuppressWarnings("UnusedReturnValue")
@@ -81,26 +83,10 @@ public final class StreetPreferences implements Serializable {
     return intersectionTraversalModel;
   }
 
-  /**
-   * This is the maximum duration for access/egress per street mode for street searches. This is a
-   * performance limit and should therefore be set high. Results close to the limit are not
-   * guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client.
-   * <p>
-   * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others. A default value is applied if the mode specific value do not exist.
-   */
   public DurationForEnum<StreetMode> maxAccessEgressDuration() {
     return maxAccessEgressDuration;
   }
 
-  /**
-   * This is the maximum duration for a direct street search for each mode. This is a performance
-   * limit and should therefore be set high. Results close to the limit are not guaranteed to be
-   * optimal. Use itinerary-filters to limit what is presented to the client.
-   * <p>
-   * The duration can be set per mode, because some street modes searches are much more resource
-   * intensive than others. A default value is applied if the mode specific value do not exist.
-   */
   public DurationForEnum<StreetMode> maxDirectDuration() {
     return maxDirectDuration;
   }
