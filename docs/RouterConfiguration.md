@@ -590,6 +590,7 @@ Http headers.
     "tags" : [ "source:parkapi" ]
   }, {
     "type" : "vehicle-parking",
+    "feedId" : "bikely",
     "sourceType" : "bikely",
     "url" : "https://api.safebikely.com/api/v1/s/locations",
     "headers" : {
