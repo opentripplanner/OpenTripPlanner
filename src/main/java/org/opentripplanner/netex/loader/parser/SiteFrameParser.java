@@ -13,6 +13,7 @@ import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.Site_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.TariffZone_VersionStructure;
 import org.rutebanken.netex.model.Zone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
   private final Collection<StopPlace> stopPlaces = new ArrayList<>();
 
-  private final Collection<TariffZone> tariffZones = new ArrayList<>();
+  private final Collection<TariffZone_VersionStructure> tariffZones = new ArrayList<>();
 
   private final Collection<Quay> quays = new ArrayList<>();
 

@@ -113,7 +113,7 @@ public class UpdaterConfigurator {
     return VehicleRentalServiceDirectoryFetcher.createUpdatersFromEndpoint(
       parameters,
       graph.getLinker(),
-      graph.getVehicleRentalStationService()
+      graph.getVehicleRentalService()
     );
   }
 
@@ -132,7 +132,7 @@ public class UpdaterConfigurator {
           configItem,
           source,
           graph.getLinker(),
-          graph.getVehicleRentalStationService()
+          graph.getVehicleRentalService()
         )
       );
     }

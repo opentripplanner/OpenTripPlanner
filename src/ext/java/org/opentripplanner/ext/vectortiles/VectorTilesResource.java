@@ -60,7 +60,7 @@ public class VectorTilesResource {
       LayerType.VehicleRental,
       (graph, transitService, layerParameters, locale) ->
         new VehicleRentalPlacesLayerBuilder(
-          graph.getVehicleRentalStationService(),
+          graph.getVehicleRentalService(),
           layerParameters,
           locale
         )
@@ -69,7 +69,7 @@ public class VectorTilesResource {
       LayerType.VehicleRentalStation,
       (graph, transitService, layerParameters, locale) ->
         new VehicleRentalStationsLayerBuilder(
-          graph.getVehicleRentalStationService(),
+          graph.getVehicleRentalService(),
           layerParameters,
           locale
         )
@@ -77,10 +77,7 @@ public class VectorTilesResource {
     layers.put(
       LayerType.VehicleRentalVehicle,
       (graph, transitService, layerParameters, locale) ->
-        new VehicleRentalVehiclesLayerBuilder(
-          graph.getVehicleRentalStationService(),
-          layerParameters
-        )
+        new VehicleRentalVehiclesLayerBuilder(graph.getVehicleRentalService(), layerParameters)
     );
     layers.put(
       LayerType.VehicleParking,

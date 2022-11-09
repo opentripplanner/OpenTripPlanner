@@ -4,14 +4,18 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.xml.bind.JAXBElement;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -210,10 +214,25 @@ class TripPatternMapper {
       new StopPattern(result.tripStopTimes.get(trips.get(0)))
     );
 
+    var tripPatternModes = new HashSet<TransitMode>();
+    for (Trip trip : trips) {
+      tripPatternModes.add(trip.getMode());
+    }
+
+    if (tripPatternModes.size() > 1) {
+      issueStore.add(
+        "ServiceJourneyPatternHasMultipleModes",
+        "ServiceJourneyPattern %s contains multiple modes: %s",
+        journeyPattern.getId(),
+        tripPatternModes.stream().map(Enum::name).collect(Collectors.joining(", "))
+      );
+    }
+
     TripPatternBuilder tripPatternBuilder = TripPattern
       .of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
+      .withMode(trips.get(0).getMode())
       .withName(journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue())
       .withHopGeometries(
         serviceLinkMapper.getGeometriesByJourneyPattern(journeyPattern, stopPattern)

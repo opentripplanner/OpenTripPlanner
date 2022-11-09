@@ -10,6 +10,7 @@ Skånetrafiken, Sweden
 ## Changelog
 - Added configuration for turning off stop arrival time match feature. 
 - Initial version (April 2022)
+- Minor changes in logging (November 2022)
 
 ## Documentation
 
