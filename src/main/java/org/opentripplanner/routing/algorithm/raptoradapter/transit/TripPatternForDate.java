@@ -18,7 +18,7 @@ import org.opentripplanner.util.time.ServiceDateUtils;
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
  * having to do any filtering by date during the search itself.
  */
-public class TripPatternForDate {
+public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
   /**
    * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules. Its
@@ -139,6 +139,12 @@ public class TripPatternForDate {
     return frequencies.length != 0;
   }
 
+  @Override
+  public int compareTo(TripPatternForDate other) {
+    return localDate.compareTo(other.localDate);
+  }
+
+  @Override
   public int hashCode() {
     return Objects.hash(
       tripPattern,
@@ -148,6 +154,7 @@ public class TripPatternForDate {
     );
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
