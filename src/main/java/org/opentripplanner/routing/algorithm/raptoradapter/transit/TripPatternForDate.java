@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -30,14 +31,14 @@ public class TripPatternForDate {
    * day. Invariant: this array should contain a subset of the TripSchedules in
    * tripPattern.tripSchedules.
    */
-  private final List<TripTimes> tripTimes;
+  private final TripTimes[] tripTimes;
 
   /**
    * The filtered FrequencyEntries for only those entries in the TripPattern that are active on the
    * given day. Invariant: this array should contain a subset of the TripSchedules in
    * tripPattern.frequencyEntries.
    */
-  private final List<FrequencyEntry> frequencies;
+  private final FrequencyEntry[] frequencies;
 
   /** The date for which the filtering was performed. */
   private final LocalDate localDate;
@@ -59,8 +60,8 @@ public class TripPatternForDate {
     LocalDate localDate
   ) {
     this.tripPattern = tripPattern;
-    this.tripTimes = List.copyOf(tripTimes);
-    this.frequencies = List.copyOf(frequencies);
+    this.tripTimes = tripTimes.toArray(new TripTimes[0]);
+    this.frequencies = frequencies.toArray(new FrequencyEntry[0]);
     this.localDate = localDate;
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
@@ -95,11 +96,11 @@ public class TripPatternForDate {
   }
 
   public List<TripTimes> tripTimes() {
-    return tripTimes;
+    return Arrays.asList(tripTimes);
   }
 
   public List<FrequencyEntry> getFrequencies() {
-    return frequencies;
+    return Arrays.asList(frequencies);
   }
 
   public RoutingTripPattern getTripPattern() {
@@ -111,7 +112,7 @@ public class TripPatternForDate {
   }
 
   public TripTimes getTripTimes(int i) {
-    return tripTimes.get(i);
+    return tripTimes[i];
   }
 
   public LocalDate getLocalDate() {
@@ -119,7 +120,7 @@ public class TripPatternForDate {
   }
 
   public int numberOfTripSchedules() {
-    return tripTimes.size();
+    return tripTimes.length;
   }
 
   public LocalDateTime getStartOfRunningPeriod() {
@@ -135,11 +136,16 @@ public class TripPatternForDate {
   }
 
   public boolean hasFrequencies() {
-    return !frequencies.isEmpty();
+    return frequencies.length != 0;
   }
 
   public int hashCode() {
-    return Objects.hash(tripPattern, tripTimes, localDate);
+    return Objects.hash(
+      tripPattern,
+      localDate,
+      Arrays.hashCode(tripTimes),
+      Arrays.hashCode(frequencies)
+    );
   }
 
   public boolean equals(Object o) {
@@ -154,7 +160,8 @@ public class TripPatternForDate {
     return (
       tripPattern.equals(that.tripPattern) &&
       localDate.equals(that.localDate) &&
-      tripTimes.equals(that.tripTimes)
+      Arrays.equals(tripTimes, that.tripTimes) &&
+      Arrays.equals(frequencies, that.frequencies)
     );
   }
 
@@ -165,14 +172,14 @@ public class TripPatternForDate {
 
   @Nullable
   public TripPatternForDate newWithFilteredTripTimes(Predicate<TripTimes> filter) {
-    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes.size());
+    ArrayList<TripTimes> filteredTripTimes = new ArrayList<>(tripTimes.length);
     for (TripTimes tripTimes : tripTimes) {
       if (filter.test(tripTimes)) {
         filteredTripTimes.add(tripTimes);
       }
     }
 
-    List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.size());
+    List<FrequencyEntry> filteredFrequencies = new ArrayList<>(frequencies.length);
     for (FrequencyEntry frequencyEntry : frequencies) {
       if (filter.test(frequencyEntry.tripTimes)) {
         filteredFrequencies.add(frequencyEntry);
@@ -184,8 +191,8 @@ public class TripPatternForDate {
     }
 
     if (
-      tripTimes.size() == filteredTripTimes.size() &&
-      frequencies.size() == filteredFrequencies.size()
+      tripTimes.length == filteredTripTimes.size() &&
+      frequencies.length == filteredFrequencies.size()
     ) {
       return this;
     }
