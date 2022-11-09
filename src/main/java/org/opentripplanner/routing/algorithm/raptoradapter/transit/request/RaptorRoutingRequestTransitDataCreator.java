@@ -177,7 +177,7 @@ class RaptorRoutingRequestTransitDataCreator {
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
       if (filter.tripPatternPredicate(p)) {
-        if (firstDay || p.getStartOfRunningPeriod().toLocalDate().equals(date)) {
+        if (firstDay || p.getStartOfRunningPeriod().equals(date)) {
           TripPatternForDate tripPatternForDate = p.newWithFilteredTripTimes(tripTimesPredicate);
           if (tripPatternForDate != null) {
             result.add(tripPatternForDate);

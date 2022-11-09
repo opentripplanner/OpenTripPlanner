@@ -44,14 +44,14 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
   private final LocalDate localDate;
 
   /**
-   * The first departure time of the first trip.
+   * The date on which the first trip departs.
    */
-  private final LocalDateTime startOfRunningPeriod;
+  private final LocalDate startOfRunningPeriod;
 
   /**
-   * The last arrival time of the last trip.
+   * The date on which the last trip arrives.
    */
-  private final LocalDateTime endOfRunningPeriod;
+  private final LocalDate endOfRunningPeriod;
 
   public TripPatternForDate(
     RoutingTripPattern tripPattern,
@@ -67,31 +67,37 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
     if (hasFrequencies()) {
       this.startOfRunningPeriod =
-        ServiceDateUtils.asDateTime(
-          localDate,
-          frequencies
-            .stream()
-            .mapToInt(frequencyEntry -> frequencyEntry.startTime)
-            .min()
-            .orElseThrow()
-        );
+        ServiceDateUtils
+          .asDateTime(
+            localDate,
+            frequencies
+              .stream()
+              .mapToInt(frequencyEntry -> frequencyEntry.startTime)
+              .min()
+              .orElseThrow()
+          )
+          .toLocalDate();
 
       this.endOfRunningPeriod =
-        ServiceDateUtils.asDateTime(
-          localDate,
-          frequencies
-            .stream()
-            .mapToInt(frequencyEntry -> frequencyEntry.endTime)
-            .max()
-            .orElseThrow()
-        );
+        ServiceDateUtils
+          .asDateTime(
+            localDate,
+            frequencies
+              .stream()
+              .mapToInt(frequencyEntry -> frequencyEntry.endTime)
+              .max()
+              .orElseThrow()
+          )
+          .toLocalDate();
     } else {
       // These depend on the tripTimes array being sorted
       this.startOfRunningPeriod =
-        ServiceDateUtils.asDateTime(localDate, tripTimes.get(0).getDepartureTime(0));
+        ServiceDateUtils.asDateTime(localDate, tripTimes.get(0).getDepartureTime(0)).toLocalDate();
       var last = tripTimes.get(tripTimes.size() - 1);
       this.endOfRunningPeriod =
-        ServiceDateUtils.asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1));
+        ServiceDateUtils
+          .asDateTime(localDate, last.getArrivalTime(last.getNumStops() - 1))
+          .toLocalDate();
     }
   }
 
@@ -123,15 +129,14 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     return tripTimes.length;
   }
 
-  public LocalDateTime getStartOfRunningPeriod() {
+  public LocalDate getStartOfRunningPeriod() {
     return startOfRunningPeriod;
   }
 
   public List<LocalDate> getRunningPeriodDates() {
     // Add one day to ensure last day is included
     return startOfRunningPeriod
-      .toLocalDate()
-      .datesUntil(endOfRunningPeriod.toLocalDate().plusDays(1))
+      .datesUntil(endOfRunningPeriod.plusDays(1))
       .collect(Collectors.toList());
   }
 
