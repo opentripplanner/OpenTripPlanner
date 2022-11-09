@@ -114,13 +114,15 @@ class RaptorRoutingRequestTransitDataCreator {
     // TripPatternForDates
     for (Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
       // Sort by date. We can mutate the array, as it was created above in the grouping.
-      List<TripPatternForDate> patternsSorted = patternEntry.getValue();
-      patternsSorted.sort(Comparator.comparing(TripPatternForDate::getLocalDate));
+      TripPatternForDate[] patternsSorted = patternEntry
+        .getValue()
+        .toArray(new TripPatternForDate[0]);
+      Arrays.sort(patternsSorted);
 
       // Calculate offsets per date
-      int[] offsets = new int[patternsSorted.size()];
-      for (int i = 0; i < patternsSorted.size(); i++) {
-        LocalDate serviceDate = patternsSorted.get(i).getLocalDate();
+      int[] offsets = new int[patternsSorted.length];
+      for (int i = 0; i < patternsSorted.length; i++) {
+        LocalDate serviceDate = patternsSorted[i].getLocalDate();
         if (offsetCache.containsKey(serviceDate)) {
           offsets[i] = offsetCache.get(serviceDate);
         } else {
