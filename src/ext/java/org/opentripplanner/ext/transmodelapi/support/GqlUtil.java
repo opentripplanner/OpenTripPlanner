@@ -17,6 +17,7 @@ import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DurationScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.RoutingService;
@@ -33,6 +34,7 @@ public class GqlUtil {
   public final GraphQLScalarType doubleFunctionScalar;
   public final GraphQLScalarType localTimeScalar;
   public final GraphQLObjectType timeScalar;
+  public final GraphQLScalarType durationScalar;
   public final GraphQLDirective timingData;
 
   /** private to prevent util class from instantiation */
@@ -43,6 +45,7 @@ public class GqlUtil {
     this.doubleFunctionScalar = DoubleFunctionScalarFactory.createDoubleFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
+    this.durationScalar = DurationScalarFactory.createDurationScalar();
     this.timingData =
       GraphQLDirective
         .newDirective()

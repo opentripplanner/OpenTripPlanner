@@ -69,6 +69,10 @@ import org.opentripplanner.ext.transmodelapi.model.plan.RoutingErrorType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripPatternType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaLocationInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaRequestInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaTripQuery;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaTripType;
 import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
@@ -129,51 +133,6 @@ public class TransmodelGraphQLSchema {
 
   public static GraphQLSchema create(RouteRequest defaultRequest, GqlUtil qglUtil) {
     return new TransmodelGraphQLSchema(defaultRequest, qglUtil).create();
-  }
-
-  public GraphQLObjectType createPlanType(
-    GraphQLOutputType bookingArrangementType,
-    GraphQLOutputType interchangeType,
-    GraphQLOutputType linkGeometryType,
-    GraphQLOutputType systemNoticeType,
-    GraphQLOutputType authorityType,
-    GraphQLOutputType operatorType,
-    GraphQLOutputType bikeRentalStationType,
-    GraphQLOutputType rentalVehicleType,
-    GraphQLOutputType quayType,
-    GraphQLOutputType estimatedCallType,
-    GraphQLOutputType lineType,
-    GraphQLOutputType serviceJourneyType,
-    GraphQLOutputType ptSituationElementType,
-    GraphQLOutputType datedServiceJourneyType
-  ) {
-    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
-    GraphQLObjectType placeType = PlanPlaceType.create(
-      bikeRentalStationType,
-      rentalVehicleType,
-      quayType
-    );
-    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
-    GraphQLObjectType legType = LegType.create(
-      bookingArrangementType,
-      interchangeType,
-      linkGeometryType,
-      authorityType,
-      operatorType,
-      quayType,
-      estimatedCallType,
-      lineType,
-      serviceJourneyType,
-      datedServiceJourneyType,
-      ptSituationElementType,
-      placeType,
-      pathGuidanceType,
-      gqlUtil
-    );
-    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
-    GraphQLObjectType routingErrorType = RoutingErrorType.create();
-
-    return TripType.create(placeType, tripPatternType, tripMetadataType, routingErrorType, gqlUtil);
   }
 
   //    private BookingArrangement getBookingArrangementForTripTimeShort(TripTimeShort tripTimeShort) {
@@ -337,24 +296,53 @@ public class TransmodelGraphQLSchema {
       gqlUtil
     );
 
-    GraphQLOutputType tripType = createPlanType(
+    GraphQLObjectType tripMetadataType = TripMetadataType.create(gqlUtil);
+    GraphQLObjectType placeType = PlanPlaceType.create(
+      bikeRentalStationType,
+      rentalVehicleType,
+      quayType
+    );
+    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
+    GraphQLObjectType legType = LegType.create(
       bookingArrangementType,
       interchangeType,
       linkGeometryType,
-      systemNoticeType,
       authorityType,
       operatorType,
-      bikeRentalStationType,
-      rentalVehicleType,
       quayType,
       estimatedCallType,
       lineType,
       serviceJourneyType,
+      datedServiceJourneyType,
       ptSituationElementType,
-      datedServiceJourneyType
+      placeType,
+      pathGuidanceType,
+      gqlUtil
+    );
+    GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
+    GraphQLObjectType routingErrorType = RoutingErrorType.create();
+
+    GraphQLOutputType tripType = TripType.create(
+      placeType,
+      tripPatternType,
+      tripMetadataType,
+      routingErrorType,
+      gqlUtil
     );
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(routing, tripType, gqlUtil);
+
+    GraphQLOutputType viaTripType = ViaTripType.create(tripPatternType, routingErrorType);
+    GraphQLInputObjectType viaLocationInputType = ViaLocationInputType.create(gqlUtil);
+    GraphQLInputObjectType viaRequestInputType = ViaRequestInputType.create();
+
+    GraphQLFieldDefinition viaTripQuery = ViaTripQuery.create(
+      routing,
+      viaTripType,
+      viaLocationInputType,
+      viaRequestInputType,
+      gqlUtil
+    );
 
     GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType
       .newInputObject()
@@ -405,6 +393,7 @@ public class TransmodelGraphQLSchema {
       .newObject()
       .name("QueryType")
       .field(tripQuery)
+      .field(viaTripQuery)
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()

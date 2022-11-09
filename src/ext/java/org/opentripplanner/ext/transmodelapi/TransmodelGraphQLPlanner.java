@@ -6,8 +6,9 @@ import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,18 +18,24 @@ import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ViaPlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -65,6 +72,62 @@ public class TransmodelGraphQLPlanner {
     Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult
       .<PlanResponse>newResult()
+      .data(response)
+      .localContext(Map.of("locale", locale))
+      .build();
+  }
+
+  public DataFetcherResult<ViaPlanResponse> planVia(DataFetchingEnvironment environment) {
+    ViaPlanResponse response;
+    TransmodelRequestContext ctx = environment.getContext();
+    OtpServerRequestContext serverContext = ctx.getServerContext();
+    RouteViaRequest request = null;
+    try {
+      request = createViaRequest(environment);
+      ViaRoutingResponse res = ctx.getRoutingService().route(request);
+
+      final List<List<Itinerary>> viaJourneys = res
+        .routingResponses()
+        .stream()
+        .map(RoutingResponse::getTripPlan)
+        .map(plan -> plan.itineraries)
+        .toList();
+
+      var connectionLists = new ArrayList<List<List<Integer>>>();
+
+      for (int i = 0; i < viaJourneys.size() - 1; i++) {
+        var connectionList = new ArrayList<List<Integer>>();
+        connectionLists.add(connectionList);
+        List<Itinerary> itineraries = viaJourneys.get(i);
+        List<Itinerary> nextItineraries = viaJourneys.get(i + 1);
+        for (var itinerary : itineraries) {
+          var currentConnections = new ArrayList<Integer>();
+          connectionList.add(currentConnections);
+          var connections = res.plan().get(itinerary);
+          if (connections != null) {
+            for (var connection : connections) {
+              var index = nextItineraries.indexOf(connection);
+              if (index != -1) {
+                currentConnections.add(index);
+              }
+            }
+          }
+        }
+      }
+
+      response = new ViaPlanResponse(viaJourneys, connectionLists, res.routingErrors());
+    } catch (Exception e) {
+      LOG.error("System error: " + e.getMessage(), e);
+      response =
+        new ViaPlanResponse(
+          List.of(),
+          List.of(),
+          List.of(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null))
+        );
+    }
+    Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
+    return DataFetcherResult
+      .<ViaPlanResponse>newResult()
       .data(response)
       .localContext(Map.of("locale", locale))
       .build();
@@ -213,6 +276,61 @@ public class TransmodelGraphQLPlanner {
     return request;
   }
 
+  private RouteViaRequest createViaRequest(DataFetchingEnvironment environment) {
+    TransmodelRequestContext context = environment.getContext();
+    OtpServerRequestContext serverContext = context.getServerContext();
+    RouteRequest request = serverContext.defaultRouteRequest();
+
+    List<ViaLocation> viaLocations =
+      ((List<Map<String, Object>>) environment.getArgument("viaLocations")).stream()
+        .map(viaLocation ->
+          new ViaLocation(
+            toGenericLocation(viaLocation),
+            false,
+            (Duration) viaLocation.get("minSlack"),
+            (Duration) viaLocation.get("maxSlack")
+          )
+        )
+        .toList();
+
+    List<JourneyRequest> viaJourneys = environment.containsArgument("viaRequests")
+      ? ((List<Map<String, Object>>) environment.getArgument("viaRequests")).stream()
+        .map(viaRequest -> {
+          final JourneyRequest journey = request.journey().clone();
+          Map<String, Object> modes = ((Map<String, Object>) viaRequest.get("modes"));
+          journey.setModes(
+            getRequestModes(
+              (StreetMode) modes.get("accessMode"),
+              (StreetMode) modes.get("egressMode"),
+              (StreetMode) modes.get("directMode"),
+              (List<Map<String, ?>>) modes.get("transportModes")
+            )
+          );
+          return journey;
+        })
+        .toList()
+      : Collections.nCopies(viaLocations.size() + 1, request.journey());
+
+    return RouteViaRequest
+      .of(viaLocations, viaJourneys)
+      .withDateTime(
+        Instant.ofEpochMilli(
+          environment.getArgumentOrDefault("dateTime", request.dateTime().toEpochMilli())
+        )
+      )
+      .withSearchWindow(environment.getArgumentOrDefault("searchWindow", request.searchWindow()))
+      .withFrom(toGenericLocation(environment.getArgument("from")))
+      .withTo(toGenericLocation(environment.getArgument("to")))
+      .withNumItineraries(
+        environment.getArgumentOrDefault("numTripPatterns", request.numItineraries())
+      )
+      .withWheelchair(
+        environment.getArgumentOrDefault("wheelchairAccessible", request.wheelchair())
+      )
+      .withLocale(TransmodelGraphQLUtils.getLocale(environment))
+      .build();
+  }
+
   private void mapPreferences(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
@@ -299,48 +417,60 @@ public class TransmodelGraphQLPlanner {
     DataFetcherDecorator callWith
   ) {
     if (GqlUtil.hasArgument(environment, "modes")) {
-      ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
-      ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
-      ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
-      ElementWrapper<List<LinkedHashMap<String, ?>>> transportModes = new ElementWrapper<>();
-      callWith.argument("modes.accessMode", accessMode::set);
-      callWith.argument("modes.egressMode", egressMode::set);
-      callWith.argument("modes.directMode", directMode::set);
-      callWith.argument("modes.transportModes", transportModes::set);
+      ElementWrapper<StreetMode> accessModeWrapper = new ElementWrapper<>();
+      ElementWrapper<StreetMode> egressModeWrapper = new ElementWrapper<>();
+      ElementWrapper<StreetMode> directModeWrapper = new ElementWrapper<>();
+      ElementWrapper<List<Map<String, ?>>> transportModesWrapper = new ElementWrapper<>();
+      callWith.argument("modes.accessMode", accessModeWrapper::set);
+      callWith.argument("modes.egressMode", egressModeWrapper::set);
+      callWith.argument("modes.directMode", directModeWrapper::set);
+      callWith.argument("modes.transportModes", transportModesWrapper::set);
 
-      RequestModesBuilder mBuilder = RequestModes
-        .of()
-        .withAccessMode(accessMode.get())
-        .withEgressMode(egressMode.get())
-        .withDirectMode(directMode.get());
-
-      mBuilder.withTransferMode(
-        accessMode.get() == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK
+      return getRequestModes(
+        accessModeWrapper.get(),
+        egressModeWrapper.get(),
+        directModeWrapper.get(),
+        transportModesWrapper.get()
       );
+    }
+    return null;
+  }
 
-      if (transportModes.get() == null) {
-        mBuilder.withTransitModes(MainAndSubMode.all());
-      } else {
-        mBuilder.clearTransitModes();
-        for (LinkedHashMap<String, ?> modeWithSubmodes : transportModes.get()) {
-          if (modeWithSubmodes.containsKey("transportMode")) {
-            TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
-            if (modeWithSubmodes.containsKey("transportSubModes")) {
-              var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
-                "transportSubModes"
-              );
-              for (TransmodelTransportSubmode submode : transportSubModes) {
-                mBuilder.withTransitMode(mainMode, submode.getValue());
-              }
-            } else {
-              mBuilder.withTransitMode(mainMode);
+  private static RequestModes getRequestModes(
+    StreetMode accessMode,
+    StreetMode egressMode,
+    StreetMode directMode,
+    List<Map<String, ?>> transferModes
+  ) {
+    RequestModesBuilder mBuilder = RequestModes
+      .of()
+      .withAccessMode(accessMode)
+      .withEgressMode(egressMode)
+      .withDirectMode(directMode);
+
+    mBuilder.withTransferMode(accessMode == StreetMode.BIKE ? StreetMode.BIKE : StreetMode.WALK);
+
+    if (transferModes == null) {
+      mBuilder.withTransitModes(MainAndSubMode.all());
+    } else {
+      mBuilder.clearTransitModes();
+      for (Map<String, ?> modeWithSubmodes : transferModes) {
+        if (modeWithSubmodes.containsKey("transportMode")) {
+          TransitMode mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
+          if (modeWithSubmodes.containsKey("transportSubModes")) {
+            var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
+              "transportSubModes"
+            );
+            for (TransmodelTransportSubmode submode : transportSubModes) {
+              mBuilder.withTransitMode(mainMode, submode.getValue());
             }
+          } else {
+            mBuilder.withTransitMode(mainMode);
           }
         }
       }
-      return mBuilder.build();
     }
-    return null;
+    return mBuilder.build();
   }
 
   /**
