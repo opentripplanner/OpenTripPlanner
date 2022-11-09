@@ -67,9 +67,8 @@ jobs:
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
-          git pull --rebase origin gh-pages
           mike list
-          mike deploy --push dev
+          mike deploy --remote git@github.com:opentripplanner/docs-experiment.git --branch main --push dev
 
   container-image:
     if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
