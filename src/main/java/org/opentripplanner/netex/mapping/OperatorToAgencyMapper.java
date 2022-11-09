@@ -1,8 +1,10 @@
 package org.opentripplanner.netex.mapping;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.organization.OperatorBuilder;
+import org.opentripplanner.util.lang.StringUtils;
 import org.rutebanken.netex.model.ContactStructure;
 
 /**
@@ -10,16 +12,24 @@ import org.rutebanken.netex.model.ContactStructure;
  */
 class OperatorToAgencyMapper {
 
+  private DataImportIssueStore issueStore;
   private final FeedScopedIdFactory idFactory;
 
-  OperatorToAgencyMapper(FeedScopedIdFactory idFactory) {
+  OperatorToAgencyMapper(DataImportIssueStore issueStore, FeedScopedIdFactory idFactory) {
+    this.issueStore = issueStore;
     this.idFactory = idFactory;
   }
 
   Operator mapOperator(org.rutebanken.netex.model.Operator source) {
-    var target = Operator
-      .of(idFactory.createId(source.getId()))
-      .withName(source.getName().getValue());
+    final String name;
+    if (source.getName() == null || !StringUtils.hasValue(source.getName().getValue())) {
+      issueStore.add("MissingOperatorName", "Missing name for operator %s", source.getId());
+      // fall back to NeTEx id when the operator name is missing
+      name = source.getId();
+    } else {
+      name = source.getName().getValue();
+    }
+    var target = Operator.of(idFactory.createId(source.getId())).withName(name);
 
     mapContactDetails(source.getContactDetails(), target);
 
