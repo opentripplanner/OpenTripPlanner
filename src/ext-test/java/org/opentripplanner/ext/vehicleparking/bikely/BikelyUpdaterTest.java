@@ -45,6 +45,8 @@ public class BikelyUpdaterTest {
       "Første 4 time(r) er kr 0,00. Etter kr 10,00 per 1 time(r)",
       first.getNote().toString(Locales.NORWAY)
     );
+    var capacity = first.getCapacity();
+    assertEquals(1, capacity.getBicycleSpaces());
 
     var freeParkingLots = parkingLots.get(2);
     assertEquals("Free of charge", freeParkingLots.getNote().toString(Locale.ENGLISH));

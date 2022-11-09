@@ -19,7 +19,7 @@ import org.opentripplanner.updater.GenericJsonDataSource;
  * Vehicle parking updater class for the Norwegian bike box provider Bikely:
  * https://www.safebikely.com/
  */
-class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
+public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
 
   private static final String JSON_PARSE_PATH = "result";
   private static final Currency NOK = Currency.getInstance("NOK");
