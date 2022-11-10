@@ -18,10 +18,6 @@ public class P2<E> extends T2<E, E> {
     }
   }
 
-  public static <E> P2<E> createPair(E first, E second) {
-    return new P2<>(first, second);
-  }
-
   @Override
   public String toString() {
     return "P2(" + first + ", " + second + ")";
