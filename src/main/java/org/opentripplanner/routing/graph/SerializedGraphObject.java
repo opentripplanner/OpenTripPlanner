@@ -171,11 +171,15 @@ public class SerializedGraphObject implements Serializable {
       logSerializationCompleteStatus(serObj.graph, serObj.transitModel);
       return serObj;
     } catch (IOException e) {
-      LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
+      LOG.error("IO exception while loading graph: {}", e.getLocalizedMessage(), e);
       return null;
     } catch (KryoException ke) {
+      if (ke.getCause() instanceof IOException) {
+        LOG.error("IO exception while loading graph: {}", ke.getLocalizedMessage(), ke);
+        return null;
+      }
       LOG.warn(
-        "Exception while loading graph: {}\n{}",
+        "Deserialization exception while loading graph: {}\n{}",
         sourceDescription,
         ke.getLocalizedMessage()
       );
