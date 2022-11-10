@@ -30,8 +30,8 @@ public final class TravelOptionsMaker {
     return makeOptions(
       transitService.getTransitModes(),
       graph.getVehicleRentalService().hasRentalBikes(),
-      service.hasBikeParkingLots(),
-      service.hasCarParkingLots()
+      service.hasBikeParking(),
+      service.hasCarParking()
     );
   }
 

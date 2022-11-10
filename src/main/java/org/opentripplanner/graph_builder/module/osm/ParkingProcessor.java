@@ -169,7 +169,9 @@ public class ParkingProcessor {
     for (OSMNode node : ring.nodes) {
       envelope.expandToInclude(new Coordinate(node.lon, node.lat));
       var accessVertex = getVertexForOsmNode.apply(node, entity);
-      if (accessVertex.getIncoming().isEmpty() || accessVertex.getOutgoing().isEmpty()) continue;
+      if (accessVertex.getIncoming().isEmpty() || accessVertex.getOutgoing().isEmpty()) {
+        continue;
+      }
       accessVertices.add(new VertexAndName(node.getAssumedName(), accessVertex));
     }
 

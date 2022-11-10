@@ -79,11 +79,11 @@ public class VehicleParkingService implements Serializable {
     return vehicleParkingGroups;
   }
 
-  public boolean hasBikeParkingLots() {
+  public boolean hasBikeParking() {
     return vehicleParkings.stream().anyMatch(VehicleParking::hasBicyclePlaces);
   }
 
-  public boolean hasCarParkingLots() {
+  public boolean hasCarParking() {
     return vehicleParkings.stream().anyMatch(VehicleParking::hasAnyCarPlaces);
   }
 }
