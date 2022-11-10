@@ -18,11 +18,6 @@ public record BikelyUpdaterParameters(
 )
   implements VehicleParkingUpdaterParameters {
   @Override
-  public int frequencySec() {
-    return frequencySec;
-  }
-
-  @Override
   public VehicleParkingSourceType sourceType() {
     return VehicleParkingSourceType.BIKELY;
   }
