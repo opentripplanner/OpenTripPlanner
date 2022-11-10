@@ -11,8 +11,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.RouteViaRequest;
-import org.opentripplanner.routing.api.request.request.ViaLocation;
+import org.opentripplanner.routing.api.request.RouteViaRequest;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -33,6 +33,7 @@ public class ViaRoutingWorker {
     Function<RouteRequest, RoutingResponse> routingWorker
   ) {
     this.request = request.routeRequest().clone();
+    this.request.setNumItineraries(request.routeRequest().numItineraries());
     this.viaRequest = request;
     this.routingWorker = routingWorker;
   }
@@ -56,6 +57,8 @@ public class ViaRoutingWorker {
       this.request.setTo(request.routeRequest().to());
     }
 
+    this.request.setJourney(v.journeyRequest());
+
     var response = this.routingWorker.apply(this.request);
 
     if (v.viaLocation() == null) {
@@ -72,7 +75,6 @@ public class ViaRoutingWorker {
     this.request.setSearchWindow(searchWindow);
     this.request.setDateTime(firstArrival.plus(v.viaLocation().minSlack()).toInstant());
     this.request.setFrom(v.viaLocation().point());
-    this.request.setJourney(v.journeyRequest());
 
     return response;
   }

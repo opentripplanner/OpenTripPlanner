@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.request;
+package org.opentripplanner.routing.api.request;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,7 +10,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
 /**
  * Trip planning request with a list of via points.
@@ -22,9 +24,6 @@ public class RouteViaRequest implements Serializable {
   private GenericLocation to = new GenericLocation(null, null);
   private Instant dateTime = Instant.now();
   private Duration searchWindow;
-  private boolean timetableView = true;
-  private boolean arriveBy = false;
-  private Locale locale = new Locale("en", "US");
   private JourneyRequest journey = new JourneyRequest();
   private boolean wheelchair = false;
   private RoutingPreferences preferences = new RoutingPreferences();
@@ -53,9 +52,6 @@ public class RouteViaRequest implements Serializable {
     this.to = Objects.requireNonNull(builder.to);
     this.dateTime = Objects.requireNonNull(builder.dateTime);
     this.searchWindow = Objects.requireNonNull(builder.searchWindow);
-    this.timetableView = builder.timetableView;
-    this.arriveBy = builder.arriveBy;
-    this.locale = Objects.requireNonNull(builder.locale);
     this.journey = Objects.requireNonNull(builder.journey);
     this.wheelchair = builder.wheelchair;
     this.preferences = Objects.requireNonNull(builder.preferences);
@@ -76,11 +72,8 @@ public class RouteViaRequest implements Serializable {
     request.setFrom(from);
     request.setSearchWindow(searchWindow);
     request.setDateTime(dateTime);
-    request.setArriveBy(arriveBy);
-    request.setLocale(locale);
     request.setJourney(journey);
     request.setWheelchair(wheelchair);
-    request.setTimetableView(timetableView);
     request.setPreferences(preferences);
 
     return request;
@@ -104,22 +97,6 @@ public class RouteViaRequest implements Serializable {
 
   public Duration searchWindow() {
     return searchWindow;
-  }
-
-  public boolean timetableView() {
-    return timetableView;
-  }
-
-  public boolean arriveBy() {
-    return arriveBy;
-  }
-
-  public Locale locale() {
-    return locale;
-  }
-
-  public JourneyRequest journey() {
-    return journey;
   }
 
   public boolean wheelchair() {
@@ -146,9 +123,6 @@ public class RouteViaRequest implements Serializable {
       to.equals(other.to) &&
       dateTime.equals(other.dateTime) &&
       searchWindow.equals(other.searchWindow) &&
-      timetableView == other.timetableView &&
-      arriveBy == other.arriveBy &&
-      locale.equals(other.locale) &&
       journey.equals(other.journey) &&
       wheelchair == other.wheelchair &&
       preferences.equals(other.preferences)
@@ -163,9 +137,6 @@ public class RouteViaRequest implements Serializable {
       to,
       dateTime,
       searchWindow,
-      timetableView,
-      arriveBy,
-      locale,
       journey,
       wheelchair,
       preferences
@@ -191,9 +162,6 @@ public class RouteViaRequest implements Serializable {
       this.to = original.to;
       this.dateTime = original.dateTime;
       this.searchWindow = original.searchWindow;
-      this.timetableView = original.timetableView;
-      this.arriveBy = original.arriveBy;
-      this.locale = original.locale;
       this.journey = original.journey;
       this.wheelchair = original.wheelchair;
       this.preferences = original.preferences;
@@ -236,11 +204,6 @@ public class RouteViaRequest implements Serializable {
 
     public Builder withLocale(Locale locale) {
       this.locale = locale;
-      return this;
-    }
-
-    public Builder withJourney(JourneyRequest journey) {
-      this.journey = journey;
       return this;
     }
 

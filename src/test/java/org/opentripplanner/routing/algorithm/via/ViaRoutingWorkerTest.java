@@ -18,9 +18,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteViaRequest;
+import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
-import org.opentripplanner.routing.api.request.request.RouteViaRequest;
-import org.opentripplanner.routing.api.request.request.ViaLocation;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.util.time.TimeUtils;
 

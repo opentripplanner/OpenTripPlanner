@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.request;
+package org.opentripplanner.routing.api.request;
 
 import java.time.Duration;
 import java.util.Objects;

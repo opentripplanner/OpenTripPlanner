@@ -9,7 +9,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.request.RouteViaRequest;
+import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.edgetype.StreetEdge;
