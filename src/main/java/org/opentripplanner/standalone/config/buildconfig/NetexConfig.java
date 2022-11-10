@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -148,6 +149,13 @@ public class NetexConfig {
             """
           )
           .asStringSet(original.ferryIdsNotAllowedForBicycle())
+      )
+      .withIgnoreFareFrame(
+        config
+          .of("ignoreFareFrame")
+          .since(V2_3)
+          .summary("Ignore contents of the FareFrame")
+          .asBoolean(original.ignoreFareFrame())
       );
   }
 
