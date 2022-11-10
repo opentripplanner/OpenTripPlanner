@@ -55,4 +55,18 @@ public class WayTestData {
     way.addTag("cycleway:left", "lane");
     return way;
   }
+
+  public static OSMWithTags flattenedCobblestones() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("surface", "cobblestones:flattened");
+    return way;
+  }
+
+  public static OSMWithTags cobblestones() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("surface", "cobblestones");
+    return way;
+  }
 }
