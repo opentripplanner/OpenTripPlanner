@@ -46,7 +46,22 @@ class VehicleParkingUpdaterTest {
     transitModel.index();
     graph.index(transitModel.getStopModel());
 
-    var parameters = new VehicleParkingUpdaterParameters(null, -1, null);
+    var parameters = new VehicleParkingUpdaterParameters() {
+      @Override
+      public VehicleParkingSourceType sourceType() {
+        return null;
+      }
+
+      @Override
+      public int frequencySec() {
+        return -1;
+      }
+
+      @Override
+      public String configRef() {
+        return null;
+      }
+    };
     vehicleParkingUpdater =
       new VehicleParkingUpdater(
         parameters,

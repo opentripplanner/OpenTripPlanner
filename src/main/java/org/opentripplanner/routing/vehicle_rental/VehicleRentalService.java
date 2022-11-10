@@ -10,45 +10,45 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class VehicleRentalStationService implements Serializable {
+public class VehicleRentalService implements Serializable {
 
-  private final Map<FeedScopedId, VehicleRentalPlace> vehicleRentalStations = new HashMap<>();
+  private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new HashMap<>();
 
   public Collection<VehicleRentalPlace> getVehicleRentalPlaces() {
-    return vehicleRentalStations.values();
+    return rentalPlaces.values();
   }
 
   public VehicleRentalPlace getVehicleRentalPlace(FeedScopedId id) {
-    return vehicleRentalStations.get(id);
+    return rentalPlaces.get(id);
   }
 
   public List<VehicleRentalVehicle> getVehicleRentalVehicles() {
-    return vehicleRentalStations
+    return rentalPlaces
       .values()
       .stream()
       .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalVehicle)
       .map(VehicleRentalVehicle.class::cast)
-      .collect(Collectors.toList());
+      .toList();
   }
 
   public VehicleRentalVehicle getVehicleRentalVehicle(FeedScopedId id) {
-    VehicleRentalPlace vehicleRentalPlace = vehicleRentalStations.get(id);
+    VehicleRentalPlace vehicleRentalPlace = rentalPlaces.get(id);
     return vehicleRentalPlace instanceof VehicleRentalVehicle
       ? (VehicleRentalVehicle) vehicleRentalPlace
       : null;
   }
 
   public List<VehicleRentalStation> getVehicleRentalStations() {
-    return vehicleRentalStations
+    return rentalPlaces
       .values()
       .stream()
       .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalStation)
       .map(VehicleRentalStation.class::cast)
-      .collect(Collectors.toList());
+      .toList();
   }
 
   public VehicleRentalStation getVehicleRentalStation(FeedScopedId id) {
-    VehicleRentalPlace vehicleRentalPlace = vehicleRentalStations.get(id);
+    VehicleRentalPlace vehicleRentalPlace = rentalPlaces.get(id);
     return vehicleRentalPlace instanceof VehicleRentalStation
       ? (VehicleRentalStation) vehicleRentalPlace
       : null;
@@ -56,12 +56,12 @@ public class VehicleRentalStationService implements Serializable {
 
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
     // Remove old reference first, as adding will be a no-op if already present
-    vehicleRentalStations.remove(vehicleRentalStation.getId());
-    vehicleRentalStations.put(vehicleRentalStation.getId(), vehicleRentalStation);
+    rentalPlaces.remove(vehicleRentalStation.getId());
+    rentalPlaces.put(vehicleRentalStation.getId(), vehicleRentalStation);
   }
 
   public void removeVehicleRentalStation(FeedScopedId vehicleRentalStationId) {
-    vehicleRentalStations.remove(vehicleRentalStationId);
+    rentalPlaces.remove(vehicleRentalStationId);
   }
 
   /**
@@ -80,10 +80,10 @@ public class VehicleRentalStationService implements Serializable {
       new Coordinate(maxLon, maxLat)
     );
 
-    return vehicleRentalStations
+    return rentalPlaces
       .values()
       .stream()
       .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
-      .collect(Collectors.toList());
+      .toList();
   }
 }

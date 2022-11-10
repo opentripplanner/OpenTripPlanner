@@ -16,7 +16,7 @@ public abstract class SiriAzureUpdaterParameters {
     this.type = type;
   }
 
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 

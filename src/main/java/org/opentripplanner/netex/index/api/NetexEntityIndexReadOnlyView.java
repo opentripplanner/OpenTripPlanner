@@ -25,7 +25,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.TariffZone_VersionStructure;
 
 public interface NetexEntityIndexReadOnlyView {
   Network lookupNetworkForLine(String groupOfLineOrNetworkId);
@@ -80,7 +80,7 @@ public interface NetexEntityIndexReadOnlyView {
 
   ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
 
-  ReadOnlyHierarchicalVersionMapById<TariffZone> getTariffZonesById();
+  ReadOnlyHierarchicalVersionMapById<TariffZone_VersionStructure> getTariffZonesById();
 
   ReadOnlyHierarchicalMapById<Branding> getBrandingById();
 

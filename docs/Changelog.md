@@ -8,6 +8,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove unused StreetClasses from StreetEdge [#4545](https://github.com/opentripplanner/OpenTripPlanner/pull/4545)
 - Do not run forward heuristic to calculate LAT, it is calculated from data already [#4537](https://github.com/opentripplanner/OpenTripPlanner/pull/4537)
 - Refactoring SIRI StopConditions from TransitAlert to EntitySelector [#4196](https://github.com/opentripplanner/OpenTripPlanner/pull/4196)
+- Add cost of egress leg to the cost of the last transit leg if transit leg arrives at destination [#4547](https://github.com/opentripplanner/OpenTripPlanner/pull/4547)
+- Setting explicit TTL on AzureSiriUpdater subscription messages [#4584](https://github.com/opentripplanner/OpenTripPlanner/pull/4584)
+- Parse NeTEx fare zones from a FareFrame [#4563](https://github.com/opentripplanner/OpenTripPlanner/pull/4563)
+- Add fallback for missing operator name [#4588](https://github.com/opentripplanner/OpenTripPlanner/pull/4588)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

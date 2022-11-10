@@ -35,7 +35,7 @@ public class WebsocketGtfsRealtimeUpdaterParameters implements UrlUpdaterParamet
   }
 
   /** The config name/type for the updater. Used to reference the configuration element. */
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 

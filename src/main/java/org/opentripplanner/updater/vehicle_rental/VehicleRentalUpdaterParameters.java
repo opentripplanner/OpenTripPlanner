@@ -20,7 +20,7 @@ public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParame
   }
 
   @Override
-  public int getFrequencySec() {
+  public int frequencySec() {
     return frequencySec;
   }
 
@@ -28,7 +28,7 @@ public class VehicleRentalUpdaterParameters implements PollingGraphUpdaterParame
    * The config name/type for the updater. Used to reference the configuration element.
    */
   @Override
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 

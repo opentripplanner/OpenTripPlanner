@@ -66,6 +66,7 @@ public class SiriTripPatternCache {
       TripPatternBuilder tripPatternBuilder = TripPattern
         .of(id)
         .withRoute(trip.getRoute())
+        .withMode(trip.getMode())
         .withStopPattern(stopPattern);
 
       // TODO - SIRI: Add pattern to transitModel index?
@@ -126,7 +127,7 @@ public class SiriTripPatternCache {
         patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));
         int sizeAfter = patternsForStop.values().size();
 
-        log.info(
+        log.debug(
           "Removed outdated TripPattern for {} stops in {} ms - tripId: {}",
           (sizeBefore - sizeAfter),
           (System.currentTimeMillis() - t1),

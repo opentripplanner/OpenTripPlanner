@@ -17,8 +17,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.basic.I18NString;
 import org.opentripplanner.transit.model.basic.NonLocalizedString;
-import org.opentripplanner.transit.model.basic.SubMode;
-import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.basic.TranslatedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -375,11 +373,9 @@ public class SiriAlertsUpdateHandler {
                 tripIds.add(tripIdFromVehicleJourney);
               } else if (siriFuzzyTripMatcher != null) {
                 tripIds =
-                  siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDateAndMode(
+                  siriFuzzyTripMatcher.getTripIdForInternalPlanningCodeServiceDate(
                     vehicleJourneyRef.getValue(),
-                    serviceDate,
-                    TransitMode.RAIL,
-                    SubMode.of("railReplacementBus")
+                    serviceDate
                   );
               }
 

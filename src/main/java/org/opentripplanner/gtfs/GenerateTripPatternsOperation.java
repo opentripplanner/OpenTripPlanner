@@ -156,7 +156,11 @@ public class GenerateTripPatternsOperation {
   ) {
     Route route = trip.getRoute();
     for (TripPattern tripPattern : tripPatterns.get(stopPattern)) {
-      if (tripPattern.getRoute().equals(route) && tripPattern.getDirection().equals(direction)) {
+      if (
+        tripPattern.getRoute().equals(route) &&
+        tripPattern.getDirection().equals(direction) &&
+        tripPattern.getMode().equals(trip.getMode())
+      ) {
         return tripPattern;
       }
     }
@@ -165,6 +169,7 @@ public class GenerateTripPatternsOperation {
       .of(patternId)
       .withRoute(route)
       .withStopPattern(stopPattern)
+      .withMode(trip.getMode())
       .withHopGeometries(geometryProcessor.createHopGeometries(trip))
       .build();
     tripPatterns.put(stopPattern, tripPattern);
