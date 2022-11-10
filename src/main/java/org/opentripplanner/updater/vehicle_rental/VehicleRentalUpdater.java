@@ -69,7 +69,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // Do any setup if needed
       source.setup();
     } catch (UpdaterConstructionException e) {
-      LOG.warn("Unable to setup updater: {}", parameters.getConfigRef(), e);
+      LOG.warn("Unable to setup updater: {}", parameters.configRef(), e);
     }
 
     if (pollingPeriodSeconds() <= 0) {

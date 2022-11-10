@@ -55,7 +55,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   }
 
   @Override
-  public String getConfigRef() {
+  public String configRef() {
     return configRef;
   }
 

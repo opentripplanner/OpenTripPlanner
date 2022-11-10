@@ -91,8 +91,6 @@ predicted arrival and departure times for the remainder of the trip.
 | feedId                                                                |  `string` | Which feed the updates apply to.                    | *Optional* |                      |   na  |
 | frequencySec                                                          | `integer` | How often the data should be downloaded in seconds. | *Optional* | `60`                 |   na  |
 | fuzzyTripMatching                                                     | `boolean` | If the trips should be matched fuzzily.             | *Optional* | `false`              |   na  |
-| maxSnapshotFrequencyMs                                                | `integer` | TODO                                                | *Optional* | `-1`                 |   na  |
-| purgeExpiredData                                                      | `boolean` | Should expired data removed from the snapshot.      | *Optional* | `false`              |   na  |
 | url                                                                   |  `string` | The URL of the GTFS-RT resource.                    | *Required* |                      |   na  |
 
 
@@ -288,7 +286,7 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 **Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
 **Path:** /updaters/[1]  \
-**Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
+**Enum values:** `gbfs` | `smoove` | `vilkku`
 
 What source of vehicle rental updater to use.
 
@@ -337,21 +335,21 @@ its [sandbox documentation](sandbox/VehicleParking.md).
 | Config Parameter                |     Type    | Summary                                      |  Req./Opt. | Default Value | Since |
 |---------------------------------|:-----------:|----------------------------------------------|:----------:|---------------|:-----:|
 | type = "VEHICLE_PARKING"        |    `enum`   | The type of the updater.                     | *Required* |               |   na  |
-| facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |   na  |
-| facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |   na  |
-| [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |   na  |
-| hubsUrl                         |   `string`  | Hubs URL                                     | *Optional* |               |   na  |
-| [sourceType](#u__2__sourceType) |    `enum`   | The source of the vehicle updates.           | *Required* |               |   na  |
-| [timeZone](#u__2__timeZone)     | `time-zone` | The time zone of the feed.                   | *Optional* |               |   na  |
-| utilizationsFrequencySec        |  `integer`  | How often the utilization should be updated. | *Optional* | `600`         |   na  |
-| utilizationsUrl                 |   `string`  | URL of the utilization data.                 | *Optional* |               |   na  |
+| facilitiesFrequencySec          |  `integer`  | How often the facilities should be updated.  | *Optional* | `3600`        |  2.2  |
+| facilitiesUrl                   |   `string`  | URL of the facilities.                       | *Optional* |               |  2.2  |
+| [feedId](#u__2__feedId)         |   `string`  | The name of the data source.                 | *Optional* |               |  2.2  |
+| hubsUrl                         |   `string`  | Hubs URL                                     | *Optional* |               |  2.2  |
+| [sourceType](#u__2__sourceType) |    `enum`   | The source of the vehicle updates.           | *Required* |               |  2.2  |
+| [timeZone](#u__2__timeZone)     | `time-zone` | The time zone of the feed.                   | *Optional* |               |  2.2  |
+| utilizationsFrequencySec        |  `integer`  | How often the utilization should be updated. | *Optional* | `600`         |  2.2  |
+| utilizationsUrl                 |   `string`  | URL of the utilization data.                 | *Optional* |               |  2.2  |
 
 
 #### Details
 
 <h4 id="u__2__feedId">feedId</h4>
 
-**Since version:** `na` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`  \
 **Path:** /updaters/[2] 
 
 The name of the data source.
@@ -360,15 +358,15 @@ This will end up in the API responses as the feed id of of the parking lot.
 
 <h4 id="u__2__sourceType">sourceType</h4>
 
-**Since version:** `na` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
+**Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`  \
 **Path:** /updaters/[2]  \
-**Enum values:** `gbfs` | `smoove` | `vilkku` | `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
+**Enum values:** `kml` | `park-api` | `bicycle-park-api` | `hsl-park`
 
 The source of the vehicle updates.
 
 <h4 id="u__2__timeZone">timeZone</h4>
 
-**Since version:** `na` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
+**Since version:** `2.2` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`  \
 **Path:** /updaters/[2] 
 
 The time zone of the feed.

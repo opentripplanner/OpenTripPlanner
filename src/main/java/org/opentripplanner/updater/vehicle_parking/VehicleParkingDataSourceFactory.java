@@ -22,7 +22,7 @@ public class VehicleParkingDataSourceFactory {
     VehicleParkingUpdaterParameters parameters,
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
-    switch (parameters.getSourceType()) {
+    switch (parameters.sourceType()) {
       case HSL_PARK:
         return new HslParkUpdater(
           (HslParkUpdaterParameters) parameters,
@@ -42,7 +42,7 @@ public class VehicleParkingDataSourceFactory {
         );
     }
     throw new IllegalArgumentException(
-      "Unknown vehicle parking source type: " + parameters.getSourceType()
+      "Unknown vehicle parking source type: " + parameters.sourceType()
     );
   }
 }

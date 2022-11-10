@@ -34,12 +34,6 @@ public class PollingTripUpdaterConfig {
         .since(NA)
         .summary("How often the data should be downloaded in seconds.")
         .asInt(60),
-      c.of("maxSnapshotFrequencyMs").since(NA).summary("TODO").asInt(-1),
-      c
-        .of("purgeExpiredData")
-        .since(NA)
-        .summary("Should expired data removed from the snapshot.")
-        .asBoolean(false),
       c
         .of("fuzzyTripMatching")
         .since(NA)
