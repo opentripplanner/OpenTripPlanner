@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
+import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.graph_builder.module.osm.tagmapping.HoustonMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -29,7 +30,11 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   private final int bestMatchScore;
 
   public ExactMatchSpecifier(String spec) {
-    operations = OsmSpecifier.parseOperations(spec, ";");
+    this(OsmSpecifier.parseOperations(spec, ";"));
+  }
+
+  public ExactMatchSpecifier(Operation... ops) {
+    operations = Arrays.asList(ops);
     if (operations.stream().anyMatch(Operation::isWildcard)) {
       throw new IllegalArgumentException(
         "Wildcards are not allowed in %s".formatted(this.getClass().getSimpleName())

@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
-import java.util.List;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.util.lang.ToStringBuilder;
 
@@ -21,7 +20,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
    * @see ExactMatchSpecifier#MATCH_MULTIPLIER
    */
   public static final int EXACT_MATCH_SCORE = 100;
-  private final List<Operation> operations;
+  private final Operation[] operations;
 
   public BestMatchSpecifier(String spec) {
     operations = OsmSpecifier.parseOperations(spec, ";");
@@ -48,9 +47,9 @@ public class BestMatchSpecifier implements OsmSpecifier {
       }
     }
 
-    int allMatchLeftBonus = (leftMatches == operations.size()) ? 10 : 0;
+    int allMatchLeftBonus = (leftMatches == operations.length) ? 10 : 0;
     leftScore += allMatchLeftBonus;
-    int allMatchRightBonus = (rightMatches == operations.size()) ? 10 : 0;
+    int allMatchRightBonus = (rightMatches == operations.length) ? 10 : 0;
     rightScore += allMatchRightBonus;
     return new Scores(leftScore, rightScore);
   }
@@ -67,13 +66,13 @@ public class BestMatchSpecifier implements OsmSpecifier {
         matches += 1;
       }
     }
-    score += matches == operations.size() ? 10 : 0;
+    score += matches == operations.length ? 10 : 0;
     return score;
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(this.getClass()).addObj("pairs", operations).toString();
+    return ToStringBuilder.of(this.getClass()).addObj("ops", operations).toString();
   }
 
   /**

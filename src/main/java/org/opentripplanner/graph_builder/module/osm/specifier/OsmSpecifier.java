@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.specifier;
 
 import java.util.Arrays;
-import java.util.List;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /**
@@ -11,7 +10,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
  * How the scoring logic is implemented is the responsibility of the implementations.
  */
 public interface OsmSpecifier {
-  static List<Operation> parseOperations(String spec, String separator) {
+  static Operation[] parseOperations(String spec, String separator) {
     return Arrays
       .stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
@@ -19,7 +18,7 @@ public interface OsmSpecifier {
         var kv = pair.split("=");
         return (Operation) new Operation.Equals(kv[0].toLowerCase(), kv[1].toLowerCase());
       })
-      .toList();
+      .toArray(Operation[]::new);
   }
 
   /**
