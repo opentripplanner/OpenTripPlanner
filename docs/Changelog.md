@@ -12,6 +12,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Setting explicit TTL on AzureSiriUpdater subscription messages [#4584](https://github.com/opentripplanner/OpenTripPlanner/pull/4584)
 - Parse NeTEx fare zones from a FareFrame [#4563](https://github.com/opentripplanner/OpenTripPlanner/pull/4563)
 - Add fallback for missing operator name [#4588](https://github.com/opentripplanner/OpenTripPlanner/pull/4588)
+- Add performance test for switzerland [#4576](https://github.com/opentripplanner/OpenTripPlanner/pull/4576)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
