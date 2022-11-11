@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.tagmapper;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL;
@@ -8,7 +8,6 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.PED
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.HoustonMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 class HoustonMapperTest {

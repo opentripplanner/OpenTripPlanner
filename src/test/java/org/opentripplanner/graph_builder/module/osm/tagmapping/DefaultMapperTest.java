@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.tagmapper;
+package org.opentripplanner.graph_builder.module.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.SpeedPicker;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.BestMatchSpecifier;
-import org.opentripplanner.graph_builder.module.osm.tagmapping.DefaultMapper;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class DefaultMapperTest {
