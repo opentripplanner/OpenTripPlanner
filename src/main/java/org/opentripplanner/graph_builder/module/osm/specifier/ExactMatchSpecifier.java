@@ -60,4 +60,8 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   public boolean allTagsMatch(OSMWithTags way) {
     return operations.stream().allMatch(o -> o.matches(way));
   }
+
+  public static ExactMatchSpecifier exact(String spec) {
+    return new ExactMatchSpecifier(spec);
+  }
 }

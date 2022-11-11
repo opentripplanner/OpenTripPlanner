@@ -104,6 +104,21 @@ public class WayTestData {
     return way;
   }
 
+  public static OSMWithTags noSidewalk() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("sidewalk", "no");
+    return way;
+  }
+
+  public static OSMWithTags noSidewalkHighSpeed() {
+    var way = new OSMWithTags();
+    way.addTag("highway", "residential");
+    way.addTag("sidewalk", "no");
+    way.addTag("maxspeed", "55 mph");
+    return way;
+  }
+
   public static OSMWithTags highwayTrunk() {
     var way = new OSMWithTags();
     way.addTag("highway", "trunk");
