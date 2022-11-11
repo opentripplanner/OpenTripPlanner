@@ -29,7 +29,10 @@ class BestMatchSpecifierTest extends SpecifierTest {
   );
 
   static OsmSpecifier cyclewayTrack = new BestMatchSpecifier("highway=footway;cycleway=track");
-  static OsmSpecifier cyclewayLane = new BestMatchSpecifier("highway=footway;cycleway=lane");
+  static OsmSpecifier highwayFootwayCyclewayLane = new BestMatchSpecifier(
+    "highway=footway;cycleway=lane"
+  );
+  static OsmSpecifier cyclewayLane = new BestMatchSpecifier("cycleway=lane");
 
   @Test
   void carTunnel() {
@@ -72,7 +75,8 @@ class BestMatchSpecifierTest extends SpecifierTest {
   static Stream<Arguments> leftRightTestCases = Stream.of(
     Arguments.of(cyclewayLeft(), bikeLane, 210, 100),
     Arguments.of(cyclewayLaneTrack(), cyclewayTrack, 100, 210),
-    Arguments.of(cyclewayLaneTrack(), cyclewayLane, 100, 100)
+    Arguments.of(cyclewayLaneTrack(), highwayFootwayCyclewayLane, 210, 100),
+    Arguments.of(cyclewayLaneTrack(), cyclewayLane, 110, 0)
   );
 
   @ParameterizedTest(

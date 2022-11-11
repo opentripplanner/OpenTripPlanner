@@ -3,7 +3,8 @@ package org.opentripplanner.graph_builder.module.osm.specifier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.EXACT;
 import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.NONE;
-import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.PARTIAL;
+import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.cyclewayLaneTrack;
+import static org.opentripplanner.graph_builder.module.osm.specifier.WayTestData.cyclewayLeft;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,9 +17,11 @@ import org.opentripplanner.test.support.VariableSource;
 class OperationTest {
 
   static Operation cyclewayLane = new Equals("cycleway", "lane");
+  static Operation cyclewayTrack = new Equals("cycleway", "track");
   static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(WayTestData.cyclewayLeft(), cyclewayLane, EXACT, NONE),
-    Arguments.of(WayTestData.cyclewayLaneTrack(), cyclewayLane, PARTIAL, NONE)
+    Arguments.of(cyclewayLeft(), cyclewayLane, EXACT, NONE),
+    Arguments.of(cyclewayLaneTrack(), cyclewayLane, EXACT, NONE),
+    Arguments.of(cyclewayLaneTrack(), cyclewayTrack, NONE, EXACT)
   );
 
   @ParameterizedTest(name = "way {0} with op {1} should have a left result {2}, right result {3}")

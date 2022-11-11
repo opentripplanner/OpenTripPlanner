@@ -33,9 +33,8 @@ public class BestMatchSpecifier implements OsmSpecifier {
     int leftMatches = 0, rightMatches = 0;
 
     for (var op : operations) {
-      var mainMatch = op.match(way);
-      var leftMatch = op.matchLeft(way).ifNone(mainMatch);
-      var rightMatch = op.matchRight(way).ifNone(mainMatch);
+      var leftMatch = op.matchLeft(way);
+      var rightMatch = op.matchRight(way);
 
       int leftTagScore = toTagScore(leftMatch);
       leftScore += leftTagScore;
@@ -91,7 +90,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
       // if the op says surface=cobblestone:flattened but the way has surface=cobblestone
       case PREFIX -> 75;
       // no match means no score
-      case PARTIAL, NONE -> 0;
+      case NONE -> 0;
     };
   }
 }

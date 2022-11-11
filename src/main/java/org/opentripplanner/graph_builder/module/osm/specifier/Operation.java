@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.osm.specifier;
 
 import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.EXACT;
 import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.NONE;
-import static org.opentripplanner.graph_builder.module.osm.specifier.Operation.MatchResult.PARTIAL;
 
 import javax.annotation.Nonnull;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -43,21 +42,12 @@ public sealed interface Operation {
   enum MatchResult {
     EXACT,
     PREFIX,
-    PARTIAL,
     WILDCARD,
     NONE;
 
     public MatchResult ifNone(MatchResult ifNone) {
       if (this == NONE) {
         return ifNone;
-      } else {
-        return this;
-      }
-    }
-
-    public MatchResult ifExact(MatchResult ifExact) {
-      if (this == EXACT) {
-        return ifExact;
       } else {
         return this;
       }
@@ -78,19 +68,25 @@ public sealed interface Operation {
     @Override
     public MatchResult matchLeft(OSMWithTags way) {
       var leftKey = key + ":left";
-      return foo(way, leftKey);
+      return getOneSideResult(way, leftKey);
     }
 
     @Override
     public MatchResult matchRight(OSMWithTags way) {
       var rightKey = key + ":right";
-      return foo(way, rightKey);
+      return getOneSideResult(way, rightKey);
     }
 
-    private MatchResult foo(OSMWithTags way, String oneSideKey) {
+    private MatchResult getOneSideResult(OSMWithTags way, String oneSideKey) {
+      var hasOneSideKey = way.hasTag(oneSideKey);
       var oneSideResult = getMatchResult(way, oneSideKey, value);
-      var mainRes = match(way).ifExact(PARTIAL);
-      return oneSideResult.ifNone(mainRes);
+      var mainRes = match(way);
+
+      if (hasOneSideKey) {
+        return oneSideResult;
+      } else {
+        return oneSideResult.ifNone(mainRes);
+      }
     }
   }
 }
