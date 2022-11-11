@@ -47,7 +47,7 @@ class OperationTest {
     assertEquals(rightExpectation, op.matchRight(way));
   }
 
-  static Stream<Arguments> opsCases = Stream.of(
+  static Stream<Arguments> otherCases = Stream.of(
     Arguments.of(carTunnel(), cyclewayAbsent, EXACT),
     Arguments.of(cobblestones(), cyclewayAbsent, EXACT),
     Arguments.of(cycleway(), cyclewayAbsent, NONE),
@@ -58,7 +58,7 @@ class OperationTest {
   );
 
   @ParameterizedTest(name = "way {0} with op {1} should have a result {2}")
-  @VariableSource("opsCases")
+  @VariableSource("otherCases")
   void otherOperations(OSMWithTags way, Operation op, MatchResult expectation) {
     assertEquals(expectation, op.match(way));
   }

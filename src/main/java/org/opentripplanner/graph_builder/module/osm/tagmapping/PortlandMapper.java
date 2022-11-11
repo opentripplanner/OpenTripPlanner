@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.edgetype.StreetTraversalPermission.ALL
 
 import org.opentripplanner.graph_builder.module.osm.WayPropertySet;
 import org.opentripplanner.graph_builder.module.osm.specifier.ExactMatchSpecifier;
+import org.opentripplanner.graph_builder.module.osm.specifier.Operation;
 import org.opentripplanner.graph_builder.module.osm.specifier.Operation.Absent;
 
 public class PortlandMapper implements OsmTagMapper {
@@ -25,6 +26,21 @@ public class PortlandMapper implements OsmTagMapper {
     props.setMixinProperties("highway=secondary_link", withModes(ALL).walkSafety(1.1));
     props.setMixinProperties("highway=tertiary", withModes(ALL).walkSafety(1.1));
     props.setMixinProperties("highway=tertiary_link", withModes(ALL).walkSafety(1.1));
+    props.setMixinProperties(
+      new ExactMatchSpecifier(new Operation.GreaterThan("lanes", 4)),
+      withModes(ALL).walkSafety(1.1)
+    );
+    props.setMixinProperties("sidewalk=both", withModes(ALL).walkSafety(0.8));
+    props.setMixinProperties("sidewalk=left", withModes(ALL).walkSafety(0.9));
+    props.setMixinProperties("sidewalk=right", withModes(ALL).walkSafety(0.9));
+    props.setMixinProperties("surface=unpaved", withModes(ALL).walkSafety(1.4));
+    // high penalty for streets with no sidewalk
+    props.setMixinProperties("sidewalk=no;maxspeed=55 mph", withModes(ALL).walkSafety(6));
+    props.setMixinProperties("sidewalk=no;maxspeed=50 mph", withModes(ALL).walkSafety(5));
+    props.setMixinProperties("sidewalk=no;maxspeed=45 mph", withModes(ALL).walkSafety(4));
+    props.setMixinProperties("sidewalk=no;maxspeed=40 mph", withModes(ALL).walkSafety(3));
+    props.setMixinProperties("sidewalk=no;maxspeed=35 mph", withModes(ALL).walkSafety(2));
+    props.setMixinProperties("sidewalk=no;maxspeed=30 mph", withModes(ALL).walkSafety(1.5));
     // Read the rest from the default set
     new DefaultMapper().populateProperties(props);
   }
